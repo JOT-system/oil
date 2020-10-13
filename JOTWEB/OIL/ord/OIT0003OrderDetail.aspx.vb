@@ -4207,6 +4207,9 @@ Public Class OIT0003OrderDetail
                         '全表示のため設定をコメントにする。
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
 
+                        '(一覧)油種
+                    ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
+                        prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -4425,8 +4428,14 @@ Public Class OIT0003OrderDetail
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
                         If OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = ""
+                            '★未卸可否フラグ未チェック時は、(一覧)受入日と(一覧)空車着日に(実績)の日付を設定
+                            OIT0003tbl_tab3.Rows(i)("ACTUALACCDATE") = Me.TxtActualAccDate.Text
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
                         Else
                             OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = "on"
+                            '★未卸可否フラグチェック時は、(一覧)受入日と(一覧)空車着日を空白
+                            OIT0003tbl_tab3.Rows(i)("ACTUALACCDATE") = ""
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
                     End If
                 Next
@@ -4441,8 +4450,12 @@ Public Class OIT0003OrderDetail
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
                         If OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = ""
+                            '★交検可否フラグ未チェック時は、(一覧)空車着日に(実績)の日付を設定
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
                         Else
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on"
+                            '★交検可否フラグチェック時は、(一覧)空車着日を空白
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
                     End If
                 Next
@@ -4457,8 +4470,12 @@ Public Class OIT0003OrderDetail
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
                         If OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = ""
+                            '★留置可否フラグ未チェック時は、(一覧)空車着日に(実績)の日付を設定
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
                         Else
                             OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = "on"
+                            '★留置可否フラグチェック時は、(一覧)空車着日を空白
+                            OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
                     End If
                 Next
@@ -6572,11 +6589,19 @@ Public Class OIT0003OrderDetail
 
         '★(予定)受入日に入力された日付を、(一覧)受入日に反映させる。
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            '★未卸可否フラグがチェックされている場合は、(一覧)受入日には設定しない。
+            If OIT0003tab3row("WHOLESALEFLG") = "on" Then Continue For
             OIT0003tab3row("ACTUALACCDATE") = Me.TxtAccDate.Text
         Next
 
         '★(予定)空車着日に入力された日付を、(一覧)空車着日に反映させる。
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            '★未卸可否フラグがチェックされている場合,
+            '　または交検可否フラグがチェックされている場合、
+            '　または留置可否フラグがチェックされている場合は、(一覧)空車着日には設定しない。
+            If OIT0003tab3row("WHOLESALEFLG") = "on" _
+                OrElse OIT0003tab3row("INSPECTIONFLG") = "on" _
+                OrElse OIT0003tab3row("DETENTIONFLG") = "on" Then Continue For
             OIT0003tab3row("ACTUALEMPARRDATE") = Me.TxtEmparrDate.Text
         Next
 
@@ -11088,7 +11113,7 @@ Public Class OIT0003OrderDetail
                     & "        UPDTERMID      = @P13, " _
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
-                    & "    AND TANKSITUATION IN ('1','2') " _
+                    & "    AND TANKSITUATION IN ('1','2','20','21') " _
                     & "    AND DELFLG        <> @P02 "
 
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
@@ -12032,6 +12057,8 @@ Public Class OIT0003OrderDetail
 
                 '(実績)受入日に入力された日付を、(一覧)受入日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '★未卸可否フラグがチェックされている場合は、(一覧)受入日には設定しない。
+                    If OIT0003tab3row("WHOLESALEFLG") = "on" Then Continue For
                     OIT0003tab3row("ACTUALACCDATE") = Me.TxtActualAccDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -12053,6 +12080,12 @@ Public Class OIT0003OrderDetail
 
                 '(実績)空車着日に入力された日付を、(一覧)空車着日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '★未卸可否フラグがチェックされている場合,
+                    '　または交検可否フラグがチェックされている場合、
+                    '　または留置可否フラグがチェックされている場合は、(一覧)空車着日には設定しない。
+                    If OIT0003tab3row("WHOLESALEFLG") = "on" _
+                    OrElse OIT0003tab3row("INSPECTIONFLG") = "on" _
+                    OrElse OIT0003tab3row("DETENTIONFLG") = "on" Then Continue For
                     OIT0003tab3row("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -13647,7 +13680,7 @@ Public Class OIT0003OrderDetail
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
-                WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
             End If
 
             '受注進行ステータスが以下の場合
@@ -13664,7 +13697,7 @@ Public Class OIT0003OrderDetail
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
-                WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
             End If
 
             '受注進行ステータスが以下の場合
@@ -13702,7 +13735,7 @@ Public Class OIT0003OrderDetail
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
-                WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
             End If
 
             '受注進行ステータスが「320:受注確定」の場合
@@ -13712,11 +13745,11 @@ Public Class OIT0003OrderDetail
             '★明細更新ボタン押下時に更新
             If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '引数１：所在地コード　⇒　変更なし(空白)
-                '引数２：タンク車状態　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("1"(発送))
                 '引数３：積車区分　　　⇒　変更あり("F"(積車))
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                 '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                WW_UpdateTankShozai("", "1", "F", I_SITUATION:="2", upLastOilCode:=True)
+                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
 
                 '(実績)発日の入力が完了
                 If Me.TxtActualDepDate.Text <> "" Then
@@ -13727,8 +13760,7 @@ Public Class OIT0003OrderDetail
                     '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                     '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                     '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
-                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2", upLastOilCode:=True)
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_02, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
                     '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                 End If
             End If
@@ -13746,8 +13778,7 @@ Public Class OIT0003OrderDetail
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                 '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                 '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2", upLastOilCode:=True)
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_02, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
                 '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
             End If
             '########################################################
@@ -13765,22 +13796,15 @@ Public Class OIT0003OrderDetail
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                 '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                 '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2")
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2", upLastOilCode:=True)
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
                 '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                 '(実績)受入日の入力が完了
                 If Me.TxtActualAccDate.Text <> "" Then
                     '★タンク車所在の更新
-                    '引数１：所在地コード　⇒　変更あり(着駅)
-                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                    '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                    '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
-                    '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
-                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", upLastOilCode:=True)
-                    '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                    WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                           BaseDllConst.CONST_TANKSITUATION_02)
+                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "E", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
                 End If
             End If
 
@@ -13792,15 +13816,9 @@ Public Class OIT0003OrderDetail
             '★明細更新ボタン押下時に更新
             If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
-                '引数１：所在地コード　⇒　変更あり(着駅)
-                '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
-                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", upLastOilCode:=True)
-                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                       BaseDllConst.CONST_TANKSITUATION_02)
+                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "E", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
             End If
             '########################################################
 
@@ -13812,7 +13830,6 @@ Public Class OIT0003OrderDetail
             If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '割り当てたタンク車のチェック
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                'For Each OIT0003row As DataRow In OIT0003tbl.Rows
                 For Each OIT0003row As DataRow In OIT0003tbl_tab3.Rows
                     WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
@@ -13822,36 +13839,76 @@ Public Class OIT0003OrderDetail
                     'タンク車がOT本社、または在日米軍のリース車の場合
                     If WW_GetValue(0) <> "" Then
 
-                        '### 特に何もしない ####################################
+                        '    ◯受入日(実績)、空車着日(実績)が未設定(空白)の場合
+                        If OIT0003row("ACTUALACCDATE").ToString() = "" _
+                            AndAlso OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
+                            '★(OT)タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_OTTankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_400,
+                                                     BaseDllConst.CONST_TANKSITUATION_20,
+                                                     OI_TANKNO:=OIT0003row("TANKNO"))
 
-                        '★タンク車所在の更新(受入日設定時の内容を設定)
-                        '引数１：所在地コード　⇒　変更あり(着駅)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        '引数６：OT所有　　　　⇒　あり　　("1")
-                        'WW_UpdateTankShozai("", "", "", upFlag:="1")
-                        WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", I_TANKNO:=OIT0003row("TANKNO"), upLastOilCode:=True, upFlag:="1")
+                            '◯空車着日(実績)が未設定(空白)の場合
+                        ElseIf OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
+                            Dim strSituation As String = ""
+                            If OIT0003row("INSPECTIONFLG") = "on" Then
+                                strSituation = BaseDllConst.CONST_TANKSITUATION_21
+                            ElseIf OIT0003row("DETENTIONFLG") = "on" Then
+                                strSituation = BaseDllConst.CONST_TANKSITUATION_22
+                            End If
+                            '★(OT)タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_OTTankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                                     strSituation,
+                                                     OI_TANKNO:=OIT0003row("TANKNO"))
 
-                    Else
-                        '★タンク車所在の更新
-                        '引数１：所在地コード　⇒　変更あり(発駅)
-                        '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-                        '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
-                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
-                        If Me.TxtActualEmparrDate.Text < OIT0003row("ACTUALEMPARRDATE") Then
-                            '### 空車着日(実績)が未来日設定なので未更新 ###############
-                            '※タンク車所在の更新はバッチにて実施する。
-                            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="2", upLastOilCode:=True)
                         Else
-                            'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
-                            WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                            '★(OT)タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_OTTankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                                     BaseDllConst.CONST_TANKSITUATION_02,
+                                                     OI_TANKNO:=OIT0003row("TANKNO"))
+                            'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "E", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, I_TANKNO:=OIT0003row("TANKNO"), upLastOilCode:=True, upFlag:="1")
                         End If
-                        '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                    Else
+                        '    ### ①START ##################################################################
+                        '    ◯受入日(実績)、空車着日(実績)が未設定(空白)の場合
+                        If OIT0003row("ACTUALACCDATE").ToString() = "" _
+                            AndAlso OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
+                            '★タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_400,
+                                                   BaseDllConst.CONST_TANKSITUATION_20,
+                                                   OI_TANKNO:=OIT0003row("TANKNO"))
+
+                            '◯空車着日(実績)が未設定(空白)の場合
+                        ElseIf OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
+                            Dim strSituation As String = ""
+                            If OIT0003row("INSPECTIONFLG") = "on" Then
+                                strSituation = BaseDllConst.CONST_TANKSITUATION_21
+                            ElseIf OIT0003row("DETENTIONFLG") = "on" Then
+                                strSituation = BaseDllConst.CONST_TANKSITUATION_22
+                            End If
+                            '★タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                                   strSituation,
+                                                   OI_TANKNO:=OIT0003row("TANKNO"))
+
+                            '◯空車着日(実績)が未来日設定なので未更新
+                        ElseIf Me.TxtActualEmparrDate.Text < OIT0003row("ACTUALEMPARRDATE") Then
+                            '★タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+                            WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_450,
+                                                   BaseDllConst.CONST_TANKSITUATION_02,
+                                                   OI_TANKNO:=OIT0003row("TANKNO"))
+                            'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True)
+                            '### ①END ####################################################################
+
+                            '### ②START ##################################################################
+                        Else
+                            '★タンク車所在の更新
+                            WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_500,
+                                                   BaseDllConst.CONST_TANKSITUATION_01,
+                                                   OI_TANKNO:=OIT0003row("TANKNO"),
+                                                   OI_ACTUALEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"))
+                            'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, BaseDllConst.CONST_TANKSTATUS_02, "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01, I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                            '### ②END ####################################################################
+                        End If
 
                     End If
                 Next
@@ -13885,6 +13942,153 @@ Public Class OIT0003OrderDetail
 
         End If
 
+    End Sub
+
+    ''' <summary>
+    ''' タンク車所在設定処理((一覧)受入日、(一覧)空車着日)
+    ''' </summary>
+    Protected Sub WW_TankShozaiSetSelect(ByVal I_FLG As String,
+                                         ByVal I_TANKSITUATION As String,
+                                         Optional ByVal OI_TANKNO As String = Nothing,
+                                         Optional ByVal OI_ACTUALEMPARRDATE As String = Nothing)
+
+        '◯受注進行ステータス
+        Select Case I_FLG
+            '400:受入日確認中
+            Case BaseDllConst.CONST_ORDERSTATUS_400
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) Then
+                    '◯タンク車Noが指定されている場合は、指定されたタンク車Noを使用
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "F",
+                                        I_TANKNO:=OI_TANKNO,
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                Else
+                    '◯タンク車Noが指定されていない場合
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "F",
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                End If
+
+            '450:受入日確認中((実績)受入日設定済み)
+            Case BaseDllConst.CONST_ORDERSTATUS_450
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) Then
+                    '◯タンク車Noが指定されている場合は、指定されたタンク車Noを使用
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "E",
+                                        I_TANKNO:=OI_TANKNO,
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                Else
+                    '◯タンク車Noが指定されていない場合
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "E",
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                End If
+
+            '500:輸送完了
+            Case BaseDllConst.CONST_ORDERSTATUS_500
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(発駅)
+                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) AndAlso Not String.IsNullOrEmpty(OI_ACTUALEMPARRDATE) Then
+                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_02,
+                                        "E",
+                                        I_TANKNO:=OI_TANKNO,
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_AEMPARRDATE:=OI_ACTUALEMPARRDATE,
+                                        upActualEmparrDate:=True,
+                                        upLastOilCode:=True)
+                End If
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' OTタンク車所在設定処理((一覧)受入日、(一覧)空車着日)
+    ''' </summary>
+    Protected Sub WW_OTTankShozaiSetSelect(ByVal I_FLG As String,
+                                           ByVal I_TANKSITUATION As String,
+                                           Optional ByVal OI_TANKNO As String = Nothing,
+                                           Optional ByVal OI_ACTUALEMPARRDATE As String = Nothing)
+
+        '◯受注進行ステータス
+        Select Case I_FLG
+            '400:受入日確認中
+            Case BaseDllConst.CONST_ORDERSTATUS_400
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) Then
+                    '◯タンク車Noが指定されている場合は、指定されたタンク車Noを使用
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "F",
+                                        I_TANKNO:=OI_TANKNO,
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True,
+                                        upFlag:="1",
+                                        I_ORDERNO:=Me.TxtOrderNo.Text)
+                End If
+
+            '450:受入日確認中((実績)受入日設定済み)
+            Case BaseDllConst.CONST_ORDERSTATUS_450
+                '★タンク車所在の更新(受入日設定時の内容を設定)
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                '引数６：OT所有　　　　⇒　あり　　("1")
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) Then
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_03,
+                                        "E",
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        I_TANKNO:=OI_TANKNO,
+                                        upLastOilCode:=True,
+                                        upFlag:="1")
+                End If
+
+            '500:輸送完了
+            Case BaseDllConst.CONST_ORDERSTATUS_500
+        End Select
     End Sub
 
     ''' <summary>
@@ -17914,7 +18118,7 @@ Public Class OIT0003OrderDetail
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
                         '引数５：(予定)空車着日⇒　更新対象(画面項目)
-                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "", I_SITUATION:="1", upEmparrDate:=True,
+                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), BaseDllConst.CONST_TANKSTATUS_01, "", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01, upEmparrDate:=True,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_EMPARRDATE:=OIT0003FIDrow("EMPARRDATE"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
 
                     '320:受注確定((実績)積込日設定済み)
@@ -17925,7 +18129,7 @@ Public Class OIT0003OrderDetail
                         '引数３：積車区分　　　⇒　変更あり("F"(積車))
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "F", I_SITUATION:="2", upLastOilCode:=True,
+                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), BaseDllConst.CONST_TANKSTATUS_01, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, upLastOilCode:=True,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
 
                     '350:受注確定((実績)発日設定済み)
@@ -17938,9 +18142,7 @@ Public Class OIT0003OrderDetail
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "2", "F", I_SITUATION:="2",
-                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
-                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "2", "F", I_SITUATION:="2",
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), BaseDllConst.CONST_TANKSTATUS_02, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
@@ -17954,9 +18156,7 @@ Public Class OIT0003OrderDetail
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "F", I_SITUATION:="2",
-                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
-                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "F", I_SITUATION:="2",
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), BaseDllConst.CONST_TANKSTATUS_03, "F", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
@@ -17970,9 +18170,7 @@ Public Class OIT0003OrderDetail
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "E", I_SITUATION:="2",
-                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
-                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "E", I_SITUATION:="2",
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), BaseDllConst.CONST_TANKSTATUS_03, "E", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
@@ -19047,6 +19245,8 @@ Public Class OIT0003OrderDetail
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
                                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                ElseIf loopdr("WHOLESALEFLG") = "on" Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -19060,10 +19260,16 @@ Public Class OIT0003OrderDetail
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
-                                If Me.WW_USEORDERFLG = True Then
+                                If loopdr("WHOLESALEFLG") = "on" _
+                                    OrElse loopdr("INSPECTIONFLG") = "on" _
+                                    OrElse loopdr("DETENTIONFLG") = "on" Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    If Me.WW_USEORDERFLG = True Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
                                 End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性
@@ -19184,6 +19390,8 @@ Public Class OIT0003OrderDetail
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
                                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                ElseIf loopdr("WHOLESALEFLG") = "on" Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
@@ -19193,7 +19401,13 @@ Public Class OIT0003OrderDetail
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                If loopdr("WHOLESALEFLG") = "on" _
+                                    OrElse loopdr("INSPECTIONFLG") = "on" _
+                                    OrElse loopdr("DETENTIONFLG") = "on" Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性
                                 'If chkObjST IsNot Nothing Then chkObjST.Enabled = False

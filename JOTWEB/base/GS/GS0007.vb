@@ -102,6 +102,11 @@ Public Class GS0007FIXVALUElst
     ''' </summary>
     ''' <returns></returns>
     Public Property ADDITIONAL_SORT_ORDER As String = ""
+    ''' <summary>
+    ''' SQL検索条件(開始～終了)の条件
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ADDITIONAL_FROM_TO As String = ""
     Protected METHOD_NAME As String = "GS0007FIXVALUElst"
 
     Public Sub GS0007FIXVALUElst()

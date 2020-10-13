@@ -795,6 +795,21 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "タンク車状態コード"
+    ''' <summary>
+    ''' 01:発送
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_01 As String = "1"
+    ''' <summary>
+    ''' 02:到着予定
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_02 As String = "2"
+    ''' <summary>
+    ''' 03:到着
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_03 As String = "3"
+#End Region
+
 #Region "タンク車状況コード"
     ''' <summary>
     ''' 01:残車

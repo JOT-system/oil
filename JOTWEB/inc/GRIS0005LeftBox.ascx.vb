@@ -254,6 +254,7 @@ Public Class GRIS0005LeftBox
         LP_OWNERCODE
         LP_BTRAINNUMBER
         LP_CTRAINNUMBER
+        LP_ADDITINALFROMTO
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -1515,6 +1516,11 @@ Public Class GRIS0005LeftBox
                 If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALSORTORDER) AndAlso
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
+                End If
+                'FixValue抽出用の開始終了条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALFROMTO) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_FROM_TO = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO))
                 End If
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR

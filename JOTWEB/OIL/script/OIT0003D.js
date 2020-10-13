@@ -394,7 +394,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
         else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
+            //document.getElementById('WF_LeftMViewChange').value = 46;
+            document.getElementById('WF_LeftMViewChange').value = 74;
         }
         else if (fieldNM === "SHIPPERSNAME") {
             document.getElementById('WF_LeftMViewChange').value = 42;

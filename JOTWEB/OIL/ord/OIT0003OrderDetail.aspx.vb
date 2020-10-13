@@ -19247,6 +19247,7 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 ElseIf loopdr("WHOLESALEFLG") = "on" Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    loopdr("ACTUALACCDATE") = ""
                                 Else
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -19264,6 +19265,7 @@ Public Class OIT0003OrderDetail
                                     OrElse loopdr("INSPECTIONFLG") = "on" _
                                     OrElse loopdr("DETENTIONFLG") = "on" Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    loopdr("ACTUALEMPARRDATE") = ""
                                 Else
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -19392,6 +19394,7 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 ElseIf loopdr("WHOLESALEFLG") = "on" Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    loopdr("ACTUALACCDATE") = ""
                                 Else
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
@@ -19405,6 +19408,7 @@ Public Class OIT0003OrderDetail
                                     OrElse loopdr("INSPECTIONFLG") = "on" _
                                     OrElse loopdr("DETENTIONFLG") = "on" Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    loopdr("ACTUALEMPARRDATE") = ""
                                 Else
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If

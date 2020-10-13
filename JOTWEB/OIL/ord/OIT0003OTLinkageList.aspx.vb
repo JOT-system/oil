@@ -399,7 +399,7 @@ Public Class OIT0003OTLinkageList
             & "      VIW0003.ORGCODE    = @P05 " _
             & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " WHERE OIT0002.DELFLG      <> @P04" _
-            & "   AND OIT0002.ORDERSTATUS <= @P03" _
+            & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
@@ -453,13 +453,15 @@ Public Class OIT0003OTLinkageList
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)         '積込日
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータスFROM
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータスTO
                 'PARA01.Value = OFFICECDE
                 PARA02.Value = targetDate
                 'PARA02.Value = "2020/08/20"
-                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
+                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
                 PARA05.Value = work.WF_SEL_OTS_SALESOFFICECODE.Text
                 Dim dtWrk As DataTable = New DataTable
@@ -780,21 +782,113 @@ Public Class OIT0003OTLinkageList
             If settings.OutputFiledList Is Nothing OrElse settings.OutputFiledList.Count = 0 Then
                 Return
             End If
-            Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings)
-                Dim url As String
-                Try
-                    url = repCbj.ConvertDataTableToCsv(False)
-                    If url = "" Then
+            'Excel出力かCSV出力かに応じ処理分岐
+            If settings.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Csv Then
+                'CSV出力
+                Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings, settings.OutputReservedFileNameWithoutExtention, settings.OutputReservedFileExtention)
+                    Dim url As String
+                    Try
+                        url = repCbj.ConvertDataTableToCsv(False)
+                        If url = "" Then
+                            Return
+                        End If
+                    Catch ex As Exception
+                        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLReserved")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLReserved"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = ex.ToString()
+                        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                        CS0011LOGWrite.CS0011LOGWrite()
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+            Else
+                'Excel出力（現状袖ヶ浦のみの想定）※正しく設定クラスを作れば動作可能
+                'CSV出力
+                Using repCbj = New OIT0003CustomReportReservedExcel(OIT0003Reserved, settings, settings.OutputReservedFileNameWithoutExtention, settings.OutputReservedFileExtention)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreatePrintData()
+                        If url = "" Then
+                            Return
+                        End If
+                    Catch ex As Exception
+                        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLReserved"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = ex.ToString()
+                        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                        CS0011LOGWrite.CS0011LOGWrite()
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+            End If
+
+            '******************************
+            '出荷予約データの（本体）ダウンロードフラグ更新
+            '                  （明細）ダウンロード数インクリメント
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                Dim procDate As Date = Now
+                Dim resProc As Boolean = False
+                Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+                Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                    'オーダー明細のダウンロードカウントのインクリメント
+                    resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate, True)
+                    If resProc = False Then
                         Return
                     End If
-                Catch ex As Exception
-                    Return
-                End Try
-                '○ 別画面でExcelを表示
-                WF_PrintURL.Value = url
-                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-            End Using
+                    'オーダー明細よりダウンロードフラグを取得
+                    orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                    If orderDlFlags Is Nothing Then
+                        Return
+                    End If
+                    'オーダーを更新
+                    resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                    If resProc = False Then
+                        Return
+                    End If
+                    '履歴登録用直近データ取得
+                    '直近履歴番号取得
+                    Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                    If historyNo = "" Then
+                        Return
+                    End If
+                    Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                    Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                    If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                        Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
 
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
+                        For Each dr As DataRow In hisDetailTbl.Rows
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                        Next
+                        'ジャーナル登録
+                        OutputJournal(orderTbl, "OIT0002_ORDER")
+                        OutputJournal(detailTbl, "OIT0003_DETAIL")
+                    End If
+
+                    'ここまで来たらコミット
+                    sqlTran.Commit()
+                End Using
+
+            End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLReserved")
 
@@ -878,7 +972,6 @@ Public Class OIT0003OTLinkageList
                 WF_PrintURL.Value = url
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
             End Using
-            Return
             '******************************
             '託送指示データの（本体）ダウンロードフラグ更新
             '                  （明細）ダウンロード数インクリメント
@@ -1430,26 +1523,49 @@ Public Class OIT0003OTLinkageList
 
         sqlStat.AppendLine("SELECT ODR.ORDERNO")            'キー情報
         sqlStat.AppendLine("     , DET.DETAILNO")           'キー情報
+        sqlStat.AppendLine("     , ODR.OFFICECODE AS OFFICECODE")     '営業所コード
         sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS LODDATE")     '積込日
         sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyyMMdd') AS LODDATE_WITHOUT_SLASH")     '積込日(スラなし）
         sqlStat.AppendLine("     , ISNULL(DET.RESERVEDNO,'')        AS RESERVEDNO")  '予約番号
         sqlStat.AppendLine("     , PRD.REPORTOILNAME")            '油種コード(甲子用？）
         sqlStat.AppendLine("     , LRV.RESERVEDQUANTITY")         '予約数量
         sqlStat.AppendLine("     , ODR.TRAINNO")
+        sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4) AS TRAINNO_PAD_ZERO")
         sqlStat.AppendLine("     , DET.TANKNO")
         sqlStat.AppendLine("     , TNK.MODEL")  'モデル⇒ﾀｷ1000の場合・・・など後続の設定処理の分岐で利用
-        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE")
+        sqlStat.AppendLine("     , TNK.OLDTANKNUMBER") '旧JOT車番
+        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE") '荷主油種コード
+        sqlStat.AppendLine("     , PRD.SHIPPEROILNAME") '荷主油種名
         sqlStat.AppendLine("     , ODR.SHIPPERSCODE")
         sqlStat.AppendLine("     , ODR.CONSIGNEECODE")
         sqlStat.AppendLine("     , CCNV.VALUE01 AS CONSIGNEECONVCODE")
         sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
+        sqlStat.AppendLine("     , CCNV.VALUE03 AS TRANSNAME") '便名 現状袖ヶ浦のみ
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
         sqlStat.AppendLine("     , '1'          AS KINO_DATAKBN")
         sqlStat.AppendLine("     , ''           AS OUTPUTRESERVENO") '出力用予約番号(後続処理で番号を組み立てる）
         sqlStat.AppendLine("     , '2'          AS KINO_TOKUISAKICODE") '得意先コード（甲子）
         sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社□□□□□'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO") 'デバッグ用
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO")
+        sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_KAI")
+        sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_POINT")
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) between 1 and 999 THEN '1000-' + DET.TANKNO  ")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) >= 1000           THEN '1001-' + DET.TANKNO  ")
+        sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
+        sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
+        sqlStat.AppendLine("     , '0'          AS NEG_SETTEI_NUM")
+        sqlStat.AppendLine("     , '0'          AS NEG_ARM_CODE")
+        sqlStat.AppendLine("     , '0'          AS NEG_TSUMI_NUM")
+
+        sqlStat.AppendLine("     , '計画済'    AS SOD_STATUS")    '袖ヶ浦ステータス
+        sqlStat.AppendLine("     , ''          AS SOD_SHELL_ORDERNO") '袖ヶ浦SHELL受注番号
+        sqlStat.AppendLine("     , '0'          AS SOD_TRANS_KBN") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE + '00000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '課税' ELSE 'その他' END AS SOD_TAX_KBN") '袖ヶ浦課税区分
+        sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
+        sqlStat.AppendLine("     , ''          AS SOD_TRANS_COMP") '袖ヶ浦運送会社
+        sqlStat.AppendLine("     , '0'         AS SOD_BACKNAME") '袖ヶ浦戻り
         sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
@@ -1537,6 +1653,10 @@ Public Class OIT0003OTLinkageList
                 End If
 
                 Dim sortedDt = From dr As DataRow In wrkDt 'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
+                Dim officeCode As String = ""
+                If sortedDt.Any Then
+                    officeCode = Convert.ToString(sortedDt.First.Item("OFFICECODE"))
+                End If
                 For Each sortedDr As DataRow In sortedDt
                     Dim newDr As DataRow = OIT0003Reserved.NewRow
 
@@ -1548,8 +1668,14 @@ Public Class OIT0003OTLinkageList
                         maxReservedNo = (CInt(maxReservedNo) + 1).ToString("000")
                         reservedNo = maxReservedNo
                     End If
-
-                    newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & reservedNo
+                    Select Case officeCode
+                        Case "011402" '根岸(前0無しの予約番号のみ)
+                            newDr("OUTPUTRESERVENO") = Convert.ToString(CInt(reservedNo))
+                        Case "011203" '袖ヶ浦(積込日+2桁0埋め予約番号)
+                            newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & CInt(reservedNo).ToString("00")
+                        Case Else 'その他は積込日+3桁0埋め予約番号
+                            newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & reservedNo
+                    End Select
 
                     OIT0003Reserved.Rows.Add(newDr)
 
@@ -1620,7 +1746,9 @@ Public Class OIT0003OTLinkageList
                 Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
                     With sqlCmd.Parameters
                         '値
-                        .Add("RESERVEDNO", SqlDbType.NVarChar).Value = orderKey.ReservedNo
+                        If updateReservedNo Then
+                            .Add("@RESERVEDNO", SqlDbType.NVarChar).Value = orderKey.ReservedNo
+                        End If
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
                         .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
                         .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
@@ -2173,6 +2301,7 @@ Public Class OIT0003OTLinkageList
             Me._Item = New Dictionary(Of String, FileLinkagePatternItem)
             Dim fileLinkageItem As FileLinkagePatternItem
             With Me._Item
+                Dim outFieldList As Dictionary(Of String, Integer)
                 '***************************
                 '仙台新港営業所
                 '***************************
@@ -2193,7 +2322,7 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011202", True, True, True
                     )
-                Dim outFieldList As New Dictionary(Of String, Integer)
+                outFieldList = New Dictionary(Of String, Integer)
                 outFieldList.Add("KINO_DATAKBN", 0)
                 outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
                 outFieldList.Add("OUTPUTRESERVENO", 0)
@@ -2206,15 +2335,41 @@ Public Class OIT0003OTLinkageList
                 outFieldList.Add("CONSIGNEECONVVALUE", 0)
                 fileLinkageItem.OutputFiledList = outFieldList
                 fileLinkageItem.OutputReservedConstantField = False
-                fileLinkageItem.OutputReservedFileNameWithoutExtention = ""
-                fileLinkageItem.OutputReservedFileExtention = ""
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = "SE183"
+                fileLinkageItem.OutputReservedFileExtention = "CSV"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '袖ヶ浦営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011203", True, False, True
+                    "011203", True, True, True
                     )
+                outFieldList = New Dictionary(Of String, Integer)
+                outFieldList.Add("SOD_STATUS", 0)
+                outFieldList.Add("SOD_SHELL_ORDERNO", 0)
+                outFieldList.Add("OUTPUTRESERVENO", 0)
+                outFieldList.Add("LODDATE", 0)
+                outFieldList.Add("SOD_TRANS_KBN", 0)
+                outFieldList.Add("SHIPPERCONVCODE", 0)
+                outFieldList.Add("SHIPPERCONVVALUE", 0)
+                outFieldList.Add("CONSIGNEECONVCODE", 0)
+                outFieldList.Add("CONSIGNEECONVVALUE", 0)
+                outFieldList.Add("SOD_SHIPPEROILCODE", 0)
+                outFieldList.Add("SHIPPEROILNAME", 0)
+                outFieldList.Add("SOD_TAX_KBN", 0)
+                outFieldList.Add("SOD_RESERVEDQUANTITY", 0)
+                outFieldList.Add("SOD_TRANS_COMP", 0)
+                outFieldList.Add("OLDTANKNUMBER", 0)
+                outFieldList.Add("TRANSNAME", 0)
+                outFieldList.Add("SOD_BACKNAME", 0)
+                fileLinkageItem.OutputFiledList = outFieldList
+                fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = "富士石油貨車出荷データ"
+                fileLinkageItem.OutputReservedFileExtention = "xlsx"
+                fileLinkageItem.OutputReservedExcelDataStartAddress = "B4"
+                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Excel2007
+                'ヘッダー必要なら↓のコメントOFF
+                fileLinkageItem.OutputReservedCustomOutputFiledHeader = "ステータス,SHELL受注番号,JOT受注番号,出荷日付,輸送方法,送荷先コード,送荷先,納入先コード,納入先,品名コード,品名,課税区分,実績数量,運送会社,輸送機関,便名,戻し"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '根岸営業所
@@ -2222,6 +2377,23 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011402", True, True, False
                     )
+                outFieldList = New Dictionary(Of String, Integer)
+                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
+                outFieldList.Add("OUTPUTRESERVENO", 0)
+                outFieldList.Add("NEG_TUMIKOMI_KAI", 0)
+                outFieldList.Add("TRAINNO_PAD_ZERO", 0)
+                outFieldList.Add("NEG_TUMIKOMI_POINT", 0)
+                outFieldList.Add("NEG_KASHANO", 0)
+                outFieldList.Add("NEG_SHIPPEROILCODE", 0)
+                outFieldList.Add("NEG_SETTEI_NUM", 0)
+                outFieldList.Add("CONSIGNEECONVCODE", 0)
+                outFieldList.Add("NEG_ARM_CODE", 0)
+                outFieldList.Add("NEG_TSUMI_NUM", 0)
+                fileLinkageItem.OutputFiledList = outFieldList
+                fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = "YOYAKU"
+                fileLinkageItem.OutputReservedFileExtention = "CSV"
+                fileLinkageItem.OutputReservedCustomOutputFiledHeader = "積込日,予約番号,積込回線,列車番号,積込ポイント,貨車番号,油種コード,設定数量,向先コード,アーム番号,積込数量"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '四日市営業所
@@ -2320,8 +2492,8 @@ Public Class OIT0003OTLinkageList
         ''' 出荷予約出力フォーマット
         ''' </summary>
         ''' <returns></returns>
-        Public Property ReservedOutputType As ReserveOutputFileType
-        ''' <summary>
+        Public Property ReservedOutputType As ReserveOutputFileType = ReserveOutputFileType.Csv
+        ''' <summary> 
         ''' 出力フィールドリスト(フィールド名、固定長用フィールドサイズ）
         ''' </summary>
         ''' <returns></returns>
@@ -2333,6 +2505,8 @@ Public Class OIT0003OTLinkageList
         Public Property OutputReservedConstantField As Boolean = False
         Public Property OutputReservedFileNameWithoutExtention As String
         Public Property OutputReservedFileExtention As String
+        Public Property OutputReservedCustomOutputFiledHeader As String
+        Public Property OutputReservedExcelDataStartAddress As String = ""
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス

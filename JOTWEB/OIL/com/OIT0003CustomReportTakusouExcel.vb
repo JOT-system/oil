@@ -59,66 +59,74 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
     ''' <param name="officeCode"></param>
     ''' <param name="printDataClass"></param>
     Public Sub New(officeCode As String, printDataClass As DataTable)
-        Dim CS0050SESSION As New CS0050SESSION
-        Dim templateParentFolderName As String = "OIT0003Takusou"
-        Dim tempXlsFileName As String = "" '[営業所コード].xlsxとする
-        tempXlsFileName = String.Format("{0}.xlsx", officeCode)
+        Try
+            Dim CS0050SESSION As New CS0050SESSION
+            Dim templateParentFolderName As String = "OIT0003Takusou"
+            Dim tempXlsFileName As String = "" '[営業所コード].xlsxとする
+            tempXlsFileName = String.Format("{0}.xlsx", officeCode)
 
-        Me.PrintData = printDataClass
-        Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+            Me.PrintData = printDataClass
+            Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                       "PRINTFORMAT",
                                                       C_DEFAULT_DATAKEY,
                                                       templateParentFolderName, tempXlsFileName)
-        Dim tempSealImageFileName As String = String.Format("{0}.png", officeCode)
-        Me.SealImageFilePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+            Dim tempSealImageFileName As String = String.Format("{0}.png", officeCode)
+            Me.SealImageFilePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                       "PRINTFORMAT",
                                                       C_DEFAULT_DATAKEY,
                                                       templateParentFolderName, tempSealImageFileName)
-        If IO.File.Exists(Me.ExcelTemplatePath) = False Then
-            Throw New Exception(String.Format("テンプレートファイルが存在しません。{0}", Me.ExcelTemplatePath))
-        End If
+            If IO.File.Exists(Me.ExcelTemplatePath) = False Then
+                Throw New Exception(String.Format("テンプレートファイルが存在しません。{0}", Me.ExcelTemplatePath))
+            End If
 
-        If IO.File.Exists(Me.SealImageFilePath) = False Then
-            Me.SealImageFilePath = ""
-        End If
-        Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+            If IO.File.Exists(Me.SealImageFilePath) = False Then
+                Me.SealImageFilePath = ""
+            End If
+            Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                    "PRINTWORK",
                                                    CS0050SESSION.USERID)
-        'ディレクトリが存在しない場合は生成
-        If IO.Directory.Exists(Me.UploadRootPath) = False Then
-            IO.Directory.CreateDirectory(Me.UploadRootPath)
-        End If
-        '前日プリフィックスのアップロードファイルが残っていた場合は削除
-        Dim targetFiles = IO.Directory.GetFiles(Me.UploadRootPath, "*.*")
-        Dim keepFilePrefix As String = Now.ToString("yyyyMMdd")
-        For Each targetFile In targetFiles
-            Dim fileName As String = IO.Path.GetFileName(targetFile)
-            '今日の日付が先頭のファイル名の場合は残す
-            If fileName.StartsWith(keepFilePrefix) Then
-                Continue For
+            'ディレクトリが存在しない場合は生成
+            If IO.Directory.Exists(Me.UploadRootPath) = False Then
+                IO.Directory.CreateDirectory(Me.UploadRootPath)
             End If
-            Try
-                IO.File.Delete(targetFile)
-            Catch ex As Exception
-                '削除時のエラーは無視
-            End Try
-        Next targetFile
-        'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+            '前日プリフィックスのアップロードファイルが残っていた場合は削除
+            Dim targetFiles = IO.Directory.GetFiles(Me.UploadRootPath, "*.*")
+            Dim keepFilePrefix As String = Now.ToString("yyyyMMdd")
+            For Each targetFile In targetFiles
+                Dim fileName As String = IO.Path.GetFileName(targetFile)
+                '今日の日付が先頭のファイル名の場合は残す
+                If fileName.StartsWith(keepFilePrefix) Then
+                    Continue For
+                End If
+                Try
+                    IO.File.Delete(targetFile)
+                Catch ex As Exception
+                    '削除時のエラーは無視
+                End Try
+            Next targetFile
+            'URLのルートを表示
+            Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
 
-        'Excelアプリケーションオブジェクトの生成
-        Me.ExcelAppObj = New Excel.Application
-        ExcelAppObj.DisplayAlerts = False
-        Dim xlHwnd As IntPtr = CType(Me.ExcelAppObj.Hwnd, IntPtr)
-        GetWindowThreadProcessId(xlHwnd, Me.xlProcId)
-        'Excelワークブックオブジェクトの生成
-        Me.ExcelBooksObj = Me.ExcelAppObj.Workbooks
-        Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
+            'Excelアプリケーションオブジェクトの生成
+            Me.ExcelAppObj = New Excel.Application
+            ExcelAppObj.DisplayAlerts = False
+            Dim xlHwnd As IntPtr = CType(Me.ExcelAppObj.Hwnd, IntPtr)
+            GetWindowThreadProcessId(xlHwnd, Me.xlProcId)
+            'Excelワークブックオブジェクトの生成
+            Me.ExcelBooksObj = Me.ExcelAppObj.Workbooks
+            Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
-        Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
-        Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+            Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
+            Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+
+        Catch ex As Exception
+            If Me.xlProcId <> 0 Then
+                ExcelProcEnd()
+            End If
+            Throw
+        End Try
     End Sub
     ''' <summary>
     ''' 帳票作成処理

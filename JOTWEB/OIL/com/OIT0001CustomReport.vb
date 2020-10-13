@@ -229,7 +229,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
 
-                '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+                '### 20201008 START 指摘票対応(No156)全体 ###################################################
                 '★袖ヶ浦営業所の場合
                 If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
                     '◯ 順位
@@ -239,7 +239,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     '◯ 順位
                     '### 未使用項目 ###########################################
                 End If
-                '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
+                '### 20201008 END   指摘票対応(No156)全体 ###################################################
                 '◯ 次回交検日
                 rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
@@ -265,7 +265,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End If
                 '### 20200917 END   指摘票対応(No138)全体 ###################################################
 
-                '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+                '### 20201008 START 指摘票対応(No157)全体 ###################################################
                 '★袖ヶ浦営業所の場合
                 If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
                     '◯ 記事
@@ -276,7 +276,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                     rngDetailArea.Value = PrintDatarow("REMARK")
                 End If
-                '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
+                '### 20201008 END   指摘票対応(No157)全体 ###################################################
 
                 i += 1
             Next

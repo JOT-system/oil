@@ -507,6 +507,10 @@ Public Module BaseDllConst
     ''' 前回灯軽油
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_104 As String = "104"
+    ''' <summary>
+    ''' 積込日エラー((一覧)積込日と(予定)発日チェック用)
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_105 As String = "105"
 
     ''' <summary>
     ''' 失注（荷主都合）

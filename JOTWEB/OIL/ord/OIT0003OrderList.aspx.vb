@@ -2586,10 +2586,18 @@ Public Class OIT0003OrderList
             & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
             & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
             & " , ''                                             AS LODPOINT" _
+            & " , OIM0003_OIL.MIDDLEOILCODE                      AS MIDDLEOILCODE" _
+            & " , OIM0003_OIL.MIDDLEOILNAME                      AS MIDDLEOILNAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , OIM0003_LASTOIL.MIDDLEOILCODE                  AS LASTMIDDLEOILCODE" _
+            & " , OIM0003_LASTOIL.MIDDLEOILNAME                  AS LASTMIDDLEOILNAME" _
+            & " , OIT0005.LASTOILCODE                            AS LASTOILCODE" _
+            & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
+            & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
+            & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
@@ -2648,6 +2656,27 @@ Public Class OIT0003OrderList
             & " AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & " AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & " AND OIM0021.DELFLG <> @P02 "
+
+        '### 20201013 START 油種中分類、及び前回油種取得するための条件を追加 ###########################
+        SQLStrCmn &=
+              " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+            & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIT0005.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_OIL ON " _
+            & "     OIM0003_OIL.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003_OIL.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0003_OIL.PLANTCODE = OIT0002.BASECODE " _
+            & " AND OIM0003_OIL.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0003_OIL.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0003_OIL.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_LASTOIL ON " _
+            & "     OIM0003_LASTOIL.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003_LASTOIL.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0003_LASTOIL.PLANTCODE = OIT0002.BASECODE " _
+            & " AND OIM0003_LASTOIL.OILCODE = OIT0005.LASTOILCODE " _
+            & " AND OIM0003_LASTOIL.SEGMENTOILCODE = OIT0005.PREORDERINGTYPE " _
+            & " AND OIM0003_LASTOIL.DELFLG <> @P02 "
+        '### 20201013 END   油種中分類、及び前回油種取得するための条件を追加 ###########################
 
         '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
         SQLStrCmn &=

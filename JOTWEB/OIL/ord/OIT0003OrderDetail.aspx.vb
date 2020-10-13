@@ -15400,6 +15400,33 @@ Public Class OIT0003OrderDetail
             chkOrderInfo.Checked = True
         End If
 
+        '### 20201013 START 指摘票対応(NoXXX) ###########################################################
+        '(一覧)積込日 と　(予定)発日を比較
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If OIT0003row("ACTUALLODDATE") = "" Then Continue For
+            iresult = Date.Parse(OIT0003row("ACTUALLODDATE")).CompareTo(Date.Parse(Me.TxtDepDate.Text))
+            If iresult = 1 Then
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_105
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(予定)発日で入力した日付より未来日のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Continue For
+            Else
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
+        Next
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込日 > (予定)発日", needsPopUp:=True)
+            Exit Sub
+        End If
+        '### 20201013 END   指摘票対応(NoXXX) ###########################################################
+
         '(予定)発日 と　(予定)積車着日を比較
         iresult = Date.Parse(Me.TxtDepDate.Text).CompareTo(Date.Parse(Me.TxtArrDate.Text))
         If iresult = 1 Then

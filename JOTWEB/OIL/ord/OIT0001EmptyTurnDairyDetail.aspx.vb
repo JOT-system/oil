@@ -2453,12 +2453,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " AND OIM0026.DELFLG <> @P02 "
         '### 20200917 END   指摘票対応(No138)全体 ###################################################
 
-        '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+        '### 20201008 START 指摘票対応(No157)全体 ###################################################
         SQLStr &=
               " LEFT JOIN oil.OIM0012_NIUKE OIM0012 ON " _
             & "     OIM0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
             & " AND OIM0012.DELFLG <> @P02 "
-        '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
+        '### 20201008 END   指摘票対応(No157)全体 ###################################################
 
         SQLStr &=
               " LEFT JOIN ( " _
@@ -3632,6 +3632,33 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_ORDERINFOFLG_10 = True
             work.WF_SEL_STACKINGFLG.Text = "1"
         End If
+
+        '### 20201013 START 指摘票対応(NoXXX) ###########################################################
+        '(一覧)積込日 と　(予定)発日を比較
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+            If OIT0001row("ACTUALLODDATE") = "" Then Continue For
+            iresult = Date.Parse(OIT0001row("ACTUALLODDATE")).CompareTo(Date.Parse(Me.TxtDepDate.Text))
+            If iresult = 1 Then
+                OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_105
+                CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(予定)発日で入力した日付より未来日のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Continue For
+            Else
+                OIT0001row("ORDERINFO") = ""
+                OIT0001row("ORDERINFONAME") = ""
+            End If
+        Next
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込日 > (予定)発日", needsPopUp:=True)
+            Exit Sub
+        End If
+        '### 20201013 END   指摘票対応(NoXXX) ###########################################################
 
         '(予定)発日 と　(予定)積車着日を比較
         iresult = Date.Parse(TxtDepDate.Text).CompareTo(Date.Parse(TxtArrDate.Text))

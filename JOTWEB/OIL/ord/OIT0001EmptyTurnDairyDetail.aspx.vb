@@ -3633,7 +3633,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             work.WF_SEL_STACKINGFLG.Text = "1"
         End If
 
-        '### 20201013 START 指摘票対応(NoXXX) ###########################################################
+        '### 20201013 START 指摘票対応(No166) ###########################################################
         '(一覧)積込日 と　(予定)発日を比較
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
             If OIT0001row("ACTUALLODDATE") = "" Then Continue For
@@ -3658,7 +3658,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込日 > (予定)発日", needsPopUp:=True)
             Exit Sub
         End If
-        '### 20201013 END   指摘票対応(NoXXX) ###########################################################
+        '### 20201013 END   指摘票対応(No166) ###########################################################
 
         '(予定)発日 と　(予定)積車着日を比較
         iresult = Date.Parse(TxtDepDate.Text).CompareTo(Date.Parse(TxtArrDate.Text))

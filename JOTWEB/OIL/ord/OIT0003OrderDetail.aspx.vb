@@ -15400,7 +15400,7 @@ Public Class OIT0003OrderDetail
             chkOrderInfo.Checked = True
         End If
 
-        '### 20201013 START 指摘票対応(NoXXX) ###########################################################
+        '### 20201013 START 指摘票対応(No166) ###########################################################
         '(一覧)積込日 と　(予定)発日を比較
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
             If OIT0003row("ACTUALLODDATE") = "" Then Continue For
@@ -15425,7 +15425,7 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込日 > (予定)発日", needsPopUp:=True)
             Exit Sub
         End If
-        '### 20201013 END   指摘票対応(NoXXX) ###########################################################
+        '### 20201013 END   指摘票対応(No166) ###########################################################
 
         '(予定)発日 と　(予定)積車着日を比較
         iresult = Date.Parse(Me.TxtDepDate.Text).CompareTo(Date.Parse(Me.TxtArrDate.Text))

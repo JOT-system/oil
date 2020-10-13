@@ -161,6 +161,7 @@ Public Class GRIS0005LeftBox
         LC_BTRAINNUMBER
         LC_UNIT
         LC_CTRAINNUMBER
+        LC_PRODUCTSEGLIST_FT
     End Enum
 
     ''' <summary>
@@ -255,6 +256,7 @@ Public Class GRIS0005LeftBox
         LP_BTRAINNUMBER
         LP_CTRAINNUMBER
         LP_ADDITINALFROMTO
+        LP_PRODUCTSEGLIST_FT
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -718,6 +720,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST
                 '品種パターン(受発注用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_SEG"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST_FT
+                '品種パターン(受発注用(開始終了指定))
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_FT_SEG"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST
                 '臨海鉄道列車番号(入線)
@@ -1517,11 +1523,13 @@ Public Class GRIS0005LeftBox
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
                 End If
+                '### 20201013 START 指摘票対応(No153) ###################################
                 'FixValue抽出用の開始終了条件付与
                 If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALFROMTO) AndAlso
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_FROM_TO = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO))
                 End If
+                '### 20201013 END   指摘票対応(No153) ###################################
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR
                 lsbx = GS0007FIXVALUElst.LISTBOX1

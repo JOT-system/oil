@@ -1093,6 +1093,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         OrElse WF_FIELD.Value = "ORDERINGOILNAME" Then
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        '### 20201013 START 指摘票対応(No153) ###################################
+                        prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                        '### 20201013 END   指摘票対応(No153) ###################################
                     End If
                     'タンク車№
                     If WF_FIELD.Value = "TANKNO" Then

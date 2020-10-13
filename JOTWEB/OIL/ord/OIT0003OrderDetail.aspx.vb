@@ -4202,14 +4202,18 @@ Public Class OIT0003OrderDetail
                         End If
                         '### LeftBoxマルチ対応(20200217) END   #####################################################
 
+                        '### 20201013 START 指摘票対応(No153) ###################################
+                        '(一覧)油種
+                        If WF_FIELD.Value = "ORDERINGOILNAME" Then
+                            prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                        End If
+                        '### 20201013 END   指摘票対応(No153) ###################################
+
                         '(一覧)ジョイント先
                     ElseIf WF_FIELD.Value = "JOINT" Then
                         '全表示のため設定をコメントにする。
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
 
-                        '(一覧)油種
-                    ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
-                        prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)

@@ -70,7 +70,6 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
     Public Function ConvertDataTableToCsv(writeHeader As Boolean,
                                           Optional ByVal blnFrame As Boolean = False,
                                           Optional ByVal delm As String = ",") As String
-        Dim retByte() As Byte
         Dim colCount As Integer = Me.OutputDef.OutputFiledList.Count
         Dim lastColIndex As Integer = colCount - 1
         Dim i As Integer
@@ -95,7 +94,10 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
                 '改行する
                 Me.CsvSW.Write(vbCrLf)
             End If
-
+            If OutputDef.OutputReservedCustomOutputFiledHeader <> "" Then
+                Me.CsvSW.Write(OutputDef.OutputReservedCustomOutputFiledHeader)
+                Me.CsvSW.Write(vbCrLf)
+            End If
             'レコードを書き込む
             Dim row As DataRow
             For Each row In Me.CsvData.Rows

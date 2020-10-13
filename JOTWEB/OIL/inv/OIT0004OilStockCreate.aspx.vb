@@ -2837,6 +2837,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.STACKINGORDERNO),'')         AS STACKINGORDERNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.STACKINGFLG),'')             AS STACKINGFLG")
 
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.WHOLESALEFLG),'')              AS WHOLESALEFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.INSPECTIONFLG),'')             AS INSPECTIONFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.DETENTIONFLG),'')              AS DETENTIONFLG")
 
@@ -4433,7 +4434,7 @@ Public Class OIT0004OilStockCreate
     Public Sub InsertOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("INSERT INTO OIL.OIT0003_DETAIL")
-        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGORDERNO,STACKINGFLG,INSPECTIONFLG,DETENTIONFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
+        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGORDERNO,STACKINGFLG,WHOLESALEFLG,INSPECTIONFLG,DETENTIONFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
         sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,")
         sqlStat.AppendLine("    ORDERINGTYPE,ORDERINGOILNAME,")
         sqlStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
@@ -4451,7 +4452,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlStat.AppendLine("    VALUES")
-        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGORDERNO,@STACKINGFLG,@INSPECTIONFLG,@DETENTIONFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
+        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGORDERNO,@STACKINGFLG,@WHOLESALEFLG,@INSPECTIONFLG,@DETENTIONFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
         sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,")
         sqlStat.AppendLine("    @ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
@@ -4479,6 +4480,7 @@ Public Class OIT0004OilStockCreate
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = detailItem.Kamoku
                 .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = detailItem.StackingOrderNo
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = detailItem.StackingFlg
+                .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = detailItem.WholeSaleFlg
                 .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = detailItem.InspectionFlg
                 .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = detailItem.DetentionFlg
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = detailItem.FirstReturnFlg
@@ -7864,6 +7866,7 @@ Public Class OIT0004OilStockCreate
             Me.Kamoku = ""
             Me.StackingOrderNo = ""
             Me.StackingFlg = "2"
+            Me.WholeSaleFlg = "2"
             Me.InspectionFlg = "2"
             Me.DetentionFlg = "2"
             Me.FirstReturnFlg = "2"
@@ -7949,6 +7952,7 @@ Public Class OIT0004OilStockCreate
             Me.Kamoku = Convert.ToString(sqlDr("KAMOKU"))
             Me.StackingOrderNo = Convert.ToString(sqlDr("STACKINGORDERNO"))
             Me.StackingFlg = Convert.ToString(sqlDr("STACKINGFLG"))
+            Me.WholeSaleFlg = Convert.ToString(sqlDr("WHOLESALEFLG"))
             Me.InspectionFlg = Convert.ToString(sqlDr("INSPECTIONFLG"))
             Me.DetentionFlg = Convert.ToString(sqlDr("DETENTIONFLG"))
             Me.FirstReturnFlg = Convert.ToString(sqlDr("FIRSTRETURNFLG"))
@@ -8056,6 +8060,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property StackingFlg As String
+        ''' <summary>
+        ''' 未卸可否フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property WholeSaleFlg As String
         ''' <summary>
         ''' 交検可否フラグ
         ''' </summary>
@@ -8354,7 +8363,7 @@ Public Class OIT0004OilStockCreate
             Dim retDt As New DataTable
             With retDt.Columns
                 Dim fieldList As New List(Of String) From {
-                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGORDERNO", "STACKINGFLG", "INSPECTIONFLG", "DETENTIONFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "OTTRANSPORTFLG", "ORDERINFO",
+                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGORDERNO", "STACKINGFLG", "WHOLESALEFLG", "INSPECTIONFLG", "DETENTIONFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "OTTRANSPORTFLG", "ORDERINFO",
                    "SHIPPERSCODE", "SHIPPERSNAME", "OILCODE", "OILNAME", "ORDERINGTYPE",
                    "ORDERINGOILNAME", "CARSNUMBER", "CARSAMOUNT", "RETURNDATETRAIN",
                    "JOINTCODE", "JOINT", "REMARK", "CHANGETRAINNO", "CHANGETRAINNAME",
@@ -8387,6 +8396,7 @@ Public Class OIT0004OilStockCreate
             dr("KAMOKU") = Me.Kamoku
             dr("STACKINGORDERNO") = Me.StackingOrderNo
             dr("STACKINGFLG") = Me.StackingFlg
+            dr("WHOLESALEFLG") = Me.WholeSaleFlg
             dr("INSPECTIONFLG") = Me.InspectionFlg
             dr("DETENTIONFLG") = Me.DetentionFlg
             dr("FIRSTRETURNFLG") = Me.FirstReturnFlg

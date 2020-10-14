@@ -245,6 +245,9 @@ Public Class OIT0003OrderList
         Me.rbDeliveryCSVBtn.Visible = False
         Me.rbShipBtn.Visible = False
         Me.rbLoadBtn.Visible = False
+        '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+        Me.rbOTLoadBtn.Visible = False
+        '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
         Me.rbLineBtn.Visible = False
         Me.rbNegishiLoadBtn.Visible = False
         Me.rbKinoeneLoadBtn.Visible = False
@@ -1840,6 +1843,10 @@ Public Class OIT0003OrderList
         Me.rbDeliveryBtn.Checked = False
         '積込指示(ラジオボタン)
         Me.rbLoadBtn.Checked = False
+        '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+        'OT積込指示(ラジオボタン)
+        Me.rbOTLoadBtn.Checked = False
+        '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
         '出荷予定(ラジオボタン)
         Me.rbShipBtn.Checked = False
         '入線方(ラジオボタン)
@@ -1855,6 +1862,10 @@ Public Class OIT0003OrderList
         Me.rbDeliveryCSVBtn.Visible = False
         '積込指示(ラジオボタン)を非表示
         Me.rbLoadBtn.Visible = False
+        '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+        'OT積込指示(ラジオボタン)
+        Me.rbOTLoadBtn.Visible = False
+        '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
         '出荷予定(ラジオボタン)を非表示
         Me.rbShipBtn.Visible = False
         '入線方(ラジオボタン)を非表示
@@ -1872,6 +1883,10 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_010402
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             '◯五井営業所
             Case BaseDllConst.CONST_OFFICECODE_011201
@@ -1879,6 +1894,10 @@ Public Class OIT0003OrderList
                 'Me.rbDeliveryCSVBtn.Visible = True
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
 
@@ -1888,6 +1907,10 @@ Public Class OIT0003OrderList
                 'Me.rbDeliveryCSVBtn.Visible = True
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '積込予定(甲子)(ラジオボタン)を表示
                 Me.rbKinoeneLoadBtn.Visible = True
 
@@ -1897,6 +1920,10 @@ Public Class OIT0003OrderList
                 'Me.rbDeliveryCSVBtn.Visible = True
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '入線方(ラジオボタン)を表示
                 Me.rbLineBtn.Visible = True
 
@@ -1904,6 +1931,10 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_011402
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
                 '積込予定(根岸)(ラジオボタン)を表示
@@ -1915,6 +1946,10 @@ Public Class OIT0003OrderList
                 'Me.rbDeliveryBtn.Visible = True
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             '◯三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
@@ -1922,6 +1957,10 @@ Public Class OIT0003OrderList
                 'Me.rbDeliveryBtn.Visible = True
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                'OT積込指示(ラジオボタン)を表示
+                Me.rbOTLoadBtn.Visible = True
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             Case Else
                 '### すべてのラジオボタン非表示のまま ##########
@@ -1952,6 +1991,7 @@ Public Class OIT0003OrderList
         If Me.rbDeliveryBtn.Checked = False _
             AndAlso Me.rbDeliveryCSVBtn.Checked = False _
             AndAlso Me.rbLoadBtn.Checked = False _
+            AndAlso Me.rbOTLoadBtn.Checked = False _
             AndAlso Me.rbShipBtn.Checked = False _
             AndAlso Me.rbLineBtn.Checked = False _
             AndAlso Me.rbNegishiLoadBtn.Checked = False _
@@ -1972,7 +2012,11 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_010402
                 If Me.rbLoadBtn.Checked = True Then             '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoLoadCommonCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '★ 固定帳票(OT積込予定(共通))作成処理
+                    WW_TyohyoLoadCommonCreate("OTLOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -1985,6 +2029,9 @@ Public Class OIT0003OrderList
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
                     WW_TyohyoGoiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '☆ 固定帳票(出荷予定(五井))作成処理
@@ -2002,6 +2049,9 @@ Public Class OIT0003OrderList
                     '★ 固定帳票(積込予定(共通))作成処理
                     WW_TyohyoKinoeneCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
+
                 ElseIf Me.rbKinoeneLoadBtn.Checked = True Then  '■積込予定(甲子)を選択
                     '☆ 固定帳票(積込予定(甲子))作成処理
                     WW_TyohyoKinoeneCreate("KINOENE_LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
@@ -2018,6 +2068,9 @@ Public Class OIT0003OrderList
                     '★ 固定帳票(積込予定(共通))作成処理
                     WW_TyohyoSodegauraCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
+
                 ElseIf Me.rbLineBtn.Checked = True Then         '■入線方を選択
                     '☆ 固定帳票(入線予定(袖ヶ浦))作成処理
                     WW_TyohyoSodegauraCreate("LINEPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
@@ -2029,6 +2082,9 @@ Public Class OIT0003OrderList
                 If Me.rbLoadBtn.Checked = True Then             '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
                     WW_TyohyoNegishiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '☆ 固定帳票(出荷予定(根岸))作成処理
@@ -2051,6 +2107,9 @@ Public Class OIT0003OrderList
                     'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                     WW_TyohyoYokkaichiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
+
                 End If
 
             '◯ 三重塩浜営業所
@@ -2063,6 +2122,9 @@ Public Class OIT0003OrderList
                     '★ 固定帳票(積込予定(共通))作成処理
                     'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                     WW_TyohyoMieShiohamaCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
+                    '### ここにOT積込処理を追加 #########
 
                 End If
         End Select
@@ -2243,7 +2305,8 @@ Public Class OIT0003OrderList
     ''' 固定帳票(積込指示書(共通))作成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_TyohyoLoadCommonCreate(ByVal officeCode As String)
+    Protected Sub WW_TyohyoLoadCommonCreate(ByVal tyohyoType As String,
+                                             ByVal officeCode As String)
 
         '******************************
         '帳票表示データ取得処理
@@ -2257,18 +2320,39 @@ Public Class OIT0003OrderList
         '******************************
         '帳票作成処理の実行
         '******************************
-        Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
-            Dim url As String
-            Try
-                url = repCbj.CreateExcelPrintData(officeCode, lodDate:=Me.txtReportLodDate.Text)
-            Catch ex As Exception
-                Return
-            End Try
-            '○ 別画面でExcelを表示
-            WF_PrintURL.Value = url
-            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-        End Using
+        Select Case tyohyoType
+            '固定帳票(積込予定(共通))作成処理
+            Case "LOADPLAN"
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintData(tyohyoType, officeCode, lodDate:=Me.txtReportLodDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
 
+            '固定帳票(OT積込予定(共通))作成処理
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_OTLOADPLAN.xlsx", OIT0003Reporttbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintData(tyohyoType, officeCode, lodDate:=Me.txtReportLodDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
+
+        End Select
     End Sub
 
     ''' <summary>
@@ -2285,7 +2369,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込予定)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(出荷予定(五井))押下
             Case "SHIPPLAN"
@@ -2328,7 +2419,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込指示)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(積込予定(甲子))押下
             Case "KINOENE_LOADPLAN"
@@ -2371,7 +2469,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込指示)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(入線方(袖ヶ浦))押下
             Case "LINEPLAN"
@@ -2427,7 +2532,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込予定)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(出荷予定(根岸))押下
             Case "SHIPPLAN"
@@ -2498,7 +2610,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込指示)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
         End Select
     End Sub
@@ -2540,7 +2659,14 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(積込指示)押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+            'ダウンロードボタン(OT積込指示)押下
+            Case "OTLOADPLAN"
+                '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
+                '★ 固定帳票(OT積込予定(共通))作成処理
+                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
         End Select
     End Sub

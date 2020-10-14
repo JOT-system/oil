@@ -262,7 +262,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 'rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
                 '◯ 積置
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("STACKING")
+                rngDetailArea.Value = PrintDatarow("STACKING").ToString().Replace("　", "")
                 '◯ 列車№
                 rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("TRAINNO")
@@ -271,8 +271,37 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '◯ 発日(予定)
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("DEPDATE")
-                '◯ 予備
-                '### 出力項目（空白） #####################################
+                '◯ 備考
+                '### 20201014 START 備考欄への表示対応 ####################
+                ''### 出力項目（空白） #####################################
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                Dim Remark As String = ""
+                '★ジョイント
+                If PrintDatarow("JOINT").ToString <> "" Then
+                    Remark = "『" + PrintDatarow("JOINT").ToString + "』"
+                End If
+                '★積込
+                If PrintDatarow("STACKING").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                End If
+                '★交検
+                If PrintDatarow("INSPECTION").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("INSPECTION").ToString + "』"
+                End If
+                '★格上
+                If PrintDatarow("UPGRADE").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                End If
+                '★備考
+                If PrintDatarow("REMARK").ToString <> "" Then
+                    If Remark = "" Then
+                        Remark &= PrintDatarow("REMARK").ToString
+                    Else
+                        Remark &= vbCrLf + PrintDatarow("REMARK").ToString
+                    End If
+                End If
+                rngDetailArea.Value = Remark
+                '### 20201014 END   備考欄への表示対応 ####################
 
                 '★ 列車名・合計車数を退避
                 strTrainNameSave = PrintDatarow("TRAINNAME").ToString()

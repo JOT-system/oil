@@ -2602,11 +2602,23 @@ Public Class OIT0003OrderList
             & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
+            & " , OIT0003.JOINT                                  AS JOINT" _
             & "	, CASE " _
             & "   WHEN OIT0003.STACKINGFLG ='1' " _
-            & "	      THEN '積置' " _
+            & "	      THEN '積　置' " _
             & "	      ELSE '' " _
             & "   END                                            AS STACKING " _
+            & "	, CASE " _
+            & "   WHEN OIT0003.INSPECTIONFLG ='1' " _
+            & "	      THEN '交　検' " _
+            & "	      ELSE '' " _
+            & "   END                                            AS INSPECTION " _
+            & "	, CASE " _
+            & "   WHEN OIM0003_LASTOIL.MIDDLEOILCODE ='2' AND OIM0003_OIL.MIDDLEOILCODE = '1' " _
+            & "	      THEN '格　上' " _
+            & "	      ELSE '' " _
+            & "   END                                            AS UPGRADE " _
+            & " , OIT0003.REMARK                                 AS REMARK" _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
             & " , OIT0002.TOTALTANKCH                            AS TOTALTANK"

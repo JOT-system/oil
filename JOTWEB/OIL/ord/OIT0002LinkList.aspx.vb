@@ -1403,12 +1403,54 @@ Public Class OIT0002LinkList
 
             'タンク車がOT本社、または在日米軍のリース車の場合
             If WW_GetValueTankSts(0) <> "" Then
-                '(タンク車所在TBL)の内容を更新
-                '引数１：タンク車状態　⇒　変更あり("3"(到着))
-                '引数２：積車区分　　　⇒　変更あり("E"(空車))
-                '引数３：タンク車状況　⇒　変更あり("1"(残車))
-                '引数４：使用受注№　　⇒　初期化あり(TRUE)
-                WW_UpdateTankShozai("3", "E", OIT0002EXLINSrow("TANKNUMBER"), OIT0002EXLINSrow("RETSTATION"), I_SITUATION:="1", I_USEORDERNO:=True)
+                '### 20201014 START 指摘票No169対応 ###########################################################
+                '★タンク車の品目が"検"(交検入場車)の場合
+                If OIT0002EXLINSrow("ARTICLENAME") = WW_ARTICLENAME(0) Then
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数２：積車区分　　　⇒　変更あり("E"(空車))
+                    '引数３：タンク車状況　⇒　変更あり("13"(交検中))
+                    '引数４：使用受注№　　⇒　初期化あり(TRUE)
+                    WW_UpdateTankShozai("3", "E",
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_13,
+                                        I_USEORDERNO:=True)
+                Else
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数２：積車区分　　　⇒　変更あり("E"(空車))
+                    '引数３：タンク車状況　⇒　変更あり("1"(残車))
+                    '引数４：使用受注№　　⇒　初期化あり(TRUE)
+                    WW_UpdateTankShozai("3", "E",
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_USEORDERNO:=True)
+                End If
+            Else
+                '★タンク車の品目が"検"(交検入場車)の場合
+                If OIT0002EXLINSrow("ARTICLENAME") = WW_ARTICLENAME(0) Then
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：タンク車状況　⇒　変更あり("13"(交検中))
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_13)
+                Else
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：タンク車状況　⇒　変更あり("01"(残車))
+                    '※タンク車状況が"13"(交検中)の場合のみ"01"(残車)へ更新
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_CONDITION:="TANKSITUATION",
+                                        I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_13)
+                End If
+                '### 20201014 END   指摘票No169対応 ###########################################################
             End If
         Next
 
@@ -1996,7 +2038,8 @@ Public Class OIT0002LinkList
                 & " , ISNULL(VIW0001_OILCONVERT.VALUE1, '')            AS OILCODE" _
                 & " , ISNULL(VIW0001_OILCONVERT.KEYCODE, '')           AS OILNAME" _
                 & " , ISNULL(VIW0001_OILCONVERT.VALUE2, '')            AS ORDERINGTYPE" _
-                & " , ISNULL(VIW0001_OILCONVERT.VALUE3, '')            AS ORDERINGOILNAME"
+                & " , ISNULL(VIW0001_OILCONVERT.VALUE3, '')            AS ORDERINGOILNAME" _
+                & " , ISNULL(OIT0011.ARTICLENAME, '')                  AS ARTICLENAME"
             'Dim SQLGetOil As String =
             '      SQLStr _
             '    & " , ISNULL(TMP0005_OILCONVERT.OILCODE, '')           AS OILCODE" _
@@ -2092,6 +2135,9 @@ Public Class OIT0002LinkList
                 SQLCmn &= String.Format("    AND OIT0011.RLINKNO = '{0}'", I_RLinkNo)
             End If
 
+            'SQL結合(SELECT分(Fetch用))
+            SQLGetOil &= SQLCmn
+
             '### 20200717 START((全体)No114対応) ######################################
             '★ 貨車連結順序表アップロード時において、品目が交検以外を対象とする。
             SQLCmn &= String.Format("    AND OIT0011.ARTICLENAME <> '{0}'", WW_ARTICLENAME)
@@ -2100,9 +2146,6 @@ Public Class OIT0002LinkList
             'SQL結合(INSERT文とSELECT分)
             SQLStr &= SQLCmn
             SQLLinkStr &= SQLStr
-
-            'SQL結合(SELECT分(Fetch用))
-            SQLGetOil &= SQLCmn
 
             Using SQLLinkcmd As New SqlCommand(SQLLinkStr, SQLcon),
                   SQLcmd As New SqlCommand(SQLGetOil, SQLcon)
@@ -4035,7 +4078,9 @@ Public Class OIT0002LinkList
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal I_LOCATION As String = Nothing,
                                       Optional ByVal I_SITUATION As String = Nothing,
-                                      Optional ByVal I_USEORDERNO As Boolean = False)
+                                      Optional ByVal I_USEORDERNO As Boolean = False,
+                                      Optional ByVal I_CONDITION As String = Nothing,
+                                      Optional ByVal I_CONDITION_VAL As String = Nothing)
 
         Try
             'DataBase接続文字
@@ -4083,8 +4128,17 @@ Public Class OIT0002LinkList
                     & "        UPDTERMID      = @P13, " _
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
-                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND NOT(TANKSITUATION IN ('3','4','5','6','7','8')) " _
                     & "    AND DELFLG        <> @P02 "
+            '& "    AND TANKSITUATION <> '3' " _
+
+            '◯条件付加
+            If Not String.IsNullOrEmpty(I_CONDITION) AndAlso Not String.IsNullOrEmpty(I_CONDITION_VAL) Then
+                Select Case I_CONDITION
+                    Case "TANKSITUATION"
+                        SQLStr &= "    AND TANKSITUATION = '" & I_CONDITION_VAL & "'"
+                End Select
+            End If
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300

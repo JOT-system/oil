@@ -180,6 +180,18 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIM0011C As String = "ASP.OIL_MAS_OIM0011TORICREATE_ASPX"
         ''' <summary>
+        ''' 荷受人マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0012S As String = "ASP.OIL_MAS_OIM0012NIUKESEARCH_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0012L As String = "ASP.OIL_MAS_OIM0012NIUKELIST_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0012C As String = "ASP.OIL_MAS_OIM0012NIUKECREATE_ASPX"
+        ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIM0020S As String = "ASP.OIL_MAS_OIM0020GUIDANCESEARCH_ASPX"

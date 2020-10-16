@@ -297,10 +297,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("JOINT").ToString <> "" Then
                     Remark = "『" + PrintDatarow("JOINT").ToString + "』"
                 End If
-                '★積込
-                If PrintDatarow("STACKING").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
-                End If
+                ''★積込
+                'If PrintDatarow("STACKING").ToString <> "" Then
+                '    Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                'End If
                 '★交検
                 If PrintDatarow("INSPECTION").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("INSPECTION").ToString + "』"

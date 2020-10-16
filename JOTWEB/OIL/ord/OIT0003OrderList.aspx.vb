@@ -2314,7 +2314,7 @@ Public Class OIT0003OrderList
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelLoadCommonDataGet(SQLcon, officeCode, lodDate:=Me.txtReportLodDate.Text)
+            ExcelLoadCommonDataGet(SQLcon, tyohyoType, officeCode, lodDate:=Me.txtReportLodDate.Text)
         End Using
 
         '******************************
@@ -2677,8 +2677,9 @@ Public Class OIT0003OrderList
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
     Protected Sub ExcelLoadCommonDataGet(ByVal SQLcon As SqlConnection,
-                                     ByVal OFFICECDE As String,
-                                     Optional ByVal lodDate As String = Nothing)
+                                         ByVal tyohyoType As String,
+                                         ByVal OFFICECDE As String,
+                                         Optional ByVal lodDate As String = Nothing)
 
         If IsNothing(OIT0003Reporttbl) Then
             OIT0003Reporttbl = New DataTable
@@ -2829,6 +2830,12 @@ Public Class OIT0003OrderList
               " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.ORDERSTATUS <= @P04 " _
+
+        '★OT積込指示書の場合、発日基準のため条件を追加
+        If tyohyoType = "OTLOADPLAN" Then
+            SQLStrCmn &=
+                  " AND OIT0002.DEPDATE = @P03 "
+        End If
 
         '★積置フラグ無し用SQL
         SQLStrNashi &= SQLStrCmn _

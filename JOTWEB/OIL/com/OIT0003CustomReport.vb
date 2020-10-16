@@ -399,6 +399,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Dim z() As Integer = {5, 32, 59}
             Dim j As Integer = 0
             Dim i As Integer = z(j)
+            Dim lineNo As Integer = 1
             For Each PrintDatarow As DataRow In PrintData.Rows
 
                 '★ 前回の列車名と今回の列車名が不一致
@@ -426,11 +427,13 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     rngDetailArea.Value = value
 
                     'i += 3
+                    lineNo = 1
                 End If
 
                 '◯ No
                 rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("LINECNT")
+                'rngDetailArea.Value = PrintDatarow("LINECNT")
+                rngDetailArea.Value = lineNo
                 '◯ 荷主
                 rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("SHIPPERSNAME")
@@ -455,7 +458,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★積込
                 If PrintDatarow("STACKING").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                    '郡山向け５０９０列車については『積置』の記載は不要
+                    If PrintDatarow("TRAINNO").ToString <> "5090" Then
+                        Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                    End If
                 End If
                 '★交検
                 If PrintDatarow("INSPECTION").ToString <> "" Then
@@ -480,6 +486,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 strTotalTankSave = PrintDatarow("TOTALTANK").ToString()
 
                 i += 1
+                lineNo += 1
             Next
         Catch ex As Exception
             Throw

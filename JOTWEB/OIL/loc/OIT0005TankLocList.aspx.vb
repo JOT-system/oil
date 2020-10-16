@@ -15,6 +15,8 @@ Public Class OIT0005TankLocList
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
 
+    Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:明細更新)
+
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             If IsPostBack Then
@@ -25,8 +27,15 @@ Public Class OIT0005TankLocList
 
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
-
+                    '◯ フラグ初期化
+                    Me.WW_UPBUTTONFLG = "0"
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECTWHOLESALE",
+                             "WF_CheckBoxSELECTINSPECTION",
+                             "WF_CheckBoxSELECTDETENTION"    'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
+                        Case "WF_ButtonUPDATE"          '更新ボタン押下
+                            WF_ButtonUPDATE_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -102,6 +111,12 @@ Public Class OIT0005TankLocList
         '○ 画面の値設定
         WW_MAPValueSet()
 
+        '★その他状況(受注(未卸中・交検中・留置中))の場合
+        If work.WF_COND_DETAILTYPE.Text = "9" Then
+            '○(一覧)テキストボックスの制御(読取専用)
+            WW_ListTextBoxReadControl()
+        End If
+
     End Sub
     ''' <summary>
     ''' 画面初期値設定処理
@@ -165,15 +180,22 @@ Public Class OIT0005TankLocList
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
+        If work.WF_COND_DETAILTYPE.Text = "9" Then
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
+        Else
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013ProfView.LEVENT = "ondblclick"
+            CS0013ProfView.LFUNC = "ListDbClick"
+        End If
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
         CS0013ProfView.SCROLLTYPE = CInt(CS0013ProfView.SCROLLTYPE_ENUM.None).ToString
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
+        'CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.OPERATIONCOLUMNWIDTHOPT = -1
         CS0013ProfView.CS0013ProfView()
@@ -332,6 +354,72 @@ Public Class OIT0005TankLocList
         TBLview = Nothing
 
     End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理
+    ''' </summary>
+    Protected Sub WF_CheckBoxSELECT_Click(ByVal chkFieldName As String)
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0005tbl)
+
+        Select Case chkFieldName
+            Case "WF_CheckBoxSELECTWHOLESALE"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0005tbl.Rows.Count - 1
+                    If Convert.ToString(OIT0005tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0005tbl.Rows(i)("WHOLESALEFLG")) = "on" Then
+                            OIT0005tbl.Rows(i)("WHOLESALEFLG") = ""
+                        Else
+                            OIT0005tbl.Rows(i)("WHOLESALEFLG") = "on"
+                        End If
+                        OIT0005tbl.Rows(i)("WHOLESALECHGFLG") = "1"
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTINSPECTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0005tbl.Rows.Count - 1
+                    If Convert.ToString(OIT0005tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0005tbl.Rows(i)("INSPECTIONFLG")) = "on" Then
+                            OIT0005tbl.Rows(i)("INSPECTIONFLG") = ""
+                        Else
+                            OIT0005tbl.Rows(i)("INSPECTIONFLG") = "on"
+                        End If
+                        OIT0005tbl.Rows(i)("INSPECTIONCHGFLG") = "1"
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTDETENTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0005tbl.Rows.Count - 1
+                    If Convert.ToString(OIT0005tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0005tbl.Rows(i)("DETENTIONFLG")) = "on" Then
+                            OIT0005tbl.Rows(i)("DETENTIONFLG") = ""
+                        Else
+                            OIT0005tbl.Rows(i)("DETENTIONFLG") = "on"
+                        End If
+                        OIT0005tbl.Rows(i)("DETENTIONCHGFLG") = "1"
+                    End If
+                Next
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0005tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 更新ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonUPDATE_Click()
+
+        '明細更新ボタン押下時
+        Me.WW_UPBUTTONFLG = "1"
+
+    End Sub
+
     ''' <summary>
     ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
     ''' </summary>
@@ -429,15 +517,22 @@ Public Class OIT0005TankLocList
         TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
 
         '○ 一覧作成
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
+        If work.WF_COND_DETAILTYPE.Text = "9" Then
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
+        Else
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013ProfView.LEVENT = "ondblclick"
+            CS0013ProfView.LFUNC = "ListDbClick"
+        End If
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
         CS0013ProfView.SCROLLTYPE = CInt(CS0013ProfView.SCROLLTYPE_ENUM.None).ToString
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
+        'CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.OPERATIONCOLUMNWIDTHOPT = -1
         CS0013ProfView.CS0013ProfView()
@@ -451,6 +546,104 @@ Public Class OIT0005TankLocList
 
         TBLview.Dispose()
         TBLview = Nothing
+
+        '★その他状況(受注(未卸中・交検中・留置中))の場合
+        If work.WF_COND_DETAILTYPE.Text = "9" Then
+            '○(一覧)テキストボックスの制御(読取専用)
+            WW_ListTextBoxReadControl()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControl()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        Dim chkObjWH As CheckBox = Nothing
+        Dim chkObjIN As CheckBox = Nothing
+        Dim chkObjDE As CheckBox = Nothing
+        'LINECNTを除いたチェックボックスID
+        Dim chkObjIdWOWHcnt As String = "chk" & pnlListArea.ID & "WHOLESALEFLG"
+        Dim chkObjIdWOINcnt As String = "chk" & pnlListArea.ID & "INSPECTIONFLG"
+        Dim chkObjIdWODEcnt As String = "chk" & pnlListArea.ID & "DETENTIONFLG"
+        'LINECNTを含むチェックボックスID
+        Dim chkObjWHId As String = ""
+        Dim chkObjINId As String = ""
+        Dim chkObjDEId As String = ""
+        Dim chkObjType As String = ""
+        '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
+        Dim loopdr As DataRow = Nothing
+        '　データテーブルの行Index
+        Dim rowIdx As Integer = 0
+
+
+        For Each rowitem As TableRow In tblObj.Rows
+            '★未卸・交検・留置(チェックボックス)の制御
+            If OIT0005tbl.Rows.Count <> 0 Then
+                loopdr = OIT0005tbl.Rows(rowIdx)
+                chkObjWHId = chkObjIdWOWHcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjWH = Nothing
+                chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjIN = Nothing
+                chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjDE = Nothing
+
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjWH = DirectCast(cellObj.FindControl(chkObjWHId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjWH IsNot Nothing AndAlso loopdr("WHOLESALEFLG").ToString() = "" AndAlso loopdr("WHOLESALECHGFLG").ToString() = "0" Then
+                        '未卸可否フラグ(チェックボックス)を非活性
+                        chkObjWH.Enabled = False
+                        Exit For
+                    End If
+                Next
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjIN IsNot Nothing AndAlso loopdr("INSPECTIONFLG").ToString() = "" AndAlso loopdr("INSPECTIONCHGFLG").ToString() = "0" Then
+                        '交検可否フラグ(チェックボックス)を非活性
+                        chkObjIN.Enabled = False
+                        Exit For
+                    End If
+                Next
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjDE IsNot Nothing AndAlso loopdr("DETENTIONFLG").ToString() = "" AndAlso loopdr("DETENTIONCHGFLG").ToString() = "0" Then
+                        '留置可否フラグ(チェックボックス)を非活性
+                        chkObjDE.Enabled = False
+                        Exit For
+                    End If
+                Next
+
+                For Each cellObj As TableCell In rowitem.Controls
+                    '(一覧)受入日
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDER_ACTUALACCDATE") Then
+                        If loopdr("WHOLESALEFLG").ToString() = "" AndAlso loopdr("WHOLESALECHGFLG").ToString() = "0" Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    End If
+
+                    '(一覧)空車着日
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDER_ACTUALEMPARRDATE") Then
+                        If loopdr("WHOLESALEFLG").ToString() = "" AndAlso loopdr("WHOLESALECHGFLG").ToString() = "0" _
+                            AndAlso loopdr("INSPECTIONFLG").ToString() = "" AndAlso loopdr("INSPECTIONCHGFLG").ToString() = "0" _
+                            AndAlso loopdr("DETENTIONFLG").ToString() = "" AndAlso loopdr("DETENTIONCHGFLG").ToString() = "0" Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    End If
+                Next
+            End If
+            rowIdx += 1
+        Next
 
     End Sub
 End Class

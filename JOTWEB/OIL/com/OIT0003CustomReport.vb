@@ -396,35 +396,36 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim strTotalTankSave As String = ""
 
         Try
-            Dim i As Integer = 5
+            Dim z() As Integer = {5, 32, 59}
+            Dim j As Integer = 0
+            Dim i As Integer = z(j)
             For Each PrintDatarow As DataRow In PrintData.Rows
 
                 '★ 前回の列車名と今回の列車名が不一致
                 If strTrainNameSave <> "" _
                     AndAlso strTrainNameSave <> PrintDatarow("TRAINNAME").ToString() Then
 
-                    '★tmpシートより合計行をコピーして値を設定
-                    rngSummary = Me.ExcelTempSheet.Range("B1:H4")
-                    rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "P" + (i + 3).ToString())
-                    'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-                    rngSummary.Copy(rngTmp)
+                    ''★tmpシートより合計行をコピーして値を設定
+                    'rngSummary = Me.ExcelTempSheet.Range("A1:H3")
+                    'rngTmp = Me.ExcelWorkSheet.Range("A" + i.ToString(), "H" + (i + 2).ToString())
+                    ''rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
+                    'rngTmp.PageBreak = Excel.XlPageBreak.xlPageBreakManual
+                    'rngSummary.Copy(rngTmp)
 
+                    j += 1
+                    i = z(j)
                     '◯ヘッダーの設定
                     '◯ 基地名
-                    rngDetailArea = Me.ExcelWorkSheet.Range("B" + (i + 1).ToString())
+                    rngDetailArea = Me.ExcelWorkSheet.Range("B" + (i - 4).ToString())
                     rngDetailArea.Value = PrintDatarow("BASENAME")
 
                     '◯ 積込日
                     Dim value As String = Date.Parse(lodDate).ToString("MM月dd日分", New Globalization.CultureInfo("ja-JP")).ToString()
                     value &= "　" + PrintDatarow("TRAINNO").ToString() + "列車"
-                    rngDetailArea = Me.ExcelWorkSheet.Range("G" + (i + 1).ToString())
+                    rngDetailArea = Me.ExcelWorkSheet.Range("G" + (i - 4).ToString())
                     rngDetailArea.Value = value
 
-                    ''◯ 合計車数
-                    'rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                    'rngDetailArea.Value = strTotalTankSave + "両"
-
-                    i += 4
+                    'i += 3
                 End If
 
                 '◯ No

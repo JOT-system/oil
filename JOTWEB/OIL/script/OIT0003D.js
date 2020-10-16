@@ -348,6 +348,13 @@ function ChangeCheckBoxLight(listId) {
 function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
 
         surfix = '';
         if (fieldName === 'STACKINGFLG') {

@@ -82,6 +82,13 @@ function ChangeCheckBox() {
 function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
 
         surfix = '';
         if (fieldName === 'WHOLESALEFLG') {
@@ -103,7 +110,7 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
 }
 
 // ○左Box用処理（左Box表示/非表示切り替え）
-function ListField_DBclick(pnlList, Line, fieldNM) {
+function ListField_Dbclick(pnlList, Line, fieldNM) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_GridDBclick').value = Line;
@@ -114,7 +121,7 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
-        document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
+        document.getElementById('WF_ButtonClick').value = "WF_Field_DbClick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }

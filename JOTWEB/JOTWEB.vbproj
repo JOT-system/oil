@@ -213,6 +213,7 @@
     <Content Include="OIL\inc\OIM0009WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0007WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
+    <Content Include="OIL\inc\OIT0007WRKINC.ascx" />
     <Content Include="OIL\lnk\OIT0007FileInputList.aspx" />
     <Content Include="OIL\lnk\OIT0007FileInputSearch.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
@@ -472,6 +473,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIM0020WRKINC.ascx.vb">
       <DependentUpon>OIM0020WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0007WRKINC.ascx.designer.vb">
+      <DependentUpon>OIT0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0007WRKINC.ascx.vb">
+      <DependentUpon>OIT0007WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\lnk\OIT0007FileInputList.aspx.designer.vb">

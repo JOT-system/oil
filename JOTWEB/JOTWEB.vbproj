@@ -147,6 +147,8 @@
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\css\OIT0002S.css" />
     <Content Include="OIL\css\OIT0006S.css" />
+    <Content Include="OIL\css\OIT0007L.css" />
+    <Content Include="OIL\css\OIT0007S.css" />
     <Content Include="OIL\ex\page_err_default.html" />
     <Content Include="OIL\for\OIT0006OutOfServiceDetail.aspx" />
     <Content Include="OIL\for\OIT0006OutOfServiceList.aspx" />
@@ -211,6 +213,8 @@
     <Content Include="OIL\inc\OIM0009WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0007WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
+    <Content Include="OIL\lnk\OIT0007FileInputList.aspx" />
+    <Content Include="OIL\lnk\OIT0007FileInputSearch.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
     <Content Include="OIL\inc\OIT0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0004WRKINC.ascx" />
@@ -322,6 +326,8 @@
     <Content Include="OIL\script\OIM0004L.js" />
     <Content Include="OIL\script\OIM0005S.js" />
     <Content Include="OIL\script\OIM0004S.js" />
+    <Content Include="OIL\script\OIT0007L.js" />
+    <Content Include="OIL\script\OIT0007S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
     <Content Include="script\easyselectbox.min.js" />
@@ -467,6 +473,20 @@
     <Compile Include="OIL\inc\OIM0020WRKINC.ascx.vb">
       <DependentUpon>OIM0020WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\lnk\OIT0007FileInputList.aspx.designer.vb">
+      <DependentUpon>OIT0007FileInputList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\lnk\OIT0007FileInputList.aspx.vb">
+      <DependentUpon>OIT0007FileInputList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\lnk\OIT0007FileInputSearch.aspx.designer.vb">
+      <DependentUpon>OIT0007FileInputSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\lnk\OIT0007FileInputSearch.aspx.vb">
+      <DependentUpon>OIT0007FileInputSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\loc\OIT0005TankLocDetail.aspx.designer.vb">
       <DependentUpon>OIT0005TankLocDetail.aspx</DependentUpon>

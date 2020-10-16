@@ -168,13 +168,6 @@ Public Class OIT0003CustomReportReservedExcel : Implements System.IDisposable
             End SyncLock
             Me.ExcelBookObj.Close(False)
 
-            ''ストリーム生成
-            'Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-            '    Dim binaryLength = Convert.ToInt32(fs.Length)
-            '    ReDim retByte(binaryLength)
-            '    fs.Read(retByte, 0, binaryLength)
-            '    fs.Flush()
-            'End Using
             Return UrlRoot & tmpFileName
 
         Catch ex As Exception

@@ -95,6 +95,15 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0006D As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICEDETAIL_ASPX"
         ''' <summary>
+        ''' 社外連携 取込検索
+        ''' </summary>
+        Public Const OIT0007S As String = "ASP.OIL_LOC_OIT0007FILEINPUTSEARCH_ASPX"
+        ''' <summary>
+        ''' 社外連携 取込一覧
+        ''' </summary>
+        Public Const OIT0007L As String = "ASP.OIL_LOC_OIT0007FILEINPUTLIST_ASPX"
+
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"

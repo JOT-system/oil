@@ -111,7 +111,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditHeaderArea()
+            EditHeaderArea(I_officeCode)
             '◯明細の設定
             EditDetailArea(I_officeCode)
             '***** TODO処理 ここまで *****
@@ -144,7 +144,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定
     ''' </summary>
-    Private Sub EditHeaderArea()
+    Private Sub EditHeaderArea(ByVal I_officeCode As String)
         Dim rngTitleArea As Excel.Range = Nothing
         Dim rngArrstationArea As Excel.Range = Nothing
         Dim rngTrainArea As Excel.Range = Nothing
@@ -152,6 +152,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Dim rngDepdateArea As Excel.Range = Nothing
         Dim rngArrdateArea As Excel.Range = Nothing
         Dim rngAccdateArea As Excel.Range = Nothing
+        Dim strTrainNo() As String = {"5461", "5972"}
         Try
             For Each PrintDatarow As DataRow In PrintData.Rows
                 '◯ 営業所名
@@ -160,11 +161,25 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '◯ 向い先(着駅)
                 rngArrstationArea = Me.ExcelWorkSheet.Range("E7")
                 rngArrstationArea.Value = PrintDatarow("ARRSTATIONNAME")
-                '◯ 列車No
-                rngTrainArea = Me.ExcelWorkSheet.Range("M7")
-                rngTrainArea.Value = PrintDatarow("TRAINNO")
-                rngTrainArea = Me.ExcelWorkSheet.Range("K41")
-                rngTrainArea.Value = PrintDatarow("TRAINNO")
+
+                '### 20201019 START 指摘票対応(No177) ####################################
+                '◎袖ヶ浦営業所の場合
+                '　かつ、列車No(5461⇒5972へ変更)
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 _
+                    AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
+                    rngTrainArea = Me.ExcelWorkSheet.Range("M7")
+                    rngTrainArea.Value = strTrainNo(1)
+                    rngTrainArea = Me.ExcelWorkSheet.Range("K41")
+                    rngTrainArea.Value = strTrainNo(1)
+                Else
+                    '◯ 列車No
+                    rngTrainArea = Me.ExcelWorkSheet.Range("M7")
+                    rngTrainArea.Value = PrintDatarow("TRAINNO")
+                    rngTrainArea = Me.ExcelWorkSheet.Range("K41")
+                    rngTrainArea.Value = PrintDatarow("TRAINNO")
+                End If
+                '### 20201019 END   指摘票対応(No177) ####################################
+
                 '◯ 積込日（予定）
                 rngLoddateArea = Me.ExcelWorkSheet.Range("E9")
                 rngLoddateArea.Value = PrintDatarow("LODDATE")

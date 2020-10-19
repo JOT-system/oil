@@ -2209,7 +2209,8 @@ Public Class OIT0002LinkList
                                 If OIT0002ExlUProw("LOADINGTRAINNO") = "" Then Continue For
 
                                 '本線列車名
-                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION")
+                                'OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION")
+                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(タ)", "")
 
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                                 WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)

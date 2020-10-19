@@ -4313,7 +4313,11 @@ Public Class OIT0003OrderDetail
         Select Case chkFieldName
             Case "WF_CheckBoxSELECTSTACKING"
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20201019 START 指摘票対応(No172) #############################################
+                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                '### 20201019 END   指摘票対応(No172) #############################################
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                     Exit Select
                 End If
                 'チェックボックス判定
@@ -4387,7 +4391,11 @@ Public Class OIT0003OrderDetail
         Select Case chkFieldName
             Case "WF_CheckBoxSELECTSTACKING"
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20201019 START 指摘票対応(No172) #############################################
+                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                '### 20201019 END   指摘票対応(No172) #############################################
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                     Exit Select
                 End If
                 'チェックボックス判定
@@ -18701,7 +18709,11 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20201019 START 指摘票対応(No172) #############################################
+                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                '### 20201019 END   指摘票対応(No172) #############################################
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                     chkObjST.Enabled = False
                 Else
                     '★積置受注№が設定されている場合はチェックボックスは非活性
@@ -18720,7 +18732,11 @@ Public Class OIT0003OrderDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
-                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                        '### 20201019 START 指摘票対応(No172) #############################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) #############################################
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             '★積置受注№が設定されている場合は積込日は非活性
                         ElseIf chkStackingOrderNo <> "" Then
@@ -18791,7 +18807,11 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20201019 START 指摘票対応(No172) #############################################
+                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                '### 20201019 END   指摘票対応(No172) #############################################
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                     chkObjST.Enabled = False
                 Else
                     '★積置受注№が設定されている場合はチェックボックスは非活性
@@ -18810,7 +18830,11 @@ Public Class OIT0003OrderDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
-                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                        '### 20201019 START 指摘票対応(No172) #############################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) #############################################
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             '★積置受注№が設定されている場合は積込日は非活性
                         ElseIf chkStackingOrderNo <> "" Then
@@ -19132,8 +19156,12 @@ Public Class OIT0003OrderDetail
                         '### 20200717 END  ((全体)No112対応) ######################################
 
                         '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        '### 20201019 START 指摘票対応(No172) ########################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) ########################################
                         '### 20200626 積置受注№が設定されている場合(条件追加) #######################
-                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                        If (Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402) _
                             OrElse chkObjType <> "" Then
                             '積込可否フラグ(チェックボックス)を非活性
                             If chkObjST IsNot Nothing Then chkObjST.Enabled = False
@@ -19314,7 +19342,11 @@ Public Class OIT0003OrderDetail
                             '    Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
                         ElseIf Me.WW_USEORDERFLG = True Then
                             '◯ 受注営業所が"010402"(仙台新港営業所)の場合
-                            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                            '### 20201019 START 指摘票対応(No172) ########################################
+                            '★ または、受注営業所が"011402"(根岸営業所)の場合
+                            '### 20201019 END   指摘票対応(No172) ########################################
+                            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 _
+                                OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                                 If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _

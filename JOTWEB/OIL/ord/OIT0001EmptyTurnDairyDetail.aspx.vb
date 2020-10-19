@@ -1156,7 +1156,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Select Case chkFieldName
             Case "WF_CheckBoxSELECTSTACKING"
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20201019 START 指摘票対応(No172) #############################################
+                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                '### 20201019 END   指摘票対応(No172) #############################################
+                If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                     Exit Select
                 End If
 
@@ -7738,8 +7742,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                         '★受注営業所が仙台新港営業所以外の場合、(一覧)積込日(実績)の入力を許可しない
+                        '### 20201019 START 指摘票対応(No172) #############################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) #############################################
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ACTUALLODDATE") _
-                    AndAlso work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    AndAlso (work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                             AndAlso work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_011402) Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
                 Next
@@ -7779,8 +7787,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                         'コントロールが見つかったら脱出
                         If chkObjST IsNot Nothing Then
                             '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                            '### 20201019 START 指摘票対応(No172) ########################################
+                            '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                            '### 20201019 END   指摘票対応(No172) ########################################
                             '### 20200626 積置受注№が設定されている場合(条件追加) #######################
-                            If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            If (work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                                AndAlso work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_011402) _
                             OrElse chkObjType <> "" Then
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
@@ -7815,8 +7827,12 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     For Each cellObj As TableCell In rowitem.Controls
                         '★受注営業所が仙台新港営業所の場合、(一覧)積込日(実績)の入力を許可する
+                        '### 20201019 START 指摘票対応(No172) #############################################
+                        '★ または、受注営業所が"011402"(根岸営業所)の場合
+                        '### 20201019 END   指摘票対応(No172) #############################################
                         If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ACTUALLODDATE") _
-                            AndAlso work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                            AndAlso (work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 _
+                                    OrElse work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402) Then
                             '★積置受注№が設定されている場合は、入力不可とする。
                             '　(他の受注オーダーにて積込済みのため)
                             If chkObjType <> "" Then

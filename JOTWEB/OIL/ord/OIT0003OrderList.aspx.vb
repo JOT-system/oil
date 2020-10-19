@@ -2753,7 +2753,7 @@ Public Class OIT0003OrderList
         '★積置フラグ無し用SQL
         Dim SQLStrNashi As String =
               SQLStrCmn _
-            & " , OIT0002.LODDATE                                AS LODDATE"
+            & " , ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE) AS LODDATE"
 
         '★積置フラグ有り用SQL
         Dim SQLStrAri As String =
@@ -2771,10 +2771,15 @@ Public Class OIT0003OrderList
             & " AND OIT0003.TANKNO <> '' " _
             & " AND OIT0003.DELFLG <> @P02 "
 
-        '★積置フラグ無し用SQL
-        SQLStrNashi &=
+        '◯OT積込指示書以外の場合
+        If tyohyoType <> "OTLOADPLAN" Then
+            '★積置フラグ無し用SQL
+            SQLStrNashi &=
               SQLStrCmn _
             & " AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
+        Else
+            SQLStrNashi &= SQLStrCmn
+        End If
 
         '★積置フラグ有り用SQL
         SQLStrAri &=
@@ -2837,9 +2842,14 @@ Public Class OIT0003OrderList
                   " AND OIT0002.DEPDATE = @P03 "
         End If
 
-        '★積置フラグ無し用SQL
-        SQLStrNashi &= SQLStrCmn _
+        '◯OT積込指示書以外の場合
+        If tyohyoType <> "OTLOADPLAN" Then
+            '★積置フラグ無し用SQL
+            SQLStrNashi &= SQLStrCmn _
             & "   AND OIT0002.LODDATE = @P03 "
+        Else
+            SQLStrNashi &= SQLStrCmn
+        End If
 
         '★積置フラグ有り用SQL
         SQLStrAri &= SQLStrCmn

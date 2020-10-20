@@ -17445,11 +17445,13 @@ Public Class OIT0003OrderDetail
         '     受注TBL, 受注明細TBLと油種マスタから積込可能件数の値を取得しチェックする
         Dim SQLStr As String =
               " SELECT " _
-            & "   ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
+            & "   ''                                        AS LINECNT" _
+            & " , ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.PLANTNAME), '')    AS PLANTNAME" _
             & " , ISNULL(RTRIM(MERGE_TBL.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(MERGE_TBL.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.CHECKOILCODE), '') AS CHECKOILCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.SEGMENTOILCODE), '') AS SEGMENTOILCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.CHECKOILNAME), '') AS CHECKOILNAME" _
             & " , ISNULL(RTRIM(MERGE_TBL.TANKCOUNT), '')    AS TANKCOUNT" _
             & " , ISNULL(RTRIM(OIM0014.BIGOILCODE), '')     AS CHK_BIGOILCODE" _
@@ -17468,6 +17470,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '') AS CHECKOILCODE" _
+            & " , ISNULL(RTRIM(OIM0003.SEGMENTOILCODE), '') AS SEGMENTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '') AS CHECKOILNAME" _
             & " , COUNT(1)                                AS TANKCOUNT" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
@@ -17492,6 +17495,7 @@ Public Class OIT0003OrderDetail
             & " , OIT0003.LINE" _
             & " , OIM0003.BIGOILCODE" _
             & " , OIM0003.CHECKOILCODE" _
+            & " , OIM0003.SEGMENTOILCODE" _
             & " , OIM0003.CHECKOILNAME"
 
         '基地コード毎の油種大分類件数一覧
@@ -17503,6 +17507,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , 'ZZZZ'                                  AS CHECKOILCODE" _
+            & " , ''                                      AS SEGMENTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILNAME), '')   AS CHECKOILNAME" _
             & " , COUNT(1)                                AS TANKCOUNT" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
@@ -17537,6 +17542,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ''                                      AS BIGOILCODE" _
             & " , ''                                      AS CHECKOILCODE" _
+            & " , ''                                      AS SEGMENTOILCODE" _
             & " , '合計'                                  AS CHECKOILNAME" _
             & " , COUNT(1)                                AS TANKCOUNT" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
@@ -17601,6 +17607,18 @@ Public Class OIT0003OrderDetail
                     OIT0003WKtbl.Load(SQLdr)
                 End Using
 
+                Dim i As Integer = 0
+                For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
+                    i += 1
+                    OIT0003UPDrow("LINECNT") = i        'LINECNT
+                Next
+
+                '### 20201020 START 指摘票対応(No173)全体 ################################################################
+                '○甲子営業所(3号軽油TCH)における油種の出荷能力件数チェック
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then WW_CheckKinoeneOil(OIT0003WKtbl)
+                '### 20201020 END   指摘票対応(No173)全体 ################################################################
+
+                Dim chkOilCode As String = ""
                 For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
                     '"1"(車数オーバー)
                     If OIT0003UPDrow("JUDGE") = "1" Then
@@ -17615,8 +17633,8 @@ Public Class OIT0003OrderDetail
                                 WW_CheckMES1 = "積込可能(油種大分類毎)件数オーバー。"
                                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
 
-                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_88
-                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+                                'updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_88
+                                'CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
 
                                 '○ 画面表示データ保存
                                 Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
@@ -17626,8 +17644,8 @@ Public Class OIT0003OrderDetail
                                 WW_CheckMES1 = "積込可能(油種合計)件数オーバー。"
                                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
 
-                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_89
-                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+                                'updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_89
+                                'CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
 
                                 '○ 画面表示データ保存
                                 Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
@@ -17637,16 +17655,23 @@ Public Class OIT0003OrderDetail
                                 WW_CheckMES1 = "積込可能(油種毎)件数オーバー。"
                                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
 
-                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_87
-                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+                                'updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_87
+                                'CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+                                chkOilCode = OIT0003UPDrow("CHECKOILCODE") + OIT0003UPDrow("SEGMENTOILCODE")
+                                For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
+                                    If chkOilCode = OIT0003tab2row("OILCODE") + OIT0003tab2row("ORDERINGTYPE") Then
+                                        OIT0003tab2row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_87
+                                        CODENAME_get("ORDERINFO", OIT0003tab2row("ORDERINFO"), OIT0003tab2row("ORDERINFONAME"), WW_DUMMY)
+                                    End If
+                                Next
 
                                 '○ 画面表示データ保存
                                 Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
                         End Select
 
-                        WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow)
+                        WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow, chkFlg:="1")
                         O_RTN = "ERR3"
-                        Exit Sub
+                        'Exit Sub
                     End If
                 Next
 
@@ -17663,7 +17688,67 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If O_RTN = C_MESSAGE_NO.NORMAL Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 甲子営業所(3号軽油TCH)における油種の出荷能力件数チェック
+    ''' </summary>
+    ''' <param name="OIT0003WKtbl_tab2"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckKinoeneOil(ByVal OIT0003WKtbl_tab2 As DataTable)
+        'O_RTN = C_MESSAGE_NO.NORMAL
+
+        '○車数オーバーのデータがある場合は、処理を抜ける。
+        For Each OIT0003tab2row As DataRow In OIT0003WKtbl_tab2.Rows
+            If OIT0003tab2row("JUDGE") = "1" Then Exit Sub
+        Next
+
+        Dim iDieselTchCnt As Integer = 0
+        Dim str3DieselTch As String = BaseDllConst.CONST_K3Tank1 + "D"
+        Dim chkOilCode As String = ""
+        '○3号軽油TCHの件数を取得
+        For Each OIT0003tab2row As DataRow In OIT0003WKtbl_tab2.Rows
+            chkOilCode = OIT0003tab2row("CHECKOILCODE") + OIT0003tab2row("SEGMENTOILCODE")
+            '○油種が「3号軽油TCH」の場合
+            If str3DieselTch = chkOilCode Then
+                iDieselTchCnt = Integer.Parse(OIT0003tab2row("TANKCOUNT"))
+            End If
+        Next
+
+        Dim strKerosene As String = BaseDllConst.CONST_TTank + "A"
+        Dim strDiesel As String = BaseDllConst.CONST_KTank1 + "A"
+        chkOilCode = ""
+        '○3号軽油TCHが存在する場合
+        If iDieselTchCnt <> 0 Then
+            '最大出荷能力の変更
+            For Each OIT0003tab2row As DataRow In OIT0003WKtbl_tab2.Rows
+                chkOilCode = OIT0003tab2row("CHECKOILCODE") + OIT0003tab2row("SEGMENTOILCODE")
+                '★灯油、軽油の最大出荷能力を3号軽油TCHが存在した値でマイナスする。
+                '　白油の最大出荷能力も同様
+                '　合計の最大出荷能力も同様
+                If strKerosene = chkOilCode _
+                    OrElse strDiesel = chkOilCode _
+                    OrElse (OIT0003tab2row("BIGOILCODE") = "W" AndAlso OIT0003tab2row("CHECKOILCODE") = "ZZZZ") _
+                    OrElse OIT0003tab2row("CHECKOILNAME") = "合計" Then
+                    OIT0003tab2row("CHK_TANKCOUNT") = Integer.Parse(OIT0003tab2row("CHK_TANKCOUNT")) - iDieselTchCnt
+                End If
+            Next
+
+            '車数オーバーがないかチェック
+            For Each OIT0003tab2row As DataRow In OIT0003WKtbl_tab2.Rows
+                If Integer.Parse(OIT0003tab2row("TANKCOUNT")) <= Integer.Parse(OIT0003tab2row("CHK_TANKCOUNT")) Then
+                    '★最大出荷能力以内の場合
+                    OIT0003tab2row("JUDGE") = "0"
+                Else
+                    '★最大出荷能力をオーバーしている場合
+                    OIT0003tab2row("JUDGE") = "1"
+                End If
+            Next
+        End If
 
     End Sub
 
@@ -17994,9 +18079,11 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <param name="MESSAGE1"></param>
     ''' <param name="MESSAGE2"></param>
-    ''' <param name="OIM0003row"></param>
+    ''' <param name="OIT0003row"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckListTab2ERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0003row As DataRow = Nothing)
+    Protected Sub WW_CheckListTab2ERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String,
+                                      Optional ByVal OIT0003row As DataRow = Nothing,
+                                      Optional ByVal chkFlg As String = Nothing)
 
         Dim WW_ERR_MES As String = ""
         WW_ERR_MES = MESSAGE1
@@ -18004,12 +18091,22 @@ Public Class OIT0003OrderDetail
             WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
         End If
 
-        If Not IsNothing(OIM0003row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIM0003row("LINECNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 回線               =" & OIM0003row("LINE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 充填ポイント       =" & OIM0003row("FILLINGPOINT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIM0003row("ORDERINGOILNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№         =" & OIM0003row("TANKNO")
+        If Not IsNothing(OIT0003row) Then
+            If chkFlg = "1" Then
+                If OIT0003row("CHECKOILNAME") = "合計" Then
+                    WW_ERR_MES &= ControlChars.NewLine & "  --> " & OIT0003row("CHECKOILNAME") & " , "
+                Else
+                    WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIT0003row("CHECKOILNAME") & " , "
+                End If
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 油種出荷件数       =" & OIT0003row("TANKCOUNT") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 最大出荷能力       =" & OIT0003row("CHK_TANKCOUNT")
+            Else
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIT0003row("LINECNT") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 回線               =" & OIT0003row("LINE") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 充填ポイント       =" & OIT0003row("FILLINGPOINT") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIT0003row("ORDERINGOILNAME") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№         =" & OIT0003row("TANKNO")
+            End If
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)

@@ -107,7 +107,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
         ElseIf excelFileName = "OIT0003L_NEGISHI_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("回線別積込"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
-        ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN.xlsx" Then
+        ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN_401.xlsx" _
+            OrElse excelFileName = "OIT0003L_SODEGAURA_LINEPLAN_501.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入線方"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         ElseIf excelFileName = "OIT0003L_KINOENE_LOADPLAN.xlsx" Then
@@ -818,11 +819,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditSodegauraLineHeaderArea(lodDate)
+            EditSodegauraLineHeaderArea(lodDate, rTrainNo)
             '◯明細の設定
             EditSodegauraLineDetailArea()
             '◯フッターの設定
-            EditSodegauraLineFooterArea()
+            EditSodegauraLineFooterArea(rTrainNo)
             '***** TODO処理 ここまで *****
             'ExcelTempSheet.Delete() '雛形シート削除
 
@@ -853,7 +854,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(入線方(袖ヶ浦))
     ''' </summary>
-    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String)
+    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String, ByVal rTrainNo As String)
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
@@ -886,6 +887,13 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '◯ 出線列車No(臨海鉄道)
                 rngHeaderArea = Me.ExcelWorkSheet.Range("F10")
                 rngHeaderArea.Value = PrintDatarow("LOADINGOUTLETTRAINNO")
+
+                '★501専用入線方の場合
+                If rTrainNo = "501" Then
+                    '◯ 受入日
+                    rngHeaderArea = Me.ExcelWorkSheet.Range("M17")
+                    rngHeaderArea.Value = PrintDatarow("ACCDATE")
+                End If
 
                 Exit For
             Next
@@ -944,14 +952,15 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のフッター設定(入線方(袖ヶ浦))
     ''' </summary>
-    Private Sub EditSodegauraLineFooterArea()
+    Private Sub EditSodegauraLineFooterArea(ByVal rTrainNo As String)
         Dim rngFooterArea As Excel.Range = Nothing
 
         Try
             '荷受人(比較用)
             Dim svConsigneeCode As String = ""
             '開始行
-            Dim j As Integer = 48
+            Dim j As Integer = 48               '401専用入線方
+            If rTrainNo = "501" Then j = 26     '501専用入線方
             Dim i As Integer = j
 
             '★油種合計(列)
@@ -967,7 +976,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Select Case svConsigneeCode
                     '# JONET松本
                         Case BaseDllConst.CONST_CONSIGNEECODE_40
-                            svTrain = clnTrain(5)
+                            svTrain = clnTrain(5)                               '401専用入線方
+                            If rTrainNo = "501" Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                         Case BaseDllConst.CONST_CONSIGNEECODE_53
                             svTrain = clnTrain(4)
@@ -1043,7 +1053,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Select Case svConsigneeCode
                     '# JONET松本
                 Case BaseDllConst.CONST_CONSIGNEECODE_40
-                    svTrain = clnTrain(5)
+                    svTrain = clnTrain(5)                               '401専用入線方
+                    If rTrainNo = "501" Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                 Case BaseDllConst.CONST_CONSIGNEECODE_53
                     svTrain = clnTrain(4)

@@ -2488,8 +2488,16 @@ Public Class OIT0003OrderList
 
                     ExcelSodegauraDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
-
-                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_LINEPLAN.xlsx", OIT0003ReportSodegauratbl)
+                '使用する帳票の確認
+                Dim tyohyoName As String = ""
+                If Me.txtReportRTrainNo.Text = "401" Then
+                    '◯ファイル名(袖ヶ浦401レ専用入線方)
+                    tyohyoName = "_SODEGAURA_LINEPLAN_401"
+                Else
+                    '◯ファイル名(袖ヶ浦501レ専用入線方)
+                    tyohyoName = "_SODEGAURA_LINEPLAN_501"
+                End If
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
                         url = repCbj.CreateExcelPrintSodegauraData("LINEPLAN", Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text)
@@ -3450,7 +3458,15 @@ Public Class OIT0003OrderList
             & "        AND SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) <= 20 THEN 4 " _
             & "   END                                            AS TRAINSUM " _
             & " , OIT0002.LODDATE                                AS LODDATE" _
+            & " , OIT0002.DEPDATE                                AS DEPDATE" _
+            & " , OIT0002.ARRDATE                                AS ARRDATE" _
+            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIT0002.EMPARRDATE                             AS EMPARRDATE" _
             & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
+            & " , OIT0003.ACTUALDEPDATE                          AS ACTUALDEPDATE" _
+            & " , OIT0003.ACTUALARRDATE                          AS ACTUALARRDATE" _
+            & " , OIT0003.ACTUALACCDATE                          AS ACTUALACCDATE" _
+            & " , OIT0003.ACTUALEMPARRDATE                       AS ACTUALEMPARRDATE" _
             & " , ROW_NUMBER() OVER(ORDER BY OIM0007.OTFLG DESC, " _
             & "                              OIM0007.ZAIKOSORT, " _
             & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS NYUSENNO" _

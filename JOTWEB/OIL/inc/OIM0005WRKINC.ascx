@@ -12,6 +12,7 @@
     <asp:TextBox ID="WF_SEL_TANKNUMBER" runat="server"></asp:TextBox>               <!-- JOT車番 -->
     <asp:TextBox ID="WF_SEL_MODEL" runat="server"></asp:TextBox>                    <!-- 形式 -->
     <asp:TextBox ID="WF_SEL_USEDFLG" runat="server"></asp:TextBox>                  <!-- 利用フラグ -->
+    <asp:TextBox ID="WF_SEL_LENGTHFLG" runat="server"></asp:TextBox>                <!-- 長さフラグ -->
 
     <!-- 登録・更新用 -->
     <asp:TextBox ID="WF_SEL_TANKNUMBER2" runat="server"></asp:TextBox>              <!-- JOT車番 -->
@@ -22,6 +23,11 @@
     <asp:TextBox ID="WF_SEL_VOLUME" runat="server"></asp:TextBox>                   <!-- 容積 -->
     <asp:TextBox ID="WF_SEL_VOLUMEUNIT" runat="server"></asp:TextBox>               <!-- 容積単位 -->
     <asp:TextBox ID="WF_SEL_MYWEIGHT" runat="server"></asp:TextBox>                 <!-- 自重 -->
+    <asp:TextBox ID="WF_SEL_LENGTH" runat="server"></asp:TextBox>                   <!-- タンク車長 -->
+    <asp:TextBox ID="WF_SEL_TANKLENGTH" runat="server"></asp:TextBox>               <!-- タンク車体長 -->
+    <asp:TextBox ID="WF_SEL_MAXCALIBER" runat="server"></asp:TextBox>               <!-- 最大口径 -->
+    <asp:TextBox ID="WF_SEL_MINCALIBER" runat="server"></asp:TextBox>               <!-- 最大口径 -->
+    <asp:TextBox ID="WF_SEL_LENGTHFLG2" runat="server"></asp:TextBox>                <!-- 長さフラグ -->
     <asp:TextBox ID="WF_SEL_ORIGINOWNERCODE" runat="server"></asp:TextBox>          <!-- 原籍所有者C -->
     <asp:TextBox ID="WF_SEL_ORIGINOWNERNAME" runat="server"></asp:TextBox>          <!-- 原籍所有者 -->
     <asp:TextBox ID="WF_SEL_OWNERCODE" runat="server"></asp:TextBox>                <!-- 名義所有者C -->

@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIM0005TankList
+Partial Public Class OIM0011ToriList
     
     '''<summary>
     '''WF_ListCNT コントロール。
@@ -21,42 +21,6 @@ Partial Public Class OIM0005TankList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ListCNT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''filter_LENGTHFLG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents filter_LENGTHFLG As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
-    '''<summary>
-    '''WF_FIL_LENGTHFLG_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FIL_LENGTHFLG_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_FIL_LENGTHFLG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FIL_LENGTHFLG As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_FIL_LENGTHFLG_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FIL_LENGTHFLG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_ButtonFIRST コントロール。
@@ -110,7 +74,7 @@ Partial Public Class OIM0005TankList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIM0005WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIM0011WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。

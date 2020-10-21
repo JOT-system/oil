@@ -1,22 +1,22 @@
-﻿<%@ Page Title="OIM0005L" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0005TankList.aspx.vb" Inherits="JOTWEB.OIM0005TankList" %>
+﻿<%@ Page Title="OIM0011L" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0011ToriList.aspx.vb" Inherits="JOTWEB.OIM0011ToriList" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/OIL/inc/OIM0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIM0011WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content ID="OIM0005LH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIM0005L.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0005L.js")%>'></script>
+<asp:Content ID="OIM0011LH" ContentPlaceHolderID="head" runat="server">
+    <link href='<%=ResolveUrl("~/OIL/css/OIM0011L.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0011L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
  
-<asp:Content ID="OIM0005L" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="OIM0011L" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
@@ -25,18 +25,9 @@
                     <div class="leftSide">
                         <!-- 一覧件数 -->
                         <asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <span id="filter_LENGTHFLG" runat="server" style="margin-left:20px;">
-                            <span class="ef">
-                                <asp:Label ID="WF_FIL_LENGTHFLG_L" runat="server" Text="長さフラグ" CssClass="WF_TEXT_LABEL"></asp:Label>
-                                <span ondblclick="Field_DBclick('WF_FIL_LENGTHFLG', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_FIL_LENGTHFLG');">
-                                    <asp:TextBox ID="WF_FIL_LENGTHFLG" runat="server" MaxLength="1" Height="22px"  Width="50px"></asp:TextBox>
-                                </span>
-                                <asp:Label ID="WF_FIL_LENGTHFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                            </span>
-                        </span>
                     </div>
                     <div class="rightSide">
-                        <!-- ボタン -->
+                    <!-- ボタン -->
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"   onclick="ButtonClick('WF_ButtonUPDATE');" />
                         <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />

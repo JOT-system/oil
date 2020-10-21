@@ -3279,6 +3279,14 @@ Public Class OIT0003OrderList
         '    & "   END                                            AS SYARYONUMBER"
         '### 20201007 END   JXTG千葉車番を設定 ##################################################################
 
+        '### 20201021 START 指摘票対応(No185)全体 ###############################################################
+        SQLStr &=
+              " , CASE" _
+            & "   WHEN ORDERINFOTBL.LENGTHFLG = 'S' THEN '★'" _
+            & "   ELSE ''" _
+            & "   END                                            AS ATTENTION"
+        '### 20201021 END   指摘票対応(No185)全体 ###############################################################
+
         SQLStr &=
               " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _
             & " , ORDERINFOTBL.RESERVEDQUANTITY                  AS RESERVEDQUANTITY" _
@@ -3298,6 +3306,7 @@ Public Class OIT0003OrderList
             & "      , OIT0003.TANKNO " _
             & "      , OIM0005.MODEL " _
             & "      , OIM0005.LOAD " _
+            & "      , OIM0005.LENGTHFLG " _
             & "      , OIM0005.JXTGTANKNUMBER2 " _
             & "      , OIT0003.OILCODE " _
             & "      , OIT0003.OILNAME " _

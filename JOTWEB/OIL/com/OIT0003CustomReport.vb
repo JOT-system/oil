@@ -776,9 +776,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     End Select
                 End If
 
-                ''◯ 注
-                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '◯ 注
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("ATTENTION")
                 '◯ 車両番号
                 rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
                 rngDetailArea.Value = PrintDatarow("SYARYONUMBER")

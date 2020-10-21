@@ -3706,6 +3706,11 @@ Public Class OIT0003OrderList
             & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN OIT0002.LTANKCH " _
             & "   END, 0)                                        AS TOTALTANK"
 
+        '★予備枠用SQLセット
+        Dim SQLStrYobi As String = SQLStr & " , ISNULL(OIT0002.RNUM, 2) AS RNUM"
+
+        SQLStr &= " , ISNULL(OIT0002.RNUM, 1) AS RNUM"
+
         '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_HTank + "' THEN IIF(OIT0002.HTANKCH <> 0, OIT0002.HTANKCH, OIT0002.HTANK) " _
         '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_RTank + "' THEN IIF(OIT0002.RTANKCH <> 0, OIT0002.RTANKCH, OIT0002.RTANK) " _
         '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_TTank + "' THEN IIF(OIT0002.TTANKCH <> 0, OIT0002.TTANKCH, OIT0002.TTANK) " _
@@ -3720,19 +3725,37 @@ Public Class OIT0003OrderList
         If type = "NEGISHI_LOADPLAN" Then   '★積込予定(根岸)
             SQLStr &=
               " FROM oil.VIW0013_OILFOR_NEGISHI_LOAD VIW0013 "
+            SQLStrYobi &=
+              " FROM oil.VIW0013_OILFOR_NEGISHI_LOAD_SUB VIW0013 "
 
         ElseIf type = "SHIPPLAN" Then       '★出荷予定(根岸)
             SQLStr &=
               " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 "
+            SQLStrYobi &=
+              " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP_SUB VIW0013 "
         End If
 
-        SQLStr &=
-              " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
-            & "     OIT0002.LODDATE = @P03 " _
+        '★共通SQL
+        Dim SQLStrCmn As String =
+              " LEFT JOIN ( " _
+            & "     SELECT OIT0002.*" _
+            & "          , ROW_NUMBER() OVER(PARTITION BY OIT0002.TRAINNO, OIT0002.LODDATE " _
+            & "                              ORDER BY OIT0002.LODDATE, OIT0002.DEPDATE) RNUM " _
+            & "     FROM OIL.OIT0002_ORDER OIT0002 " _
+            & "     WHERE OIT0002.LODDATE = @P03 " _
+            & "       AND OIT0002.OFFICECODE = @P01 " _
+            & "       AND OIT0002.DELFLG <> @P02 " _
+            & "       AND OIT0002.ORDERSTATUS <> @P04 " _
+            & " ) OIT0002 ON "
+        '" LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON "
+
+        SQLStrCmn &=
+              "     OIT0002.LODDATE = @P03 " _
             & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
             & " AND OIT0002.OFFICECODE = @P01 " _
             & " AND OIT0002.DELFLG <> @P02 " _
             & " AND OIT0002.ORDERSTATUS <> @P04 " _
+            & " AND ISNULL(OIT0002.RNUM, @P05) = @P05 " _
             & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & " AND OIT0003.DELFLG <> @P02 " _
@@ -3742,7 +3765,7 @@ Public Class OIT0003OrderList
             & " AND OIM0003.DELFLG <> @P02 "
 
         '### 20200710 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
-        SQLStr &=
+        SQLStrCmn &=
               " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
             & "     OIM0024.OFFICECODE = @P01 " _
             & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
@@ -3750,13 +3773,18 @@ Public Class OIT0003OrderList
             & " AND OIM0024.DELFLG <> @P02 "
         '### 20200710 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
 
-        SQLStr &=
+        SQLStrCmn &=
                 " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT" _
             & "  , VIW0013.JRTRAINNO1" _
             & "  , OIM0024.PRIORITYNO"
         '& "  , TOTALTANK　DESC"
+
+        '### 20201020 START 指摘票対応(No174)全体 ##################################################
+        SQLStr &= SQLStrCmn
+        SQLStrYobi &= SQLStrCmn
+        '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################
@@ -3828,7 +3856,9 @@ Public Class OIT0003OrderList
 #End Region
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLYobicmd As New SqlCommand(SQLStrYobi, SQLcon),
+                  SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon)
                 Dim PARALDP01 As SqlParameter = SQLLDPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 PARALDP01.Value = BaseDllConst.CONST_OFFICECODE_011402
 
@@ -3846,6 +3876,7 @@ Public Class OIT0003OrderList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar)     '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '同日積込日データ優先１取得
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011402
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3854,6 +3885,7 @@ Public Class OIT0003OrderList
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA05.Value = 1
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3864,6 +3896,27 @@ Public Class OIT0003OrderList
                     '○ テーブル検索結果をテーブル格納
                     OIT0003ReportNegishitbl.Load(SQLdr)
                 End Using
+
+                '### 20201020 START 指摘票対応(No174)全体 ##################################################
+                Dim PARAY01 As SqlParameter = SQLYobicmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARAY02 As SqlParameter = SQLYobicmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARAY03 As SqlParameter = SQLYobicmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARAY04 As SqlParameter = SQLYobicmd.Parameters.Add("@P04", SqlDbType.NVarChar)     '受注進行ステータス
+                Dim PARAY05 As SqlParameter = SQLYobicmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '同日積込日データ優先２取得
+                PARAY01.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARAY02.Value = C_DELETE_FLG.DELETE
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    PARAY03.Value = lodDate
+                Else
+                    PARAY03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+                PARAY04.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARAY05.Value = 2
+                Using SQLdr As SqlDataReader = SQLYobicmd.ExecuteReader()
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportNegishitbl.Load(SQLdr)
+                End Using
+                '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
                 Dim i As Integer = 0
                 Dim strTrainNo As String = ""

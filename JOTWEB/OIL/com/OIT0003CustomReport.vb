@@ -1178,85 +1178,104 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            Dim i As Integer = 0
-            For Each PrintDatarow As DataRow In PrintData.Rows
+            '○帳票の明細共通処理(出荷予定表(根岸))
+            Dim strTate As Integer() = {6, 12}
+            EditNegishiShipCmn(rngDetailArea, strTate, "RNUM=1")
 
-                '★行位置決め（列車別の固定行を設定）
-                Select Case PrintDatarow("TRAINNO").ToString()
-                    '着駅(坂城)
-                    Case "5463", "2085", "8471"
-                        i = 6
-                        If PrintDatarow("TRAINNO").ToString() = "5463" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "2085" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "8471" Then i = i + 2
-                    '着駅(竜王)
-                    Case "81", "83"
-                        i = 10
-                        If PrintDatarow("TRAINNO").ToString() = "81" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "83" Then i = i + 1
-                    '着駅(宇都宮)
-                    Case "4091", "2091", "8571", "8569", "2569"
-                        i = 20
-                        If PrintDatarow("TRAINNO").ToString() = "4091" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "2091" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "8571" Then i = i + 2
-                        If PrintDatarow("TRAINNO").ToString() = "8569" Then i = i + 3
-                        If PrintDatarow("TRAINNO").ToString() = "2569" Then i = i + 4
-                    '着駅(倉賀野)
-                    Case "3093", "3091", "8777", "2777"
-                        i = 25
-                        If PrintDatarow("TRAINNO").ToString() = "3093" Then i = i
-                        'If PrintDatarow("TRAINNO").ToString() = "5166" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 2
-                        If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 3
-                        'If PrintDatarow("TRAINNO").ToString() = "8099" Then i = i + 4
-                        If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 5
-                    '着駅(八王子)
-                    Case "85", "87", "8097", "5692"
-                        i = 31
-                        If PrintDatarow("TRAINNO").ToString() = "85" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "87" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "8097" Then i = i + 2
-                        If PrintDatarow("TRAINNO").ToString() = "5692" Then i = i + 3
-                End Select
-
-                '★列位置決め（油種別の固定列を設定）
-                Select Case PrintDatarow("OILCODE").ToString()
-                    '◯ 油種(ＨＧ)
-                    Case BaseDllConst.CONST_HTank
-                        rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                    '◯ 油種(ＲＧ)
-                    Case BaseDllConst.CONST_RTank
-                        rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
-                    '◯ 油種(クト)灯油？
-                    Case BaseDllConst.CONST_TTank
-                        rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
-                    '◯ 油種(未ト)未添加灯油？
-                    Case BaseDllConst.CONST_MTTank
-                        rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                    '◯ 油種(軽)
-                    Case BaseDllConst.CONST_KTank1
-                        rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                    '◯ 油種(軽３)
-                    Case BaseDllConst.CONST_K3Tank1
-                        rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
-                    '◯ 油種(Ａ)
-                    Case BaseDllConst.CONST_ATank
-                        rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
-                    '◯ 油種(ＬＡ)
-                    Case BaseDllConst.CONST_LTank1
-                        rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
-                    Case Else
-                        Continue For
-                End Select
-                rngDetailArea.Value = PrintDatarow("TOTALTANK")
-            Next
+            '### 20201020 START 指摘票対応(No174)全体 ##################################################
+            '○帳票の明細共通処理(出荷予定表(根岸))※予備枠の設定
+            Dim strTateYobi As Integer() = {9, 17}
+            EditNegishiShipCmn(rngDetailArea, strTateYobi, "RNUM=2")
+            '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
         Catch ex As Exception
             Throw
         Finally
             ExcelMemoryRelease(rngDetailArea)
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細共通処理(出荷予定表(根岸))
+    ''' </summary>
+    Private Sub EditNegishiShipCmn(ByVal I_rngDetailArea As Excel.Range,
+                                   ByVal I_TATE() As Integer,
+                                   ByVal I_CONDITION As String)
+
+        Dim i As Integer = 0
+        For Each PrintDatarow As DataRow In PrintData.Select(I_CONDITION)
+
+            '★行位置決め（列車別の固定行を設定）
+            Select Case PrintDatarow("TRAINNO").ToString()
+                    '着駅(坂城)
+                Case "5463", "2085", "8471"
+                    i = I_TATE(0)
+                    If PrintDatarow("TRAINNO").ToString() = "5463" Then i = i
+                    If PrintDatarow("TRAINNO").ToString() = "2085" Then i = i + 1
+                    If PrintDatarow("TRAINNO").ToString() = "8471" Then i = i + 2
+                    '着駅(竜王)
+                Case "81", "83"
+                    i = I_TATE(1)
+                    If PrintDatarow("TRAINNO").ToString() = "81" Then i = i
+                    If PrintDatarow("TRAINNO").ToString() = "83" Then i = i + 1
+                    '着駅(宇都宮)
+                Case "4091", "2091", "8571", "8569", "2569"
+                    i = 22
+                    If PrintDatarow("TRAINNO").ToString() = "4091" Then i = i
+                    If PrintDatarow("TRAINNO").ToString() = "2091" Then i = i + 1
+                    If PrintDatarow("TRAINNO").ToString() = "8571" Then i = i + 2
+                    If PrintDatarow("TRAINNO").ToString() = "8569" Then i = i + 3
+                    If PrintDatarow("TRAINNO").ToString() = "2569" Then i = i + 4
+                    '着駅(倉賀野)
+                Case "3093", "3091", "8777", "2777"
+                    i = 27
+                    If PrintDatarow("TRAINNO").ToString() = "3093" Then i = i
+                    'If PrintDatarow("TRAINNO").ToString() = "5166" Then i = i + 1
+                    If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 2
+                    If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 3
+                    'If PrintDatarow("TRAINNO").ToString() = "8099" Then i = i + 4
+                    If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 5
+                    '着駅(八王子)
+                Case "85", "87", "8097", "5692"
+                    i = 33
+                    If PrintDatarow("TRAINNO").ToString() = "85" Then i = i
+                    If PrintDatarow("TRAINNO").ToString() = "87" Then i = i + 1
+                    If PrintDatarow("TRAINNO").ToString() = "8097" Then i = i + 2
+                    If PrintDatarow("TRAINNO").ToString() = "5692" Then i = i + 3
+            End Select
+
+            '★列位置決め（油種別の固定列を設定）
+            Select Case PrintDatarow("OILCODE").ToString()
+                    '◯ 油種(ＨＧ)
+                Case BaseDllConst.CONST_HTank
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    '◯ 油種(ＲＧ)
+                Case BaseDllConst.CONST_RTank
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                    '◯ 油種(クト)灯油？
+                Case BaseDllConst.CONST_TTank
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
+                    '◯ 油種(未ト)未添加灯油？
+                Case BaseDllConst.CONST_MTTank
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    '◯ 油種(軽)
+                Case BaseDllConst.CONST_KTank1
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                    '◯ 油種(軽３)
+                Case BaseDllConst.CONST_K3Tank1
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
+                    '◯ 油種(Ａ)
+                Case BaseDllConst.CONST_ATank
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
+                    '◯ 油種(ＬＡ)
+                Case BaseDllConst.CONST_LTank1
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
+                Case Else
+                    Continue For
+            End Select
+            I_rngDetailArea.Value = PrintDatarow("TOTALTANK")
+        Next
+
     End Sub
 
     ''' <summary>
@@ -1285,59 +1304,15 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            Dim iYoko As Integer = 0
             Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
-            Dim iTate As Integer = 0
-            Dim intTate As Integer() = {6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48}
-            Dim iTateJyogai As Integer = 0
-            Dim intTateJyogai As Integer() = {50, 52, 54, 56, 58}
-            Dim jTate As Integer = 0
-            Dim svTrainNo As String = ""
+            '○帳票の明細共通処理(積込予定表(根岸))
+            EditNegishiLoadCmn(rngDetailArea, strYoko, "RNUM=1")
 
-            For Each PrintDatarow As DataRow In PrintData.Rows
-
-                '★列車(着駅)が変更となった場合
-                If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("TRAINNO").ToString() Then
-                    '列を１つ右に移動
-                    iYoko += 1
-                    '除外枠の行を初期化
-                    iTateJyogai = 0
-                End If
-
-                '◯ 充填ポイント
-                If PrintDatarow("FILLINGPOINT").ToString() = "" Then
-                    '### 2020/06/25 START 充填ポイントにはまらない油種は除外枠に表示 ########################################
-                    If PrintDatarow("OILKANA").ToString() <> "" Then
-                        '列車名(着駅)
-                        rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + intTateJyogai(iTateJyogai).ToString())
-                        rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
-
-                        '油種名
-                        rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + (intTateJyogai(iTateJyogai) + 1).ToString())
-                        rngDetailArea.Value = PrintDatarow("OILKANA")
-
-                        iTateJyogai += 1
-                    End If
-                    '### 2020/06/25 END   充填ポイントにはまらない油種は除外枠に表示 ########################################
-
-                    svTrainNo = PrintDatarow("TRAINNO").ToString()
-                    Continue For
-                End If
-                jTate = Integer.Parse(PrintDatarow("FILLINGPOINT").ToString()) - 1
-
-                '列車名(着駅)
-                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + intTate(jTate).ToString())
-                'rngDetailArea.Value = PrintDatarow("TRAINNAME")
-                rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
-
-                '油種名
-                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + (intTate(jTate) + 1).ToString())
-                'rngDetailArea.Value = PrintDatarow("OILNAME")
-                rngDetailArea.Value = PrintDatarow("OILKANA")
-
-                '★列車名(着駅)を退避
-                svTrainNo = PrintDatarow("TRAINNO").ToString()
-            Next
+            '### 20201020 START 指摘票対応(No174)全体 ##################################################
+            Dim strYokoYobi As String() = {"W", "X", "Y", "Z", "AA"}
+            '○帳票の明細共通処理(積込予定表(根岸))※予備枠の設定
+            EditNegishiLoadCmn(rngDetailArea, strYokoYobi, "RNUM=2")
+            '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
         Catch ex As Exception
             Throw
@@ -1345,6 +1320,68 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細共通処理(積込予定表(根岸))
+    ''' </summary>
+    Private Sub EditNegishiLoadCmn(ByVal I_rngDetailArea As Excel.Range,
+                                   ByVal I_YOKO() As String,
+                                   ByVal I_CONDITION As String)
+
+        Dim iYoko As Integer = 0
+        'Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
+        Dim iTate As Integer = 0
+        Dim intTate As Integer() = {6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48}
+        Dim iTateJyogai As Integer = 0
+        Dim intTateJyogai As Integer() = {50, 52, 54, 56, 58}
+        Dim jTate As Integer = 0
+        Dim svTrainNo As String = ""
+
+        For Each PrintDatarow As DataRow In PrintData.Select(I_CONDITION)
+
+            '★列車(着駅)が変更となった場合
+            If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("TRAINNO").ToString() Then
+                '列を１つ右に移動
+                iYoko += 1
+                '除外枠の行を初期化
+                iTateJyogai = 0
+            End If
+
+            '◯ 充填ポイント
+            If PrintDatarow("FILLINGPOINT").ToString() = "" Then
+                '### 2020/06/25 START 充填ポイントにはまらない油種は除外枠に表示 ########################################
+                If PrintDatarow("OILKANA").ToString() <> "" Then
+                    '列車名(着駅)
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + intTateJyogai(iTateJyogai).ToString())
+                    I_rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
+
+                    '油種名
+                    I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + (intTateJyogai(iTateJyogai) + 1).ToString())
+                    I_rngDetailArea.Value = PrintDatarow("OILKANA")
+
+                    iTateJyogai += 1
+                End If
+                '### 2020/06/25 END   充填ポイントにはまらない油種は除外枠に表示 ########################################
+
+                svTrainNo = PrintDatarow("TRAINNO").ToString()
+                Continue For
+            End If
+            jTate = Integer.Parse(PrintDatarow("FILLINGPOINT").ToString()) - 1
+
+            '列車名(着駅)
+            I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + intTate(jTate).ToString())
+            'rngDetailArea.Value = PrintDatarow("TRAINNAME")
+            I_rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
+
+            '油種名
+            I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + (intTate(jTate) + 1).ToString())
+            'rngDetailArea.Value = PrintDatarow("OILNAME")
+            I_rngDetailArea.Value = PrintDatarow("OILKANA")
+
+            '★列車名(着駅)を退避
+            svTrainNo = PrintDatarow("TRAINNO").ToString()
+        Next
     End Sub
 #End Region
 

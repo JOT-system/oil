@@ -1143,7 +1143,11 @@ Public Class OIT0006OutOfServiceDetail
                         '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                         'End If
 
-                        prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text, "")
+                        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+                            prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text + "_IDO", "")
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text, "")
+                        End If
 
                         '### LeftBoxマルチ対応(20200217) START #####################################################
                         If WF_FIELD.Value = "TANKNO" Then
@@ -2624,6 +2628,12 @@ Public Class OIT0006OutOfServiceDetail
             MAPDataGet(SQLcon, 0)
         End Using
 
+        '回送(一覧)画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            WW_KaisouListTBLSet(SQLcon)
+        End Using
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0006tbl)
 
@@ -3778,6 +3788,12 @@ Public Class OIT0006OutOfServiceDetail
                     '◯名称取得
                     '目的
                     CODENAME_get("OBJECTIVECODE", OIT0006row("OBJECTIVECODE"), OIT0006row("OBJECTIVENAME"), WW_RTN_SW)
+                    '回送進行ステータス
+                    Select Case OIT0006row("KAISOUSTATUS")
+                        Case BaseDllConst.CONST_KAISOUSTATUS_450,
+                             BaseDllConst.CONST_KAISOUSTATUS_500
+                            CODENAME_get("KAISOUSTATUS", OIT0006row("KAISOUSTATUS") + OIT0006row("OBJECTIVECODE"), OIT0006row("KAISOUSTATUSNAME"), WW_DUMMY)
+                    End Select
 
                 Next
             End Using
@@ -5508,9 +5524,8 @@ Public Class OIT0006OutOfServiceDetail
 
                 'Else
 
-                '回送画面の目的が"24:疎開留置(片道)"の場合、または"25:移動(片道)"の場合
-                If (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 AndAlso ChkFareFlg.Checked = True) _
-                    OrElse (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 AndAlso ChkFareFlg.Checked = True) Then
+                '◯回送画面の目的が"24:疎開留置(片道)"の場合
+                If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 AndAlso ChkFareFlg.Checked = True Then
 
                     Dim strOfficeCode As String = ""
 
@@ -5532,40 +5547,58 @@ Public Class OIT0006OutOfServiceDetail
                             strOfficeCode = BaseDllConst.CONST_OFFICECODE_012301
                     End Select
 
-                    '　　◯回送画面の目的が"24:疎開留置"の場合
-                    If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 Then
-                        '★タンク車所在の更新
-                        '引数１：所在地コード　　　⇒　変更なし(空白)
-                        '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　　　⇒　変更なし(空白)
-                        '引数４：所属営業所コード　⇒　変更なし(支店)
-                        '引数５：タンク車№　　　　⇒　指定あり
-                        '引数６：タンク車状況　　　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai("", "3", "", I_OFFICE:=strOfficeCode, I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　　　⇒　変更なし(空白)
+                    '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　　　⇒　変更なし(空白)
+                    '引数４：所属営業所コード　⇒　変更なし(支店)
+                    '引数５：タンク車№　　　　⇒　指定あり
+                    '引数６：タンク車状況　　　⇒　変更あり("15"(留置中))
+                    WW_UpdateTankShozai("", "3", "", I_OFFICE:=strOfficeCode, I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_15, upActualEmparrDate:=True)
 
-                        '◯回送画面の目的が"25:移動"の場合
-                    ElseIf Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                        '★タンク車所在の更新
-                        '引数１：所在地コード　　　⇒　変更なし(空白)
-                        '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　　　⇒　変更なし(空白)
-                        '引数４：所属営業所コード　⇒　変更なし(支店)
-                        '引数５：タンク車№　　　　⇒　指定あり
-                        WW_UpdateTankShozai("", "3", "", I_OFFICE:=strOfficeCode, I_TANKNO:=OIT0006row("TANKNO"))
 
-                    End If
+                    '◯回送画面の目的が"25:移動(片道)"の場合
+                ElseIf Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 AndAlso ChkFareFlg.Checked = True Then
+
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                    WW_FixvalueMasterSearch("ZZ", "KAISOU_IDO_ONEWAY", Me.TxtArrstationCode.Text, WW_GetValue)
+
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　　　⇒　変更なし(空白)
+                    '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　　　⇒　変更なし(空白)
+                    '引数４：所属営業所コード　⇒　変更なし(支店)
+                    '引数５：タンク車№　　　　⇒　指定あり
+                    '引数６：タンク車状況　　　⇒　変更あり("1"(残車))
+                    WW_UpdateTankShozai("", "3", "", I_OFFICE:=WW_GetValue(0), I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01, upActualEmparrDate:=True)
 
                 Else
 
                     '★運賃フラグ(片道)の場合
                     If ChkFareFlg.Checked = True Then
+                        Dim strTanksituation As String = ""
+                        Select Case Me.TxtObjective.Text
+                            '◯回送画面の目的が"20:修理"の場合
+                            Case BaseDllConst.CONST_OBJECTCODE_20
+                                strTanksituation = BaseDllConst.CONST_TANKSITUATION_11
+                            '◯回送画面の目的が"21:MC"の場合
+                            Case BaseDllConst.CONST_OBJECTCODE_21
+                                strTanksituation = BaseDllConst.CONST_TANKSITUATION_12
+                            '◯回送画面の目的が"22:交検"の場合
+                            Case BaseDllConst.CONST_OBJECTCODE_22
+                                strTanksituation = BaseDllConst.CONST_TANKSITUATION_13
+                            '◯回送画面の目的が"23:全検"の場合
+                            Case BaseDllConst.CONST_OBJECTCODE_23
+                                strTanksituation = BaseDllConst.CONST_TANKSITUATION_14
+                        End Select
+
                         '★タンク車所在の更新
                         '引数１：所在地コード　　　⇒　変更あり(着駅)
                         '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　　　⇒　変更なし(空白)
                         '引数４：タンク車№　　　　⇒　指定あり
-                        '引数５：タンク車状況　　　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
+                        '引数５：タンク車状況　　　⇒　変更あり(目的別にて更新)
+                        WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:=strTanksituation, upActualEmparrDate:=True)
                     Else
                         '★タンク車所在の更新
                         '引数１：所在地コード　　　⇒　変更あり(発駅)
@@ -5573,7 +5606,7 @@ Public Class OIT0006OutOfServiceDetail
                         '引数３：積車区分　　　　　⇒　変更なし(空白)
                         '引数４：タンク車№　　　　⇒　指定あり
                         '引数５：タンク車状況　　　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01, upActualEmparrDate:=True)
                     End If
 
                 End If
@@ -5958,7 +5991,13 @@ Public Class OIT0006OutOfServiceDetail
                 SQLcon.Open()       'DataBase接続
 
                 WW_UpdateKaisouStatus(O_VALUE)
-                CODENAME_get("KAISOUSTATUS", O_VALUE, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                Select Case O_VALUE
+                    Case BaseDllConst.CONST_KAISOUSTATUS_450,
+                         BaseDllConst.CONST_KAISOUSTATUS_500
+                        CODENAME_get("KAISOUSTATUS", O_VALUE + Me.TxtObjective.Text, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                    Case Else
+                        CODENAME_get("KAISOUSTATUS", O_VALUE, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                End Select
                 work.WF_SEL_KAISOUSTATUS.Text = O_VALUE
                 work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
 

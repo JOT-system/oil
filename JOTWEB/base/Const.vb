@@ -256,7 +256,6 @@ Public Module BaseDllConst
     Public Const CONST_BRANCHCODE_710001 As String = "710001"
 #End Region
 
-
 #Region "営業所"
     ''' <summary>
     ''' 情報システム部
@@ -310,6 +309,37 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_OFFICECODE_012402 As String = "012402"
 
+#End Region
+
+#Region "基地"
+    ''' <summary>
+    ''' ENEOS仙台
+    ''' </summary>
+    Public Const CONST_PLANTCODE_0401 As String = "0401"
+    ''' <summary>
+    ''' コスモ千葉
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1201 As String = "1201"
+    ''' <summary>
+    ''' ENEOS千葉
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1202 As String = "1202"
+    ''' <summary>
+    ''' 富士袖ヶ浦
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1203 As String = "1203"
+    ''' <summary>
+    ''' ENEOS根岸
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1401 As String = "1401"
+    ''' <summary>
+    ''' コスモ四日市
+    ''' </summary>
+    Public Const CONST_PLANTCODE_2401 As String = "2401"
+    ''' <summary>
+    ''' 出光昭和四日市
+    ''' </summary>
+    Public Const CONST_PLANTCODE_2402 As String = "2402"
 #End Region
 
 #Region "荷受人"
@@ -477,6 +507,10 @@ Public Module BaseDllConst
     ''' 前回灯軽油
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_104 As String = "104"
+    ''' <summary>
+    ''' 積込日エラー((一覧)積込日と(予定)発日チェック用)
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_105 As String = "105"
 
     ''' <summary>
     ''' 失注（荷主都合）
@@ -765,6 +799,21 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "タンク車状態コード"
+    ''' <summary>
+    ''' 01:発送
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_01 As String = "1"
+    ''' <summary>
+    ''' 02:到着予定
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_02 As String = "2"
+    ''' <summary>
+    ''' 03:到着
+    ''' </summary>
+    Public Const CONST_TANKSTATUS_03 As String = "3"
+#End Region
+
 #Region "タンク車状況コード"
     ''' <summary>
     ''' 01:残車
@@ -798,14 +847,41 @@ Public Module BaseDllConst
     ''' 08:回送中(移動)
     ''' </summary>
     Public Const CONST_TANKSITUATION_08 As String = "8"
+
     ''' <summary>
-    ''' 09:交検中
+    ''' 11:修理中(回送(片道))
     ''' </summary>
-    Public Const CONST_TANKSITUATION_09 As String = "9"
+    Public Const CONST_TANKSITUATION_11 As String = "11"
     ''' <summary>
-    ''' 10:留置中
+    ''' 12:MC中(回送(片道))
     ''' </summary>
-    Public Const CONST_TANKSITUATION_10 As String = "10"
+    Public Const CONST_TANKSITUATION_12 As String = "12"
+    ''' <summary>
+    ''' 13:交検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_13 As String = "13"
+    ''' <summary>
+    ''' 14:全検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_14 As String = "14"
+    ''' <summary>
+    ''' 15:留置中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_15 As String = "15"
+
+    ''' <summary>
+    ''' 20:未卸(受注用)
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_20 As String = "20"
+    ''' <summary>
+    ''' 21:交検中(仙台(受注用))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_21 As String = "21"
+    ''' <summary>
+    ''' 22:留置中(仙台(受注用))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_22 As String = "22"
+
 #End Region
 
 #Region "油種"
@@ -905,6 +981,20 @@ Public Module BaseDllConst
     Public Const CONST_COSMO_LSABU As String = "LAブ"
 #End Region
 
+#Region "型式(タンク車)"
+    ''' <summary>
+    ''' タキ1000
+    ''' </summary>
+    Public Const CONST_MODEL_1000 As String = "タキ1000"
+    ''' <summary>
+    ''' タキ43000
+    ''' </summary>
+    Public Const CONST_MODEL_43000 As String = "タキ43000"
+    ''' <summary>
+    ''' タキ243000
+    ''' </summary>
+    Public Const CONST_MODEL_243000 As String = "タキ243000"
+#End Region
 
 #Region "海外向け"
     ''' <summary>

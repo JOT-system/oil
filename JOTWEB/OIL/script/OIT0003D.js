@@ -258,6 +258,13 @@ function ChangeCheckBoxLight(listId) {
     var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chk" + listId + "OTTRANSPORTFLG']");
     var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "OTTRANSPORTFLG']");
 
+    var chkObjsLight5 = objLightTable.querySelectorAll("input[id^='chk" + listId + "WHOLESALEFLG']");
+    var spnObjsLight5 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "WHOLESALEFLG']");
+    var chkObjsLight6 = objLightTable.querySelectorAll("input[id^='chk" + listId + "INSPECTIONFLG']");
+    var spnObjsLight6 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "INSPECTIONFLG']");
+    var chkObjsLight7 = objLightTable.querySelectorAll("input[id^='chk" + listId + "DETENTIONFLG']");
+    var spnObjsLight7 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "DETENTIONFLG']");
+
     for (let i = 0; i < chkObjsLight1.length; i++) {
 
         if (chkObjsLight1[i] !== null) {
@@ -301,6 +308,39 @@ function ChangeCheckBoxLight(listId) {
             }
         }
     }
+
+    for (let i = 0; i < chkObjsLight5.length; i++) {
+
+        if (chkObjsLight5[i] !== null) {
+            if (spnObjsLight5[i].innerText === "on") {
+                chkObjsLight5[i].checked = true;
+            } else {
+                chkObjsLight5[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight6.length; i++) {
+
+        if (chkObjsLight6[i] !== null) {
+            if (spnObjsLight6[i].innerText === "on") {
+                chkObjsLight6[i].checked = true;
+            } else {
+                chkObjsLight6[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight7.length; i++) {
+
+        if (chkObjsLight7[i] !== null) {
+            if (spnObjsLight7[i].innerText === "on") {
+                chkObjsLight7[i].checked = true;
+            } else {
+                chkObjsLight7[i].checked = false;
+            }
+        }
+    }
 }
 
 
@@ -308,10 +348,26 @@ function ChangeCheckBoxLight(listId) {
 function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
 
         surfix = '';
         if (fieldName === 'STACKINGFLG') {
             surfix = 'STACKING'
+        }
+        if (fieldName === 'WHOLESALEFLG') {
+            surfix = 'WHOLESALE'
+        }
+        if (fieldName === 'INSPECTIONFLG') {
+            surfix = 'INSPECTION'
+        }
+        if (fieldName === 'DETENTIONFLG') {
+            surfix = 'DETENTION'
         }
         if (fieldName === 'FIRSTRETURNFLG') {
             surfix = 'FIRSTRETURN'
@@ -345,7 +401,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
         else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
+            //document.getElementById('WF_LeftMViewChange').value = 46;
+            document.getElementById('WF_LeftMViewChange').value = 74;
         }
         else if (fieldNM === "SHIPPERSNAME") {
             document.getElementById('WF_LeftMViewChange').value = 42;

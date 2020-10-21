@@ -66,6 +66,14 @@ function ChangeCheckBox() {
 function SelectCheckBox(obj, lineCnt) {
 
     if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";

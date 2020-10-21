@@ -111,7 +111,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditHeaderArea()
+            EditHeaderArea(I_officeCode)
             '◯明細の設定
             EditDetailArea(I_officeCode)
             '***** TODO処理 ここまで *****
@@ -144,7 +144,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定
     ''' </summary>
-    Private Sub EditHeaderArea()
+    Private Sub EditHeaderArea(ByVal I_officeCode As String)
         Dim rngTitleArea As Excel.Range = Nothing
         Dim rngArrstationArea As Excel.Range = Nothing
         Dim rngTrainArea As Excel.Range = Nothing
@@ -152,6 +152,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Dim rngDepdateArea As Excel.Range = Nothing
         Dim rngArrdateArea As Excel.Range = Nothing
         Dim rngAccdateArea As Excel.Range = Nothing
+        Dim strTrainNo() As String = {"5461", "5972"}
         Try
             For Each PrintDatarow As DataRow In PrintData.Rows
                 '◯ 営業所名
@@ -160,11 +161,25 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '◯ 向い先(着駅)
                 rngArrstationArea = Me.ExcelWorkSheet.Range("E7")
                 rngArrstationArea.Value = PrintDatarow("ARRSTATIONNAME")
-                '◯ 列車No
-                rngTrainArea = Me.ExcelWorkSheet.Range("M7")
-                rngTrainArea.Value = PrintDatarow("TRAINNO")
-                rngTrainArea = Me.ExcelWorkSheet.Range("K41")
-                rngTrainArea.Value = PrintDatarow("TRAINNO")
+
+                '### 20201019 START 指摘票対応(No177) ####################################
+                '◎袖ヶ浦営業所の場合
+                '　かつ、列車No(5461⇒5972へ変更)
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 _
+                    AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
+                    rngTrainArea = Me.ExcelWorkSheet.Range("M7")
+                    rngTrainArea.Value = strTrainNo(1)
+                    rngTrainArea = Me.ExcelWorkSheet.Range("K41")
+                    rngTrainArea.Value = strTrainNo(1)
+                Else
+                    '◯ 列車No
+                    rngTrainArea = Me.ExcelWorkSheet.Range("M7")
+                    rngTrainArea.Value = PrintDatarow("TRAINNO")
+                    rngTrainArea = Me.ExcelWorkSheet.Range("K41")
+                    rngTrainArea.Value = PrintDatarow("TRAINNO")
+                End If
+                '### 20201019 END   指摘票対応(No177) ####################################
+
                 '◯ 積込日（予定）
                 rngLoddateArea = Me.ExcelWorkSheet.Range("E9")
                 rngLoddateArea.Value = PrintDatarow("LODDATE")
@@ -228,8 +243,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '◯ 前回油種
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
-                '◯ 順位
-                '### 未使用項目 ###########################################
+
+                '### 20201008 START 指摘票対応(No156)全体 ###################################################
+                '★袖ヶ浦営業所の場合
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '◯ 順位
+                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("SHIPORDER")
+                Else
+                    '◯ 順位
+                    '### 未使用項目 ###########################################
+                End If
+                '### 20201008 END   指摘票対応(No156)全体 ###################################################
                 '◯ 次回交検日
                 rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
@@ -241,7 +266,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '★袖ヶ浦営業所の場合(フォーマットが異なるため別設定)
                 If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
                     '◯ FOC入線順
-                    '### 未使用項目 ###########################################
+                    rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("LINEORDER")
                     '◯ 託送用コード
                     rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
                     rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
@@ -254,9 +280,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End If
                 '### 20200917 END   指摘票対応(No138)全体 ###################################################
 
-                '◯ 記事
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("REMARK")
+                '### 20201008 START 指摘票対応(No157)全体 ###################################################
+                '★袖ヶ浦営業所の場合
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '◯ 記事
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+                Else
+                    '◯ 記事
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("REMARK")
+                End If
+                '### 20201008 END   指摘票対応(No157)全体 ###################################################
 
                 i += 1
             Next

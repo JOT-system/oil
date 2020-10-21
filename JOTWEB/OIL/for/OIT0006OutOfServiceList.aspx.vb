@@ -366,6 +366,12 @@ Public Class OIT0006OutOfServiceList
                     '◯名称取得
                     '目的
                     CODENAME_get("OBJECTIVECODE", OIT0006row("OBJECTIVECODE"), OIT0006row("OBJECTIVENAME"), WW_RTN_SW)
+                    '回送進行ステータス
+                    Select Case OIT0006row("KAISOUSTATUS")
+                        Case BaseDllConst.CONST_KAISOUSTATUS_450,
+                             BaseDllConst.CONST_KAISOUSTATUS_500
+                            CODENAME_get("KAISOUSTATUS", OIT0006row("KAISOUSTATUS") + OIT0006row("OBJECTIVECODE"), OIT0006row("KAISOUSTATUSNAME"), WW_DUMMY)
+                    End Select
 
                 Next
             End Using

@@ -2086,11 +2086,21 @@ Public Class OIT0002LinkDetail
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
-            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
-            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
-            & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
-            & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME" _
-            & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " , OIM0029.VALUE02                                AS REPORTOILNAME" _
+            & " , OIM0029.VALUE05                                AS RINKAIOILKANA" _
+            & " , OIM0029.VALUE06                                AS RINKAISEGMENTOILNAME"
+        'SQLStr &=
+        '      " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
+        '    & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
+        '    & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME"
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
@@ -2108,13 +2118,25 @@ Public Class OIT0002LinkDetail
             & " LEFT JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
             & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
-            & " AND OIT0003.DELFLG <> @DELFLG " _
-            & " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
-            & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
-            & " AND TMP0005.OILNo = '1' " _
-            & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
-            & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & " AND OIT0003.DELFLG <> @DELFLG "
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & " AND OIM0029.KEYCODE04 = '1' " _
+            & " AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
+            & " AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "
+        'SQLStr &=
+        '      " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+        '    & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
+        '    & " AND TMP0005.OILNo = '1' " _
+        '    & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
+        '    & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0011.TRUCKNO " _
             & " AND OIM0005.DELFLG <> @DELFLG " _
             & " WHERE OIT0011.RLINKNO = @RLINKNO "
@@ -4405,7 +4427,7 @@ Public Class OIT0002LinkDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , LINEORDER          , TANKNO" _
-            & "        , STACKINGFLG          , INSPECTIONFLG          , DETENTIONFLG" _
+            & "        , STACKINGFLG          , WHOLESALEFLG           , INSPECTIONFLG      , DETENTIONFLG" _
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
@@ -4420,7 +4442,7 @@ Public Class OIT0002LinkDetail
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @ORDERNO              , @DETAILNO               , @LINEORDER          , @TANKNO" _
-            & "        , @STACKINGFLG          , @INSPECTIONFLG          , @DETENTIONFLG" _
+            & "        , @STACKINGFLG          , @WHOLESALEFLG           , @INSPECTIONFLG      , @DETENTIONFLG" _
             & "        , @FIRSTRETURNFLG       , @AFTERRETURNFLG         , @OTTRANSPORTFLG" _
             & "        , @ORDERINFO            , @SHIPPERSCODE           , @SHIPPERSNAME" _
             & "        , @OILCODE              , @OILNAME                , @ORDERINGTYPE       , @ORDERINGOILNAME" _
@@ -4444,6 +4466,7 @@ Public Class OIT0002LinkDetail
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , STACKINGFLG" _
+            & "    , WHOLESALEFLG" _
             & "    , INSPECTIONFLG" _
             & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
@@ -4498,6 +4521,7 @@ Public Class OIT0002LinkDetail
                 Dim P_LINEORDER As SqlParameter = SQLcmd.Parameters.Add("@LINEORDER", SqlDbType.NVarChar, 2)        '貨物駅入線順
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)              'タンク車№
                 Dim P_STACKINGFLG As SqlParameter = SQLcmd.Parameters.Add("@STACKINGFLG", SqlDbType.NVarChar)       '積置可否フラグ
+                Dim P_WHOLESALEFLG As SqlParameter = SQLcmd.Parameters.Add("@WHOLESALEFLG", SqlDbType.NVarChar)     '未卸可否フラグ
                 Dim P_INSPECTIONFLG As SqlParameter = SQLcmd.Parameters.Add("@INSPECTIONFLG", SqlDbType.NVarChar)   '交検可否フラグ
                 Dim P_DETENTIONFLG As SqlParameter = SQLcmd.Parameters.Add("@DETENTIONFLG", SqlDbType.NVarChar)     '留置可否フラグ
                 Dim P_FIRSTRETURNFLG As SqlParameter = SQLcmd.Parameters.Add("@FIRSTRETURNFLG", SqlDbType.NVarChar) '先返し可否フラグ
@@ -4555,6 +4579,7 @@ Public Class OIT0002LinkDetail
                     'P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
                     P_TANKNO.Value = OIT0002row("TANKNUMBER")               'タンク車№
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
+                    P_WHOLESALEFLG.Value = "2"                              '未卸可否フラグ
                     P_INSPECTIONFLG.Value = "2"                             '交検可否フラグ
                     P_DETENTIONFLG.Value = "2"                              '留置可否フラグ
                     P_FIRSTRETURNFLG.Value = "2"                            '先返し可否フラグ
@@ -6328,17 +6353,17 @@ Public Class OIT0002LinkDetail
                 Case "DEPSTATION"       '積込後発駅
                     'leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))
                     If IsNothing(I_OFFICECODE) Then
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text, "DEPSTATION"))
                     Else
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "2", "DEPSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE, "DEPSTATION"))
                     End If
 
                 Case "RETSTATION"       '積込後着駅
                     'leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "RETSTATION"))
                     If IsNothing(I_OFFICECODE) Then
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "RETSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text, "RETSTATION"))
                     Else
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "1", "RETSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE, "RETSTATION"))
                     End If
 
                 Case "PRODUCTPATTERN"   '油種

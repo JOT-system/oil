@@ -168,6 +168,9 @@ Public Class OIT0005TankLocCondition
         sqlStat.AppendLine("SELECT ")
         sqlStat.AppendLine("       ISNULL(SUM(CASE WHEN VTS.ISCOUNT1GROUP='1' THEN 1 ELSE 0 END),0) AS COUNTGROUP1")
         sqlStat.AppendLine("      ,ISNULL(SUM(CASE WHEN VTS.ISCOUNT2GROUP='1' THEN 1 ELSE 0 END),0) AS COUNTGROUP2")
+        If condItem.Value3Name <> "" Then
+            sqlStat.AppendLine("      ,ISNULL(SUM(CASE WHEN VTS.ISCOUNT3GROUP='1' THEN 1 ELSE 0 END),0) AS COUNTGROUP3")
+        End If
         sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
         sqlStat.AppendFormat(" WHERE VTS.OFFICECODE IN ({0})", salesOfficeInStat)
         Using sqlCmd = New SqlCommand(sqlStat.ToString, sqlCon)
@@ -175,12 +178,17 @@ Public Class OIT0005TankLocCondition
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 Dim retVal1 As Decimal = 0
                 Dim retVal2 As Decimal = 0
+                Dim retVal3 As Decimal = 0
                 While sqlDr.Read
                     retVal1 = CDec(sqlDr("COUNTGROUP1"))
                     retVal2 = CDec(sqlDr("COUNTGROUP2"))
+                    If condItem.Value3Name <> "" Then
+                        retVal3 = CDec(sqlDr("COUNTGROUP3"))
+                    End If
                 End While
                 condItem.Value1 = retVal1
                 condItem.Value2 = retVal2
+                condItem.Value3 = retVal3
             End Using
         End Using
         Return condItem

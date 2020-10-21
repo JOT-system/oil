@@ -116,6 +116,47 @@
                         <asp:TextBox ID="WF_MYWEIGHT" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_MYWEIGHT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                    
+                    <!-- タンク車長 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_LENGTH_L" runat="server" Text="タンク車長" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_LENGTH" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_LENGTH_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_5.6">
+                    <!-- タンク車体長 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_TANKLENGTH_L" runat="server" Text="タンク車体長" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_TANKLENGTH" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_TANKLENGTH_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    
+                    <!-- 最大口径 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_MAXCALIBER_L" runat="server" Text="最大口径" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_MAXCALIBER" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_MAXCALIBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_5.7">
+                    <!-- 最小口径 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_MINCALIBER_L" runat="server" Text="最小口径" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_MINCALIBER" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_MINCALIBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    
+                    <!-- 長さフラグ -->
+                    <span class="ef">
+                        <asp:Label ID="WF_LENGTHFLG_L" runat="server" Text="長さフラグ" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_LENGTHFLG', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_LENGTHFLG');">
+                            <asp:TextBox ID="WF_LENGTHFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_LENGTHFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
                 </p>
 
                 <p id="KEY_LINE_6">

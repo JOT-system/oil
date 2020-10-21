@@ -275,6 +275,141 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_MYWEIGHT_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_LENGTH_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTH_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_LENGTH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTH As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_LENGTH_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTH_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TANKLENGTH_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKLENGTH_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TANKLENGTH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKLENGTH As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TANKLENGTH_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKLENGTH_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MAXCALIBER_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAXCALIBER_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MAXCALIBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAXCALIBER As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_MAXCALIBER_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAXCALIBER_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MINCALIBER_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MINCALIBER_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MINCALIBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MINCALIBER As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_MINCALIBER_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MINCALIBER_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_LENGTHFLG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTHFLG_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_LENGTHFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTHFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_LENGTHFLG_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LENGTHFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_ORIGINOWNERCODE_L コントロール。
     '''</summary>
     '''<remarks>

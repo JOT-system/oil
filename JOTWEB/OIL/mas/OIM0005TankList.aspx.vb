@@ -85,6 +85,16 @@ Public Class OIM0005TankList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                            WF_FIELD_Change()
+                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -179,6 +189,10 @@ Public Class OIM0005TankList
             Master.CreateXMLSaveFile()
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005C Then
             Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
+
+            '長さフラグ
+            WF_FIL_LENGTHFLG.Text = work.WF_SEL_LENGTHFLG.Text
+            CODENAME_get("LENGTHFLG", WF_FIL_LENGTHFLG.Text, WF_FIL_LENGTHFLG_TEXT.Text, WW_RTN_SW)
         End If
 
     End Sub
@@ -205,10 +219,39 @@ Public Class OIM0005TankList
         '〇 一覧の件数を取得
         Me.WF_ListCNT.Text = "件数：" + OIM0005tbl.Rows.Count.ToString()
 
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each OIM0005row As DataRow In OIM0005tbl.Rows
+            'Filter
+            If WF_FIL_LENGTHFLG.Text <> "" AndAlso OIM0005row("LENGTHFLG") <> WF_FIL_LENGTHFLG.Text Then
+                OIM0005row("HIDDEN") = 1
+            End If
+
+            If OIM0005row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIM0005row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIM0005tbl)
 
-        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
 
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
@@ -270,6 +313,11 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.VOLUME), '')                            AS VOLUME " _
             & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')                        AS VOLUMEUNIT " _
             & " , ISNULL(RTRIM(OIM0005.MYWEIGHT), '')                          AS MYWEIGHT " _
+            & " , ISNULL(RTRIM(OIM0005.LENGTH), '')                            AS LENGTH " _
+            & " , ISNULL(RTRIM(OIM0005.TANKLENGTH), '')                        AS TANKLENGTH " _
+            & " , ISNULL(RTRIM(OIM0005.MAXCALIBER), '')                        AS MAXCALIBER " _
+            & " , ISNULL(RTRIM(OIM0005.MINCALIBER), '')                        AS MINCALIBER " _
+            & " , ISNULL(RTRIM(OIM0005.LENGTHFLG), '')                         AS LENGTHFLG " _
             & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')                   AS ORIGINOWNERCODE " _
             & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')                   AS ORIGINOWNERNAME " _
             & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')                         AS OWNERCODE " _
@@ -469,6 +517,11 @@ Public Class OIM0005TankList
 
         '○ 表示対象行カウント(絞り込み対象)
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
+            'Filter
+            If WF_FIL_LENGTHFLG.Text <> "" AndAlso OIM0005row("LENGTHFLG") <> WF_FIL_LENGTHFLG.Text Then
+                OIM0005row("HIDDEN") = 1
+            End If
+
             If OIM0005row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
@@ -538,10 +591,142 @@ Public Class OIM0005TankList
     End Sub
 
     ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            Dim WW_FIELD As String = ""
+            If WF_FIELD_REP.Value = "" Then
+                WW_FIELD = WF_FIELD.Value
+            Else
+                WW_FIELD = WF_FIELD_REP.Value
+            End If
+
+            With leftview
+                Dim prmData As New Hashtable
+
+                'フィールドによってパラメータを変える
+                Select Case WF_FIELD.Value
+
+                            '長さフラグ
+                    Case "WF_FIL_LENGTHFLG"
+                        prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "LENGTHFLG")
+
+                End Select
+
+                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                .ActiveListBox()
+            End With
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '長さフラグ
+            Case "WF_FIL_LENGTHFLG"
+                CODENAME_get("LENGTHFLG", WF_FIL_LENGTHFLG.Text, WF_FIL_LENGTHFLG_TEXT.Text, WW_RTN_SW)
+                WF_GridPosition.Text = "1"
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+        End If
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  leftBOX関連操作                                                       ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        If WF_FIELD_REP.Value = "" Then
+            Select Case WF_FIELD.Value
+
+                Case "WF_FIL_LENGTHFLG"    '長さフラグ
+                    WF_FIL_LENGTHFLG.Text = WW_SelectValue
+                    WF_FIL_LENGTHFLG_TEXT.Text = WW_SelectText
+                    WF_FIL_LENGTHFLG.Focus()
+
+            End Select
+        Else
+        End If
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+
+    End Sub
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+
+        '○ フォーカスセット
+        If WF_FIELD_REP.Value = "" Then
+            Select Case WF_FIELD.Value
+
+                Case "WF_FIL_LENGTHFLG"                     '長さフラグ
+                    WF_FIL_LENGTHFLG.Focus()
+
+            End Select
+        Else
+        End If
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+
+    End Sub
+
+
+    ''' <summary>
     ''' 追加ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
+
+        '長さフラグ(Filter)
+        work.WF_SEL_LENGTHFLG.Text = WF_FIL_LENGTHFLG.Text
 
         '選択行
         work.WF_SEL_LINECNT.Text = ""
@@ -682,19 +867,34 @@ Public Class OIM0005TankList
         work.WF_SEL_MODELKANA.Text = ""
 
         '荷重
-        work.WF_SEL_LOAD.Text = ""
+        work.WF_SEL_LOAD.Text = "0.0"
 
         '荷重単位
         work.WF_SEL_LOADUNIT.Text = ""
 
         '容積
-        work.WF_SEL_VOLUME.Text = ""
+        work.WF_SEL_VOLUME.Text = "0.0"
 
         '容積単位
         work.WF_SEL_VOLUMEUNIT.Text = ""
 
         '自重
-        work.WF_SEL_MYWEIGHT.Text = ""
+        work.WF_SEL_MYWEIGHT.Text = "0.0"
+
+        'タンク車長
+        work.WF_SEL_LENGTH.Text = "0"
+
+        'タンク車体長
+        work.WF_SEL_TANKLENGTH.Text = "0"
+
+        '最大口径
+        work.WF_SEL_MAXCALIBER.Text = "0"
+
+        '最小口径
+        work.WF_SEL_MINCALIBER.Text = "0"
+
+        '長さフラグ
+        work.WF_SEL_LENGTHFLG2.Text = ""
 
         '原籍所有者
         work.WF_SEL_ORIGINOWNERNAME.Text = ""
@@ -999,6 +1199,11 @@ Public Class OIM0005TankList
             & "        , JXTGTANKNUMBER3 = @P89" _
             & "        , JXTGTANKNUMBER4 = @P90" _
             & "        , SAPSHELLTANKNUMBER = @P91" _
+            & "        , LENGTH = @P92" _
+            & "        , TANKLENGTH = @P93" _
+            & "        , MAXCALIBER = @P94" _
+            & "        , MINCALIBER = @P95" _
+            & "        , LENGTHFLG = @P96" _
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -1094,7 +1299,12 @@ Public Class OIM0005TankList
             & "        , JXTGTANKNUMBER2" _
             & "        , JXTGTANKNUMBER3" _
             & "        , JXTGTANKNUMBER4" _
-            & "        , SAPSHELLTANKNUMBER)" _
+            & "        , SAPSHELLTANKNUMBER" _
+            & "        , LENGTH" _
+            & "        , TANKLENGTH" _
+            & "        , MAXCALIBER" _
+            & "        , MINCALIBER" _
+            & "        , LENGTHFLG)" _
             & "    VALUES" _
             & "        (@P00" _
             & "        , @P01" _
@@ -1187,7 +1397,12 @@ Public Class OIM0005TankList
             & "        , @P88" _
             & "        , @P89" _
             & "        , @P90" _
-            & "        , @P91) ;" _
+            & "        , @P91" _
+            & "        , @P92" _
+            & "        , @P93" _
+            & "        , @P94" _
+            & "        , @P95" _
+            & "        , @P96) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
 
@@ -1254,6 +1469,11 @@ Public Class OIM0005TankList
             & "    , RESERVE3" _
             & "    , USEDFLG" _
             & "    , MYWEIGHT" _
+            & "    , LENGTH" _
+            & "    , TANKLENGTH" _
+            & "    , MAXCALIBER" _
+            & "    , MINCALIBER" _
+            & "    , LENGTHFLG" _
             & "    , AUTOEXTENTIONNAME" _
             & "    , BIGOILCODE" _
             & "    , BIGOILNAME" _
@@ -1386,6 +1606,11 @@ Public Class OIM0005TankList
                 Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20)          'JXTG川崎車番
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.NVarChar, 20)          'JXTG根岸車番
                 Dim PARA91 As SqlParameter = SQLcmd.Parameters.Add("@P91", SqlDbType.NVarChar, 20)          '出光昭シSAP車番
+                Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.Int)                   'タンク車長
+                Dim PARA93 As SqlParameter = SQLcmd.Parameters.Add("@P93", SqlDbType.Int)                   'タンク車体長
+                Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.Int)                   '最大口径
+                Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.Int)                   '最大口径
+                Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)           '長さフラグ
 
 
                 Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
@@ -1642,6 +1867,27 @@ Public Class OIM0005TankList
                         PARA89.Value = OIM0005row("JXTGTANKNUMBER3")
                         PARA90.Value = OIM0005row("JXTGTANKNUMBER4")
                         PARA91.Value = OIM0005row("SAPSHELLTANKNUMBER")
+                        If OIM0005row("LENGTH") <> "" Then
+                            PARA92.Value = OIM0005row("LENGTH")
+                        Else
+                            PARA92.Value = "0"
+                        End If
+                        If OIM0005row("TANKLENGTH") <> "" Then
+                            PARA93.Value = OIM0005row("TANKLENGTH")
+                        Else
+                            PARA93.Value = "0"
+                        End If
+                        If OIM0005row("MAXCALIBER") <> "" Then
+                            PARA94.Value = OIM0005row("MAXCALIBER")
+                        Else
+                            PARA94.Value = "0"
+                        End If
+                        If OIM0005row("MINCALIBER") <> "" Then
+                            PARA95.Value = OIM0005row("MINCALIBER")
+                        Else
+                            PARA95.Value = "0"
+                        End If
+                        PARA96.Value = OIM0005row("LENGTHFLG")
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
 
@@ -1948,6 +2194,9 @@ Public Class OIM0005TankList
             Exit Sub
         End Try
 
+        '長さフラグ(Filter)
+        work.WF_SEL_LENGTHFLG.Text = WF_FIL_LENGTHFLG.Text
+
         '選択行
         work.WF_SEL_LINECNT.Text = OIM0005tbl.Rows(WW_LINECNT)("LINECNT")
 
@@ -2130,6 +2379,21 @@ Public Class OIM0005TankList
 
         '自重
         work.WF_SEL_MYWEIGHT.Text = OIM0005tbl.Rows(WW_LINECNT)("MYWEIGHT")
+
+        'タンク車長
+        work.WF_SEL_LENGTH.Text = OIM0005tbl.Rows(WW_LINECNT)("LENGTH")
+
+        'タンク車体長
+        work.WF_SEL_TANKLENGTH.Text = OIM0005tbl.Rows(WW_LINECNT)("TANKLENGTH")
+
+        '最大口径
+        work.WF_SEL_MAXCALIBER.Text = OIM0005tbl.Rows(WW_LINECNT)("MAXCALIBER")
+
+        '最小口径
+        work.WF_SEL_MINCALIBER.Text = OIM0005tbl.Rows(WW_LINECNT)("MINCALIBER")
+
+        '長さフラグ
+        work.WF_SEL_LENGTHFLG2.Text = OIM0005tbl.Rows(WW_LINECNT)("LENGTHFLG")
 
         '自動延長名
         work.WF_SEL_AUTOEXTENTIONNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("AUTOEXTENTIONNAME")
@@ -2341,6 +2605,11 @@ Public Class OIM0005TankList
                 WW_COLUMNS.IndexOf("VOLUME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("VOLUMEUNIT") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("MYWEIGHT") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LENGTH") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("TANKLENGTH") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("MAXCALIBER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("MINCALIBER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LENGTHFLG") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ORIGINOWNERNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("OWNERCODE") >= 0 AndAlso
@@ -2427,6 +2696,11 @@ Public Class OIM0005TankList
                         XLSTBLrow("VOLUME") = OIM0005row("VOLUME") AndAlso
                         XLSTBLrow("VOLUMEUNIT") = OIM0005row("VOLUMEUNIT") AndAlso
                         XLSTBLrow("MYWEIGHT") = OIM0005row("MYWEIGHT") AndAlso
+                        XLSTBLrow("LENGTH") = OIM0005row("LENGTH") AndAlso
+                        XLSTBLrow("TANKLENGTH") = OIM0005row("TANKLENGTH") AndAlso
+                        XLSTBLrow("MAXCALIBER") = OIM0005row("MAXCALIBER") AndAlso
+                        XLSTBLrow("MINCALIBER") = OIM0005row("MINCALIBER") AndAlso
+                        XLSTBLrow("LENGTHFLG") = OIM0005row("LENGTHFLG") AndAlso
                         XLSTBLrow("ORIGINOWNERCODE") = OIM0005row("ORIGINOWNERCODE") AndAlso
                         XLSTBLrow("ORIGINOWNERNAME") = OIM0005row("ORIGINOWNERNAME") AndAlso
                         XLSTBLrow("OWNERCODE") = OIM0005row("OWNERCODE") AndAlso
@@ -2549,6 +2823,31 @@ Public Class OIM0005TankList
             '自重
             If WW_COLUMNS.IndexOf("MYWEIGHT") >= 0 Then
                 OIM0005INProw("MYWEIGHT") = XLSTBLrow("MYWEIGHT")
+            End If
+
+            'タンク車長
+            If WW_COLUMNS.IndexOf("LENGTH") >= 0 Then
+                OIM0005INProw("LENGTH") = XLSTBLrow("LENGTH")
+            End If
+
+            'タンク車体長
+            If WW_COLUMNS.IndexOf("TANKLENGTH") >= 0 Then
+                OIM0005INProw("TANKLENGTH") = XLSTBLrow("TANKLENGTH")
+            End If
+
+            '最大口径
+            If WW_COLUMNS.IndexOf("MAXCALIBER") >= 0 Then
+                OIM0005INProw("MAXCALIBER") = XLSTBLrow("MAXCALIBER")
+            End If
+
+            '最小口径
+            If WW_COLUMNS.IndexOf("MINCALIBER") >= 0 Then
+                OIM0005INProw("MINCALIBER") = XLSTBLrow("MINCALIBER")
+            End If
+
+            '長さフラグ
+            If WW_COLUMNS.IndexOf("LENGTHFLG") >= 0 Then
+                OIM0005INProw("LENGTHFLG") = XLSTBLrow("LENGTHFLG")
             End If
 
             '原籍所有者C
@@ -2931,12 +3230,12 @@ Public Class OIM0005TankList
                 OIM0005INProw("USEDFLG") = XLSTBLrow("USEDFLG")
             End If
 
-            ''削除フラグ
-            'If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-            '    OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
-            'Else
-            '    OIM0005INProw("DELFLG") = "0"
-            'End If
+            '削除フラグ
+            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
+            Else
+                OIM0005INProw("DELFLG") = "0"
+            End If
 
             OIM0005INPtbl.Rows.Add(OIM0005INProw)
         Next
@@ -3097,17 +3396,7 @@ Public Class OIM0005TankList
             'JOT車番(バリデーションチェック)
             WW_TEXT = OIM0005INProw("TANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("TANKNUMBER", OIM0005INProw("TANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JOT車番入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(JOT車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -3119,15 +3408,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("ORIGINOWNERCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("ORIGINOWNERCODE", OIM0005INProw("ORIGINOWNERCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(原籍所有者C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("ORIGINOWNERCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(原籍所有者C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(原籍所有者C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3140,15 +3431,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("OWNERCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("OWNERCODE", OIM0005INProw("OWNERCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(名義所有者C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("ORIGINOWNERCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(名義所有者C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(名義所有者C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3161,15 +3454,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LEASECODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("LEASECODE", OIM0005INProw("LEASECODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("LEASECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3182,15 +3477,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LEASECLASS")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("LEASECLASS", OIM0005INProw("LEASECLASS"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(リース区分C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("LEASECLASS", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(リース区分C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(リース区分C入力エラー)です。"
                 WW_CheckMES1 = "リース区分C入力エラー。"
@@ -3204,15 +3501,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("AUTOEXTENTION")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("AUTOEXTENTION", OIM0005INProw("AUTOEXTENTION"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(自動延長入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("AUTOEXTENTION", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(自動延長入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(自動延長入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3225,15 +3524,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LEASESTYMD")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASESTYMD", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("LEASESTYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(リース開始年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("LEASESTYMD") = CDate(OIM0005INProw("LEASESTYMD")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(リース開始年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("LEASESTYMD") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(リース開始年月日入力エラー)です。"
@@ -3247,15 +3549,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LEASEENDYMD")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASEENDYMD", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("LEASEENDYMD"), "リース満了年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(リース満了年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("LEASEENDYMD") = CDate(OIM0005INProw("LEASEENDYMD")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "リース満了年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(リース満了年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("LEASEENDYMD") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(リース満了年月日入力エラー)です。"
@@ -3269,15 +3574,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("USERCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("USERCODE", OIM0005INProw("USERCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(第三者使用者C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("USERCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(第三者使用者C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(第三者使用者C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3290,14 +3597,16 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("CURRENTSTATIONCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("STATIONPATTERN", OIM0005INProw("CURRENTSTATIONCODE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(原常備駅C入力エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("STATIONPATTERN", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(原常備駅C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(原常備駅C入力エラー)です。"
@@ -3311,14 +3620,16 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("EXTRADINARYSTATIONCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("STATIONPATTERN", OIM0005INProw("EXTRADINARYSTATIONCODE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(臨時常備駅C入力エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("STATIONPATTERN", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(臨時常備駅C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(臨時常備駅C入力エラー)です。"
@@ -3332,15 +3643,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("USERLIMIT")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERLIMIT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("USERLIMIT"), "第三者使用期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(第三者使用期限入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("USERLIMIT") = CDate(OIM0005INProw("USERLIMIT")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "第三者使用期限", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(第三者使用期限入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("USERLIMIT") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(第三者使用期限入力エラー)です。"
@@ -3354,15 +3668,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LIMITTEXTRADIARYSTATION")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LIMITTEXTRADIARYSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("LIMITTEXTRADIARYSTATION"), "臨時常備駅期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(臨時常備駅期限入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("LIMITTEXTRADIARYSTATION") = CDate(OIM0005INProw("LIMITTEXTRADIARYSTATION")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "臨時常備駅期限", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(臨時常備駅期限入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("LIMITTEXTRADIARYSTATION") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(臨時常備駅期限入力エラー)です。"
@@ -3376,15 +3693,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("DEDICATETYPECODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("DEDICATETYPECODE", OIM0005INProw("DEDICATETYPECODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(原専用種別C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("DEDICATETYPECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(原専用種別C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(原専用種別C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3397,15 +3716,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("EXTRADINARYTYPECODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("EXTRADINARYTYPECODE", OIM0005INProw("EXTRADINARYTYPECODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(臨時専用種別C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("EXTRADINARYTYPECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(臨時専用種別C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(臨時専用種別C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3418,15 +3739,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("EXTRADINARYLIMIT")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYLIMIT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("EXTRADINARYLIMIT"), "臨時専用期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(臨時専用期限入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("EXTRADINARYLIMIT") = CDate(OIM0005INProw("EXTRADINARYLIMIT")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "臨時専用期限", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(臨時専用期限入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("EXTRADINARYLIMIT") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(臨時専用期限入力エラー)です。"
@@ -3440,14 +3764,16 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("OPERATIONBASECODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("BASE", OIM0005INProw("OPERATIONBASECODE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(運用基地C入力エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("BASE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(運用基地C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(運用基地C入力エラー)です。"
@@ -3461,15 +3787,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("COLORCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("COLORCODE", OIM0005INProw("COLORCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(塗色C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("COLORCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(塗色C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(塗色C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3482,15 +3810,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("MARKCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MARKCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("MARKCODE", OIM0005INProw("MARKCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(マークコード入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("MARKCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(マークコード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(マークコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3502,17 +3832,7 @@ Public Class OIM0005TankList
             'マーク名(バリデーションチェック)
             WW_TEXT = OIM0005INProw("MARKNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MARKNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("MARKNAME", OIM0005INProw("MARKNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(マーク名入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(マーク名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -3524,15 +3844,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("ALLINSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("ALLINSPECTIONDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("ALLINSPECTIONDATE") = CDate(OIM0005INProw("ALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("ALLINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー入力エラー)です。"
@@ -3546,15 +3869,18 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("TRANSFERDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRANSFERDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("TRANSFERDATE"), "車籍編入年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(車籍編入年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("TRANSFERDATE") = CDate(OIM0005INProw("TRANSFERDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "車籍編入年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(車籍編入年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("TRANSFERDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(車籍編入年月日入力エラー)です。"
@@ -3568,15 +3894,17 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("OBTAINEDCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(取得先C入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("OBTAINEDCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(取得先C入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(取得先C入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -3588,18 +3916,8 @@ Public Class OIM0005TankList
             ' 形式（バリデーションチェック）
             WW_TEXT = OIM0005INProw("MODEL")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MODEL", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("MODEL", OIM0005INProw("MODEL"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(形式エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(形式エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(形式入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3609,18 +3927,8 @@ Public Class OIM0005TankList
             ' 形式カナ（バリデーションチェック）
             WW_TEXT = OIM0005INProw("MODELKANA")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MODELKANA", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("MODELKANA", OIM0005INProw("MODELKANA"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(形式カナエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(形式カナエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(形式カナ入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3630,18 +3938,8 @@ Public Class OIM0005TankList
             ' 荷重（バリデーションチェック）
             WW_TEXT = OIM0005INProw("LOAD")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LOAD", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("LOAD", OIM0005INProw("LOAD"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(荷重エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(荷重エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(荷重入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3652,17 +3950,19 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("LOADUNIT")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LOADUNIT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("LOADUNIT", OIM0005INProw("LOADUNIT"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(荷重単位エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("UNIT", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(荷重単位入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(荷重単位エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(荷重単位入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3672,18 +3972,8 @@ Public Class OIM0005TankList
             ' 容積（バリデーションチェック）
             WW_TEXT = OIM0005INProw("VOLUME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "VOLUME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("VOLUME", OIM0005INProw("VOLUME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(容積エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(容積エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(容積入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3694,17 +3984,19 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("VOLUMEUNIT")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "VOLUMEUNIT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("VOLUMEUNIT", OIM0005INProw("VOLUMEUNIT"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(容積単位エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("UNIT", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(容積単位入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(容積単位エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(容積単位入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3714,18 +4006,75 @@ Public Class OIM0005TankList
             ' 自重（バリデーションチェック）
             WW_TEXT = OIM0005INProw("MYWEIGHT")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MYWEIGHT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(自重入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' タンク車長（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("LENGTH")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LENGTH", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(タンク車長入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' タンク車体長（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("TANKLENGTH")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKLENGTH", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(タンク車体長入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 最大口径（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("MAXCALIBER")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MAXCALIBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(最大口径入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 最小口径（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("MINCALIBER")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MINCALIBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(最小口径入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 長さフラグ（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("LENGTHFLG")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LENGTHFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("MYWEIGHT", OIM0005INProw("MYWEIGHT"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(自重エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("LENGTHFLG", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(長さフラグ入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(自重エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(長さフラグ入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3735,18 +4084,8 @@ Public Class OIM0005TankList
             ' 原籍所有者（バリデーションチェック）
             WW_TEXT = OIM0005INProw("ORIGINOWNERNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("ORIGINOWNERNAME", OIM0005INProw("ORIGINOWNERNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(原籍所有者エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(原籍所有者エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(原籍所有者入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3756,18 +4095,8 @@ Public Class OIM0005TankList
             ' 名義所有者（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OWNERNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("OWNERNAME", OIM0005INProw("OWNERNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(名義所有者エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(名義所有者エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(名義所有者入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3777,18 +4106,8 @@ Public Class OIM0005TankList
             ' リース先（バリデーションチェック）
             WW_TEXT = OIM0005INProw("LEASENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("LEASENAME", OIM0005INProw("LEASENAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(リース先エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(リース先エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(リース先入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3798,18 +4117,8 @@ Public Class OIM0005TankList
             ' リース区分（バリデーションチェック）
             WW_TEXT = OIM0005INProw("LEASECLASSNEMAE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASSNEMAE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("LEASECLASSNEMAE", OIM0005INProw("LEASECLASSNEMAE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(リース区分エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(リース区分エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(リース区分入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3819,18 +4128,8 @@ Public Class OIM0005TankList
             ' 自動延長名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("AUTOEXTENTIONNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTIONNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("AUTOEXTENTIONNAME", OIM0005INProw("AUTOEXTENTIONNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(自動延長名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(自動延長名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(自動延長名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3840,18 +4139,8 @@ Public Class OIM0005TankList
             ' 第三者使用者（バリデーションチェック）
             WW_TEXT = OIM0005INProw("USERNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("USERNAME", OIM0005INProw("USERNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(第三者使用者エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(第三者使用者エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(第三者使用者入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3861,18 +4150,8 @@ Public Class OIM0005TankList
             ' 原常備駅（バリデーションチェック）
             WW_TEXT = OIM0005INProw("CURRENTSTATIONNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("CURRENTSTATIONNAME", OIM0005INProw("CURRENTSTATIONNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(原常備駅エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(原常備駅エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(原常備駅入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3882,18 +4161,8 @@ Public Class OIM0005TankList
             ' 臨時常備駅（バリデーションチェック）
             WW_TEXT = OIM0005INProw("EXTRADINARYSTATIONNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("EXTRADINARYSTATIONNAME", OIM0005INProw("EXTRADINARYSTATIONNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(臨時常備駅エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(臨時常備駅エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(臨時常備駅入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3903,18 +4172,8 @@ Public Class OIM0005TankList
             ' 原専用種別（バリデーションチェック）
             WW_TEXT = OIM0005INProw("DEDICATETYPENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("DEDICATETYPENAME", OIM0005INProw("DEDICATETYPENAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(原専用種別エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(原専用種別エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(原専用種別入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3924,18 +4183,8 @@ Public Class OIM0005TankList
             ' 臨時専用種別（バリデーションチェック）
             WW_TEXT = OIM0005INProw("EXTRADINARYTYPENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("EXTRADINARYTYPENAME", OIM0005INProw("EXTRADINARYTYPENAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(臨時専用種別エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(臨時専用種別エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(臨時専用種別入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3946,17 +4195,19 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("BIGOILCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BIGOILCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("BIGOILCODE", OIM0005INProw("BIGOILCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(油種大分類コードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("BIGOILCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(油種大分類コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(油種大分類コードエラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(油種大分類コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3966,18 +4217,8 @@ Public Class OIM0005TankList
             ' 油種大分類名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("BIGOILNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BIGOILNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("BIGOILNAME", OIM0005INProw("BIGOILNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(油種大分類名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(油種大分類名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種大分類名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3987,18 +4228,8 @@ Public Class OIM0005TankList
             ' 運用場所（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OPERATIONBASENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("OPERATIONBASENAME", OIM0005INProw("OPERATIONBASENAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(運用場所エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(運用場所エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(運用場所入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4008,18 +4239,8 @@ Public Class OIM0005TankList
             ' 塗色（バリデーションチェック）
             WW_TEXT = OIM0005INProw("COLORNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("COLORNAME", OIM0005INProw("COLORNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(塗色エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(塗色エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(塗色入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4029,18 +4250,8 @@ Public Class OIM0005TankList
             ' JXTG仙台タグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGCODE1")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGCODE1", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGCODE1", OIM0005INProw("JXTGTAGCODE1"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4050,18 +4261,8 @@ Public Class OIM0005TankList
             ' JXTG仙台タグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGNAME1")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGNAME1", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGNAME1", OIM0005INProw("JXTGTAGNAME1"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG仙台タグ名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4071,18 +4272,8 @@ Public Class OIM0005TankList
             ' JXTG千葉タグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGCODE2")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGCODE2", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGCODE2", OIM0005INProw("JXTGTAGCODE2"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4092,18 +4283,8 @@ Public Class OIM0005TankList
             ' JXTG千葉タグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGNAME2")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGNAME2", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGNAME2", OIM0005INProw("JXTGTAGNAME2"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG千葉タグ名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4113,18 +4294,8 @@ Public Class OIM0005TankList
             ' JXTG川崎タグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGCODE3")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGCODE3", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGCODE3", OIM0005INProw("JXTGTAGCODE3"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4134,18 +4305,8 @@ Public Class OIM0005TankList
             ' JXTG川崎タグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGNAME3")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGNAME3", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGNAME3", OIM0005INProw("JXTGTAGNAME3"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG川崎タグ名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4155,18 +4316,8 @@ Public Class OIM0005TankList
             ' JXTG根岸タグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGCODE4")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGCODE4", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGCODE4", OIM0005INProw("JXTGTAGCODE4"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4176,18 +4327,8 @@ Public Class OIM0005TankList
             ' JXTG根岸タグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTAGNAME4")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTAGNAME4", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTAGNAME4", OIM0005INProw("JXTGTAGNAME4"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG根岸タグ名入力入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4197,18 +4338,8 @@ Public Class OIM0005TankList
             ' 出光昭シタグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("IDSSTAGCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "IDSSTAGCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("IDSSTAGCODE", OIM0005INProw("IDSSTAGCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(出光昭シタグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(出光昭シタグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(出光昭シタグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4218,18 +4349,8 @@ Public Class OIM0005TankList
             ' 出光昭シタグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("IDSSTAGNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "IDSSTAGNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("IDSSTAGNAME", OIM0005INProw("IDSSTAGNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(出光昭シタグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(出光昭シタグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(出光昭シタグ名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4239,18 +4360,8 @@ Public Class OIM0005TankList
             ' コスモタグコード（バリデーションチェック）
             WW_TEXT = OIM0005INProw("COSMOTAGCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COSMOTAGCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("COSMOTAGCODE", OIM0005INProw("COSMOTAGCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(コスモタグコードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(コスモタグコードエラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(コスモタグコード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4260,18 +4371,8 @@ Public Class OIM0005TankList
             ' コスモタグ名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("COSMOTAGNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COSMOTAGNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("COSMOTAGNAME", OIM0005INProw("COSMOTAGNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(コスモタグ名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(コスモタグ名エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(コスモタグ名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4281,18 +4382,8 @@ Public Class OIM0005TankList
             ' 予備1（バリデーションチェック）
             WW_TEXT = OIM0005INProw("RESERVE1")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RESERVE1", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("RESERVE1", OIM0005INProw("RESERVE1"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(予備1エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(予備1エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(予備1入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4302,18 +4393,8 @@ Public Class OIM0005TankList
             ' 予備2（バリデーションチェック）
             WW_TEXT = OIM0005INProw("RESERVE2")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RESERVE2", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("RESERVE2", OIM0005INProw("RESERVE2"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(予備2エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(予備2エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(予備2入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4324,18 +4405,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("JRINSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRINSPECTIONDATE"), "次回交検年月日(JR）", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR）入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回交検年月日(JR）", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR）入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("JRINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR）エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR）入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4346,18 +4430,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("INSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("INSPECTIONDATE"), "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("INSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(次回交検年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4368,18 +4455,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("JRSPECIFIEDDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRSPECIFIEDDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRSPECIFIEDDATE"), "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("JRSPECIFIEDDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4390,18 +4480,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("SPECIFIEDDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SPECIFIEDDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("SPECIFIEDDATE"), "次回指定年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(次回指定年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("SPECIFIEDDATE") = CDate(OIM0005INProw("SPECIFIEDDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回指定年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回指定年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("SPECIFIEDDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(次回指定年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(次回指定年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4412,18 +4505,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("JRALLINSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRALLINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRALLINSPECTIONDATE"), "次回全検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(次回全検年月日(JR)入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("JRALLINSPECTIONDATE") = CDate(OIM0005INProw("JRALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回全検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回全検年月日(JR)入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("JRALLINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(次回全検年月日(JR) エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(次回全検年月日(JR)入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4434,18 +4530,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("PREINSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PREINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("PREINSPECTIONDATE"), "前回全検年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(前回全検年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("PREINSPECTIONDATE") = CDate(OIM0005INProw("PREINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "前回全検年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(前回全検年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("PREINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(前回全検年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(前回全検年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4456,18 +4555,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("GETDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "GETDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("GETDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("GETDATE") = CDate(OIM0005INProw("GETDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("GETDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(取得年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4477,17 +4579,7 @@ Public Class OIM0005TankList
             ' 取得先名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OBTAINEDNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("OBTAINEDNAME", OIM0005INProw("OBTAINEDNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(取得先名エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(取得先名エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -4498,18 +4590,8 @@ Public Class OIM0005TankList
             ' 現在経年（バリデーションチェック）
             WW_TEXT = OIM0005INProw("PROGRESSYEAR")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PROGRESSYEAR", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("PROGRESSYEAR", OIM0005INProw("PROGRESSYEAR"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(現在経年エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(現在経年エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(現在経年入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4519,18 +4601,8 @@ Public Class OIM0005TankList
             ' 次回全検時経年（バリデーションチェック）
             WW_TEXT = OIM0005INProw("NEXTPROGRESSYEAR")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "NEXTPROGRESSYEAR", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("NEXTPROGRESSYEAR", OIM0005INProw("NEXTPROGRESSYEAR"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(次回全検時経年エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(次回全検時経年エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(次回全検時経年入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4541,18 +4613,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("EXCLUDEDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXCLUDEDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("EXCLUDEDATE"), "車籍除外年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(車籍除外年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("EXCLUDEDATE") = CDate(OIM0005INProw("EXCLUDEDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "車籍除外年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(車籍除外年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("EXCLUDEDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(車籍除外年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(車籍除外年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4563,18 +4638,21 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("RETIRMENTDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RETIRMENTDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("RETIRMENTDATE"), "資産除却年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(資産除却年月日入力エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0005INProw("RETIRMENTDATE") = CDate(OIM0005INProw("RETIRMENTDATE")).ToString("yyyy/MM/dd")
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "資産除却年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(資産除却年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("RETIRMENTDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(資産除却年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(資産除却年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4584,17 +4662,7 @@ Public Class OIM0005TankList
             ' JR車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JRTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JRTANKNUMBER", OIM0005INProw("JRTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JR車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(JR車番エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -4606,17 +4674,19 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("JRTANKTYPE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRTANKTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JRTANKTYPE", OIM0005INProw("JRTANKTYPE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JR車種コードエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("JRTANKTYPE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(JR車種コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(JR車種コードエラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(JR車種コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4626,18 +4696,8 @@ Public Class OIM0005TankList
             ' 旧JOT車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OLDTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OLDTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("OLDTANKNUMBER", OIM0005INProw("OLDTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(旧JOT車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(旧JOT車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(旧JOT車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4647,18 +4707,8 @@ Public Class OIM0005TankList
             ' OT車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OTTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OTTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("OTTANKNUMBER", OIM0005INProw("OTTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(OT車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(OT車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(OT車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4668,18 +4718,8 @@ Public Class OIM0005TankList
             ' JXTG仙台車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTANKNUMBER1")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER1", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTANKNUMBER1", OIM0005INProw("JXTGTANKNUMBER1"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG仙台車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG仙台車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG仙台車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4689,18 +4729,8 @@ Public Class OIM0005TankList
             ' JXTG千葉車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTANKNUMBER2")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER2", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTANKNUMBER2", OIM0005INProw("JXTGTANKNUMBER2"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG千葉車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG千葉車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG千葉車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4710,18 +4740,8 @@ Public Class OIM0005TankList
             ' JXTG川崎車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTANKNUMBER3")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER3", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTANKNUMBER3", OIM0005INProw("JXTGTANKNUMBER3"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG川崎車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG川崎車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG川崎車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4731,18 +4751,8 @@ Public Class OIM0005TankList
             ' JXTG根岸車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("JXTGTANKNUMBER4")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER4", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("JXTGTANKNUMBER4", OIM0005INProw("JXTGTANKNUMBER4"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(JXTG根岸車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG根岸車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JXTG根岸車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4752,18 +4762,8 @@ Public Class OIM0005TankList
             ' コスモ車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("COSMOTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COSMOTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("COSMOTANKNUMBER", OIM0005INProw("COSMOTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(コスモ車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(コスモ車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(コスモ車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4773,18 +4773,8 @@ Public Class OIM0005TankList
             ' 富士石油車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("FUJITANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FUJITANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("FUJITANKNUMBER", OIM0005INProw("FUJITANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(富士石油車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(富士石油車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(富士石油車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4794,18 +4784,8 @@ Public Class OIM0005TankList
             ' 出光昭シ車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("SHELLTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SHELLTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("SHELLTANKNUMBER", OIM0005INProw("SHELLTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(出光昭シ車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(出光昭シ車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(出光昭シ車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4815,18 +4795,8 @@ Public Class OIM0005TankList
             ' 出光昭シSAP車番（バリデーションチェック）
             WW_TEXT = OIM0005INProw("SAPSHELLTANKNUMBER")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SAPSHELLTANKNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("SAPSHELLTANKNUMBER", OIM0005INProw("SAPSHELLTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(出光昭シSAP車番エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(出光昭シSAP車番エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(出光昭シSAP車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4836,18 +4806,8 @@ Public Class OIM0005TankList
             ' 予備（バリデーションチェック）
             WW_TEXT = OIM0005INProw("RESERVE3")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RESERVE3", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("RESERVE3", OIM0005INProw("RESERVE3"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(予備エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(予備エラー)です。"
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(予備入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4858,17 +4818,19 @@ Public Class OIM0005TankList
             WW_TEXT = OIM0005INProw("USEDFLG")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USEDFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '' 値存在チェック
-                'CODENAME_get("USEDFLG", OIM0005INProw("USEDFLG"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(利用フラグエラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("USEDFLG", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(利用フラグ入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(利用フラグエラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(利用フラグ入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4953,6 +4915,11 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 容積 =" & OIM0005row("VOLUME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 容積単位 =" & OIM0005row("VOLUMEUNIT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自重 =" & OIM0005row("MYWEIGHT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車長 =" & OIM0005row("LENGTH") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車体長 =" & OIM0005row("TANKLENGTH") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 最大口径 =" & OIM0005row("MAXCALIBER") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 最小口径 =" & OIM0005row("MINCALIBER") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 長さフラグ =" & OIM0005row("LENGTHFLG") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者C =" & OIM0005row("ORIGINOWNERCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者 =" & OIM0005row("ORIGINOWNERNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者C =" & OIM0005row("OWNERCODE") & " , "
@@ -5090,6 +5057,11 @@ Public Class OIM0005TankList
                         OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
                         OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
                         OIM0005row("MYWEIGHT") = OIM0005INProw("MYWEIGHT") AndAlso
+                        OIM0005row("LENGTH") = OIM0005INProw("LENGTH") AndAlso
+                        OIM0005row("TANKLENGTH") = OIM0005INProw("TANKLENGTH") AndAlso
+                        OIM0005row("MAXCALIBER") = OIM0005INProw("MAXCALIBER") AndAlso
+                        OIM0005row("MINCALIBER") = OIM0005INProw("MINCALIBER") AndAlso
+                        OIM0005row("LENGTHFLG") = OIM0005INProw("LENGTHFLG") AndAlso
                         OIM0005row("ORIGINOWNERCODE") = OIM0005INProw("ORIGINOWNERCODE") AndAlso
                         OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
                         OIM0005row("OWNERCODE") = OIM0005INProw("OWNERCODE") AndAlso
@@ -5295,23 +5267,57 @@ Public Class OIM0005TankList
         Dim prmData As New Hashtable
 
         Try
+            prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+
             Select Case I_FIELD
-                Case "CAMPCODE"         '会社コード
+                Case "CAMPCODE"                     '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"              '運用部署
+                Case "ORG"                          '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKNUMBER"       'JOT車番
-                    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                Case "UNIT"                         '荷重単位, 容積単位
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_UNIT, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "ORIGINOWNERCODE"              '原籍所有者C
+                    prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "LEASECLASS"                   'リース区分C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LEASECLASS, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "AUTOEXTENTION"                '自動延長
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "USERCODE"                     '第三者使用者C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_THIRDUSER, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATIONPATTERN"　              '原常備駅C、臨時常備駅C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "BASE"             '運用基地
+                Case "DEDICATETYPECODE"             '原専用種別C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "EXTRADINARYTYPECODE"          '臨時専用種別C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BIGOILCODE"                   '油種大分類コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BIGOILCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BASE"                         '運用基地
                     prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "DELFLG"           '削除
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+                Case "COLORCODE"                    '塗色C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COLOR, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "MARKCODE"                     'マークコード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "MARKCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TAGCODE"                      'タグコード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TAGCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OBTAINEDCODE"                 '取得先C
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_OBTAINED, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "JRTANKTYPE"                   'JR車種コード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "JRTANKTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "LENGTHFLG"                    '長さフラグ
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "LENGTHFLG")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "USEDFLG"                      '利用フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DELFLG"                       '削除フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

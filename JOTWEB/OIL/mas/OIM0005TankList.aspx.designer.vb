@@ -23,6 +23,42 @@ Partial Public Class OIM0005TankList
     Protected WithEvents WF_ListCNT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''filter_LENGTHFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents filter_LENGTHFLG As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_FIL_LENGTHFLG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FIL_LENGTHFLG_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_FIL_LENGTHFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FIL_LENGTHFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_FIL_LENGTHFLG_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FIL_LENGTHFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>

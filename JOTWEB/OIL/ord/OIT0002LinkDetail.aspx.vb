@@ -85,6 +85,7 @@ Public Class OIT0002LinkDetail
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT",
+                             "WF_CheckBoxSELECTINSPECTION",
                              "WF_CheckBoxSELECTOTTRANSPORT"   'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
@@ -418,6 +419,7 @@ Public Class OIT0002LinkDetail
                 & " , ''                                            AS EXTEND " _
                 & " , ''                                            AS CONVERSIONTOTAL " _
                 & " , ''                                            AS LOADINGIRILINEORDER " _
+                & " , ''                                            AS INSPECTIONFLG" _
                 & " , ''                                            AS OILCODE " _
                 & " , ''                                            AS OILNAME " _
                 & " , ''                                            AS ORDERINGTYPE " _
@@ -499,6 +501,10 @@ Public Class OIT0002LinkDetail
                 & " , ISNULL(RTRIM(OIT0011.CONVERSIONTOTAL), '')    AS CONVERSIONTOTAL " _
                 & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER)," _
                 & "          RTRIM(OIT0011.SERIALNUMBER))           AS LOADINGIRILINEORDER " _
+                & " , CASE ISNULL(RTRIM(OIT0005.TANKSITUATION), '')" _
+                & "   WHEN @P11 THEN 'on'" _
+                & "   ELSE ''" _
+                & "   END                                           AS INSPECTIONFLG" _
                 & " , ISNULL(RTRIM(OIT0003.OILCODE), '')            AS OILCODE " _
                 & " , ISNULL(RTRIM(OIT0003.OILNAME), '')            AS OILNAME " _
                 & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')       AS ORDERINGTYPE " _
@@ -539,8 +545,18 @@ Public Class OIT0002LinkDetail
                 & " AND OIT0004.DELFLG      <> @P09 " _
                 & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
                 & "     OIT0011.TRUCKNO = OIM0005.TANKNUMBER " _
-                & " AND OIM0005.DELFLG <> @P09 " _
-                & " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+                & " AND OIM0005.DELFLG <> @P09 "
+
+            '### 20201021 START 指摘票対応(No183)全体 #############################################
+            SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+                & "     OIT0011.TRUCKNO = OIT0005.TANKNUMBER " _
+                & " AND OIT0005.TANKSITUATION = @P11 " _
+                & " AND OIT0005.DELFLG <> @P09 "
+            '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+            SQLStr &=
+                  " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
                 & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
                 & " AND OIT0002.DELFLG <> @P09 " _
                 & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -578,6 +594,7 @@ Public Class OIT0002LinkDetail
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40)  '着駅名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Date)         '登録年月日
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar)     'タンク車状況コード
 
                 PARA01.Value = O_INSCNT
                 If work.WF_SEL_RLINKNO.Text <> "" Then
@@ -599,6 +616,7 @@ Public Class OIT0002LinkDetail
                 PARA08.Value = work.WF_SEL_RETSTATIONNAME.Text
                 PARA09.Value = C_DELETE_FLG.DELETE
                 PARA10.Value = Now.ToString("yyyy/MM/dd")
+                PARA11.Value = BaseDllConst.CONST_TANKSITUATION_13
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -1082,6 +1100,19 @@ Public Class OIT0002LinkDetail
                         End If
                     End If
                 Next
+                '### 20201021 START 指摘票対応(No183)全体 #############################################
+            Case "WF_CheckBoxSELECTINSPECTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+                    If OIT0002tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0002tbl.Rows(i)("INSPECTIONFLG") = "on" Then
+                            OIT0002tbl.Rows(i)("INSPECTIONFLG") = ""
+                        Else
+                            OIT0002tbl.Rows(i)("INSPECTIONFLG") = "on"
+                        End If
+                    End If
+                Next
+                '### 20201021 END   指摘票対応(No183)全体 #############################################
             Case Else
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
@@ -1861,6 +1892,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS EXTEND " _
             & " , ''                                            AS CONVERSIONTOTAL " _
             & " , ''                                            AS LOADINGIRILINEORDER " _
+            & " , ''                                            AS INSPECTIONFLG" _
             & " , ''                                            AS OILCODE " _
             & " , ''                                            AS OILNAME " _
             & " , ''                                            AS ORDERINGTYPE " _
@@ -2308,6 +2340,32 @@ Public Class OIT0002LinkDetail
 
             WW_UpdateORDER(SQLcon)
         End Using
+
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        'タンク車所在(交検)更新
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            If OIT0002row("INSPECTIONFLG") = "on" Then
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：タンク車状況　⇒　変更あり("13"(交検中))
+                WW_UpdateTankShozai(Nothing, Nothing, Nothing,
+                                    I_TANKNO:=OIT0002row("TANKNUMBER"),
+                                    I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_13)
+            Else
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：タンク車状況　⇒　変更あり("01"(残車))
+                '※タンク車状況が"13"(交検中)の場合のみ"01"(残車)へ更新
+                WW_UpdateTankShozai(Nothing, Nothing, Nothing,
+                                    I_TANKNO:=OIT0002row("TANKNUMBER"),
+                                    I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                    I_CONDITION:="TANKSITUATION",
+                                    I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_13)
+            End If
+        Next
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
 
         If WF_UPDERRFLG.Value <> "1" Then
             '貨車連結表(一覧)画面表示データ取得
@@ -6207,8 +6265,11 @@ Public Class OIT0002LinkDetail
                                       ByVal I_KBN As String,
                                       Optional ByVal I_OFFICE As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
-                                      Optional ByVal upActualEmparrDate As Boolean = False)
+                                      Optional ByVal upActualEmparrDate As Boolean = False,
+                                      Optional ByVal I_CONDITION As String = Nothing,
+                                      Optional ByVal I_CONDITION_VAL As String = Nothing)
 
         Try
             'DataBase接続文字
@@ -6237,6 +6298,10 @@ Public Class OIT0002LinkDetail
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
             End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+            End If
             ''空車着日（予定）
             'If upEmparrDate = True Then
             '    SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
@@ -6253,7 +6318,15 @@ Public Class OIT0002LinkDetail
                     & "        UPDTERMID    = @P13, " _
                     & "        RECEIVEYMD   = @P14  " _
                     & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02; "
+                    & "    AND DELFLG      <> @P02  "
+
+            '◯条件付加
+            If Not String.IsNullOrEmpty(I_CONDITION) AndAlso Not String.IsNullOrEmpty(I_CONDITION_VAL) Then
+                Select Case I_CONDITION
+                    Case "TANKSITUATION"
+                        SQLStr &= "    AND TANKSITUATION = '" & I_CONDITION_VAL & "'"
+                End Select
+            End If
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300

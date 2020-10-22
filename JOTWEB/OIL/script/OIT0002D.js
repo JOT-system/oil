@@ -110,6 +110,21 @@ function ChangeCheckBox() {
         }
     }
 
+    // 交検
+    var chkObjsLight6 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
+    var spnObjsLight6 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
+
+    for (let i = 0; i < chkObjsLight6.length; i++) {
+
+        if (chkObjsLight6[i] !== null) {
+            if (spnObjsLight6[i].innerText === "on") {
+                chkObjsLight6[i].checked = true;
+            } else {
+                chkObjsLight6[i].checked = false;
+            }
+        }
+    }
+
 }
 
 
@@ -119,6 +134,9 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
 
         surfix = '';
+        if (fieldName === 'INSPECTIONFLG') {
+            surfix = 'INSPECTION'
+        }
         if (fieldName === 'OTTRANSPORTFLG') {
             surfix = 'OTTRANSPORT'
         }

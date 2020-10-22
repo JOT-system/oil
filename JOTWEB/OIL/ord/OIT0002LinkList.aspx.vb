@@ -3944,7 +3944,7 @@ Public Class OIT0002LinkList
     Protected Sub WW_CheckUpload(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
-        Dim WW_Kensa As String = "検"
+        Dim WW_Kensa As String = WW_ARTICLENAME(0)
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
         Dim WW_ErrMES() As String = {"入力している本線列車番号が列車マスタに登録されていない為、受注登録できませんでした。",

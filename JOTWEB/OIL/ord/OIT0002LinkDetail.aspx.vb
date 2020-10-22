@@ -50,6 +50,9 @@ Public Class OIT0002LinkDetail
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
 
+    '○ 貨車連結順序表ダウンロード用
+    Private WW_ARTICLENAME() As String = {"検", "○"}               '品名
+
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
@@ -2107,9 +2110,20 @@ Public Class OIT0002LinkDetail
             & " , OIT0011.TRUCKSYMBOL                            AS TRUCKSYMBOL" _
             & " , OIT0011.TRUCKNO                                AS TRUCKNO" _
             & " , OIT0011.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
-            & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
-            & " , OIT0011.ARTICLENAME                            AS ARTICLENAME" _
-            & " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
+            & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME"
+
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        'SQLStr &=
+        '      " , OIT0011.ARTICLENAME                            AS ARTICLENAME"
+        SQLStr &=
+              " , CASE ISNULL(RTRIM(OIT0005.TANKSITUATION), '')" _
+            & "   WHEN @TANKSITUATION THEN '" & WW_ARTICLENAME(0) & "'" _
+            & "   ELSE OIT0011.ARTICLENAME" _
+            & "   END                                            AS ARTICLENAME"
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+        SQLStr &=
+              " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
             & " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
             & " , OIT0011.ARTICLE                                AS ARTICLE" _
             & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
@@ -2167,6 +2181,14 @@ Public Class OIT0002LinkDetail
         '    & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
         '### 20201002 END   変換マスタに移行したため修正 ########################
 
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+                & "     OIT0011.TRUCKNO = OIT0005.TANKNUMBER " _
+                & " AND OIT0005.TANKSITUATION = @TANKSITUATION " _
+                & " AND OIT0005.DELFLG <> @DELFLG "
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
+
         SQLStr &=
               " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0011.TRUCKNO " _
@@ -2175,10 +2197,12 @@ Public Class OIT0002LinkDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)  '貨車連結(臨海)順序表№
-                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)           '貨車連結(臨海)順序表№
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)              '削除フラグ
+                Dim P_TANKSITUATION As SqlParameter = SQLcmd.Parameters.Add("@TANKSITUATION", SqlDbType.NVarChar)   'タンク車状況コード
                 P_RLINKNO.Value = work.WF_SEL_RLINKNO.Text
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_13
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

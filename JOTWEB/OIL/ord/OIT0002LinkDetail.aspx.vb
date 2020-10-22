@@ -5997,6 +5997,11 @@ Public Class OIT0002LinkDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        '### 交検フラグ用 START ############################################################
+        Dim chkObjIN As CheckBox = Nothing
+        Dim chkObjIdWOINcnt As String = "chk" & pnlListArea.ID & "INSPECTIONFLG"
+        Dim chkObjINId As String
+        '### 交検フラグ用 END   ############################################################
         '### OT輸送フラグ用 START ##########################################################
         Dim chkObjOT As CheckBox = Nothing
         Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea.ID & "OTTRANSPORTFLG"
@@ -6018,6 +6023,17 @@ Public Class OIT0002LinkDetail
                 cvTruckSymbolSub = ""
             End Try
 
+            '★交検可否フラグ
+            chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+            chkObjIN = Nothing
+            For Each cellObj As TableCell In rowitem.Controls
+                chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                'コントロールが見つかったら脱出
+                If chkObjIN IsNot Nothing Then
+                    Exit For
+                End If
+            Next
+
             For Each cellObj As TableCell In rowitem.Controls
                 '★コンテナの場合は入力制限する。
                 '    ### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
@@ -6038,6 +6054,9 @@ Public Class OIT0002LinkDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
 
+                    '交検(チェックボックス)を非活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
+
                     '★(一覧)の営業所が受注営業所コード(テキストボックス)と不一致の場合は入力制限する。
                 ElseIf loopdr("OFFICECODE") <> work.WF_SEL_OFFICECODE.Text Then
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
@@ -6053,6 +6072,9 @@ Public Class OIT0002LinkDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
+
+                    '交検(チェックボックス)を非活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
 
                 Else
                     '(一覧)積込油種, (一覧)入線列車, (一覧)出線列車, 
@@ -6071,6 +6093,10 @@ Public Class OIT0002LinkDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                     End If
+
+                    '交検(チェックボックス)を活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = True
+
                 End If
             Next
 

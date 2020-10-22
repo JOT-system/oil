@@ -1875,8 +1875,12 @@ Public Class OIT0002LinkList
                     If cvTruckSymbol = "" Then
                         '貨車連結順序表№は未設定
                         LINKNO.Value = ""
-                    ElseIf cvTruckSymbol.Substring(0, 1) = "コ" _
-                        OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+
+                        '### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
+                        'ElseIf cvTruckSymbol.Substring(0, 1) = "コ" _
+                        '    OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+                    ElseIf cvTruckSymbol.Substring(0, 1) = "チ" Then
+                        '### 20201022 END   コタキ(OTタンク車)のため除外しない対応 ########
                         '貨車連結順序表№は未設定
                         LINKNO.Value = ""
                     Else

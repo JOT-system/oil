@@ -3177,8 +3177,11 @@ Public Class OIT0002LinkDetail
 
             '★コンテナの場合はタンク車番号チェックは未実施
             cvTruckSymbol = StrConv(OIT0002row("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
-            If cvTruckSymbol.Substring(0, 1) = "コ" _
-                OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+            '    ### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
+            'If cvTruckSymbol.Substring(0, 1) = "コ" _
+            '    OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+            If cvTruckSymbol.Substring(0, 1) = "チ" Then
+                '### 20201022 END   コタキ(OTタンク車)のため除外しない対応 ########
                 Continue For
             End If
 
@@ -5993,7 +5996,10 @@ Public Class OIT0002LinkDetail
 
             For Each cellObj As TableCell In rowitem.Controls
                 '★コンテナの場合は入力制限する。
-                If (cvTruckSymbolSub = "コ" OrElse cvTruckSymbolSub = "チ") Then
+                '    ### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
+                'If (cvTruckSymbolSub = "コ" OrElse cvTruckSymbolSub = "チ") Then
+                If (cvTruckSymbolSub = "チ") Then
+                    '### 20201022 END   コタキ(OTタンク車)のため除外しない対応 ########
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _

@@ -2252,7 +2252,7 @@ Public Class OIT0002LinkList
                                     ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
                                         OIT0002ExlUProw("LOADINGARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
                                         OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
-                                        OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                                        OIT0002ExlUProw("LOADINGEMPARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
                                     End If
                                 Catch ex As Exception
                                     OIT0002ExlUProw("LOADINGARRDATE") = DBNull.Value
@@ -2406,7 +2406,8 @@ Public Class OIT0002LinkList
             & " AND OIT0002.TRAINNAME  = @TRAINNAME" _
             & " AND OIT0002.LODDATE    = @LODDATE" _
             & " AND OIT0002.DEPDATE    = @DEPDATE" _
-            & " AND OIT0002.DELFLG    <> @DELFLG"
+            & " AND OIT0002.DELFLG    <> @DELFLG" _
+            & " AND OIT0002.ORDERSTATUS <> @ORDERSTATUS"
 
         SQLStr &=
               " GROUP BY OIT0002.ORDERNO"
@@ -2418,8 +2419,10 @@ Public Class OIT0002LinkList
                 Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.Date)               '積込日(予定)
                 Dim P_DEPDATE As SqlParameter = SQLcmd.Parameters.Add("@DEPDATE", SqlDbType.Date)               '発日(予定)
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
+                Dim P_ORDERSTATUS As SqlParameter = SQLcmd.Parameters.Add("@ORDERSTATUS", SqlDbType.NVarChar)   '受注進行ステータス
 
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 '受注№取得
                 Dim WW_GetValue() As String = {"", "", "", "", "", ""}
@@ -4638,6 +4641,7 @@ Public Class OIT0002LinkList
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
 
             '検索SQL文
             Dim SQLStr As String =
@@ -4735,6 +4739,9 @@ Public Class OIT0002LinkList
                         Next
                     Next
                 End If
+
+                'CLOSE
+                SQLcmd.Dispose()
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L MASTER_SELECT")

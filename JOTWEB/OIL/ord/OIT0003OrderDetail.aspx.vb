@@ -5478,6 +5478,10 @@ Public Class OIT0003OrderDetail
                     End If
 
                 Next
+
+                'CLOSE
+                SQLcmd.Dispose()
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 LINEADD")
@@ -5623,6 +5627,10 @@ Public Class OIT0003OrderDetail
                     End If
 
                 Next
+
+                'CLOSE
+                SQLcmd.Dispose()
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 LINEADD")
@@ -12741,6 +12749,7 @@ Public Class OIT0003OrderDetail
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
 
             '検索SQL文
             Dim SQLStr As String =
@@ -12838,6 +12847,10 @@ Public Class OIT0003OrderDetail
                         Next
                     Next
                 End If
+
+                'CLOSE
+                SQLcmd.Dispose()
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")

@@ -397,7 +397,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim strTotalTankSave As String = ""
 
         Try
-            Dim z() As Integer = {5, 32, 59}
+            Dim z() As Integer = {5, 32, 59, 86}
             Dim j As Integer = 0
             Dim i As Integer = z(j)
             Dim lineNo As Integer = 1

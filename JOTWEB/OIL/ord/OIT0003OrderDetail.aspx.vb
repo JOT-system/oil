@@ -2094,6 +2094,24 @@ Public Class OIT0003OrderDetail
                         CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                     End If
 
+                    ''★貨車連結順序アップロードから作成された新規受注データの場合
+                    '& " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')                       AS EMPTYTURNFLG" _
+                    'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                    '    AndAlso OIT0003row("EMPTYTURNFLG") = "3" Then
+                    '    '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合は値を設定
+                    '    '　※上記以外(2:発送対象外)については、入力しないため値は未入力。
+                    '    If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+                    '        OIT0003row("SHIPORDER") = i    '発送順
+                    '    End If
+
+                    '    '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
+                    '    '　※上記以外の営業所については、入力しないため値は未入力。
+                    '    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '        OIT0003row("LINEORDER") = i    '貨物駅入線順
+
+                    '    End If
+                    'End If
+
                 Next
             End Using
         Catch ex As Exception
@@ -3994,7 +4012,7 @@ Public Class OIT0003OrderDetail
 
             '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
             '　※上記以外の営業所については、入力しないため値は未入力。
-            If Me.TxtOrderOfficeCode.Text = "011203" Then
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 OIT0003row("LINEORDER") = j    '貨物駅入線順
 
             End If

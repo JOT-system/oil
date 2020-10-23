@@ -2036,21 +2036,30 @@ Public Class OIT0002LinkList
                 & String.Format(" , '{0}'                              AS UPDTERMID", Master.USERTERMID) _
                 & String.Format(" , '{0}'                              AS RECEIVEYMD", C_DEFAULT_YMD)
 
+            '### 20201023 START 油種情報を品種マスタより取得するように修正 ############
             '### 20200923 START(受注用の油種コード(JOT)を取得) ########################
             Dim SQLGetOil As String =
                   SQLStr _
-                & " , ISNULL(VIW0001_OILCONVERT.VALUE1, '')            AS OILCODE" _
-                & " , ISNULL(VIW0001_OILCONVERT.KEYCODE, '')           AS OILNAME" _
-                & " , ISNULL(VIW0001_OILCONVERT.VALUE2, '')            AS ORDERINGTYPE" _
-                & " , ISNULL(VIW0001_OILCONVERT.VALUE3, '')            AS ORDERINGOILNAME" _
+                & " , ISNULL(OIM0003.OILCODE, '')                      AS OILCODE" _
+                & " , ISNULL(OIM0003.OILNAME, '')                      AS OILNAME" _
+                & " , ISNULL(OIM0003.SEGMENTOILCODE, '')               AS ORDERINGTYPE" _
+                & " , ISNULL(OIM0003.SEGMENTOILNAME, '')               AS ORDERINGOILNAME" _
                 & " , ISNULL(OIT0011.ARTICLENAME, '')                  AS ARTICLENAME"
+            'Dim SQLGetOil As String =
+            '      SQLStr _
+            '    & " , ISNULL(VIW0001_OILCONVERT.VALUE1, '')            AS OILCODE" _
+            '    & " , ISNULL(VIW0001_OILCONVERT.KEYCODE, '')           AS OILNAME" _
+            '    & " , ISNULL(VIW0001_OILCONVERT.VALUE2, '')            AS ORDERINGTYPE" _
+            '    & " , ISNULL(VIW0001_OILCONVERT.VALUE3, '')            AS ORDERINGOILNAME" _
+            '    & " , ISNULL(OIT0011.ARTICLENAME, '')                  AS ARTICLENAME"
+            '### 20201023 END   油種情報を品種マスタより取得するように修正 ############
             'Dim SQLGetOil As String =
             '      SQLStr _
             '    & " , ISNULL(TMP0005_OILCONVERT.OILCODE, '')           AS OILCODE" _
             '    & " , ISNULL(TMP0005_OILCONVERT.OILNAME, '')           AS OILNAME" _
             '    & " , ISNULL(TMP0005_OILCONVERT.SEGMENTOILCODE, '')    AS ORDERINGTYPE" _
             '    & " , ISNULL(TMP0005_OILCONVERT.SEGMENTOILNAME, '')    AS ORDERINGOILNAME" _
-            '### 20200923 END  (受注用の油種コード(JOT)を取得) ########################
+            ''### 20200923 END  (受注用の油種コード(JOT)を取得) ########################
 
             'SQLStr &=
             Dim SQLCmn As String =
@@ -2092,12 +2101,18 @@ Public Class OIT0002LinkList
             '                            BaseDllConst.CONST_ATank)
             '### 20201002 END   変換マスタに移行したため修正 ########################
 
+            '### 20201023 START 油種情報を品種マスタより取得するように修正 ############
             '### 20200923 START(受注用の油種コード(JOT)を取得) ########################
             SQLCmn &=
-                  " LEFT JOIN OIL.VIW0001_FIXVALUE VIW0001_OILCONVERT ON" _
-                & "  VIW0001_OILCONVERT.CLASS = 'PRODUCTPATTERN_N'" _
-                & "  AND VIW0001_OILCONVERT.CAMPCODE = VIW0002.OFFICECODE" _
-                & "  AND VIW0001_OILCONVERT.VALUE3 = OIT0011.OILNAME"
+                  " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003 ON" _
+                & "  OIM0003.OFFICECODE = VIW0002.OFFICECODE" _
+                & "  AND OIM0003.SEGMENTOILNAME = OIT0011.OILNAME"
+            'SQLCmn &=
+            '      " LEFT JOIN OIL.VIW0001_FIXVALUE VIW0001_OILCONVERT ON" _
+            '    & "  VIW0001_OILCONVERT.CLASS = 'PRODUCTPATTERN_N'" _
+            '    & "  AND VIW0001_OILCONVERT.CAMPCODE = VIW0002.OFFICECODE" _
+            '    & "  AND VIW0001_OILCONVERT.VALUE3 = OIT0011.OILNAME"
+            '### 20201023 END   油種情報を品種マスタより取得するように修正 ############
             ''### 20200910 START(受注用の油種コードを取得) #############################
             'SQLCmn &=
             '      " LEFT JOIN OIL.TMP0005OILMASTER TMP0005_OILCONVERT ON" _
@@ -2112,7 +2127,7 @@ Public Class OIT0002LinkList
             '                            BaseDllConst.CONST_KTank1,
             '                            BaseDllConst.CONST_ATank)
             ''### 20200910 END  (受注用の油種コードを取得) #############################
-            '### 20200923 END  (受注用の油種コード(JOT)を取得) ########################
+            ''### 20200923 END  (受注用の油種コード(JOT)を取得) ########################
 
             SQLCmn &=
                   " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON" _

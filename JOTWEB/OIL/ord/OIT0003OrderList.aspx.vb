@@ -3295,7 +3295,7 @@ Public Class OIT0003OrderList
             & "   ELSE '' " _
             & "   END                                            AS DELIVERYFIRST" _
             & " FROM oil.VIW0013_OILFOR_KINOENE_LOAD VIW0013 " _
-            & "  LEFT JOIN ( "
+            & "  INNER JOIN ( "
 
         '受注データ(KEY(甲子営業所、積込日))を取得し
         'タンク車マスタ(型式)、積込予約マスタ(予約数量)を設定
@@ -3367,6 +3367,7 @@ Public Class OIT0003OrderList
             & "       AND OIM0021.DELFLG <> @P02 " _
             & "      WHERE OIT0002.OFFICECODE = @P01 " _
             & "      AND OIT0002.LODDATE = @P03 " _
+            & "      AND OIT0002.ORDERSTATUS <> @P04 " _
             & "  ) ORDERINFOTBL ON " _
             & "      VIW0013.RINKAITRAINNAME = ORDERINFOTBL.LOADINGIRILINETRAINNAME " _
             & "  AND VIW0013.SPOTNO = ORDERINFOTBL.FILLINGPOINT "
@@ -3381,6 +3382,7 @@ Public Class OIT0003OrderList
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar)     '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011202
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3388,6 +3390,7 @@ Public Class OIT0003OrderList
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

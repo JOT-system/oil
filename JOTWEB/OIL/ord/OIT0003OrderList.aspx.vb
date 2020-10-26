@@ -1303,7 +1303,8 @@ Public Class OIT0003OrderList
 
         '★列車マスタから情報を取得
         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        'WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAIN.Text + work.WF_SEL_ARRIVALSTATION.Text, WW_GetValue)
         '発送順区分
         work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
         'OT本線列車

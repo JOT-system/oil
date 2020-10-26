@@ -9473,12 +9473,15 @@ Public Class OIT0003OrderDetail
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                     '〇 画面(受注営業所).テキストボックスが未設定
                     If work.WF_SEL_ORDERSALESOFFICECODE.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                        'WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
                     Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                        'WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
                     End If
                 Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                    'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
                 End If
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
 
@@ -11905,7 +11908,8 @@ Public Class OIT0003OrderDetail
                 '### 2020608 START ########################################################################################
                 '◯ 列車(名称)から日数を取得
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
 
                 '〇 (予定)の日付を設定
                 Me.TxtDepDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
@@ -11931,7 +11935,8 @@ Public Class OIT0003OrderDetail
                 '### 2020608 START ########################################################################################
                 '◯ 列車(名称)から日数を取得
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
 
                 '〇 (予定)の日付を設定
                 If Integer.Parse(WW_GetValue(6)) = 0 Then
@@ -11962,7 +11967,8 @@ Public Class OIT0003OrderDetail
                 '### 2020608 START ########################################################################################
                 '◯ 列車(名称)から日数を取得
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
 
                 '〇 (予定)の日付を設定
                 If Integer.Parse(WW_GetValue(8)) = 0 Then
@@ -11991,7 +11997,8 @@ Public Class OIT0003OrderDetail
                 '### 2020608 START ########################################################################################
                 '◯ 列車(名称)から日数を取得
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
 
                 '〇 (予定)の日付を設定
                 If Integer.Parse(WW_GetValue(9)) = 0 Then
@@ -14901,14 +14908,23 @@ Public Class OIT0003OrderDetail
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGIRILINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
 
-                WW_CheckMES1 = "積込入線順未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                O_Msg = "(一覧)積込入線順"
-                Exit Sub
+                '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                            AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+                    'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
+
+                    WW_CheckMES1 = "積込入線順未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    O_Msg = "(一覧)積込入線順"
+                    Exit Sub
+                End If
+
             End If
 
             '### 20200616 START((全体)No74対応) ######################################
@@ -14956,14 +14972,22 @@ Public Class OIT0003OrderDetail
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGOUTLETORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
 
-                WW_CheckMES1 = "出線順未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                O_Msg = "(一覧)出線順"
-                Exit Sub
+                '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                            AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
+
+                    WW_CheckMES1 = "出線順未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    O_Msg = "(一覧)出線順"
+                    Exit Sub
+                End If
+
             End If
         Next
 
@@ -15949,7 +15973,8 @@ Public Class OIT0003OrderDetail
         Else
             WW_OfficeCode = work.WF_SEL_SALESOFFICECODE.Text
         End If
-        WW_FixvalueMasterSearch(WW_OfficeCode, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+        'WW_FixvalueMasterSearch(WW_OfficeCode, "TRAINNUMBER_FIND", Me.TxtTrainName.Text, WW_GetValue)
+        WW_FixvalueMasterSearch(WW_OfficeCode, "TRAINNUMBER_FIND", Me.TxtTrainNo.Text + Me.TxtArrstationCode.Text, WW_GetValue)
 
         '高速列車対応タンク車チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -19128,6 +19153,15 @@ Public Class OIT0003OrderDetail
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                             '### 20200616 END  ((全体)No74対応) ######################################
+                            '### 20201026 START 甲子営業所の入力制御対応 #############################
+                            '★甲子営業所の場合、入線順と出線順を入力不可とする。
+                            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" _
+                                AndAlso (cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER")) Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                            '### 20201026 END   甲子営業所の入力制御対応 #############################
                         Next
                     Next
 

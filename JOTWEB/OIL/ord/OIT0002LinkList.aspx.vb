@@ -2296,6 +2296,12 @@ Public Class OIT0002LinkList
                         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                         WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE").ToString(), "RINKAITRAIN_FIND_I", OIT0002ExlUProw("INLINETRAINNAME"), WW_GetValue)
 
+                        '★袖ヶ浦営業所の場合は回線を追加設定
+                        If OIT0002ExlUProw("OFFICECODE").ToString() = BaseDllConst.CONST_OFFICECODE_011203 Then
+                            '回線
+                            OIT0002ExlUProw("LINE") = WW_GetValue(5)
+                        End If
+
                         '出線列車番号
                         OIT0002ExlUProw("OUTLINETRAIN") = WW_GetValue(6)
                         '出線列車名

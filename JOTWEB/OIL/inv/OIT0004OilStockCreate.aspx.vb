@@ -265,8 +265,13 @@ Public Class OIT0004OilStockCreate
                 Next 'suggestListItem
             Else
                 dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
+
             End If
             '既登録データ抽出
+            If dispDataObj.TrainOperationList IsNot Nothing AndAlso
+              (From itm In dispDataObj.TrainList.Values Where itm.TrainNo.Equals("川崎")).Any Then
+
+            End If
         End Using
         '取得値を元に再計算
         dispDataObj.RecalcStockList(False)
@@ -2318,9 +2323,11 @@ Public Class OIT0004OilStockCreate
                     Dim targetDate As String = ""
                     Dim trainNum As Decimal = 0D
                     Dim miTrainNum As Decimal = 0D
+                    Dim hasKawasakiAnyValue As Boolean = False
                     While sqlDr.Read
                         targetDate = Convert.ToString(sqlDr("STOCKYMD"))
                         trainNo = Convert.ToString(sqlDr("TRAINNO"))
+                        hasKawasakiAnyValue = False
                         '対象日付を保持していない場合はスキップ
                         If retVal.SuggestList.ContainsKey(targetDate) = False Then
                             Continue While
@@ -2342,6 +2349,10 @@ Public Class OIT0004OilStockCreate
 
                             trainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "1"))
                             miTrainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "2"))
+                            If trainNo.Equals("川崎") AndAlso {DayOfWeek.Saturday, DayOfWeek.Sunday}.Contains(CDate(targetDate).DayOfWeek) _
+                                AndAlso (trainNum > 0 OrElse miTrainNum > 0) Then
+                                hasKawasakiAnyValue = True
+                            End If
                             '対象の油種にテーブル内容を転記
                             If suggestDayTrainItm.ContainsKey(oilCode) Then
                                 suggestDayTrainItm(oilCode).ItemValue = trainNum.ToString
@@ -2351,6 +2362,10 @@ Public Class OIT0004OilStockCreate
                             End If
 
                         Next oilCodeToFieldName
+
+                        If hasKawasakiAnyValue Then
+                            retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).TrainLock = False
+                        End If
                     End While
                 End If
             End Using 'sqlDr

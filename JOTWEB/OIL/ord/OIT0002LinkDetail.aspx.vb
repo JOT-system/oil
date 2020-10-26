@@ -2169,7 +2169,8 @@ Public Class OIT0002LinkDetail
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
               " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "     OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & " AND OIM0029.KEYCODE04 = '1' " _
             & " AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
             & " AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "

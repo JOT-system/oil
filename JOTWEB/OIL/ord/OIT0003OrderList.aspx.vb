@@ -3127,7 +3127,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
+            & "     OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
             & " AND OIM0029.KEYCODE02 = OIT0002.SHIPPERSCODE " _
             & " AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & " AND OIM0029.KEYCODE04 = '1' " _
@@ -3340,7 +3341,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "       INNER JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "           OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "           OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "       AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & "       AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "       AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "       AND OIM0029.KEYCODE04 = '1' " _
@@ -3539,7 +3541,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "      OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
+            & "      OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "  AND OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
             & "  AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "  AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "  AND OIM0029.KEYCODE04 = '1' " _

@@ -11,62 +11,98 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIS0001UserSearch
-    
+Partial Public Class OIM0001OrgSearch
+
     '''<summary>
-    '''WF_CAMPCODE_CODE コントロール。
+    '''TxtCampCodeMy コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CAMPCODE_CODE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtCampCodeMy As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_CAMPCODE_NAME コントロール。
+    '''txtCampNameMy コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CAMPCODE_NAME As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents txtCampNameMy As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_STYMD_CODE コントロール。
+    '''TxtOrgCodeMy コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtOrgCodeMy As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_ENDYMD_CODE コントロール。
+    '''txtOrgNameMy コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ENDYMD_CODE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents txtOrgNameMy As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_ORG_CODE コントロール。
+    '''TxtCampCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ORG_CODE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtCampCode As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_ORG_NAME コントロール。
+    '''txtCampName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ORG_NAME As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents txtCampName As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''TxtOrgCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents TxtOrgCode As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''txtOrgName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents txtOrgName As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''RdBSearch1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents RdBSearch1 As Global.System.Web.UI.WebControls.RadioButton
+
+    '''<summary>
+    '''RdBSearch2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents RdBSearch2 As Global.System.Web.UI.WebControls.RadioButton
+
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -74,8 +110,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rightview As Global.JOTWEB.GRIS0003SRightBox
-    
+    Public WithEvents rightview As Global.JOTWEB.GRIS0003SRightBox
+
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -83,8 +119,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+    Public WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -92,8 +128,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIS0001WRKINC
-    
+    Public WithEvents work As Global.JOTWEB.OIM0001WRKINC
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -101,8 +137,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -110,8 +146,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -119,8 +155,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -128,8 +164,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -137,8 +173,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -146,8 +182,8 @@ Partial Public Class OIS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''Master プロパティ。
     '''</summary>

@@ -46,6 +46,8 @@
     <asp:TextBox ID="WF_SEL_FAX" runat="server"></asp:TextBox>
     <!-- メールアドレス -->
     <asp:TextBox ID="WF_SEL_MAIL" runat="server"></asp:TextBox>
+    <!--- チェックボックス --->
+     <asp:TextBox ID="WF_SEL_SELECT" runat="server"></asp:TextBox>
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
 

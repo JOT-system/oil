@@ -106,6 +106,8 @@
     <Content Include="img\tank2.png" />
     <Content Include="OIL\css\M00001.css" />
     <Content Include="OIL\css\M00002.css" />
+    <Content Include="OIL\css\OIM0001C.css" />
+    <Content Include="OIL\css\OIM0001L.css" />
     <Content Include="OIL\css\OIM0003C.css" />
     <Content Include="OIL\css\OIM0002C.css" />
     <Content Include="OIL\css\OIM0003L.css" />
@@ -198,9 +200,7 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
-    <Content Include="OIL\inc\OIM0002C.css" />
-    <Content Include="OIL\inc\OIM0002L.css" />
-    <Content Include="OIL\inc\OIM0002S.css" />
+    <Content Include="OIL\inc\OIM0001WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0003WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0002WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
@@ -223,6 +223,7 @@
     <Content Include="OIL\ex\page_404.html" />
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\M00002MENU.aspx" />
+    <Content Include="OIL\mas\OIM0001CampSearch.aspx" />
     <Content Include="OIL\mas\OIM0002OrgCreate.aspx" />
     <Content Include="OIL\mas\OIM0002OrgList.aspx" />
     <Content Include="OIL\mas\OIM0003ProductSearch.aspx" />
@@ -265,6 +266,9 @@
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
     <Content Include="OIL\script\M00001.js" />
+    <Content Include="OIL\script\OIM0001C.js" />
+    <Content Include="OIL\script\OIM0001L.js" />
+    <Content Include="OIL\script\OIM0001S.js" />
     <Content Include="OIL\script\OIM0003C.js" />
     <Content Include="OIL\script\OIM0002C.js" />
     <Content Include="OIL\script\OIM0003L.js" />
@@ -402,6 +406,13 @@
     </Compile>
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0001WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0001WRKINC.ascx.vb">
+      <DependentUpon>OIM0001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIM0003WRKINC.ascx.designer.vb">
@@ -553,6 +564,13 @@
     <Compile Include="OIL\inv\OIT0004OilStockSearch.aspx.vb">
       <DependentUpon>OIT0004OilStockSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0001CampSearch.aspx.designer.vb">
+      <DependentUpon>OIM0001CampSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0001CampSearch.aspx.vb">
+      <DependentUpon>OIM0001CampSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIM0002OrgCreate.aspx.designer.vb">
       <DependentUpon>OIM0002OrgCreate.aspx</DependentUpon>

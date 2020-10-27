@@ -85,15 +85,71 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    var objTableDR = document.getElementById("pnlListArea_DR").children[0];
+    var objLightTable = objTableDR.children[0];
+    if (objLightTable === null) {
+        return;
+    }
+    if (objLightTable === undefined) {
+        return;
+    }
+
+    // OT輸送
+    var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaOTTRANSPORTFLG']");
+    var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaOTTRANSPORTFLG']");
+
+    for (let i = 0; i < chkObjsLight4.length; i++) {
+
+        if (chkObjsLight4[i] !== null) {
+            if (spnObjsLight4[i].innerText === "on") {
+                chkObjsLight4[i].checked = true;
+            } else {
+                chkObjsLight4[i].checked = false;
+            }
+        }
+    }
+
+    // 交検
+    var chkObjsLight6 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
+    var spnObjsLight6 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
+
+    for (let i = 0; i < chkObjsLight6.length; i++) {
+
+        if (chkObjsLight6[i] !== null) {
+            if (spnObjsLight6[i].innerText === "on") {
+                chkObjsLight6[i].checked = true;
+            } else {
+                chkObjsLight6[i].checked = false;
+            }
+        }
+    }
+
 }
 
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
+
+        surfix = '';
+        if (fieldName === 'INSPECTIONFLG') {
+            surfix = 'INSPECTION'
+        }
+        if (fieldName === 'OTTRANSPORTFLG') {
+            surfix = 'OTTRANSPORT'
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }
@@ -113,6 +169,22 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         }
         else if (fieldNM === "ORDERINGOILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 46;
+        }
+        else if (fieldNM === "FILLINGPOINT") {
+            document.getElementById('WF_LeftMViewChange').value = 52;
+        }
+        else if (fieldNM === "LOADINGIRILINETRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 47;
+        }
+        else if (fieldNM === "LOADINGOUTLETTRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 48;
+        }
+        else if (fieldNM === "LOADINGTRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 23;
+        }
+        else if (fieldNM === "LOADINGLODDATE"
+            || fieldNM === "LOADINGDEPDATE") {
+            document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";

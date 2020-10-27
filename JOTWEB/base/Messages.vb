@@ -639,7 +639,94 @@ Public Module Messages
         ''' 指定タンク車№が所属営業所以外のためエラー
         ''' </summary>
         Public Const OIL_ORDER_NOT_BELONGOFFICE_TANKNO_ERROR As String = "20059"
-
+        ''' <summary>
+        ''' 受注オーダー時の積込日チェック(列車が同一かつ積込日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_LODDATE_SAMETRAINTANKNO As String = "20060"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性警告
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ALERT As String = "20061"
+        ''' <summary>
+        ''' OT連携行未存在
+        ''' </summary>
+        Public Const OIL_OTLINKAGELINE_NOTFOUND As String = "20062"
+        ''' <summary>
+        ''' タンク車(同一積込日)使用メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_LOADDATE_USE As String = "20063"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
+        ''' <summary>
+        ''' 指定タンク車№が所在地以外のためエラー
+        ''' </summary>
+        Public Const OIL_ORDER_NOT_LOCATION_TANKNO_ERROR As String = "20065"
+        ''' <summary>
+        ''' 前回灯軽油で今回黒油、または揮発油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTLIGHTOIL_BLACKVOLATILEOIL_ERROR As String = "20066"
+        ''' <summary>
+        ''' 発送順設定値0エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_ZERO_ERROR As String = "20067"
+        ''' <summary>
+        ''' 入線順設定値0エラー
+        ''' </summary>
+        Public Const OIL_LINEORDER_ZERO_ERROR As String = "20068"
+        ''' <summary>
+        ''' (実績)日付の一括設定確認メッセージ
+        ''' </summary>
+        Public Const OIL_ACTUALDATE_BULKSET_MSG As String = "20069"
+        ''' <summary>
+        ''' アップロード(警告)メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_MESSAGE As String = "20070"
+        ''' <summary>
+        ''' タンク車(交検日(間近))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_KOUKENBI_UPCLOSE_ERROR As String = "20071"
+        ''' <summary>
+        ''' タンク車(全検日(間近))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_ZENKENBI_UPCLOSE_ERROR As String = "20072"
+        ''' <summary>
+        ''' 託送指示未選択エラー
+        ''' </summary>
+        Public Const OIL_TAKUSOU_PRINT_NOTFOUND As String = "20073"
+        ''' <summary>
+        ''' 託送指示複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS As String = "20074"
+        ''' <summary>
+        ''' 出荷予約未選択エラー
+        ''' </summary>
+        Public Const OIL_RESERVED_PRINT_NOTFOUND As String = "20075"
+        ''' <summary>
+        ''' 出荷予約複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_RESERVED_NOT_ACCEPT_SEL_DAYS As String = "20076"
+        ''' <summary>
+        ''' OT発送日報複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS As String = "20077"
+        ''' <summary>
+        ''' アップロード(列車番号)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_TRAINNO_MESSAGE As String = "20078"
+        ''' <summary>
+        ''' アップロード(油種)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_OILCODE_MESSAGE As String = "20079"
+        ''' <summary>
+        ''' アップロード(交検)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_KOUKEN_MESSAGE As String = "20080"
+        ''' <summary>
+        ''' アップロード(列車番号)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_TRAINNO_MESSAGE As String = "20081"
 #End Region
 
 

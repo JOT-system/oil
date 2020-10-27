@@ -8,6 +8,8 @@ Public Class OIT0003WRKINC
     Public Const MAPIDL As String = "OIT0003L"       'MAPID(一覧)
     Public Const MAPIDQ As String = "OIT0003Q"       'MAPID(貨車連結割当)
     Public Const MAPIDD As String = "OIT0003D"       'MAPID(明細)
+    Public Const MAPIDOTS As String = "OIT0003OTS"   'MAPID(OT連携検索)
+    Public Const MAPIDOTL As String = "OIT0003OTL"   'MAPID(OT連携一覧)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 

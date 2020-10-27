@@ -18,9 +18,11 @@ div[data-generated="1"] div[id$="_DR"] {
 }
 
 /* 受付情報のツールチップをOFFにする */
+/* ### 20200807 START ツールチップOFFを解除 ###
 div[data-generated="1"] td:nth-child(4) {
     pointer-events: none;
 }
+   ### 20200807 END   ツールチップOFFを解除 ### */
 /* Operetion枠の左マージンを個別指定 */
 .Operation {
     margin-left: 0.7em;

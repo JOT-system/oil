@@ -142,32 +142,32 @@ Public Class OIT0003OrderBusinessSearch
         '営業所
         '※選択された営業所の判断
         If rbTohokuSendai.Checked = True Then                   '東北(仙台新港)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "010402"
-            work.WF_SEL_SALESOFFICECODE.Text = "010402"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_010402
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402
             work.WF_SEL_SALESOFFICE.Text = "仙台新港営業所"
         ElseIf rbKantoGoi.Checked = True Then                   '関東(五井)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "011201"
-            work.WF_SEL_SALESOFFICECODE.Text = "011201"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_011201
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201
             work.WF_SEL_SALESOFFICE.Text = "五井営業所"
         ElseIf rbKantoKinoene.Checked = True Then               '関東(甲子)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "011202"
-            work.WF_SEL_SALESOFFICECODE.Text = "011202"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_011202
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202
             work.WF_SEL_SALESOFFICE.Text = "甲子営業所"
         ElseIf rbKantoSodegaura.Checked = True Then             '関東(袖ヶ浦)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "011203"
-            work.WF_SEL_SALESOFFICECODE.Text = "011203"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_011203
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203
             work.WF_SEL_SALESOFFICE.Text = "袖ヶ浦営業所"
         ElseIf rbKantoNegishi.Checked = True Then               '関東(根岸)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "011402"
-            work.WF_SEL_SALESOFFICECODE.Text = "011402"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_011402
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402
             work.WF_SEL_SALESOFFICE.Text = "根岸営業所"
         ElseIf rbChubuYokkaichi.Checked = True Then             '中部(四日市)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "012401"
-            work.WF_SEL_SALESOFFICECODE.Text = "012401"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_012401
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_012401
             work.WF_SEL_SALESOFFICE.Text = "四日市営業所"
         ElseIf rbChubuMieShiohama.Checked = True Then           '中部(三重塩浜)
-            work.WF_SEL_SALESOFFICECODEMAP.Text = "012402"
-            work.WF_SEL_SALESOFFICECODE.Text = "012402"
+            work.WF_SEL_SALESOFFICECODEMAP.Text = BaseDllConst.CONST_OFFICECODE_012402
+            work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_012402
             work.WF_SEL_SALESOFFICE.Text = "三重塩浜営業所"
         End If
 

@@ -27,7 +27,7 @@
                                     </HeaderTemplate>
                                     <ItemTemplate>
                                         <div class="deptItem">
-                                             <asp:Label ID="lbldept" runat="server" Text='<%# Eval("Name") %>' ClientIDMode="Predictable"></asp:Label>
+                                             <asp:Label ID="lbldept" runat="server" Text='<%# Eval("Name") %>' data-isclosed='<%# Eval("IsClosed") %>' ClientIDMode="Predictable"></asp:Label>
                                             <div class="underArrow">
                                             </div>
                                         </div>
@@ -38,7 +38,7 @@
                                     </FooterTemplate>
                                 </asp:Repeater>
                                 <div class="branchItemItem">
-                                    <asp:Label ID="lblBranch" runat="server" Text='<%# DirectCast(Eval("Value"), ClosingItem).Name %>' ClientIDMode="Predictable"></asp:Label>
+                                    <asp:Label ID="lblBranch" runat="server" Text='<%# DirectCast(Eval("Value"), ClosingItem).Name %>' data-isclosed='<%# DirectCast(Eval("Value"), ClosingItem).IsClosed %>' ClientIDMode="Predictable"></asp:Label>
                                     <div class="underArrow">
                                     </div>
                                 </div>
@@ -48,10 +48,13 @@
                 </div>
                 <div class="cycleBillingStatusBottom">
                     <div class="bottomItem">
-                        <asp:Label ID="lblBottomItem" runat="server" Text="Label" ClientIDMode="Predictable"></asp:Label>
+                        <asp:Label ID="lblBottomItem" runat="server" Text="" ClientIDMode="Predictable"></asp:Label>
                     </div>
                 </div>
             </div>
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生し月締状況を表示出来ませんでした。
+            </asp:Panel>
         </div>
     </div>
     <asp:HiddenField ID="hdnPaneOrder" runat="server" Visible="false" />

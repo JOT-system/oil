@@ -1,0 +1,312 @@
+﻿/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/* 受注(検索)画面 */
+/* #################１行目 ################# */
+/* 営業所(ラベル) */
+#WF_OFFICECODE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*営業所コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_OFFICECODE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*営業所コードinput tag*/
+#WF_OFFICECODE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+    #WF_OFFICECODE input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 営業所名称*/
+#WF_OFFICECODE_TEXT {
+    position: fixed;
+    top: calc(20% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+/* #################２行目 ################# */
+/* 年月日(ラベル) */
+#WF_DATE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(27% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position: fixed;
+    top: 9.5em;
+    left: 40em;
+    color: #737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*年月日(カレンダーアイコン ※ワンクリック用)*/
+#WF_DATE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(32.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/* 年月日 */
+#WF_DATE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(31% - 50px/2);
+    left: calc(46% - 140px/2);
+/*
+    position: fixed;
+    top: 11em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+*/
+}
+    #WF_DATE input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+/* 年月日(記号) */
+#WF_DATE_SYMBOL {
+    position: fixed;
+    top: calc(32% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    position: fixed;
+    top: 11em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+/* #################３行目 ################# */
+/* 列車番号(ラベル) */
+#WF_TRAINNO_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(39% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+/*
+    position: fixed;
+    top: 14em;
+    left: 40em;
+    color: #737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 列車番号 */
+#WF_TRAINNO {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(43% - 50px/2);
+    left: calc(46% - 140px/2);
+/*
+    position: fixed;
+    top: 15.5em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+*/
+}
+    #WF_TRAINNO input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* #################４行目 ################# */
+/* 荷卸地(ラベル) */
+#WF_UNLOADING_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(51% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*荷卸地コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_UNLOADING_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(56.2% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*荷卸地コードinput tag*/
+#WF_UNLOADING {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(55% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+
+    #WF_UNLOADING input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 荷卸地名称*/
+#WF_UNLOADING_TEXT {
+    position: fixed;
+    top: calc(56% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+
+/* #################５行目 ################# */
+/* 状態(ラベル) */
+#WF_STATUS_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(63% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*状態コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_STATUS_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(68.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+
+/*状態コードinput tag*/
+#WF_STATUS {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(67% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+
+    #WF_STATUS input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 状態名称*/
+#WF_STATUS_TEXT {
+    position: fixed;
+    top: calc(68% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+

@@ -230,6 +230,15 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents WF_BUTTONpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_BUTTONofficecode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BUTTONofficecode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''lblReportLodDate コントロール。
     '''</summary>
     '''<remarks>
@@ -282,6 +291,15 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbOTLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbOTLoadBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rbShipBtn コントロール。

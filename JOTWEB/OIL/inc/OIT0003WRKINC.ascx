@@ -248,6 +248,8 @@
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
     <!-- 貨車連結用更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
+    <!-- OT連携用更新データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPOTLINKAGETBL" runat="server"></asp:TextBox>
 
     <!-- 明細画面(タブ１)(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTAB1TBL" runat="server"></asp:TextBox>
@@ -276,4 +278,12 @@
     <!-- 発送順区分 -->
     <asp:TextBox ID="WF_SEL_SHIPORDERCLASS" runat="server"></asp:TextBox>
 
+    <!-- ***** ↓OT外部連携専用↓ ***** -->
+    <!-- 外部連携対象営業所コード -->
+    <asp:TextBox ID="WF_SEL_OTS_SALESOFFICECODE" runat="server"></asp:TextBox>
+    <!-- 外部連携対象営業所名 -->
+    <asp:TextBox ID="WF_SEL_OTS_SALESOFFICE" runat="server"></asp:TextBox>
+    <!-- 検索画面スキップフラグ 一覧から戻る際に使用,（1:検索画面スキップ、それ以外：検索画面維持） -->
+    <asp:TextBox ID="WF_SEL_CAN_BYPASS_SERACH" runat="server"></asp:TextBox>
+    <!-- ***** ↑OT外部連携専用↑ ***** -->
 </div>

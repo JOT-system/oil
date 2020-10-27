@@ -164,6 +164,7 @@ div.parentMenu.hasChild > input[type=checkbox] + label:after {
     display: block;
     background-repeat: no-repeat;
     background-size: contain;
+    z-index:1;
 }
 div.parentMenu.hasChild > input[type=checkbox]:checked + label:after {
     content: "▲";
@@ -186,10 +187,68 @@ div.parentMenu.menu2Link > input[type=checkbox] + label:after {
     background-repeat: no-repeat;
     background-size: contain;
 }
+div.parentMenu.menu2Link > input[type=checkbox]:checked + label {
+    z-index: 999;
+}
+div.parentMenu.menu2Link > input[type=checkbox]:checked + label:after {
+    content: "◀";
+}
+div.parentMenu.menu2Link {
+    position:relative;
+}
+div.parentMenu.menu2Link > .childMenu {
+    position:fixed;
+    top:38px;
+    //left:245px;
+    left:0;
+    padding-left:245px;
+    z-index:2;
+    background-color:rgba(255,255,255,0.85);
+    height:calc(100vh - 60px);
+    width:calc(100vw - 245px);
+    min-width:250px;
+}
+.menu2wrap {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
+    align-content: flex-start;
+        //justify-content:flex-start;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y:hidden;
+    text-align: left;
+}
+.menu2wrap > div {
+    width: 250px;
+    min-width:250px;
+    max-width:250px;
+    //height:30px;
+    margin-left:10px;
+    background-color:white;
 
+}
+div.parentMenu.menu2Link > .childMenu > div {
+    //display:flex;
+}
+div.parentMenu.menu2Link .childMenu label::before {
+    width:0;
+    min-width:0;
+}
+div.parentMenu.menu2Link .childMenu label {
+//    width: 200px;
+//    min-width: 200px;
+    padding-top:8px;
+    padding-left:5px;
+    font-size: 18px;
+    height:40px;
+}
 /* 左ナビゲーション アコーディオン */
 div.parentMenu > input[type=checkbox] + label + div {
-    display:none;
+    display: none;
 }
 div.parentMenu > input[type=checkbox]:checked + label + div {
     display:block;
@@ -282,6 +341,7 @@ div.showGuidance a[id^="Menu_"] {
 #paneList {
     width :100%;
     min-width:1095px;
+    max-width:1095px;
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
@@ -299,6 +359,9 @@ div.showGuidance a[id^="Menu_"] {
     border-radius: 5px;
     box-sizing: border-box;
     background-color: rgba(225, 225, 225, 1)
+}
+.menuPaneItem:hover {
+    border-color:darkgray;
 }
 /* ３列幅を使うペイン設定 */
 .menuPaneItem.paneWidth3 {
@@ -370,7 +433,8 @@ div.showGuidance a[id^="Menu_"] {
     }
 }
 /* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
-.paneContent select.officeDdl {
+.paneContent select.officeDdl,
+.paneContent select.stationDdl {
     height: 28px;
     font-size: 12pt;
     padding: 2px;
@@ -427,6 +491,19 @@ div.showGuidance a[id^="Menu_"] {
     content:'―';
     font-weight:bolder;
 }
+/* 表示データなしエリア */
+.paneContent .nodataArea {
+    color: red;
+    font-weight: bold;
+    margin: 5px;
+    font-size: 20px;
+}
+/* マイナス */
+.paneContent span.minus:before {
+    content: "\025B3";
+    color:red;
+    font-weight:bolder;
+}
 /* ******************** */
 /* 締状況ペイン個別 */
 /* ******************** */
@@ -460,7 +537,8 @@ div.showGuidance a[id^="Menu_"] {
 }
 .cycleBillingStatusWrapper .branchItemItem > span,
 .cycleBillingStatusWrapper .deptItem > span,
-.cycleBillingStatusWrapper .bottomItem > span {
+.cycleBillingStatusWrapper .bottomItem > span
+ {
     display: flex;
     height: 35px;
     border: 1px solid rgb(65,113,156);
@@ -471,7 +549,22 @@ div.showGuidance a[id^="Menu_"] {
     margin-right: 5px;
     margin-bottom: 2px;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
+    letter-spacing: 2px;
+    overflow:hidden;
+    text-overflow:initial;
+}
+.cycleBillingStatusWrapper .bottomItem > span {
+    border:none;
+}
+.cycleBillingStatusWrapper .bottomItem > span > span {
+    width:100%;
+    height:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(65,113,156);
+    border-radius: 10px;
 }
 .cycleBillingStatusWrapper .deptItem {
     text-align: center;
@@ -486,9 +579,34 @@ div.showGuidance a[id^="Menu_"] {
 .deptItem > span {
     width:145px;
 }
+/* 〆完了時表示 */
+.cycleBillingStatusWrapper span[data-isclosed="True"] {
+    background-color: gray;
+    position:relative ;
+}
+.cycleBillingStatusWrapper span[data-isclosed="True"]:before {
+    content:"〆";
+    color:red;
+    position:absolute;
+    left:5px;
+    font-weight:bold;
+}
 /* ******************** */
 /* 月間輸送量ペイン個別 */
 /* ******************** */
+/* 切り口選択エリア */
+#P002_contentPane .divDdlArea {
+    display:flex;
+    align-items:center;
+}
+#P002_contentPane .divDdlArea .officeDdl {
+    margin-left:5px;
+    margin-right:5px;
+}
+#P002_contentPane .measureText {
+    margin-left:auto;
+    margin-right:10px;
+}
 /* 表とグラフを横並び */
 .monthTransLeft, .monthTransRight {
     display: inline-block;
@@ -511,28 +629,129 @@ div.showGuidance a[id^="Menu_"] {
 }
 /* 左グラフの縦位置調整 */
 .monthTransRight {
-    margin-top:-15px;
+    //margin-top:-15px;
 }
-.monthTransTable table tr:nth-child(1) th:nth-child(1) {
+.monthTransTable table th {
+    background-color:rgb(255,255,102);
+}
+.monthTransTable table td {
+    background-color: white;
+}
+.monthTransTable th.erase {
     border-top: none;
     border-left: none;
+    background-color: transparent;
 }
-/* その他数値セル幅 */
+/* */
+.monthTransTable.view003 table {
+    width: 100%;
+}
+.monthTransTable table th.trainClass {
+    width: 50px;
+    min-width: 50px;
+    max-width:50px;
+    white-space: normal;
+    word-break: break-all;
+}
+
+/* 油種セル幅 */
 .monthTransTable table th.oilType {
-    width:120px;
+    width: 120px;
+    min-width: 120px;
 }
-/* その他数値セル幅 */
+/* 白黒油種セル幅 */
+.monthTransTable table th.bigOilCode {
+    width:50px;
+    min-width:50px;
+    white-space:normal;
+    word-break:break-all;
+}
+/* 支店セル幅 */
+.monthTransTable table th.orgCode {
+    width: 80px;
+    min-width:80px;
+}
+/* 荷主セル幅 */
+.monthTransTable table th.shpCode {
+    width: 120px;
+    min-width:120px;
+}
+/* 着基地セル幅 */
+.monthTransTable table th.cnsCode {
+    width: 80px;
+    min-width:80px;
+}
+/* 数値(kl表示部)セル幅 */
 .monthTransTable table th.yesterday,
 .monthTransTable table th.today,
-.monthTransTable table th.todayTrans{
-    width:100px;
+.monthTransTable table th.todayTrans,
+.monthTransTable table th.volumeChange,
+.monthTransTable table th.lyVolumeChange {
+    width: 125px;
+    min-width: 125px;
+    max-width: 125px;
+}
+/* 数値(率表示部)セル幅 */
+.monthTransTable table th.volumeRatio,
+.monthTransTable table th.lyVolumeRatio {
+    width: 95px;
+    min-width: 95px;
+    max-width: 95px;
 }
 /* 列見出し（油種名）*/
 .monthTransTable .oilNameData {
     text-align: left;
 }
+/* 列データ */
 .monthTransTable td {
-    text-align:right;
+    text-align: right;
+}
+.monthTransTable td.center {
+    text-align: center;
+}
+/* 列データ(文字の均等割付（両端そろえ）荷主と着基地 */
+.monthTransTable td.shpCode:not(.summary) span,
+.monthTransTable td.cnsCode:not(.summary) span,
+.monthTransTable td.orgCode:not(.summary) span,
+.monthTransTable.view005 td.oilCode span{
+    text-align:justify;
+    text-align-last: justify;
+    text-justify:inter-ideograph ;  
+    display:block;
+    word-break: break-all
+}
+.monthTransTable.view005 td.oilCode.summary span,
+.monthTransTable.view005 td.oilCode.midSummary span {
+    font-weight: bold;
+}
+.monthTransTable table td.trainClass {
+    white-space: normal;
+    word-break: break-all;
+}
+/* 合計行のセル */
+.monthTransTable td.summary {
+   background-color:palegoldenrod;
+}
+/* 中計行のセル */
+.monthTransTable td.midSummary {
+   background-color:khaki;
+}
+/* 総計行のセル */
+.monthTransTable td[data-ttlsum="1"] {
+    background-color: palegoldenrod;
+}
+/* 行Hover時 */
+.monthTransTable tr:hover td:not([rowspan]),
+.monthTransTable tr:hover td[rowspan="1"] {
+    background-color: darkorange;
+    color: white;
+}
+#P002_contentPane .btnDownload {
+    margin-left: 10px;
+    height: 28px;
+    padding-top: 0px;
+    box-sizing:border-box;
+    width:140px;
 }
 /* ******************************** */
 /* 貨車連結順序表取込状況ペイン個別 */
@@ -541,7 +760,6 @@ div.showGuidance a[id^="Menu_"] {
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
-
 }
 .paneLinkListImportItems > div {
     align-content:center;

@@ -26,15 +26,41 @@ Public Class MP0003OTLoadingSendStatus
         '初回ロードかポストバックか判定
         If IsPostBack = False Then
             '初回ロード
-            Initialize()
+            Try
+                Initialize()
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlLoadingSendStatusOffice.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0003OTLoadingSendStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "INIT"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+            End Try
         Else
             'ポストバック
-            If Me.hdnRefreshCall.Value = "1" Then
-                '最新化処理
-                SetDisplayValues()
-            End If
-            '処理フラグを落とす
-            Me.hdnRefreshCall.Value = ""
+            Try
+                If Me.hdnRefreshCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    Me.ddlLoadingSendStatusOffice.Enabled = True
+                    '最新化処理
+                    SetDisplayValues()
+                End If
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlLoadingSendStatusOffice.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0003OTLoadingSendStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "POSTBACK"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+                Me.hdnRefreshCall.Value = ""
+            End Try
+
         End If 'End IsPostBack = False
     End Sub
     ''' <summary>
@@ -61,7 +87,7 @@ Public Class MP0003OTLoadingSendStatus
         'TODO 着駅で同一が複数、ソートまちまちなので要調整
         '     一旦列車番号
         sqlStat.AppendLine("SELECT TR.TRAINNO ")
-        sqlStat.AppendLine("  FROM OIL.OIM0007_TRAIN TR")
+        sqlStat.AppendLine("  FROM OIL.OIM0007_TRAIN TR with(nolock)")
         sqlStat.AppendLine(" WHERE TR.OFFICECODE  = @OFFICECODE")
         sqlStat.AppendLine("   AND TR.OTFLG       = @OTFLG")
         'sqlStat.AppendLine("   AND TR.TRAINCLASS  IN(@TRAINCLASS_O,@TRAINCLASS_T)")

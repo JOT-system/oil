@@ -68,7 +68,11 @@
                     <asp:TextBox ID="TxtBTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
-            <span></span>
+            <span>
+                <a id="WF_BTRAINNAME">
+                    <asp:Label ID="LblBTrainName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </span>
             <!-- ■　空車着日　■ -->
             <span>
                 <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
@@ -171,11 +175,13 @@
     <div class="detailbox" id="detailbox">
         <div class="actionButtonBox">
             <div class="leftSide">
-                <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   onclick="ButtonClick('WF_ButtonALLSELECT');" />
-                <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
-                <input type="button" id="WF_ButtonLINE_ADD"      class="btn-sticky" value="行追加"   onclick="ButtonClick('WF_ButtonLINE_ADD');" />
-                <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                <div style="display:none">
+                    <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                    <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                    <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                    <input type="button" id="WF_ButtonLINE_ADD"      class="btn-sticky" value="行追加"   onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+                </div>
+                <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
             </div>
             <div class="rightSide">
                 <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="明細更新" onclick="ButtonClick('WF_ButtonUPDATE');" />

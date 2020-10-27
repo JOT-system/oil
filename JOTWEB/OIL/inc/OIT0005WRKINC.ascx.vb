@@ -75,10 +75,20 @@ Public Class OIT0005WRKINC
                 viewName = "OIL.VIW0008_TANKLOC01_ZANSHA"
             Case "2" '輸送状況
                 viewName = "OIL.VIW0008_TANKLOC02_TRANS"
-            Case "3" '回送状況
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
-            Case "4" 'その他状況
-                viewName = "OIL.VIW0008_TANKLOC04_OTHERS"
+            Case "3" '回送中（交検）
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD_KK"
+            Case "4" '回送中（全検）
+                viewName = "OIL.VIW0008_TANKLOC04_FORWARD_ZK"
+            Case "5" '回送中（修理）
+                viewName = "OIL.VIW0008_TANKLOC05_FORWARD_RP"
+            Case "7" '回送中（疎開留置）
+                viewName = "OIL.VIW0008_TANKLOC07_FORWARD_SR"
+            Case "8" '回送（ＭＣ）状況
+                viewName = "OIL.VIW0008_TANKLOC08_FORWARD_MC"
+            'Case "9" 'その他状況
+            '    viewName = "OIL.VIW0008_TANKLOC09_OTHERS"
+            Case "9" 'その他状況(受注(未卸中・交検中・留置中))
+                viewName = "OIL.VIW0008_TANKLOC09_ORDER_MKR"
         End Select
         Return viewName
     End Function
@@ -91,13 +101,29 @@ Public Class OIT0005WRKINC
         Dim viewName As String = ""
         Select Case detailType
             Case "1" '残車状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
             Case "2" '輸送状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
             Case "3" '回送状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
-            Case "4" 'その他状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "4" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "5" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "7" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "8" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "9" 'その他状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
         End Select
         Return viewName
     End Function
@@ -117,8 +143,13 @@ Public Class OIT0005WRKINC
             Me.ConditionList = New List(Of ConditionItem)
             Me.ConditionList.AddRange({New ConditionItem("1", "残車状況", "残車数", 0, "交検間近", 0),
                                        New ConditionItem("2", "輸送状況", "翌日発送分", 0, "輸送中", 0),
-                                       New ConditionItem("3", "回送状況", "回送指示中分", 0, "回送中", 0),
-                                       New ConditionItem("4", "その他状況", "留置", 0, "その他", 0)})
+                                       New ConditionItem("3", "回送（交検）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("4", "回送（全検）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("5", "回送（修理）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("7", "回送（<span style='letter-spacing:0;'>疎開留</span>置）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("8", "回送（ＭＣ）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("9", "その他状況", "未卸中", 0, "交検中", 0, "留置中", 0)})
+            'New ConditionItem("9", "その他状況", "留置", 0, "その他", 0)})
 
         End Sub
         ''' <summary>
@@ -142,6 +173,7 @@ Public Class OIT0005WRKINC
             Dim dicRetVal As New Dictionary(Of String, String)
             dicRetVal.Add("1", selectedDetail.Value1Name)
             dicRetVal.Add("2", selectedDetail.Value2Name)
+            If detailType = "9" Then dicRetVal.Add("3", selectedDetail.Value3Name)
             Return dicRetVal
         End Function
     End Class
@@ -151,13 +183,15 @@ Public Class OIT0005WRKINC
     <Serializable>
     Public Class ConditionItem
         Public Sub New(detailType As String, conditionName As String, value1Name As String, value1 As Decimal,
-                       value2Name As String, value2 As Decimal)
+                       value2Name As String, value2 As Decimal, Optional value3Name As String = Nothing, Optional value3 As Decimal = 0)
             Me.DetailType = detailType
             Me.ConditionName = conditionName
             Me.Value1Name = value1Name
             Me.Value1 = value1
             Me.Value2Name = value2Name
             Me.Value2 = value2
+            Me.Value3Name = value3Name
+            Me.Value3 = value3
 
         End Sub
         Public Property DetailType As String = ""
@@ -166,6 +200,8 @@ Public Class OIT0005WRKINC
         Public Property Value1 As Decimal = 0
         Public Property Value2Name As String = ""
         Public Property Value2 As Decimal = 0
+        Public Property Value3Name As String = ""
+        Public Property Value3 As Decimal = 0
     End Class
 
 End Class

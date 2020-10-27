@@ -62,7 +62,7 @@ function InitDisplay() {
 
                 //活性
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
-                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "disabled";
 
             }
             else {
@@ -72,10 +72,10 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
-                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
 
                 //非活性
-                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "";
             }
         }
         ////〇タブ２
@@ -168,6 +168,14 @@ function ChangeCheckBox(listId) {
 function SelectCheckBox(obj, lineCnt) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt;
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";

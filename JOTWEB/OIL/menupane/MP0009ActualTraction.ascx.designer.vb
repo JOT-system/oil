@@ -50,6 +50,15 @@ Partial Public Class MP0009ActualTraction
     Protected WithEvents ddlActualTractionOffice As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''ddlActualTractionArrStation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlActualTractionArrStation As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''chtActualTraction コントロール。
     '''</summary>
     '''<remarks>
@@ -59,6 +68,15 @@ Partial Public Class MP0009ActualTraction
     Protected WithEvents chtActualTraction As Global.System.Web.UI.DataVisualization.Charting.Chart
     
     '''<summary>
+    '''pnlSysError コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSysError As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>
@@ -66,4 +84,13 @@ Partial Public Class MP0009ActualTraction
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnPaneOrder As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnCurrentOfficeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnCurrentOfficeCode As Global.System.Web.UI.WebControls.HiddenField
 End Class

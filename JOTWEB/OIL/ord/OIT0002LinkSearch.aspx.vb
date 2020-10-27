@@ -112,8 +112,8 @@ Public Class OIT0002LinkSearch
 
         End If
 
-        '返送列車番号を入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtBTrainNo.Attributes("onkeyPress") = "CheckNum()"
+        '返送列車番号を入力するテキストボックスは数値(0～9),英語(A～Z)のみ可能とする。
+        Me.TxtBTrainNo.Attributes("onkeyPress") = "CheckNumAZ()"
         '空車着日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
         Me.TxtEmparrDate.Attributes("onkeyPress") = "CheckCalendar()"
 
@@ -395,7 +395,12 @@ Public Class OIT0002LinkSearch
                 End If
 
                 Me.TxtBTrainNo.Text = WW_SelectValue
-                Me.LblBTrainNo.Text = WW_SelectText.Substring(5)
+                Try
+                    Me.LblBTrainNo.Text = WW_SelectText.Substring(5)
+                    If Me.LblBTrainNo.Text = "" Then Me.LblBTrainNo.Text = WW_SelectText
+                Catch ex As Exception
+                    Me.LblBTrainNo.Text = WW_SelectText
+                End Try
                 Me.TxtBTrainNo.Focus()
 
             Case "TxtEmparrDate"             '空車着日

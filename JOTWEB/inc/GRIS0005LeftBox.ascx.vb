@@ -159,6 +159,9 @@ Public Class GRIS0005LeftBox
         LC_ORIGINOWNERCODE
         LC_OWNERCODE
         LC_BTRAINNUMBER
+        LC_UNIT
+        LC_CTRAINNUMBER
+        LC_PRODUCTSEGLIST_FT
     End Enum
 
     ''' <summary>
@@ -251,6 +254,9 @@ Public Class GRIS0005LeftBox
         LP_ORIGINOWNERCODE
         LP_OWNERCODE
         LP_BTRAINNUMBER
+        LP_CTRAINNUMBER
+        LP_ADDITINALFROMTO
+        LP_PRODUCTSEGLIST_FT
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -715,6 +721,10 @@ Public Class GRIS0005LeftBox
                 '品種パターン(受発注用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_SEG"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST_FT
+                '品種パターン(受発注用(開始終了指定))
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_FT_SEG"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST
                 '臨海鉄道列車番号(入線)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "RINKAITRAIN_I"
@@ -788,6 +798,16 @@ Public Class GRIS0005LeftBox
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BTRAINNUMBER"
                 lbox = CreateFixValueList(Params, O_RTN)
 
+            Case LIST_BOX_CLASSIFICATION.LC_CTRAINNUMBER
+                '列車番号(在線)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "CTRAINNUMBER_FIND"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_UNIT
+                '単位
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "UNIT"
+                lbox = CreateFixValueList(Params, O_RTN)
+
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing
@@ -850,6 +870,7 @@ Public Class GRIS0005LeftBox
                 '上記データテーブルの表示対象項目を定義(フィールド、表示名）
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("VALUE9", "状態"),
+                     New LeftTableDefItem("VALUE15", "状況", 13),
                      New LeftTableDefItem("VALUE5", "管轄支店", 9),
                      New LeftTableDefItem("VALUE7", "所属営業所", 9),
                      New LeftTableDefItem("VALUE3", "所在地", 9),
@@ -1502,6 +1523,13 @@ Public Class GRIS0005LeftBox
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
                 End If
+                '### 20201013 START 指摘票対応(No153) ###################################
+                'FixValue抽出用の開始終了条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALFROMTO) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_FROM_TO = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO))
+                End If
+                '### 20201013 END   指摘票対応(No153) ###################################
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR
                 lsbx = GS0007FIXVALUElst.LISTBOX1

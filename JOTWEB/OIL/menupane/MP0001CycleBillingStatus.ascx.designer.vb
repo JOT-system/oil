@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class MP0001CycleBillingStatus
-
+    
     '''<summary>
     '''contentPane コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents contentPane As Global.System.Web.UI.WebControls.Panel
-
+    
     '''<summary>
     '''lblPaneTitle コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents lblPaneTitle As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''hdnRefreshCall コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnRefreshCall As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnTargetMonth コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnTargetMonth As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''repBranch コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repBranch As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''lblBottomItem コントロール。
     '''</summary>
@@ -66,7 +66,16 @@ Partial Public Class MP0001CycleBillingStatus
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents lblBottomItem As Global.System.Web.UI.WebControls.Label
-
+    
+    '''<summary>
+    '''pnlSysError コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSysError As Global.System.Web.UI.WebControls.Panel
+    
     '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>

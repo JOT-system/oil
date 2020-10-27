@@ -20,7 +20,8 @@ Public Module PrevDispMap
         ''' <summary>
         ''' サブメニュー画面
         ''' </summary>
-        Public Const SUBMENU As String = "ASP.OIL_M00002MENU_ASPX"
+        Public Const SUBMENU As String = "ASP.OIL_M00001MENU_ASPX"
+        'Public Const SUBMENU As String = "ASP.OIL_M00002MENU_ASPX"
         ''' <summary>
         ''' 空回日報検索
         ''' </summary>
@@ -94,6 +95,15 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0006D As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICEDETAIL_ASPX"
         ''' <summary>
+        ''' 社外連携 取込検索
+        ''' </summary>
+        Public Const OIT0007S As String = "ASP.OIL_LOC_OIT0007FILEINPUTSEARCH_ASPX"
+        ''' <summary>
+        ''' 社外連携 取込一覧
+        ''' </summary>
+        Public Const OIT0007L As String = "ASP.OIL_LOC_OIT0007FILEINPUTLIST_ASPX"
+
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"
@@ -142,6 +152,54 @@ Public Module PrevDispMap
         ''' タンク車マスタメンテナンス（登録）
         ''' </summary>
         Public Const OIM0005C As String = "ASP.OIL_MAS_OIM0005TANKCREATE_ASPX"
+        ''' <summary>
+        ''' 列車マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0007S As String = "ASP.OIL_MAS_OIM0007TRAINSEARCH_ASPX"
+        ''' <summary>
+        ''' 列車マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0007L As String = "ASP.OIL_MAS_OIM0007TRAINLIST_ASPX"
+        ''' <summary>
+        ''' 列車マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0007C As String = "ASP.OIL_MAS_OIM0007TRAINCREATE_ASPX"
+        ''' <summary>
+        ''' 基地マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0009S As String = "ASP.OIL_MAS_OIM0009PLANTSEARCH_ASPX"
+        ''' <summary>
+        ''' 基地マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0009L As String = "ASP.OIL_MAS_OIM0009PLANTLIST_ASPX"
+        ''' <summary>
+        ''' 基地マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0009C As String = "ASP.OIL_MAS_OIM0009PLANTCREATE_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0011S As String = "ASP.OIL_MAS_OIM0011TORISEARCH_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0011L As String = "ASP.OIL_MAS_OIM0011TORILIST_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0011C As String = "ASP.OIL_MAS_OIM0011TORICREATE_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0012S As String = "ASP.OIL_MAS_OIM0012NIUKESEARCH_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0012L As String = "ASP.OIL_MAS_OIM0012NIUKELIST_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0012C As String = "ASP.OIL_MAS_OIM0012NIUKECREATE_ASPX"
         ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
         ''' </summary>

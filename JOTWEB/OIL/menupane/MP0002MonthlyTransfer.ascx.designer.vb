@@ -41,6 +41,24 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents hdnRefreshCall As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''ddlListPattern コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlListPattern As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''divMonthlyTransOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divMonthlyTransOffice As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''ddlMonthTransOffice コントロール。
     '''</summary>
     '''<remarks>
@@ -48,6 +66,42 @@ Partial Public Class MP0002MonthlyTransfer
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents ddlMonthTransOffice As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''btnDownload コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents btnDownload As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''hdnDownloadCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDownloadCall As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''mvwMonthlyTransfer コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mvwMonthlyTransfer As Global.System.Web.UI.WebControls.MultiView
+    
+    '''<summary>
+    '''VIEW001 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW001 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
     '''repMonthTrans コントロール。
@@ -68,6 +122,123 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents chtMonthTrans As Global.System.Web.UI.DataVisualization.Charting.Chart
     
     '''<summary>
+    '''VIEW002 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW002 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans002 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans002 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''VIEW003 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW003 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans003 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans003 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''VIEW004 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW004 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans004 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans004 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''VIEW005 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW005 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans005 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans005 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''VIEW006 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VIEW006 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans006 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans006 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''UNDEFINE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents UNDEFINE As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''pnlNoData コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlNoData As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''pnlSysError コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSysError As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>
@@ -75,4 +246,13 @@ Partial Public Class MP0002MonthlyTransfer
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnPaneOrder As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnCurrentListPattern コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnCurrentListPattern As Global.System.Web.UI.WebControls.HiddenField
 End Class

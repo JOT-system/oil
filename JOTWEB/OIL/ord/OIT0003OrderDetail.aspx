@@ -29,6 +29,9 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <%-- 20200916 START 指摘票対応(No148) --%>
+                <input type="button" id="WF_ButtonBULKDATE" class="btn-sticky" value="実績日一括反映" onclick="ButtonClick('WF_ButtonBULKDATE');" />
+                <%-- 20200916 END   指摘票対応(No148) --%>
                 <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
                 <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
                 <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
@@ -580,6 +583,7 @@
                     </div>
                     <div class="rightSide">
                         <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="割当確定"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
+                        <input type="button" id="WF_ButtonCANCEL_TAB1" class="btn-sticky" value="割当解除"  onclick="ButtonClick('WF_ButtonCANCEL_TAB1');" />
                     </div>
                 </div>
                 <!-- 一覧レイアウト -->
@@ -687,12 +691,16 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 一括フラグ -->
+        <input id="WF_BULKFLG" runat="server" value="" type="text" />
         <!-- 手配連絡フラグ -->
         <input id="WF_CONTACTFLG" runat="server" value="" type="text" />
         <!-- 結果受理フラグ -->
         <input id="WF_RESULTFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
+        <!-- 使用受注オーダー可否フラグ -->
+        <input id="WF_USEORDERFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->
         <input id="WF_MAPButtonControl" runat="server" value="0" type="text" />
         <!-- DetailBox Mview切替 -->

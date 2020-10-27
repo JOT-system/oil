@@ -16,7 +16,8 @@ function InitDisplay() {
     }
 
     //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
+    if (document.getElementById('WF_MAPpermitcode').value === "TRUE"
+        && document.getElementById('WF_OrderStatusFLG').value === "FALSE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value === "1") {
             //活性
@@ -54,6 +55,7 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+        //document.getElementById("WF_ButtonCSV").disabled = "disabled";
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
     /* フッターの高さ調整 */
@@ -88,15 +90,109 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    var objTableDR = document.getElementById("pnlListArea_DR").children[0];
+    var objLightTable = objTableDR.children[0];
+    if (objLightTable === null) {
+        return;
+    }
+    if (objLightTable === undefined) {
+        return;
+    }
+
+    // 積置フラグ
+    var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaSTACKINGFLG']");
+    var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaSTACKINGFLG']");
+
+    for (let i = 0; i < chkObjsLight1.length; i++) {
+
+        if (chkObjsLight1[i] !== null) {
+            if (spnObjsLight1[i].innerText === "on") {
+                chkObjsLight1[i].checked = true;
+            } else {
+                chkObjsLight1[i].checked = false;
+            }
+        }
+    }
+
+    //### 20201009 START 指摘票No165対応 ############################################################
+    // 未卸可否フラグ
+    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaWHOLESALEFLG']");
+    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaWHOLESALEFLG']");
+    // 交検可否フラグ
+    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
+    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
+    // 留置可否フラグ
+    var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaDETENTIONFLG']");
+    var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaDETENTIONFLG']");
+
+    for (let i = 0; i < chkObjsLight2.length; i++) {
+
+        if (chkObjsLight2[i] !== null) {
+            if (spnObjsLight2[i].innerText === "on") {
+                chkObjsLight2[i].checked = true;
+            } else {
+                chkObjsLight2[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight3.length; i++) {
+
+        if (chkObjsLight3[i] !== null) {
+            if (spnObjsLight3[i].innerText === "on") {
+                chkObjsLight3[i].checked = true;
+            } else {
+                chkObjsLight3[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight4.length; i++) {
+
+        if (chkObjsLight4[i] !== null) {
+            if (spnObjsLight4[i].innerText === "on") {
+                chkObjsLight4[i].checked = true;
+            } else {
+                chkObjsLight4[i].checked = false;
+            }
+        }
+    }
+    //### 20201009 END   指摘票No165対応 ############################################################
+
 }
 
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
+
+        surfix = '';
+        if (fieldName === 'STACKINGFLG') {
+            surfix = 'STACKING'
+        }
+        //### 20201009 START 指摘票No165対応 ############################################################
+        if (fieldName === 'WHOLESALEFLG') {
+            surfix = 'WHOLESALE'
+        }
+        if (fieldName === 'INSPECTIONFLG') {
+            surfix = 'INSPECTION'
+        }
+        if (fieldName === 'DETENTIONFLG') {
+            surfix = 'DETENTION'
+        }
+        //### 20201009 END   指摘票No165対応 ############################################################
+
         document.getElementById("WF_SelectedIndex").value = lineCnt;
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }
@@ -117,7 +213,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
         else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
+            //document.getElementById('WF_LeftMViewChange').value = 46;
+            document.getElementById('WF_LeftMViewChange').value = 74;
         }
         else if (fieldNM === "SHIPPERSNAME") {
             document.getElementById('WF_LeftMViewChange').value = 42;
@@ -127,6 +224,10 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         }
         else if (fieldNM === "JOINT") {
             document.getElementById('WF_LeftMViewChange').value = 53;
+        }
+        else if (fieldNM === "ACTUALLODDATE" 
+            || fieldNM === "JRINSPECTIONDATE") {
+            document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";

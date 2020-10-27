@@ -263,6 +263,24 @@ Public Class CS0050SESSION : Implements IDisposable
             SESSION(C_SESSION_KEY.SYSTEM_PATH) = value
         End Set
     End Property
+    '### 20200828 START OT発送日報送信用追加 #########################################
+    ''' <summary>
+    ''' OT発送日報送信FILE格納ディレクトリ
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property OTFILESEND_PATH As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.OTFILESEND_PATH))
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.OTFILESEND_PATH) = value
+        End Set
+    End Property
+    '### 20200828 END   OT発送日報送信用追加 #########################################
     ''' <summary>
     ''' APサーバ端末ID
     ''' </summary>

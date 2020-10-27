@@ -1040,6 +1040,15 @@ Partial Public Class OIT0003WRKINC
     Public WithEvents WF_SEL_INPLINKTBL As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_INPOTLINKAGETBL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_INPOTLINKAGETBL As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_INPTAB1TBL コントロール。
     '''</summary>
     '''<remarks>
@@ -1137,4 +1146,31 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SHIPORDERCLASS As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_OTS_SALESOFFICECODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_OTS_SALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_OTS_SALESOFFICE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_OTS_SALESOFFICE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_CAN_BYPASS_SERACH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CAN_BYPASS_SERACH As Global.System.Web.UI.WebControls.TextBox
 End Class

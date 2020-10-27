@@ -67,6 +67,7 @@ function bindLeftNaviClick() {
                 hdnPosiColObj.value = posicol;
                 let hdnRowLineObj = document.getElementById('hdnRowLine');
                 hdnRowLineObj.value = rowline;
+                commonDispWait();
                 ButtonClick('WF_ButtonLeftNavi'); /* 共通サブミット処理、VB側ロード時のSelectケースで割り振らせる */ 
             };
         })(posicol, rowline), false);
@@ -169,4 +170,31 @@ function refreshPane(refreshMarkObjId) {
         document.forms[0].submit();
     }
 
+}
+function downloadPaneData(dlButtonId) {
+    let downLoadMarkObj = document.getElementById(dlButtonId);
+    if (downLoadMarkObj === null) {
+        return;
+    }
+    let dlMarkObj = document.querySelector("#" + dlButtonId + " + input[type=hidden]");
+    let menuVscrollObj = document.getElementById('hdnPaneAreaVScroll');
+    let menuPaneArea = document.querySelector('#Menuheaderbox > .menuMain');
+
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        if (menuVscrollObj !== null) {
+            if (menuPaneArea !== null) {
+                menuVscrollObj.value = menuPaneArea.scrollTop;
+            }
+        }
+        
+        setTimeout(function () {
+            dlMarkObj.value = '';
+            downLoadMarkObj.disabled = false;
+            document.getElementById("MF_SUBMIT").value = "FALSE";
+        }, 2000);
+        dlMarkObj.value = '1';
+        downLoadMarkObj.disabled = true;
+        document.forms[0].submit();
+    }
 }

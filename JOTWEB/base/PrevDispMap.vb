@@ -95,6 +95,15 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0006D As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICEDETAIL_ASPX"
         ''' <summary>
+        ''' 社外連携 取込検索
+        ''' </summary>
+        Public Const OIT0007S As String = "ASP.OIL_LOC_OIT0007FILEINPUTSEARCH_ASPX"
+        ''' <summary>
+        ''' 社外連携 取込一覧
+        ''' </summary>
+        Public Const OIT0007L As String = "ASP.OIL_LOC_OIT0007FILEINPUTLIST_ASPX"
+
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"
@@ -167,6 +176,30 @@ Public Module PrevDispMap
         ''' 基地マスタメンテナンス（登録）
         ''' </summary>
         Public Const OIM0009C As String = "ASP.OIL_MAS_OIM0009PLANTCREATE_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0011S As String = "ASP.OIL_MAS_OIM0011TORISEARCH_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0011L As String = "ASP.OIL_MAS_OIM0011TORILIST_ASPX"
+        ''' <summary>
+        ''' 取引先マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0011C As String = "ASP.OIL_MAS_OIM0011TORICREATE_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0012S As String = "ASP.OIL_MAS_OIM0012NIUKESEARCH_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0012L As String = "ASP.OIL_MAS_OIM0012NIUKELIST_ASPX"
+        ''' <summary>
+        ''' 荷受人マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0012C As String = "ASP.OIL_MAS_OIM0012NIUKECREATE_ASPX"
         ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
         ''' </summary>

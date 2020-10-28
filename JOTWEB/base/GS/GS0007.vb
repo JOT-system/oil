@@ -102,6 +102,13 @@ Public Class GS0007FIXVALUElst
     ''' </summary>
     ''' <returns></returns>
     Public Property ADDITIONAL_SORT_ORDER As String = ""
+    '### 20201013 START 指摘票対応(No153) ###################################
+    ''' <summary>
+    ''' SQL検索条件(開始～終了)の条件
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ADDITIONAL_FROM_TO As String = ""
+    '### 20201013 END   指摘票対応(No153) ###################################
     Protected METHOD_NAME As String = "GS0007FIXVALUElst"
 
     Public Sub GS0007FIXVALUElst()
@@ -177,9 +184,18 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(NAMES)  as VALUE5    " _
                     & " FROM  OIL.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
-                    & "   and STYMD    <= @P3 " _
-                    & "   and ENDYMD   >= @P4 " _
                     & "   and DELFLG   <> @P5 "
+                '### 20201013 START 指摘票対応(No153) ###################################
+                '& "   and STYMD    <= @P3 " _
+                '& "   and ENDYMD   >= @P4 " _
+                If ADDITIONAL_FROM_TO <> "" Then
+                    SQLStr = SQLStr & "   and STYMD    <= '" & ADDITIONAL_FROM_TO & "'" _
+                                    & "   and ENDYMD   >= '" & ADDITIONAL_FROM_TO & "'"
+                Else
+                    SQLStr = SQLStr & "   and STYMD    <= @P3 " _
+                                    & "   and ENDYMD   >= @P4 "
+                End If
+                '### 20201013 END   指摘票対応(No153) ###################################
                 If ADDITIONAL_CONDITION <> "" Then
                     SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
                 End If
@@ -201,9 +217,19 @@ Public Class GS0007FIXVALUElst
                     & " FROM  OIL.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
-                    & "   and STYMD    <= @P3 " _
-                    & "   and ENDYMD   >= @P4 " _
                     & "   and DELFLG   <> @P5 "
+                '### 20201013 START 指摘票対応(No153) ###################################
+                '& "   and STYMD    <= @P3 " _
+                '& "   and ENDYMD   >= @P4 " _
+                If ADDITIONAL_FROM_TO <> "" Then
+                    SQLStr = SQLStr & "   and STYMD    <= '" & ADDITIONAL_FROM_TO & "'" _
+                                    & "   and ENDYMD   >= '" & ADDITIONAL_FROM_TO & "'"
+                Else
+                    SQLStr = SQLStr & "   and STYMD    <= @P3 " _
+                                    & "   and ENDYMD   >= @P4 "
+                End If
+                '### 20201013 END   指摘票対応(No153) ###################################
+
                 If ADDITIONAL_CONDITION <> "" Then
                     SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
                 End If
@@ -253,7 +279,7 @@ Public Class GS0007FIXVALUElst
                 SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
-                    .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
+                    .Add("@P2", SqlDbType.NVarChar, 25).Value = CLAS
                     .Add("@P3", SqlDbType.Date).Value = Date.Now
                     .Add("@P4", SqlDbType.Date).Value = Date.Now
                     .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE

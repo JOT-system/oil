@@ -348,6 +348,13 @@ function ChangeCheckBoxLight(listId) {
 function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
 
         surfix = '';
         if (fieldName === 'STACKINGFLG') {
@@ -394,7 +401,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
         else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
+            //document.getElementById('WF_LeftMViewChange').value = 46;
+            document.getElementById('WF_LeftMViewChange').value = 74;
         }
         else if (fieldNM === "SHIPPERSNAME") {
             document.getElementById('WF_LeftMViewChange').value = 42;

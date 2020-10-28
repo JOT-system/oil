@@ -1318,6 +1318,7 @@ Public Class OIT0001EmptyTurnDairyList
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
 
             '検索SQL文
             Dim SQLStr As String =

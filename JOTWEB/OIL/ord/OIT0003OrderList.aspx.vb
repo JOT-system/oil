@@ -15,6 +15,7 @@ Public Class OIT0003OrderList
     Private OIT0003tbl As DataTable                                 '一覧格納用テーブル
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003EXLUPtbl As DataTable                            'EXCELアップロード用
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
@@ -1395,6 +1396,19 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FILEUPLOAD()
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '★ファイル判別フラグ
+        Dim useFlg As String = ""
+
+        Try
+            '○ UPLOAD XLSデータ取得
+            CS0023XLSUPLOAD.CS0023XLSUPLOAD_NEGISHI_LOADPLAN(OIT0003EXLUPtbl)
+
+        Catch ex As Exception
+            Exit Sub
+        End Try
 
     End Sub
 #End Region

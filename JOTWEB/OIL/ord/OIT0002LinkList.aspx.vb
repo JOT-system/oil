@@ -2510,8 +2510,6 @@ Public Class OIT0002LinkList
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
                         OIT0002EXLUProw("ORDERNO") = sOrderContent(0)
-                        'iNum = Integer.Parse(sOrderContent(1)) + 1
-                        'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                         For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
                             If OIT0002GETrow("ORDERINGOILNAME") = OIT0002EXLUProw("OILNAME") Then
                                 'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
@@ -2521,9 +2519,14 @@ Public Class OIT0002LinkList
                             End If
                         Next
                         If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
-                            i += 1
-                            iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                            OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            If OIT0002GETtbl.Rows.Count = 0 Then
+                                iNum = Integer.Parse(sOrderContent(1)) + 1
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            Else
+                                i += 1
+                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            End If
                         End If
                     Else
                         P_OFFICECODE.Value = OIT0002EXLUProw("OFFICECODE").ToString()

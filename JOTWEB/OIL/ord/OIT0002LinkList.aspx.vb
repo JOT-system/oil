@@ -4081,6 +4081,7 @@ Public Class OIT0002LinkList
             & " INNER JOIN oil.OIM0004_STATION OIM0004_ARR ON " _
             & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION " _
             & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE2, @OFFICECODE3) " _
+            & "   AND OIM0007.TSUMI      =  'N' " _
             & "   AND OIM0007.DELFLG     <> @DELFLG "
 
         Try
@@ -4114,6 +4115,9 @@ Public Class OIT0002LinkList
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO <> ''")
 
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
+                        '★発駅が異なる場合はSKIP
+                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
+
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _

@@ -17459,7 +17459,7 @@ Public Class OIT0003OrderDetail
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            WW_CheckLoadingCnt(WW_ERRCODE, SQLcon)
+            WW_CheckLoadingCnt(SQLcon, WW_ERRCODE)
             If WW_ERRCODE = "ERR3" Then Exit Sub
         End Using
 
@@ -17471,9 +17471,10 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 積込可能件数チェック
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckLoadingCnt(ByRef O_RTN As String, ByVal SQLcon As SqlConnection)
+    Protected Sub WW_CheckLoadingCnt(ByVal SQLcon As SqlConnection, ByRef O_RTN As String)
         O_RTN = C_MESSAGE_NO.NORMAL
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""

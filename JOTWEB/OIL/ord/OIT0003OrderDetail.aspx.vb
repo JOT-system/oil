@@ -11934,33 +11934,33 @@ Public Class OIT0003OrderDetail
                 '### 2020608 END   ########################################################################################
 
                 '### 20201030 START 積込日(予定)を変更したら一覧を初期化 ##################################################
-                '(割当後)タンク車割当
-                Me.TxtHTank_w.Text = "0"
-                Me.TxtRTank_w.Text = "0"
-                Me.TxtTTank_w.Text = "0"
-                Me.TxtMTTank_w.Text = "0"
-                Me.TxtKTank_w.Text = "0"
-                Me.TxtK3Tank_w.Text = "0"
-                Me.TxtK5Tank_w.Text = "0"
-                Me.TxtK10Tank_w.Text = "0"
-                Me.TxtLTank_w.Text = "0"
-                Me.TxtATank_w.Text = "0"
-                Me.TxtTotalCnt_w.Text = "0"
+                ''(割当後)タンク車割当
+                'Me.TxtHTank_w.Text = "0"
+                'Me.TxtRTank_w.Text = "0"
+                'Me.TxtTTank_w.Text = "0"
+                'Me.TxtMTTank_w.Text = "0"
+                'Me.TxtKTank_w.Text = "0"
+                'Me.TxtK3Tank_w.Text = "0"
+                'Me.TxtK5Tank_w.Text = "0"
+                'Me.TxtK10Tank_w.Text = "0"
+                'Me.TxtLTank_w.Text = "0"
+                'Me.TxtATank_w.Text = "0"
+                'Me.TxtTotalCnt_w.Text = "0"
 
-                '○ 一覧の初期化画面表示データ取得
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                ''○ 一覧の初期化画面表示データ取得
+                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()       'DataBase接続
 
-                    '######################################################
-                    '受注営業所を変更した時点で、新規登録と同様の扱いとする。
-                    work.WF_SEL_CREATEFLG.Text = "1"
-                    work.WF_SEL_CREATELINKFLG.Text = "1"
-                    '######################################################
-                    MAPDataGet(SQLcon, 0)
-                End Using
+                '    '######################################################
+                '    '受注営業所を変更した時点で、新規登録と同様の扱いとする。
+                '    work.WF_SEL_CREATEFLG.Text = "1"
+                '    work.WF_SEL_CREATELINKFLG.Text = "1"
+                '    '######################################################
+                '    MAPDataGet(SQLcon, 0)
+                'End Using
 
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003tbl)
+                ''○ 画面表示データ保存
+                'Master.SaveTable(OIT0003tbl)
                 '### 20201030 END   積込日(予定)を変更したら一覧を初期化 ##################################################
 
             '(予定)発日

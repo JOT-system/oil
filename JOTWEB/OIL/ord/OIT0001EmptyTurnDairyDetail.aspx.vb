@@ -1541,28 +1541,28 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '### 2020608 END   ########################################################################################
 
                 '### 20201030 START 積込日(予定)を変更したら一覧を初期化 ##################################################
-                '○ 油種別タンク車数(車)の件数を初期化
-                TxtTotalTank.Text = "0"
-                TxtHTank.Text = "0"
-                TxtRTank.Text = "0"
-                TxtTTank.Text = "0"
-                TxtMTTank.Text = "0"
-                TxtKTank.Text = "0"
-                TxtK3Tank.Text = "0"
-                TxtK5Tank.Text = "0"
-                TxtK10Tank.Text = "0"
-                TxtLTank.Text = "0"
-                TxtATank.Text = "0"
+                ''○ 油種別タンク車数(車)の件数を初期化
+                'TxtTotalTank.Text = "0"
+                'TxtHTank.Text = "0"
+                'TxtRTank.Text = "0"
+                'TxtTTank.Text = "0"
+                'TxtMTTank.Text = "0"
+                'TxtKTank.Text = "0"
+                'TxtK3Tank.Text = "0"
+                'TxtK5Tank.Text = "0"
+                'TxtK10Tank.Text = "0"
+                'TxtLTank.Text = "0"
+                'TxtATank.Text = "0"
 
-                '○ 一覧の初期化画面表示データ取得
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                ''○ 一覧の初期化画面表示データ取得
+                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()       'DataBase接続
 
-                    MAPDataGet(SQLcon, 0)
-                End Using
+                '    MAPDataGet(SQLcon, 0)
+                'End Using
 
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0001tbl)
+                ''○ 画面表示データ保存
+                'Master.SaveTable(OIT0001tbl)
                 '### 20201030 END   積込日(予定)を変更したら一覧を初期化 ##################################################
 
             Case "TxtDepDate"           '(予定)発日

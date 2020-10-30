@@ -1516,7 +1516,7 @@ Public Class OIT0002LinkList
           " DELETE FROM OIL.OIT0011_RLINK WHERE RLINKNO = @P01 AND DELFLG = '0'; "
 
         Dim SQLDelLinkTblStr As String =
-          " DELETE FROM OIL.OIT0004_LINK WHERE LINKNO = @P01 AND DELFLG = '0'; " _
+          " DELETE FROM OIL.OIT0004_LINK WHERE LINKNO = @P01 AND DELFLG = '0'; "
 
         '○ 検索SQL
         '　検索説明

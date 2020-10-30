@@ -1022,20 +1022,49 @@ Public Structure CS0023XLSUPLOAD
                                    ByVal rng As Excel.Range)
 
         '★セルの内容を取得
-        'Dim sCellAgoBehind() As String = {"", ""}
-        Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K", "L", "M", "N", "O"}
-        Dim sCellTitleYMD() As String = {"", "", "", "", "", "", "", "", "", ""}
+        '### ヘッダー情報取得用 START #################################################################################
+        Dim sCellTitleYMDC As String = ""
+        'Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K", "L", "M", "N"}
+        Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K"}
+        Dim sCellTitleYMD() As String = {"", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleYMDL As String = ""
         Dim sCellTitlePointYoko() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
-        Dim sCellTitlePoint() As String = {"", "", "", "", "", "", "", "", "", ""}
-        'Dim sCellFooter() As String = {"", "", ""}
+        Dim sCellTitleLine() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleArrstation() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleTrainNo() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        '### ヘッダー情報取得用 END   #################################################################################
+
+        '### 明細情報取得用 START #####################################################################################
+        Dim sCellDetailYoko1() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
+        Dim sCellDetailYoko2() As String = {"F", "H", "J", "L", "N", "P", "R", "T", "V", "X", "Z", "AB", "AD", "AF"}
+        '### 明細情報取得用 END   #####################################################################################
 
         Try
             '◯ヘッダー情報取得
+            '★日付(年月日(曜日))※作成日
+            rng = oSheet.Range("AE2")
+            sCellTitleYMDC = rng.Text.ToString()
+            rng = oSheet.Range("AF2")
+            sCellTitleYMDC += rng.Text.ToString()
+
             Dim i As Integer = 0
-            '★日付(年月日(曜日))
+            '★日付(年月日(曜日))※積込日
             For Each sCellTitleYokorow As String In sCellTitleYMDYoko
                 rng = oSheet.Range(sCellTitleYokorow + "3")
                 sCellTitleYMD(i) = rng.Text.ToString()
+                sCellTitleYMDL += rng.Text.ToString()
+                i += 1
+            Next
+
+            '★ポイント(回線・着駅・列車)
+            i = 0
+            For Each sCellTitlePointYokorow As String In sCellTitlePointYoko
+                rng = oSheet.Range(sCellTitlePointYokorow + "4")
+                sCellTitleLine(i) = rng.Text.ToString()
+                rng = oSheet.Range(sCellTitlePointYokorow + "5")
+                sCellTitleArrstation(i) = rng.Text.ToString()
+                rng = oSheet.Range(sCellTitlePointYokorow + "6")
+                sCellTitleTrainNo(i) = rng.Text.ToString()
                 i += 1
             Next
 
@@ -1045,65 +1074,59 @@ Public Structure CS0023XLSUPLOAD
             '◯明細情報取得
             ExcelUploadNLoadPlanItemSet(dt)
 
-            ''明細行の開始
-            'Dim jStart As Integer = 9
-            ''明細行の終了
-            'Dim jEnd As Integer = 29
-            'For i As Integer = 0 To jEnd
-            '    dt.Rows.Add(dt.NewRow())
-            '    dt.Rows(i)("RLINKNO") = ""
-            '    dt.Rows(i)("RLINKDETAILNO") = (i + 1).ToString("000")
-            '    dt.Rows(i)("FILENAME") = excelFileName
-            '    dt.Rows(i)("AGOBEHINDFLG") = ""
-            '    dt.Rows(i)("REGISTRATIONDATE") = sCellTitleYMD(0)
-            '    dt.Rows(i)("TRAINNO") = sCellTitleYMD(1)
-            '    dt.Rows(i)("CONVENTIONAL") = ""
-            '    dt.Rows(i)("CONVENTIONALTIME") = ""
+            '明細行の開始
+            Dim jStart As Integer = 7
+            '明細行の終了
+            Dim jEnd As Integer = 21
+            i = 0
+            '明細のポイント
+            Dim jPoint As Integer = 1
+            '全明細の件数用
+            Dim j As Integer = 0
 
-            '    rng = oSheet.Range("A" + jStart.ToString())
-            '    dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
-            '    rng = oSheet.Range("B" + jStart.ToString())
-            '    dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
-            '    rng = oSheet.Range("C" + jStart.ToString())
-            '    dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
-            '    rng = oSheet.Range("D" + jStart.ToString())
-            '    dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
-            '    rng = oSheet.Range("E" + jStart.ToString())
-            '    dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
-            '    rng = oSheet.Range("F" + jStart.ToString())
-            '    dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+            '★EXCELデータをDataTableにセット
+            For Each sCellTitleLinerow As String In sCellTitleLine
+                jStart = 7
+                jPoint = 1
+                For z As Integer = 0 To jEnd
+                    dt.Rows.Add(dt.NewRow())
+                    dt.Rows(j)("FILENAME") = excelFileName
+                    dt.Rows(j)("DATERECEIVEYMD") = Date.Parse(sCellTitleYMDC).ToString("yyyy/MM/dd")
+                    dt.Rows(j)("LODDATE") = Date.Parse(sCellTitleYMDL).ToString("yyyy/MM/dd")
+                    dt.Rows(j)("LINE_HEADER") = sCellTitleLine(i)
+                    dt.Rows(j)("ARRSTATION_HEADER") = sCellTitleArrstation(i)
+                    dt.Rows(j)("TRAINNO_HEADER") = sCellTitleTrainNo(i)
 
-            '    rng = oSheet.Range("G" + jStart.ToString())
-            '    dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
-            '    rng = oSheet.Range("H" + jStart.ToString())
-            '    dt.Rows(i)("ARTICLE") = rng.Text.ToString()
-            '    rng = oSheet.Range("I" + jStart.ToString())
-            '    dt.Rows(i)("INSPECTIONDATE") = rng.Text.ToString()
+                    dt.Rows(j)("POINT") = jPoint
+                    rng = oSheet.Range(sCellDetailYoko1(i) + jStart.ToString())
+                    dt.Rows(j)("OIL_DETAIL") = rng.Text.ToString()
+                    rng = oSheet.Range(sCellDetailYoko2(i) + jStart.ToString())
+                    dt.Rows(j)("TANKNO_DETAIL") = rng.Text.ToString()
+                    rng = oSheet.Range(sCellDetailYoko2(i) + (jStart + 1).ToString())
+                    dt.Rows(j)("TRAINNO_DETAIL") = rng.Text.ToString()
 
-            '    ' ### 運送指示書(項目) START ####################################
-            '    rng = oSheet.Range("K" + jStart.ToString())
-            '    dt.Rows(i)("OILNAME") = rng.Text.ToString()
-            '    rng = oSheet.Range("L" + jStart.ToString())
-            '    dt.Rows(i)("LINE") = rng.Text.ToString()
-            '    rng = oSheet.Range("M" + jStart.ToString())
-            '    dt.Rows(i)("POSITION") = rng.Text.ToString()
-            '    rng = oSheet.Range("N" + jStart.ToString())
-            '    dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
-            '    rng = oSheet.Range("O" + jStart.ToString())
-            '    dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
-            '    rng = oSheet.Range("Q" + jStart.ToString())
-            '    dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
-            '    rng = oSheet.Range("R" + jStart.ToString())
-            '    dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
-            '    rng = oSheet.Range("S" + jStart.ToString())
-            '    dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
-            '    ' ### 運送指示書(項目) END   ####################################
+                    jStart += 2
+                    jPoint += 1
+                    j += 1
+                Next
+                i += 1
+            Next
 
-
-
-            '    jStart += 1
-            'Next
-
+            '★指定された列車の再設定
+            Dim svTraiNo As String = ""
+            Dim reg = New Regex("[①-⑨]")
+            Dim regHalf = New Regex("[^０-９]")
+            For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
+                If svTraiNo = "" Then
+                    svTraiNo = reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "")
+                ElseIf svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
+                    svTraiNo = ""
+                Else
+                    dtrow("TRAINNO_DETAIL") = svTraiNo
+                End If
+                dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
+                dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))
+            Next
 
         Catch ex As Exception
             Throw　'呼び出し元の例外にスロー
@@ -1120,14 +1143,18 @@ Public Structure CS0023XLSUPLOAD
     Private Sub ExcelUploadNLoadPlanItemSet(ByRef dt As DataTable)
         '◯明細情報取得
         '　フィールド名とフィールドの型を設定
+        dt.Columns.Add("FILENAME", Type.GetType("System.String"))
         dt.Columns.Add("DATERECEIVEYMD", Type.GetType("System.String"))
-        dt.Columns.Add("LINE", Type.GetType("System.String"))
-        dt.Columns.Add("ARRSTATIONNAME", Type.GetType("System.String"))
+        dt.Columns.Add("LODDATE", Type.GetType("System.String"))
+        dt.Columns.Add("LINE_HEADER", Type.GetType("System.String"))
+        dt.Columns.Add("ARRSTATION_HEADER", Type.GetType("System.String"))
         dt.Columns.Add("TRAINNO_HEADER", Type.GetType("System.String"))
-        dt.Columns.Add("POINT", Type.GetType("System.String"))
-        dt.Columns.Add("OILNAME", Type.GetType("System.String"))
-        dt.Columns.Add("TANKNO", Type.GetType("System.String"))
+        dt.Columns.Add("POINT", Type.GetType("System.Int32"))
+        dt.Columns.Add("OIL_DETAIL", Type.GetType("System.String"))
+        dt.Columns.Add("TANKNO_DETAIL", Type.GetType("System.String"))
         dt.Columns.Add("TRAINNO_DETAIL", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
+        dt.Columns.Add("TANKNO", Type.GetType("System.String"))
 
     End Sub
 #End Region

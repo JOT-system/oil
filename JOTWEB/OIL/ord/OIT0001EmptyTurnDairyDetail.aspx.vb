@@ -5109,8 +5109,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '〇各営業者で管理している油種を取得
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
+        WW_FixvalueMasterSearch("01" + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
 
         For i As Integer = 0 To WW_GetValue.Length - 1
             Select Case WW_GetValue(i)

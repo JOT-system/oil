@@ -17579,6 +17579,7 @@ Public Class OIT0003OrderDetail
         Dim SQLStr As String =
               " SELECT " _
             & "   ''                                        AS LINECNT" _
+            & " , ISNULL(RTRIM(MERGE_TBL.NO), '')           AS NO" _
             & " , ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.PLANTNAME), '')    AS PLANTNAME" _
             & " , ISNULL(RTRIM(MERGE_TBL.LINE), '')         AS LINE" _
@@ -17598,7 +17599,8 @@ Public Class OIT0003OrderDetail
         '基地コード毎の油種件数一覧
         SQLStr &=
               " SELECT " _
-            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & "   '1'                                     AS NO" _
+            & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
@@ -17635,7 +17637,8 @@ Public Class OIT0003OrderDetail
         SQLStr &=
               " UNION ALL " _
             & " SELECT " _
-            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & "   '2'                                     AS NO" _
+            & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
@@ -17670,7 +17673,8 @@ Public Class OIT0003OrderDetail
         SQLStr &=
               " UNION ALL " _
             & " SELECT " _
-            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & "   '3'                                     AS NO" _
+            & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ''                                      AS BIGOILCODE" _
@@ -17721,7 +17725,8 @@ Public Class OIT0003OrderDetail
             & " ) OIM0014 ON" _
             & "     OIM0014.PLANTCODE = MERGE_TBL.PLANTCODE " _
             & " AND OIM0014.BIGOILCODE = MERGE_TBL.BIGOILCODE " _
-            & " AND OIM0014.CHECKOILCODE = MERGE_TBL.CHECKOILCODE "
+            & " AND OIM0014.CHECKOILCODE = MERGE_TBL.CHECKOILCODE " _
+            & " ORDER BY LINE, NO "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

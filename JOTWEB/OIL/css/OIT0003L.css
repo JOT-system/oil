@@ -45,3 +45,12 @@ div[data-generated="1"] td:nth-child(4) {
 .boxIconArea div {
     margin-top: calc(100% - 14px) !important;
 }
+/* ポップアップボタン3列から4列に変更 */
+#divContentsPopUp {
+    width: 700px; /* 共通は500pxから変更 */
+    min-width: 700px;
+    margin-left: calc(50vw - 350px) /* 中央位置表示位置も横幅アップの為calc(50vw - 250px)から調整 */
+}
+#divContentsPopUp .grc0001Wrapper ul {
+    width:650px; /* 共通は450px で３列折り返しから４列折り返しに */
+}

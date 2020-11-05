@@ -783,12 +783,17 @@ Public Class OIT0003OTLinkageList
                 Return
             End If
             'Excel出力かCSV出力かに応じ処理分岐
-            If settings.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Csv Then
+            If {FileLinkagePatternItem.ReserveOutputFileType.Csv, FileLinkagePatternItem.ReserveOutputFileType.Seq}.Contains(settings.ReservedOutputType) Then
                 'CSV出力
                 Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings, settings.OutputReservedFileNameWithoutExtention, settings.OutputReservedFileExtention)
                     Dim url As String
                     Try
-                        url = repCbj.ConvertDataTableToCsv(False)
+                        If FileLinkagePatternItem.ReserveOutputFileType.Csv = settings.ReservedOutputType Then
+                            url = repCbj.ConvertDataTableToCsv(False)
+                        Else
+                            url = repCbj.CreateSequence(False)
+                        End If
+
                         If url = "" Then
                             Return
                         End If
@@ -2444,6 +2449,7 @@ Public Class OIT0003OTLinkageList
             Excel2007 = 2 '4文字拡張子
             Excel2003 = 4 '3文字拡張子（これはマクロが入るからやらない想定？）
             Pdf = 8       'Pdf（これは絶対に無い想定？）PDF作ってメール送信あるかも？
+            Seq = 16
         End Enum
 
         ''' <summary>

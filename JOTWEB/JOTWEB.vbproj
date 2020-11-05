@@ -421,6 +421,7 @@
     <Compile Include="OIL\com\OIT0004CustomReportOLD.vb" />
     <Compile Include="OIL\com\OIT0007InputCsv.vb" />
     <Compile Include="OIL\com\OIT0007InputExcel.vb" />
+    <Compile Include="OIL\com\ReportSignSQL.vb" />
     <Compile Include="OIL\for\OIT0006OutOfServiceDetail.aspx.designer.vb">
       <DependentUpon>OIT0006OutOfServiceDetail.aspx</DependentUpon>
     </Compile>

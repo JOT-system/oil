@@ -17885,44 +17885,44 @@ Public Class OIT0003OrderDetail
         Dim str3DieselTch As String = BaseDllConst.CONST_K3Tank1 + "D"
         Dim chkOilCode As String = ""
         '○3号軽油TCHの件数を取得
-        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+        For Each OIT0003row As DataRow In OIT0003WKtbl.Select(Nothing, "LINE, NO")
             chkOilCode = OIT0003row("CHECKOILCODE") + OIT0003row("SEGMENTOILCODE")
             '○油種が「3号軽油TCH」の場合
             If str3DieselTch = chkOilCode Then
                 iDieselTchCnt = Integer.Parse(OIT0003row("TANKCOUNT"))
+
+                Dim strKerosene As String = BaseDllConst.CONST_TTank + "A"
+                Dim strDiesel As String = BaseDllConst.CONST_KTank1 + "A"
+                Dim strLine As String = "LINE='" + OIT0003row("LINE") + "'"
+                chkOilCode = ""
+                '○3号軽油TCHが存在する場合
+                '最大出荷能力の変更
+                For Each OIT0003Chgrow As DataRow In OIT0003WKtbl.Select(strLine)
+                    chkOilCode = OIT0003Chgrow("CHECKOILCODE") + OIT0003Chgrow("SEGMENTOILCODE")
+                    '★灯油、軽油の最大出荷能力を3号軽油TCHが存在した値でマイナスする。
+                    '　白油の最大出荷能力も同様(←20201105廃止)
+                    '　合計の最大出荷能力も同様
+                    '    OrElse (OIT0003Chgrow("BIGOILCODE") = "W" AndAlso OIT0003Chgrow("CHECKOILCODE") = "ZZZZ") _
+                    If strKerosene = chkOilCode _
+                        OrElse strDiesel = chkOilCode _
+                        OrElse OIT0003Chgrow("CHECKOILNAME") = "合計" Then
+                        OIT0003Chgrow("CHK_TANKCOUNT") = Integer.Parse(OIT0003Chgrow("CHK_TANKCOUNT")) - iDieselTchCnt
+                    End If
+                Next
+
+                '車数オーバーがないかチェック
+                For Each OIT0003Jderow As DataRow In OIT0003WKtbl.Select(strLine)
+                    If Integer.Parse(OIT0003Jderow("TANKCOUNT")) <= Integer.Parse(OIT0003Jderow("CHK_TANKCOUNT")) Then
+                        '★最大出荷能力以内の場合
+                        OIT0003Jderow("JUDGE") = "0"
+                    Else
+                        '★最大出荷能力をオーバーしている場合
+                        OIT0003Jderow("JUDGE") = "1"
+                    End If
+                Next
+
             End If
         Next
-
-        Dim strKerosene As String = BaseDllConst.CONST_TTank + "A"
-        Dim strDiesel As String = BaseDllConst.CONST_KTank1 + "A"
-        chkOilCode = ""
-        '○3号軽油TCHが存在する場合
-        If iDieselTchCnt <> 0 Then
-            '最大出荷能力の変更
-            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
-                chkOilCode = OIT0003row("CHECKOILCODE") + OIT0003row("SEGMENTOILCODE")
-                '★灯油、軽油の最大出荷能力を3号軽油TCHが存在した値でマイナスする。
-                '　白油の最大出荷能力も同様
-                '　合計の最大出荷能力も同様
-                If strKerosene = chkOilCode _
-                    OrElse strDiesel = chkOilCode _
-                    OrElse (OIT0003row("BIGOILCODE") = "W" AndAlso OIT0003row("CHECKOILCODE") = "ZZZZ") _
-                    OrElse OIT0003row("CHECKOILNAME") = "合計" Then
-                    OIT0003row("CHK_TANKCOUNT") = Integer.Parse(OIT0003row("CHK_TANKCOUNT")) - iDieselTchCnt
-                End If
-            Next
-
-            '車数オーバーがないかチェック
-            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
-                If Integer.Parse(OIT0003row("TANKCOUNT")) <= Integer.Parse(OIT0003row("CHK_TANKCOUNT")) Then
-                    '★最大出荷能力以内の場合
-                    OIT0003row("JUDGE") = "0"
-                Else
-                    '★最大出荷能力をオーバーしている場合
-                    OIT0003row("JUDGE") = "1"
-                End If
-            Next
-        End If
 
     End Sub
 

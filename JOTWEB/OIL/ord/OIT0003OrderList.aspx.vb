@@ -15,6 +15,10 @@ Public Class OIT0003OrderList
     Private OIT0003tbl As DataTable                                 '一覧格納用テーブル
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003EXLUPtbl As DataTable                            'EXCELアップロード用
+    Private OIT0003EXLDELtbl As DataTable                           'EXCELアップロード(削除)用
+    Private OIT0003EXLINStbl As DataTable                           'EXCELアップロード(追加(回線別積込取込(日新)TBL))用
+    Private OIT0003EXLCHKtbl As DataTable                           'EXCELアップロード(チェック)用
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
@@ -94,7 +98,7 @@ Public Class OIT0003OrderList
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            'WF_FILEUPLOAD()
+                            WF_FILEUPLOAD()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -1303,7 +1307,8 @@ Public Class OIT0003OrderList
 
         '★列車マスタから情報を取得
         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        'WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAIN.Text + work.WF_SEL_ARRIVALSTATION.Text, WW_GetValue)
         '発送順区分
         work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
         'OT本線列車
@@ -1394,8 +1399,431 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FILEUPLOAD()
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '★ファイル判別フラグ
+        Dim useFlg As String = ""
+
+        Try
+            '○ UPLOAD XLSデータ取得
+            CS0023XLSUPLOAD.CS0023XLSUPLOAD_NEGISHI_LOADPLAN(OIT0003EXLUPtbl)
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        '◯回線別積込取込(日新)TBL削除処理(再アップロード対応)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_DELETE_NLINELOAD(SQLcon)
+        End Using
+
+        '◯回線別積込取込(日新)TBL追加処理
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_INSERT_NLINELOAD(SQLcon)
+        End Using
+
+        '◯回線別積込取込(日新)TBL更新処理(JOT油種反映)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UPDATE_NLINELOAD(SQLcon)
+        End Using
 
     End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL削除処理(再アップロード対応)
+    ''' </summary>
+    ''' <param name="SQLcon">接続オブジェクト</param>
+    Protected Sub WW_DELETE_NLINELOAD(ByVal SQLcon As SqlConnection)
+        '再アップロード時の削除データ取得用
+        If IsNothing(OIT0003EXLDELtbl) Then
+            OIT0003EXLDELtbl = New DataTable
+        End If
+
+        If OIT0003EXLDELtbl.Columns.Count <> 0 Then
+            OIT0003EXLDELtbl.Columns.Clear()
+        End If
+
+        OIT0003EXLDELtbl.Clear()
+
+        '○ ＤＢ削除
+        Dim SQLDelNLineLoadTblStr As String =
+          " DELETE FROM OIL.OIT0012_NLINELOAD WHERE FILENAME = @P01 AND LODDATE = @P02 AND DELFLG = '0'; "
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを回線別積込取込(日新)テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT " _
+            & "      ISNULL(RTRIM(OIT0012.FILENAME), '')         AS FILENAME " _
+            & "    , ISNULL(RTRIM(OIT0012.REGISTRATIONDATE), '') AS REGISTRATIONDATE " _
+            & "    , ISNULL(RTRIM(OIT0012.LODDATE), '')          AS LODDATE " _
+            & "    , ISNULL(RTRIM(OIT0012.LINE), '')             AS LINE " _
+            & "    , ISNULL(RTRIM(OIT0012.ARRSTATION), '')       AS ARRSTATION " _
+            & "    , ISNULL(RTRIM(OIT0012.TRAINNO), '')          AS TRAINNO " _
+            & " FROM oil.OIT0012_NLINELOAD OIT0012 " _
+            & " WHERE " _
+            & "     OIT0012.FILENAME = @P01 " _
+            & " AND OIT0012.LODDATE  = @P02 " _
+            & " AND OIT0012.DELFLG  <> @P03 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLDel1cmd As New SqlCommand(SQLDelNLineLoadTblStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      'ファイル名
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)          '積置日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)   '削除フラグ
+
+                PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+                PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003EXLDELtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003EXLDELtbl.Load(SQLdr)
+                End Using
+
+                '★削除対象データが存在した場合
+                If OIT0003EXLDELtbl.Rows.Count <> 0 Then
+                    '★削除実行(回線別積込取込(日新)テーブル)
+                    Dim PARADELRL01 As SqlParameter = SQLDel1cmd.Parameters.Add("@P01", SqlDbType.NVarChar) 'ファイル名
+                    Dim PARADELRL02 As SqlParameter = SQLDel1cmd.Parameters.Add("@P02", SqlDbType.NVarChar) '積置日
+                    PARADELRL01.Value = OIT0003EXLDELtbl.Rows(0)("FILENAME")
+                    PARADELRL02.Value = OIT0003EXLDELtbl.Rows(0)("LODDATE")
+                    SQLDel1cmd.ExecuteNonQuery()
+                    SQLDel1cmd.Dispose()
+                End If
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL追加処理
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    Protected Sub WW_INSERT_NLINELOAD(ByVal SQLcon As SqlConnection, Optional ByVal useFlg As String = Nothing)
+
+        '追加SQL文･･･回線別積込取込(日新)TBL
+        Dim SQLNLineLoadStr As String =
+              " INSERT INTO OIL.OIT0012_NLINELOAD " _
+            & " ( FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
+            & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
+            & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
+            & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
+            & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD)"
+
+        SQLNLineLoadStr &=
+              " VALUES" _
+            & " ( @FILENAME  , @REGISTRATIONDATE, @LODDATE       , @LINE" _
+            & " , @ARRSTATION, @TRAINNO         , @POINT         , @OIL" _
+            & " , @TANKNO    , @TRAINNODETAIL   , @LOADINGTRAINNO, @LOADINGTANKNO" _
+            & " , @DELFLG    , @INITYMD         , @INITUSER      , @INITTERMID" _
+            & " , @UPDYMD    , @UPDUSER         , @UPDTERMID     , @RECEIVEYMD);"
+
+        Try
+            Using SQLNLineLoadcmd As New SqlCommand(SQLNLineLoadStr, SQLcon)
+
+                Dim WW_DATENOW As DateTime = Date.Now
+                Dim FILENAME As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@FILENAME", SqlDbType.NVarChar)                 'ファイル名(EXCEL)
+                Dim REGISTRATIONDATE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@REGISTRATIONDATE", SqlDbType.Date) '登録年月日(EXCEL)
+                Dim LODDATE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LODDATE", SqlDbType.Date)                   '積込日(EXCEL)
+                Dim LINE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LINE", SqlDbType.NVarChar)                         '回線(EXCEL)
+                Dim ARRSTATION As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@ARRSTATION", SqlDbType.NVarChar)             '着駅(EXCEL)
+                Dim TRAINNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar)                   '列車(EXCEL)
+                Dim POINT As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@POINT", SqlDbType.NVarChar)                       'ポイント(EXCEL)
+                Dim OIL As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@OIL", SqlDbType.NVarChar)                           '油種(EXCEL)
+                Dim TANKNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar)                     'タンク車№(EXCEL)
+                Dim TRAINNODETAIL As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TRAINNODETAIL", SqlDbType.NVarChar)       '列車(EXCEL)
+                Dim LOADINGTRAINNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LOADINGTRAINNO", SqlDbType.NVarChar)     '列車(受注用)
+                Dim LOADINGTANKNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LOADINGTANKNO", SqlDbType.NVarChar)       'タンク車№(受注用)
+
+                Dim DELFLG As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar)         '削除フラグ
+                Dim INITYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITYMD", SqlDbType.DateTime)       '登録年月日
+                Dim INITUSER As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITUSER", SqlDbType.NVarChar)     '登録ユーザーＩＤ
+                Dim INITTERMID As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITTERMID", SqlDbType.NVarChar) '登録端末
+                Dim UPDYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDYMD", SqlDbType.DateTime)         '更新年月日
+                Dim UPDUSER As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDUSER", SqlDbType.NVarChar)       '更新ユーザーＩＤ
+                Dim UPDTERMID As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDTERMID", SqlDbType.NVarChar)   '更新端末
+                Dim RECEIVEYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime) '集信日時
+
+                For Each OIT0003EXLUProw As DataRow In OIT0003EXLUPtbl.Rows
+                    'ファイル名(EXCEL)
+                    FILENAME.Value = OIT0003EXLUProw("FILENAME")
+                    '登録年月日(EXCEL)
+                    REGISTRATIONDATE.Value = OIT0003EXLUProw("DATERECEIVEYMD")
+                    '積込日(EXCEL)
+                    LODDATE.Value = OIT0003EXLUProw("LODDATE")
+                    '回線(EXCEL)
+                    LINE.Value = OIT0003EXLUProw("LINE_HEADER")
+                    '着駅(EXCEL)
+                    ARRSTATION.Value = OIT0003EXLUProw("ARRSTATION_HEADER")
+                    '列車(EXCEL)
+                    TRAINNO.Value = OIT0003EXLUProw("TRAINNO_HEADER")
+                    'ポイント(EXCEL)
+                    POINT.Value = OIT0003EXLUProw("POINT")
+                    '油種(EXCEL)
+                    OIL.Value = OIT0003EXLUProw("OIL_DETAIL")
+                    'タンク車№(EXCEL)
+                    TANKNO.Value = OIT0003EXLUProw("TANKNO_DETAIL")
+                    '列車(EXCEL)
+                    TRAINNODETAIL.Value = OIT0003EXLUProw("TRAINNO_DETAIL")
+                    '列車(受注用)
+                    LOADINGTRAINNO.Value = OIT0003EXLUProw("TRAINNO")
+                    'タンク車№(受注用)
+                    LOADINGTANKNO.Value = OIT0003EXLUProw("TANKNO")
+
+                    '削除フラグ
+                    DELFLG.Value = C_DELETE_FLG.ALIVE
+                    '登録年月日
+                    INITYMD.Value = Date.Now
+                    '登録ユーザーＩＤ
+                    INITUSER.Value = Master.USERID
+                    '登録端末
+                    INITTERMID.Value = Master.USERTERMID
+                    '更新年月日
+                    UPDYMD.Value = Date.Now
+                    '更新ユーザーＩＤ
+                    UPDUSER.Value = Master.USERID
+                    '更新端末
+                    UPDTERMID.Value = Master.USERTERMID
+                    '集信日時
+                    RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    SQLNLineLoadcmd.CommandTimeout = 300
+                    SQLNLineLoadcmd.ExecuteNonQuery()
+                Next
+                'CLOSE
+                SQLNLineLoadcmd.Dispose()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_INSERT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL更新処理(JOT油種に変換)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UPDATE_NLINELOAD(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003EXLCHKtbl) Then
+            OIT0003EXLCHKtbl = New DataTable
+        End If
+
+        If OIT0003EXLCHKtbl.Columns.Count <> 0 Then
+            OIT0003EXLCHKtbl.Columns.Clear()
+        End If
+
+        OIT0003EXLCHKtbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLChkStr As String =
+              " SELECT " _
+            & "    OIM0029.value04   AS NISSHIN_OIL " _
+            & " ,  OIM0029.KEYCODE05 AS OILCODE " _
+            & " ,  OIM0029.KEYCODE06 AS OILNAME " _
+            & " ,  OIM0029.KEYCODE07 AS OILKANA " _
+            & " ,  OIM0029.KEYCODE08 AS SEGMENTOILCODE " _
+            & " ,  OIM0029.KEYCODE09 AS SEGMENTOILNAME " _
+            & " FROM OIL.OIM0029_CONVERT OIM0029 " _
+            & " WHERE OIM0029.CLASS     = @P01" _
+            & "   AND OIM0029.KEYCODE01 = @P02" _
+            & "   AND OIM0029.DELFLG   <> @P03"
+        Try
+            Using SQLChkcmd As New SqlCommand(SQLChkStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLChkcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '分類
+                Dim PARA02 As SqlParameter = SQLChkcmd.Parameters.Add("@P02", SqlDbType.NVarChar)     '受注営業所
+                Dim PARA03 As SqlParameter = SQLChkcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = "NISSHIN_OILMASTER"
+                PARA02.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLChkcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003EXLCHKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003EXLCHKtbl.Load(SQLdr)
+                End Using
+                'CLOSE
+                SQLChkcmd.Dispose()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_CHECK")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_CHECK"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        Try
+            '更新SQL文･･･回線別積込取込(日新)TBLの各項目をを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0012_NLINELOAD " _
+                    & "    SET LOADINGOILCODE          = @P05, " _
+                    & "        LOADINGOILNAME          = @P06, " _
+                    & "        LOADINGORDERINGTYPE     = @P07, " _
+                    & "        LOADINGORDERINGOILNAME  = @P08, " _
+                    & "        UPDYMD                  = @P09, " _
+                    & "        UPDUSER                 = @P10, " _
+                    & "        UPDTERMID               = @P11, " _
+                    & "        RECEIVEYMD              = @P12  " _
+                    & " WHERE " _
+                    & "     FILENAME = @P01 " _
+                    & " AND LODDATE  = @P02 " _
+                    & " AND OIL      = @P03 " _
+                    & " AND DELFLG  <> @P04 "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)              'ファイル名(EXCEL)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)                  '積込日(EXCEL)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar)              '油種(EXCEL)
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)           '削除フラグ
+            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)              '油種コード(JOT)
+            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)              '油種名(JOT)
+            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar)              '油種コード(受発注用)(JOT)
+            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar)              '油種名(受発注用)(JOT)
+            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.DateTime)  '更新年月日
+            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.NVarChar)  '更新端末
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.DateTime)  '集信日時
+
+            PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+            PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+            PARA04.Value = C_DELETE_FLG.DELETE
+            PARA09.Value = Date.Now
+            PARA10.Value = Master.USERID
+            PARA11.Value = Master.USERTERMID
+            PARA12.Value = C_DEFAULT_YMD
+
+            For Each OIT0003CHKrow In OIT0003EXLCHKtbl.Rows
+                PARA03.Value = OIT0003CHKrow("NISSHIN_OIL")
+                PARA05.Value = OIT0003CHKrow("OILCODE")
+                PARA06.Value = OIT0003CHKrow("OILNAME")
+                PARA07.Value = OIT0003CHKrow("SEGMENTOILCODE")
+                PARA08.Value = OIT0003CHKrow("SEGMENTOILNAME")
+
+                SQLcmd.ExecuteNonQuery()
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        Try
+            '追加SQL文･･･回線別積込取込(日新)WORK
+            Dim SQLNLineLoadStr As String =
+                  " DELETE FROM OIL.TMP0006_NLINELOAD; " _
+                & " INSERT INTO OIL.TMP0006_NLINELOAD " _
+                & " ( FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
+                & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
+                & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
+                & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
+                & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD)"
+
+            SQLNLineLoadStr &=
+                  " SELECT" _
+                & "   FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
+                & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
+                & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
+                & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
+                & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD" _
+                & " FROM OIL.OIT0012_NLINELOAD OIT0012" _
+                & " WHERE " _
+                & "     OIT0012.FILENAME = @P01" _
+                & " AND OIT0012.LODDATE  = @P02"
+
+            Using SQLNLineLoadcmd As New SqlCommand(SQLNLineLoadStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      'ファイル名
+                Dim PARA02 As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@P02", SqlDbType.Date)          '積置日
+
+                PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+                PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+
+                SQLNLineLoadcmd.CommandTimeout = 300
+                SQLNLineLoadcmd.ExecuteNonQuery()
+
+                'CLOSE
+                SQLNLineLoadcmd.Dispose()
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_WORK_INSERT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_WORK_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
 #End Region
 
     ' ******************************************************************************
@@ -3126,7 +3554,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
+            & "     OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
             & " AND OIM0029.KEYCODE02 = OIT0002.SHIPPERSCODE " _
             & " AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & " AND OIM0029.KEYCODE04 = '1' " _
@@ -3339,7 +3768,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "       INNER JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "           OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "           OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "       AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & "       AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "       AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "       AND OIM0029.KEYCODE04 = '1' " _
@@ -3538,7 +3968,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "      OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
+            & "      OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "  AND OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
             & "  AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "  AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "  AND OIM0029.KEYCODE04 = '1' " _

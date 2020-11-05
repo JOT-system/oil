@@ -735,7 +735,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            'Dim i As Integer = 0
+            Dim i As Integer = 0
             Dim iST As Integer = 0
             Dim i1ST As Integer = 6
             Dim i2ST As Integer = 17
@@ -776,23 +776,30 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     End Select
                 End If
 
+                '★スポットの位置を設定
+                i = iST + (Integer.Parse(PrintDatarow("SPOTNO").ToString()) - 1)
                 '◯ 注
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ATTENTION")
                 '◯ 車両番号
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("SYARYONUMBER")
                 '◯ 油種名
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
                 '◯ 予約数量
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("RESERVEDQUANTITY")
                 '◯ 納入先
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("DELIVERYFIRST")
 
-                iST += 1
+                'iST += 1
                 sPointy = PrintDatarow("LOADINGPOINT").ToString()
 
             Next

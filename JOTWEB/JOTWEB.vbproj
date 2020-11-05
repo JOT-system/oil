@@ -211,9 +211,6 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
-    <Content Include="OIL\inc\OIM0002C.css" />
-    <Content Include="OIL\inc\OIM0002L.css" />
-    <Content Include="OIL\inc\OIM0002S.css" />
     <Content Include="OIL\inc\OIM0003WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0002WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0012WRKINC.ascx" />

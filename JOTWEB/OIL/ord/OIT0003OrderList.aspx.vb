@@ -2323,8 +2323,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
@@ -2336,8 +2336,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '積込予定(甲子)(ラジオボタン)を表示
                 Me.rbKinoeneLoadBtn.Visible = True
@@ -2349,8 +2349,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '入線方(ラジオボタン)を表示
                 Me.rbLineBtn.Visible = True
@@ -2360,8 +2360,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
@@ -2375,8 +2375,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             '◯三重塩浜営業所
@@ -2386,8 +2386,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             Case Else

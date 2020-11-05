@@ -30,6 +30,7 @@ Public Class OIT0003OrderList
     Private OIT0003ReportSodegauratbl As DataTable                  '帳票用(袖ヶ浦)テーブル
     Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
+    Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -2982,7 +2983,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text)
+                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text, dtFT:=OIT0003ItemGettbl)
                     Catch ex As Exception
                         Return
                     End Try
@@ -4245,6 +4246,31 @@ Public Class OIT0003OrderList
         SQLStrYobi &= SQLStrCmn
         '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
+        '### 20201105 START 指摘票対応(No191) ####################################################################
+        If IsNothing(OIT0003ItemGettbl) Then
+            OIT0003ItemGettbl = New DataTable
+        End If
+
+        If OIT0003ItemGettbl.Columns.Count <> 0 Then
+            OIT0003ItemGettbl.Columns.Clear()
+        End If
+
+        OIT0003ItemGettbl.Clear()
+
+        '★値取得SQL(3号軽油のFROM, TOを取得(帳票に反映するため))
+        Dim SQLGetStr As String =
+              " SELECT " _
+            & "   OIM0003.OILCODE           AS OILCODE" _
+            & " , OIM0003.OILNAME           AS OILNAME" _
+            & " , OIM0003.SEGMENTOILCODE    AS SEGMENTOILCODE" _
+            & " , OIM0003.SEGMENTOILNAME    AS SEGMENTOILNAME" _
+            & " , OIM0003.ORDERFROMDATE     AS ORDERFROMDATE" _
+            & " , OIM0003.ORDERTODATE       AS ORDERTODATE" _
+            & " FROM oil.OIM0003_PRODUCT OIM0003 " _
+            & " WHERE OIM0003.OFFICECODE = @P01 " _
+            & "   AND OIM0003.OILCODE = @P02 "
+        '### 20201105 END   指摘票対応(No191) ####################################################################
+
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################
         '" SELECT " _
@@ -4317,7 +4343,8 @@ Public Class OIT0003OrderList
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
                   SQLYobicmd As New SqlCommand(SQLStrYobi, SQLcon),
-                  SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon)
+                  SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon),
+                  SQLGetcmd As New SqlCommand(SQLGetStr, SQLcon)
                 Dim PARALDP01 As SqlParameter = SQLLDPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 PARALDP01.Value = BaseDllConst.CONST_OFFICECODE_011402
 
@@ -4330,6 +4357,23 @@ Public Class OIT0003OrderList
                     '○ テーブル検索結果をテーブル格納
                     OIT0003WKtbl.Load(SQLLDPdr)
                 End Using
+
+                '### 20201105 START 指摘票対応(No191) ####################################################################
+                Dim PARAGET01 As SqlParameter = SQLGetcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARAGET02 As SqlParameter = SQLGetcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '油種コード
+                PARAGET01.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARAGET02.Value = BaseDllConst.CONST_K3Tank1
+
+                Using SQLGETdr As SqlDataReader = SQLGetcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLGETdr.FieldCount - 1
+                        OIT0003ItemGettbl.Columns.Add(SQLGETdr.GetName(index), SQLGETdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ItemGettbl.Load(SQLGETdr)
+                End Using
+                '### 20201105 END   指摘票対応(No191) ####################################################################
 
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ

@@ -7,7 +7,7 @@
     Public Function EmptyTurnDairy(ByVal mapID As String)
 
         Dim SQLStr As String =
-                    " SELECT " _
+              " SELECT " _
             & "   0                                              AS LINECNT" _
             & " , ''                                             AS OPERATION" _
             & " , '0'                                            AS TIMSTP" _

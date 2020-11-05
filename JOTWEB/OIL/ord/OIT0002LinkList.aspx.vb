@@ -4067,7 +4067,7 @@ Public Class OIT0002LinkList
 
         '○ 検索SQL
         '     条件指定に従い該当データを列車マスタから取得する
-        Dim SQLStr As String =
+        Dim SQLCmnStr As String =
             " SELECT DISTINCT" _
             & "   0                                                     AS LINECNT" _
             & " , ISNULL(RTRIM(OIM0007.TRAINNO), '')                    AS TRAINNO" _
@@ -4082,9 +4082,20 @@ Public Class OIT0002LinkList
             & " INNER JOIN oil.OIM0004_STATION OIM0004_DEP ON " _
             & "       OIM0004_DEP.STATIONCODE + OIM0004_DEP.BRANCH = OIM0007.DEPSTATION " _
             & " INNER JOIN oil.OIM0004_STATION OIM0004_ARR ON " _
-            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION " _
-            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE2, @OFFICECODE3) " _
+            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION "
+
+        '五井営業所・袖ヶ浦営業所用
+        Dim SQLStr As String =
+            SQLCmnStr _
+            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE3) " _
             & "   AND OIM0007.TSUMI      =  'N' " _
+            & "   AND OIM0007.DELFLG     <> @DELFLG "
+
+        '甲子営業所用
+        SQLStr &=
+            "UNION ALL" _
+            & SQLCmnStr _
+            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE2) " _
             & "   AND OIM0007.DELFLG     <> @DELFLG "
 
         Try

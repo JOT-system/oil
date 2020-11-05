@@ -60,8 +60,70 @@
  
             </div>
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-            <div id="divUpdList">
-
+            <div id="divUpdList" class='<%= Me.ShowUpdConfirm  %>'>
+                <asp:HiddenField ID="hdnUpdateConfirmIsActive" runat="server" Value="" />
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <span>チェックが付いた受注の数量を更新しますよろしいですか？</span>
+                    </div>
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonUpadteAmount" class="btn-sticky" value="更新"   onclick="ButtonClick('WF_ButtonUpadteAmount');" />
+                        <input type="button" id="btnCloseThisConfirm" class="btn-sticky" value="ｷｬﾝｾﾙ"  onclick="closeThisConfirm();" />
+                    </div>
+                </div>
+                <div id="divInputResultWrapper">
+                    <asp:Repeater ID="repUpdateList" runat="server" ItemType="JOTWEB.OIT0007FileInputList.InputDataItem" >
+                        <HeaderTemplate>
+                            <div class="updateList">
+                                <table class="tblUpdList">
+                                    <tr>
+                                        <th rowspan="2" class="headerLine1 updChk">更新</th>
+                                        <th colspan="5" class="headerLine1 file">実績ファイル情報</th>
+                                        <th colspan="7" class="headerLine1 db">受注情報</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="headerLine2 file reservedNo">積込予約番号</th>
+                                        <th class="headerLine2 file trnNo">車番</th>
+                                        <th class="headerLine2 file oilName">油種名</th>
+                                        <th class="headerLine2 file amount">数量</th>
+                                        <th class="headerLine2 file reason">理由</th>
+                                        <th class="headerLine2 db dbReservedNo">予約番号</th>
+                                        <th class="headerLine2 db trnNo">車番</th>
+                                        <th class="headerLine2 db oilName">油種名</th>
+                                        <th class="headerLine2 db amount">数量</th>
+                                        <th class="headerLine2 db trainNo">列車番号</th>
+                                        <th class="headerLine2 db lodDate">積込日</th>
+                                        <th class="headerLine2 db depDate">発日</th>
+                                    </tr>
+                        </HeaderTemplate>
+                        <ItemTemplate>
+                            <tr>
+                                <td class="updChk">
+                                    <asp:CheckBox ID="chkUpdate" runat="server" 
+                                        Checked='<%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).InputCheck %>' 
+                                        Visible='<%# DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).CanUpdate %>' />
+                                    <asp:HiddenField ID="hdnUpdIndex" runat="server" Value='<%# DirectCast(Container, RepeaterItem).ItemIndex %>' />
+                                </td>
+                                <td class="reservedNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).InpReservedNo %></td>
+                                <td class="trnNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).InpTnkNo %></td>
+                                <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).InpOilTypeName  %></td>
+                                <td class="amount"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).InpCarsAmount  %></td>
+                                <td class="reason"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).CheckReason  %></td>
+                                <td class="dbReservedNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).DbReservedNo  %></td>
+                                <td class="trnNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).TankNo  %></td>
+                                <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).OilName  %></td>
+                                <td class="amount"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).CarsAmount %></td>
+                                <td class="trainNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).TrainNo %></td>
+                                <td class="lodDate"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).DbLodDate %></td>
+                                <td class="depDate"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, InputDataItem).DepDate %></td>
+                            </tr>
+                        </ItemTemplate>
+                        <FooterTemplate>
+                                </table>
+                            </div>
+                        </FooterTemplate>
+                    </asp:Repeater>
+                </div>
             </div>
         </div>
 

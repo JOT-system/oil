@@ -43,7 +43,7 @@ Public Class OIM0001WRKINC
     '' <param name="I_CAMPCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Public Function CreateCAMPParam2(ByVal I_COMPCODE As String) As Hashtable
+    Public Function CreateCAMPParam(ByVal I_COMPCODE As String) As Hashtable
 
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
@@ -52,7 +52,7 @@ Public Class OIM0001WRKINC
         prmData.Item(C_PARAMETERS.LP_ORG_CATEGORYS) = New String() {
             GL0002OrgList.C_CATEGORY_LIST.CARAGE}
 
-        CreateCAMPParam2 = prmData
+        CreateCAMPParam = prmData
 
     End Function
     ''' <summary>

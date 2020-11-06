@@ -4,10 +4,10 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-'' 会社マスタ登録（検索）
+''' 会社マスタ登録（検索）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIM0001OrgSearch
+Public Class OIM0001CampSearch
     Inherits Page
 
     ''' <summary>
@@ -29,7 +29,7 @@ Public Class OIM0001OrgSearch
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks></remarks>
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Public Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
 
         If IsPostBack Then
             '○ 各ボタン押下処理
@@ -68,7 +68,7 @@ Public Class OIM0001OrgSearch
     ''' 初期化処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub Initialize()
+    Public Sub Initialize()
 
         TxtCampCode.Focus()
         WF_FIELD.Value = ""
@@ -88,7 +88,7 @@ Public Class OIM0001OrgSearch
     ''' 画面初期値設定処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_MAPValueSet()
+    Public Sub WW_MAPValueSet()
 
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU _
             OrElse Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
@@ -166,7 +166,7 @@ Public Class OIM0001OrgSearch
     ''' 検索ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonDO_Click()
+    Public Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
         '会社コード
@@ -217,7 +217,7 @@ Public Class OIM0001OrgSearch
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_Check(ByRef O_RTN As String)
+    Public Sub WW_Check(ByRef O_RTN As String)
 
         O_RTN = ""
         Dim WW_TEXT As String = ""
@@ -318,7 +318,7 @@ Public Class OIM0001OrgSearch
     ''' 終了ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonEND_Click()
+    Public Sub WF_ButtonEND_Click()
 
         '○ 前画面遷移
         Master.TransitionPrevPage()
@@ -330,7 +330,7 @@ Public Class OIM0001OrgSearch
     ''' フィールドダブルクリック時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_FIELD_DBClick()
+    Public Sub WF_FIELD_DBClick()
 
         If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
             Try
@@ -370,7 +370,7 @@ Public Class OIM0001OrgSearch
     ''' フィールドチェンジ時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_FIELD_Change()
+    Public Sub WF_FIELD_Change()
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
@@ -406,7 +406,7 @@ Public Class OIM0001OrgSearch
     ''' LeftBox選択時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonSel_Click()
+    Public Sub WF_ButtonSel_Click()
 
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
@@ -443,7 +443,7 @@ Public Class OIM0001OrgSearch
     ''' LeftBoxキャンセルボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonCan_Click()
+    Public Sub WF_ButtonCan_Click()
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
@@ -464,7 +464,7 @@ Public Class OIM0001OrgSearch
     ''' RightBoxダブルクリック時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_RIGHTBOX_DBClick()
+    Public Sub WF_RIGHTBOX_DBClick()
 
         rightview.InitViewID(TxtCampCode.Text, WW_DUMMY)
 
@@ -474,7 +474,7 @@ Public Class OIM0001OrgSearch
     ''' RightBoxメモ欄更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_RIGHTBOX_Change()
+    Public Sub WF_RIGHTBOX_Change()
 
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
@@ -485,7 +485,7 @@ Public Class OIM0001OrgSearch
     ''' ヘルプ表示
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_HELP_Click()
+    Public Sub WF_HELP_Click()
 
         Master.ShowHelp()
 
@@ -504,7 +504,7 @@ Public Class OIM0001OrgSearch
     ''' <param name="O_TEXT"></param>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+    Public Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
 
         O_TEXT = ""
         O_RTN = ""
@@ -548,7 +548,7 @@ Public Class OIM0001OrgSearch
 
     End Sub
 
-    Protected Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RdBSearch1.CheckedChanged
+    Public Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RdBSearch1.CheckedChanged
 
     End Sub
 End Class

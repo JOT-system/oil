@@ -4,6 +4,8 @@
 <div hidden="hidden">
     <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
+    <!-- 会社名称 -->
+    <asp:TextBox ID="WF_SEL_CAMPNAME" runat="server"></asp:TextBox>
     <!-- 運用部署 -->
     <asp:TextBox ID="WF_SEL_UORG" runat="server"></asp:TextBox>
     <!-- 選択行 -->
@@ -20,6 +22,7 @@
     <asp:TextBox ID="WF_SEL_STYMD2" runat="server"></asp:TextBox>
     <!-- 終了年月日 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_ENDYMD2" runat="server"></asp:TextBox>
     <!-- 会社名称 -->
     <asp:TextBox ID="WF_SEL_NAME" runat="server"></asp:TextBox>
     <!-- 会社名称（短） -->

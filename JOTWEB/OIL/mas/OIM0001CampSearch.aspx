@@ -64,7 +64,8 @@
             </div>
 
             <!-- 組織コード2 -->
-            <div class="inputItem">
+            <!-- 
+                <div class="inputItem">
                 <a id="LblOrgCode" >組織コード</a><br/>&nbsp;
                     <a class="ef" id="WF_ORGCODE" ondblclick="Field_DBclick('WF_ORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE');">
                         <asp:TextBox ID="TxtOrgCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
@@ -73,6 +74,7 @@
                     <asp:Label ID="txtOrgName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
+                -->
 
             <!-- 削除フラグ -->
             <div class="inputItem">
@@ -85,7 +87,7 @@
 
             <!-- 削除フラグ -->
             <div class="inputItem">
-                <a id="LblWord">※会社コード、組織コードの条件指定がない時は全件表示</a><br/>
+                <a id="LblWord">※会社コードの条件指定がない時は全件表示</a><br/>
             </div>
 
         </div> <!-- End inputBox -->

@@ -23,6 +23,15 @@ Partial Public Class OIM0001WRKINC
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
+    '''WF_SEL_CAMPNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
     '''WF_SEL_UORG コントロール。
     '''</summary>
     '''<remarks>
@@ -111,6 +120,15 @@ Partial Public Class OIM0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ENDYMD As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_ENDYMD2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEL_ENDYMD2 As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_NAME コントロール。

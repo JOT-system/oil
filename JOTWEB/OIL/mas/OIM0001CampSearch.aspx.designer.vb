@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIM0001OrgSearch
+Partial Public Class OIM0001CampSearch
 
     '''<summary>
     '''TxtCampCodeMy コントロール。
@@ -192,7 +192,7 @@ Partial Public Class OIM0001OrgSearch
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

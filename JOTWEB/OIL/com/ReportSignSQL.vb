@@ -1,6 +1,7 @@
 ﻿Public Class ReportSignSQL
     ''' <summary>
     ''' 空回日報(帳票)表示用SQL
+    ''' 
     ''' </summary>
     ''' <param name="mapID">画面ID</param>
     ''' <remarks>空回日報の帳票を表示する際のSQLを設定</remarks>

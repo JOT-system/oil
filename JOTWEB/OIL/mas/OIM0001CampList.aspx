@@ -1,31 +1,46 @@
-﻿<%@ Page Title="OIS0001L" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0001CampList.aspx.vb" Inherits="JOTWEB.OIS0001UserList" %>
+﻿<%@ Page Title="OIM0001L" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0001CampList.aspx.vb" Inherits="JOTWEB.OIM0001CampList" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/OIL/inc/OIS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIM0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content ID="OIS0001LH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIS0001L.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIS0001L.js")%>'></script>
+<asp:Content ID="OIM0001LH" ContentPlaceHolderID="head" runat="server">
+    <%--<link href='<%=ResolveUrl("~/OIL/css/OIM0001L.css")%>' rel="stylesheet" type="text/css" />--%>
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0001L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
  
-<asp:Content ID="OIS0001L" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="OIM0001L" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
+                        <!-- ↓ これも使ってないなら消す！ ↓ --> 
+                        <!-- 会社コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
+
+                        <!-- 組織コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SELUCamp_L" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SELUCamp_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
+                        <!-- ↑ これも使ってないなら消す！ ↑ --> 
+
                         <!-- 一覧件数 -->
                         <asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
                     </div>
+
                     <div class="rightSide">
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="追加"    onclick ="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"  onclick="ButtonClick('WF_ButtonUPDATE');" />
@@ -35,6 +50,7 @@
                         <div id="WF_ButtonFIRST" class="firstPage" runat="server"                    onclick="ButtonClick('WF_ButtonFIRST');"></div>
                         <div id="WF_ButtonLAST" class="lastPage" runat="server"                      onclick="ButtonClick('WF_ButtonLAST');"></div>
                     </div>
+
                 </div> <!-- End class=actionButtonBox -->
 
             </div> <!-- End class="Operation" -->
@@ -51,7 +67,7 @@
         <MSINC:wrklist ID="work" runat="server" />
 
         <!-- イベント用 -->
-        <div style="display:none;">
+        <div hidden="hidden">
             <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView DBクリック-->
             <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>
@@ -81,6 +97,7 @@
 
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
+
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 権限 -->
         </div>

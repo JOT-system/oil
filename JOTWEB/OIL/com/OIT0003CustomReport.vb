@@ -837,15 +837,20 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditSodegauraLineHeaderArea(lodDate, rTrainNo)
-            '◯明細の設定
-            EditSodegauraLineDetailArea()
-            '◯フッターの設定
-            EditSodegauraLineFooterArea(rTrainNo)
-            '***** TODO処理 ここまで *****
-            'ExcelTempSheet.Delete() '雛形シート削除
+            '○帳票の種類
+            Select Case repPtn
+                '★入線方(袖ヶ浦)
+                Case "LINEPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditSodegauraLineHeaderArea(lodDate, rTrainNo)
+                    '◯明細の設定
+                    EditSodegauraLineDetailArea()
+                    '◯フッターの設定
+                    EditSodegauraLineFooterArea(rTrainNo)
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+            End Select
 
             '保存処理実行
             Dim saveExcelLock As New Object

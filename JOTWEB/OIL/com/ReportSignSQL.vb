@@ -140,7 +140,10 @@
             Case "OIT0003"
                 SQLStr &=
                   "   WHERE OIT0002.OFFICECODE = @P03 " _
-                & "   AND OIT0002.LODDATE = @P04 "
+                & "   AND OIT0002.DELFLG <> @P02 " _
+                & "   AND OIT0002.LODDATE = @P04 " _
+                & "   AND OIT0002.ORDERSTATUS <> @P05 "
+
         End Select
 
         SQLStr &=

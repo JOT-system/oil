@@ -2654,7 +2654,8 @@ Public Class OIT0002LinkList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER               = @LINEORDER            , TANKNO                  = @TANKNO" _
+            & "        SHIPORDER               = @SHIPORDER" _
+            & "        , LINEORDER             = @LINEORDER            , TANKNO                  = @TANKNO" _
             & "        , STACKINGFLG           = @STACKINGFLG          , OTTRANSPORTFLG          = @OTTRANSPORTFLG" _
             & "        , SHIPPERSCODE          = @SHIPPERSCODE         , SHIPPERSNAME            = @SHIPPERSNAME" _
             & "        , OILCODE               = @OILCODE              , OILNAME                 = @OILNAME" _
@@ -2673,7 +2674,8 @@ Public Class OIT0002LinkList
             & "        AND DETAILNO     = @DETAILNO" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO              , DETAILNO               , LINEORDER          , TANKNO" _
+            & "        ( ORDERNO              , DETAILNO" _
+            & "        , SHIPORDER            , LINEORDER              , TANKNO" _
             & "        , STACKINGFLG          , WHOLESALEFLG           , INSPECTIONFLG      , DETENTIONFLG" _
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
@@ -2688,7 +2690,8 @@ Public Class OIT0002LinkList
             & "        , DELFLG               , INITYMD                , INITUSER           , INITTERMID" _
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @ORDERNO              , @DETAILNO               , @LINEORDER          , @TANKNO" _
+            & "        ( @ORDERNO              , @DETAILNO" _
+            & "        , @SHIPORDER            , @LINEORDER              , @TANKNO" _
             & "        , @STACKINGFLG          , @WHOLESALEFLG           , @INSPECTIONFLG      , @DETENTIONFLG" _
             & "        , @FIRSTRETURNFLG       , @AFTERRETURNFLG         , @OTTRANSPORTFLG" _
             & "        , @ORDERINFO            , @SHIPPERSCODE           , @SHIPPERSNAME" _
@@ -2710,6 +2713,7 @@ Public Class OIT0002LinkList
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
+            & "    , SHIPORDER" _
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , STACKINGFLG" _
@@ -2765,6 +2769,7 @@ Public Class OIT0002LinkList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)           '受注№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)          '受注明細№
+                Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", SqlDbType.NVarChar, 2)        '発送順
                 Dim P_LINEORDER As SqlParameter = SQLcmd.Parameters.Add("@LINEORDER", SqlDbType.NVarChar, 2)        '貨物駅入線順
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)              'タンク車№
                 Dim P_STACKINGFLG As SqlParameter = SQLcmd.Parameters.Add("@STACKINGFLG", SqlDbType.NVarChar)       '積置可否フラグ
@@ -2817,6 +2822,8 @@ Public Class OIT0002LinkList
                 Dim JP_DETAILNO As SqlParameter = SQLcmdJnl.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3) '受注明細№
 
                 Dim WW_DATENOW As DateTime = Date.Now
+                '〇 位置の設定件数を取得
+                Dim intListCnt As Integer = OIT0002EXLUPtbl.Select("POSITION<>''").Count
                 For Each OIT0002row As DataRow In OIT0002EXLUPtbl.Select(Nothing, "ORDERNO, DETAILNO")
 
                     '★受注№が未設定の場合は次レコード
@@ -2826,8 +2833,27 @@ Public Class OIT0002LinkList
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
 
-                    P_LINEORDER.Value = ""               '貨物駅入線順
-                    'P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
+                    '### 20201106 START 指摘票対応(No209)全体 #############################
+                    '★袖ヶ浦営業所の場合
+                    If OIT0002row("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011203 _
+                        AndAlso Convert.ToString(OIT0002row("POSITION")) <> "" Then
+                        '発送順
+                        Try
+                            P_SHIPORDER.Value = (intListCnt - Integer.Parse(OIT0002row("POSITION")) + 1)
+                        Catch ex As Exception
+                            P_SHIPORDER.Value = ""
+                        End Try
+                        '貨物駅入線順
+                        Try
+                            P_LINEORDER.Value = Integer.Parse(OIT0002row("POSITION"))
+                        Catch ex As Exception
+                            P_LINEORDER.Value = ""
+                        End Try
+                    Else
+                        P_SHIPORDER.Value = ""                              '発送順
+                        P_LINEORDER.Value = ""                              '貨物駅入線順
+                    End If
+                    '### 20201106 end   指摘票対応(No209)全体 #############################
                     P_TANKNO.Value = OIT0002row("TRUCKNO")                  'タンク車№
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
                     P_WHOLESALEFLG.Value = "2"                              '未卸可否フラグ

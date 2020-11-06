@@ -310,6 +310,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("UPGRADE").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
+
+                '### 20201105 START 指摘票対応(No210)全体 ################################
+                '★「５０％運行分」※甲子営業所(2685列車)対応
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 _
+                    AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = "2685" Then
+                    If Remark = "" Then
+                        Remark &= "「５０％運行分」"
+                    Else
+                        Remark &= vbCrLf + "「５０％運行分」"
+                    End If
+                End If
+                '### 20201105 END   指摘票対応(No210)全体 ################################
+
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then

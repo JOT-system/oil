@@ -817,6 +817,37 @@ function f_ExcelPrint() {
     // リンク参照
     window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
 }
+// ○ダウンロード処理フォルダ固定でバッチでフォルダ指定ダウンロード(テスト用)
+// 対象[ダウンロードファイル名].batを生成し指定フォルダダウンロードバッチを作成する
+function f_ExcelPrintTsst() {
+    // リンク参照
+    let url = document.getElementById("WF_PrintURL").value;
+    // URLよりファイル名のみ抜き出し
+    let arr = url.split("/");
+    let fileName = arr[arr.length - 1];
+    // バッチコマンド生成
+    let textContents = "";
+    textContents = textContents + 'cd c:\r\n';
+    textContents = textContents + 'bitsadmin /transfer download \"' + url + '\" \"C:\\test\\' + fileName + '\"\r\n';
+    // コマンドテキストよりファイルBlob生成
+    var blob = new Blob([textContents], { "type": "text/plain" });
+    // ダウンロード処理実行
+    if (window.navigator.msSaveBlob) {
+        // ブラウザIEの場合こちらの分岐
+        window.navigator.msSaveBlob(blob, fileName + ".bat");
+        // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+        window.navigator.msSaveOrOpenBlob(blob, fileName + ".bat");
+    } else {
+        // ブラウザIE以外の場合はこちらの分岐
+        let downloadLink = document.createElement("a");
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.download = fileName + ".bat";
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+}
 
 function f_PDFPrint() {
     // リンク参照

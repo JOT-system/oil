@@ -28,6 +28,7 @@ Public Structure CS0001INIFILEget
         UPF_DIR
         SYS_DIR
         OTFILESEND_DIR
+        PRINTROOT
     End Enum
 
     Private Const IniFileC As String = "C:\APPL\APPLINI\OIL\JOTWEB.ini"
@@ -220,7 +221,24 @@ Public Structure CS0001INIFILEget
                         End If
                     End If
                     '### 20200828 END   OT発送日報送信用追加 #########################################
+                    'APサーバー名称
+                    If IniBuf.IndexOf("<print root>") >= 0 OrElse IniType = STRINGTYPE.PRINTROOT Then
+                        IniType = STRINGTYPE.PRINTROOT
+                        IniString &= IniBuf
 
+                        If IniBuf.IndexOf("</print root>") >= 0 Then
+                            IniString = IniString.Replace("<name string>", "")
+                            IniString = IniString.Replace("</name string>", "")
+                            IniString = IniString.Replace("<print root>", "")
+                            IniString = IniString.Replace("</print root>", "")
+                            IniString = IniString.Replace(ControlChars.Quote, "")
+                            IniString = IniString.Replace("value=", "")
+
+                            CS0050SESSION.PRINT_ROOT_URL_NAME = Trim(IniString)
+                            IniString = ""
+                            IniType = STRINGTYPE.NONE
+                        End If
+                    End If
                 End While
             Catch ex As Exception
                 ERR = C_MESSAGE_NO.SYSTEM_ADM_ERROR

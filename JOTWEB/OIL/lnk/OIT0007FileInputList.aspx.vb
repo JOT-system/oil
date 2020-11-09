@@ -1526,6 +1526,7 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("   AND FXOST.DELFLG     = @DELFLG")
         '固定値マスタ（受注ステータス）結合ここまで↑
         sqlStat.AppendLine(" WHERE ODR.DELFLG       = @DELFLG")
+        sqlStat.AppendLine("   AND ODR.OFFICECODE   = @OFFICECODE")
         sqlStat.AppendLine("   AND ( ")
         Dim isFirst As Boolean = True
         For Each inpItem In inpData
@@ -1553,6 +1554,7 @@ Public Class OIT0007FileInputList
                 'SQLパラメータ設定
                 With sqlCmd.Parameters
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text
                     '.Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
                 End With
                 'SQL実行
@@ -1844,6 +1846,7 @@ Public Class OIT0007FileInputList
         ''' <summary>
         ''' チェック結果コード
         ''' </summary>
+        ''' <remarks>現在単一使用想定だがビットマスクを考慮した数値</remarks>
         Public Enum CheckReasonCodes
             ''' <summary>
             ''' 正常
@@ -1880,11 +1883,11 @@ Public Class OIT0007FileInputList
             ''' <summary>
             ''' 本来ありえないが同一の予約番号、積込予定日で複数合致した場合
             ''' </summary>
-            TooMenyOrderInfo = 9999
+            TooMenyOrderInfo = 32768
             ''' <summary>
             ''' 初期値
             ''' </summary>
-            InitVal = 99999
+            InitVal = 65536
         End Enum
         ''' <summary>
         ''' コンストラクタ
@@ -1953,7 +1956,7 @@ Public Class OIT0007FileInputList
                     Case CheckReasonCodes.TankUnmatch
                         Return "車番不一致"
                     Case CheckReasonCodes.OrderStatusCannotAccept
-                        Return "受注状況が登録、実績数量を登録出来る範囲ではありません。"
+                        Return "受注状況が実績数量を登録出来る範囲ではありません。"
                     Case CheckReasonCodes.TooMenyOrderInfo
                         '本来ありえない想定だが念の為
                         Return "受注結果複数"

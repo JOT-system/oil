@@ -72,6 +72,8 @@ Public Module SessionKey
         ''' </summary>
         Public Const OTFILESEND_PATH As String = "OTFILESenddir"
         '### 20200828 END   OT発送日報送信用追加 #########################################
+        Public Const PRINT_ROOT_URL_NAME As String = "PRINTROOTUrlName"
+
         ''' <summary>
         ''' APサーバ端末ID
         ''' </summary>

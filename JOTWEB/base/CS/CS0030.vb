@@ -1075,7 +1075,7 @@ Public Structure CS0030REPORT
                 Case "pdf"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".pdf"
                     'URL = "http://" & Dns.GetHostName & "/PRINT/" & WW_Term & "/" & WW_datetime & ".pdf"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".pdf"
+                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".pdf"
                     W_ExcelBook.ExportAsFixedFormat(Type:=0,
                          Filename:=FILEpath,
                          Quality:=0,
@@ -1085,23 +1085,23 @@ Public Structure CS0030REPORT
                 Case "csv"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".CSV"
                     'URL = "http://" & Dns.GetHostName & "/PRINT/" & WW_Term & "/" & WW_datetime & ".CSV"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".CSV"
+                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".CSV"
                     W_ExcelApp.DisplayAlerts = False
                     W_ExcelSheet.SaveAs(Filename:=FILEpath, FileFormat:=Excel.XlFileFormat.xlCSV)
                 Case "xls"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLS"
                     'URL = "http://" & Dns.GetHostName & "/PRINT/" & WW_Term & "/" & WW_datetime & ".XLS"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLS"
+                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLS"
                     W_ExcelBook.SaveAs(FILEpath)
                 Case "xlsx"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLSX"
                     'URL = "http://" & Dns.GetHostName & "/PRINT/" & WW_Term & "/" & WW_datetime & ".XLSX"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
                     W_ExcelBook.SaveAs(FILEpath)
                 Case "xlsm"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLSM"
                     'URL = "http://" & Dns.GetHostName & "/PRINT/" & WW_Term & "/" & WW_datetime & ".XLSM"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSM"
+                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSM"
                     'W_ExcelBook.SaveAs(FILEpath)
                     W_ExcelBook.SaveAs(Filename:=FILEpath, FileFormat:=Excel.XlFileFormat.xlOpenXMLWorkbookMacroEnabled)
             End Select

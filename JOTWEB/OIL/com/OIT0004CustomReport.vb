@@ -87,7 +87,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
         ExcelAppObj.DisplayAlerts = False

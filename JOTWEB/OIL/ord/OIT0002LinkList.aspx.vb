@@ -2261,6 +2261,7 @@ Public Class OIT0002LinkList
                                 'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
                                 'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
                                 WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
+                                If WW_GetValue(12) = "T" Then OIT0002ExlUProw("LOADINGTRAINNAME") &= "-積置"
 
                                 Try
                                     '〇 (予定)の日付を設定
@@ -2469,7 +2470,7 @@ Public Class OIT0002LinkList
             & "     OIT0003_MAX.ORDERNO = OIT0002.ORDERNO" _
             & " WHERE " _
             & "     OIT0002.OFFICECODE = @OFFICECODE" _
-            & " AND OIT0002.TRAINNAME  = @TRAINNAME" _
+            & " AND OIT0002.TRAINNO    = @TRAINNO" _
             & " AND OIT0002.LODDATE    = @LODDATE" _
             & " AND OIT0002.DEPDATE    = @DEPDATE" _
             & " AND OIT0002.DELFLG    <> @DELFLG" _
@@ -2478,7 +2479,7 @@ Public Class OIT0002LinkList
         Try
             Using SQLcmd As New SqlCommand(SQLCmpStr, SQLcon)
                 Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 6)  '受注営業所コード
-                Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar, 40)   '本線列車名
+                Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar, 40)       '本線列車No
                 Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.Date)               '積込日(予定)
                 Dim P_DEPDATE As SqlParameter = SQLcmd.Parameters.Add("@DEPDATE", SqlDbType.Date)               '発日(予定)
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
@@ -2505,7 +2506,7 @@ Public Class OIT0002LinkList
 
                     '同じオーダーの場合
                     If sOrderContent(2) = OIT0002EXLUProw("OFFICECODE").ToString() _
-                       AndAlso sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNAME").ToString() _
+                       AndAlso sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO").ToString() _
                        AndAlso sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE").ToString() _
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
@@ -2530,7 +2531,7 @@ Public Class OIT0002LinkList
                         End If
                     Else
                         P_OFFICECODE.Value = OIT0002EXLUProw("OFFICECODE").ToString()
-                        P_TRAINNAME.Value = OIT0002EXLUProw("LOADINGTRAINNAME").ToString()
+                        P_TRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO").ToString()
                         P_LODDATE.Value = OIT0002EXLUProw("LOADINGLODDATE").ToString()
                         P_DEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE").ToString()
                         P_DELFLG.Value = C_DELETE_FLG.DELETE
@@ -2590,7 +2591,7 @@ Public Class OIT0002LinkList
                     sOrderContent(0) = OIT0002EXLUProw("ORDERNO")
                     sOrderContent(1) = OIT0002EXLUProw("DETAILNO")
                     sOrderContent(2) = OIT0002EXLUProw("OFFICECODE")
-                    sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNAME")
+                    sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO")
                     sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE")
                     sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE")
                 Next

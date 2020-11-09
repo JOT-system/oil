@@ -306,7 +306,16 @@ Public Class MP0002MonthlyTransfer
         If qTarget.Any Then
             targetTbl = qTarget.CopyToDataTable
         End If
-        Me.repMonthTrans.DataSource = targetTbl
+        Dim repeaterTbl As DataTable = targetTbl.Clone
+        For Each dr As DataRow In targetTbl.Rows
+            Dim addRow As DataRow = repeaterTbl.NewRow
+            addRow.ItemArray = dr.ItemArray
+            repeaterTbl.Rows.Add(addRow)
+        Next
+        Dim appendDr = CreateDispRow(targetTbl, repeaterTbl)
+        appendDr("OILNAME") = "計"
+        repeaterTbl.Rows.Add(appendDr)
+        Me.repMonthTrans.DataSource = repeaterTbl ' targetTbl
         Me.repMonthTrans.DataBind()
         With Me.chtMonthTrans
             Dim revData = targetTbl

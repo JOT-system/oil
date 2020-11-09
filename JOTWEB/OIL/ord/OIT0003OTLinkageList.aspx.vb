@@ -1571,6 +1571,40 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
         sqlStat.AppendLine("     , ''          AS SOD_TRANS_COMP") '袖ヶ浦運送会社
         sqlStat.AppendLine("     , '0'         AS SOD_BACKNAME") '袖ヶ浦戻り
+        sqlStat.AppendLine("     , '10'        AS SEQ_DATATYPE_RESERVED") 'シーケンスファイルデータ区部（予約）
+        sqlStat.AppendLine("     , '1'         AS SEQ_PROC_KBN") 'シーケンスファイル処理区分(一旦新規のみ）
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '06' ELSE '08' END AS SEQ_DEPT_CODE") 'シーケンスファイル支店コード
+        sqlStat.AppendLine("     , '03'         AS SEQ_TORIKBN") 'シーケンスファイル取引区分コード
+        sqlStat.AppendLine("     , format(ODR.ARRDATE,'yyyyMMdd') AS ARRDATE_WITHOUT_SLASH")     '積車着日(スラなし）
+        sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
+        sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '0011'  ELSE '0012' END AS SEQ_UKEHARAI_CODE") 'シーケンスファイル受払い基地コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        sqlStat.AppendLine("     , '1'           AS SEQ_TRANSWAY") 'シーケンスファイル輸送方法
+        sqlStat.AppendLine("     , CASE WHEN TRA.TRAINCLASS = 'O'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND DET.OTTRANSPORTFLG = '1'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' ANS ODR.OFFICECODE = '011201'")
+        sqlStat.AppendLine("                 THEN '022'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' ANS ODR.OFFICECODE = '012401'")
+        sqlStat.AppendLine("                 THEN '017'")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
+        sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキタキ243000'")
+        sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        sqlStat.AppendLine("            ELSE '000000'")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
+        sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
+        sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") '伝票明細№
+        sqlStat.AppendLine("     , '00000' AS SEQ_ACCTUAL_AMOUNT") '実績数量
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_BEGIN_TIME") '荷役開始時刻
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") '荷役終了時刻
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") '荷役終了時刻
         sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
@@ -1578,22 +1612,31 @@ Public Class OIT0003OTLinkageList
         '明細結合ここから↓
         sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
         sqlStat.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
-        sqlStat.AppendLine("   AND DET.DELFLG  = @DELFLG")
+        sqlStat.AppendLine("   And DET.DELFLG  = @DELFLG")
         '明細結合ここまで↑
         '油種マスタ結合ここから↓
         sqlStat.AppendLine(" LEFT JOIN OIL.OIM0003_PRODUCT PRD")
         sqlStat.AppendLine("    ON PRD.OFFICECODE     = ODR.OFFICECODE")
-        sqlStat.AppendLine("   AND PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
-        sqlStat.AppendLine("   AND PRD.PLANTCODE      = ODR.BASECODE")
-        sqlStat.AppendLine("   AND PRD.OILCODE        = DET.OILCODE")
-        sqlStat.AppendLine("   AND PRD.SEGMENTOILCODE = DET.ORDERINGTYPE")
-        sqlStat.AppendLine("   AND PRD.DELFLG         = @DELFLG")
+        sqlStat.AppendLine("   And PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   And PRD.PLANTCODE      = ODR.BASECODE")
+        sqlStat.AppendLine("   And PRD.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   And PRD.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   And PRD.DELFLG         = @DELFLG")
         '油種マスタ結合ここまで↑
         'タンク車マスタ結合ここから↓
         sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK")
         sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
-        sqlStat.AppendLine("   AND TNK.DELFLG      = @DELFLG")
+        sqlStat.AppendLine("   And TNK.DELFLG      = @DELFLG")
         'タンク車マスタ結合ここまで↑
+        '列車マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0007_TRAIN TRA")
+        sqlStat.AppendLine("    ON TRA.OFFICECODE  = @OFFICECODE")
+        sqlStat.AppendLine("   And TRA.TRAINNO     = ODR.TRAINNO")
+        sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
+        sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
+        sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
+        '列車マスタ結合ここまで↑
         '積込予約マスタ結合ここから↓
         sqlStat.AppendLine(" LEFT JOIN OIL.OIM0021_LOADRESERVE LRV")
         sqlStat.AppendLine("    ON LRV.OFFICECODE     = ODR.OFFICECODE")
@@ -1628,7 +1671,8 @@ Public Class OIT0003OTLinkageList
         sqlMaxReservedNo.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
         sqlMaxReservedNo.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
         '明細結合ここまで↑
-        sqlMaxReservedNo.AppendLine(" WHERE ODR.LODDATE = @LODDATE")
+        sqlMaxReservedNo.AppendLine(" WHERE ODR.LODDATE    = @LODDATE")
+        sqlMaxReservedNo.AppendLine("   AND ODR.OFFICECODE = @OFFICECODE")
         Try
             '並び順は抽出後
             Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
@@ -1637,6 +1681,7 @@ Public Class OIT0003OTLinkageList
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
                     .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
                     .Add("@LODDATE", SqlDbType.Date).Value = lodDate
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_OTS_SALESOFFICECODE.Text
                 End With
                 'SQL実行
                 Dim wrkDt As New DataTable
@@ -2307,6 +2352,7 @@ Public Class OIT0003OTLinkageList
             Dim fileLinkageItem As FileLinkagePatternItem
             With Me._Item
                 Dim outFieldList As Dictionary(Of String, Integer)
+                Dim outRequestFieldList As Dictionary(Of String, Integer) = Nothing
                 '***************************
                 '仙台新港営業所
                 '***************************
@@ -2320,7 +2366,27 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011201", True, True, True
                     )
+                '予約ファイル用フィールド
+                outFieldList = New Dictionary(Of String, Integer)
+                With outFieldList
+                    .Add("KINO_DATAKBN", 0)
+                    .Add("LODDATE_WITHOUT_SLASH", 0)
+                    .Add("OUTPUTRESERVENO", 0)
+                    .Add("KINO_TRAINNO", 0)
+                    .Add("REPORTOILNAME", 0)
+                    .Add("RESERVEDQUANTITY", 0)
+                    .Add("KINO_TOKUISAKICODE", 0)
+                    .Add("KINO_TOKUISAKINAME", 0)
+                    .Add("CONSIGNEECONVCODE", 0)
+                    .Add("CONSIGNEECONVVALUE", 0)
+                End With
+                '実績要求ファイル用フィールド
+                outRequestFieldList = New Dictionary(Of String, Integer)
+                With outRequestFieldList
+
+                End With
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                outRequestFieldList = Nothing
                 '***************************
                 '甲子営業所
                 '***************************
@@ -2504,6 +2570,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property OutputFiledList As Dictionary(Of String, Integer)
+        ''' <summary>
+        ''' シーケンスファイル出力の実績要求ファイルのフィールドリスト（フィールド名、固定長用フィールドサイズ）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutputRequestFieldList As Dictionary(Of String, Integer)
         ''' <summary>
         ''' 出荷予約にてフィールドサイズ（OutputFiledList）で設定したサイズで出力する場合True、デフォルトはFalse
         ''' </summary>

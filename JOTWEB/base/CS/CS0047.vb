@@ -227,7 +227,7 @@ Public Structure CS0047XLSMERGE
             '○Excelファイル保存
             Try
                 'URL = "http://" & Dns.GetHostName & "/PRINT/" & ユーザーID & "/" & WW_datetime & ".XLSX"
-                URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/PRINT/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
                 W_OutExcelBook.SaveAs(FILEpath)
 
             Catch ex As Exception

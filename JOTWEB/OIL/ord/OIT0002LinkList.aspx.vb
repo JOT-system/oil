@@ -2251,7 +2251,7 @@ Public Class OIT0002LinkList
                                 OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(タ)", "")
 
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
+                                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", (Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(", "")).Replace(")", ""), WW_GetValue)
                                 OIT0002ExlUProw("DEPSTATION") = WW_GetValue(0)
                                 'OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
 
@@ -4157,7 +4157,10 @@ Public Class OIT0002LinkList
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
                         '★発駅が異なる場合はSKIP
                         If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
-
+                        '★着駅が異なる場合はSKIP
+                        If OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+                        '★甲子営業所の場合は、チェック不要と判断し一旦SKIP
+                        If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _

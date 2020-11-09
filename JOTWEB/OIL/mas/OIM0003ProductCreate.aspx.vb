@@ -1,14 +1,4 @@
-﻿''************************************************************
-' 品種マスタメンテ登録画面
-' 作成日 2020/06/18
-' 更新日 2020/06/18
-' 作成者 JOT杉山
-' 更新車 JOT杉山
-'
-' 修正履歴:新規作成
-'         :
-''************************************************************
-Imports System.Data.SqlClient
+﻿Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -27,11 +17,6 @@ Public Class OIM0003ProductCreate
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
-    Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
-
-    'Private Const CONST_PATTERN1 As String = "1"                    'モデル距離パターン　届先のみ
-    'Private Const CONST_PATTERN2 As String = "2"                    'モデル距離パターン　届先、出荷場所
-    'Private Const CONST_PATTERN3 As String = "3"                    'モデル距離パターン　出荷場所
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -153,15 +138,12 @@ Public Class OIM0003ProductCreate
         '右Boxへの値設定
         rightview.MAPID = Master.MAPID
         rightview.MAPVARI = Master.MAPvariant
-        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
 
         '○ 画面の値設定
         WW_MAPValueSet()
-
-        '○ GridView初期設定
-        '        GridViewInitialize()
 
     End Sub
 
@@ -177,62 +159,106 @@ Public Class OIM0003ProductCreate
             Master.CreateXMLSaveFile()
         End If
 
-        '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
-
-        '会社コード、運用部署、会社コード2・組織コード2・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtCampCodeMy.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtOrgCodeMy.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtCampCode.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtOrgCode.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
         '開始年月日・終了年月日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
-        Me.TxtStYmd.Attributes("onkeyPress") = "CheckCalendar()"
-        Me.TxtEndYmd.Attributes("onkeyPress") = "CheckCalendar()"
-
-        '会社コード
-        TxtCampCodeMy.Text = work.WF_SEL_CAMPCODE.Text
-
-        '運用部署
-        TxtOrgCodeMy.Text = work.WF_SEL_ORGCODE.Text
+        WF_ORDERFROMDATE.Attributes("onkeyPress") = "CheckCalendar()"
+        WF_ORDERTODATE.Attributes("onkeyPress") = "CheckCalendar()"
 
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        '会社コード2
-        '2020/06/16杉山修正
-        'TxtCampCode.Text = work.WF_SEL_CAMPCODE2.Text
-        TxtCampCode.Text = work.WF_SEL_CAMPCODE_L.Text
-        CODENAME_get("CAMPCODE", TxtCampCode.Text, Label2.Text, WW_RTN_SW)
+        '営業所コード
+        WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE2.Text
+        CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_DUMMY)
 
-        '組織コード2
-        '2020/06/16杉山修正
-        'TxtOrgCode.Text = work.WF_SEL_ORGCODE2.Text
-        TxtOrgCode.Text = work.WF_SEL_ORGCODE_L.Text
-        'CODENAME_get("ORGCODE", TxtOrgCode.Text, Label3.Text, WW_DUMMY)
+        '荷主コード
+        WF_SHIPPERCODE.Text = work.WF_SEL_SHIPPERCODE2.Text
+        CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_DUMMY)
 
-        '組織名称
-        TxtOrgName.Text = work.WF_SEL_ORGNAME.Text
+        '基地コード
+        WF_PLANTCODE.Text = work.WF_SEL_PLANTCODE2.Text
+        CODENAME_get("PLANTCODE", WF_PLANTCODE.Text, WF_PLANTCODE_TEXT.Text, WW_DUMMY)
 
-        '組織名称（短）
-        TxtOrgNameS.Text = work.WF_SEL_ORGNAMES.Text
+        '油種大分類コード
+        WF_BIGOILCODE.Text = work.WF_SEL_BIGOILCODE2.Text
+        'CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_DUMMY)
 
-        '組織名称カナ
-        TxtOrgNameKana.Text = work.WF_SEL_ORGNAMEKANA.Text
+        '油種大分類名
+        WF_BIGOILNAME.Text = work.WF_SEL_BIGOILNAME.Text
+        'CODENAME_get("BIGOILNAME", WF_BIGOILNAME.Text, WF_BIGOILNAME_TEXT.Text, WW_DUMMY)
 
-        '組織名称カナ（短）
-        TxtOrgNameKanaS.Text = work.WF_SEL_ORGNAMEKANAS.Text
+        '油種大分類名カナ
+        WF_BIGOILKANA.Text = work.WF_SEL_BIGOILKANA.Text
+        'CODENAME_get("BIGOILKANA", WF_BIGOILKANA.Text, WF_BIGOILKANA_TEXT.Text, WW_DUMMY)
 
-        '開始年月日
-        TxtStYmd.Text = work.WF_SEL_STYMD.Text
+        '油種中分類コード
+        WF_MIDDLEOILCODE.Text = work.WF_SEL_MIDDLEOILCODE2.Text
+        'CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_DUMMY)
 
-        '終了年月日
-        TxtEndYmd.Text = work.WF_SEL_ENDYMD.Text
+        '油種中分類名
+        WF_MIDDLEOILNAME.Text = work.WF_SEL_MIDDLEOILNAME.Text
+        'CODENAME_get("MIDDLEOILNAME", WF_MIDDLEOILNAME.Text, WF_MIDDLEOILNAME_TEXT.Text, WW_DUMMY)
 
-        '削除
-        TxtDelFlg.Text = work.WF_SEL_SELECT.Text
-        CODENAME_get("DELFLG", TxtDelFlg.Text, Label1.Text, WW_DUMMY)
+        '油種中分類名カナ
+        WF_MIDDLEOILKANA.Text = work.WF_SEL_MIDDLEOILKANA.Text
+        'CODENAME_get("MIDDLEOILKANA", WF_MIDDLEOILKANA.Text, WF_MIDDLEOILKANA_TEXT.Text, WW_DUMMY)
+
+        '油種コード
+        WF_OILCODE.Text = work.WF_SEL_OILCODE2.Text
+        'CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_DUMMY)
+
+        '油種名
+        WF_OILNAME.Text = work.WF_SEL_OILNAME.Text
+        'CODENAME_get("OILNAME", WF_OILNAME.Text, WF_OILNAME_TEXT.Text, WW_DUMMY)
+
+        '油種名カナ
+        WF_OILKANA.Text = work.WF_SEL_OILKANA.Text
+        'CODENAME_get("OILKANA", WF_OILKANA.Text, WF_OILKANA_TEXT.Text, WW_DUMMY)
+
+        '油種細分コード
+        WF_SEGMENTOILCODE.Text = work.WF_SEL_SEGMENTOILCODE.Text
+        'CODENAME_get("SEGMENTOILCODE", WF_SEGMENTOILCODE.Text, WF_SEGMENTOILCODE_TEXT.Text, WW_DUMMY)
+
+        '油種名（細分）
+        WF_SEGMENTOILNAME.Text = work.WF_SEL_SEGMENTOILNAME.Text
+        'CODENAME_get("SEGMENTOILNAME", WF_SEGMENTOILNAME.Text, WF_SEGMENTOILNAME_TEXT.Text, WW_DUMMY)
+
+        'OT油種コード
+        WF_OTOILCODE.Text = work.WF_SEL_OTOILCODE.Text
+        'CODENAME_get("OTOILCODE", WF_OTOILCODE.Text, WF_OTOILCODE_TEXT.Text, WW_DUMMY)
+
+        'OT油種名
+        WF_OTOILNAME.Text = work.WF_SEL_OTOILNAME.Text
+        'CODENAME_get("OTOILNAME", WF_OTOILNAME.Text, WF_OTOILNAME_TEXT.Text, WW_DUMMY)
+
+        '荷主油種コード
+        WF_SHIPPEROILCODE.Text = work.WF_SEL_SHIPPEROILCODE.Text
+        'CODENAME_get("SHIPPEROILCODE", WF_SHIPPEROILCODE.Text, WF_SHIPPEROILCODE_TEXT.Text, WW_DUMMY)
+
+        '荷主油種名
+        WF_SHIPPEROILNAME.Text = work.WF_SEL_SHIPPEROILNAME.Text
+        'CODENAME_get("SHIPPEROILNAME", WF_SHIPPEROILNAME.Text, WF_SHIPPEROILNAME_TEXT.Text, WW_DUMMY)
+
+        '積込チェック用油種コード
+        WF_CHECKOILCODE.Text = work.WF_SEL_CHECKOILCODE.Text
+        'CODENAME_get("CHECKOILCODE", WF_CHECKOILCODE.Text, WF_CHECKOILCODE_TEXT.Text, WW_DUMMY)
+
+        '積込チェック用油種名
+        WF_CHECKOILNAME.Text = work.WF_SEL_CHECKOILNAME.Text
+        'CODENAME_get("CHECKOILNAME", WF_CHECKOILNAME.Text, WF_CHECKOILNAME_TEXT.Text, WW_DUMMY)
+
+        '在庫管理対象フラグ
+        WF_STOCKFLG.Text = work.WF_SEL_STOCKFLG.Text
+        CODENAME_get("STOCKFLG", WF_STOCKFLG.Text, WF_STOCKFLG_TEXT.Text, WW_DUMMY)
+
+        '受注登録可能期間FROM
+        WF_ORDERFROMDATE.Text = work.WF_SEL_ORDERFROMDATE.Text
+
+        '受注登録可能期間TO
+        WF_ORDERTODATE.Text = work.WF_SEL_ORDERTODATE.Text
+
+        '削除フラグ
+        WF_DELFLG.Text = work.WF_SEL_DELFLG2.Text
+        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -245,29 +271,36 @@ Public Class OIM0003ProductCreate
         '○ 対象データ取得
         Dim SQLStr As String =
               " SELECT" _
-            & "    CAMPCODE" _
-            & "    , ORGCODE" _
+            & "    OFFICECODE" _
+            & "    , SHIPPERCODE" _
+            & "    , PLANTCODE" _
+            & "    , OILCODE" _
+            & "    , SEGMENTOILCODE" _
             & " FROM" _
-            & "    OIL.OIM0003_ORG" _
+            & "    OIL.OIM0003_PRODUCT" _
             & " WHERE" _
-            & "        CAMPCODE      = @P1" _
-            & "    AND DELFLG           <> @P2"
-
-        '○ 条件指定で指定されたものでSQLで可能なものを追加する
-        '組織コード
-        If Not String.IsNullOrEmpty(TxtOrgCode.Text) Then
-            SQLStr &= String.Format("    AND ORGCODE = '{0}'", TxtOrgCode.Text)
-        Else
-            SQLStr &= String.Format("    AND ORGCODE = '{0}'", "")
-        End If
+            & "    OFFICECODE         =  @P01" _
+            & "    AND SHIPPERCODE    =  @P02" _
+            & "    AND PLANTCODE      =  @P03" _
+            & "    AND OILCODE        =  @P04" _
+            & "    AND SEGMENTOILCODE =  @P05" _
+            & "    AND DELFLG         <> @P06"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 4)            '会社コード
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)            '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)            '営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10)           '荷主コード
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 4)            '基地コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)            '油種コード
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)            '油種細分コード
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)            '削除フラグ
 
-                PARA1.Value = TxtCampCode.Text
-                PARA2.Value = C_DELETE_FLG.DELETE
+                PARA01.Value = WF_OFFICECODE.Text
+                PARA02.Value = WF_SHIPPERCODE.Text
+                PARA03.Value = WF_PLANTCODE.Text
+                PARA04.Value = WF_OILCODE.Text
+                PARA05.Value = WF_SEGMENTOILCODE.Text
+                PARA06.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -336,11 +369,6 @@ Public Class OIM0003ProductCreate
         '○ 画面表示データ保存
         Master.SaveTable(OIM0003tbl, work.WF_SEL_INPTBL.Text)
 
-        ''○ 詳細画面初期化
-        'If isNormal(WW_ERR_SW) Then
-        '    DetailBoxClear()
-        'End If
-
         '○ メッセージ表示
         If WW_ERR_SW = "" Then
             Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
@@ -349,7 +377,7 @@ Public Class OIM0003ProductCreate
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
             ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
-                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "会社コード", needsPopUp:=True)
+                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "営業所コード,荷主コード,基地コード,油種コード,油種細分コード,削除フラグ", needsPopUp:=True)
 
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -378,11 +406,11 @@ Public Class OIM0003ProductCreate
         O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(TxtDelFlg.Text)            '削除
+        Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-            String.IsNullOrEmpty(TxtDelFlg.Text) Then
+            String.IsNullOrEmpty(WF_DELFLG.Text) Then
             Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
@@ -435,22 +463,30 @@ Public Class OIM0003ProductCreate
         OIM0003INProw("SELECT") = 1
         OIM0003INProw("HIDDEN") = 0
 
-        'OIM0003INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text           '会社コード
-        'OIM0003INProw("UORG") = work.WF_SEL_ORGCODE.Text                '運用部署
-
-        OIM0003INProw("CAMPCODE") = Me.TxtCampCode.Text                  '会社コード
-        OIM0003INProw("ORGCODE") = Me.TxtOrgCode.Text                    '組織コード
-        OIM0003INProw("STYMD") = Me.TxtStYmd.Text                         '開始年月日
-        OIM0003INProw("ENDYMD") = Me.TxtEndYmd.Text                       '組織コード
-        OIM0003INProw("NAME") = Me.TxtOrgName.Text                       '組織名称
-        OIM0003INProw("NAMES") = Me.TxtOrgNameS.Text                      '組織名称（短）
-        OIM0003INProw("NAMEKANA") = Me.TxtOrgNameKana.Text                '組織名称カナ
-        OIM0003INProw("NAMEKANAS") = Me.TxtOrgNameKanaS.Text              '組織名称カナ（短）
-        OIM0003INProw("DELFLG") = Me.TxtDelFlg.Text                       '削除
-
-        '○ 名称取得
-        '会社名
-        CODENAME_get("CAMPCODE", OIM0003INProw("CAMPCODE"), OIM0003INProw("CAMPNAME"), WW_DUMMY)
+        OIM0003INProw("OFFICECODE") = WF_OFFICECODE.Text            '営業所コード
+        OIM0003INProw("SHIPPERCODE") = WF_SHIPPERCODE.Text          '荷主コード
+        OIM0003INProw("PLANTCODE") = WF_PLANTCODE.Text              '基地コード
+        OIM0003INProw("BIGOILCODE") = WF_BIGOILCODE.Text            '油種大分類コード
+        OIM0003INProw("BIGOILNAME") = WF_BIGOILNAME.Text            '油種大分類名
+        OIM0003INProw("BIGOILKANA") = WF_BIGOILKANA.Text            '油種大分類名カナ
+        OIM0003INProw("MIDDLEOILCODE") = WF_MIDDLEOILCODE.Text      '油種中分類コード
+        OIM0003INProw("MIDDLEOILNAME") = WF_MIDDLEOILNAME.Text      '油種中分類名
+        OIM0003INProw("MIDDLEOILKANA") = WF_MIDDLEOILKANA.Text      '油種中分類名カナ
+        OIM0003INProw("OILCODE") = WF_OILCODE.Text                  '油種コード
+        OIM0003INProw("OILNAME") = WF_OILNAME.Text                  '油種名
+        OIM0003INProw("OILKANA") = WF_OILKANA.Text                  '油種名カナ
+        OIM0003INProw("SEGMENTOILCODE") = WF_SEGMENTOILCODE.Text    '油種細分コード
+        OIM0003INProw("SEGMENTOILNAME") = WF_SEGMENTOILNAME.Text    '油種名（細分）
+        OIM0003INProw("OTOILCODE") = WF_OTOILCODE.Text              'OT油種コード
+        OIM0003INProw("OTOILNAME") = WF_OTOILNAME.Text              'OT油種名
+        OIM0003INProw("SHIPPEROILCODE") = WF_SHIPPEROILCODE.Text    '荷主油種コード
+        OIM0003INProw("SHIPPEROILNAME") = WF_SHIPPEROILNAME.Text    '荷主油種名
+        OIM0003INProw("CHECKOILCODE") = WF_CHECKOILCODE.Text        '積込チェック用油種コード
+        OIM0003INProw("CHECKOILNAME") = WF_CHECKOILNAME.Text        '積込チェック用油種名
+        OIM0003INProw("STOCKFLG") = WF_STOCKFLG.Text                '在庫管理対象フラグ
+        OIM0003INProw("ORDERFROMDATE") = WF_ORDERFROMDATE.Text      '受注登録可能期間FROM
+        OIM0003INProw("ORDERTODATE") = WF_ORDERTODATE.Text          '受注登録可能期間TO
+        OIM0003INProw("DELFLG") = WF_DELFLG.Text                    '削除フラグ
 
         '○ チェック用テーブルに登録する
         OIM0003INPtbl.Rows.Add(OIM0003INProw)
@@ -469,9 +505,6 @@ Public Class OIM0003ProductCreate
 
         '○ メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-        ''○画面切替設定
-        'WF_BOXChange.Value = "headerbox"
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
@@ -517,14 +550,31 @@ Public Class OIM0003ProductCreate
         Master.SaveTable(OIM0003tbl, work.WF_SEL_INPTBL.Text)
 
         WF_Sel_LINECNT.Text = ""            'LINECNT
-        TxtCampCode.Text = ""               '会社コード
-        TxtOrgCode.Text = ""                '組織コード
-        TxtOrgName.Text = ""                '組織名称
-        TxtOrgNameS.Text = ""               '組織名称（短）
-        TxtOrgNameKana.Text = ""            '組織名称カナ
-        TxtOrgNameKanaS.Text = ""           '組織名称カナ（短）
-        TxtDelFlg.Text = ""                 '削除
-        Label1.Text = ""                    '削除名称
+
+        WF_OFFICECODE.Text = ""             '営業所コード
+        WF_SHIPPERCODE.Text = ""            '荷主コード
+        WF_PLANTCODE.Text = ""              '基地コード
+        WF_BIGOILCODE.Text = ""             '油種大分類コード
+        WF_BIGOILNAME.Text = ""             '油種大分類名
+        WF_BIGOILKANA.Text = ""             '油種大分類名カナ
+        WF_MIDDLEOILCODE.Text = ""          '油種中分類コード
+        WF_MIDDLEOILNAME.Text = ""          '油種中分類名
+        WF_MIDDLEOILKANA.Text = ""          '油種中分類名カナ
+        WF_OILCODE.Text = ""                '油種コード
+        WF_OILNAME.Text = ""                '油種名
+        WF_OILKANA.Text = ""                '油種名カナ
+        WF_SEGMENTOILCODE.Text = ""         '油種細分コード
+        WF_SEGMENTOILNAME.Text = ""         '油種名（細分）
+        WF_OTOILCODE.Text = ""              'OT油種コード
+        WF_OTOILNAME.Text = ""              'OT油種名
+        WF_SHIPPEROILCODE.Text = ""         '荷主油種コード
+        WF_SHIPPEROILNAME.Text = ""         '荷主油種名
+        WF_CHECKOILCODE.Text = ""           '積込チェック用油種コード
+        WF_CHECKOILNAME.Text = ""           '積込チェック用油種名
+        WF_STOCKFLG.Text = ""               '在庫管理対象フラグ
+        WF_ORDERFROMDATE.Text = ""          '受注登録可能期間FROM
+        WF_ORDERTODATE.Text = ""            '受注登録可能期間TO
+        WF_DELFLG.Text = ""                 '削除フラグ
 
     End Sub
 
@@ -554,10 +604,12 @@ Public Class OIM0003ProductCreate
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = TxtStYmd.Text
-                            Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = TxtEndYmd.Text
+                            Case WF_ORDERFROMDATE.ID
+                                '受注登録可能期間FROM
+                                .WF_Calendar.Text = WF_ORDERFROMDATE.Text
+                            Case WF_ORDERTODATE.ID
+                                '受注登録可能期間TO
+                                .WF_Calendar.Text = WF_ORDERTODATE.Text
                         End Select
                         .ActiveCalendar()
 
@@ -566,38 +618,30 @@ Public Class OIM0003ProductCreate
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
-                            Case "WF_CAMPCODE"       '会社コード
-                                'If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
-                                prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                                'Else
-                                '    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ROLE
-                                'End If
-                                prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCode.Text
-
-                            Case "WF_ORGCODE"       '組織コード
-                                Dim AUTHORITYALL_FLG As String = "0"
-                                'If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
-                                If TxtCampCode.Text = "" Then '会社コードが空の場合
-                                    AUTHORITYALL_FLG = "1"
-                                Else '会社コードに入力済みの場合
-                                    AUTHORITYALL_FLG = "2"
-                                End If
-                                'End If
-                                prmData = work.CreateORGParam(TxtCampCode.Text, AUTHORITYALL_FLG)
-                                'prmData = work.CreateORGParam2(TxtCampCode.Text)
-                            'Case "WF_MENUROLE"       'メニュー表示制御ロール
-                            '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
-                            'Case "WF_MAPROLE"       '画面参照更新制御ロール
-                            '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MAP")
-                            'Case "WF_VIEWPROFID"       '画面表示項目制御ロール
-                            '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "VIEW")
-                            'Case "WF_RPRTPROFID"       'エクセル出力制御ロール
-                            '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
-                            'Case "WF_APPROVALID"       '承認権限ロール
-                            '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
-                            Case "WF_DELFLG"
-                                prmData.Item(C_PARAMETERS.LP_COMPANY) = Master.USERCAMP
-                                prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
+                            Case WF_OFFICECODE.ID
+                                '営業所コード
+                                prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, WF_OFFICECODE.Text)
+                            Case WF_SHIPPERCODE.ID
+                                '荷主コード
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "JOINTMASTER")
+                            Case WF_PLANTCODE.ID
+                                '基地コード
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PLANTMASTER")
+                            Case WF_BIGOILCODE.ID
+                                '油種大分類コード
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "BIGOILCODE")
+                            Case WF_MIDDLEOILCODE.ID
+                                '油種中分類コード
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "MIDDLEOILCODE")
+                            Case WF_OTOILCODE.ID
+                                'OT油種コード
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "OTOILCODE")
+                            Case WF_STOCKFLG.ID
+                                '在庫管理対象フラグ
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PRODUCTSTOCKFLG")
+                            Case WF_DELFLG.ID
+                                '削除フラグ
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                         End Select
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -614,15 +658,30 @@ Public Class OIM0003ProductCreate
     Protected Sub WF_FIELD_Change()
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            ''会社コード
-            Case "WF_CAMPCODE"
-                CODENAME_get("CAMPCODE", TxtCampCode.Text, Label2.Text, WW_RTN_SW)
-            ''組織コード
-            'Case "WF_UORG"
-            '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
-            '削除フラグ
-            Case "TxtDelFlg"
-                CODENAME_get("DELFLG", TxtDelFlg.Text, Label1.Text, WW_RTN_SW)
+            Case WF_OFFICECODE.ID
+                '営業所コード
+                CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
+            Case WF_SHIPPERCODE.ID
+                '荷主コード
+                CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_PLANTCODE.ID
+                '基地コード
+                CODENAME_get("PLANTCODE", WF_PLANTCODE.Text, WF_PLANTCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_BIGOILCODE.ID
+                '油種大分類コード
+                CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_MIDDLEOILCODE.ID
+                '油種中分類コード
+                CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE_TEXT.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_OTOILCODE.ID
+                'OT油種コード
+                CODENAME_get("OTOILCODE", WF_OTOILCODE.Text, WF_OTOILCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_STOCKFLG.ID
+                '在庫管理対象フラグ
+                CODENAME_get("STOCKFLG", WF_STOCKFLG.Text, WF_STOCKFLG_TEXT.Text, WW_RTN_SW)
+            Case WF_DELFLG.ID
+                '削除フラグ
+                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
 
         End Select
 
@@ -630,12 +689,9 @@ Public Class OIM0003ProductCreate
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            If WF_FIELD.Value = "TxtDelFlg" Then
-                Master.Output(C_MESSAGE_NO.OIL_DELFLG_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Else
-                Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
-            End If
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
+
     End Sub
 
     ' ******************************************************************************
@@ -661,47 +717,72 @@ Public Class OIM0003ProductCreate
         '○ 選択内容を画面項目へセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    TxtDelFlg.Text = WW_SelectValue
-                    Label1.Text = WW_SelectText
-                    TxtDelFlg.Focus()
-                Case "WF_STYMD"             '開始年月日(From)
+                Case WF_OFFICECODE.ID
+                    '営業所コード
+                    WF_OFFICECODE.Text = WW_SelectValue
+                    WF_OFFICECODE_TEXT.Text = WW_SelectText
+                    WF_OFFICECODE.Focus()
+                Case WF_SHIPPERCODE.ID
+                    '荷主コード
+                    WF_SHIPPERCODE.Text = WW_SelectValue
+                    WF_SHIPPERCODE_TEXT.Text = WW_SelectText
+                    WF_SHIPPERCODE.Focus()
+                Case WF_PLANTCODE.ID
+                    '基地コード
+                    WF_PLANTCODE.Text = WW_SelectValue
+                    WF_PLANTCODE_TEXT.Text = WW_SelectText
+                    WF_PLANTCODE.Focus()
+                Case WF_BIGOILCODE.ID
+                    '油種大分類コード
+                    WF_BIGOILCODE.Text = WW_SelectValue
+                    WF_BIGOILCODE_TEXT.Text = WW_SelectText
+                    WF_BIGOILCODE.Focus()
+                Case WF_MIDDLEOILCODE.ID
+                    '油種中分類コード
+                    WF_MIDDLEOILCODE.Text = WW_SelectValue
+                    WF_MIDDLEOILCODE_TEXT.Text = WW_SelectText
+                    WF_MIDDLEOILCODE.Focus()
+                Case WF_OTOILCODE.ID
+                    'OT油種コード
+                    WF_OTOILCODE.Text = WW_SelectValue
+                    WF_OTOILCODE_TEXT.Text = WW_SelectText
+                    WF_OTOILCODE.Focus()
+                Case WF_STOCKFLG.ID
+                    '在庫管理対象フラグ
+                    WF_STOCKFLG.Text = WW_SelectValue
+                    WF_STOCKFLG_TEXT.Text = WW_SelectText
+                    WF_STOCKFLG.Focus()
+                Case WF_ORDERFROMDATE.ID
+                    '受注登録可能期間FROM
                     Dim WW_DATE As Date
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
                         If WW_DATE < C_DEFAULT_YMD Then
-                            TxtStYmd.Text = ""
+                            WF_ORDERFROMDATE.Text = ""
                         Else
-                            TxtStYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            WF_ORDERFROMDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                         End If
                     Catch ex As Exception
                     End Try
-                    TxtStYmd.Focus()
-
-                Case "WF_ENDYMD"            '終了年月日(To)
+                    WF_ORDERFROMDATE.Focus()
+                Case WF_ORDERTODATE.ID
+                    '受注登録可能期間TO
                     Dim WW_DATE As Date
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
                         If WW_DATE < C_DEFAULT_YMD Then
-                            TxtEndYmd.Text = ""
+                            WF_ORDERTODATE.Text = ""
                         Else
-                            TxtEndYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            WF_ORDERTODATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                         End If
                     Catch ex As Exception
                     End Try
-                    TxtEndYmd.Focus()
-
-                Case "WF_CAMPCODE"               '会社コード
-                    TxtCampCode.Text = WW_SelectValue
-                    Label2.Text = WW_SelectText
-                    TxtCampCode.Focus()
-
-                Case "WF_ORGCODE"               '組織コード
-                    TxtOrgCode.Text = WW_SelectValue
-                    Label3.Text = WW_SelectText
-                    TxtOrgCode.Focus()
-
+                    WF_ORDERTODATE.Focus()
+                Case WF_DELFLG.ID
+                    '削除フラグ
+                    WF_DELFLG.Text = WW_SelectValue
+                    WF_DELFLG_TEXT.Text = WW_SelectText
+                    WF_DELFLG.Focus()
             End Select
         Else
         End If
@@ -723,9 +804,36 @@ Public Class OIM0003ProductCreate
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    TxtDelFlg.Focus()
+                Case WF_OFFICECODE.ID
+                    '営業所コード
+                    WF_OFFICECODE.Focus()
+                Case WF_SHIPPERCODE.ID
+                    '荷主コード
+                    WF_SHIPPERCODE.Focus()
+                Case WF_PLANTCODE.ID
+                    '基地コード
+                    WF_PLANTCODE.Focus()
+                Case WF_BIGOILCODE.ID
+                    '油種大分類コード
+                    WF_BIGOILCODE.Focus()
+                Case WF_MIDDLEOILCODE.ID
+                    '油種中分類コード
+                    WF_MIDDLEOILCODE.Focus()
+                Case WF_OTOILCODE.ID
+                    'OT油種コード
+                    WF_OTOILCODE.Focus()
+                Case WF_STOCKFLG.ID
+                    '在庫管理対象フラグ
+                    WF_STOCKFLG.Focus()
+                Case WF_ORDERFROMDATE.ID
+                    '受注登録可能期間FROM
+                    WF_ORDERFROMDATE.Focus()
+                Case WF_ORDERTODATE.ID
+                    '受注登録可能期間TO
+                    WF_ORDERTODATE.Focus()
+                Case WF_DELFLG.ID
+                    '削除フラグ
+                    WF_DELFLG.Focus()
             End Select
         Else
         End If
@@ -815,94 +923,387 @@ Public Class OIM0003ProductCreate
             WW_LINE_ERR = ""
 
             '削除フラグ(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIM0003INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "DELFLG", OIM0003INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("DELFLG", OIM0003INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                If Not String.IsNullOrEmpty(OIM0003INProw("DELFLG")) Then
+                    '値存在チェック
+                    CODENAME_get("DELFLG", OIM0003INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(削除フラグ入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-            '開始年月日(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", OIM0003INProw("STYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0003INProw("STYMD"), "開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(開始年月日エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0003INProw("STYMD") = CDate(OIM0003INProw("STYMD")).ToString("yyyy/MM/dd")
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(開始年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(削除フラグ入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '終了年月日(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENDYMD", OIM0003INProw("ENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            '営業所コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OFFICECODE", OIM0003INProw("OFFICECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '年月日チェック
-                WW_CheckDate(OIM0003INProw("ENDYMD"), "終了年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(終了年月日エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIM0003INProw("ENDYMD") = CDate(OIM0003INProw("ENDYMD")).ToString("yyyy/MM/dd")
+                If Not String.IsNullOrEmpty(OIM0003INProw("OFFICECODE")) Then
+                    '値存在チェック
+                    CODENAME_get("OFFICECODE", OIM0003INProw("OFFICECODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(営業所コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(終了年月日エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(営業所コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '会社コード(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", OIM0003INProw("CAMPCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            '荷主コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "SHIPPERCODE", OIM0003INProw("SHIPPERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("SHIPPERCODE")) Then
+                    '値存在チェック
+                    CODENAME_get("SHIPPERCODE", OIM0003INProw("SHIPPERCODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(荷主コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(荷主コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '基地コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "PLANTCODE", OIM0003INProw("PLANTCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("PLANTCODE")) Then
+                    '値存在チェック
+                    CODENAME_get("PLANTCODE", OIM0003INProw("PLANTCODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(基地コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(基地コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種大分類コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "BIGOILCODE", OIM0003INProw("BIGOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("BIGOILCODE")) Then
+                    '値存在チェック
+                    CODENAME_get("BIGOILCODE", OIM0003INProw("BIGOILCODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(油種大分類コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(油種大分類コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種大分類名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "BIGOILNAME", OIM0003INProw("BIGOILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "会社コード入力エラー。"
+                WW_CheckMES1 = "・更新できないレコード(油種大分類名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '組織コード(バリデーションチェック)
-            '組織コードが設定されている場合のみチェック
-            If Not String.IsNullOrEmpty(OIM0003INProw("ORGCODE")) Then
-                Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORGCODE", OIM0003INProw("ORGCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                If Not isNormal(WW_CS0024FCHECKERR) Then
-                    WW_CheckMES1 = "組織コード入力エラー。"
+            '油種大分類名カナ(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "BIGOILKANA", OIM0003INProw("BIGOILKANA"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種大分類名カナ入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種中分類コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "MIDDLEOILCODE", OIM0003INProw("MIDDLEOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("MIDDLEOILCODE")) Then
+                    '値存在チェック
+                    CODENAME_get("MIDDLEOILCODE", OIM0003INProw("MIDDLEOILCODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(油種中分類コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(油種中分類コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種中分類名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "MIDDLEOILNAME", OIM0003INProw("MIDDLEOILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種中分類名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種中分類名カナ(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "MIDDLEOILKANA", OIM0003INProw("MIDDLEOILKANA"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種中分類名カナ入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OILCODE", OIM0003INProw("OILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OILNAME", OIM0003INProw("OILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種名カナ(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OILKANA", OIM0003INProw("OILKANA"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種名カナ入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種細分コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "SEGMENTOILCODE", OIM0003INProw("SEGMENTOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種細分コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種名（細分）(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "SEGMENTOILNAME", OIM0003INProw("SEGMENTOILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種名（細分）入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'OT油種コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OTOILCODE", OIM0003INProw("OTOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("OTOILCODE")) Then
+                    '値存在チェック
+                    CODENAME_get("OTOILCODE", OIM0003INProw("OTOILCODE"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(OT油種コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(OT油種コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'OT油種名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "OTOILNAME", OIM0003INProw("OTOILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(OT油種名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '荷主油種コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "SHIPPEROILCODE", OIM0003INProw("SHIPPEROILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(荷主油種コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '荷主油種名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "SHIPPEROILNAME", OIM0003INProw("SHIPPEROILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(荷主油種名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '積込チェック用油種コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "CHECKOILCODE", OIM0003INProw("CHECKOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(積込チェック用油種コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '積込チェック用油種名(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "CHECKOILNAME", OIM0003INProw("CHECKOILNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(積込チェック用油種名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '在庫管理対象フラグ(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "STOCKFLG", OIM0003INProw("STOCKFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("STOCKFLG")) Then
+                    '値存在チェック
+                    CODENAME_get("STOCKFLG", OIM0003INProw("STOCKFLG"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(在庫管理対象フラグ入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(在庫管理対象フラグ入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '受注登録可能期間FROM(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "ORDERFROMDATE", OIM0003INProw("ORDERFROMDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("ORDERFROMDATE")) Then
+                    '年月日チェック
+                    WW_CheckDate(OIM0003INProw("ORDERFROMDATE"), "受注登録可能期間FROM", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(受注登録可能期間FROM入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKERR
+                        O_RTN = "ERR"
+                        Exit Sub
+                    Else
+                        OIM0003INProw("ORDERFROMDATE") = CDate(OIM0003INProw("ORDERFROMDATE")).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(受注登録可能期間FROM入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '受注登録可能期間TO(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "ORDERTODATE", OIM0003INProw("ORDERTODATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(OIM0003INProw("ORDERTODATE")) Then
+                    '年月日チェック
+                    WW_CheckDate(OIM0003INProw("ORDERTODATE"), "受注登録可能期間TO", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(受注登録可能期間TO入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKERR
+                        O_RTN = "ERR"
+                        Exit Sub
+                    Else
+                        OIM0003INProw("ORDERTODATE") = CDate(OIM0003INProw("ORDERTODATE")).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(受注登録可能期間TO入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '受注登録可能期間FROM-TOチェック
+            If Not String.IsNullOrEmpty(OIM0003INProw("ORDERFROMDATE")) AndAlso Not String.IsNullOrEmpty(OIM0003INProw("ORDERTODATE")) Then
+                If CDate(OIM0003INProw("ORDERFROMDATE")).CompareTo(CDate(OIM0003INProw("ORDERTODATE"))) > 0 Then
+                    WW_CheckMES1 = "・更新できないレコード(受注登録可能期間FROM-TO入力エラー)です。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
                     WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    O_RTN = C_MESSAGE_NO.START_END_DATE_RELATION_ERROR
                 End If
             End If
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
             '2020/06/16杉山修正
-            If OIM0003INProw("CAMPCODE") = work.WF_SEL_CAMPCODE_L.Text _
-                AndAlso OIM0003INProw("ORGCODE") = work.WF_SEL_ORGCODE_L.Text Then
+            If OIM0003INProw("OFFICECODE") = work.WF_SEL_OFFICECODE2.Text AndAlso
+                OIM0003INProw("SHIPPERCODE") = work.WF_SEL_SHIPPERCODE2.Text AndAlso
+                OIM0003INProw("PLANTCODE") = work.WF_SEL_PLANTCODE2.Text AndAlso
+                OIM0003INProw("OILCODE") = work.WF_SEL_OILCODE2.Text AndAlso
+                OIM0003INProw("SEGMENTOILCODE") = work.WF_SEL_SEGMENTOILCODE.Text AndAlso
+                OIM0003INProw("DELFLG") = work.WF_SEL_DELFLG2.Text Then
 
             Else
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -916,8 +1317,12 @@ Public Class OIM0003ProductCreate
                 If Not isNormal(WW_UniqueKeyCHECK) Then
                     WW_CheckMES1 = "一意制約違反。"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                   "([" & OIM0003INProw("CAMPCODE") & "]" &
-                                   " [" & OIM0003INProw("ORGCODE") & "])"
+                                   "([" & OIM0003INProw("OFFICECODE") & "]" &
+                                   "([" & OIM0003INProw("SHIPPERCODE") & "]" &
+                                   "([" & OIM0003INProw("PLANTCODE") & "]" &
+                                   "([" & OIM0003INProw("OILCODE") & "]" &
+                                   "([" & OIM0003INProw("SEGMENTOILCODE") & "]" &
+                                   " [" & OIM0003INProw("DELFLG") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
@@ -977,6 +1382,7 @@ Public Class OIM0003ProductCreate
         End Try
 
     End Sub
+
     ''' <summary>
     ''' エラーレポート編集
     ''' </summary>
@@ -991,17 +1397,32 @@ Public Class OIM0003ProductCreate
         If MESSAGE2 <> "" Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
         End If
-   
+
         If Not IsNothing(OIM0003row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード         =" & OIM0003row("CAMPCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード         =" & OIM0003row("ORGCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日         =" & OIM0003row("STYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日         =" & OIM0003row("ENDYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称           =" & OIM0003row("NAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称（短）     =" & OIM0003row("NAMES") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ       =" & OIM0003row("NAMEKANA") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ（短） =" & OIM0003row("NAMEKANAS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除               =" & OIM0003row("DELFLG")
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 営業所コード             =" & OIM0003row("OFFICECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主コード               =" & OIM0003row("SHIPPERCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 基地コード               =" & OIM0003row("PLANTCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類コード         =" & OIM0003row("BIGOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類名             =" & OIM0003row("BIGOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類名カナ         =" & OIM0003row("BIGOILKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類コード         =" & OIM0003row("MIDDLEOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類名             =" & OIM0003row("MIDDLEOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類名カナ         =" & OIM0003row("MIDDLEOILKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種コード               =" & OIM0003row("OILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種名                   =" & OIM0003row("OILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種名カナ               =" & OIM0003row("OILKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種細分コード           =" & OIM0003row("SEGMENTOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種名（細分）           =" & OIM0003row("SEGMENTOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> OT油種コード             =" & OIM0003row("OTOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> OT油種名                 =" & OIM0003row("OTOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主油種コード           =" & OIM0003row("SHIPPEROILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主油種名               =" & OIM0003row("SHIPPEROILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 積込チェック用油種コード =" & OIM0003row("CHECKOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 積込チェック用油種名     =" & OIM0003row("CHECKOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 在庫管理対象フラグ       =" & OIM0003row("STOCKFLG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間FROM     =" & OIM0003row("ORDERFROMDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間TO       =" & OIM0003row("ORDERTODATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ               =" & OIM0003row("DELFLG")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
@@ -1043,8 +1464,11 @@ Public Class OIM0003ProductCreate
 
             'KEY項目が等しい時
             For Each OIM0003row As DataRow In OIM0003tbl.Rows
-                If OIM0003row("CAMPCODE") = OIM0003INProw("CAMPCODE") AndAlso
-                    OIM0003row("ORGCODE") = OIM0003INProw("ORGCODE") Then
+                If OIM0003row("OFFICECODE") = OIM0003INProw("OFFICECODE") AndAlso
+                    OIM0003row("SHIPPERCODE") = OIM0003INProw("SHIPPERCODE") AndAlso
+                    OIM0003row("PLANTCODE") = OIM0003INProw("PLANTCODE") AndAlso
+                    OIM0003row("OILCODE") = OIM0003INProw("OILCODE") AndAlso
+                    OIM0003row("SEGMENTOILCODE") = OIM0003INProw("SEGMENTOILCODE") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
                         OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
@@ -1087,8 +1511,11 @@ Public Class OIM0003ProductCreate
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
 
             '同一レコードか判定
-            If OIM0003INProw("CAMPCODE") = OIM0003row("CAMPCODE") AndAlso
-                OIM0003INProw("ORGCODE") = OIM0003row("ORGCODE") Then
+            If OIM0003INProw("OFFICECODE") = OIM0003row("OFFICECODE") AndAlso
+                OIM0003INProw("SHIPPERCODE") = OIM0003row("SHIPPERCODE") AndAlso
+                OIM0003INProw("PLANTCODE") = OIM0003row("PLANTCODE") AndAlso
+                OIM0003INProw("OILCODE") = OIM0003row("OILCODE") AndAlso
+                OIM0003INProw("SEGMENTOILCODE") = OIM0003row("SEGMENTOILCODE") Then
                 '画面入力テーブル項目設定
                 OIM0003INProw("LINECNT") = OIM0003row("LINECNT")
                 OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -1119,7 +1546,6 @@ Public Class OIM0003ProductCreate
         If OIM0003INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
             OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
         Else
-            '            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
         End If
 
@@ -1142,8 +1568,11 @@ Public Class OIM0003ProductCreate
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
 
             '同一レコードか判定
-            If OIM0003INProw("CAMPCODE") = OIM0003row("CAMPCODE") AndAlso
-               OIM0003INProw("ORGCODE") = OIM0003row("ORGCODE") Then
+            If OIM0003INProw("OFFICECODE") = OIM0003row("OFFICECODE") AndAlso
+                OIM0003INProw("SHIPPERCODE") = OIM0003row("SHIPPERCODE") AndAlso
+                OIM0003INProw("PLANTCODE") = OIM0003row("PLANTCODE") AndAlso
+                OIM0003INProw("OILCODE") = OIM0003row("OILCODE") AndAlso
+                OIM0003INProw("SEGMENTOILCODE") = OIM0003row("SEGMENTOILCODE") Then
                 '画面入力テーブル項目設定
                 OIM0003INProw("LINECNT") = OIM0003row("LINECNT")
                 OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -1180,23 +1609,38 @@ Public Class OIM0003ProductCreate
 
         Try
             Select Case I_FIELD
-                Case "CAMPCODE"         '会社コード
-                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "UORG"             '運用部署
-                    prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "ORGCODE"             '運用部署
-                    prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE2.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "DELFLG"           '削除
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
-
-                Case "SALESOFFICE"      '営業所
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+                Case "OFFICECODE"
+                    '営業所コード
+                    prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SHIPPERCODE"
+                    '荷主コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "JOINTMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "PLANTCODE"
+                    '基地コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "PLANTMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BIGOILCODE"
+                    '油種大分類コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "BIGOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "MIDDLEOILCODE"
+                    '油種中分類コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "MIDDLEOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OTOILCODE"
+                    'OT油種コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "OTOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STOCKFLG"
+                    '在庫管理対象フラグ
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "PRODUCTSTOCKFLG")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DELFLG"
+                    '削除フラグ
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

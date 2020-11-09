@@ -1,16 +1,4 @@
-﻿'Option Strict On
-'Option Explicit On
-''************************************************************
-' 品種マスタメンテ検索画面
-' 作成日 2020/06/18
-' 更新日 2020/06/18
-' 作成者 JOT杉山
-' 更新車 JOT杉山
-'
-' 修正履歴:新規作成
-'         :
-''************************************************************
-Imports JOTWEB.GRIS0005LeftBox
+﻿Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
 ''' 品種マスタ登録（検索）
@@ -19,18 +7,10 @@ Imports JOTWEB.GRIS0005LeftBox
 Public Class OIM0003ProductSearch
     Inherits Page
 
-    ''' <summary>
-    ''' ユーザ情報取得
-    ''' </summary>
-    Private CS0051UserInfo As New CS0051UserInfo            'ユーザ情報取得
-
     '○ 共通処理結果
     Private WW_ERR_SW As String
     Private WW_RTN_SW As String
     Private WW_DUMMY As String
-
-    'Private Const CONST_ORGCODE_INFOSYS As String = "010006"        '組織コード_情報システム部
-    'Private Const CONST_ORGCODE_OIL As String = "010007"            '組織コード_石油部
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -79,13 +59,14 @@ Public Class OIM0003ProductSearch
     ''' <remarks></remarks>
     Protected Sub Initialize()
 
-        TxtOfficeCode.Focus()
+        Master.MAPID = OIM0003WRKINC.MAPIDS
+
+        WF_OFFICECODE.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_LeftMViewChange.Value = ""
         WF_RightboxOpen.Value = ""
-        Master.MAPID = OIM0003WRKINC.MAPIDS
         leftview.ActiveListBox()
 
         '○ 画面の値設定
@@ -98,78 +79,52 @@ Public Class OIM0003ProductSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
+        Dim WW_TEXT As String = ""
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU _
-            OrElse Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
             '〇画面間の情報クリア
             work.Initialize()
 
             '〇初期変数設定処理
-            'ログインユーザー情報をWRKINCにセット
-
-
-            TxtCampCodeMy.Text = Master.USERCAMP             '会社コード
-            TxtOrgCodeMy.Text = Master.USER_ORG              '組織コード
-
-            work.WF_SEL_CAMPCODE.Text = Master.USERCAMP             '会社コード
-            work.WF_SEL_ORGCODE.Text = Master.USER_ORG              '組織コード
-
-            '画面の入力項目にセット
-            '営業所コード
-            'Master.GetFirstValue(work.WF_SEL_CAMPCODE2.Text, "CAMPCODE2", TxtCampCode.Text)
-            TxtOfficeCode.Text = ""
-            '荷主コード
-            TxtShipperName.Text = ""
-            '基地コード
-            TxtPlantCode.Text = ""
-            '油種大分類コード
-            TxtBigoilCode.Text = ""
-            '油種中分類コード
-            TxtMiddleoilCode.Text = ""
-            '油種コード
-            TxtOilCode.Text = ""
-
-            'ステータス選択
-            RdBSearch1.Checked = True
-            RdBSearch2.Checked = False
+            Master.GetFirstValue(work.WF_SEL_OFFICECODE.Text, "OFFICECODE", WF_OFFICECODE.Text)              '営業所コード
+            Master.GetFirstValue(work.WF_SEL_SHIPPERCODE.Text, "SHIPPERCODE", WF_SHIPPERCODE.Text)           '荷主コード
+            Master.GetFirstValue(work.WF_SEL_PLANTCODE.Text, "PLANTCODE", WF_PLANTCODE.Text)                 '基地コード
+            Master.GetFirstValue(work.WF_SEL_BIGOILCODE.Text, "BIGOILCODE", WF_BIGOILCODE.Text)              '油種大分類コード
+            Master.GetFirstValue(work.WF_SEL_MIDDLEOILCODE.Text, "MIDDLEOILCODE", WF_MIDDLEOILCODE.Text)     '油種中分類コード
+            Master.GetFirstValue(work.WF_SEL_OILCODE.Text, "OILCODE", WF_OILCODE.Text)                       '油種コード
+            Master.GetFirstValue(work.WF_SEL_DELFLG.Text, "DELFLG", WW_TEXT)                                 '削除フラグ
+            If WW_TEXT = C_DELETE_FLG.DELETE Then
+                WF_DELFLG_DELETED.Checked = True
+                WF_DELFLG_NOTDELETED.Checked = False
+            ElseIf WW_TEXT <> C_DELETE_FLG.DELETE Then
+                WF_DELFLG_DELETED.Checked = False
+                WF_DELFLG_NOTDELETED.Checked = True
+            Else
+                WF_DELFLG_DELETED.Checked = False
+                WF_DELFLG_NOTDELETED.Checked = True
+            End If
 
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0003L Then   '実行画面からの遷移
             '〇画面項目設定処理
-            '会社コード
-            TxtCampCodeMy.Text = work.WF_SEL_CAMPCODE.Text
-            '運用部署
-            TxtOrgCodeMy.Text = work.WF_SEL_ORGCODE.Text
-
-            '営業所コード
-            TxtOfficeCode.Text = work.WF_SEL_OFFICECODE.Text
-            '荷主コード
-            TxtShipperCode.Text = work.WF_SEL_SHIPPERCODE.Text
-            '基地コード
-            TxtPlantCode.Text = work.WF_SEL_PLANTCODE.Text
-            '油種大分類コード
-            TxtBigoilCode.Text = work.WF_SEL_BIGOILCODE.Text
-            '油種中分類コード
-            TxtMiddleoilCode.Text = work.WF_SEL_MIDDLEOILCODE.Text
-            '油種コード
-            TxtOilCode.Text = work.WF_SEL_OILCODE.Text
-            'ステータス選択
-            If work.WF_SEL_SELECT.Text = 0 Then
-                RdBSearch1.Checked = True
-                RdBSearch2.Checked = False
+            WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text             '営業所コード
+            WF_SHIPPERCODE.Text = work.WF_SEL_SHIPPERCODE.Text           '荷主コード
+            WF_PLANTCODE.Text = work.WF_SEL_PLANTCODE.Text               '基地コード
+            WF_BIGOILCODE.Text = work.WF_SEL_BIGOILCODE.Text             '油種大分類コード
+            WF_MIDDLEOILCODE.Text = work.WF_SEL_MIDDLEOILCODE.Text       '油種中分類コード
+            WF_OILCODE.Text = work.WF_SEL_OILCODE.Text                   '油種コード
+            If work.WF_SEL_DELFLG.Text = C_DELETE_FLG.DELETE Then        '削除フラグ
+                WF_DELFLG_NOTDELETED.Checked = False
+                WF_DELFLG_DELETED.Checked = True
             Else
-                RdBSearch1.Checked = False
-                RdBSearch2.Checked = True
+                WF_DELFLG_NOTDELETED.Checked = True
+                WF_DELFLG_DELETED.Checked = False
             End If
         End If
-
-        '会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtCampCodeMy.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtOrgCodeMy.Attributes("onkeyPress") = "CheckNum()"
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0003WRKINC.MAPIDS
         rightview.MAPID = OIM0003WRKINC.MAPIDL
-        rightview.COMPCODE = TxtCampCodeMy.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
         rightview.MENUROLE = Master.ROLE_MENU
@@ -180,10 +135,12 @@ Public Class OIM0003ProductSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        ''会社コード
-        'CODENAME_get("CAMPCODE", TxtCampCode.Text, txtCampName.Text, WW_DUMMY)
-        ''組織コード
-        'CODENAME_get("ORGCODE", TxtOrgCode.Text, txtOrgName.Text, WW_DUMMY)
+        CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)                  '営業所コード
+        CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_RTN_SW)               '荷主コード
+        CODENAME_get("PLANTCODE", WF_PLANTCODE.Text, WF_PLANTCODE.Text, WW_RTN_SW)                          '基地コード
+        CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)                  '油種大分類コード
+        CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)         '油種中分類コード
+        CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)                           '油種コード
 
     End Sub
 
@@ -195,15 +152,12 @@ Public Class OIM0003ProductSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        '会社コード
-        Master.EraseCharToIgnore(TxtCampCodeMy.Text)
-        '運用部署
-        Master.EraseCharToIgnore(TxtOrgCodeMy.Text)
-
-        ''会社コード2
-        'Master.EraseCharToIgnore(TxtCampCode.Text)
-        ''組織コード2
-        'Master.EraseCharToIgnore(TxtOrgCode.Text)
+        Master.EraseCharToIgnore(WF_OFFICECODE.Text)                '営業所コード
+        Master.EraseCharToIgnore(WF_SHIPPERCODE.Text)               '荷主コード
+        Master.EraseCharToIgnore(WF_PLANTCODE.Text)                 '基地コード
+        Master.EraseCharToIgnore(WF_BIGOILCODE.Text)                '油種大分類コード
+        Master.EraseCharToIgnore(WF_MIDDLEOILCODE.Text)             '油種中分類コード
+        Master.EraseCharToIgnore(WF_OILCODE.Text)                   '油種コード
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -212,33 +166,27 @@ Public Class OIM0003ProductSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        '営業所コード
-        work.WF_SEL_OFFICECODE.Text = TxtOfficeCode.Text
-        '荷主コード
-        work.WF_SEL_SHIPPERCODE.Text = TxtShipperCode.Text
-        '基地コード
-        work.WF_SEL_PLANTCODE.Text = TxtPlantCode.Text
-        '油種大分類コード
-        work.WF_SEL_BIGOILCODE.Text = TxtBigoilCode.Text
-        '油種中分類コード
-        work.WF_SEL_MIDDLEOILCODE.Text = TxtMiddleoilCode.Text
-        '油種コード
-        work.WF_SEL_OILCODE.Text = TxtOilCode.Text
+        work.WF_SEL_OFFICECODE.Text = WF_OFFICECODE.Text         '営業所コード
+        work.WF_SEL_SHIPPERCODE.Text = WF_SHIPPERCODE.Text       '荷主コード
+        work.WF_SEL_PLANTCODE.Text = WF_PLANTCODE.Text           '基地コード
+        work.WF_SEL_BIGOILCODE.Text = WF_BIGOILCODE.Text         '油種大分類コード
+        work.WF_SEL_MIDDLEOILCODE.Text = WF_MIDDLEOILCODE.Text   '油種中分類コード
+        work.WF_SEL_OILCODE.Text = WF_OILCODE.Text               '油種コード
 
-        '検索条件
-        If RdBSearch1.Checked = True Then
-            work.WF_SEL_SELECT.Text = "0"                   '削除除く
-        End If
-        If RdBSearch2.Checked = True Then
-            work.WF_SEL_SELECT.Text = "1"                   '削除のみ
+        If WF_DELFLG_NOTDELETED.Checked = True Then                 '削除フラグ
+            work.WF_SEL_DELFLG.Text = C_DELETE_FLG.ALIVE             '削除除く
+        ElseIf WF_DELFLG_DELETED.Checked = True Then
+            work.WF_SEL_DELFLG.Text = C_DELETE_FLG.DELETE            '削除のみ
+        Else
+            work.WF_SEL_DELFLG.Text = ""                             '指定なし（暫定）
         End If
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
-            Master.VIEWID = rightview.GetViewId(TxtCampCodeMy.Text)
+            Master.VIEWID = rightview.GetViewId(Master.USERCAMP)
         End If
 
-        Master.CheckParmissionCode(TxtCampCodeMy.Text)
+        Master.CheckParmissionCode(Master.USERCAMP)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
             '画面遷移
             Master.TransitionPage()
@@ -259,210 +207,140 @@ Public Class OIM0003ProductSearch
         Dim WW_CS0024FCHECKREPORT As String = ""
 
         '○ 単項目チェック
-        '会社コード
-        Master.CheckField(TxtCampCodeMy.Text, "CAMPCODE", TxtCampCodeMy.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        '営業所コード
+        WW_TEXT = WF_OFFICECODE.Text
+        Master.CheckField(Master.USERCAMP, "OFFICECODE", WF_OFFICECODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("CAMPCODE", TxtCampCodeMy.Text, txtCampNameMy.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & TxtCampCodeMy.Text)
-                TxtOfficeCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtCampCodeMy.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '運用部署
-        WW_TEXT = TxtOrgCodeMy.Text
-        Master.CheckField(TxtCampCodeMy.Text, "ORGCODE", TxtOrgCodeMy.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtOrgCodeMy.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_OFFICECODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("UORG", TxtOrgCodeMy.Text, txtOrgNameMy.Text, WW_RTN_SW)
+                CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & TxtOrgCodeMy.Text)
-                    TxtOrgCodeMy.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "営業所コード : " & WF_OFFICECODE.Text, needsPopUp:=True)
+                    WF_OFFICECODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtOfficeCode.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '営業所コード
-        Master.CheckField(TxtOfficeCode.Text, "OFFICECODE", TxtOfficeCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("OFFICECODE", TxtOfficeCode.Text, TxtOfficeName.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "営業所コード : " & TxtOfficeCode.Text)
-                TxtOfficeCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtOfficeCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所コード", needsPopUp:=True)
+            WF_OFFICECODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '荷主コード
-        WW_TEXT = TxtShipperCode.Text
-        Master.CheckField(TxtShipperCode.Text, "SHIPPERCODE", TxtShipperCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_SHIPPERCODE.Text
+        Master.CheckField(Master.USERCAMP, "SHIPPERCODE", WF_SHIPPERCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtShipperCode.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_SHIPPERCODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("SHIPPERCODE", TxtShipperCode.Text, TxtShipperName.Text, WW_RTN_SW)
+                CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "荷主コード : " & TxtShipperCode.Text)
-                    TxtShipperCode.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "荷主コード : " & WF_SHIPPERCODE.Text, needsPopUp:=True)
+                    WF_SHIPPERCODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtShipperCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "荷主コード", needsPopUp:=True)
+            WF_SHIPPERCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
-        '○ 単項目チェック
-        '営業所
-        Master.CheckField(TxtOfficeCode.Text, "OFFICECODE", TxtOfficeCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            CODENAME_get("OFFICECODE", TxtOfficeCode.Text, TxtOfficeName.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtOfficeCode.Text, needsPopUp:=True)
-                TxtOfficeCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所", needsPopUp:=True)
-            TxtOfficeCode.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-        '荷主 Shipper
-        Master.CheckField(TxtShipperCode.Text, "SHIPPERCODE", TxtShipperCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("SHIPPERCODE", TxtShipperCode.Text, TxtShipperName.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "荷主 : " & TxtShipperCode.Text, needsPopUp:=True)
-                TxtShipperCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "荷主", needsPopUp:=True)
-            TxtShipperCode.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
+
         '基地コード
-        WW_TEXT = TxtPlantCode.Text
-        Master.CheckField(TxtPlantCode.Text, "PLANTCODE", TxtPlantCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_PLANTCODE.Text
+        Master.CheckField(Master.USERCAMP, "PLANTCODE", WF_PLANTCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtPlantCode.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_PLANTCODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("PLANTCODE", TxtPlantCode.Text, TxtPlantCode.Text, WW_RTN_SW)
+                CODENAME_get("PLANTCODE", WF_PLANTCODE.Text, WF_PLANTCODE.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "基地コード : " & TxtShipperCode.Text)
-                    TxtPlantCode.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "基地コード : " & WF_SHIPPERCODE.Text, needsPopUp:=True)
+                    WF_PLANTCODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtPlantCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "基地コード", needsPopUp:=True)
+            WF_PLANTCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '油種大分類コード
-        WW_TEXT = TxtBigoilCode.Text
-        Master.CheckField(TxtBigoilCode.Text, "BIGOILCODE", TxtBigoilCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_BIGOILCODE.Text
+        Master.CheckField(Master.USERCAMP, "BIGOILCODE", WF_BIGOILCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtBigoilCode.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_BIGOILCODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("BIGOILCODE", TxtBigoilCode.Text, TxtBigoilName.Text, WW_RTN_SW)
+                CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種大分類コード : " & TxtBigoilCode.Text)
-                    TxtBigoilCode.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種大分類コード : " & WF_BIGOILCODE.Text, needsPopUp:=True)
+                    WF_BIGOILCODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtBigoilCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "油種大分類コード", needsPopUp:=True)
+            WF_BIGOILCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '油種中分類コード
-        WW_TEXT = TxtMiddleoilCode.Text
-        Master.CheckField(TxtMiddleoilCode.Text, "MIDDLEOILCODE", TxtMiddleoilCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_MIDDLEOILCODE.Text
+        Master.CheckField(Master.USERCAMP, "MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtMiddleoilCode.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_MIDDLEOILCODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("MIDDLEOILCODE", TxtMiddleoilCode.Text, TxtMiddleoilName.Text, WW_RTN_SW)
+                CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種中分類コード : " & TxtMiddleoilCode.Text)
-                    TxtMiddleoilCode.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種中分類コード : " & WF_MIDDLEOILCODE.Text, needsPopUp:=True)
+                    WF_MIDDLEOILCODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtMiddleoilCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "油種中分類コード", needsPopUp:=True)
+            WF_MIDDLEOILCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '油種コード
-        WW_TEXT = TxtOilCode.Text
-        Master.CheckField(TxtOilCode.Text, "OILCODE", TxtOilCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_OILCODE.Text
+        Master.CheckField(Master.USERCAMP, "OILCODE", WF_OILCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtOilCode.Text = ""
+            If String.IsNullOrEmpty(WW_TEXT) Then
+                WF_OILCODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("OILCODE", TxtOilCode.Text, TxtOilName.Text, WW_RTN_SW)
+                CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種コード : " & TxtOilCode.Text)
-                    TxtOilCode.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油種コード : " & WF_OILCODE.Text, needsPopUp:=True)
+                    WF_OILCODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtOilCode.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "油種コード", needsPopUp:=True)
+            WF_OILCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
@@ -501,24 +379,26 @@ Public Class OIM0003ProductSearch
             With leftview
                 Dim prmData As New Hashtable
                 Select Case WF_FIELD.Value
-                    Case "WF_OFFICECODE"        '営業所コード
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCodeMy.Text
-                        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOfficeCode.Text)
-                    Case "WF_SHIPPERCODE"       '荷主コード
-                        prmData = work.CreateFIXParam(TxtShipperCode.Text, "JOINTMASTER")
-                    Case "WF_PLANTCODE"         '基地コード
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtPlantCode.Text
-                    Case "WF_BIGOILCODE"        '油種大分類コード
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtBigoilCode.Text
-                    Case "WF_MIDDLEOILCODE"     '油種中分類コード
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtMiddleoilCode.Text
-                    Case "WF_OILCODE"           '油種コード
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtOilCode.Text
+                    Case WF_OFFICECODE.ID
+                        '営業所コード
+                        prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, WF_OFFICECODE.Text)
+                    Case WF_SHIPPERCODE.ID
+                        '荷主コード
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "JOINTMASTER")
+                    Case WF_PLANTCODE.ID
+                        '基地コード
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "PLANTMASTER")
+                    Case WF_BIGOILCODE.ID
+                        '油種大分類コード
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "BIGOILCODE")
+                    Case WF_MIDDLEOILCODE.ID
+                        '油種中分類コード
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "MIDDLEOILCODE")
+                    Case WF_OILCODE.ID
+                        '油種コード
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "OILCODE")
                 End Select
+
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                 .ActiveListBox()
 
@@ -537,37 +417,31 @@ Public Class OIM0003ProductSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            '営業所コード
-            Case "WF_OFFICECODE"
-                CODENAME_get("OFFICECODE", TxtOfficeCode.Text, TxtOfficeName.Text, WW_RTN_SW)
-            '荷主コード
-            Case "WF_SHIPPERCODE"
-                CODENAME_get("SHIPPERCODE", TxtShipperCode.Text, TxtShipperName.Text, WW_RTN_SW)
+            Case WF_OFFICECODE.ID
+                '営業所コード
+                CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
+            Case WF_SHIPPERCODE.ID
+                '荷主コード
+                CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_PLANTCODE.ID
                 '基地コード
-            Case "WF_PLANTCODE"
-                CODENAME_get("CAMPCODE", TxtPlantCode.Text, TxtPlantName.Text, WW_RTN_SW)
-            '油種大分類コード
-            Case "WF_BIGOILCODE"
-                CODENAME_get("ORGCODE", TxtBigoilCode.Text, TxtBigoilName.Text, WW_RTN_SW)
-            '油種中分類コード
-            Case "WF_MIDDLEOILCODE"
-                CODENAME_get("CAMPCODE", TxtMiddleoilName.Text, TxtMiddleoilName.Text, WW_RTN_SW)
-            '油種コード
-            Case "WF_OILCODE"
-                CODENAME_get("ORGCODE", TxtOilCode.Text, TxtOilName.Text, WW_RTN_SW)
+                CODENAME_get("PLANTCODE", WF_PLANTCODE.Text, WF_PLANTCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_BIGOILCODE.ID
+                '油種大分類コード
+                CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_MIDDLEOILCODE.ID
+                '油種中分類コード
+                CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE_TEXT.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)
+            Case WF_OILCODE.ID
+                '油種コード
+                CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Select Case WF_FIELD.Value
-                '### like検索を実施するため、存在チェックは外す(20191223) ###########################################
-                'Case "TxtStationCode"
-                '    '何もしない(like検索をするにあたって、「マスタが存在しない」旨を未出力とするため)
-                Case Else
-                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
-            End Select
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub
@@ -595,30 +469,36 @@ Public Class OIM0003ProductSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "WF_OFFICECODE"       '営業所コード
-                TxtOfficeCode.Text = WW_SelectValue
-                TxtOfficeName.Text = WW_SelectText
-                TxtOfficeCode.Focus()
-            Case "WF_SHIPPERCODE"       '荷主コード
-                TxtShipperCode.Text = WW_SelectValue
-                TxtPlantName.Text = WW_SelectText
-                TxtShipperCode.Focus()
-            Case "WF_PLANTCODE"         '基地コード
-                TxtPlantCode.Text = WW_SelectValue
-                TxtPlantName.Text = WW_SelectText
-                TxtPlantCode.Focus()
-            Case "WF_BIGOILCODE"        '油種大分類コード
-                TxtBigoilCode.Text = WW_SelectValue
-                TxtBigoilName.Text = WW_SelectText
-                TxtBigoilCode.Focus()
-            Case "WF_MIDDLEOILCODE"      '油種中分類コード
-                TxtMiddleoilCode.Text = WW_SelectValue
-                TxtMiddleoilName.Text = WW_SelectText
-                TxtMiddleoilCode.Focus()
-            Case "WF_OILCODE"            '油種コード
-                TxtOilCode.Text = WW_SelectValue
-                TxtOilName.Text = WW_SelectText
-                TxtOilCode.Focus()
+            Case WF_OFFICECODE.ID
+                '営業所コード
+                WF_OFFICECODE.Text = WW_SelectValue
+                WF_OFFICECODE_TEXT.Text = WW_SelectText
+                WF_OFFICECODE.Focus()
+            Case WF_SHIPPERCODE.ID
+                '荷主コード
+                WF_SHIPPERCODE.Text = WW_SelectValue
+                WF_PLANTCODE_TEXT.Text = WW_SelectText
+                WF_SHIPPERCODE.Focus()
+            Case WF_PLANTCODE.ID
+                '基地コード
+                WF_PLANTCODE.Text = WW_SelectValue
+                WF_PLANTCODE_TEXT.Text = WW_SelectText
+                WF_PLANTCODE.Focus()
+            Case WF_BIGOILCODE.ID
+                '油種大分類コード
+                WF_BIGOILCODE.Text = WW_SelectValue
+                WF_BIGOILCODE_TEXT.Text = WW_SelectText
+                WF_BIGOILCODE.Focus()
+            Case WF_MIDDLEOILCODE.ID
+                '油種中分類コード
+                WF_MIDDLEOILCODE.Text = WW_SelectValue
+                WF_MIDDLEOILCODE_TEXT.Text = WW_SelectText
+                WF_MIDDLEOILCODE.Focus()
+            Case WF_OILCODE.ID
+                '油種コード
+                WF_OILCODE.Text = WW_SelectValue
+                WF_OILCODE_TEXT.Text = WW_SelectText
+                WF_OILCODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -636,18 +516,24 @@ Public Class OIM0003ProductSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_OFFICECODE"          '営業所コード
-                TxtOfficeCode.Focus()
-            Case "WF_SHIPPERCODE"              '荷主コード
-                TxtShipperCode.Focus()
-            Case "WF_PLANTCODE"          '基地コード
-                TxtPlantCode.Focus()
-            Case "WF_BIGOILCODE"              '油種大分類コード
-                TxtBigoilCode.Focus()
-            Case "WF_MIDDLEOILCODE"          '油種中分類コード
-                TxtMiddleoilCode.Focus()
-            Case "WF_OILCODE"              '油種コード
-                TxtOilCode.Focus()
+            Case WF_OFFICECODE.ID
+                '営業所コード
+                WF_OFFICECODE.Focus()
+            Case WF_SHIPPERCODE.ID
+                '荷主コード
+                WF_SHIPPERCODE.Focus()
+            Case WF_PLANTCODE.ID
+                '基地コード
+                WF_PLANTCODE.Focus()
+            Case WF_BIGOILCODE.ID
+                '油種大分類コード
+                WF_BIGOILCODE.Focus()
+            Case WF_MIDDLEOILCODE.ID
+                '油種中分類コード
+                WF_MIDDLEOILCODE.Focus()
+            Case WF_OILCODE.ID
+                '油種コード
+                WF_OILCODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -663,7 +549,7 @@ Public Class OIM0003ProductSearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_DBClick()
 
-        rightview.InitViewID(TxtCampCodeMy.Text, WW_DUMMY)
+        rightview.InitViewID(Master.USERCAMP, WW_DUMMY)
 
     End Sub
 
@@ -712,42 +598,42 @@ Public Class OIM0003ProductSearch
         End If
 
         Dim prmData As New Hashtable
-        'prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCode.Text
 
         Try
             Select Case I_FIELD
-                Case "CAMPCODE"         '会社コード
-                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "UORG"             '組織コード
-                    prmData = work.CreateORGParam(TxtCampCodeMy.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "OFFICECODE"      '営業所コード
-                    prmData = work.CreateSALESOFFICEParam(TxtCampCodeMy.Text, I_VALUE)
+                Case "OFFICECODE"
+                    '営業所コード
+                    prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "SHIPPERCODE"     '荷主コード
-                    prmData = work.CreateFIXParam(TxtOfficeCode.Text, "JOINTMASTER")
+                Case "SHIPPERCODE"
+                    '荷主コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "JOINTMASTER")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "PLANTCODE"       '基地コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_PLANTCODE.Text, "PLANTCODE"))
-                Case "BIGOILCODE"      '油種大分類コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_BIGOILCODE.Text, "BIGOILCODE"))
-                Case "MIDDLEOILCODE"   '油種中分類コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_MIDDLEOILCODE.Text, "MIDDLEOILCODE"))
-                Case "OILCODE"         '油種コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OILCODE.Text, "OILCODE"))
-
-
+                Case "PLANTCODE"
+                    '基地コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "PLANTMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BIGOILCODE"
+                    '油種大分類コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "BIGOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "MIDDLEOILCODE"
+                    '油種中分類コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "MIDDLEOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OTOILCODE"
+                    'OT油種コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "OTOILCODE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STOCKFLG"
+                    '在庫管理対象フラグ
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "PRODUCTSTOCKFLG")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
             Exit Sub
         End Try
-
-    End Sub
-
-    Protected Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RdBSearch1.CheckedChanged
 
     End Sub
 End Class

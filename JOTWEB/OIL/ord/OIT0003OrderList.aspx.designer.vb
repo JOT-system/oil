@@ -365,6 +365,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''lblEndMonthChkDmy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblEndMonthChkDmy As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''ChkEndMonthChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkEndMonthChk As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

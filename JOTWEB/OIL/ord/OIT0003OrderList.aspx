@@ -189,13 +189,13 @@
             </a>
         </span>
     </div>
-<%--    <div id="divEndMonthChk">
+    <div id="divEndMonthChk">
         <span id="spnEndMonthChk">
             <asp:Label ID="lblEndMonthChkDmy" runat="server" Text="　　　　　　　　　"></asp:Label>
             <a id="aEndMonthChk">
                 <asp:CheckBox ID="ChkEndMonthChk" runat="server" Text=" 当月積込、翌月発分を含める" />
             </a>
         </span>
-    </div>--%>
+    </div>
 
 </asp:Content>

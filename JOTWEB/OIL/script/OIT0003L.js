@@ -205,18 +205,18 @@ function reportRadioButton() {
     }
 
     // ### 20201106 START OT積込指示(月末)対応 ##################################
-    //let chkObj2 = document.getElementById('rbOTLoadBtn');
-    //let txtObj2 = document.getElementById('divEndMonthChk'); //←表示非表示切替用
+    let chkObj2 = document.getElementById('rbOTLoadBtn');
+    let txtObj2 = document.getElementById('divEndMonthChk'); //←表示非表示切替用
 
-    //if (chkObj2 === null) {
-    //    txtObj2.style.display = 'none'
-    //    //return;
-    //} else {
-    //    if (chkObj2.checked) {
-    //        txtObj2.style.display = 'block'
-    //    } else {
-    //        txtObj2.style.display = 'none'
-    //    }
-    //}
+    if (chkObj2 === null) {
+        txtObj2.style.display = 'none'
+        //return;
+    } else {
+        if (chkObj2.checked) {
+            txtObj2.style.display = 'block'
+        } else {
+            txtObj2.style.display = 'none'
+        }
+    }
     // ### 20201106 END   OT積込指示(月末)対応 ##################################
 }

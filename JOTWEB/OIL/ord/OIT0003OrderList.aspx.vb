@@ -3262,13 +3262,14 @@ Public Class OIT0003OrderList
             & " AND OIT0003.TANKNO <> '' " _
             & " AND OIT0003.DELFLG <> @P02 "
 
-        '◯OT積込指示書以外の場合
+        '★積置フラグ無し用SQL
         If tyohyoType <> "OTLOADPLAN" Then
-            '★積置フラグ無し用SQL
+            '◯積込指示書の場合
             SQLStrNashi &=
               SQLStrCmn _
             & " AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
         Else
+            '◯OT積込指示書の場合
             SQLStrNashi &= SQLStrCmn
         End If
 
@@ -3327,24 +3328,33 @@ Public Class OIT0003OrderList
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.ORDERSTATUS <= @P04 " _
 
-        '★OT積込指示書の場合、発日基準のため条件を追加
-        If tyohyoType = "OTLOADPLAN" Then
-            SQLStrCmn &=
-                  " AND OIT0002.DEPDATE = @P03 "
-        End If
-
-        '◯OT積込指示書以外の場合
+        '★積置フラグ無し用SQL
         If tyohyoType <> "OTLOADPLAN" Then
-            '★積置フラグ無し用SQL
+            '◯積込指示書の場合
             SQLStrNashi &= SQLStrCmn _
             & "   AND OIT0002.LODDATE = @P03 "
         Else
-            SQLStrNashi &= SQLStrCmn
+            '◯OT積込指示書の場合(発日基準)
+            SQLStrNashi &= SQLStrCmn _
+            & "   AND OIT0002.DEPDATE = @P03 "
         End If
 
         '★積置フラグ有り用SQL
-        SQLStrAri &= SQLStrCmn
-
+        If tyohyoType <> "OTLOADPLAN" Then
+            '◯積込指示書の場合
+            SQLStrAri &= SQLStrCmn
+        Else
+            '◯OT積込指示書の場合(発日基準)
+            If ChkEndMonthChk.Checked = False Then
+                SQLStrAri &= SQLStrCmn _
+                & "   AND OIT0002.DEPDATE = @P03 "
+            Else
+                '### 20201109 START 『(チェックボックス)当月積込、翌月発分を含める』がチェックされた場合 ##########
+                SQLStrAri &= SQLStrCmn _
+                & "   AND CONVERT(VARCHAR(6), OIT0002.DEPDATE, 112) = @P05 "
+                '### 20201109 END   『(チェックボックス)当月積込、翌月発分を含める』がチェックされた場合 ##########
+            End If
+        End If
 
         'Dim SQLStr As String =
         '      " SELECT " _
@@ -3437,13 +3447,16 @@ Public Class OIT0003OrderList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '発日(翌月)
                 PARA01.Value = OFFICECDE
                 PARA02.Value = C_DELETE_FLG.DELETE
                 'PARA03.Value = "2020/5/29"
                 If Not String.IsNullOrEmpty(lodDate) Then
                     PARA03.Value = lodDate
+                    PARA05.Value = Format(Date.Parse(lodDate).AddMonths(1), "yyyyMM")
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                    PARA05.Value = Format(Now.AddMonths(1), "yyyyMM")
                 End If
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
 

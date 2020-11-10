@@ -369,8 +369,9 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     '◯ 合計
                     rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
                     rngDetailArea.Value = Convert.ToString(z) + "車"
-                    '★次明細用として合計を初期化
+                    '★次明細用として合計,油種(保存)を初期化
                     z = 0
+                    strOtOilNameSave = ""
 
                     '★次明細の行設定
                     j += 1

@@ -1575,6 +1575,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '1'         AS SEQ_PROC_KBN") 'シーケンスファイル処理区分(一旦新規のみ）
         sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '06' ELSE '08' END AS SEQ_DEPT_CODE") 'シーケンスファイル支店コード
         sqlStat.AppendLine("     , '03'         AS SEQ_TORIKBN") 'シーケンスファイル取引区分コード
+        sqlStat.AppendLine("     , '00000'         AS SEQ_TOKUISAKI") 'シーケンスファイル得意先コード
         sqlStat.AppendLine("     , format(ODR.ARRDATE,'yyyyMMdd') AS ARRDATE_WITHOUT_SLASH")     '積車着日(スラなし）
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
         sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
@@ -1585,9 +1586,9 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("                 THEN '023'")
         sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND DET.OTTRANSPORTFLG = '1'")
         sqlStat.AppendLine("                 THEN '023'")
-        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' ANS ODR.OFFICECODE = '011201'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '011201'")
         sqlStat.AppendLine("                 THEN '022'")
-        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' ANS ODR.OFFICECODE = '012401'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '012401'")
         sqlStat.AppendLine("                 THEN '017'")
         sqlStat.AppendLine("             END")
         sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
@@ -1600,11 +1601,19 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
         sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
         sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
-        sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") '伝票明細№
-        sqlStat.AppendLine("     , '00000' AS SEQ_ACCTUAL_AMOUNT") '実績数量
-        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_BEGIN_TIME") '荷役開始時刻
-        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") '荷役終了時刻
-        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") '荷役終了時刻
+        sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
+        sqlStat.AppendLine("     , '00000' AS SEQ_ACCTUAL_AMOUNT") 'シーケンス実績数量
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_BEGIN_TIME") 'シーケンス荷役開始時刻
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") 'シーケンス荷役終了時刻
+        sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4)  AS SEQ_TRAINNO") 'シーケンス列車番号
+        sqlStat.AppendLine("     , ''  AS SEQ_TOKUISAKI_KANA") 'シーケンス得意先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HAISOU_KANA") 'シーケンス配送先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HINMEI_KANA") 'シーケンス品名コード（略称カナ）
+        sqlStat.AppendLine("     , Format(GetDate(),'yyyyMMddHHmm')  AS SEQ_CREATEDATETIME") 'シーケンスデータ作成年月日時分
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '046'  ELSE '071' END  AS SEQ_PLANTCODE") 'シーケンス当社基地コード
+        sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
+        sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
+        sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
         sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
@@ -1723,6 +1732,8 @@ Public Class OIT0003OTLinkageList
                             newDr("OUTPUTRESERVENO") = Convert.ToString(CInt(reservedNo))
                         Case "011203" '袖ヶ浦(積込日+2桁0埋め予約番号)
                             newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & CInt(reservedNo).ToString("00")
+                        Case "011201", "012401" '五井、四日市（３桁の予約番号のみ）
+                            newDr("OUTPUTRESERVENO") = CInt(reservedNo).ToString("000")
                         Case Else 'その他は積込日+3桁0埋め予約番号
                             newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & reservedNo
                     End Select
@@ -2369,16 +2380,26 @@ Public Class OIT0003OTLinkageList
                 '予約ファイル用フィールド
                 outFieldList = New Dictionary(Of String, Integer)
                 With outFieldList
-                    .Add("KINO_DATAKBN", 0)
-                    .Add("LODDATE_WITHOUT_SLASH", 0)
-                    .Add("OUTPUTRESERVENO", 0)
-                    .Add("KINO_TRAINNO", 0)
-                    .Add("REPORTOILNAME", 0)
-                    .Add("RESERVEDQUANTITY", 0)
-                    .Add("KINO_TOKUISAKICODE", 0)
-                    .Add("KINO_TOKUISAKINAME", 0)
-                    .Add("CONSIGNEECONVCODE", 0)
-                    .Add("CONSIGNEECONVVALUE", 0)
+                    .Add("SEQ_DATATYPE_RESERVED", 3)
+                    .Add("SEQ_PROC_KBN", 2)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
                 End With
                 '実績要求ファイル用フィールド
                 outRequestFieldList = New Dictionary(Of String, Integer)

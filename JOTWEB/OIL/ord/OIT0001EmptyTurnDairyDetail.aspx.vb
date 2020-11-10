@@ -81,7 +81,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                              "WF_CheckBoxSELECTSTACKING",
                              "WF_CheckBoxSELECTWHOLESALE",
                              "WF_CheckBoxSELECTINSPECTION",
-                             "WF_CheckBoxSELECTDETENTION"    'チェックボックス(選択)クリック
+                             "WF_CheckBoxSELECTDETENTION",
+                             "WF_CheckBoxSELECTOTTRANSPORT"     'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
@@ -293,6 +294,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
         work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
         work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+        work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
         '○ 名称設定処理
         '会社コード
@@ -883,6 +885,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
         work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
         work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+        work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
         'タンク車数の件数カウント用
         Dim intTankCnt As Integer = 0
@@ -1235,6 +1238,20 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Next
                 '### 20201009 END   指摘票No165対応 ############################################################
 
+                '### 20201110 END   指摘票No198対応 ############################################################
+            Case "WF_CheckBoxSELECTOTTRANSPORT"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
+                    If Convert.ToString(OIT0001tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0001tbl.Rows(i)("OTTRANSPORTFLG")) = "on" Then
+                            OIT0001tbl.Rows(i)("OTTRANSPORTFLG") = ""
+                        Else
+                            OIT0001tbl.Rows(i)("OTTRANSPORTFLG") = "on"
+                        End If
+                    End If
+                Next
+                '### 20201110 END   指摘票No198対応 ############################################################
+
             Case Else
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
@@ -1447,6 +1464,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     work.WF_SEL_CONSIGNEENAME.Text = ""
                     work.WF_SEL_PATTERNCODE.Text = ""
                     work.WF_SEL_PATTERNNAME.Text = ""
+                    work.WF_SEL_TRKBN.Text = ""
 
                     Exit Select
                 End If
@@ -1494,6 +1512,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
                 work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
                 work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+                work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
             Case "TxtDepstation"        '発駅
                 TxtDepstation.Text = WW_SelectValue
@@ -1515,6 +1534,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
                 work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
                 work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+                work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
             Case "TxtLoadingDate"       '(予定)積込日
                 Dim WW_DATE As Date
@@ -5600,7 +5620,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
             & "        TANKNO            = @P03, STACKINGFLG   = @P40" _
-            & "        , WHOLESALEFLG    = @P51, INSPECTIONFLG = @P46, DETENTIONFLG = @P47" _
+            & "        , WHOLESALEFLG    = @P51, INSPECTIONFLG = @P46, DETENTIONFLG = @P47, OTTRANSPORTFLG  = @P50" _
             & "        , ORDERINFO       = @P34, SHIPPERSCODE  = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME       = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
             & "        , RETURNDATETRAIN = @P07, JOINTCODE     = @P39, JOINT        = @P08, REMARK          = @P38" _
@@ -5817,7 +5837,14 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     PARA48.Value = "2"                                '先返し可否フラグ
                     PARA49.Value = "2"                                '後返し可否フラグ
-                    PARA50.Value = "2"                                'OT輸送可否フラグ
+                    '### 20201110 START 指摘票No198対応 ############################################################
+                    '# OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
+                    If OIT0001row("OTTRANSPORTFLG") = "on" Then
+                        PARA50.Value = "1"
+                    Else
+                        PARA50.Value = "2"
+                    End If
+                    '### 20201110 START 指摘票No198対応 ############################################################
 
                     PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
@@ -7546,6 +7573,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim chkObjINId As String
         Dim chkObjDEId As String
         Dim chkObjType As String = ""
+        '### 20201110 START 指摘票対応(No198)全体 ################################
+        Dim chkObjOT As CheckBox = Nothing
+        Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea.ID & "OTTRANSPORTFLG"
+        Dim chkObjOTId As String
+        '### 20201110 END   指摘票対応(No198)全体 ################################
         '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
         Dim loopdr As DataRow = Nothing
         '　データテーブルの行Index
@@ -7635,6 +7667,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                             Exit For
                         End If
                     Next
+                    '### 20201110 START 指摘票対応(No198)全体 ################################
+                    chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjOT = Nothing
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjOT IsNot Nothing Then
+                            'OT輸送可否フラグ(チェックボックス)を非活性
+                            chkObjOT.Enabled = False
+                            Exit For
+                        End If
+                    Next
+                    '### 20201110 END   指摘票対応(No198)全体 ################################
                 End If
                 rowIdx += 1
             Next
@@ -7734,7 +7779,25 @@ Public Class OIT0001EmptyTurnDairyDetail
                             End If
                         End If
                     Next
-
+                    '### 20201110 START 指摘票対応(No198)全体 ################################
+                    chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjOT = Nothing
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjOT IsNot Nothing Then
+                            '★輸送形態が"M"(請負OT混載)ではない場合
+                            If work.WF_SEL_TRKBN.Text <> BaseDllConst.CONST_TRKBN_M Then
+                                'OT輸送可否フラグ(チェックボックス)を非活性
+                                chkObjOT.Enabled = False
+                            Else
+                                'OT輸送可否フラグ(チェックボックス)を活性
+                                chkObjOT.Enabled = True
+                            End If
+                            Exit For
+                        End If
+                    Next
+                    '### 20201110 END   指摘票対応(No198)全体 ################################
                     For Each cellObj As TableCell In rowitem.Controls
                         '★受注営業所が仙台新港営業所の場合、(一覧)積込日(実績)の入力を許可する
                         '### 20201019 START 指摘票対応(No172) #############################################

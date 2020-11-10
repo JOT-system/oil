@@ -1811,6 +1811,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
+            & " , ''                                             AS OTTRANSPORTFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -1929,6 +1930,11 @@ Public Class OIT0003OrderDetail
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
                 & "   END                                                           AS STACKINGFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                           AS OTTRANSPORTFLG" _
                 & " , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALLODDATE" _
                 & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                          AS JOINTCODE" _
                 & " , ISNULL(RTRIM(OIT0003.JOINT), '')                              AS JOINT" _
@@ -2225,6 +2231,11 @@ Public Class OIT0003OrderDetail
             & "   WHEN '2' THEN ''" _
             & "   ELSE ''" _
             & "   END                                                           AS STACKINGFLG" _
+            & " , CASE ISNULL(RTRIM(TMP0001.OTTRANSPORTFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                           AS OTTRANSPORTFLG" _
             & " , ISNULL(FORMAT(TMP0001.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALLODDATE" _
             & " , ISNULL(RTRIM(TMP0001.JOINTCODE), '')                          AS JOINTCODE" _
             & " , ISNULL(RTRIM(TMP0001.JOINT), '')                              AS JOINT" _
@@ -5389,6 +5400,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
+            & " , ''                                             AS OTTRANSPORTFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -19044,6 +19056,12 @@ Public Class OIT0003OrderDetail
         '#######################################################################
         Dim chkStackingOrderNo As String = ""
 
+        '### 20201110 START 指摘票No199対応 ####################################
+        Dim chkObjOT As CheckBox = Nothing
+        Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea1.ID & "OTTRANSPORTFLG"
+        Dim chkObjOTId As String
+        '### 20201110 END   指摘票No199対応 ####################################
+
         '受注進行ステータスが"受注受付"の場合
         '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
         '※但し、受注営業所が"010402"(仙台新港営業所)以外の場合は、積込日を読取専用(入力不可)とする。
@@ -19059,23 +19077,43 @@ Public Class OIT0003OrderDetail
                     chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjST IsNot Nothing Then
+                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        '### 20201019 START 指摘票対応(No172) ##################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) ##################################
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
+                            chkObjST.Enabled = False
+                        Else
+                            '★積置受注№が設定されている場合はチェックボックスは非活性
+                            If chkStackingOrderNo <> "" Then
+                                chkObjST.Enabled = False
+                            End If
+                        End If
                         Exit For
                     End If
                 Next
-                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                '### 20201019 START 指摘票対応(No172) #############################################
-                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
-                '### 20201019 END   指摘票対応(No172) #############################################
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
-                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
-                    chkObjST.Enabled = False
-                Else
-                    '★積置受注№が設定されている場合はチェックボックスは非活性
-                    If chkStackingOrderNo <> "" Then
-                        chkObjST.Enabled = False
+                '#######################################################################
+
+                '### 20201110 START 指摘票No199対応 ####################################
+                chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjOT = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjOT IsNot Nothing Then
+                        '★輸送形態が"M"(請負OT混載)ではない場合
+                        If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                            'OT輸送可否フラグ(チェックボックス)を非活性
+                            chkObjOT.Enabled = False
+                        Else
+                            'OT輸送可否フラグ(チェックボックス)を活性
+                            chkObjOT.Enabled = True
+                        End If
+                        Exit For
                     End If
-                End If
-                '###################################################################
+                Next
+                '### 20201110 END   指摘票No199対応 ####################################
 
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -19148,7 +19186,7 @@ Public Class OIT0003OrderDetail
             Dim chkJRInspectionDate As String = ""
 
             For Each rowitem As TableRow In tblObj.Rows
-                '### ★積置選択（チェックボックス）を非活性にする ##################
+                '### ★積置選択（チェックボックス）を非活性にする ######################
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjST = Nothing
@@ -19157,23 +19195,42 @@ Public Class OIT0003OrderDetail
                     chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjST IsNot Nothing Then
+                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        '### 20201019 START 指摘票対応(No172) ##################################
+                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20201019 END   指摘票対応(No172) ##################################
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
+                            chkObjST.Enabled = False
+                        Else
+                            '★積置受注№が設定されている場合はチェックボックスは非活性
+                            If chkStackingOrderNo <> "" Then
+                                chkObjST.Enabled = False
+                            End If
+                        End If
                         Exit For
                     End If
                 Next
-                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                '### 20201019 START 指摘票対応(No172) #############################################
-                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
-                '### 20201019 END   指摘票対応(No172) #############################################
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
-                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
-                    chkObjST.Enabled = False
-                Else
-                    '★積置受注№が設定されている場合はチェックボックスは非活性
-                    If chkStackingOrderNo <> "" Then
-                        chkObjST.Enabled = False
+                '#######################################################################
+                '### 20201110 START 指摘票No199対応 ####################################
+                chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjOT = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjOT IsNot Nothing Then
+                        '★輸送形態が"M"(請負OT混載)ではない場合
+                        If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                            'OT輸送可否フラグ(チェックボックス)を非活性
+                            chkObjOT.Enabled = False
+                        Else
+                            'OT輸送可否フラグ(チェックボックス)を活性
+                            chkObjOT.Enabled = True
+                        End If
+                        Exit For
                     End If
-                End If
-                '###################################################################
+                Next
+                '### 20201110 END   指摘票No199対応 ####################################
 
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -19247,7 +19304,7 @@ Public Class OIT0003OrderDetail
             '#######################################################################
 
             For Each rowitem As TableRow In tblObj.Rows
-                '### ★選択（チェックボックス）を非活性にする ######################
+                '### ★選択（チェックボックス）を非活性にする ##########################
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
                 'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
@@ -19256,13 +19313,14 @@ Public Class OIT0003OrderDetail
                     chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObj IsNot Nothing Then
+                        '選択(チェックボックス)を非活性
+                        chkObj.Enabled = False
                         Exit For
                     End If
                 Next
-                chkObj.Enabled = False
-                '###################################################################
+                '#######################################################################
 
-                '### ★積置選択（チェックボックス）を非活性にする ##################
+                '### ★積置選択（チェックボックス）を非活性にする ######################
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjST = Nothing
@@ -19270,11 +19328,25 @@ Public Class OIT0003OrderDetail
                     chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjST IsNot Nothing Then
+                        '積置可否フラグ(チェックボックス)を非活性
+                        chkObjST.Enabled = False
                         Exit For
                     End If
                 Next
-                chkObjST.Enabled = False
-                '###################################################################
+                '#######################################################################
+                '### 20201110 START 指摘票No199対応 ####################################
+                chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjOT = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjOT IsNot Nothing Then
+                        'OT輸送可否フラグ(チェックボックス)を非活性
+                        chkObjOT.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '### 20201110 END   指摘票No199対応 ####################################
 
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -19470,6 +19542,17 @@ Public Class OIT0003OrderDetail
                             chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjST IsNot Nothing Then
+                                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                                '### 20201019 START 指摘票対応(No172) ########################################
+                                '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
+                                '### 20201019 END   指摘票対応(No172) ########################################
+                                '### 20200626 積置受注№が設定されている場合(条件追加) #######################
+                                If (Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                                        AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402) _
+                                    OrElse chkObjType <> "" Then
+                                    '積込可否フラグ(チェックボックス)を非活性
+                                    If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                End If
                                 Exit For
                             End If
                         Next
@@ -19489,6 +19572,14 @@ Public Class OIT0003OrderDetail
                                 Exit For
                             End If
                         Next
+                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                            '交検可否フラグ(チェックボックス)を非活性
+                            If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
+                            '留置可否フラグ(チェックボックス)を非活性
+                            If chkObjDE IsNot Nothing Then chkObjDE.Enabled = False
+                        End If
+
                         chkObjFR = Nothing
                         For Each cellObj As TableCell In rowitem.Controls
                             chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
@@ -19506,40 +19597,6 @@ Public Class OIT0003OrderDetail
                                 Exit For
                             End If
                         Next
-                        '### 20200622 END  ((全体)No87対応) ######################################
-                        '### 20200717 START((全体)No112対応) ######################################
-                        chkObjOT = Nothing
-                        For Each cellObj As TableCell In rowitem.Controls
-                            chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
-                            'コントロールが見つかったら脱出
-                            If chkObjOT IsNot Nothing Then
-                                Exit For
-                            End If
-                        Next
-                        '### 20200717 END  ((全体)No112対応) ######################################
-
-                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                        '### 20201019 START 指摘票対応(No172) ########################################
-                        '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
-                        '### 20201019 END   指摘票対応(No172) ########################################
-                        '### 20200626 積置受注№が設定されている場合(条件追加) #######################
-                        If (Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
-                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402) _
-                            OrElse chkObjType <> "" Then
-                            '積込可否フラグ(チェックボックス)を非活性
-                            If chkObjST IsNot Nothing Then chkObjST.Enabled = False
-
-                        End If
-
-                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
-                            '交検可否フラグ(チェックボックス)を非活性
-                            If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
-                            '留置可否フラグ(チェックボックス)を非活性
-                            If chkObjDE IsNot Nothing Then chkObjDE.Enabled = False
-
-                        End If
-
                         '◯ 受注営業所が"011402"(根岸営業所)以外の場合
                         '### 20200618 すでに指定したタンク車№が他の受注で使用されている場合の対応 ### 
                         'Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
@@ -19552,7 +19609,6 @@ Public Class OIT0003OrderDetail
                             '後返し可否フラグ(チェックボックス)を非活性
                             If chkObjAF IsNot Nothing Then chkObjAF.Enabled = False
 
-                            '### 20200622 START((全体)No87対応) ######################################
                         ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                             If Me.TxtTrainNo.Text = "81" Then
                                 '先返し可否フラグ(チェックボックス)を活性
@@ -19573,16 +19629,22 @@ Public Class OIT0003OrderDetail
                                 If chkObjAF IsNot Nothing Then chkObjAF.Enabled = False
 
                             End If
-                            '### 20200622 END  ((全体)No87対応) ######################################
                         End If
+                        '### 20200622 END  ((全体)No87対応) ######################################
 
                         '### 20200717 START((全体)No112対応) ######################################
-                        If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
-
-                            'OT輸送可否フラグ(チェックボックス)を非活性
-                            If chkObjOT IsNot Nothing Then chkObjOT.Enabled = False
-
-                        End If
+                        chkObjOT = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjOT IsNot Nothing Then
+                                If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                                    'OT輸送可否フラグ(チェックボックス)を非活性
+                                    If chkObjOT IsNot Nothing Then chkObjOT.Enabled = False
+                                End If
+                                Exit For
+                            End If
+                        Next
                         '### 20200717 END  ((全体)No112対応) ######################################
                     End If
 

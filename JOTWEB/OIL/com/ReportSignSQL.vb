@@ -155,7 +155,8 @@
             & "       , OIM0003.OTOILCODE " _
             & "       , OIM0003.OTOILNAME " _
             & " ) OTOILCT ON " _
-            & "     OTOILCT.SHIPPERSCODE = OIT0003.SHIPPERSCODE " _
+            & "     OTOILCT.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OTOILCT.SHIPPERSCODE = OIT0003.SHIPPERSCODE " _
             & " AND OTOILCT.OTOILCODE = OIM0003.OTOILCODE "
 
         Select Case mapID
@@ -177,6 +178,7 @@
         SQLStr &=
                 " ORDER BY" _
             & "    OIT0003.SHIPPERSCODE" _
+            & "  , OIT0002.TRAINNO" _
             & "  , OIT0002.DEPSTATION" _
             & "  , OIM0003.OTOILCODE" _
             & "  , OIT0003.LINEORDER" _

@@ -80,7 +80,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
 
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
@@ -310,6 +310,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("UPGRADE").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
+
+                '### 20201105 START 指摘票対応(No210)全体 ################################
+                '★「５０％運行分」※甲子営業所(2685列車)対応
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 _
+                    AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = "2685" Then
+                    If Remark = "" Then
+                        Remark &= "「５０％運行分」"
+                    Else
+                        Remark &= vbCrLf + "「５０％運行分」"
+                    End If
+                End If
+                '### 20201105 END   指摘票対応(No210)全体 ################################
+
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then
@@ -824,15 +837,20 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditSodegauraLineHeaderArea(lodDate, rTrainNo)
-            '◯明細の設定
-            EditSodegauraLineDetailArea()
-            '◯フッターの設定
-            EditSodegauraLineFooterArea(rTrainNo)
-            '***** TODO処理 ここまで *****
-            'ExcelTempSheet.Delete() '雛形シート削除
+            '○帳票の種類
+            Select Case repPtn
+                '★入線方(袖ヶ浦)
+                Case "LINEPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditSodegauraLineHeaderArea(lodDate, rTrainNo)
+                    '◯明細の設定
+                    EditSodegauraLineDetailArea()
+                    '◯フッターの設定
+                    EditSodegauraLineFooterArea(rTrainNo)
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+            End Select
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -1114,7 +1132,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String, ByVal lodDate As String) As String
+    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String, ByVal lodDate As String, Optional ByVal dtFT As DataTable = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -1124,7 +1142,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '***** TODO処理 ここから *****
             If repPtn = "SHIPPLAN" Then
                 '◯ヘッダーの設定
-                EditNegishiShipHeaderArea(lodDate)
+                EditNegishiShipHeaderArea(lodDate, dtFT)
                 '◯明細の設定
                 EditNegishiShipDetailArea()
             ElseIf repPtn = "LOADPLAN" Then
@@ -1163,7 +1181,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
-    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String)
+    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String, ByVal dtFT As DataTable)
         Dim rngHeaderArea As Excel.Range = Nothing
         'Dim valueYear As String = Now.AddDays(1).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
         'Dim valueMonth As String = Now.AddDays(1).ToString("MM", New Globalization.CultureInfo("ja-JP"))
@@ -1182,6 +1200,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '日
             rngHeaderArea = Me.ExcelWorkSheet.Range("H3")
             rngHeaderArea.Value = valueDay
+
+            '### 20201105 START 指摘票対応(No191) ####################################################################
+            '積込日
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E71")
+            rngHeaderArea.Value = lodDate
+            '出荷開始日(3号軽油)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E72")
+            rngHeaderArea.Value = dtFT.Rows(0)("ORDERFROMDATE")
+            '出荷終了日(3号軽油)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E73")
+            rngHeaderArea.Value = dtFT.Rows(0)("ORDERTODATE")
+            '### 20201105 END   指摘票対応(No191) ####################################################################
+
         Catch ex As Exception
             Throw
         Finally

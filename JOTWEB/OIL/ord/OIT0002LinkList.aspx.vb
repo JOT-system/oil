@@ -1516,7 +1516,7 @@ Public Class OIT0002LinkList
           " DELETE FROM OIL.OIT0011_RLINK WHERE RLINKNO = @P01 AND DELFLG = '0'; "
 
         Dim SQLDelLinkTblStr As String =
-          " DELETE FROM OIL.OIT0004_LINK WHERE LINKNO = @P01 AND DELFLG = '0'; " _
+          " DELETE FROM OIL.OIT0004_LINK WHERE LINKNO = @P01 AND DELFLG = '0'; "
 
         '○ 検索SQL
         '　検索説明
@@ -2251,7 +2251,7 @@ Public Class OIT0002LinkList
                                 OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(タ)", "")
 
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
+                                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", (Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(", "")).Replace(")", ""), WW_GetValue)
                                 OIT0002ExlUProw("DEPSTATION") = WW_GetValue(0)
                                 'OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
 
@@ -2261,6 +2261,7 @@ Public Class OIT0002LinkList
                                 'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
                                 'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
                                 WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
+                                If WW_GetValue(12) = "T" Then OIT0002ExlUProw("LOADINGTRAINNAME") &= "-積置"
 
                                 Try
                                     '〇 (予定)の日付を設定
@@ -2469,7 +2470,7 @@ Public Class OIT0002LinkList
             & "     OIT0003_MAX.ORDERNO = OIT0002.ORDERNO" _
             & " WHERE " _
             & "     OIT0002.OFFICECODE = @OFFICECODE" _
-            & " AND OIT0002.TRAINNAME  = @TRAINNAME" _
+            & " AND OIT0002.TRAINNO    = @TRAINNO" _
             & " AND OIT0002.LODDATE    = @LODDATE" _
             & " AND OIT0002.DEPDATE    = @DEPDATE" _
             & " AND OIT0002.DELFLG    <> @DELFLG" _
@@ -2478,7 +2479,7 @@ Public Class OIT0002LinkList
         Try
             Using SQLcmd As New SqlCommand(SQLCmpStr, SQLcon)
                 Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 6)  '受注営業所コード
-                Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar, 40)   '本線列車名
+                Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar, 40)       '本線列車No
                 Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.Date)               '積込日(予定)
                 Dim P_DEPDATE As SqlParameter = SQLcmd.Parameters.Add("@DEPDATE", SqlDbType.Date)               '発日(予定)
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
@@ -2505,13 +2506,11 @@ Public Class OIT0002LinkList
 
                     '同じオーダーの場合
                     If sOrderContent(2) = OIT0002EXLUProw("OFFICECODE").ToString() _
-                       AndAlso sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNAME").ToString() _
+                       AndAlso sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO").ToString() _
                        AndAlso sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE").ToString() _
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
                         OIT0002EXLUProw("ORDERNO") = sOrderContent(0)
-                        'iNum = Integer.Parse(sOrderContent(1)) + 1
-                        'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                         For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
                             If OIT0002GETrow("ORDERINGOILNAME") = OIT0002EXLUProw("OILNAME") Then
                                 'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
@@ -2521,13 +2520,18 @@ Public Class OIT0002LinkList
                             End If
                         Next
                         If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
-                            i += 1
-                            iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                            OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            If OIT0002GETtbl.Rows.Count = 0 Then
+                                iNum = Integer.Parse(sOrderContent(1)) + 1
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            Else
+                                i += 1
+                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            End If
                         End If
                     Else
                         P_OFFICECODE.Value = OIT0002EXLUProw("OFFICECODE").ToString()
-                        P_TRAINNAME.Value = OIT0002EXLUProw("LOADINGTRAINNAME").ToString()
+                        P_TRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO").ToString()
                         P_LODDATE.Value = OIT0002EXLUProw("LOADINGLODDATE").ToString()
                         P_DEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE").ToString()
                         P_DELFLG.Value = C_DELETE_FLG.DELETE
@@ -2587,7 +2591,7 @@ Public Class OIT0002LinkList
                     sOrderContent(0) = OIT0002EXLUProw("ORDERNO")
                     sOrderContent(1) = OIT0002EXLUProw("DETAILNO")
                     sOrderContent(2) = OIT0002EXLUProw("OFFICECODE")
-                    sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNAME")
+                    sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO")
                     sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE")
                     sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE")
                 Next
@@ -2651,7 +2655,8 @@ Public Class OIT0002LinkList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER               = @LINEORDER            , TANKNO                  = @TANKNO" _
+            & "        SHIPORDER               = @SHIPORDER" _
+            & "        , LINEORDER             = @LINEORDER            , TANKNO                  = @TANKNO" _
             & "        , STACKINGFLG           = @STACKINGFLG          , OTTRANSPORTFLG          = @OTTRANSPORTFLG" _
             & "        , SHIPPERSCODE          = @SHIPPERSCODE         , SHIPPERSNAME            = @SHIPPERSNAME" _
             & "        , OILCODE               = @OILCODE              , OILNAME                 = @OILNAME" _
@@ -2670,7 +2675,8 @@ Public Class OIT0002LinkList
             & "        AND DETAILNO     = @DETAILNO" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO              , DETAILNO               , LINEORDER          , TANKNO" _
+            & "        ( ORDERNO              , DETAILNO" _
+            & "        , SHIPORDER            , LINEORDER              , TANKNO" _
             & "        , STACKINGFLG          , WHOLESALEFLG           , INSPECTIONFLG      , DETENTIONFLG" _
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
@@ -2685,7 +2691,8 @@ Public Class OIT0002LinkList
             & "        , DELFLG               , INITYMD                , INITUSER           , INITTERMID" _
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @ORDERNO              , @DETAILNO               , @LINEORDER          , @TANKNO" _
+            & "        ( @ORDERNO              , @DETAILNO" _
+            & "        , @SHIPORDER            , @LINEORDER              , @TANKNO" _
             & "        , @STACKINGFLG          , @WHOLESALEFLG           , @INSPECTIONFLG      , @DETENTIONFLG" _
             & "        , @FIRSTRETURNFLG       , @AFTERRETURNFLG         , @OTTRANSPORTFLG" _
             & "        , @ORDERINFO            , @SHIPPERSCODE           , @SHIPPERSNAME" _
@@ -2707,6 +2714,7 @@ Public Class OIT0002LinkList
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
+            & "    , SHIPORDER" _
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , STACKINGFLG" _
@@ -2762,6 +2770,7 @@ Public Class OIT0002LinkList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)           '受注№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)          '受注明細№
+                Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", SqlDbType.NVarChar, 2)        '発送順
                 Dim P_LINEORDER As SqlParameter = SQLcmd.Parameters.Add("@LINEORDER", SqlDbType.NVarChar, 2)        '貨物駅入線順
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)              'タンク車№
                 Dim P_STACKINGFLG As SqlParameter = SQLcmd.Parameters.Add("@STACKINGFLG", SqlDbType.NVarChar)       '積置可否フラグ
@@ -2814,6 +2823,8 @@ Public Class OIT0002LinkList
                 Dim JP_DETAILNO As SqlParameter = SQLcmdJnl.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3) '受注明細№
 
                 Dim WW_DATENOW As DateTime = Date.Now
+                '〇 位置の設定件数を取得
+                Dim intListCnt As Integer = OIT0002EXLUPtbl.Select("POSITION<>''").Count
                 For Each OIT0002row As DataRow In OIT0002EXLUPtbl.Select(Nothing, "ORDERNO, DETAILNO")
 
                     '★受注№が未設定の場合は次レコード
@@ -2823,8 +2834,27 @@ Public Class OIT0002LinkList
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
 
-                    P_LINEORDER.Value = ""               '貨物駅入線順
-                    'P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
+                    '### 20201106 START 指摘票対応(No209)全体 #############################
+                    '★袖ヶ浦営業所の場合
+                    If OIT0002row("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011203 _
+                        AndAlso Convert.ToString(OIT0002row("POSITION")) <> "" Then
+                        '発送順
+                        Try
+                            P_SHIPORDER.Value = (intListCnt - Integer.Parse(OIT0002row("POSITION")) + 1)
+                        Catch ex As Exception
+                            P_SHIPORDER.Value = ""
+                        End Try
+                        '貨物駅入線順
+                        Try
+                            P_LINEORDER.Value = Integer.Parse(OIT0002row("POSITION"))
+                        Catch ex As Exception
+                            P_LINEORDER.Value = ""
+                        End Try
+                    Else
+                        P_SHIPORDER.Value = ""                              '発送順
+                        P_LINEORDER.Value = ""                              '貨物駅入線順
+                    End If
+                    '### 20201106 end   指摘票対応(No209)全体 #############################
                     P_TANKNO.Value = OIT0002row("TRUCKNO")                  'タンク車№
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
                     P_WHOLESALEFLG.Value = "2"                              '未卸可否フラグ
@@ -4064,7 +4094,7 @@ Public Class OIT0002LinkList
 
         '○ 検索SQL
         '     条件指定に従い該当データを列車マスタから取得する
-        Dim SQLStr As String =
+        Dim SQLCmnStr As String =
             " SELECT DISTINCT" _
             & "   0                                                     AS LINECNT" _
             & " , ISNULL(RTRIM(OIM0007.TRAINNO), '')                    AS TRAINNO" _
@@ -4079,9 +4109,20 @@ Public Class OIT0002LinkList
             & " INNER JOIN oil.OIM0004_STATION OIM0004_DEP ON " _
             & "       OIM0004_DEP.STATIONCODE + OIM0004_DEP.BRANCH = OIM0007.DEPSTATION " _
             & " INNER JOIN oil.OIM0004_STATION OIM0004_ARR ON " _
-            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION " _
-            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE2, @OFFICECODE3) " _
+            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION "
+
+        '五井営業所・袖ヶ浦営業所用
+        Dim SQLStr As String =
+            SQLCmnStr _
+            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE3) " _
             & "   AND OIM0007.TSUMI      =  'N' " _
+            & "   AND OIM0007.DELFLG     <> @DELFLG "
+
+        '甲子営業所用
+        SQLStr &=
+            "UNION ALL" _
+            & SQLCmnStr _
+            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE2) " _
             & "   AND OIM0007.DELFLG     <> @DELFLG "
 
         Try
@@ -4117,7 +4158,10 @@ Public Class OIT0002LinkList
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
                         '★発駅が異なる場合はSKIP
                         If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
-
+                        '★着駅が異なる場合はSKIP
+                        If OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+                        '★甲子営業所の場合は、チェック不要と判断し一旦SKIP
+                        If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _

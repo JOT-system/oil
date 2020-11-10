@@ -159,6 +159,21 @@ function ChangeCheckBox() {
         }
     }
     //### 20201009 END   指摘票No165対応 ############################################################
+    //### 20201110 START 指摘票No198対応 ############################################################
+    // OT輸送可否フラグ
+    var chkObjsLight5 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaOTTRANSPORTFLG']");
+    var spnObjsLight5 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaOTTRANSPORTFLG']");
+    for (let i = 0; i < chkObjsLight5.length; i++) {
+
+        if (chkObjsLight5[i] !== null) {
+            if (spnObjsLight5[i].innerText === "on") {
+                chkObjsLight5[i].checked = true;
+            } else {
+                chkObjsLight5[i].checked = false;
+            }
+        }
+    }
+    //### 20201110 END   指摘票No198対応 ############################################################
 
 }
 
@@ -190,6 +205,11 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
             surfix = 'DETENTION'
         }
         //### 20201009 END   指摘票No165対応 ############################################################
+        //### 20201110 START 指摘票No198対応 ############################################################
+        if (fieldName === 'OTTRANSPORTFLG') {
+            surfix = 'OTTRANSPORT'
+        }
+        //### 20201110 END   指摘票No198対応 ############################################################
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;

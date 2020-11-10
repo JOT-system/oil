@@ -922,6 +922,244 @@ Public Structure CS0023XLSUPLOAD
 
     End Sub
 
+#Region "XLSアップロード(根岸営業所(タンク車回線別積込予定表))"
+    ''' <summary>
+    ''' XLSアップロード(根岸営業所(タンク車回線別積込予定表))
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub CS0023XLSUPLOAD_NEGISHI_LOADPLAN(ByRef dt As DataTable, Optional ByRef useFlg As String = Nothing)
+
+        If IsNothing(dt) Then
+            dt = New DataTable
+        End If
+
+        If dt.Columns.Count <> 0 Then
+            dt.Columns.Clear()
+        End If
+
+        dt.Clear()
+
+        '■共通宣言
+        Dim CS0011LOGWRITE As New CS0011LOGWrite                'LogOutput DirString Get
+        Dim CS0021PROFXLS As New CS0021PROFXLS                  'プロファイル(帳票)取得
+        Dim CS0028STRUCT As New CS0028STRUCT                    '構造取得
+        Dim CS0050SESSION As New CS0050SESSION                  'セッション情報操作処理
+
+        Dim excelName As String = Nothing                       ' ファイル保管場所(ファイル名含む)
+        Dim excelFileName As String = Nothing                   ' ファイル名
+        Dim excelSheetName As String = Nothing                  ' シート名
+        Dim oXls As Excel.Application = Nothing                 ' Excelオブジェクト
+        Dim oWBooks As Excel.Workbooks = Nothing                ' Workbookオブジェクト
+        Dim oWBook As Excel.Workbook = Nothing                  ' Workbookオブジェクト
+        Dim oSheets As Excel.Sheets = Nothing                   ' sheets オブジェクト
+        Dim oSheet As Excel.Worksheet = Nothing                 ' Worksheet オブジェクト
+        Dim rng As Excel.Range = Nothing                        ' Range オブジェクト
+
+        oXls = New Excel.Application()
+        'oXls.Visible = True ' 確認のためExcelのウィンドウを表示する
+
+        '★ファイルパスからファイル名を取得
+        For Each tempFile As String In Directory.GetFiles(CS0050SESSION.UPLOAD_PATH & "\UPLOAD_TMP\" & CS0050SESSION.USERID, "*.*")
+            excelName = tempFile
+            excelFileName = Path.GetFileName(excelName)
+            excelSheetName = excelFileName.Substring(0, 4)
+            Exit For
+        Next
+
+        '★Excelファイルをオープンする
+        Try
+            oWBooks = oXls.Workbooks
+            '2020/07/16三宅コメント 任意ファイルすぎるので外部リンク更新メッセージ抑止と読み取り専用モードの引数は追加
+            oWBook = oWBooks.Open(excelName, UpdateLinks:=False, ReadOnly:=True)
+
+        Catch ex As Exception
+            'EXCEL OPENエラー
+            ERR = C_MESSAGE_NO.EXCEL_OPEN_ERROR
+
+            CS0011LOGWRITE.INFSUBCLASS = "CS0023XLSUPLOAD_NEGISHI_LOADPLAN" 'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "Excel_Open"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = ERR
+            CS0011LOGWRITE.CS0011LOGWrite()                      'ログ出力
+
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+            Exit Sub
+        End Try
+        Try
+            '★与えられたワークシート名から、Worksheetオブジェクトを得る
+            Dim sheetName As String = excelSheetName
+
+            oSheets = oWBook.Worksheets
+            '2020/7/16三宅メモ ↓oWBook.Sheets(1) か(0)で確か先頭のシートになります「getSheetIndex(sheetName, oSheets)」は不要
+            'oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
+            oSheet = CType(oSheets.Item(1), Excel.Worksheet)
+
+            '◯DataTable作成(タンク車回線別積込予定表)
+            'useFlg = "0"
+            dtNegishiLoadPlan(dt, excelFileName, oSheet, rng)
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' DataTable作成(タンク車回線別積込予定表)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub dtNegishiLoadPlan(ByRef dt As DataTable,
+                                   ByVal excelFileName As String,
+                                   ByVal oSheet As Excel.Worksheet,
+                                   ByVal rng As Excel.Range)
+
+        '★セルの内容を取得
+        '### ヘッダー情報取得用 START #################################################################################
+        Dim sCellTitleYMDC As String = ""
+        'Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K", "L", "M", "N"}
+        Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K"}
+        Dim sCellTitleYMD() As String = {"", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleYMDL As String = ""
+        Dim sCellTitlePointYoko() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
+        Dim sCellTitleLine() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleArrstation() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleTrainNo() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        '### ヘッダー情報取得用 END   #################################################################################
+
+        '### 明細情報取得用 START #####################################################################################
+        Dim sCellDetailYoko1() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
+        Dim sCellDetailYoko2() As String = {"F", "H", "J", "L", "N", "P", "R", "T", "V", "X", "Z", "AB", "AD", "AF"}
+        '### 明細情報取得用 END   #####################################################################################
+
+        Try
+            '◯ヘッダー情報取得
+            '★日付(年月日(曜日))※作成日
+            rng = oSheet.Range("AE2")
+            sCellTitleYMDC = rng.Text.ToString()
+            rng = oSheet.Range("AF2")
+            sCellTitleYMDC += rng.Text.ToString()
+
+            Dim i As Integer = 0
+            '★日付(年月日(曜日))※積込日
+            For Each sCellTitleYokorow As String In sCellTitleYMDYoko
+                rng = oSheet.Range(sCellTitleYokorow + "3")
+                sCellTitleYMD(i) = rng.Text.ToString()
+                sCellTitleYMDL += rng.Text.ToString()
+                i += 1
+            Next
+
+            '★ポイント(回線・着駅・列車)
+            i = 0
+            For Each sCellTitlePointYokorow As String In sCellTitlePointYoko
+                rng = oSheet.Range(sCellTitlePointYokorow + "4")
+                sCellTitleLine(i) = rng.Text.ToString()
+                rng = oSheet.Range(sCellTitlePointYokorow + "5")
+                sCellTitleArrstation(i) = rng.Text.ToString()
+                rng = oSheet.Range(sCellTitlePointYokorow + "6")
+                sCellTitleTrainNo(i) = rng.Text.ToString()
+                i += 1
+            Next
+
+            '◯フッター情報取得
+            '### 特になし #######################
+
+            '◯明細情報取得
+            ExcelUploadNLoadPlanItemSet(dt)
+
+            '明細行の開始
+            Dim jStart As Integer = 7
+            '明細行の終了
+            Dim jEnd As Integer = 21
+            i = 0
+            '明細のポイント
+            Dim jPoint As Integer = 1
+            '全明細の件数用
+            Dim j As Integer = 0
+
+            '★EXCELデータをDataTableにセット
+            For Each sCellTitleLinerow As String In sCellTitleLine
+                jStart = 7
+                jPoint = 1
+                For z As Integer = 0 To jEnd
+                    dt.Rows.Add(dt.NewRow())
+                    dt.Rows(j)("FILENAME") = excelFileName
+                    dt.Rows(j)("DATERECEIVEYMD") = Date.Parse(sCellTitleYMDC).ToString("yyyy/MM/dd")
+                    dt.Rows(j)("LODDATE") = Date.Parse(sCellTitleYMDL).ToString("yyyy/MM/dd")
+                    dt.Rows(j)("LINE_HEADER") = sCellTitleLine(i)
+                    dt.Rows(j)("ARRSTATION_HEADER") = sCellTitleArrstation(i)
+                    dt.Rows(j)("TRAINNO_HEADER") = sCellTitleTrainNo(i)
+
+                    dt.Rows(j)("POINT") = jPoint
+                    rng = oSheet.Range(sCellDetailYoko1(i) + jStart.ToString())
+                    dt.Rows(j)("OIL_DETAIL") = rng.Text.ToString()
+                    rng = oSheet.Range(sCellDetailYoko2(i) + jStart.ToString())
+                    dt.Rows(j)("TANKNO_DETAIL") = rng.Text.ToString()
+                    rng = oSheet.Range(sCellDetailYoko2(i) + (jStart + 1).ToString())
+                    dt.Rows(j)("TRAINNO_DETAIL") = rng.Text.ToString()
+
+                    jStart += 2
+                    jPoint += 1
+                    j += 1
+                Next
+                i += 1
+            Next
+
+            '★指定された列車の再設定
+            Dim svTraiNo As String = ""
+            Dim reg = New Regex("[①-⑨]")
+            Dim regHalf = New Regex("[^０-９]")
+            For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
+                If svTraiNo = "" Then
+                    svTraiNo = reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "")
+                ElseIf svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
+                    svTraiNo = ""
+                Else
+                    dtrow("TRAINNO_DETAIL") = svTraiNo
+                End If
+                dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
+                dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))
+            Next
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+            'Excelリリース
+            ExcelMemoryRelease(rng)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' アップロード項目設定
+    ''' </summary>
+    Private Sub ExcelUploadNLoadPlanItemSet(ByRef dt As DataTable)
+        '◯明細情報取得
+        '　フィールド名とフィールドの型を設定
+        dt.Columns.Add("FILENAME", Type.GetType("System.String"))
+        dt.Columns.Add("DATERECEIVEYMD", Type.GetType("System.String"))
+        dt.Columns.Add("LODDATE", Type.GetType("System.String"))
+        dt.Columns.Add("LINE_HEADER", Type.GetType("System.String"))
+        dt.Columns.Add("ARRSTATION_HEADER", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNO_HEADER", Type.GetType("System.String"))
+        dt.Columns.Add("POINT", Type.GetType("System.Int32"))
+        dt.Columns.Add("OIL_DETAIL", Type.GetType("System.String"))
+        dt.Columns.Add("TANKNO_DETAIL", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNO_DETAIL", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
+        dt.Columns.Add("TANKNO", Type.GetType("System.String"))
+
+    End Sub
+#End Region
+
+#Region "XLSアップロード(貨車連結順序表(臨海鉄道))"
     ''' <summary>
     ''' XLSアップロード(貨車連結順序表(臨海鉄道))
     ''' </summary>
@@ -1100,7 +1338,7 @@ Public Structure CS0023XLSUPLOAD
             sCellFooter(2) = rng.Text.ToString()
 
             '◯明細情報取得
-            ExcelUploadItemSet(dt)
+            ExcelUploadRLinkItemSet(dt)
 
             '明細行の開始
             Dim jStart As Integer = 9
@@ -1214,7 +1452,7 @@ Public Structure CS0023XLSUPLOAD
             sCellFooter(2) = rng.Text.ToString()
 
             '◯明細情報取得
-            ExcelUploadItemSet(dt)
+            ExcelUploadRLinkItemSet(dt)
 
             '明細行の開始
             Dim jStart As Integer = 9
@@ -1331,7 +1569,7 @@ Public Structure CS0023XLSUPLOAD
             sCellFooter(2) = rng.Text.ToString()
 
             '◯明細情報取得
-            ExcelUploadItemSet(dt)
+            ExcelUploadRLinkItemSet(dt)
 
             '明細行の開始
             Dim jStart As Integer = 12
@@ -1447,7 +1685,7 @@ Public Structure CS0023XLSUPLOAD
             sCellFooter(2) = rng.Text.ToString()
 
             '◯明細情報取得
-            ExcelUploadItemSet(dt)
+            ExcelUploadRLinkItemSet(dt)
 
             '明細行の開始
             Dim jStart As Integer = 9
@@ -1541,7 +1779,7 @@ Public Structure CS0023XLSUPLOAD
     ''' <summary>
     ''' アップロード項目設定
     ''' </summary>
-    Private Sub ExcelUploadItemSet(ByRef dt As DataTable)
+    Private Sub ExcelUploadRLinkItemSet(ByRef dt As DataTable)
         '◯明細情報取得
         '　フィールド名とフィールドの型を設定
         dt.Columns.Add("RLINKNO", Type.GetType("System.String"))
@@ -1579,6 +1817,7 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("EXTEND", Type.GetType("System.String"))
         dt.Columns.Add("CONVERSIONTOTAL", Type.GetType("System.String"))
     End Sub
+#End Region
 
     ''' <summary>
     ''' Excel操作のメモリ開放

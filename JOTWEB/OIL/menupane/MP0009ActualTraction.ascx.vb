@@ -147,9 +147,10 @@ Public Class MP0009ActualTraction
         sqlStat.AppendLine("              ,DTL.CARSNUMBER")
         sqlStat.AppendLine("          FROM COM.OIS0021_CALENDAR CAL with(nolock)")
         sqlStat.AppendLine("     LEFT JOIN OIL.OIT0002_ORDER ODR  with(nolock)")
-        sqlStat.AppendLine("            ON CAL.WORKINGYMD =  ODR.LODDATE")
-        sqlStat.AppendLine("           AND CAL.DELFLG     =  @DELFLG")
-        sqlStat.AppendLine("           AND ODR.DELFLG     =  @DELFLG")
+        sqlStat.AppendLine("            ON CAL.WORKINGYMD  =  ODR.LODDATE")
+        sqlStat.AppendLine("           AND CAL.DELFLG      =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.DELFLG      =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.ORDERSTATUS <> @ORDERSTATUS")
         sqlStat.AppendLine("           AND ODR.LODDATE IS NOT NULL")
         sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL  with(nolock)")
         sqlStat.AppendLine("            ON ODR.ORDERNO = DTL.ORDERNO")
@@ -163,7 +164,7 @@ Public Class MP0009ActualTraction
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.ddlActualTractionOffice.SelectedValue
                 .Add("@ARRSTATION", SqlDbType.NVarChar).Value = Me.ddlActualTractionArrStation.SelectedValue
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-
+                .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
             Dim fieldList As String = ""
             Dim firldListWithIsNull As String = ""

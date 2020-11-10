@@ -54,7 +54,7 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
         '書き込むファイルを開く
         'Dim sr As New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
         Me.CsvSW = New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
@@ -147,7 +147,92 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
         End Try
 
     End Function
+    ''' <summary>
+    ''' シーケンスファイル作成メソッド
+    ''' </summary>
+    ''' <param name="writeHeader"></param>
+    ''' <param name="blnFrame"></param>
+    ''' <param name="delm"></param>
+    ''' <returns></returns>
+    Public Function CreateSequence(writeHeader As Boolean,
+                                   Optional ByVal blnFrame As Boolean = False,
+                                   Optional ByVal delm As String = ",") As String
+        Dim colCount As Integer = Me.OutputDef.OutputFiledList.Count
+        Dim lastColIndex As Integer = colCount - 1
+        Dim i As Integer
 
+        Try
+            'ヘッダを書き込む
+            If writeHeader Then
+                For i = 0 To colCount - 1
+                    'ヘッダの取得
+                    Dim field As String = Me.OutputDef.OutputFiledList.Keys(i)
+                    '"で囲む
+                    If blnFrame = True Then
+                        field = EncloseDoubleQuotesIfNeed(field)
+                    End If
+                    'フィールドを書き込む
+                    Me.CsvSW.Write(field)
+                    'カンマを書き込む
+                    If lastColIndex > i Then
+                        Me.CsvSW.Write(delm)
+                    End If
+                Next
+                '改行する
+                Me.CsvSW.Write(vbCrLf)
+            End If
+            If OutputDef.OutputReservedCustomOutputFiledHeader <> "" Then
+                Me.CsvSW.Write(OutputDef.OutputReservedCustomOutputFiledHeader)
+                Me.CsvSW.Write(vbCrLf)
+            End If
+            'レコードを書き込む
+            Dim row As DataRow
+            For Each row In Me.CsvData.Rows
+                For i = 0 To colCount - 1
+                    Dim fieldName As String = Me.OutputDef.OutputFiledList.Keys(i)
+                    If Me.CsvData.Columns.Contains(fieldName) = False Then
+                        Return ""
+                    End If
+                    'フィールドの取得
+                    Dim field As String = Convert.ToString(row(fieldName))
+                    '"で囲む
+                    If blnFrame = True Then
+                        field = EncloseDoubleQuotesIfNeed(field)
+                    End If
+                    'フィールドを書き込む
+                    Me.CsvSW.Write(field)
+                    'カンマを書き込む
+                    If lastColIndex > i Then
+                        Me.CsvSW.Write(delm)
+                    End If
+                Next
+                '改行する
+                Me.CsvSW.Write(vbCrLf)
+            Next
+            '閉じる
+            Me.CsvSW.Close()
+
+            '★指定フォルダが設定されている場合
+            If Me.UploadFilePath <> "" Then
+                '作成したファイルを指定フォルダに配置する。
+                System.IO.File.Copy(Me.UploadTmpFilePath, Me.UploadFilePath)
+            End If
+
+            ''ストリーム生成
+            'Using fs As New IO.FileStream(Me.UploadTmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            '    Dim binaryLength = Convert.ToInt32(fs.Length)
+            '    ReDim retByte(binaryLength)
+            '    fs.Read(retByte, 0, binaryLength)
+            '    fs.Flush()
+            'End Using
+            Return UrlRoot & Me.UploadTmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+
+        End Try
+    End Function
     ''' <summary>
     ''' 必要ならば、文字列をダブルクォートで囲む
     ''' </summary>

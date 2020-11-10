@@ -32,7 +32,7 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
         sqlOrderStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
         sqlOrderStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
-        sqlOrderStat.AppendLine("    OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,BTRAINNO,BTRAINNAME,")
+        sqlOrderStat.AppendLine("    OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,BTRAINNO,BTRAINNAME,ANASYORIFLG,")
         sqlOrderStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlOrderStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
         sqlOrderStat.AppendLine("    VALUES")
@@ -50,7 +50,7 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
         sqlOrderStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
         sqlOrderStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
-        sqlOrderStat.AppendLine("    @OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,@BTRAINNO,@BTRAINNAME,")
+        sqlOrderStat.AppendLine("    @OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,@BTRAINNO,@BTRAINNAME,@ANASYORIFLG,")
         sqlOrderStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlOrderStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
@@ -156,6 +156,15 @@ Public Class EntryHistory
                 .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = drOrder("TAKUSOUSTATUS")
                 .Add("BTRAINNO", SqlDbType.NVarChar).Value = drOrder("BTRAINNO")
                 .Add("BTRAINNAME", SqlDbType.NVarChar).Value = drOrder("BTRAINNAME")
+                Try
+                    .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
+                Catch ex As Exception
+                    If .Contains("ANASYORIFLG") Then
+                        .Item("ANASYORIFLG").Value = ""
+                    Else
+                        .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
@@ -201,7 +210,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    LOADINGOUTLETTRAINNAME,LOADINGOUTLETORDER,")
         sqlDetailStat.AppendLine("    ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
         sqlDetailStat.AppendLine("    RESERVEDNO,OTSENDCOUNT,DLRESERVEDCOUNT,DLTAKUSOUCOUNT,")
-        sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,ANASYORIFLG,VOLSYORIFLG,")
         sqlDetailStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
@@ -221,7 +230,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    @LOADINGOUTLETTRAINNAME,@LOADINGOUTLETORDER,")
         sqlDetailStat.AppendLine("    @ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
         sqlDetailStat.AppendLine("    @RESERVEDNO,@OTSENDCOUNT,@DLRESERVEDCOUNT,@DLTAKUSOUCOUNT,")
-        sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@ANASYORIFLG,@VOLSYORIFLG,")
         sqlDetailStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlDetailStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
 
@@ -295,6 +304,24 @@ Public Class EntryHistory
                 .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
                 .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
                 .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
+                Try
+                    .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
+                Catch ex As Exception
+                    If .Contains("ANASYORIFLG") Then
+                        .Item("ANASYORIFLG").Value = ""
+                    Else
+                        .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
+                Try
+                    .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = drOrder("VOLSYORIFLG")
+                Catch ex As Exception
+                    If .Contains("VOLSYORIFLG") Then
+                        .Item("VOLSYORIFLG").Value = ""
+                    Else
+                        .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")

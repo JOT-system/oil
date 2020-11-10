@@ -282,6 +282,24 @@ Public Class CS0050SESSION : Implements IDisposable
     End Property
     '### 20200828 END   OT発送日報送信用追加 #########################################
     ''' <summary>
+    ''' 印刷先URLのルート名
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property PRINT_ROOT_URL_NAME As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Dim retVal As String = Convert.ToString(SESSION(C_SESSION_KEY.PRINT_ROOT_URL_NAME))
+            If retVal.Trim = "" Then
+                retVal = "PRINT"
+            End If
+            Return retVal
+        End Get
+        Set(value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.PRINT_ROOT_URL_NAME) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' APサーバ端末ID
     ''' </summary>
     ''' <value></value>

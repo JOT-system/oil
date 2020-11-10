@@ -8636,7 +8636,8 @@ Public Class OIT0003OrderDetail
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
             & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO        = @P03" _
-            & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, SHIPPERSCODE  = @P23, SHIPPERSNAME = @P24" _
+            & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, OTTRANSPORTFLG = @P46" _
+            & "        , SHIPPERSCODE        = @P23, SHIPPERSNAME         = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE  = @P35" _
             & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE     = @P39, JOINT        = @P08" _
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
@@ -8848,7 +8849,12 @@ Public Class OIT0003OrderDetail
                     PARA53.Value = "2"                                '留置可否フラグ(1:留置あり 2:留置なし)
                     PARA42.Value = "2"                                '先返し可否フラグ(1:先返しあり 2:先返しなし)
                     PARA45.Value = "2"                                '後返し可否フラグ(1:後返しあり 2:後返しなし)
-                    PARA46.Value = "2"                                'OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
+                    '# OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
+                    If OIT0003row("OTTRANSPORTFLG") = "on" Then
+                        PARA46.Value = "1"
+                    Else
+                        PARA46.Value = "2"
+                    End If
 
                     '# 積込日(実績)
                     If OIT0003row("ACTUALLODDATE") = "" Then

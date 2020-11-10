@@ -64,6 +64,12 @@ Public Class OIT0003OrderDetail
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
     Private Const CONST_PATTERNERR As String = "PATTEN ERR"         '関連チェックエラー
 
+    '○ (一覧)発送順をタブ<タンク車割当>⇒タブ<タンク車明細>にて必須入力対象の列車番号
+    Private Const CONST_GOI_TRAINNO_8681 As String = "8681"         '8681レ
+    Private Const CONST_GOI_TRAINNO_8883 As String = "8883"         '8883レ
+    Private Const CONST_GOI_TRAINNO_8685 As String = "8685"         '8685レ
+    Private Const CONST_KINOENE_TRAINNO_8685 As String = "8685"
+
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
@@ -14846,22 +14852,39 @@ Public Class OIT0003OrderDetail
             '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
             '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
             If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
-                '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
-                '(一覧)発送順(空白チェック)
-                If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
 
-                    WW_CheckMES1 = "発送順未設定エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                    O_RTN = "ERR"
-                    Exit Sub
+                '### 20201110 START 指摘票対応(No218)全体 #############################################################
+                If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+
+                    '### タブ<タンク車割当>でのチェックは不要(※タブ<タンク車明細>にて必須チェックとする) #############
+                    WW_SHIPORDER = "0"
+
+                Else
+                    '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+                    '(一覧)発送順(空白チェック)
+                    If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
+
+                        WW_CheckMES1 = "発送順未設定エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                        O_RTN = "ERR"
+                        Exit Sub
+                    End If
+                    '### END  #############################################################################################
+
+                    '★数値(大文字)で設定されている場合は、数値(小文字)に変換する。
+                    OIT0003row("SHIPORDER") = StrConv(OIT0003row("SHIPORDER"), VbStrConv.Narrow)
+
                 End If
-                '### END  #############################################################################################
-
-                '★数値(大文字)で設定されている場合は、数値(小文字)に変換する。
-                OIT0003row("SHIPORDER") = StrConv(OIT0003row("SHIPORDER"), VbStrConv.Narrow)
-
+                '### 20201110 END   指摘票対応(No218)全体 #############################################################
             End If
 
             '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施

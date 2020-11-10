@@ -1316,6 +1316,38 @@ Public Class OIT0002LinkList
             '○ UPLOAD XLSデータ取得
             CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
 
+            '○必須項目チェック(本線列車設定時のチェック)
+            For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+                Dim iTrainNo As Integer
+                Dim dtLodDate As Date
+                Dim dtDepDate As Date
+                Try
+                    iTrainNo = Integer.Parse(OIT0002EXLUProw("LOADINGTRAINNO"))
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した本線列車が数値ではありません。再度確認をおねがいします。", needsPopUp:=True)
+                    WW_ERRCODE = "ERR"
+                    Exit For
+                End Try
+                Try
+                    dtLodDate = Date.Parse(OIT0002EXLUProw("LOADINGLODDATE"))
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した積込日の日付形式が不正です。再度確認をおねがいします。", needsPopUp:=True)
+                    WW_ERRCODE = "ERR"
+                    Exit For
+                End Try
+                Try
+                    dtDepDate = Date.Parse(OIT0002EXLUProw("LOADINGDEPDATE"))
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した発日の日付形式が不正です。再度確認をおねがいします。", needsPopUp:=True)
+                    WW_ERRCODE = "ERR"
+                    Exit For
+                End Try
+            Next
+            If WW_ERRCODE = "ERR" Then Exit Sub
+
             '◯列車分解報告(運用指示書あり)、またはポラリス投入用の場合
             Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
             If useFlg = "2" OrElse useFlg = "4" Then
@@ -4156,12 +4188,13 @@ Public Class OIT0002LinkList
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO <> ''")
 
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
-                        '★発駅が異なる場合はSKIP
-                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
-                        '★着駅が異なる場合はSKIP
-                        If OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+                        '★発駅・着駅が異なる場合はSKIP
+                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") _
+                            AndAlso OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+
                         '★甲子営業所の場合は、チェック不要と判断し一旦SKIP
                         If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
+
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _

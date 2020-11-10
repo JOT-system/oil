@@ -4385,6 +4385,24 @@ Public Class OIT0003OrderDetail
                 Next
                 '### 20200626 END   (一覧)積置をチェックした場合の表示方法を変更 ###################
 
+            '    ### 20200717 START((全体)No199対応) ######################################
+            Case "WF_CheckBoxSELECTOTTRANSPORT"
+                '◯ 輸送形態区分が"M"(請負OT混載)以外の場合
+                If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                    Exit Select
+                End If
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+                    If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl.Rows(i)("OTTRANSPORTFLG") = "on" Then
+                            OIT0003tbl.Rows(i)("OTTRANSPORTFLG") = ""
+                        Else
+                            OIT0003tbl.Rows(i)("OTTRANSPORTFLG") = "on"
+                        End If
+                    End If
+                Next
+                '### 20200717 END  ((全体)No199対応) ######################################
+
             Case Else
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl.Rows.Count - 1

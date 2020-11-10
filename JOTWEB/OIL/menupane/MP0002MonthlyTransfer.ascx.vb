@@ -302,19 +302,23 @@ Public Class MP0002MonthlyTransfer
     ''' <param name="dt"></param>
     Private Function SetView001(dt As DataTable) As List(Of DataTable)
         Dim targetTbl As DataTable = Nothing
+        Dim repeaterTbl As DataTable = Nothing
         Dim qTarget = (From dr As DataRow In dt Order By Convert.ToString(dr("OILCODE")) Ascending)
         If qTarget.Any Then
             targetTbl = qTarget.CopyToDataTable
+            repeaterTbl = targetTbl.Clone
+            For Each dr As DataRow In targetTbl.Rows
+                Dim addRow As DataRow = repeaterTbl.NewRow
+                addRow.ItemArray = dr.ItemArray
+                repeaterTbl.Rows.Add(addRow)
+            Next
+            If repeaterTbl.Rows.Count > 0 Then
+                Dim appendDr = CreateDispRow(targetTbl, repeaterTbl)
+                appendDr("OILNAME") = "計"
+                repeaterTbl.Rows.Add(appendDr)
+            End If
         End If
-        Dim repeaterTbl As DataTable = targetTbl.Clone
-        For Each dr As DataRow In targetTbl.Rows
-            Dim addRow As DataRow = repeaterTbl.NewRow
-            addRow.ItemArray = dr.ItemArray
-            repeaterTbl.Rows.Add(addRow)
-        Next
-        Dim appendDr = CreateDispRow(targetTbl, repeaterTbl)
-        appendDr("OILNAME") = "計"
-        repeaterTbl.Rows.Add(appendDr)
+
         Me.repMonthTrans.DataSource = repeaterTbl ' targetTbl
         Me.repMonthTrans.DataBind()
         With Me.chtMonthTrans

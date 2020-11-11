@@ -29,6 +29,7 @@ Public Class OIT0003OrderList
     Private OIT0003ReportKinoenetbl As DataTable                    '帳票用(甲子)テーブル
     Private OIT0003ReportSodegauratbl As DataTable                  '帳票用(袖ヶ浦)テーブル
     Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
+    Private OIT0003ReportPlanFrame As DataTable                     '帳票用(計画枠用)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
     Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
 
@@ -3034,10 +3035,23 @@ Public Class OIT0003OrderList
 
             'ダウンロードボタン(出荷予定(根岸))押下
             Case CONST_RPT_SHIPPLAN
+                '### 20201111 START 指摘票No193(全体)対応 #####################################################
+                '******************************
+                '帳票表示(計画枠)データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelPlanFrameDataGet(SQLcon)
+                End Using
+                '### 20201111 END   指摘票No193(全体)対応 #####################################################
+
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text, dtFT:=OIT0003ItemGettbl)
+                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text,
+                                                                 dtFT:=OIT0003ItemGettbl,
+                                                                 dtPF:=OIT0003ReportPlanFrame)
                     Catch ex As Exception
                         Return
                     End Try
@@ -4223,6 +4237,77 @@ Public Class OIT0003OrderList
 
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003ReportSodegauratbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(計画枠)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelPlanFrameDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003ReportPlanFrame) Then
+            OIT0003ReportPlanFrame = New DataTable
+        End If
+
+        If OIT0003ReportPlanFrame.Columns.Count <> 0 Then
+            OIT0003ReportPlanFrame.Columns.Clear()
+        End If
+
+        OIT0003ReportPlanFrame.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　出荷予定表(計画枠)取得用SQL
+        Dim SQLStr As String =
+            " SELECT " _
+            & "   OIM0003.OFFICECODE                             AS OFFICECODE" _
+            & " , OIM0003.SHIPPERCODE                            AS SHIPPERCODE" _
+            & " , OIM0003.OILCODE                                AS OILCODE" _
+            & " , OIM0003.OILNAME                                AS OILNAME" _
+            & " , OIM0003.SEGMENTOILCODE                         AS SEGMENTOILCODE" _
+            & " , OIM0003.SEGMENTOILNAME                         AS SEGMENTOILNAME" _
+            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , OIM0003.SHIPPINGPLAN                           AS SHIPPINGPLAN" _
+            & " , '0'                                            AS DELFLG" _
+            & " FROM oil.OIM0003_PRODUCT OIM0003 " _
+            & " WHERE " _
+            & "     OIM0003.OFFICECODE = @P01 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6) '受注営業所コード
+                PARA01.Value = BaseDllConst.CONST_OFFICECODE_011402
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportPlanFrame.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportPlanFrame.Load(SQLdr)
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LNEGISHI PLANFRAME_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LNEGISHI PLANFRAME_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0003ReportPlanFrame)
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)

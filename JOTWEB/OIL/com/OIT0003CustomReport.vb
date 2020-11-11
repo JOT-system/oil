@@ -1132,7 +1132,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String, ByVal lodDate As String, Optional ByVal dtFT As DataTable = Nothing) As String
+    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String,
+                                                ByVal lodDate As String,
+                                                Optional ByVal dtFT As DataTable = Nothing,
+                                                Optional ByVal dtPF As DataTable = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -1142,7 +1145,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '***** TODO処理 ここから *****
             If repPtn = "SHIPPLAN" Then
                 '◯ヘッダーの設定
-                EditNegishiShipHeaderArea(lodDate, dtFT)
+                EditNegishiShipHeaderArea(lodDate, dtFT, dtPF)
                 '◯明細の設定
                 EditNegishiShipDetailArea()
             ElseIf repPtn = "LOADPLAN" Then
@@ -1181,7 +1184,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
-    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String, ByVal dtFT As DataTable)
+    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String, ByVal dtFT As DataTable, ByVal dtPF As DataTable)
         Dim rngHeaderArea As Excel.Range = Nothing
         'Dim valueYear As String = Now.AddDays(1).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
         'Dim valueMonth As String = Now.AddDays(1).ToString("MM", New Globalization.CultureInfo("ja-JP"))
@@ -1200,6 +1203,45 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '日
             rngHeaderArea = Me.ExcelWorkSheet.Range("H3")
             rngHeaderArea.Value = valueDay
+
+            '### 20201105 START 指摘票対応(No193) ####################################################################
+            '#枠(計画)
+            Dim iTTank As Integer = 0
+            For Each dtPFrow As DataRow In dtPF.Rows
+                Select Case Convert.ToString(dtPFrow("OILCODE"))
+                    'HG
+                    Case BaseDllConst.CONST_HTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E61")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'RG
+                    Case BaseDllConst.CONST_RTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E62")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    '灯油、未添加灯油
+                    Case BaseDllConst.CONST_TTank,
+                         BaseDllConst.CONST_MTTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E63")
+                        iTTank += Integer.Parse(Convert.ToString(dtPFrow("SHIPPINGPLAN")))
+                        rngHeaderArea.Value = iTTank
+                    '軽油
+                    Case BaseDllConst.CONST_KTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E65")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    '3号軽油
+                    Case BaseDllConst.CONST_K3Tank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E66")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'A重油
+                    Case BaseDllConst.CONST_ATank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E67")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'LSA
+                    Case BaseDllConst.CONST_LTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E68")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                End Select
+            Next
+            '### 20201105 START 指摘票対応(No193) ####################################################################
 
             '### 20201105 START 指摘票対応(No191) ####################################################################
             '積込日

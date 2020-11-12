@@ -410,7 +410,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim strTotalTankSave As String = ""
 
         Try
-            Dim z() As Integer = {5, 32, 59, 86}
+            '### 20201112 START 行数追加に伴い開始行を変更 ##########
+            'Dim z() As Integer = {5, 32, 59, 86}
+            Dim z() As Integer = {5, 49, 93, 137}
+            '### 20201112 END   行数追加に伴い開始行を変更 ##########
             Dim j As Integer = 0
             Dim i As Integer = z(j)
             Dim lineNo As Integer = 1

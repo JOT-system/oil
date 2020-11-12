@@ -1376,22 +1376,32 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("INSPECTIONDATE") = rng.Text.ToString()
 
                 ' ### 運送指示書(項目) START ####################################
+                '### 20201111 START 指摘票対応(No190)全体 #######################
                 rng = oSheet.Range("K" + jStart.ToString())
-                dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                dt.Rows(i)("OBJECTIVENAME") = rng.Text.ToString()
+                '### 20201111 START 指摘票対応(No190)全体 #######################
                 rng = oSheet.Range("L" + jStart.ToString())
-                dt.Rows(i)("LINE") = rng.Text.ToString()
+                dt.Rows(i)("OILNAME") = rng.Text.ToString()
                 rng = oSheet.Range("M" + jStart.ToString())
-                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                dt.Rows(i)("LINE") = rng.Text.ToString()
                 rng = oSheet.Range("N" + jStart.ToString())
-                dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                dt.Rows(i)("POSITION") = rng.Text.ToString()
                 rng = oSheet.Range("O" + jStart.ToString())
+                dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                rng = oSheet.Range("P" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
-                rng = oSheet.Range("Q" + jStart.ToString())
-                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
                 rng = oSheet.Range("R" + jStart.ToString())
-                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
                 rng = oSheet.Range("S" + jStart.ToString())
+                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                rng = oSheet.Range("T" + jStart.ToString())
                 dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
+                '### 20201111 START 指摘票対応(No190)全体 #######################
+                rng = oSheet.Range("U" + jStart.ToString())
+                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
+                rng = oSheet.Range("V" + jStart.ToString())
+                dt.Rows(i)("FORWARDINGCONFIGURE") = rng.Text.ToString()
+                '### 20201111 START 指摘票対応(No190)全体 #######################
                 ' ### 運送指示書(項目) END   ####################################
 
                 dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
@@ -1803,6 +1813,9 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("ARTICLE", Type.GetType("System.String"))
 
         ' ### 運送指示書(項目) START ####################################
+        '### 20201111 START 指摘票対応(No190)全体 #######################
+        dt.Columns.Add("OBJECTIVENAME", Type.GetType("System.String")).DefaultValue = ""
+        '### 20201111 END   指摘票対応(No190)全体 #######################
         dt.Columns.Add("OILNAME", Type.GetType("System.String"))
         dt.Columns.Add("LINE", Type.GetType("System.String"))
         dt.Columns.Add("POSITION", Type.GetType("System.String"))
@@ -1811,6 +1824,10 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGDEPDATE", Type.GetType("System.String"))
+        '### 20201111 START 指摘票対応(No190)全体 #######################
+        dt.Columns.Add("FORWARDINGARRSTATION", Type.GetType("System.String"))
+        dt.Columns.Add("FORWARDINGCONFIGURE", Type.GetType("System.String"))
+        '### 20201111 END   指摘票対応(No190)全体 #######################
         ' ### 運送指示書(項目) END   ####################################
 
         dt.Columns.Add("CURRENTCARTOTAL", Type.GetType("System.String"))

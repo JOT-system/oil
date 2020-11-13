@@ -1815,6 +1815,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONALERT" _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , ''                                             AS EMPTYTURNFLG" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
@@ -1930,6 +1931,7 @@ Public Class OIT0003OrderDetail
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '" + C_INSPECTIONALERT.ALERT_GREEN + "'" _
                 & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
+                & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')                       AS EMPTYTURNFLG" _
                 & " , ISNULL(RTRIM(OIT0003.STACKINGORDERNO), '')                    AS STACKINGORDERNO" _
                 & " , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '')" _
                 & "   WHEN '1' THEN 'on'" _
@@ -2096,6 +2098,8 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                '〇 一覧の件数取得
+                Dim intListCnt As Integer = OIT0003tbl.Rows.Count
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
@@ -2106,23 +2110,28 @@ Public Class OIT0003OrderDetail
                         CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                     End If
 
-                    ''★貨車連結順序アップロードから作成された新規受注データの場合
-                    '& " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')                       AS EMPTYTURNFLG" _
-                    'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                    '    AndAlso OIT0003row("EMPTYTURNFLG") = "3" Then
-                    '    '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合は値を設定
-                    '    '　※上記以外(2:発送対象外)については、入力しないため値は未入力。
-                    '    If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
-                    '        OIT0003row("SHIPORDER") = i    '発送順
-                    '    End If
+                    '★貨車連結順序アップロードから作成された新規受注データの場合
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                        AndAlso OIT0003row("EMPTYTURNFLG") = "3" Then
 
-                    '    '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
-                    '    '　※上記以外の営業所については、入力しないため値は未入力。
-                    '    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                    '        OIT0003row("LINEORDER") = i    '貨物駅入線順
+                        '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
+                        '　※上記以外の営業所については、入力しないため値は未入力。
+                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                            Try
+                                '発送順を自動設定(貨物駅入線順の値の逆値を設定する)
+                                OIT0003row("SHIPORDER") = (intListCnt - Integer.Parse(OIT0003row("LINEORDER")) + 1)
+                            Catch ex As Exception
+                                OIT0003row("SHIPORDER") = ""
+                            End Try
+                        End If
 
-                    '    End If
-                    'End If
+                        'OIT0003row("LINEORDER") = i    '貨物駅入線順
+                        ''◯列車マスタ(発送順区分)が対象(1:発送対象)の場合は値を設定
+                        ''　※上記以外(2:発送対象外)については、入力しないため値は未入力。
+                        'If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+                        '    OIT0003row("SHIPORDER") = i    '発送順
+                        'End If
+                    End If
 
                 Next
             End Using
@@ -2231,6 +2240,7 @@ Public Class OIT0003OrderDetail
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10" _
             & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
+            & " , ISNULL(RTRIM(TMP0001.EMPTYTURNFLG), '')                       AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(TMP0001.STACKINGORDERNO), '')                    AS STACKINGORDERNO" _
             & " , CASE ISNULL(RTRIM(TMP0001.STACKINGFLG), '')" _
             & "   WHEN '1' THEN 'on'" _
@@ -5422,6 +5432,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONALERT" _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , ''                                             AS EMPTYTURNFLG" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _

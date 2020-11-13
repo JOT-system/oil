@@ -6167,6 +6167,9 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
 
+        '★ 各タブ(一覧)の再表示処理
+        ReDisplayTabList()
+
         '〇 受注ステータスが"310:手配完了"へ変更された場合
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             WF_DTAB_CHANGE_NO.Value = "2"

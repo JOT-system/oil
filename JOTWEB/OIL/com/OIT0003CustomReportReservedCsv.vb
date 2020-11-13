@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 出荷予約CSV出力クラス（テキストベース）
 ''' </summary>
 Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
@@ -150,37 +151,17 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
     ''' <summary>
     ''' シーケンスファイル作成メソッド
     ''' </summary>
-    ''' <param name="writeHeader"></param>
     ''' <param name="blnFrame"></param>
     ''' <param name="delm"></param>
     ''' <returns></returns>
-    Public Function CreateSequence(writeHeader As Boolean,
-                                   Optional ByVal blnFrame As Boolean = False,
-                                   Optional ByVal delm As String = ",") As String
+    Public Function CreateSequence(Optional ByVal blnFrame As Boolean = False,
+                                   Optional ByVal delm As String = "") As String
         Dim colCount As Integer = Me.OutputDef.OutputFiledList.Count
         Dim lastColIndex As Integer = colCount - 1
         Dim i As Integer
 
         Try
             'ヘッダを書き込む
-            If writeHeader Then
-                For i = 0 To colCount - 1
-                    'ヘッダの取得
-                    Dim field As String = Me.OutputDef.OutputFiledList.Keys(i)
-                    '"で囲む
-                    If blnFrame = True Then
-                        field = EncloseDoubleQuotesIfNeed(field)
-                    End If
-                    'フィールドを書き込む
-                    Me.CsvSW.Write(field)
-                    'カンマを書き込む
-                    If lastColIndex > i Then
-                        Me.CsvSW.Write(delm)
-                    End If
-                Next
-                '改行する
-                Me.CsvSW.Write(vbCrLf)
-            End If
             If OutputDef.OutputReservedCustomOutputFiledHeader <> "" Then
                 Me.CsvSW.Write(OutputDef.OutputReservedCustomOutputFiledHeader)
                 Me.CsvSW.Write(vbCrLf)
@@ -189,12 +170,15 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
             Dim row As DataRow
             For Each row In Me.CsvData.Rows
                 For i = 0 To colCount - 1
+
                     Dim fieldName As String = Me.OutputDef.OutputFiledList.Keys(i)
+                    Dim fieldLength As Integer = Me.OutputDef.OutputFiledList(fieldName)
                     If Me.CsvData.Columns.Contains(fieldName) = False Then
                         Return ""
                     End If
                     'フィールドの取得
                     Dim field As String = Convert.ToString(row(fieldName))
+                    field = PaddingRightSpace(field, fieldLength)
                     '"で囲む
                     If blnFrame = True Then
                         field = EncloseDoubleQuotesIfNeed(field)
@@ -267,7 +251,31 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
             field.EndsWith(" ") OrElse
             field.EndsWith(vbTab)
     End Function
-
+    ''' <summary>
+    ''' 全角混在、文字数オーバーした場合はカットする関数
+    ''' </summary>
+    ''' <param name="targetString">対象文字列</param>
+    ''' <param name="length">設定バイト数</param>
+    ''' <returns></returns>
+    Private Function PaddingRightSpace(targetString As String, length As Integer) As String
+        Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        '最大Length×2分の追加スペースを一旦追加
+        Dim additionalSpace As String = Space(length * 2)
+        Dim editString As String = targetString & additionalSpace
+        '入力文字列を切り取りバイト配列に格納
+        Dim bArray() As Byte = DirectCast(Array.CreateInstance(GetType(Byte), length), Byte())
+        Dim st1 As String = enc.GetString(bArray)
+        Array.Copy(enc.GetBytes(editString), 0, bArray, 0, length)
+        '切り取った結果をバイト配列に格納
+        Dim resString As String = enc.GetString(bArray)
+        '最後が全角の1バイト分の場合はLengthが1少ない為、１スペース分足す
+        Dim resLength = enc.GetByteCount(resString) - 1
+        If resLength = length + 1 Then
+            Return resString & " "
+        Else
+            Return resString
+        End If
+    End Function
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには
 

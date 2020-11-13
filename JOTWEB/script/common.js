@@ -2357,9 +2357,11 @@ function commonBindEnterToVerticalTabStep() {
             if (textBoxes.length === j + 1) {
                 // 最後のテキストボックスは先頭のフィールド
                 nextTextFieldName = textBoxes[0].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[0].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             } else if (textBoxes.length > j + 1) {
                 nextTextFieldName = textBoxes[j + 1].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[j + 1].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             }
 

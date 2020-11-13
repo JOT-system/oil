@@ -791,7 +791,7 @@ Public Class OIT0003OTLinkageList
                         If FileLinkagePatternItem.ReserveOutputFileType.Csv = settings.ReservedOutputType Then
                             url = repCbj.ConvertDataTableToCsv(False)
                         Else
-                            url = repCbj.CreateSequence(False)
+                            url = repCbj.CreateSequence()
                         End If
 
                         If url = "" Then
@@ -1609,6 +1609,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , ''  AS SEQ_TOKUISAKI_KANA") 'シーケンス得意先名（略称カナ）
         sqlStat.AppendLine("     , ''  AS SEQ_HAISOU_KANA") 'シーケンス配送先名（略称カナ）
         sqlStat.AppendLine("     , ''  AS SEQ_HINMEI_KANA") 'シーケンス品名コード（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_TAXKBN_KANA") '税区分名（略称カナ）（略称カナ）
         sqlStat.AppendLine("     , Format(GetDate(),'yyyyMMddHHmm')  AS SEQ_CREATEDATETIME") 'シーケンスデータ作成年月日時分
         sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '046'  ELSE '071' END  AS SEQ_PLANTCODE") 'シーケンス当社基地コード
         sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
@@ -1747,10 +1748,10 @@ Public Class OIT0003OTLinkageList
             End Using
             Return retVal
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL TAKUSOU_DATAGET")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL RESERVED_DATAGET")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL TAKUSOU_DATAGET"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL RESERVED_DATAGET"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2400,6 +2401,19 @@ Public Class OIT0003OTLinkageList
                     .Add("SEQ_KAIJI", 1)
                     .Add("SEQ_DEN_NO", 5)
                     .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
                 End With
                 '実績要求ファイル用フィールド
                 outRequestFieldList = New Dictionary(Of String, Integer)
@@ -2493,6 +2507,47 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "012401", True, True, True
                     )
+                outFieldList = New Dictionary(Of String, Integer)
+                With outFieldList
+                    .Add("SEQ_DATATYPE_RESERVED", 3)
+                    .Add("SEQ_PROC_KBN", 2)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
+                End With
+                fileLinkageItem.OutputFiledList = outFieldList
+                fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = "COSSO"
+                fileLinkageItem.OutputReservedFileExtention = "SEQ"
+                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Seq
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '三重塩浜営業所

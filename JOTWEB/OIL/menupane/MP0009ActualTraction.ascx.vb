@@ -152,6 +152,7 @@ Public Class MP0009ActualTraction
         sqlStat.AppendLine("           AND ODR.DELFLG      =  @DELFLG")
         sqlStat.AppendLine("           AND ODR.ORDERSTATUS <> @ORDERSTATUS")
         sqlStat.AppendLine("           AND ODR.LODDATE IS NOT NULL")
+        sqlStat.AppendLine("           AND ODR.OFFICECODE  = @OFFICECODE")
         sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL  with(nolock)")
         sqlStat.AppendLine("            ON ODR.ORDERNO = DTL.ORDERNO")
         sqlStat.AppendLine("           AND DTL.DELFLG     =  @DELFLG")

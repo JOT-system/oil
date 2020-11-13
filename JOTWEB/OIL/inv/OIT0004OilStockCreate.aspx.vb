@@ -1370,14 +1370,14 @@ Public Class OIT0004OilStockCreate
         Dim dateTo As String = qdataVal.Last    '過去日ではない内最後
         'ACCDATE[受入日（予定）]を元に取得（変更の場合は条件と抽出両方の項目忘れずに）
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("  　 , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("  　 , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS AMOUNT")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.LODDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
         sqlStr.AppendLine("   AND ODR.ACTUALLODDATE is not null")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
@@ -1394,7 +1394,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -2190,14 +2190,14 @@ Public Class OIT0004OilStockCreate
         Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
 
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         '荷主取得条件(JOINTコード考慮)↓
@@ -2213,7 +2213,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE

@@ -1895,6 +1895,8 @@ Public Class OIT0002LinkList
 
                         'ElseIf useFlg = "1" Then
                     ElseIf useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "1" Then
+                        'タンク車指示(運用指示)
+                        OBJECTIVENAME.Value = OIT0002EXLUProw("OBJECTIVENAME")
                         '油種(運用指示)
                         OILNAME.Value = ""
                         '回転(運用指示)
@@ -1911,6 +1913,11 @@ Public Class OIT0002LinkList
                         LOADINGLODDATE.Value = DBNull.Value
                         '発日(運用指示)
                         LOADINGDEPDATE.Value = DBNull.Value
+                        '回送先(着駅)(回送用)
+                        FORWARDINGARRSTATION.Value = OIT0002EXLUProw("FORWARDINGARRSTATION")
+                        '回送先(その他)(回送用)
+                        FORWARDINGCONFIGURE.Value = OIT0002EXLUProw("FORWARDINGCONFIGURE")
+
                     End If
                     ' ### 運送指示書(項目) END   ####################################
 

@@ -9655,8 +9655,24 @@ Public Class OIT0003OrderDetail
                     & "        LOADINGIRILINEORDER     = @P08, " _
                     & "        LOADINGOUTLETTRAINNO    = @P09, " _
                     & "        LOADINGOUTLETTRAINNAME  = @P10, " _
-                    & "        LOADINGOUTLETORDER      = @P11, " _
-                    & "        UPDYMD                  = @P12, " _
+                    & "        LOADINGOUTLETORDER      = @P11, "
+
+            '### 20201110 START 指摘票対応(No218)全体 #############################################################
+            If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+                SQLStr &=
+                      "        SHIPORDER               = @P16, "
+            End If
+            '### 20201110 END   指摘票対応(No218)全体 #############################################################
+
+            SQLStr &=
+                      "        UPDYMD                  = @P12, " _
                     & "        UPDUSER                 = @P13, " _
                     & "        UPDTERMID               = @P14, " _
                     & "        RECEIVEYMD              = @P15  " _
@@ -9670,6 +9686,7 @@ Public Class OIT0003OrderDetail
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '受注№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '受注明細No
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
+            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '回線
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '充填ポイント
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '積込入線列車番号
@@ -9688,6 +9705,31 @@ Public Class OIT0003OrderDetail
                 PARA01.Value = OIT0003tab2row("ORDERNO")
                 PARA02.Value = OIT0003tab2row("DETAILNO")
                 PARA03.Value = C_DELETE_FLG.DELETE
+
+                '### 20201110 START 指摘票対応(No218)全体 #############################################################
+                If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+
+                    '○発送順を営業所別で自動設定
+                    Select Case Me.TxtOrderOfficeCode.Text
+                        Case BaseDllConst.CONST_OFFICECODE_011201
+                            '★五井営業所の場合
+                            '　入線順⇒発送順に設定
+                            PARA16.Value = OIT0003tab2row("LOADINGIRILINEORDER")
+                        Case BaseDllConst.CONST_OFFICECODE_011202
+                            '★甲子営業所の場合
+                            '　出線順⇒発送順に設定
+                            PARA16.Value = OIT0003tab2row("LOADINGOUTLETORDER")
+                    End Select
+                End If
+                '### 20201110 END   指摘票対応(No218)全体 #############################################################
+
                 PARA04.Value = OIT0003tab2row("LINE")
                 PARA05.Value = OIT0003tab2row("FILLINGPOINT")
                 PARA06.Value = OIT0003tab2row("LOADINGIRILINETRAINNO")

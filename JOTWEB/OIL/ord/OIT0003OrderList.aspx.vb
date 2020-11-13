@@ -4152,7 +4152,8 @@ Public Class OIT0003OrderList
 
         SQLStr &=
               " WHERE OIT0002.OFFICECODE = @P01 " _
-            & " AND OIT0002.LODDATE = @P03 "
+            & " AND OIT0002.LODDATE = @P03 " _
+            & " AND OIT0002.ORDERSTATUS <> @P05 "
 
         SQLStr &=
               " ORDER BY" _
@@ -4166,6 +4167,7 @@ Public Class OIT0003OrderList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)  '積込入線列車番号
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011203
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -4174,6 +4176,7 @@ Public Class OIT0003OrderList
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
                 PARA04.Value = rTrainNo
+                PARA05.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

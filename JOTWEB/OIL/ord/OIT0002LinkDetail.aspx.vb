@@ -52,6 +52,10 @@ Public Class OIT0002LinkDetail
 
     '○ 貨車連結順序表ダウンロード用
     Private WW_ARTICLENAME() As String = {"検", "○"}               '品名
+    Private WW_OBJECTIVENAME() As String = {"残車",
+                                            "交検",
+                                            "回送(全検)",
+                                            "回送(その他)"}         '指示内容
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -2129,10 +2133,19 @@ Public Class OIT0002LinkDetail
             & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
             & " , OIT0011.EXTEND                                 AS EXTEND" _
             & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
+            & " , OIT0011.OBJECTIVENAME                          AS OBJECTIVENAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201021 START 指摘票対応(No189)全体 #############################################
+        SQLStr &=
+              " , OIT0005_LASTOIL.LASTOILCODE                    AS LASTOILCODE" _
+            & " , OIT0005_LASTOIL.LASTOILNAME                    AS LASTOILNAME" _
+            & " , OIT0005_LASTOIL.PREORDERINGTYPE                AS PREORDERINGTYPE" _
+            & " , OIT0005_LASTOIL.PREORDERINGOILNAME             AS PREORDERINGOILNAME"
+        '### 20201021 END   指摘票対応(No189)全体 #############################################
 
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
@@ -2150,9 +2163,23 @@ Public Class OIT0002LinkDetail
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
-            & " , OIT0002.TRAINNO                                AS ORDERTRAINNO " _
-            & " , FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')          AS ORDERLODDATE " _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')          AS ORDERDEPDATE " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGTRAINNO" _
+            & "   ELSE OIT0002.TRAINNO" _
+            & "   END                                            AS ORDERTRAINNO " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGLODDATE" _
+            & "   ELSE FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')" _
+            & "   END                                            AS ORDERLODDATE " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGDEPDATE" _
+            & "   ELSE FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')" _
+            & "   END                                            AS ORDERDEPDATE " _
+            & " , OIT0011.FORWARDINGARRSTATION                   AS FORWARDINGARRSTATION" _
+            & " , OIT0011.FORWARDINGCONFIGURE                    AS FORWARDINGCONFIGURE" _
             & " , OIT0002.ORDERNO                                AS ORDERNO " _
             & " , OIT0003.DETAILNO                               AS DETAILNO " _
             & " , ''                                             AS ORDERTRKBN " _
@@ -2189,6 +2216,13 @@ Public Class OIT0002LinkDetail
                 & " AND OIT0005.TANKSITUATION = @TANKSITUATION " _
                 & " AND OIT0005.DELFLG <> @DELFLG "
         '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+        '### 20201021 START 指摘票対応(No189)全体 #############################################
+        SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005_LASTOIL ON " _
+                & "     OIT0011.TRUCKNO = OIT0005_LASTOIL.TANKNUMBER " _
+                & " AND OIT0005_LASTOIL.DELFLG <> @DELFLG "
+        '### 20201021 END   指摘票対応(No189)全体 #############################################
 
         SQLStr &=
               " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _

@@ -3110,6 +3110,7 @@ Public Class OIT0002LinkList
             & "        , LODDATE         = @LODDATE      , DEPDATE        = @DEPDATE" _
             & "        , ARRDATE         = @ARRDATE      , ACCDATE        = @ACCDATE" _
             & "        , EMPARRDATE      = @EMPARRDATE" _
+            & "        , BTRAINNO        = @BTRAINNO     , BTRAINNAME     = @BTRAINNAME" _
             & "        , UPDYMD          = @UPDYMD       , UPDUSER        = @UPDUSER" _
             & "        , UPDTERMID       = @UPDTERMID    , RECEIVEYMD     = @RECEIVEYMD" _
             & "    WHERE" _
@@ -4253,7 +4254,7 @@ Public Class OIT0002LinkList
                 '★本線列車が設定されているデータが対象
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO <> ''")
                     '★ポラリス(託送指示)が選択されている場合はSKIP
-                    If Convert.ToString(OIT0002EXLUPtbl("OBJECTIVENAME")) <> "" Then Continue For
+                    If Convert.ToString(OIT0002EXLUProw("OBJECTIVENAME")) <> "" Then Continue For
 
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
                         '★発駅・着駅が異なる場合はSKIP

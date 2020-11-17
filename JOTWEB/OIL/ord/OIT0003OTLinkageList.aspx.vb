@@ -787,11 +787,13 @@ Public Class OIT0003OTLinkageList
                 'CSV出力
                 Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings, settings.OutputReservedFileNameWithoutExtention, settings.OutputReservedFileExtention)
                     Dim url As String
+                    Dim url2 As String = ""
                     Try
                         If FileLinkagePatternItem.ReserveOutputFileType.Csv = settings.ReservedOutputType Then
                             url = repCbj.ConvertDataTableToCsv(False)
                         Else
                             url = repCbj.CreateSequence()
+                            url2 = repCbj.CreateSequenceRequest()
                         End If
 
                         If url = "" Then
@@ -810,6 +812,13 @@ Public Class OIT0003OTLinkageList
                     End Try
                     '○ 別画面でExcelを表示
                     WF_PrintURL.Value = url
+                    If url2 <> "" Then
+                        Dim url2Obj As New HiddenField
+                        url2Obj.EnableViewState = False
+                        url2Obj.ID = "WF_PrintURL2"
+                        url2Obj.Value = url2
+                        Me.Form.Controls.Add(url2Obj)
+                    End If
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
             Else
@@ -2378,11 +2387,10 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011201", True, True, True
                     )
-                '予約ファイル用フィールド
                 outFieldList = New Dictionary(Of String, Integer)
                 With outFieldList
-                    .Add("SEQ_DATATYPE_RESERVED", 3)
-                    .Add("SEQ_PROC_KBN", 2)
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
                     .Add("LODDATE_WITHOUT_SLASH", 8)
                     .Add("SEQ_DEPT_CODE", 2)
                     .Add("OUTPUTRESERVENO", 3)
@@ -2415,13 +2423,12 @@ Public Class OIT0003OTLinkageList
                     .Add("SEQ_CONSIGNEECODE", 6)
                     .Add("SEQ_YOBI", 109)
                 End With
-                '実績要求ファイル用フィールド
-                outRequestFieldList = New Dictionary(Of String, Integer)
-                With outRequestFieldList
-
-                End With
+                fileLinkageItem.OutputFiledList = outFieldList
+                fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = "COSSO"
+                fileLinkageItem.OutputReservedFileExtention = "SEQ"
+                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Seq
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
-                outRequestFieldList = Nothing
                 '***************************
                 '甲子営業所
                 '***************************
@@ -2461,7 +2468,7 @@ Public Class OIT0003OTLinkageList
                 outFieldList.Add("CONSIGNEECONVCODE", 0)
                 outFieldList.Add("CONSIGNEECONVVALUE", 0)
                 outFieldList.Add("SOD_SHIPPEROILCODE", 0)
-                outFieldList.Add("SHIPPEROILNAME", 0)
+                outFieldList.Add("REPORTOILNAME", 0)
                 outFieldList.Add("SOD_TAX_KBN", 0)
                 outFieldList.Add("SOD_RESERVEDQUANTITY", 0)
                 outFieldList.Add("SOD_TRANS_COMP", 0)
@@ -2509,8 +2516,8 @@ Public Class OIT0003OTLinkageList
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 With outFieldList
-                    .Add("SEQ_DATATYPE_RESERVED", 3)
-                    .Add("SEQ_PROC_KBN", 2)
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
                     .Add("LODDATE_WITHOUT_SLASH", 8)
                     .Add("SEQ_DEPT_CODE", 2)
                     .Add("OUTPUTRESERVENO", 3)

@@ -132,6 +132,7 @@ function dropEvent(e, acceptExtentions) {
     // ポップアップ表示している場合はアップロードスキップ
     let canUploadObj = document.getElementById('hdnUpdateConfirmIsActive');
     if (canUploadObj.value === '1') {
+        commonHideWait();
         return;
     }
     // ********************************

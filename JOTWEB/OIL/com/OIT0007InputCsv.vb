@@ -46,6 +46,9 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
         ElseIf Me.InputSettings.OfficeCode = "011402" Then
             '根岸ファイル読み取り
             Return Read011402Negi()
+        ElseIf {"011201", "012401"}.Contains(Me.InputSettings.OfficeCode) Then
+            '五井、四日市SEQファイルと判定
+            Return ReadSeqFile()
         Else
             Return Nothing
         End If
@@ -149,6 +152,97 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
             End While
         End Using
         Return retVal
+    End Function
+    ''' <summary>
+    ''' シーケンスファイルより入力データアイテムリストクラスに変換
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function ReadSeqFile() As List(Of OIT0007FileInputList.InputDataItem)
+        Dim dt As DataTable = ReadSeqToDataTable()
+        Dim lineNo As Integer = 1
+        Dim retVal As New List(Of OIT0007FileInputList.InputDataItem)
+        For Each dr As DataRow In dt.Rows
+            Dim itmData As New OIT0007FileInputList.InputDataItem
+            itmData.InpRowNum = lineNo
+            '実績積込日（更新対象）
+            Dim lodDateStr As String = Convert.ToString(dr("LODDATE_WITHOUT_SLASH"))
+            If IsNumeric(lodDateStr) AndAlso lodDateStr.Length = 8 Then
+                itmData.UpdActualLodDate = CInt(lodDateStr).ToString("0000/00/00") 'スラッシュ無し年月日をスラッシュ付きに変換
+            End If
+            itmData.InpReservedNo = Convert.ToString(dr("OUTPUTRESERVENO"))
+            itmData.InpTnkNo = Convert.ToString(dr("SEQ_TANKNO"))
+            itmData.InpOilTypeName = Convert.ToString(dr("SHIPPEROILCODE"))
+            itmData.InpCarsAmount = Convert.ToString(dr("SEQ_ACCTUAL_AMOUNT"))
+            If IsNumeric(itmData.InpCarsAmount) AndAlso itmData.InpCarsAmount.Length = 5 Then
+                '小数点なしの為左２桁＆小数点＆右３桁で文字連結
+                itmData.InpCarsAmount = Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3) & "." & Right(itmData.InpCarsAmount, 3)
+            Else
+                'それ以外は書式エラーとする
+                itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
+            End If
+            '取り込んだ予約番号を積込予定日と予約番号３桁に分離
+            If IsNumeric(itmData.InpReservedNo) AndAlso itmData.InpReservedNo.Length = 3 Then
+                itmData.LodDate = itmData.UpdActualLodDate
+                itmData.ReservedNo = CInt(itmData.InpReservedNo).ToString("000")
+            End If
+            retVal.Add(itmData)
+            lineNo = lineNo + 1
+        Next dr
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 設定に合せシーケンスファイルを読み取り
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function ReadSeqToDataTable() As DataTable
+        Dim retDt As DataTable = Nothing
+        Dim enc = System.Text.Encoding.GetEncoding("Shift-JIS")
+        Dim lineNo As Integer = 1
+        Dim retVal As New List(Of OIT0007FileInputList.InputDataItem)
+        Dim lineStr As String = ""
+        'SEQファイルは改行なし１行の為、行ループで読み込まない
+        Using sr As New IO.StreamReader(Me.Fs, enc)
+            If sr.EndOfStream Then
+                Return retDt
+            End If
+            '1行読み取り
+            lineStr = sr.ReadLine()
+        End Using
+        '1行のバイト数が各フィールドのLength合計の倍数でない場合は対象外ファイルと判定
+        Dim recLength = (From itm In Me.InputSettings.InputFiledList Select itm.Value).Sum
+        Dim lineLength = enc.GetByteCount(lineStr)
+        If lineLength Mod recLength <> 0 Then
+            Return retDt
+        End If
+        '少なくともLengthにのっとったSEQの為処理開始
+        retDt = New DataTable
+        '********************************************
+        '*テーブルカラム生成
+        '********************************************
+        For Each fldItem In Me.InputSettings.InputFiledList
+            Dim colItem As New DataColumn(fldItem.Key, GetType(String))
+            retDt.Columns.Add(colItem)
+        Next
+        Dim curLength As Integer = recLength
+        Dim lineBytedata As Byte() = enc.GetBytes(lineStr)
+        Do
+            Dim startPosition = curLength - recLength
+            '一行分切り出し
+            Dim rowString = enc.GetString(lineBytedata, startPosition, recLength)
+            Dim rowByteData As Byte() = enc.GetBytes(rowString)
+            Dim dr As DataRow = retDt.NewRow
+            '読み込みフィールドリストループ
+            Dim startFieldPos As Integer = 0
+            For Each fldItem In Me.InputSettings.InputFiledList
+                Dim fieldString As String = enc.GetString(rowByteData, startFieldPos, fldItem.Value)
+                dr(fldItem.Key) = fieldString.Trim
+                startFieldPos = startFieldPos + fldItem.Value
+            Next
+            retDt.Rows.Add(dr)
+            curLength = curLength + recLength
+        Loop Until curLength > lineLength
+
+        Return retDt
     End Function
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには

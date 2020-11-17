@@ -57,11 +57,16 @@ Public Class OIT0007FileInputList
                     'End If
                     Dim outPutInfo = FileUploaded()
                     outPutInfo = GetOrderUpdateOrderInfo(outPutInfo)
-                    'TODO outPutInfoの数が0なら対象外ファイルを上げたと想定
+
                     Me.WF_FILENAMELIST.Value = ""
                     '○ 一覧再表示処理
                     Master.RecoverTable(OIT0007tbl)
                     DisplayGrid()
+                    'TODO outPutInfoの数が0なら対象外ファイルを上げたと想定
+                    If outPutInfo Is Nothing OrElse outPutInfo.Count = 0 Then
+                        Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ERR, "正しい出荷実績ファイルをアップロードしてください。", needsPopUp:=True)
+                        Return
+                    End If
                     '更新確認に値を設定
                     Me.repUpdateList.DataSource = outPutInfo
                     Me.repUpdateList.DataBind()
@@ -1391,8 +1396,12 @@ Public Class OIT0007FileInputList
                     tankNo = Convert.ToString(targetRow("NEG_KASHANO"))
                 Case "011203"
                     '袖ヶ浦
-                    oilName = Convert.ToString(targetRow("SHIPPEROILNAME"))
+                    oilName = Convert.ToString(targetRow("REPORTOILNAME"))
                     tankNo = Convert.ToString(targetRow("OLDTANKNUMBER"))
+                Case "011201", "012401"
+                    '五井、四日市
+                    oilName = Convert.ToString(targetRow("SHIPPEROILCODE"))
+                    tankNo = Convert.ToString(targetRow("SEQ_TANKNO"))
             End Select
 
             '油種不一致チェック
@@ -1472,17 +1481,59 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("     , FXOST.VALUE1   AS ORDERSTATUS_NAME")
         sqlStat.AppendLine("     , DET.CARSAMOUNT ")
         sqlStat.AppendLine("     , PRD.OILNAME ")
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '06' ELSE '08' END AS SEQ_DEPT_CODE") 'シーケンスファイル支店コード
+        sqlStat.AppendLine("     , '03'         AS SEQ_TORIKBN") 'シーケンスファイル取引区分コード
+        sqlStat.AppendLine("     , '00000'         AS SEQ_TOKUISAKI") 'シーケンスファイル得意先コード
+        sqlStat.AppendLine("     , format(ODR.ARRDATE,'yyyyMMdd') AS ARRDATE_WITHOUT_SLASH")     '積車着日(スラなし）
+        sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
+        sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '0011'  ELSE '0012' END AS SEQ_UKEHARAI_CODE") 'シーケンスファイル受払い基地コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        sqlStat.AppendLine("     , '1'           AS SEQ_TRANSWAY") 'シーケンスファイル輸送方法
+        sqlStat.AppendLine("     , CASE WHEN TRA.TRAINCLASS = 'O'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND DET.OTTRANSPORTFLG = '1'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '011201'")
+        sqlStat.AppendLine("                 THEN '022'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '012401'")
+        sqlStat.AppendLine("                 THEN '017'")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
+        sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキタキ243000'")
+        sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        sqlStat.AppendLine("            ELSE '000000'")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
+        sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
+        sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
+        sqlStat.AppendLine("     , '00000' AS SEQ_ACCTUAL_AMOUNT") 'シーケンス実績数量
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_BEGIN_TIME") 'シーケンス荷役開始時刻
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") 'シーケンス荷役終了時刻
+        sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4)  AS SEQ_TRAINNO") 'シーケンス列車番号
+        sqlStat.AppendLine("     , ''  AS SEQ_TOKUISAKI_KANA") 'シーケンス得意先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HAISOU_KANA") 'シーケンス配送先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HINMEI_KANA") 'シーケンス品名コード（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_TAXKBN_KANA") '税区分名（略称カナ）（略称カナ）
+        sqlStat.AppendLine("     , Format(GetDate(),'yyyyMMddHHmm')  AS SEQ_CREATEDATETIME") 'シーケンスデータ作成年月日時分
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '046'  ELSE '071' END  AS SEQ_PLANTCODE") 'シーケンス当社基地コード
+        sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
+        sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
+        sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
         sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
-        sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR WITH(nolock)")
         '明細結合ここから↓
-        sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
+        sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET WITH(nolock)")
         sqlStat.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
         sqlStat.AppendLine("   AND DET.DELFLG  = @DELFLG")
         '明細結合ここまで↑
         '油種マスタ結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0003_PRODUCT PRD")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0003_PRODUCT PRD WITH(nolock)")
         sqlStat.AppendLine("    ON PRD.OFFICECODE     = ODR.OFFICECODE")
         sqlStat.AppendLine("   AND PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
         sqlStat.AppendLine("   AND PRD.PLANTCODE      = ODR.BASECODE")
@@ -1491,12 +1542,21 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("   AND PRD.DELFLG         = @DELFLG")
         '油種マスタ結合ここまで↑
         'タンク車マスタ結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK WITH(nolock)")
         sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
         sqlStat.AppendLine("   AND TNK.DELFLG      = @DELFLG")
         'タンク車マスタ結合ここまで↑
+        '列車マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0007_TRAIN TRA WITH(nolock)")
+        sqlStat.AppendLine("    ON TRA.OFFICECODE  = @OFFICECODE")
+        sqlStat.AppendLine("   And TRA.TRAINNO     = ODR.TRAINNO")
+        sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
+        sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
+        sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
+        '列車マスタ結合ここまで↑
         '積込予約マスタ結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0021_LOADRESERVE LRV")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0021_LOADRESERVE LRV WITH(nolock)")
         sqlStat.AppendLine("    ON LRV.OFFICECODE     = ODR.OFFICECODE")
         sqlStat.AppendLine("   AND ODR.LODDATE        BETWEEN LRV.FROMYMD AND LRV.TOYMD")
         sqlStat.AppendLine("   AND LRV.LOAD           = TNK.LOAD")
@@ -1505,21 +1565,21 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("   AND LRV.DELFLG         = @DELFLG")
         '積込予約マスタ結合ここまで↑
         '変換マスタ（荷受人）結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CCNV")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CCNV WITH(nolock)")
         sqlStat.AppendLine("    ON CCNV.CLASS          = 'RESERVED_NIUKE'")
         sqlStat.AppendLine("   AND CCNV.KEYCODE01      = ODR.OFFICECODE")
         sqlStat.AppendLine("   AND CCNV.KEYCODE02      = ODR.CONSIGNEECODE")
         sqlStat.AppendLine("   AND CCNV.DELFLG         = @DELFLG")
         '変換マスタ（荷受人）結合ここまで↑
         '変換マスタ（荷主）結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT SCNV")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT SCNV WITH(nolock)")
         sqlStat.AppendLine("    ON SCNV.CLASS          = 'RESERVED_SHIPPER'")
         sqlStat.AppendLine("   AND SCNV.KEYCODE01      = ODR.OFFICECODE")
         sqlStat.AppendLine("   AND SCNV.KEYCODE02      = ODR.SHIPPERSCODE")
         sqlStat.AppendLine("   AND SCNV.DELFLG         = @DELFLG")
         '変換マスタ（荷主）結合ここまで↑
         '固定値マスタ（受注ステータス）結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN COM.OIS0015_FIXVALUE FXOST")
+        sqlStat.AppendLine(" LEFT JOIN COM.OIS0015_FIXVALUE FXOST WITH(nolock)")
         sqlStat.AppendLine("    ON FXOST.CAMPCODE   = '01'")
         sqlStat.AppendLine("   AND FXOST.CLASS      = 'ORDERSTATUS'")
         sqlStat.AppendLine("   AND FXOST.KEYCODE    = ODR.ORDERSTATUS")
@@ -1529,9 +1589,11 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("   AND ODR.OFFICECODE   = @OFFICECODE")
         sqlStat.AppendLine("   AND ( ")
         Dim isFirst As Boolean = True
+        Dim hasCondition As Boolean = False
         For Each inpItem In inpData
             '予約番号や積込予定日がない事はありえないが念の為スキップ
-            If inpItem.ReservedNo = "" OrElse inpItem.LodDate = "" Then
+            If inpItem.ReservedNo = "" OrElse inpItem.LodDate = "" OrElse
+               IsDate(inpItem.LodDate) = False Then
                 Continue For
             End If
 
@@ -1541,7 +1603,12 @@ Public Class OIT0007FileInputList
             Else
                 sqlStat.AppendFormat("         OR  ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
             End If
+            hasCondition = True
         Next
+        If hasCondition = False Then
+            '予約番号、受注日の条件が全くないので不一致になる条件を付与
+            sqlStat.AppendLine("'0'='1'")
+        End If
         sqlStat.AppendLine("       )")
 
         Try
@@ -1632,7 +1699,7 @@ Public Class OIT0007FileInputList
             Me._Item = New Dictionary(Of String, FileLinkagePatternItem)
             Dim fileLinkageItem As FileLinkagePatternItem
             With Me._Item
-                Dim outFieldList As Dictionary(Of String, Integer)
+                Dim inpFieldList As Dictionary(Of String, Integer)
                 '***************************
                 '仙台新港営業所
                 '***************************
@@ -1646,6 +1713,44 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011201", False
                     )
+                inpFieldList = New Dictionary(Of String, Integer)
+                With inpFieldList
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
+                End With
+                fileLinkageItem.InputFiledList = inpFieldList
+                fileLinkageItem.InputExtention = "seq"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '甲子営業所
@@ -1653,17 +1758,7 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011202", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("KINO_DATAKBN", 0)
-                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("KINO_TRAINNO", 0)
-                outFieldList.Add("REPORTOILNAME", 0)
-                outFieldList.Add("RESERVEDQUANTITY", 0)
-                outFieldList.Add("KINO_TOKUISAKICODE", 0)
-                outFieldList.Add("KINO_TOKUISAKINAME", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("CONSIGNEECONVVALUE", 0)
+
                 fileLinkageItem.InputExtention = "csv"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
@@ -1672,24 +1767,6 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011203", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("SOD_STATUS", 0)
-                outFieldList.Add("SOD_SHELL_ORDERNO", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("LODDATE", 0)
-                outFieldList.Add("SOD_TRANS_KBN", 0)
-                outFieldList.Add("SHIPPERCONVCODE", 0)
-                outFieldList.Add("SHIPPERCONVVALUE", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("CONSIGNEECONVVALUE", 0)
-                outFieldList.Add("SOD_SHIPPEROILCODE", 0)
-                outFieldList.Add("SHIPPEROILNAME", 0)
-                outFieldList.Add("SOD_TAX_KBN", 0)
-                outFieldList.Add("SOD_RESERVEDQUANTITY", 0)
-                outFieldList.Add("SOD_TRANS_COMP", 0)
-                outFieldList.Add("OLDTANKNUMBER", 0)
-                outFieldList.Add("TRANSNAME", 0)
-                outFieldList.Add("SOD_BACKNAME", 0)
                 fileLinkageItem.InputExtention = "xlsx"
                 'ヘッダー必要なら↓のコメントOFF
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
@@ -1699,18 +1776,6 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011402", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_KAI", 0)
-                outFieldList.Add("TRAINNO_PAD_ZERO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_POINT", 0)
-                outFieldList.Add("NEG_KASHANO", 0)
-                outFieldList.Add("NEG_SHIPPEROILCODE", 0)
-                outFieldList.Add("NEG_SETTEI_NUM", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("NEG_ARM_CODE", 0)
-                outFieldList.Add("NEG_TSUMI_NUM", 0)
                 fileLinkageItem.InputExtention = "csv"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
@@ -1719,6 +1784,44 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "012401", False
                     )
+                inpFieldList = New Dictionary(Of String, Integer)
+                With inpFieldList
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
+                End With
+                fileLinkageItem.InputFiledList = inpFieldList
+                fileLinkageItem.InputExtention = "seq"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '三重塩浜営業所
@@ -1810,6 +1913,12 @@ Public Class OIT0007FileInputList
         ''' <returns></returns>
         Public Property InputConstantField As Boolean = False
         Public Property InputDelem As String = ","
+        ''' <summary> 
+        ''' 出力フィールドリスト(フィールド名、固定長用フィールドサイズ）
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>SEQファイル専用</remarks>
+        Public Property InputFiledList As Dictionary(Of String, Integer)
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス

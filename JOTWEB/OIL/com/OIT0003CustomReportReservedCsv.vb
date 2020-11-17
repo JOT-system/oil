@@ -191,7 +191,7 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
                     End If
                 Next
                 '改行する
-                Me.CsvSW.Write(vbCrLf)
+                'Me.CsvSW.Write(vbCrLf)
             Next
             '閉じる
             Me.CsvSW.Close()
@@ -217,6 +217,33 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
 
         End Try
     End Function
+    ''' <summary>
+    ''' シーケンスヘッダーファイル生成
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function CreateSequenceRequest(Optional requestFileName As String = "COSDE.SEQ") As String
+        Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        Dim filePath As String = IO.Path.Combine(Me.UploadRootPath, requestFileName)
+        Using sw As New IO.StreamWriter(filePath, False, enc)
+            'データ種別
+            sw.Write(PaddingRightSpace("90", 2))
+            '処理区分
+            sw.Write(PaddingRightSpace("0", 1))
+            '年月日
+            sw.Write(PaddingRightSpace(Strings.StrDup(8, "0"), 8))
+            '支店コード
+            Dim branch As String = "06"
+            If Me.OutputDef.OfficeCode = "012401" Then
+                branch = "08"
+            End If
+            sw.Write(PaddingRightSpace(branch, 2))
+            '予備
+            sw.Write(PaddingRightSpace(Strings.StrDup(238, "0"), 238))
+        End Using
+        Return UrlRoot & requestFileName
+
+    End Function
+
     ''' <summary>
     ''' 必要ならば、文字列をダブルクォートで囲む
     ''' </summary>
@@ -259,8 +286,8 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
     ''' <returns></returns>
     Private Function PaddingRightSpace(targetString As String, length As Integer) As String
         Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
-        '最大Length×2分の追加スペースを一旦追加
-        Dim additionalSpace As String = Space(length * 2)
+        '最大Length分の追加スペースを一旦追加
+        Dim additionalSpace As String = Space(length)
         Dim editString As String = targetString & additionalSpace
         '入力文字列を切り取りバイト配列に格納
         Dim bArray() As Byte = DirectCast(Array.CreateInstance(GetType(Byte), length), Byte())
@@ -269,9 +296,9 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
         '切り取った結果をバイト配列に格納
         Dim resString As String = enc.GetString(bArray)
         '最後が全角の1バイト分の場合はLengthが1少ない為、１スペース分足す
-        Dim resLength = enc.GetByteCount(resString) - 1
-        If resLength = length + 1 Then
-            Return resString & " "
+        Dim resLength = enc.GetByteCount(resString)
+        If length = resLength - 1 Then
+            Return resString.Substring(0, resString.Length - 1) & " "
         Else
             Return resString
         End If

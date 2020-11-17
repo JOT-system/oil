@@ -405,7 +405,7 @@ Public Class OIT0003OTLinkageList
         SQLStrNashi &=
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @P02" _
-            & "         OR OIT0002.DEPDATE     >= @P02) "
+            & "         OR OIT0002.DEPDATE     >= @TODAY) "
 
         '★積置フラグ有り用SQL
         SQLStrAri &=
@@ -450,6 +450,7 @@ Public Class OIT0003OTLinkageList
 
         Try
             Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
+            Dim today As String = Now.ToString("yyyy/MM/dd")
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)         '積込日
@@ -457,8 +458,10 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータスTO
+                Dim PARA_TODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '当日
                 'PARA01.Value = OFFICECDE
                 PARA02.Value = targetDate
+                PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
@@ -491,15 +494,19 @@ Public Class OIT0003OTLinkageList
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
-                    '積込日比較
-                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                    'OT発送日報出力可否(発日 >= 当日)
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= today Then
                         OIT0003row("CAN_OTSEND") = "1"
-                        OIT0003row("CAN_RESERVED") = "1"
                     Else
                         OIT0003row("CAN_OTSEND") = "0"
+                    End If
+                    '出荷予約出力可否(積日 >= 翌日)
+                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                        OIT0003row("CAN_RESERVED") = "1"
+                    Else
                         OIT0003row("CAN_RESERVED") = "0"
                     End If
-                    '発日比較
+                    '託送指示出力可否(発日 >= 翌日)
                     If Convert.ToString(OIT0003row("DEPDATE")) >= targetDate Then
                         OIT0003row("CAN_TAKUSOU") = "1"
                     Else

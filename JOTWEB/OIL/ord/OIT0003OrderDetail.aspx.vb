@@ -9700,7 +9700,6 @@ Public Class OIT0003OrderDetail
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '受注№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '受注明細No
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
-            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '回線
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '充填ポイント
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '積込入線列車番号
@@ -9729,6 +9728,8 @@ Public Class OIT0003OrderDetail
                         AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
                         AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+
+                    Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
 
                     '○発送順を営業所別で自動設定
                     Select Case Me.TxtOrderOfficeCode.Text

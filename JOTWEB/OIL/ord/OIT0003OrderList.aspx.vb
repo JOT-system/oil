@@ -2134,83 +2134,83 @@ Public Class OIT0003OrderList
                     CODENAME_get("ORDERSTATUS", OIT0003UPDrow("ORDERSTATUS"), OIT0003UPDrow("ORDERSTATUSNAME"), WW_DUMMY)
 
                     SQLcmd.ExecuteNonQuery()
+
+                    '### START 受注履歴テーブルの追加(2020/03/26) #############
+                    WW_InsertOrderHistory(SQLcon)
+                    '### END   ################################################
+
+                    '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
+                    For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
+                        Select Case strOrderSts
+                            Case BaseDllConst.CONST_ORDERSTATUS_100
+
+                                '### 何もしない####################
+
+                            '200:手配　～　310：手配完了
+                            Case BaseDllConst.CONST_ORDERSTATUS_200,
+                                 BaseDllConst.CONST_ORDERSTATUS_205,
+                                 BaseDllConst.CONST_ORDERSTATUS_210,
+                                 BaseDllConst.CONST_ORDERSTATUS_220,
+                                 BaseDllConst.CONST_ORDERSTATUS_230,
+                                 BaseDllConst.CONST_ORDERSTATUS_240,
+                                 BaseDllConst.CONST_ORDERSTATUS_250,
+                                 BaseDllConst.CONST_ORDERSTATUS_260,
+                                 BaseDllConst.CONST_ORDERSTATUS_270,
+                                 BaseDllConst.CONST_ORDERSTATUS_280,
+                                 BaseDllConst.CONST_ORDERSTATUS_290,
+                                 BaseDllConst.CONST_ORDERSTATUS_300,
+                                 BaseDllConst.CONST_ORDERSTATUS_305,
+                                 BaseDllConst.CONST_ORDERSTATUS_310,
+                                 BaseDllConst.CONST_ORDERSTATUS_320
+                                '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                                '引数１：所在地コード　⇒　変更なし(空白)
+                                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                                '引数３：積車区分　　　⇒　変更なし(空白)
+                                '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                                'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                '                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
+                                '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
+                                                    I_ActualEmparrDate:="", upActualEmparrDate:=True)
+
+                            '350：受注確定
+                            Case BaseDllConst.CONST_ORDERSTATUS_350
+                                StatusChk = True
+
+                                '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                                '引数１：所在地コード　⇒　変更あり(発駅)
+                                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                                '引数３：積車区分　　　⇒　変更なし(空白)
+                                WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                                    I_TANKNO:=OIT0003His2tblrow("TANKNO"),
+                                                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+
+                            '400：受入確認中, 450:受入確認中(受入日入力)
+                            Case BaseDllConst.CONST_ORDERSTATUS_400,
+                                 BaseDllConst.CONST_ORDERSTATUS_450
+
+                                '### 何もしない####################
+
+                            '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
+                            '　条件は追加しておく
+                            Case BaseDllConst.CONST_ORDERSTATUS_500,
+                                 BaseDllConst.CONST_ORDERSTATUS_550,
+                                 BaseDllConst.CONST_ORDERSTATUS_600,
+                                 BaseDllConst.CONST_ORDERSTATUS_700,
+                                 BaseDllConst.CONST_ORDERSTATUS_800,
+                                 BaseDllConst.CONST_ORDERSTATUS_900
+
+                                '### 何もしない####################
+
+                        End Select
+                    Next
                 End If
             Next
 
             'CLOSE
             SQLcmd.Dispose()
             SQLcmd = Nothing
-
-            '### START 受注履歴テーブルの追加(2020/03/26) #############
-            WW_InsertOrderHistory(SQLcon)
-            '### END   ################################################
-
-            '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
-            For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
-                Select Case strOrderSts
-                    Case BaseDllConst.CONST_ORDERSTATUS_100
-
-                        '### 何もしない####################
-
-                    '200:手配　～　310：手配完了
-                    Case BaseDllConst.CONST_ORDERSTATUS_200,
-                         BaseDllConst.CONST_ORDERSTATUS_205,
-                         BaseDllConst.CONST_ORDERSTATUS_210,
-                         BaseDllConst.CONST_ORDERSTATUS_220,
-                         BaseDllConst.CONST_ORDERSTATUS_230,
-                         BaseDllConst.CONST_ORDERSTATUS_240,
-                         BaseDllConst.CONST_ORDERSTATUS_250,
-                         BaseDllConst.CONST_ORDERSTATUS_260,
-                         BaseDllConst.CONST_ORDERSTATUS_270,
-                         BaseDllConst.CONST_ORDERSTATUS_280,
-                         BaseDllConst.CONST_ORDERSTATUS_290,
-                         BaseDllConst.CONST_ORDERSTATUS_300,
-                         BaseDllConst.CONST_ORDERSTATUS_305,
-                         BaseDllConst.CONST_ORDERSTATUS_310,
-                         BaseDllConst.CONST_ORDERSTATUS_320
-                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
-                        '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                        '                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
-                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
-                        WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
-                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
-
-                        '350：受注確定
-                    Case BaseDllConst.CONST_ORDERSTATUS_350
-                        StatusChk = True
-
-                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
-                        '引数１：所在地コード　⇒　変更あり(発駅)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"),
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
-
-                    '400：受入確認中, 450:受入確認中(受入日入力)
-                    Case BaseDllConst.CONST_ORDERSTATUS_400,
-                         BaseDllConst.CONST_ORDERSTATUS_450
-
-                        '### 何もしない####################
-
-                    '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
-                    '　条件は追加しておく
-                    Case BaseDllConst.CONST_ORDERSTATUS_500,
-                         BaseDllConst.CONST_ORDERSTATUS_550,
-                         BaseDllConst.CONST_ORDERSTATUS_600,
-                         BaseDllConst.CONST_ORDERSTATUS_700,
-                         BaseDllConst.CONST_ORDERSTATUS_800,
-                         BaseDllConst.CONST_ORDERSTATUS_900
-
-                        '### 何もしない####################
-
-                End Select
-            Next
 
             '受注進行ステータスの状態によって、貨車連結順序表を利用不可にする。
             Select Case strOrderSts

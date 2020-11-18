@@ -3408,6 +3408,7 @@ Public Class OIT0002LinkList
                 Dim sOrderContent() As String = {"", "", "", "", "", ""}
                 Dim iNum As Integer
                 Dim i As Integer = 0
+                Dim tankNoFlg As String = "0"
 
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select(Nothing, "LOADINGTRAINNAME, LOADINGLODDATE, LOADINGDEPDATE, ORDERNO, DETAILNO")
 
@@ -3415,6 +3416,7 @@ Public Class OIT0002LinkList
                     If OIT0002EXLUProw("ORDERNO").ToString() <> "" Then Continue For
                     If OIT0002EXLUProw("LOADINGTRAINNAME").ToString() = "" Then Continue For
 
+                    tankNoFlg = "0"
                     '同じ受注オーダーの場合
                     If sOrderContent(2) = OIT0002EXLUProw("OFFICECODE").ToString() _
                        AndAlso sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO").ToString() _
@@ -3422,15 +3424,27 @@ Public Class OIT0002LinkList
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
                         OIT0002EXLUProw("ORDERNO") = sOrderContent(0)
+                        '★タンク車Noと一致した明細Noを設定
                         For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
-                            'If OIT0002GETrow("ORDERINGOILNAME") = OIT0002EXLUProw("OILNAME") Then
-                            If OIT0002GETrow("TANKNO") = OIT0002EXLUProw("TRUCKNO") Then
+                            If Convert.ToString(OIT0002GETrow("TANKNO")) = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
                                 'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
                                 OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")
                                 OIT0002GETrow("USEFLG") = "1"
+                                tankNoFlg = "1"
                                 Exit For
                             End If
                         Next
+                        '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
+                        If tankNoFlg = "0" Then
+                            For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
+                                If Convert.ToString(OIT0002GETrow("ORDERINGOILNAME")) = Convert.ToString(OIT0002EXLUProw("OILNAME")) Then
+                                    'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
+                                    OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")
+                                    OIT0002GETrow("USEFLG") = "1"
+                                    Exit For
+                                End If
+                            Next
+                        End If
                         If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
                             If OIT0002GETtbl.Rows.Count = 0 Then
                                 iNum = Integer.Parse(sOrderContent(1)) + 1
@@ -3477,15 +3491,27 @@ Public Class OIT0002LinkList
                             OIT0002EXLUProw("ORDERNO") = OIT0002GETtbl.Rows(0)("ORDERNO")
                             'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO")) + 1
                             'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                            '★タンク車Noと一致した明細Noを設定
                             For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
-                                'If OIT0002GETrow("ORDERINGOILNAME") = OIT0002EXLUProw("OILNAME") Then
-                                If OIT0002GETrow("TANKNO") = OIT0002EXLUProw("TRUCKNO") Then
+                                If Convert.ToString(OIT0002GETrow("TANKNO")) = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
                                     'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
                                     OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")
                                     OIT0002GETrow("USEFLG") = "1"
+                                    tankNoFlg = "1"
                                     Exit For
                                 End If
                             Next
+                            '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
+                            If tankNoFlg = "0" Then
+                                For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
+                                    If Convert.ToString(OIT0002GETrow("ORDERINGOILNAME")) = Convert.ToString(OIT0002EXLUProw("OILNAME")) Then
+                                        'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
+                                        OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")
+                                        OIT0002GETrow("USEFLG") = "1"
+                                        Exit For
+                                    End If
+                                Next
+                            End If
                             If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
                                 i += 1
                                 iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
@@ -5015,9 +5041,15 @@ Public Class OIT0002LinkList
             & " , ISNULL(RTRIM(OIM0007.TRAINNO), '')                    AS TRAINNO" _
             & " , ISNULL(RTRIM(OIM0007.TRAINNAME), '')                  AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIM0007.OTTRAINNO), '')                  AS OTTRAINNO" _
-            & " , ISNULL(RTRIM(OIM0007.JRTRAINNO1), '')                 AS JRTRAINNO1" _
-            & " , ISNULL(RTRIM(OIM0007.JRTRAINNO2), '')                 AS JRTRAINNO2" _
-            & " , ISNULL(RTRIM(OIM0007.JRTRAINNO3), '')                 AS JRTRAINNO3" _
+            & " , CASE" _
+            & "   WHEN OIM0007.TSUMI = 'N' THEN ISNULL(RTRIM(OIM0007.JRTRAINNO1), '')" _
+            & "   ELSE '' END                                           AS JRTRAINNO1" _
+            & " , CASE" _
+            & "   WHEN OIM0007.TSUMI = 'N' THEN ISNULL(RTRIM(OIM0007.JRTRAINNO2), '')" _
+            & "   ELSE '' END                                           AS JRTRAINNO2" _
+            & " , CASE" _
+            & "   WHEN OIM0007.TSUMI = 'N' THEN ISNULL(RTRIM(OIM0007.JRTRAINNO3), '')" _
+            & "   ELSE '' END                                           AS JRTRAINNO3" _
             & " , ISNULL(RTRIM(OIM0007.DEPSTATION), '')                 AS DEPSTATIONCODE" _
             & " , ISNULL(RTRIM(OIM0004_DEP.STATONNAME), '')             AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIM0007.ARRSTATION), '')                 AS ARRSTATIONCODE" _

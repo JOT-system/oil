@@ -592,7 +592,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private Sub EditGoiShipDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
         Dim svTrainNo As String = ""
-        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q"}
+        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q", "R"}
+        Dim iOilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         Dim iYoko As Integer = 0
 
         Try
@@ -603,6 +604,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("OTTRAINNO").ToString() Then
                     '行を１つ下に移動
                     i += 1
+                    '油種数を初期化
+                    iOilCnt = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
                 End If
 
                 '油種が未設定の場合は次のデータへ
@@ -637,18 +640,21 @@ Public Class OIT0003CustomReport : Implements IDisposable
                         iYoko = 6
 
                     '◯黒油
-                    '　LA-1(ＬＳＡ - 1)
+                    '　LA-1(LSA-1, LSA-1(山岳))
                     Case BaseDllConst.CONST_COSMO_LSA
                         iYoko = 7
-                    '　LAブ(ＬＳＡ - 1（山岳）)
+                    '　LAブ(LSA-ブレンド, LSA-ブレンド(山岳))
                     Case BaseDllConst.CONST_COSMO_LSABU
                         iYoko = 8
-                    '　AFO(AFO)
+                    '　AFO(AFO, AFO(山岳))
                     Case BaseDllConst.CONST_COSMO_AFO
                         iYoko = 9
-                    '　A-SP(AFO（山岳）)
+                    '　A-SP(AFOーSP, AFOーSP(山岳))
                     Case BaseDllConst.CONST_COSMO_AFOSP
                         iYoko = 10
+                    '　A(ブ(AFOーブレンド(山岳))
+                    Case BaseDllConst.CONST_COSMO_AFOBU
+                        iYoko = 11
 
                     Case Else
                         Continue For
@@ -656,7 +662,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
                 '★帳票に値を設定
                 rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
-                rngDetailArea.Value = PrintDatarow("CNT")
+                iOilCnt(iYoko) += Integer.Parse(Convert.ToString(PrintDatarow("CNT")))
+                rngDetailArea.Value = iOilCnt(iYoko)
 
                 '★列車番号を退避
                 svTrainNo = PrintDatarow("OTTRAINNO").ToString()

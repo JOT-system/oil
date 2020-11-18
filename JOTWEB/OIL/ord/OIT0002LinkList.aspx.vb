@@ -5118,15 +5118,18 @@ Public Class OIT0002LinkList
                         ''★甲子営業所の場合は、チェック不要と判断し一旦SKIP
                         'If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
 
+                        'If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
+                        '    OrElse (OIT0002EXLCHKrow("OTTRAINNO") <> "" _
+                        '            AndAlso OIT0002EXLCHKrow("OTTRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO")) _
+                        '    OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
+                        '            AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _
+                        '    OrElse (OIT0002EXLCHKrow("JRTRAINNO2") <> "" _
+                        '            AndAlso OIT0002EXLCHKrow("JRTRAINNO2") = OIT0002EXLUProw("LOADINGTRAINNO")) _
+                        '    OrElse (OIT0002EXLCHKrow("JRTRAINNO3") <> "" _
+                        '            AndAlso OIT0002EXLCHKrow("JRTRAINNO3") = OIT0002EXLUProw("LOADINGTRAINNO")) Then
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
                             OrElse (OIT0002EXLCHKrow("OTTRAINNO") <> "" _
-                                    AndAlso OIT0002EXLCHKrow("OTTRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO")) _
-                            OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
-                                    AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _
-                            OrElse (OIT0002EXLCHKrow("JRTRAINNO2") <> "" _
-                                    AndAlso OIT0002EXLCHKrow("JRTRAINNO2") = OIT0002EXLUProw("LOADINGTRAINNO")) _
-                            OrElse (OIT0002EXLCHKrow("JRTRAINNO3") <> "" _
-                                    AndAlso OIT0002EXLCHKrow("JRTRAINNO3") = OIT0002EXLUProw("LOADINGTRAINNO")) Then
+                                    AndAlso OIT0002EXLCHKrow("OTTRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO")) Then
 
                             OIT0002EXLUProw("LOADINGTRAINNO") = OIT0002EXLCHKrow("TRAINNO")
                             OIT0002EXLUProw("LOADINGTRAINNAME") = OIT0002EXLCHKrow("TRAINNAME")

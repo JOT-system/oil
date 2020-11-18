@@ -2365,7 +2365,7 @@ Public Class OIT0002LinkList
                 '★営業所コード、本線列車名、発着駅、油種の設定
                 OIT0002EXLUPtbl.Columns.Add("OFFICECODE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("OFFICENAME", Type.GetType("System.String"))
-                OIT0002EXLUPtbl.Columns.Add("LOADINGTRAINNAME", Type.GetType("System.String"))
+                'OIT0002EXLUPtbl.Columns.Add("LOADINGTRAINNAME", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("DEPSTATION", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("RETSTATION", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("ORDEROILCODE", Type.GetType("System.String"))
@@ -2404,21 +2404,18 @@ Public Class OIT0002LinkList
                                 If Convert.ToString(OIT0002ExlUProw("OBJECTIVENAME")) <> "" Then Continue For
 
                                 '本線列車名
-                                'OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION")
-                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(タ)", "")
+                                'OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(タ)", "")
 
+                                '★着駅コードを取得
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                                 WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", (Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")).Replace("(", "")).Replace(")", ""), WW_GetValue)
                                 OIT0002ExlUProw("DEPSTATION") = WW_GetValue(0)
-                                'OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
 
-                                '積車着日(予定), 受入日(予定), 空車着日(予定)
+                                '★積車着日(予定), 受入日(予定), 空車着日(予定)を取得
                                 If OIT0002ExlUProw("LOADINGDEPDATE").ToString() = "" Then Continue For
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                                'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
-                                'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
                                 WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
-                                If WW_GetValue(12) = "T" Then OIT0002ExlUProw("LOADINGTRAINNAME") &= "-積置"
+                                'If WW_GetValue(12) = "T" Then OIT0002ExlUProw("LOADINGTRAINNAME") &= "-積置"
 
                                 Try
                                     '〇 (予定)の日付を設定
@@ -5016,6 +5013,8 @@ Public Class OIT0002LinkList
             " SELECT DISTINCT" _
             & "   0                                                     AS LINECNT" _
             & " , ISNULL(RTRIM(OIM0007.TRAINNO), '')                    AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIM0007.TRAINNAME), '')                  AS TRAINNAME" _
+            & " , ISNULL(RTRIM(OIM0007.OTTRAINNO), '')                  AS OTTRAINNO" _
             & " , ISNULL(RTRIM(OIM0007.JRTRAINNO1), '')                 AS JRTRAINNO1" _
             & " , ISNULL(RTRIM(OIM0007.JRTRAINNO2), '')                 AS JRTRAINNO2" _
             & " , ISNULL(RTRIM(OIM0007.JRTRAINNO3), '')                 AS JRTRAINNO3" _
@@ -5027,24 +5026,26 @@ Public Class OIT0002LinkList
             & " INNER JOIN oil.OIM0004_STATION OIM0004_DEP ON " _
             & "       OIM0004_DEP.STATIONCODE + OIM0004_DEP.BRANCH = OIM0007.DEPSTATION " _
             & " INNER JOIN oil.OIM0004_STATION OIM0004_ARR ON " _
-            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION "
-
-        '五井営業所・袖ヶ浦営業所用
-        Dim SQLStr As String =
-            SQLCmnStr _
-            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE3) " _
-            & "   AND OIM0007.TSUMI      =  'N' " _
+            & "       OIM0004_ARR.STATIONCODE + OIM0004_ARR.BRANCH = OIM0007.ARRSTATION " _
+            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE2, @OFFICECODE3) " _
             & "   AND OIM0007.DELFLG     <> @DELFLG "
 
-        '甲子営業所用
-        SQLStr &=
-            "UNION ALL" _
-            & SQLCmnStr _
-            & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE2) " _
-            & "   AND OIM0007.DELFLG     <> @DELFLG "
+        ''五井営業所・袖ヶ浦営業所用
+        'Dim SQLStr As String =
+        '    SQLCmnStr _
+        '    & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE1, @OFFICECODE3) " _
+        '    & "   AND OIM0007.TSUMI      =  'N' " _
+        '    & "   AND OIM0007.DELFLG     <> @DELFLG "
+
+        ''甲子営業所用
+        'SQLStr &=
+        '    "UNION ALL" _
+        '    & SQLCmnStr _
+        '    & " WHERE OIM0007.OFFICECODE IN (@OFFICECODE2) " _
+        '    & "   AND OIM0007.DELFLG     <> @DELFLG "
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLCmnStr, SQLcon)
                 Dim P_OFFICECODE1 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE1", SqlDbType.NVarChar) '受注営業所
                 Dim P_OFFICECODE2 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE2", SqlDbType.NVarChar) '受注営業所
                 Dim P_OFFICECODE3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE3", SqlDbType.NVarChar) '受注営業所
@@ -5071,6 +5072,8 @@ Public Class OIT0002LinkList
                 'Next
 
                 '★本線列車が設定されているデータが対象
+                '本線列車名
+                OIT0002EXLUPtbl.Columns.Add("LOADINGTRAINNAME", Type.GetType("System.String"))
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO <> ''")
                     '★ポラリス(託送指示)が選択されている場合はSKIP
                     If Convert.ToString(OIT0002EXLUProw("OBJECTIVENAME")) <> "" Then Continue For
@@ -5080,10 +5083,12 @@ Public Class OIT0002LinkList
                         If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") _
                             AndAlso OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
 
-                        '★甲子営業所の場合は、チェック不要と判断し一旦SKIP
-                        If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
+                        ''★甲子営業所の場合は、チェック不要と判断し一旦SKIP
+                        'If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
 
                         If OIT0002EXLCHKrow("TRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO") _
+                            OrElse (OIT0002EXLCHKrow("OTTRAINNO") <> "" _
+                                    AndAlso OIT0002EXLCHKrow("OTTRAINNO") = OIT0002EXLUProw("LOADINGTRAINNO")) _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO1") <> "" _
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO1") = OIT0002EXLUProw("LOADINGTRAINNO")) _
                             OrElse (OIT0002EXLCHKrow("JRTRAINNO2") <> "" _
@@ -5092,6 +5097,7 @@ Public Class OIT0002LinkList
                                     AndAlso OIT0002EXLCHKrow("JRTRAINNO3") = OIT0002EXLUProw("LOADINGTRAINNO")) Then
 
                             OIT0002EXLUProw("LOADINGTRAINNO") = OIT0002EXLCHKrow("TRAINNO")
+                            OIT0002EXLUProw("LOADINGTRAINNAME") = OIT0002EXLCHKrow("TRAINNAME")
                             O_RTN = C_MESSAGE_NO.NORMAL
                             Exit For
                         Else

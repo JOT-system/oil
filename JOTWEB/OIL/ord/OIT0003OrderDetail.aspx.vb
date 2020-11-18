@@ -1481,7 +1481,8 @@ Public Class OIT0003OrderDetail
         & SQLFromStr2 _
         & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
         & "           Case WHEN OIT0002.BASECODE = '" & BaseDllConst.CONST_PLANTCODE_0401 & "' AND OIT0002.CONSIGNEECODE = '" & BaseDllConst.CONST_CONSIGNEECODE_51 & "' THEN" _
-        & "                Case WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
+        & "                Case WHEN VIW0012.BREAKDOWNCODE = '1' THEN '3'" _
+        & "                     WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
         & "           Else '0' END" _
         & " WHERE OIT0002.ORDERNO = @P01 " _
         & " AND OIT0002.DELFLG <> @P02 "

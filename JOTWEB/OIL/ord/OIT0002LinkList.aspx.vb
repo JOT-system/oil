@@ -1441,6 +1441,12 @@ Public Class OIT0002LinkList
                 WW_GetOrderNo(SQLcon)
             End Using
 
+            '◯アップロードデータチェック
+            WW_CheckErrUpload(WW_ERRCODE)
+            If WW_ERRCODE = "ERR" Then
+                Exit Sub
+            End If
+
             '受注明細DB追加・更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -1610,7 +1616,7 @@ Public Class OIT0002LinkList
         '◯ポラリス投入用のみチェック
         If useFlg = "4" Then
             '◯アップロードデータチェック
-            WW_CheckUpload(WW_ERRCODE)
+            WW_CheckWarUpload(WW_ERRCODE)
             If WW_ERRCODE = "WAR" Then
                 Master.Output(C_MESSAGE_NO.OIL_UPLOAD_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
             End If
@@ -3413,7 +3419,8 @@ Public Class OIT0002LinkList
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select(Nothing, "LOADINGTRAINNAME, LOADINGLODDATE, LOADINGDEPDATE, ORDERNO, DETAILNO")
 
                     '★すでに受注Noが設定されているデータはSKIP
-                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" Then Continue For
+                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" _
+                        AndAlso OIT0002EXLUProw("DETAILNO").ToString() <> "" Then Continue For
                     If OIT0002EXLUProw("LOADINGTRAINNAME").ToString() = "" Then Continue For
 
                     tankNoFlg = "0"
@@ -3450,9 +3457,13 @@ Public Class OIT0002LinkList
                                 iNum = Integer.Parse(sOrderContent(1)) + 1
                                 OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                             Else
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
                     Else
@@ -3513,9 +3524,13 @@ Public Class OIT0002LinkList
                                 Next
                             End If
                             If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
 
@@ -5162,10 +5177,34 @@ Public Class OIT0002LinkList
     End Sub
 
     ''' <summary>
-    ''' アップロードデータチェック
+    ''' アップロードデータチェック(エラー)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckUpload(ByRef O_RTN As String)
+    Protected Sub WW_CheckErrUpload(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_ErrorMES As String = ""
+
+        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+            '貨車アップロードにて指定した本線列車が登録されているかチェック
+            If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" Then
+                WW_ErrorMES = Convert.ToString(OIT0002ExlUProw("LOADINGTRAINNAME"))
+                WW_ErrorMES &= "　" + Convert.ToString(OIT0002ExlUProw("OILNAME"))
+                Master.Output(C_MESSAGE_NO.OIL_UPLOAD_ERR_OILOVER_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=WW_ErrorMES, needsPopUp:=True)
+
+                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, C_MESSAGE_NO.OIL_UPLOAD_ERR_OILOVER_MESSAGE)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' アップロードデータチェック(ワーニング)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckWarUpload(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
         Dim WW_Kensa As String = WW_ARTICLENAME(0)
@@ -5190,13 +5229,13 @@ Public Class OIT0002LinkList
             '　または、(ポラリス必須)積込日が設定されている
             '　または、(ポラリス必須)発日が設定されている
             If OIT0002ExlUProw("LOADINGTRAINNO") = "" AndAlso
-                (OIT0002ExlUProw("OILNAME") <> "" _
-                 OrElse OIT0002ExlUProw("LINE") <> "" _
-                 OrElse OIT0002ExlUProw("POSITION") <> "" _
-                 OrElse OIT0002ExlUProw("INLINETRAIN") <> "" _
-                 OrElse OIT0002ExlUProw("LOADARRSTATION") <> "" _
-                 OrElse OIT0002ExlUProw("LOADINGLODDATE") <> "" _
-                 OrElse OIT0002ExlUProw("LOADINGDEPDATE") <> "") Then
+                    (OIT0002ExlUProw("OILNAME") <> "" _
+                     OrElse OIT0002ExlUProw("LINE") <> "" _
+                     OrElse OIT0002ExlUProw("POSITION") <> "" _
+                     OrElse OIT0002ExlUProw("INLINETRAIN") <> "" _
+                     OrElse OIT0002ExlUProw("LOADARRSTATION") <> "" _
+                     OrElse OIT0002ExlUProw("LOADINGLODDATE") <> "" _
+                     OrElse OIT0002ExlUProw("LOADINGDEPDATE") <> "") Then
 
                 If OIT0002ExlUProw("ARTICLENAME") = WW_Kensa Then
                     WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(2))

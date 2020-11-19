@@ -179,6 +179,9 @@
             <li>
                 <asp:RadioButton ID="rbKuukaiBtn" runat="server" GroupName="WF_SW" Text="空回日報" onclick="reportRadioButton();" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbFillingPointBtn" runat="server" GroupName="WF_SW" Text="充填ポイント表" onclick="reportRadioButton();" />
+            </li>
         </ul>
     </div>
     <div id="divRTrainNo">

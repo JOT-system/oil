@@ -2950,14 +2950,14 @@ Public Class OIT0003OrderDetail
                 & " , TMP0002.BREAKDOWN                                  AS BREAKDOWN" _
                 & " , TMP0002.CALCKBN                                    AS CALCKBN" _
                 & " , TMP0002.CALCKBNNAME                                AS CALCKBNNAME" _
-                & " , REPLACE(CONVERT(VARCHAR,CAST(ROUND(CASE " _
+                & " , REPLACE(CONVERT(VARCHAR,CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
-                & "        SUM(TMP0002.CARSNUMBER) " _
+                & "        CAST(SUM(TMP0002.CARSNUMBER) AS DECIMAL(12, 3)) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
-                & "        SUM(TMP0002.CARSAMOUNT) " _
+                & "        CAST(SUM(TMP0002.CARSAMOUNT) AS DECIMAL(12, 3)) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
-                & "        SUM(TMP0002.LOAD) " _
-                & "   END, 3) AS MONEY), 1),'.00' , '') CARSAMOUNT" _
+                & "        CAST(SUM(TMP0002.LOAD) AS DECIMAL(12, 3)) " _
+                & "   END, 1),'.000' , '')                               AS CARSAMOUNT" _
                 & " , ''                                                 AS CARSAMOUNTNAME" _
                 & " , '￥' " _
                 & "  + REPLACE ( " _

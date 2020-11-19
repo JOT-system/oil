@@ -6374,7 +6374,62 @@ Public Class OIT0004OilStockCreate
                     suggestOrder.Value.MiSuggestValuesItem = itm.SuggestValuesItem
                 Next
             End Sub
+            ''' <summary>
+            ''' 受注提案キー情報保持
+            ''' </summary>
+            <Serializable>
+            Public Structure SuggestKeys
+                ''' <summary>
+                ''' インデックス
+                ''' </summary>
+                Public Index As Integer
+                ''' <summary>
+                ''' 積込日
+                ''' </summary>
+                Public LodDate As String
 
+                ''' <summary>
+                ''' 自身に格納している情報をBase64情報に変換
+                ''' </summary>
+                ''' <returns></returns>
+                Public Function GetKeyString() As String
+                    Dim enc As Encoding = Encoding.GetEncoding("UFT-8")
+                    Dim key As String = LodDate & "@" & Index
+                    Return Convert.ToBase64String(enc.GetBytes(key))
+                End Function
+                ''' <summary>
+                ''' Base64変換したキー情報を当構造体形式にデコード
+                ''' </summary>
+                ''' <param name="keyString"></param>
+                ''' <returns></returns>
+                Public Shared Function GetDecKeyString(keyString As String) As SuggestKeys
+                    Dim enc As Encoding = Encoding.GetEncoding("UFT-8")
+                    Dim index As Integer = 0
+                    Dim lodDate As String = ""
+                    If lodDate = "" Then
+                        Return Nothing
+                    End If
+                    Dim decodedString = enc.GetString(Convert.FromBase64String(keyString))
+                    Dim splitVal = decodedString.Split("@"c)
+                    If Not (splitVal IsNot Nothing AndAlso splitVal.Length > 2 AndAlso IsNumeric(splitVal(1))) Then
+                        lodDate = splitVal(0)
+                        index = CInt(splitVal(1))
+                        Return GetNewSuggestKey(index, lodDate)
+                    Else
+                        Return Nothing
+                    End If
+
+                End Function
+                ''' <summary>
+                ''' ２値を持つ構造体に変換
+                ''' </summary>
+                ''' <param name="index"></param>
+                ''' <param name="lodDate"></param>
+                ''' <returns></returns>
+                Public Shared Function GetNewSuggestKey(index As Integer, lodDate As String) As SuggestKeys
+                    Return New SuggestKeys With {.LodDate = lodDate, .Index = index}
+                End Function
+            End Structure
             ''' <summary>
             ''' 受注提案タンク車数用数値情報格納クラス
             ''' </summary>
@@ -6405,6 +6460,11 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property TrainInfo As TrainListItem
+                ''' <summary>
+                ''' 先頭アイテム
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property IsFirstLodDate As Boolean = True
                 ''' <summary>
                 ''' デフォルトプロパティ
                 ''' </summary>
@@ -6483,6 +6543,16 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property TrainInfo As TrainListItem
+                ''' <summary>
+                ''' 基準日（LodDateから受入日を算出するための日数）
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property AccDays As Integer = 0
+                ''' <summary>
+                ''' 何もしない場合の初期のAcc日数
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property DafaultAccDate As String = ""
             End Class
         End Class
         ''' <summary>

@@ -3458,11 +3458,11 @@ Public Class OIT0002LinkList
                                 OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                             Else
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                OIT0002EXLUProw("DETAILNO") = ""
-                                'i += 1
-                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                'OIT0002EXLUProw("DETAILNO") = ""
+                                i += 1
+                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
@@ -3525,11 +3525,11 @@ Public Class OIT0002LinkList
                             End If
                             If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                OIT0002EXLUProw("DETAILNO") = ""
-                                'i += 1
-                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                'OIT0002EXLUProw("DETAILNO") = ""
+                                i += 1
+                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If

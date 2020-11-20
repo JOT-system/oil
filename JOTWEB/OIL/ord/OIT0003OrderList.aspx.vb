@@ -1795,19 +1795,21 @@ Public Class OIT0003OrderList
             Dim SQLNLineLoadStr As String =
                   " DELETE FROM OIL.TMP0006_NLINELOAD; " _
                 & " INSERT INTO OIL.TMP0006_NLINELOAD " _
-                & " ( FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
-                & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
-                & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
-                & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
-                & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD)"
+                & " ( FILENAME      , REGISTRATIONDATE, LODDATE            , LINE" _
+                & " , ARRSTATION    , TRAINNO         , POINT              , OIL" _
+                & " , TANKNO        , TRAINNODETAIL   , LOADINGTRAINNO     , LOADINGTANKNO" _
+                & " , LOADINGOILCODE, LOADINGOILNAME  , LOADINGORDERINGTYPE, LOADINGORDERINGOILNAME" _
+                & " , DELFLG        , INITYMD         , INITUSER           , INITTERMID" _
+                & " , UPDYMD        , UPDUSER         , UPDTERMID          , RECEIVEYMD)"
 
             SQLNLineLoadStr &=
                   " SELECT" _
-                & "   FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
-                & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
-                & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
-                & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
-                & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD" _
+                & "   FILENAME      , REGISTRATIONDATE, LODDATE            , LINE" _
+                & " , ARRSTATION    , TRAINNO         , POINT              , OIL" _
+                & " , TANKNO        , TRAINNODETAIL   , LOADINGTRAINNO     , LOADINGTANKNO" _
+                & " , LOADINGOILCODE, LOADINGOILNAME  , LOADINGORDERINGTYPE, LOADINGORDERINGOILNAME" _
+                & " , DELFLG        , INITYMD         , INITUSER           , INITTERMID" _
+                & " , UPDYMD        , UPDUSER         , UPDTERMID          , RECEIVEYMD" _
                 & " FROM OIL.OIT0012_NLINELOAD OIT0012" _
                 & " WHERE " _
                 & "     OIT0012.FILENAME = @P01" _

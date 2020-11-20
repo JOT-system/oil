@@ -720,6 +720,21 @@ div.oilTypeData div.col1 span[data-tiptext] {
     color: #14171A;
     background-color: rgb(248,203,173) !important;
 }
+/* ************************** */
+/* 提案表の日付増殖ボタン     */
+/* ************************** */
+.suggestDateTest:after {
+    /* TODO これは初期値用 */
+    display: inline-block;
+    height: 14px;
+    color: white !important;
+    content: "＋";
+    font-weight: bolder;
+    margin-left: 10px;
+    font-size: 14px;
+    overflow: visible;
+    cursor: pointer;
+}
 /* TIP表示 */
 [data-tiptext] {
     position: relative;
@@ -842,4 +857,9 @@ div.popUpContents > div {
 }
 .calendarIconArea div {
     margin-top:calc(100% - 14px) !important;
+}
+/* 変更された情報を押えるテキストボックススタイル */
+input[type=text].modified {
+    background-color:blue;
+    color:white;
 }

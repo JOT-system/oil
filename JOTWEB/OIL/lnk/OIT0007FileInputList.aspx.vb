@@ -1711,7 +1711,7 @@ Public Class OIT0007FileInputList
                 '五井営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011201", False
+                    "011201", True
                     )
                 inpFieldList = New Dictionary(Of String, Integer)
                 With inpFieldList
@@ -1782,7 +1782,7 @@ Public Class OIT0007FileInputList
                 '四日市営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012401", False
+                    "012401", True
                     )
                 inpFieldList = New Dictionary(Of String, Integer)
                 With inpFieldList

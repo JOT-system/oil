@@ -1099,10 +1099,39 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '油種
                     If WF_FIELD.Value = "OILNAME" _
                         OrElse WF_FIELD.Value = "ORDERINGOILNAME" Then
+
+                        '○ LINECNT取得
+                        Dim WW_LINECNT As Integer = 0
+                        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0001tbl.AsEnumerable.
+                            FirstOrDefault(Function(x) CInt(x.Item("LINECNT")) = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
+
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+
                         '### 20201013 START 指摘票対応(No153) ###################################
-                        prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                        'prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                        '### 20201120 START 指摘票対応(No224)全体 ###############################
+                        '★荷受人ごとに取得するため、「荷受人」＋「受注営業所」をKEYとして設定
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CONSIGNEECODE.Text + prmData.Item(C_PARAMETERS.LP_COMPANY)
+
+                        '○積込日を設定
+                        Dim strlodDate As String = ""
+                        '★積置フラグにチェックがある場合
+                        If updHeader.Item("STACKINGFLG") = "on" Then
+                            Try
+                                strlodDate = Date.Parse(updHeader.Item("ACTUALLODDATE")).ToString("yyyy/MM/dd")
+                            Catch ex As Exception
+                                strlodDate = Me.TxtLoadingDate.Text
+                            End Try
+                            prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = strlodDate
+                        Else
+                            prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                        End If
+                        '### 20201120 END   指摘票対応(No224)全体 ###############################
                         '### 20201013 END   指摘票対応(No153) ###################################
                     End If
                     'タンク車№
@@ -2834,13 +2863,9 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '●タンク車№から対象データを自動で設定
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", Convert.ToString(OIT0001INProw("TANKNO")), WW_GetValue)
-                'WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
                 OIT0001INProw("LASTOILCODE") = WW_GetValue(1)
 
                 '前回油種名(前回油種コードから油種名を取得し設定)
-                'WW_GetValue = {"", "", "", "", "", "", "", ""}
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
-                'OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
                 OIT0001INProw("LASTOILNAME") = WW_GetValue(4)
                 OIT0001INProw("PREORDERINGTYPE") = WW_GetValue(5)
                 OIT0001INProw("PREORDERINGOILNAME") = WW_GetValue(6)
@@ -4986,7 +5011,10 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '〇各営業者で管理している油種を取得
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch("01" + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        '### 20201120 START 指摘票対応(No224)全体 #########################################################################
+        'WW_FixvalueMasterSearch("01" + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        '### 20201120 END   指摘票対応(No224)全体 #########################################################################
 
         For i As Integer = 0 To WW_GetValue.Length - 1
             Select Case WW_GetValue(i)

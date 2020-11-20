@@ -727,6 +727,10 @@ Public Module Messages
         ''' アップロード(列車番号)エラーメッセージ
         ''' </summary>
         Public Const OIL_UPLOAD_ERR_TRAINNO_MESSAGE As String = "20081"
+        ''' <summary>
+        ''' アップロード(油種数オーバー)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_OILOVER_MESSAGE As String = "20082"
 #End Region
 
 

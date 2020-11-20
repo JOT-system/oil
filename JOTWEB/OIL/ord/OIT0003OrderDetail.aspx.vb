@@ -1481,7 +1481,8 @@ Public Class OIT0003OrderDetail
         & SQLFromStr2 _
         & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
         & "           Case WHEN OIT0002.BASECODE = '" & BaseDllConst.CONST_PLANTCODE_0401 & "' AND OIT0002.CONSIGNEECODE = '" & BaseDllConst.CONST_CONSIGNEECODE_51 & "' THEN" _
-        & "                Case WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
+        & "                Case WHEN VIW0012.BREAKDOWNCODE = '1' THEN '3'" _
+        & "                     WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
         & "           Else '0' END" _
         & " WHERE OIT0002.ORDERNO = @P01 " _
         & " AND OIT0002.DELFLG <> @P02 "
@@ -2949,14 +2950,14 @@ Public Class OIT0003OrderDetail
                 & " , TMP0002.BREAKDOWN                                  AS BREAKDOWN" _
                 & " , TMP0002.CALCKBN                                    AS CALCKBN" _
                 & " , TMP0002.CALCKBNNAME                                AS CALCKBNNAME" _
-                & " , REPLACE(CONVERT(VARCHAR,CAST(ROUND(CASE " _
+                & " , REPLACE(CONVERT(VARCHAR,CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
-                & "        SUM(TMP0002.CARSNUMBER) " _
+                & "        CAST(SUM(TMP0002.CARSNUMBER) AS DECIMAL(12, 3)) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
-                & "        SUM(TMP0002.CARSAMOUNT) " _
+                & "        CAST(SUM(TMP0002.CARSAMOUNT) AS DECIMAL(12, 3)) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
-                & "        SUM(TMP0002.LOAD) " _
-                & "   END, 3) AS MONEY), 1),'.00' , '') CARSAMOUNT" _
+                & "        CAST(SUM(TMP0002.LOAD) AS DECIMAL(12, 3)) " _
+                & "   END, 1),'.000' , '')                               AS CARSAMOUNT" _
                 & " , ''                                                 AS CARSAMOUNTNAME" _
                 & " , '￥' " _
                 & "  + REPLACE ( " _
@@ -9700,7 +9701,6 @@ Public Class OIT0003OrderDetail
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '受注№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '受注明細No
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
-            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '回線
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '充填ポイント
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '積込入線列車番号
@@ -9729,6 +9729,8 @@ Public Class OIT0003OrderDetail
                         AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
                         AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+
+                    Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
 
                     '○発送順を営業所別で自動設定
                     Select Case Me.TxtOrderOfficeCode.Text
@@ -12896,123 +12898,169 @@ Public Class OIT0003OrderDetail
         OIT0003Fixvaltbl.Clear()
 
         Try
-            'DataBase接続文字
-            Dim SQLcon = CS0050SESSION.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-            SqlConnection.ClearPool(SQLcon)
+#Region "改善版対応のためコメント"
+            ''DataBase接続文字
+            'Dim SQLcon = CS0050SESSION.getConnection
+            'SQLcon.Open() 'DataBase接続(Open)
+            'SqlConnection.ClearPool(SQLcon)
 
-            '検索SQL文
-            Dim SQLStr As String =
-               " SELECT" _
-                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
-                & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
-                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
-                & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
-                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE16), '')     AS VALUE16" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE17), '')     AS VALUE17" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE18), '')     AS VALUE18" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE19), '')     AS VALUE19" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE20), '')     AS VALUE20" _
-                & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
-                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
-                & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
-                & " WHERE VIW0001.CLASS = @P01" _
-                & " AND VIW0001.DELFLG <> @P03"
+            ''検索SQL文
+            'Dim SQLStr As String =
+            '   " SELECT" _
+            '    & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+            '    & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+            '    & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+            '    & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+            '    & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE16), '')     AS VALUE16" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE17), '')     AS VALUE17" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE18), '')     AS VALUE18" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE19), '')     AS VALUE19" _
+            '    & " , ISNULL(RTRIM(VIW0001.VALUE20), '')     AS VALUE20" _
+            '    & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+            '    & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
+            '    & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+            '    & " WHERE VIW0001.CLASS = @P01" _
+            '    & " AND VIW0001.DELFLG <> @P03"
 
-            '○ 条件指定で指定されたものでSQLで可能なものを追加する
-            '会社コード
-            If Not String.IsNullOrEmpty(I_CODE) Then
-                SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
-            End If
-            'マスターキー
-            If Not String.IsNullOrEmpty(I_KEYCODE) Then
-                SQLStr &= String.Format("    AND VIW0001.KEYCODE = '{0}'", I_KEYCODE)
-            End If
+            ''○ 条件指定で指定されたものでSQLで可能なものを追加する
+            ''会社コード
+            'If Not String.IsNullOrEmpty(I_CODE) Then
+            '    SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+            'End If
+            ''マスターキー
+            'If Not String.IsNullOrEmpty(I_KEYCODE) Then
+            '    SQLStr &= String.Format("    AND VIW0001.KEYCODE = '{0}'", I_KEYCODE)
+            'End If
 
-            SQLStr &=
-                  " ORDER BY" _
-                & "    VIW0001.KEYCODE"
+            'SQLStr &=
+            '      " ORDER BY" _
+            '    & "    VIW0001.KEYCODE"
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            'Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
-                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            '    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            '    'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            '    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
 
-                PARA01.Value = I_CLASS
-                'PARA02.Value = I_KEYCODE
-                PARA03.Value = C_DELETE_FLG.DELETE
+            '    PARA01.Value = I_CLASS
+            '    'PARA02.Value = I_KEYCODE
+            '    PARA03.Value = C_DELETE_FLG.DELETE
 
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003Fixvaltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+            '    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            '        '○ フィールド名とフィールドの型を取得
+            '        For index As Integer = 0 To SQLdr.FieldCount - 1
+            '            OIT0003Fixvaltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+            '        Next
 
-                    '○ テーブル検索結果をテーブル格納
-                    OIT0003Fixvaltbl.Load(SQLdr)
-                End Using
+            '        '○ テーブル検索結果をテーブル格納
+            '        OIT0003Fixvaltbl.Load(SQLdr)
+            '    End Using
 
-                If I_KEYCODE.Equals("") Then
+            '    If I_KEYCODE.Equals("") Then
 
-                    If IsNothing(I_PARA01) Then
-                        'Dim i As Integer = 0 '2020/3/23 三宅 Delete
-                        For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
-                            'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
-                            For i = 1 To O_VALUE.Length
-                                O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
-                            Next
-                            'i += 1 '2020/3/23 三宅 Delete
-                        Next
+            '        If IsNothing(I_PARA01) Then
+            '            'Dim i As Integer = 0 '2020/3/23 三宅 Delete
+            '            For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
+            '                'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
+            '                For i = 1 To O_VALUE.Length
+            '                    O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+            '                Next
+            '                'i += 1 '2020/3/23 三宅 Delete
+            '            Next
 
-                    ElseIf I_PARA01 = "1" Then    '### 油種登録用の油種コードを取得 ###
-                        Dim i As Integer = 0
-                        For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
-                            '### 20201030 START 積込日(予定)基準で油種の開始終了を制御 ################################################
-                            'O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE"))
-                            'i += 1
-                            Try
-                                If OIT0003WKrow("STYMD") <= Date.Parse(Me.TxtLoadingDate.Text) _
-                                AndAlso OIT0003WKrow("ENDYMD") >= Date.Parse(Me.TxtLoadingDate.Text) Then
-                                    O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
-                                    i += 1
-                                End If
-                            Catch ex As Exception
-                                Exit For
-                            End Try
-                            '### 20201030 END   積込日(予定)基準で油種の開始終了を制御 ################################################
-                        Next
-                    End If
+            '        ElseIf I_PARA01 = "1" Then    '### 油種登録用の油種コードを取得 ###
+            '            Dim i As Integer = 0
+            '            For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+            '                '### 20201030 START 積込日(予定)基準で油種の開始終了を制御 ################################################
+            '                'O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE"))
+            '                'i += 1
+            '                Try
+            '                    If OIT0003WKrow("STYMD") <= Date.Parse(Me.TxtLoadingDate.Text) _
+            '                    AndAlso OIT0003WKrow("ENDYMD") >= Date.Parse(Me.TxtLoadingDate.Text) Then
+            '                        O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
+            '                        i += 1
+            '                    End If
+            '                Catch ex As Exception
+            '                    Exit For
+            '                End Try
+            '                '### 20201030 END   積込日(予定)基準で油種の開始終了を制御 ################################################
+            '            Next
+            '        End If
 
-                Else
-                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+            '    Else
+            '        For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
 
+            '            For i = 1 To O_VALUE.Length
+            '                O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+            '            Next
+            '        Next
+            '    End If
+
+            '    'CLOSE
+            '    SQLcmd.Dispose()
+
+            'End Using
+#End Region
+
+            'DBより取得
+            OIT0003Fixvaltbl = WW_FixvalueMasterDataGet(I_CODE, I_CLASS, I_KEYCODE, I_PARA01)
+
+            If I_KEYCODE.Equals("") Then
+
+                If IsNothing(I_PARA01) Then
+                    'Dim i As Integer = 0 '2020/3/23 三宅 Delete
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
+                        'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
                         For i = 1 To O_VALUE.Length
                             O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
                         Next
+                        'i += 1 '2020/3/23 三宅 Delete
+                    Next
+
+                ElseIf I_PARA01 = "1" Then    '### 油種登録用の油種コードを取得 ###
+                    Dim i As Integer = 0
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                        '### 20201030 START 積込日(予定)基準で油種の開始終了を制御 ################################################
+                        'O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE"))
+                        'i += 1
+                        Try
+                            If OIT0003WKrow("STYMD") <= Date.Parse(Me.TxtLoadingDate.Text) _
+                                AndAlso OIT0003WKrow("ENDYMD") >= Date.Parse(Me.TxtLoadingDate.Text) Then
+                                O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
+                                i += 1
+                            End If
+                        Catch ex As Exception
+                            Exit For
+                        End Try
+                        '### 20201030 END   積込日(予定)基準で油種の開始終了を制御 ################################################
                     Next
                 End If
 
-                'CLOSE
-                SQLcmd.Dispose()
+            Else
+                For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
 
-            End Using
+                    For i = 1 To O_VALUE.Length
+                        O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                    Next
+                Next
+            End If
+
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
@@ -13024,6 +13072,127 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
     End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理（同じパラメータならDB抽出せずに保持内容を返却）
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="I_PARA01"></param>
+    ''' <returns></returns>
+    Private Function WW_FixvalueMasterDataGet(I_CODE As String, I_CLASS As String, I_KEYCODE As String, I_PARA01 As String) As DataTable
+        Static keyValues As Dictionary(Of String, String)
+        Static retDt As DataTable
+        Dim retFilterdDt As DataTable
+        'キー情報を比較または初期状態または異なるキーの場合は再抽出
+        If keyValues Is Nothing OrElse
+           (Not (keyValues("I_CODE") = I_CODE _
+                 AndAlso keyValues("I_CLASS") = I_CLASS _
+                 AndAlso keyValues("I_PARA01") = I_PARA01)) Then
+            keyValues = New Dictionary(Of String, String) _
+                      From {{"I_CODE", I_CODE}, {"I_CLASS", I_CLASS}, {"I_PARA01", I_PARA01}}
+            retDt = New DataTable
+        Else
+            retFilterdDt = retDt
+            '抽出キー情報が一致しているので保持内容を返却
+            If I_KEYCODE <> "" Then
+                Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+                If qKeyFilterd.Any Then
+                    retFilterdDt = qKeyFilterd.CopyToDataTable
+                Else
+                    retFilterdDt = retDt.Clone
+                End If
+            End If
+
+            Return retFilterdDt
+        End If
+        'キーが変更された場合の抽出処理
+        'DataBase接続文字
+        Dim SQLcon = CS0050SESSION.getConnection
+        SQLcon.Open() 'DataBase接続(Open)
+        SqlConnection.ClearPool(SQLcon)
+
+        '検索SQL文
+        Dim SQLStr As String =
+           " SELECT" _
+            & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+            & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+            & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+            & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+            & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE16), '')     AS VALUE16" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE17), '')     AS VALUE17" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE18), '')     AS VALUE18" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE19), '')     AS VALUE19" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE20), '')     AS VALUE20" _
+            & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+            & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
+            & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+            & " WHERE VIW0001.CLASS = @P01" _
+            & " AND VIW0001.DELFLG <> @P03"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '会社コード
+        If Not String.IsNullOrEmpty(I_CODE) Then
+            SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+        End If
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    VIW0001.KEYCODE"
+
+        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            PARA01.Value = I_CLASS
+            'PARA02.Value = I_KEYCODE
+            PARA03.Value = C_DELETE_FLG.DELETE
+
+            Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                '○ フィールド名とフィールドの型を取得
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    retDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+
+                '○ テーブル検索結果をテーブル格納
+                retDt.Load(SQLdr)
+            End Using
+            'CLOSE
+            SQLcmd.Dispose()
+        End Using
+
+        retFilterdDt = retDt
+        '抽出キー情報が一致しているので保持内容を返却
+        If I_KEYCODE <> "" Then
+            Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+            If qKeyFilterd.Any Then
+                retFilterdDt = qKeyFilterd.CopyToDataTable
+            Else
+                retFilterdDt = retDt.Clone
+            End If
+        End If
+
+        Return retFilterdDt
+    End Function
 
     ''' <summary>
     ''' 画面表示設定処理(受注進行ステータス)
@@ -19223,8 +19392,7 @@ Public Class OIT0003OrderDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         '### 20201019 START 指摘票対応(No172) #############################################
@@ -19244,6 +19412,9 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                         AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
+                        AndAlso Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
                 Next
@@ -19340,8 +19511,7 @@ Public Class OIT0003OrderDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         '### 20201019 START 指摘票対応(No172) #############################################
@@ -19361,6 +19531,9 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                         AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
+                        AndAlso Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
                 Next

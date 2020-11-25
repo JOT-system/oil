@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIM0003ProductList
+Partial Public Class OIM0015SyogenList
     
     '''<summary>
     '''WF_ListCNT コントロール。
@@ -74,7 +74,7 @@ Partial Public Class OIM0003ProductList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIM0003WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIM0015WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。

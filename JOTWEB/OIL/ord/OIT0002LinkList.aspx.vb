@@ -5191,9 +5191,9 @@ Public Class OIT0002LinkList
             If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" Then
                 WW_ErrorMES = Convert.ToString(OIT0002ExlUProw("LOADINGTRAINNAME"))
                 WW_ErrorMES &= "　" + Convert.ToString(OIT0002ExlUProw("OILNAME"))
-                Master.Output(C_MESSAGE_NO.OIL_UPLOAD_ERR_OILOVER_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=WW_ErrorMES, needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=WW_ErrorMES, needsPopUp:=True)
 
-                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, C_MESSAGE_NO.OIL_UPLOAD_ERR_OILOVER_MESSAGE)
+                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, C_MESSAGE_NO.OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE)
                 O_RTN = "ERR"
                 Exit Sub
             End If

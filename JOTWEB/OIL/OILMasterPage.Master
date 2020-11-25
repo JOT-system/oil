@@ -100,6 +100,11 @@
                 <asp:HiddenField ID="MF_ALERT" runat="server" Value="FALSE" />      <%-- 確認ポップアップ処理可能 --%>
 
                 <asp:HiddenField ID="MF_SHOWCUSTOMOPOUP" runat="server" Value="0" />      <%-- カスタムポップアップ表示(0:非表示,1:表示) --%>
+                
+                <asp:HiddenField ID="MF_CommonDeleteItemName" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象名称（共通処理一覧表内部のテキストの場合フィールド名、それ以外はID) --%>
+                <asp:HiddenField ID="MF_CommonDeleteRow" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象行（共通処理一覧表内部のテキストの場合LINECNT、それ以外は未設定) --%>
+                <asp:HiddenField ID="MF_CommonDeleteListId" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象表ID（共通処理一覧表内部のテキストの場合表ID（パネルID）、それ以外は未設定) --%>
+
             </div>
         </div>
     </form>

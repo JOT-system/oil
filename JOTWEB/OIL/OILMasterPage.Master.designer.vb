@@ -300,4 +300,31 @@ Partial Public Class OILMasterPage
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents MF_SHOWCUSTOMOPOUP As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_CommonDeleteItemName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_CommonDeleteItemName As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_CommonDeleteRow コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_CommonDeleteRow As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_CommonDeleteListId コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_CommonDeleteListId As Global.System.Web.UI.WebControls.HiddenField
 End Class

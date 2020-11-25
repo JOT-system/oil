@@ -711,6 +711,26 @@ Public Module Messages
         ''' OT発送日報複数日付選択エラー
         ''' </summary>
         Public Const OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS As String = "20077"
+        ''' <summary>
+        ''' アップロード(列車番号)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_TRAINNO_MESSAGE As String = "20078"
+        ''' <summary>
+        ''' アップロード(油種)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_OILCODE_MESSAGE As String = "20079"
+        ''' <summary>
+        ''' アップロード(交検)警告メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_KOUKEN_MESSAGE As String = "20080"
+        ''' <summary>
+        ''' アップロード(列車番号)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_TRAINNO_MESSAGE As String = "20081"
+        ''' <summary>
+        ''' アップロード(油種数オーバー)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_OILOVER_MESSAGE As String = "20082"
 #End Region
 
 

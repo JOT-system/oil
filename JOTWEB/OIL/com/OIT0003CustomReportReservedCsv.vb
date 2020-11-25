@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 出荷予約CSV出力クラス（テキストベース）
 ''' </summary>
 Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
@@ -54,7 +55,7 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
         '書き込むファイルを開く
         'Dim sr As New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
         Me.CsvSW = New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
@@ -147,6 +148,101 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
         End Try
 
     End Function
+    ''' <summary>
+    ''' シーケンスファイル作成メソッド
+    ''' </summary>
+    ''' <param name="blnFrame"></param>
+    ''' <param name="delm"></param>
+    ''' <returns></returns>
+    Public Function CreateSequence(Optional ByVal blnFrame As Boolean = False,
+                                   Optional ByVal delm As String = "") As String
+        Dim colCount As Integer = Me.OutputDef.OutputFiledList.Count
+        Dim lastColIndex As Integer = colCount - 1
+        Dim i As Integer
+
+        Try
+            'ヘッダを書き込む
+            If OutputDef.OutputReservedCustomOutputFiledHeader <> "" Then
+                Me.CsvSW.Write(OutputDef.OutputReservedCustomOutputFiledHeader)
+                Me.CsvSW.Write(vbCrLf)
+            End If
+            'レコードを書き込む
+            Dim row As DataRow
+            For Each row In Me.CsvData.Rows
+                For i = 0 To colCount - 1
+
+                    Dim fieldName As String = Me.OutputDef.OutputFiledList.Keys(i)
+                    Dim fieldLength As Integer = Me.OutputDef.OutputFiledList(fieldName)
+                    If Me.CsvData.Columns.Contains(fieldName) = False Then
+                        Return ""
+                    End If
+                    'フィールドの取得
+                    Dim field As String = Convert.ToString(row(fieldName))
+                    field = PaddingRightSpace(field, fieldLength)
+                    '"で囲む
+                    If blnFrame = True Then
+                        field = EncloseDoubleQuotesIfNeed(field)
+                    End If
+                    'フィールドを書き込む
+                    Me.CsvSW.Write(field)
+                    'カンマを書き込む
+                    If lastColIndex > i Then
+                        Me.CsvSW.Write(delm)
+                    End If
+                Next
+                '改行する
+                'Me.CsvSW.Write(vbCrLf)
+            Next
+            '閉じる
+            Me.CsvSW.Close()
+
+            '★指定フォルダが設定されている場合
+            If Me.UploadFilePath <> "" Then
+                '作成したファイルを指定フォルダに配置する。
+                System.IO.File.Copy(Me.UploadTmpFilePath, Me.UploadFilePath)
+            End If
+
+            ''ストリーム生成
+            'Using fs As New IO.FileStream(Me.UploadTmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            '    Dim binaryLength = Convert.ToInt32(fs.Length)
+            '    ReDim retByte(binaryLength)
+            '    fs.Read(retByte, 0, binaryLength)
+            '    fs.Flush()
+            'End Using
+            Return UrlRoot & Me.UploadTmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+
+        End Try
+    End Function
+    ''' <summary>
+    ''' シーケンスヘッダーファイル生成
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function CreateSequenceRequest(Optional requestFileName As String = "COSDE.SEQ") As String
+        Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        Dim filePath As String = IO.Path.Combine(Me.UploadRootPath, requestFileName)
+        Using sw As New IO.StreamWriter(filePath, False, enc)
+            'データ種別
+            sw.Write(PaddingRightSpace("90", 2))
+            '処理区分
+            sw.Write(PaddingRightSpace("0", 1))
+            '年月日
+            sw.Write(PaddingRightSpace(Strings.StrDup(8, "0"), 8))
+            '支店コード
+            Dim branch As String = "06"
+            If Me.OutputDef.OfficeCode = "012401" Then
+                branch = "08"
+            End If
+            sw.Write(PaddingRightSpace(branch, 2))
+            '予備
+            sw.Write(PaddingRightSpace(Strings.StrDup(238, "0"), 238))
+        End Using
+        Return UrlRoot & requestFileName
+
+    End Function
 
     ''' <summary>
     ''' 必要ならば、文字列をダブルクォートで囲む
@@ -182,7 +278,31 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
             field.EndsWith(" ") OrElse
             field.EndsWith(vbTab)
     End Function
-
+    ''' <summary>
+    ''' 全角混在、文字数オーバーした場合はカットする関数
+    ''' </summary>
+    ''' <param name="targetString">対象文字列</param>
+    ''' <param name="length">設定バイト数</param>
+    ''' <returns></returns>
+    Private Function PaddingRightSpace(targetString As String, length As Integer) As String
+        Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        '最大Length分の追加スペースを一旦追加
+        Dim additionalSpace As String = Space(length)
+        Dim editString As String = targetString & additionalSpace
+        '入力文字列を切り取りバイト配列に格納
+        Dim bArray() As Byte = DirectCast(Array.CreateInstance(GetType(Byte), length), Byte())
+        Dim st1 As String = enc.GetString(bArray)
+        Array.Copy(enc.GetBytes(editString), 0, bArray, 0, length)
+        '切り取った結果をバイト配列に格納
+        Dim resString As String = enc.GetString(bArray)
+        '最後が全角の1バイト分の場合はLengthが1少ない為、１スペース分足す
+        Dim resLength = enc.GetByteCount(resString)
+        If length = resLength - 1 Then
+            Return resString.Substring(0, resString.Length - 1) & " "
+        Else
+            Return resString
+        End If
+    End Function
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには
 

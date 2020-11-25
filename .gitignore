@@ -89,6 +89,7 @@ ipch/
 *.vsp
 *.vspx
 *.sap
+*.vbproj
 
 # TFS 2012 Local Workspace
 $tf/
@@ -161,6 +162,7 @@ PublishScripts/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 # NuGet v3's project.json files produces more ignoreable files
+*.config
 *.nuget.props
 *.nuget.targets
 

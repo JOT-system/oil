@@ -50,6 +50,13 @@ Public Class OIT0002LinkDetail
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
 
+    '○ 貨車連結順序表ダウンロード用
+    Private WW_ARTICLENAME() As String = {"検", "○"}               '品名
+    Private WW_OBJECTIVENAME() As String = {"残車",
+                                            "交検",
+                                            "回送(全検)",
+                                            "回送(その他)"}         '指示内容
+
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
@@ -85,6 +92,7 @@ Public Class OIT0002LinkDetail
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT",
+                             "WF_CheckBoxSELECTINSPECTION",
                              "WF_CheckBoxSELECTOTTRANSPORT"   'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
@@ -375,77 +383,78 @@ Public Class OIT0002LinkDetail
         If work.WF_SEL_CREATEFLG.Text = 1 Then
 
             SQLStr =
-              " SELECT TOP (@P01)" _
-            & "   0                                             AS LINECNT " _
-            & " , ''                                            AS OPERATION " _
-            & " , ''                                            AS UPDTIMSTP " _
-            & " , 1                                             AS 'SELECT' " _
-            & " , 0                                             AS HIDDEN " _
-            & " , @P02                                          AS RLINKNO " _
-            & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS RLINKDETAILNO " _
-            & " , ''                                            AS LINKNO " _
-            & " , @P10                                          AS REGISTRATIONDATE " _
-            & " , ''                                            AS TRAINNO " _
-            & " , ''                                            AS MODEL " _
-            & " , ''                                            AS TANKNUMBER " _
-            & " , @P03                                          AS OFFICECODE " _
-            & " , @P04                                          AS OFFICENAME " _
-            & " , ''                                            AS PATTERNCODE " _
-            & " , ''                                            AS PATTERNNAME " _
-            & " , ''                                            AS SHIPPERSCODE " _
-            & " , ''                                            AS SHIPPERSNAME " _
-            & " , ''                                            AS BASECODE " _
-            & " , ''                                            AS BASENAME " _
-            & " , ''                                            AS CONSIGNEECODE " _
-            & " , ''                                            AS CONSIGNEENAME " _
-            & " , ''                                            AS ORDERINFO " _
-            & " , ''                                            AS ORDERINFONAME " _
-            & " , @P05                                          AS DEPSTATION " _
-            & " , @P06                                          AS DEPSTATIONNAME " _
-            & " , @P07                                          AS RETSTATION " _
-            & " , @P08                                          AS RETSTATIONNAME " _
-            & " , ''                                            AS EMPARRDATE " _
-            & " , ''                                            AS PREOILCODE " _
-            & " , ''                                            AS PREOILNAME " _
-            & " , ''                                            AS PREORDERINGTYPE " _
-            & " , ''                                            AS PREORDERINGOILNAME " _
-            & " , ''                                            AS ARTICLENAME " _
-            & " , ''                                            AS CONVERSIONAMOUNT " _
-            & " , ''                                            AS ARTICLE " _
-            & " , ''                                            AS ARTICLETRAINNO " _
-            & " , ''                                            AS ARTICLEOILNAME " _
-            & " , ''                                            AS CURRENTCARTOTAL " _
-            & " , ''                                            AS EXTEND " _
-            & " , ''                                            AS CONVERSIONTOTAL " _
-            & " , ''                                            AS LOADINGIRILINEORDER " _
-            & " , ''                                            AS OILCODE " _
-            & " , ''                                            AS OILNAME " _
-            & " , ''                                            AS ORDERINGTYPE " _
-            & " , ''                                            AS ORDERINGOILNAME " _
-            & " , ''                                            AS FILLINGPOINT " _
-            & " , ''                                            AS LINE " _
-            & " , ''                                            AS LOADINGIRILINETRAINNO " _
-            & " , ''                                            AS LOADINGIRILINETRAINNAME " _
-            & " , ''                                            AS LOADINGOUTLETTRAINNO " _
-            & " , ''                                            AS LOADINGOUTLETTRAINNAME " _
-            & " , ''                                            AS LOADINGOUTLETORDER " _
-            & " , ''                                            AS ORDERNO " _
-            & " , ''                                            AS DETAILNO " _
-            & " , ''                                            AS LOADINGTRAINNO " _
-            & " , ''                                            AS LOADINGTRAINNAME " _
-            & " , ''                                            AS LOADINGDEPSTATION " _
-            & " , ''                                            AS LOADINGDEPSTATIONNAME " _
-            & " , ''                                            AS LOADINGRETSTATION " _
-            & " , ''                                            AS LOADINGRETSTATIONNAME " _
-            & " , ''                                            AS ORDERTRKBN " _
-            & " , ''                                            AS OTTRANSPORTFLG " _
-            & " , ''                                            AS LOADINGLODDATE " _
-            & " , ''                                            AS LOADINGDEPDATE " _
-            & " , ''                                            AS LOADINGARRDATE " _
-            & " , ''                                            AS LOADINGACCDATE " _
-            & " , ''                                            AS LOADINGEMPARRDATE " _
-            & " , '0'                                           AS DELFLG " _
-            & " FROM sys.all_objects "
+                  " SELECT TOP (@P01)" _
+                & "   0                                             AS LINECNT " _
+                & " , ''                                            AS OPERATION " _
+                & " , ''                                            AS UPDTIMSTP " _
+                & " , 1                                             AS 'SELECT' " _
+                & " , 0                                             AS HIDDEN " _
+                & " , @P02                                          AS RLINKNO " _
+                & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS RLINKDETAILNO " _
+                & " , ''                                            AS LINKNO " _
+                & " , @P10                                          AS REGISTRATIONDATE " _
+                & " , ''                                            AS TRAINNO " _
+                & " , ''                                            AS MODEL " _
+                & " , ''                                            AS TANKNUMBER " _
+                & " , @P03                                          AS OFFICECODE " _
+                & " , @P04                                          AS OFFICENAME " _
+                & " , ''                                            AS PATTERNCODE " _
+                & " , ''                                            AS PATTERNNAME " _
+                & " , ''                                            AS SHIPPERSCODE " _
+                & " , ''                                            AS SHIPPERSNAME " _
+                & " , ''                                            AS BASECODE " _
+                & " , ''                                            AS BASENAME " _
+                & " , ''                                            AS CONSIGNEECODE " _
+                & " , ''                                            AS CONSIGNEENAME " _
+                & " , ''                                            AS ORDERINFO " _
+                & " , ''                                            AS ORDERINFONAME " _
+                & " , @P05                                          AS DEPSTATION " _
+                & " , @P06                                          AS DEPSTATIONNAME " _
+                & " , @P07                                          AS RETSTATION " _
+                & " , @P08                                          AS RETSTATIONNAME " _
+                & " , ''                                            AS EMPARRDATE " _
+                & " , ''                                            AS PREOILCODE " _
+                & " , ''                                            AS PREOILNAME " _
+                & " , ''                                            AS PREORDERINGTYPE " _
+                & " , ''                                            AS PREORDERINGOILNAME " _
+                & " , ''                                            AS ARTICLENAME " _
+                & " , ''                                            AS CONVERSIONAMOUNT " _
+                & " , ''                                            AS ARTICLE " _
+                & " , ''                                            AS ARTICLETRAINNO " _
+                & " , ''                                            AS ARTICLEOILNAME " _
+                & " , ''                                            AS CURRENTCARTOTAL " _
+                & " , ''                                            AS EXTEND " _
+                & " , ''                                            AS CONVERSIONTOTAL " _
+                & " , ''                                            AS LOADINGIRILINEORDER " _
+                & " , ''                                            AS INSPECTIONFLG" _
+                & " , ''                                            AS OILCODE " _
+                & " , ''                                            AS OILNAME " _
+                & " , ''                                            AS ORDERINGTYPE " _
+                & " , ''                                            AS ORDERINGOILNAME " _
+                & " , ''                                            AS FILLINGPOINT " _
+                & " , ''                                            AS LINE " _
+                & " , ''                                            AS LOADINGIRILINETRAINNO " _
+                & " , ''                                            AS LOADINGIRILINETRAINNAME " _
+                & " , ''                                            AS LOADINGOUTLETTRAINNO " _
+                & " , ''                                            AS LOADINGOUTLETTRAINNAME " _
+                & " , ''                                            AS LOADINGOUTLETORDER " _
+                & " , ''                                            AS ORDERNO " _
+                & " , ''                                            AS DETAILNO " _
+                & " , ''                                            AS LOADINGTRAINNO " _
+                & " , ''                                            AS LOADINGTRAINNAME " _
+                & " , ''                                            AS LOADINGDEPSTATION " _
+                & " , ''                                            AS LOADINGDEPSTATIONNAME " _
+                & " , ''                                            AS LOADINGRETSTATION " _
+                & " , ''                                            AS LOADINGRETSTATIONNAME " _
+                & " , ''                                            AS ORDERTRKBN " _
+                & " , ''                                            AS OTTRANSPORTFLG " _
+                & " , ''                                            AS LOADINGLODDATE " _
+                & " , ''                                            AS LOADINGDEPDATE " _
+                & " , ''                                            AS LOADINGARRDATE " _
+                & " , ''                                            AS LOADINGACCDATE " _
+                & " , ''                                            AS LOADINGEMPARRDATE " _
+                & " , '0'                                           AS DELFLG " _
+                & " FROM sys.all_objects "
 
             SQLStr &=
                   " ORDER BY " _
@@ -454,102 +463,116 @@ Public Class OIT0002LinkDetail
             '明細データダブルクリック
         ElseIf work.WF_SEL_CREATEFLG.Text = 2 Then
             SQLStr =
-              " SELECT " _
-            & "   0                                             AS LINECNT " _
-            & " , ''                                            AS OPERATION " _
-            & " , CAST(OIT0011.UPDTIMSTP AS bigint)             AS UPDTIMSTP " _
-            & " , 1                                             AS 'SELECT' " _
-            & " , 0                                             AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIT0011.RLINKNO), '')            AS RLINKNO " _
-            & " , ISNULL(RTRIM(OIT0011.RLINKDETAILNO), '')      AS RLINKDETAILNO " _
-            & " , ISNULL(RTRIM(OIT0011.LINKNO), '')             AS LINKNO " _
-            & " , ISNULL(RTRIM(OIT0011.REGISTRATIONDATE), '')   AS REGISTRATIONDATE " _
-            & " , ISNULL(RTRIM(OIT0011.TRAINNO), '')            AS TRAINNO " _
-            & " , ISNULL(RTRIM(OIT0011.TRUCKSYMBOL), '')        AS MODEL " _
-            & " , ISNULL(RTRIM(OIT0011.TRUCKNO), '')            AS TANKNUMBER " _
-            & " , ISNULL(RTRIM(OIT0002.OFFICECODE)," _
-            & "          ISNULL(RTRIM(OIT0004.OFFICECODE), '')) AS OFFICECODE " _
-            & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')         AS OFFICENAME " _
-            & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')          AS PATTERNCODE " _
-            & " , ''                                            AS PATTERNNAME " _
-            & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')       AS SHIPPERSCODE " _
-            & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')       AS SHIPPERSNAME " _
-            & " , ISNULL(RTRIM(OIT0002.BASECODE), '')           AS BASECODE " _
-            & " , ISNULL(RTRIM(OIT0002.BASENAME), '')           AS BASENAME " _
-            & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')      AS CONSIGNEECODE " _
-            & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')      AS CONSIGNEENAME " _
-            & " , ISNULL(RTRIM(OIT0004.INFO), '')               AS ORDERINFO " _
-            & " , ''                                            AS ORDERINFONAME " _
-            & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')         AS DEPSTATION " _
-            & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')     AS DEPSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')         AS RETSTATION " _
-            & " , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')     AS RETSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIT0004.EMPARRDATE), '')         AS EMPARRDATE " _
-            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')         AS PREOILCODE " _
-            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')         AS PREOILNAME " _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), '')    AS PREORDERINGTYPE " _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), '') AS PREORDERINGOILNAME " _
-            & " , ISNULL(RTRIM(OIT0011.ARTICLENAME), '')        AS ARTICLENAME " _
-            & " , ISNULL(RTRIM(OIT0011.CONVERSIONAMOUNT), '')   AS CONVERSIONAMOUNT " _
-            & " , ISNULL(RTRIM(OIT0011.ARTICLE), '')            AS ARTICLE " _
-            & " , ISNULL(RTRIM(OIT0011.ARTICLETRAINNO), '')     AS ARTICLETRAINNO " _
-            & " , ISNULL(RTRIM(OIT0011.ARTICLEOILNAME), '')     AS ARTICLEOILNAME " _
-            & " , ISNULL(RTRIM(OIT0011.CURRENTCARTOTAL), '')    AS CURRENTCARTOTAL " _
-            & " , ISNULL(RTRIM(OIT0011.EXTEND), '')             AS EXTEND " _
-            & " , ISNULL(RTRIM(OIT0011.CONVERSIONTOTAL), '')    AS CONVERSIONTOTAL " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER)," _
-            & "          RTRIM(OIT0011.SERIALNUMBER))           AS LOADINGIRILINEORDER " _
-            & " , ISNULL(RTRIM(OIT0003.OILCODE), '')            AS OILCODE " _
-            & " , ISNULL(RTRIM(OIT0003.OILNAME), '')            AS OILNAME " _
-            & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')       AS ORDERINGTYPE " _
-            & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')    AS ORDERINGOILNAME " _
-            & " , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')       AS FILLINGPOINT " _
-            & " , ISNULL(RTRIM(OIT0003.LINE), '')               AS LINE " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO)," _
-            & "          RTRIM(OIT0004.LINETRAINNO))            AS LOADINGIRILINETRAINNO  " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNAME), '') AS LOADINGIRILINETRAINNAME " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNO), '')    AS LOADINGOUTLETTRAINNO " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNAME), '')  AS LOADINGOUTLETTRAINNAME " _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETORDER), '')      AS LOADINGOUTLETORDER " _
-            & " , ISNULL(RTRIM(OIT0011.ORDERNO), '')            AS ORDERNO " _
-            & " , ISNULL(RTRIM(OIT0011.DETAILNO), '')           AS DETAILNO " _
-            & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')            AS LOADINGTRAINNO " _
-            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')          AS LOADINGTRAINNAME " _
-            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')         AS LOADINGDEPSTATION " _
-            & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')     AS LOADINGDEPSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')         AS LOADINGRETSTATION " _
-            & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')     AS LOADINGRETSTATIONNAME " _
-            & " , ''                                            AS ORDERTRKBN " _
-            & " , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')" _
-            & "   WHEN '1' THEN 'on'" _
-            & "   WHEN '2' THEN ''" _
-            & "   ELSE ''" _
-            & "   END                                           AS OTTRANSPORTFLG" _
-            & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '') AS LOADINGLODDATE" _
-            & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '') AS LOADINGDEPDATE" _
-            & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '') AS LOADINGARRDATE" _
-            & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), '') AS LOADINGACCDATE" _
-            & " , ISNULL(FORMAT(OIT0002.EMPARRDATE, 'yyyy/MM/dd'), '') AS LOADINGEMPARRDATE" _
-            & " , ISNULL(RTRIM(OIT0004.DELFLG), '')             AS DELFLG " _
-            & " FROM OIL.OIT0011_RLINK OIT0011 " _
-            & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
-            & "     OIT0004.LINKNO       = OIT0011.LINKNO" _
-            & " AND OIT0004.LINKDETAILNO = OIT0011.RLINKDETAILNO " _
-            & " AND OIT0004.STATUS       = '1' " _
-            & " AND OIT0004.DELFLG      <> @P09 " _
-            & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
-            & "     OIT0011.TRUCKNO = OIM0005.TANKNUMBER " _
-            & " AND OIM0005.DELFLG <> @P09 " _
-            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
-            & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
-            & " AND OIT0002.DELFLG <> @P09 " _
-            & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-            & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
-            & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
-            & " AND OIT0003.DELFLG <> @P09 " _
-            & " WHERE OIT0011.RLINKNO = @P02" _
-            & " AND OIT0011.DELFLG <> @P09 " _
-            & " AND ISNULL(OIT0011.TRUCKSYMBOL, '') <> '' "
+                  " SELECT " _
+                & "   0                                             AS LINECNT " _
+                & " , ''                                            AS OPERATION " _
+                & " , CAST(OIT0011.UPDTIMSTP AS bigint)             AS UPDTIMSTP " _
+                & " , 1                                             AS 'SELECT' " _
+                & " , 0                                             AS HIDDEN " _
+                & " , ISNULL(RTRIM(OIT0011.RLINKNO), '')            AS RLINKNO " _
+                & " , ISNULL(RTRIM(OIT0011.RLINKDETAILNO), '')      AS RLINKDETAILNO " _
+                & " , ISNULL(RTRIM(OIT0011.LINKNO), '')             AS LINKNO " _
+                & " , ISNULL(RTRIM(OIT0011.REGISTRATIONDATE), '')   AS REGISTRATIONDATE " _
+                & " , ISNULL(RTRIM(OIT0011.TRAINNO), '')            AS TRAINNO " _
+                & " , ISNULL(RTRIM(OIT0011.TRUCKSYMBOL), '')        AS MODEL " _
+                & " , ISNULL(RTRIM(OIT0011.TRUCKNO), '')            AS TANKNUMBER " _
+                & " , ISNULL(RTRIM(OIT0002.OFFICECODE)," _
+                & "          ISNULL(RTRIM(OIT0004.OFFICECODE), '')) AS OFFICECODE " _
+                & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')         AS OFFICENAME " _
+                & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')          AS PATTERNCODE " _
+                & " , ''                                            AS PATTERNNAME " _
+                & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')       AS SHIPPERSCODE " _
+                & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')       AS SHIPPERSNAME " _
+                & " , ISNULL(RTRIM(OIT0002.BASECODE), '')           AS BASECODE " _
+                & " , ISNULL(RTRIM(OIT0002.BASENAME), '')           AS BASENAME " _
+                & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')      AS CONSIGNEECODE " _
+                & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')      AS CONSIGNEENAME " _
+                & " , ISNULL(RTRIM(OIT0004.INFO), '')               AS ORDERINFO " _
+                & " , ''                                            AS ORDERINFONAME " _
+                & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')         AS DEPSTATION " _
+                & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')     AS DEPSTATIONNAME " _
+                & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')         AS RETSTATION " _
+                & " , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')     AS RETSTATIONNAME " _
+                & " , ISNULL(RTRIM(OIT0004.EMPARRDATE), '')         AS EMPARRDATE " _
+                & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')         AS PREOILCODE " _
+                & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')         AS PREOILNAME " _
+                & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), '')    AS PREORDERINGTYPE " _
+                & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), '') AS PREORDERINGOILNAME " _
+                & " , ISNULL(RTRIM(OIT0011.ARTICLENAME), '')        AS ARTICLENAME " _
+                & " , ISNULL(RTRIM(OIT0011.CONVERSIONAMOUNT), '')   AS CONVERSIONAMOUNT " _
+                & " , ISNULL(RTRIM(OIT0011.ARTICLE), '')            AS ARTICLE " _
+                & " , ISNULL(RTRIM(OIT0011.ARTICLETRAINNO), '')     AS ARTICLETRAINNO " _
+                & " , ISNULL(RTRIM(OIT0011.ARTICLEOILNAME), '')     AS ARTICLEOILNAME " _
+                & " , ISNULL(RTRIM(OIT0011.CURRENTCARTOTAL), '')    AS CURRENTCARTOTAL " _
+                & " , ISNULL(RTRIM(OIT0011.EXTEND), '')             AS EXTEND " _
+                & " , ISNULL(RTRIM(OIT0011.CONVERSIONTOTAL), '')    AS CONVERSIONTOTAL " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER)," _
+                & "          RTRIM(OIT0011.SERIALNUMBER))           AS LOADINGIRILINEORDER " _
+                & " , CASE ISNULL(RTRIM(OIT0005.TANKSITUATION), '')" _
+                & "   WHEN @P11 THEN 'on'" _
+                & "   ELSE ''" _
+                & "   END                                           AS INSPECTIONFLG" _
+                & " , ISNULL(RTRIM(OIT0003.OILCODE), '')            AS OILCODE " _
+                & " , ISNULL(RTRIM(OIT0003.OILNAME), '')            AS OILNAME " _
+                & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')       AS ORDERINGTYPE " _
+                & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')    AS ORDERINGOILNAME " _
+                & " , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')       AS FILLINGPOINT " _
+                & " , ISNULL(RTRIM(OIT0003.LINE), '')               AS LINE " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO)," _
+                & "          RTRIM(OIT0004.LINETRAINNO))            AS LOADINGIRILINETRAINNO  " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNAME), '') AS LOADINGIRILINETRAINNAME " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNO), '')    AS LOADINGOUTLETTRAINNO " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNAME), '')  AS LOADINGOUTLETTRAINNAME " _
+                & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETORDER), '')      AS LOADINGOUTLETORDER " _
+                & " , ISNULL(RTRIM(OIT0011.ORDERNO), '')            AS ORDERNO " _
+                & " , ISNULL(RTRIM(OIT0011.DETAILNO), '')           AS DETAILNO " _
+                & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')            AS LOADINGTRAINNO " _
+                & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')          AS LOADINGTRAINNAME " _
+                & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')         AS LOADINGDEPSTATION " _
+                & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')     AS LOADINGDEPSTATIONNAME " _
+                & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')         AS LOADINGRETSTATION " _
+                & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')     AS LOADINGRETSTATIONNAME " _
+                & " , ''                                            AS ORDERTRKBN " _
+                & " , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                           AS OTTRANSPORTFLG" _
+                & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '') AS LOADINGLODDATE" _
+                & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '') AS LOADINGDEPDATE" _
+                & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '') AS LOADINGARRDATE" _
+                & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), '') AS LOADINGACCDATE" _
+                & " , ISNULL(FORMAT(OIT0002.EMPARRDATE, 'yyyy/MM/dd'), '') AS LOADINGEMPARRDATE" _
+                & " , ISNULL(RTRIM(OIT0004.DELFLG), '')             AS DELFLG " _
+                & " FROM OIL.OIT0011_RLINK OIT0011 " _
+                & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
+                & "     OIT0004.LINKNO       = OIT0011.LINKNO" _
+                & " AND OIT0004.LINKDETAILNO = OIT0011.RLINKDETAILNO " _
+                & " AND OIT0004.STATUS       = '1' " _
+                & " AND OIT0004.DELFLG      <> @P09 " _
+                & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+                & "     OIT0011.TRUCKNO = OIM0005.TANKNUMBER " _
+                & " AND OIM0005.DELFLG <> @P09 "
+
+            '### 20201021 START 指摘票対応(No183)全体 #############################################
+            SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+                & "     OIT0011.TRUCKNO = OIT0005.TANKNUMBER " _
+                & " AND OIT0005.TANKSITUATION = @P11 " _
+                & " AND OIT0005.DELFLG <> @P09 "
+            '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+            SQLStr &=
+                  " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+                & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
+                & " AND OIT0002.DELFLG <> @P09 " _
+                & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+                & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
+                & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
+                & " AND OIT0003.DELFLG <> @P09 " _
+                & " WHERE OIT0011.RLINKNO = @P02" _
+                & " AND OIT0011.DELFLG <> @P09 " _
+                & " AND ISNULL(OIT0011.TRUCKSYMBOL, '') <> '' "
 
             SQLStr &=
                   " ORDER BY " _
@@ -578,6 +601,7 @@ Public Class OIT0002LinkDetail
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40)  '着駅名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Date)         '登録年月日
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar)     'タンク車状況コード
 
                 PARA01.Value = O_INSCNT
                 If work.WF_SEL_RLINKNO.Text <> "" Then
@@ -599,6 +623,7 @@ Public Class OIT0002LinkDetail
                 PARA08.Value = work.WF_SEL_RETSTATIONNAME.Text
                 PARA09.Value = C_DELETE_FLG.DELETE
                 PARA10.Value = Now.ToString("yyyy/MM/dd")
+                PARA11.Value = BaseDllConst.CONST_TANKSITUATION_13
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -1082,6 +1107,19 @@ Public Class OIT0002LinkDetail
                         End If
                     End If
                 Next
+                '### 20201021 START 指摘票対応(No183)全体 #############################################
+            Case "WF_CheckBoxSELECTINSPECTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+                    If OIT0002tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0002tbl.Rows(i)("INSPECTIONFLG") = "on" Then
+                            OIT0002tbl.Rows(i)("INSPECTIONFLG") = ""
+                        Else
+                            OIT0002tbl.Rows(i)("INSPECTIONFLG") = "on"
+                        End If
+                    End If
+                Next
+                '### 20201021 END   指摘票対応(No183)全体 #############################################
             Case Else
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
@@ -1861,6 +1899,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS EXTEND " _
             & " , ''                                            AS CONVERSIONTOTAL " _
             & " , ''                                            AS LOADINGIRILINEORDER " _
+            & " , ''                                            AS INSPECTIONFLG" _
             & " , ''                                            AS OILCODE " _
             & " , ''                                            AS OILNAME " _
             & " , ''                                            AS ORDERINGTYPE " _
@@ -2075,18 +2114,38 @@ Public Class OIT0002LinkDetail
             & " , OIT0011.TRUCKSYMBOL                            AS TRUCKSYMBOL" _
             & " , OIT0011.TRUCKNO                                AS TRUCKNO" _
             & " , OIT0011.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
-            & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
-            & " , OIT0011.ARTICLENAME                            AS ARTICLENAME" _
-            & " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
+            & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME"
+
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        'SQLStr &=
+        '      " , OIT0011.ARTICLENAME                            AS ARTICLENAME"
+        SQLStr &=
+              " , CASE ISNULL(RTRIM(OIT0005.TANKSITUATION), '')" _
+            & "   WHEN @TANKSITUATION THEN '" & WW_ARTICLENAME(0) & "'" _
+            & "   ELSE OIT0011.ARTICLENAME" _
+            & "   END                                            AS ARTICLENAME"
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+        SQLStr &=
+              " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
             & " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
             & " , OIT0011.ARTICLE                                AS ARTICLE" _
             & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
             & " , OIT0011.EXTEND                                 AS EXTEND" _
             & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
+            & " , OIT0011.OBJECTIVENAME                          AS OBJECTIVENAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201021 START 指摘票対応(No189)全体 #############################################
+        SQLStr &=
+              " , OIT0005_LASTOIL.LASTOILCODE                    AS LASTOILCODE" _
+            & " , OIT0005_LASTOIL.LASTOILNAME                    AS LASTOILNAME" _
+            & " , OIT0005_LASTOIL.PREORDERINGTYPE                AS PREORDERINGTYPE" _
+            & " , OIT0005_LASTOIL.PREORDERINGOILNAME             AS PREORDERINGOILNAME"
+        '### 20201021 END   指摘票対応(No189)全体 #############################################
 
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
@@ -2104,9 +2163,23 @@ Public Class OIT0002LinkDetail
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
-            & " , OIT0002.TRAINNO                                AS ORDERTRAINNO " _
-            & " , FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')          AS ORDERLODDATE " _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')          AS ORDERDEPDATE " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGTRAINNO" _
+            & "   ELSE OIT0002.TRAINNO" _
+            & "   END                                            AS ORDERTRAINNO " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGLODDATE" _
+            & "   ELSE FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')" _
+            & "   END                                            AS ORDERLODDATE " _
+            & " , CASE " _
+            & "   WHEN OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(2) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & WW_OBJECTIVENAME(3) & "' THEN OIT0011.LOADINGDEPDATE" _
+            & "   ELSE FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')" _
+            & "   END                                            AS ORDERDEPDATE " _
+            & " , OIT0011.FORWARDINGARRSTATION                   AS FORWARDINGARRSTATION" _
+            & " , OIT0011.FORWARDINGCONFIGURE                    AS FORWARDINGCONFIGURE" _
             & " , OIT0002.ORDERNO                                AS ORDERNO " _
             & " , OIT0003.DETAILNO                               AS DETAILNO " _
             & " , ''                                             AS ORDERTRKBN " _
@@ -2123,7 +2196,8 @@ Public Class OIT0002LinkDetail
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
               " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "     OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & " AND OIM0029.KEYCODE04 = '1' " _
             & " AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
             & " AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "
@@ -2135,6 +2209,21 @@ Public Class OIT0002LinkDetail
         '    & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
         '### 20201002 END   変換マスタに移行したため修正 ########################
 
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+                & "     OIT0011.TRUCKNO = OIT0005.TANKNUMBER " _
+                & " AND OIT0005.TANKSITUATION = @TANKSITUATION " _
+                & " AND OIT0005.DELFLG <> @DELFLG "
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
+
+        '### 20201021 START 指摘票対応(No189)全体 #############################################
+        SQLStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005_LASTOIL ON " _
+                & "     OIT0011.TRUCKNO = OIT0005_LASTOIL.TANKNUMBER " _
+                & " AND OIT0005_LASTOIL.DELFLG <> @DELFLG "
+        '### 20201021 END   指摘票対応(No189)全体 #############################################
+
         SQLStr &=
               " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0011.TRUCKNO " _
@@ -2143,10 +2232,12 @@ Public Class OIT0002LinkDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)  '貨車連結(臨海)順序表№
-                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)           '貨車連結(臨海)順序表№
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)              '削除フラグ
+                Dim P_TANKSITUATION As SqlParameter = SQLcmd.Parameters.Add("@TANKSITUATION", SqlDbType.NVarChar)   'タンク車状況コード
                 P_RLINKNO.Value = work.WF_SEL_RLINKNO.Text
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_13
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2308,6 +2399,32 @@ Public Class OIT0002LinkDetail
 
             WW_UpdateORDER(SQLcon)
         End Using
+
+        '### 20201021 START 指摘票対応(No183)全体 #############################################
+        'タンク車所在(交検)更新
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            If OIT0002row("INSPECTIONFLG") = "on" Then
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：タンク車状況　⇒　変更あり("13"(交検中))
+                WW_UpdateTankShozai(Nothing, Nothing, Nothing,
+                                    I_TANKNO:=OIT0002row("TANKNUMBER"),
+                                    I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_13)
+            Else
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：タンク車状況　⇒　変更あり("01"(残車))
+                '※タンク車状況が"13"(交検中)の場合のみ"01"(残車)へ更新
+                WW_UpdateTankShozai(Nothing, Nothing, Nothing,
+                                    I_TANKNO:=OIT0002row("TANKNUMBER"),
+                                    I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                    I_CONDITION:="TANKSITUATION",
+                                    I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_13)
+            End If
+        Next
+        '### 20201021 END   指摘票対応(No183)全体 #############################################
 
         If WF_UPDERRFLG.Value <> "1" Then
             '貨車連結表(一覧)画面表示データ取得
@@ -3119,8 +3236,11 @@ Public Class OIT0002LinkDetail
 
             '★コンテナの場合はタンク車番号チェックは未実施
             cvTruckSymbol = StrConv(OIT0002row("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
-            If cvTruckSymbol.Substring(0, 1) = "コ" _
-                OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+            '    ### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
+            'If cvTruckSymbol.Substring(0, 1) = "コ" _
+            '    OrElse cvTruckSymbol.Substring(0, 1) = "チ" Then
+            If cvTruckSymbol.Substring(0, 1) = "チ" Then
+                '### 20201022 END   コタキ(OTタンク車)のため除外しない対応 ########
                 Continue For
             End If
 
@@ -3420,6 +3540,7 @@ Public Class OIT0002LinkDetail
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
 
             '検索SQL文
             Dim SQLStr As String =
@@ -5912,6 +6033,11 @@ Public Class OIT0002LinkDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        '### 交検フラグ用 START ############################################################
+        Dim chkObjIN As CheckBox = Nothing
+        Dim chkObjIdWOINcnt As String = "chk" & pnlListArea.ID & "INSPECTIONFLG"
+        Dim chkObjINId As String
+        '### 交検フラグ用 END   ############################################################
         '### OT輸送フラグ用 START ##########################################################
         Dim chkObjOT As CheckBox = Nothing
         Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea.ID & "OTTRANSPORTFLG"
@@ -5933,9 +6059,23 @@ Public Class OIT0002LinkDetail
                 cvTruckSymbolSub = ""
             End Try
 
+            '★交検可否フラグ
+            chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+            chkObjIN = Nothing
+            For Each cellObj As TableCell In rowitem.Controls
+                chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                'コントロールが見つかったら脱出
+                If chkObjIN IsNot Nothing Then
+                    Exit For
+                End If
+            Next
+
             For Each cellObj As TableCell In rowitem.Controls
                 '★コンテナの場合は入力制限する。
-                If (cvTruckSymbolSub = "コ" OrElse cvTruckSymbolSub = "チ") Then
+                '    ### 20201022 START コタキ(OTタンク車)のため除外しない対応 ########
+                'If (cvTruckSymbolSub = "コ" OrElse cvTruckSymbolSub = "チ") Then
+                If (cvTruckSymbolSub = "チ") Then
+                    '### 20201022 END   コタキ(OTタンク車)のため除外しない対応 ########
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _
@@ -5949,6 +6089,9 @@ Public Class OIT0002LinkDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
+
+                    '交検(チェックボックス)を非活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
 
                     '★(一覧)の営業所が受注営業所コード(テキストボックス)と不一致の場合は入力制限する。
                 ElseIf loopdr("OFFICECODE") <> work.WF_SEL_OFFICECODE.Text Then
@@ -5965,6 +6108,9 @@ Public Class OIT0002LinkDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
+
+                    '交検(チェックボックス)を非活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
 
                 Else
                     '(一覧)積込油種, (一覧)入線列車, (一覧)出線列車, 
@@ -5983,6 +6129,10 @@ Public Class OIT0002LinkDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                     End If
+
+                    '交検(チェックボックス)を活性
+                    If chkObjIN IsNot Nothing Then chkObjIN.Enabled = True
+
                 End If
             Next
 
@@ -6207,8 +6357,11 @@ Public Class OIT0002LinkDetail
                                       ByVal I_KBN As String,
                                       Optional ByVal I_OFFICE As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
-                                      Optional ByVal upActualEmparrDate As Boolean = False)
+                                      Optional ByVal upActualEmparrDate As Boolean = False,
+                                      Optional ByVal I_CONDITION As String = Nothing,
+                                      Optional ByVal I_CONDITION_VAL As String = Nothing)
 
         Try
             'DataBase接続文字
@@ -6237,6 +6390,10 @@ Public Class OIT0002LinkDetail
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
             End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+            End If
             ''空車着日（予定）
             'If upEmparrDate = True Then
             '    SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
@@ -6253,7 +6410,15 @@ Public Class OIT0002LinkDetail
                     & "        UPDTERMID    = @P13, " _
                     & "        RECEIVEYMD   = @P14  " _
                     & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02; "
+                    & "    AND DELFLG      <> @P02  "
+
+            '◯条件付加
+            If Not String.IsNullOrEmpty(I_CONDITION) AndAlso Not String.IsNullOrEmpty(I_CONDITION_VAL) Then
+                Select Case I_CONDITION
+                    Case "TANKSITUATION"
+                        SQLStr &= "    AND TANKSITUATION = '" & I_CONDITION_VAL & "'"
+                End Select
+            End If
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300

@@ -265,8 +265,13 @@ Public Class OIT0004OilStockCreate
                 Next 'suggestListItem
             Else
                 dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
+
             End If
             '既登録データ抽出
+            If dispDataObj.TrainOperationList IsNot Nothing AndAlso
+              (From itm In dispDataObj.TrainList.Values Where itm.TrainNo.Equals("川崎")).Any Then
+
+            End If
         End Using
         '取得値を元に再計算
         dispDataObj.RecalcStockList(False)
@@ -1365,14 +1370,14 @@ Public Class OIT0004OilStockCreate
         Dim dateTo As String = qdataVal.Last    '過去日ではない内最後
         'ACCDATE[受入日（予定）]を元に取得（変更の場合は条件と抽出両方の項目忘れずに）
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("  　 , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("  　 , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS AMOUNT")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.LODDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
         sqlStr.AppendLine("   AND ODR.ACTUALLODDATE is not null")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
@@ -1389,7 +1394,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -2185,14 +2190,14 @@ Public Class OIT0004OilStockCreate
         Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
 
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         '荷主取得条件(JOINTコード考慮)↓
@@ -2208,7 +2213,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -2318,9 +2323,11 @@ Public Class OIT0004OilStockCreate
                     Dim targetDate As String = ""
                     Dim trainNum As Decimal = 0D
                     Dim miTrainNum As Decimal = 0D
+                    Dim hasKawasakiAnyValue As Boolean = False
                     While sqlDr.Read
                         targetDate = Convert.ToString(sqlDr("STOCKYMD"))
                         trainNo = Convert.ToString(sqlDr("TRAINNO"))
+                        hasKawasakiAnyValue = False
                         '対象日付を保持していない場合はスキップ
                         If retVal.SuggestList.ContainsKey(targetDate) = False Then
                             Continue While
@@ -2342,6 +2349,10 @@ Public Class OIT0004OilStockCreate
 
                             trainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "1"))
                             miTrainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "2"))
+                            If trainNo.Equals("川崎") AndAlso {DayOfWeek.Saturday, DayOfWeek.Sunday}.Contains(CDate(targetDate).DayOfWeek) _
+                                AndAlso (trainNum > 0 OrElse miTrainNum > 0) Then
+                                hasKawasakiAnyValue = True
+                            End If
                             '対象の油種にテーブル内容を転記
                             If suggestDayTrainItm.ContainsKey(oilCode) Then
                                 suggestDayTrainItm(oilCode).ItemValue = trainNum.ToString
@@ -2351,6 +2362,10 @@ Public Class OIT0004OilStockCreate
                             End If
 
                         Next oilCodeToFieldName
+
+                        If hasKawasakiAnyValue Then
+                            retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).TrainLock = False
+                        End If
                     End While
                 End If
             End Using 'sqlDr
@@ -6359,7 +6374,62 @@ Public Class OIT0004OilStockCreate
                     suggestOrder.Value.MiSuggestValuesItem = itm.SuggestValuesItem
                 Next
             End Sub
+            ''' <summary>
+            ''' 受注提案キー情報保持
+            ''' </summary>
+            <Serializable>
+            Public Structure SuggestKeys
+                ''' <summary>
+                ''' インデックス
+                ''' </summary>
+                Public Index As Integer
+                ''' <summary>
+                ''' 積込日
+                ''' </summary>
+                Public LodDate As String
 
+                ''' <summary>
+                ''' 自身に格納している情報をBase64情報に変換
+                ''' </summary>
+                ''' <returns></returns>
+                Public Function GetKeyString() As String
+                    Dim enc As Encoding = Encoding.GetEncoding("UFT-8")
+                    Dim key As String = LodDate & "@" & Index
+                    Return Convert.ToBase64String(enc.GetBytes(key))
+                End Function
+                ''' <summary>
+                ''' Base64変換したキー情報を当構造体形式にデコード
+                ''' </summary>
+                ''' <param name="keyString"></param>
+                ''' <returns></returns>
+                Public Shared Function GetDecKeyString(keyString As String) As SuggestKeys
+                    Dim enc As Encoding = Encoding.GetEncoding("UFT-8")
+                    Dim index As Integer = 0
+                    Dim lodDate As String = ""
+                    If lodDate = "" Then
+                        Return Nothing
+                    End If
+                    Dim decodedString = enc.GetString(Convert.FromBase64String(keyString))
+                    Dim splitVal = decodedString.Split("@"c)
+                    If Not (splitVal IsNot Nothing AndAlso splitVal.Length > 2 AndAlso IsNumeric(splitVal(1))) Then
+                        lodDate = splitVal(0)
+                        index = CInt(splitVal(1))
+                        Return GetNewSuggestKey(index, lodDate)
+                    Else
+                        Return Nothing
+                    End If
+
+                End Function
+                ''' <summary>
+                ''' ２値を持つ構造体に変換
+                ''' </summary>
+                ''' <param name="index"></param>
+                ''' <param name="lodDate"></param>
+                ''' <returns></returns>
+                Public Shared Function GetNewSuggestKey(index As Integer, lodDate As String) As SuggestKeys
+                    Return New SuggestKeys With {.LodDate = lodDate, .Index = index}
+                End Function
+            End Structure
             ''' <summary>
             ''' 受注提案タンク車数用数値情報格納クラス
             ''' </summary>
@@ -6390,6 +6460,11 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property TrainInfo As TrainListItem
+                ''' <summary>
+                ''' 先頭アイテム
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property IsFirstLodDate As Boolean = True
                 ''' <summary>
                 ''' デフォルトプロパティ
                 ''' </summary>
@@ -6468,6 +6543,16 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property TrainInfo As TrainListItem
+                ''' <summary>
+                ''' 基準日（LodDateから受入日を算出するための日数）
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property AccDays As Integer = 0
+                ''' <summary>
+                ''' 何もしない場合の初期のAcc日数
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property DafaultAccDate As String = ""
             End Class
         End Class
         ''' <summary>

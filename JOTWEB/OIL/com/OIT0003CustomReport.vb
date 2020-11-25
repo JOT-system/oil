@@ -80,7 +80,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
 
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
@@ -103,6 +103,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
         ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
             OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入出力画面"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_GOI_FILLINGPOINT.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("五井明細データ"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         ElseIf excelFileName = "OIT0003L_NEGISHI_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("回線別積込"), Excel.Worksheet)
@@ -310,6 +313,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("UPGRADE").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
+
+                '### 20201105 START 指摘票対応(No210)全体 ################################
+                '★「５０％運行分」※甲子営業所(2685列車)対応
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 _
+                    AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = "2685" Then
+                    If Remark = "" Then
+                        Remark &= "「５０％運行分」"
+                    Else
+                        Remark &= vbCrLf + "「５０％運行分」"
+                    End If
+                End If
+                '### 20201105 END   指摘票対応(No210)全体 ################################
+
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then
@@ -397,7 +413,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim strTotalTankSave As String = ""
 
         Try
-            Dim z() As Integer = {5, 32, 59}
+            '### 20201112 START 行数追加に伴い開始行を変更 ##########
+            'Dim z() As Integer = {5, 32, 59, 86}
+            Dim z() As Integer = {5, 49, 93, 137}
+            '### 20201112 END   行数追加に伴い開始行を変更 ##########
             Dim j As Integer = 0
             Dim i As Integer = z(j)
             Dim lineNo As Integer = 1
@@ -511,13 +530,25 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditGoiShipHeaderArea(lodDate)
-            '◯明細の設定
-            EditGoiShipDetailArea()
-            '***** TODO処理 ここまで *****
-            'ExcelTempSheet.Delete() '雛形シート削除
+            Select Case repPtn
+                '充填ポイント表
+                Case "FILLINGPOINT"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditGoiFillingPointHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditGoiFillingPointDetailArea()
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+                Case Else
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditGoiShipHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditGoiShipDetailArea()
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+            End Select
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -541,6 +572,84 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngWrite)
         End Try
     End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(充填ポイント表(五井))
+    ''' </summary>
+    Private Sub EditGoiFillingPointHeaderArea(ByVal lodDate As String)
+        'Dim rngHeaderArea As Excel.Range = Nothing
+
+        'Try
+
+        'Catch ex As Exception
+        '    Throw
+        'Finally
+        '    ExcelMemoryRelease(rngHeaderArea)
+        'End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(充填ポイント表(五井))
+    ''' </summary>
+    Private Sub EditGoiFillingPointDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 3
+
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 積込日
+                rngDetailArea = Me.ExcelWorkSheet.Range("A" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("LODDATE")
+                '◯ 入線列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
+                '◯ 積込車数
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("TOTALCNT")
+                '◯ 回線
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("LINE")
+                '◯ 充填ポイント
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("LOADINGPOINT")
+                '◯ 油種
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("OILCODE")
+                '◯ 油種区分
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("ORDERINGTYPE")
+                '◯ 車型
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("MODEL")
+                '◯ 車番
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("TANKNO")
+                '◯ 着駅
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("ARRSTATION")
+                '◯ 着駅名
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("ARRSTATIONNAME")
+                '◯ 発列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("TRAINNO")
+                '◯ 発列車名
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("TRAINNAME")
+                '◯ 所在
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+
+                i += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(五井))
@@ -576,7 +685,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private Sub EditGoiShipDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
         Dim svTrainNo As String = ""
-        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q"}
+        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q", "R"}
+        Dim iOilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         Dim iYoko As Integer = 0
 
         Try
@@ -587,6 +697,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("OTTRAINNO").ToString() Then
                     '行を１つ下に移動
                     i += 1
+                    '油種数を初期化
+                    iOilCnt = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
                 End If
 
                 '油種が未設定の場合は次のデータへ
@@ -621,18 +733,21 @@ Public Class OIT0003CustomReport : Implements IDisposable
                         iYoko = 6
 
                     '◯黒油
-                    '　LA-1(ＬＳＡ - 1)
+                    '　LA-1(LSA-1, LSA-1(山岳))
                     Case BaseDllConst.CONST_COSMO_LSA
                         iYoko = 7
-                    '　LAブ(ＬＳＡ - 1（山岳）)
+                    '　LAブ(LSA-ブレンド, LSA-ブレンド(山岳))
                     Case BaseDllConst.CONST_COSMO_LSABU
                         iYoko = 8
-                    '　AFO(AFO)
+                    '　AFO(AFO, AFO(山岳))
                     Case BaseDllConst.CONST_COSMO_AFO
                         iYoko = 9
-                    '　A-SP(AFO（山岳）)
+                    '　A-SP(AFOーSP, AFOーSP(山岳))
                     Case BaseDllConst.CONST_COSMO_AFOSP
                         iYoko = 10
+                    '　A(ブ(AFOーブレンド(山岳))
+                    Case BaseDllConst.CONST_COSMO_AFOBU
+                        iYoko = 11
 
                     Case Else
                         Continue For
@@ -640,7 +755,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
                 '★帳票に値を設定
                 rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
-                rngDetailArea.Value = PrintDatarow("CNT")
+                iOilCnt(iYoko) += Integer.Parse(Convert.ToString(PrintDatarow("CNT")))
+                rngDetailArea.Value = iOilCnt(iYoko)
 
                 '★列車番号を退避
                 svTrainNo = PrintDatarow("OTTRAINNO").ToString()
@@ -735,7 +851,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            'Dim i As Integer = 0
+            Dim i As Integer = 0
             Dim iST As Integer = 0
             Dim i1ST As Integer = 6
             Dim i2ST As Integer = 17
@@ -776,23 +892,30 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     End Select
                 End If
 
-                ''◯ 注
+                '★スポットの位置を設定
+                i = iST + (Integer.Parse(PrintDatarow("SPOTNO").ToString()) - 1)
+                '◯ 注
                 'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ATTENTION")
                 '◯ 車両番号
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("SYARYONUMBER")
                 '◯ 油種名
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
                 '◯ 予約数量
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("RESERVEDQUANTITY")
                 '◯ 納入先
-                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + i.ToString())
                 rngDetailArea.Value = PrintDatarow("DELIVERYFIRST")
 
-                iST += 1
+                'iST += 1
                 sPointy = PrintDatarow("LOADINGPOINT").ToString()
 
             Next
@@ -817,15 +940,20 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditSodegauraLineHeaderArea(lodDate, rTrainNo)
-            '◯明細の設定
-            EditSodegauraLineDetailArea()
-            '◯フッターの設定
-            EditSodegauraLineFooterArea(rTrainNo)
-            '***** TODO処理 ここまで *****
-            'ExcelTempSheet.Delete() '雛形シート削除
+            '○帳票の種類
+            Select Case repPtn
+                '★入線方(袖ヶ浦)
+                Case "LINEPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditSodegauraLineHeaderArea(lodDate, rTrainNo)
+                    '◯明細の設定
+                    EditSodegauraLineDetailArea()
+                    '◯フッターの設定
+                    EditSodegauraLineFooterArea(rTrainNo)
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+            End Select
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -1107,7 +1235,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String, ByVal lodDate As String) As String
+    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String,
+                                                ByVal lodDate As String,
+                                                Optional ByVal dtFT As DataTable = Nothing,
+                                                Optional ByVal dtPF As DataTable = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -1117,7 +1248,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '***** TODO処理 ここから *****
             If repPtn = "SHIPPLAN" Then
                 '◯ヘッダーの設定
-                EditNegishiShipHeaderArea(lodDate)
+                EditNegishiShipHeaderArea(lodDate, dtFT, dtPF)
                 '◯明細の設定
                 EditNegishiShipDetailArea()
             ElseIf repPtn = "LOADPLAN" Then
@@ -1156,7 +1287,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
-    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String)
+    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String, ByVal dtFT As DataTable, ByVal dtPF As DataTable)
         Dim rngHeaderArea As Excel.Range = Nothing
         'Dim valueYear As String = Now.AddDays(1).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
         'Dim valueMonth As String = Now.AddDays(1).ToString("MM", New Globalization.CultureInfo("ja-JP"))
@@ -1175,6 +1306,58 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '日
             rngHeaderArea = Me.ExcelWorkSheet.Range("H3")
             rngHeaderArea.Value = valueDay
+
+            '### 20201105 START 指摘票対応(No193) ####################################################################
+            '#枠(計画)
+            Dim iTTank As Integer = 0
+            For Each dtPFrow As DataRow In dtPF.Rows
+                Select Case Convert.ToString(dtPFrow("OILCODE"))
+                    'HG
+                    Case BaseDllConst.CONST_HTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E61")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'RG
+                    Case BaseDllConst.CONST_RTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E62")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    '灯油、未添加灯油
+                    Case BaseDllConst.CONST_TTank,
+                         BaseDllConst.CONST_MTTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E63")
+                        iTTank += Integer.Parse(Convert.ToString(dtPFrow("SHIPPINGPLAN")))
+                        rngHeaderArea.Value = iTTank
+                    '軽油
+                    Case BaseDllConst.CONST_KTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E65")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    '3号軽油
+                    Case BaseDllConst.CONST_K3Tank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E66")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'A重油
+                    Case BaseDllConst.CONST_ATank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E67")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                    'LSA
+                    Case BaseDllConst.CONST_LTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E68")
+                        rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
+                End Select
+            Next
+            '### 20201105 START 指摘票対応(No193) ####################################################################
+
+            '### 20201105 START 指摘票対応(No191) ####################################################################
+            '積込日
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E71")
+            rngHeaderArea.Value = lodDate
+            '出荷開始日(3号軽油)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E72")
+            rngHeaderArea.Value = dtFT.Rows(0)("ORDERFROMDATE")
+            '出荷終了日(3号軽油)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E73")
+            rngHeaderArea.Value = dtFT.Rows(0)("ORDERTODATE")
+            '### 20201105 END   指摘票対応(No191) ####################################################################
+
         Catch ex As Exception
             Throw
         Finally

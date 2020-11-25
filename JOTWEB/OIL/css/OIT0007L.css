@@ -1,2 +1,204 @@
-﻿body {
+﻿/* 左ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+
+/* 右ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HR"] table tr {
+    height: 37px;
+}
+
+/* 左(固定データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"] {
+    top: 37px;
+}
+/* 右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px;
+}
+
+/* 受付情報のツールチップをOFFにする */
+/* ### 20200807 START ツールチップOFFを解除 ###
+div[data-generated="1"] td:nth-child(4) {
+    pointer-events: none;
+}
+   ### 20200807 END   ツールチップOFFを解除 ### */
+/* Operetion枠の左マージンを個別指定 */
+.Operation {
+    margin-left: 0.7em;
+}
+/* 横スクロールを出す最小幅を個別指定 */
+form.btnCnt1 .headerboxOnly {
+    min-width: 1100px; /* (共通指定 650pxだと小さすぎる為) */
+}
+
+form.btnCnt2 .headerboxOnly {
+    min-width: 1230px; /* (共通指定 650pxだと小さすぎる為) */
+}
+
+form.btnCnt3 .headerboxOnly {
+    min-width: 1365px; /* (共通指定 650pxだと小さすぎる為) */
+}
+/* 帳票ポップアップ個別指定*/
+#txtReportLodDate {
+    width: 150px !important;
+}
+
+#txtReportRTrainNo {
+    width: 150px !important;
+}
+
+.calendarIconArea div {
+    margin-top: calc(100% - 10px) !important;
+}
+
+.boxIconArea div {
+    margin-top: calc(100% - 10px) !important;
+}
+
+a.ef {
+    height: 30px;
+    width: 150px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+    a.ef input {
+        height: 28px;
+    }
+
+.rightSide {
+    height: 31.3px;
+}
+
+.filterDateFiledWrapper {
+    display: inline-block;
+    height: 25px;
+    vertical-align: middle;
+}
+
+    .filterDateFiledWrapper td {
+        vertical-align: middle;
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: center;
+        margin-top: -4px;
+    }
+
+.filterDateFiledWrapper input[type=radio] {
+    /* margin-top: 2px; */
+    margin-left: 5px;
+    margin-right: 5px;
+    /* height: 15px; */
+    cursor: pointer;
+}
+
+.filterDateFiledWrapper input[type=radio] + label {
+    cursor: pointer;
+    //display:inline-block;
+    //height:20px;
+}
+
+.filterDateFiledWrapper input[type=radio]:checked + label {
+    color: darkcyan;
+}
+
+#rblFilterDateFiled {
+    height: 100%;
+}
+#fupAttachment {
+    display: none;
+}
+
+/* ********************** */
+/* 更新確認ボックス関連   */
+/* ********************** */
+/* 初期は非表示 */
+#divUpdList {
+    display:none;
+    pointer-events:none;
+}
+/* 初期は非表示 */
+#divUpdList.showUpdConfirm {
+    padding:5px;
+    display:block;
+    position:absolute;
+    top:0;
+    background-color:white;
+    width:100%;
+    height:100%;
+    z-index:10;
+    pointer-events:auto;
+}
+#divUpdList .actionButtonBox {
+    width:100vw;
+}
+#divUpdList #divInputResultWrapper {
+    width:calc(100% - 5px);
+    height:calc(100% - 35px);
+    overflow:auto;
+}
+#divUpdList .updateList {
+    //height: calc(100% - 20px);
+    margin-bottom:20px;
+    min-height:410px;
+}
+#btnCloseThisConfirm {
+    margin-right: 10px;
+}
+.tblUpdList {
+    border-collapse :collapse;
+    table-layout:fixed;
+} 
+.tblUpdList th,
+.tblUpdList td {
+    padding: 5px;
+    vertical-align :middle;
+    border:1px solid gray;
+}
+.tblUpdList td { 
+    vertical-align :top;
+}
+.tblUpdList td.updChk {
+    text-align:center;
+    vertical-align :middle;
+} 
+.tblUpdList th.updChk {
+    width:32px;
+}
+.tblUpdList th.reservedNo {
+    width:100px;
+}
+.tblUpdList th.trnNo {
+    width:90px;
+}
+.tblUpdList th.oilName {
+    width:80px;
+}
+.tblUpdList th.amount {
+    width:50px;
+}
+.tblUpdList th.reason {
+    width:150px;
+}
+.tblUpdList th.dbReservedNo {
+    width:65px;
+}
+.tblUpdList th.trainNo {
+    width:65px;
+}
+.tblUpdList th.lodDate,
+.tblUpdList th.depDate{
+    width:90px;
+}
+
+.tblUpdList th {
+    background-color:rgb(189,215,238);
+}
+.tblUpdList th.db {
+    background-color:rgb(248,203,173);
+}
+.tblUpdList td.amount {
+    text-align:right;
 }

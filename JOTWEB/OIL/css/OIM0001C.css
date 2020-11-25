@@ -1,0 +1,28 @@
+﻿/*左Boxオープン用虫眼鏡アイコン*/
+/*.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}*/
+
+/*カレンダーオープン用アイコン*/
+/*.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}*/
+
+/* 実行画面 ヘッダー部(詳細) */
+.detailboxOnly input[type='text'] {
+    padding-left: 1.3em;
+}
+
+/*削除フラグ(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_DELFLG_ICON {
+    position: fixed;
+    height: 50px;
+    width: 50px;
+    top: 4px;
+    left: 15px;
+    cursor: pointer;
+}

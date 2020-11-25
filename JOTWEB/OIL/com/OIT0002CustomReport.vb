@@ -80,7 +80,7 @@ Public Class OIT0002CustomReport : Implements IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
 
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
@@ -222,34 +222,52 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '◯ 交検日
                 rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("INSPECTIONDATE")
+                '### 20201021 START 指摘票対応(No189)全体 #############################################
+                '◯ 前回油種
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
+                '### 20201021 START 指摘票対応(No189)全体 #############################################
 
                 '### 運　用　指　示 ###########################################
-                '◯ 充 填 線(油　種)
+                '### 20201111 START 指摘票対応(No190)全体 #####################
+                '◯ タンク車指示(指示内容)
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OBJECTIVENAME")
+                '### 20201111 END   指摘票対応(No190)全体 #####################
+                '◯ 充 填 線(油　種)
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
                 'rngDetailArea.Value = PrintDatarow("RINKAIOILKANA")
                 rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
                 '◯ 充 填 線(回　転)
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("LINE")
                 '◯ 充 填 線(位　置)
-                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("FILLINGPOINT")
                 '◯ 入　線 　列　車
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
                 '◯ 着駅(本線列車)※自動設定のため未設定
-                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
                 'rngDetailArea.Value = PrintDatarow("LOADINGARRSTATIONNAME")
 
                 '◯ ポラリス受注登録必須項目(本線列車)
-                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERTRAINNO")
                 '◯ ポラリス受注登録必須項目(積込日)
-                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERLODDATE")
                 '◯ ポラリス受注登録必須項目(発日)
-                rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("T" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERDEPDATE")
+                '### 20201111 START 指摘票対応(No190)全体 #####################
+                '◯ ポラリス受注登録必須項目(回送(着駅))
+                rngDetailArea = Me.ExcelWorkSheet.Range("U" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("FORWARDINGARRSTATION")
+                '◯ ポラリス受注登録必須項目(回送(その他))
+                rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("FORWARDINGCONFIGURE")
+                '### 20201111 END   指摘票対応(No190)全体 #####################
 
                 i += 1
             Next

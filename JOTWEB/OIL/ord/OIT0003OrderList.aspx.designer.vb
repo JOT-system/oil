@@ -338,6 +338,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbNegishiLoadBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''rbKuukaiBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbKuukaiBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbFillingPointBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbFillingPointBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
     '''lblReportRTrainNo コントロール。
     '''</summary>
     '''<remarks>
@@ -354,6 +372,24 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''lblEndMonthChkDmy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblEndMonthChkDmy As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''ChkEndMonthChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkEndMonthChk As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''Master プロパティ。

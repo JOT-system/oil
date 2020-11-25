@@ -15,6 +15,10 @@ Public Class OIT0003OrderList
     Private OIT0003tbl As DataTable                                 '一覧格納用テーブル
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003EXLUPtbl As DataTable                            'EXCELアップロード用
+    Private OIT0003EXLDELtbl As DataTable                           'EXCELアップロード(削除)用
+    Private OIT0003EXLINStbl As DataTable                           'EXCELアップロード(追加(回線別積込取込(日新)TBL))用
+    Private OIT0003EXLCHKtbl As DataTable                           'EXCELアップロード(チェック)用
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
@@ -25,7 +29,9 @@ Public Class OIT0003OrderList
     Private OIT0003ReportKinoenetbl As DataTable                    '帳票用(甲子)テーブル
     Private OIT0003ReportSodegauratbl As DataTable                  '帳票用(袖ヶ浦)テーブル
     Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
+    Private OIT0003ReportPlanFrame As DataTable                     '帳票用(計画枠用)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
+    Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -41,6 +47,17 @@ Public Class OIT0003OrderList
     Private Const CONST_SODE_TRAIN_8883 As String = "8883"          '袖ヶ浦営業所(列車番号：8883)
     Private Const CONST_SODE_TRAIN_5461 As String = "5461"          '袖ヶ浦営業所(列車番号：5461)
 
+    '○ 帳票用
+    Private Const CONST_RPT_LOADPLAN As String = "LOADPLAN"                 '積込予定(共通)
+    Private Const CONST_RPT_LOADPLAN_KINOENE As String = "KINOENE_LOADPLAN" '積込予定(甲子)
+    Private Const CONST_RPT_LOADPLAN_NEGISHI As String = "NEGISHI_LOADPLAN" '積込予定(根岸)
+    Private Const CONST_RPT_OTLOADPLAN As String = "OTLOADPLAN"             'OT積込予定(共通)
+    Private Const CONST_RPT_SHIPPLAN As String = "SHIPPLAN"                 '出荷予定
+    Private Const CONST_RPT_LINEPLAN As String = "LINEPLAN"                 '入線予定(袖ヶ浦)
+    Private Const CONST_RPT_DELIVERYPLAN As String = "DELIVERYPLAN"         '託送指示
+    Private Const CONST_RPT_KUUKAI_SODEGAURA As String = "KUUKAI_SODEGAURA" '空回日報(袖ヶ浦)
+    Private Const CONST_RPT_FILLINGPOINT As String = "FILLINGPOINT"         '充填ポイント表
+
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
@@ -49,6 +66,7 @@ Public Class OIT0003OrderList
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -94,7 +112,7 @@ Public Class OIT0003OrderList
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            'WF_FILEUPLOAD()
+                            WF_FILEUPLOAD()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -249,8 +267,12 @@ Public Class OIT0003OrderList
         Me.rbOTLoadBtn.Visible = False
         '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
         Me.rbLineBtn.Visible = False
-        Me.rbNegishiLoadBtn.Visible = False
         Me.rbKinoeneLoadBtn.Visible = False
+        Me.rbNegishiLoadBtn.Visible = False
+        '### 20201106 START 指摘票No195(空回日報対応) #################################################
+        Me.rbKuukaiBtn.Visible = False
+        '### 20201106 END   指摘票No195(空回日報対応) #################################################
+        Me.rbFillingPointBtn.Visible = False
 
         ''帳票のポップアップを閉じる
         'Master.HideCustomPopUp()
@@ -1303,7 +1325,8 @@ Public Class OIT0003OrderList
 
         '★列車マスタから情報を取得
         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        'WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAIN.Text + work.WF_SEL_ARRIVALSTATION.Text, WW_GetValue)
         '発送順区分
         work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
         'OT本線列車
@@ -1394,8 +1417,433 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FILEUPLOAD()
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '★ファイル判別フラグ
+        Dim useFlg As String = ""
+
+        Try
+            '○ UPLOAD XLSデータ取得
+            CS0023XLSUPLOAD.CS0023XLSUPLOAD_NEGISHI_LOADPLAN(OIT0003EXLUPtbl)
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        '◯回線別積込取込(日新)TBL削除処理(再アップロード対応)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_DELETE_NLINELOAD(SQLcon)
+        End Using
+
+        '◯回線別積込取込(日新)TBL追加処理
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_INSERT_NLINELOAD(SQLcon)
+        End Using
+
+        '◯回線別積込取込(日新)TBL更新処理(JOT油種反映)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UPDATE_NLINELOAD(SQLcon)
+        End Using
 
     End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL削除処理(再アップロード対応)
+    ''' </summary>
+    ''' <param name="SQLcon">接続オブジェクト</param>
+    Protected Sub WW_DELETE_NLINELOAD(ByVal SQLcon As SqlConnection)
+        '再アップロード時の削除データ取得用
+        If IsNothing(OIT0003EXLDELtbl) Then
+            OIT0003EXLDELtbl = New DataTable
+        End If
+
+        If OIT0003EXLDELtbl.Columns.Count <> 0 Then
+            OIT0003EXLDELtbl.Columns.Clear()
+        End If
+
+        OIT0003EXLDELtbl.Clear()
+
+        '○ ＤＢ削除
+        Dim SQLDelNLineLoadTblStr As String =
+          " DELETE FROM OIL.OIT0012_NLINELOAD WHERE FILENAME = @P01 AND LODDATE = @P02 AND DELFLG = '0'; "
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを回線別積込取込(日新)テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT " _
+            & "      ISNULL(RTRIM(OIT0012.FILENAME), '')         AS FILENAME " _
+            & "    , ISNULL(RTRIM(OIT0012.REGISTRATIONDATE), '') AS REGISTRATIONDATE " _
+            & "    , ISNULL(RTRIM(OIT0012.LODDATE), '')          AS LODDATE " _
+            & "    , ISNULL(RTRIM(OIT0012.LINE), '')             AS LINE " _
+            & "    , ISNULL(RTRIM(OIT0012.ARRSTATION), '')       AS ARRSTATION " _
+            & "    , ISNULL(RTRIM(OIT0012.TRAINNO), '')          AS TRAINNO " _
+            & " FROM oil.OIT0012_NLINELOAD OIT0012 " _
+            & " WHERE " _
+            & "     OIT0012.FILENAME = @P01 " _
+            & " AND OIT0012.LODDATE  = @P02 " _
+            & " AND OIT0012.DELFLG  <> @P03 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLDel1cmd As New SqlCommand(SQLDelNLineLoadTblStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      'ファイル名
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)          '積置日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)   '削除フラグ
+
+                PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+                PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003EXLDELtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003EXLDELtbl.Load(SQLdr)
+                End Using
+
+                '★削除対象データが存在した場合
+                If OIT0003EXLDELtbl.Rows.Count <> 0 Then
+                    '★削除実行(回線別積込取込(日新)テーブル)
+                    Dim PARADELRL01 As SqlParameter = SQLDel1cmd.Parameters.Add("@P01", SqlDbType.NVarChar) 'ファイル名
+                    Dim PARADELRL02 As SqlParameter = SQLDel1cmd.Parameters.Add("@P02", SqlDbType.NVarChar) '積置日
+                    PARADELRL01.Value = OIT0003EXLDELtbl.Rows(0)("FILENAME")
+                    PARADELRL02.Value = OIT0003EXLDELtbl.Rows(0)("LODDATE")
+                    SQLDel1cmd.ExecuteNonQuery()
+                    SQLDel1cmd.Dispose()
+                End If
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL追加処理
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    Protected Sub WW_INSERT_NLINELOAD(ByVal SQLcon As SqlConnection, Optional ByVal useFlg As String = Nothing)
+
+        '追加SQL文･･･回線別積込取込(日新)TBL
+        Dim SQLNLineLoadStr As String =
+              " INSERT INTO OIL.OIT0012_NLINELOAD " _
+            & " ( FILENAME  , REGISTRATIONDATE, LODDATE       , LINE" _
+            & " , ARRSTATION, TRAINNO         , POINT         , OIL" _
+            & " , TANKNO    , TRAINNODETAIL   , LOADINGTRAINNO, LOADINGTANKNO" _
+            & " , DELFLG    , INITYMD         , INITUSER      , INITTERMID" _
+            & " , UPDYMD    , UPDUSER         , UPDTERMID     , RECEIVEYMD)"
+
+        SQLNLineLoadStr &=
+              " VALUES" _
+            & " ( @FILENAME  , @REGISTRATIONDATE, @LODDATE       , @LINE" _
+            & " , @ARRSTATION, @TRAINNO         , @POINT         , @OIL" _
+            & " , @TANKNO    , @TRAINNODETAIL   , @LOADINGTRAINNO, @LOADINGTANKNO" _
+            & " , @DELFLG    , @INITYMD         , @INITUSER      , @INITTERMID" _
+            & " , @UPDYMD    , @UPDUSER         , @UPDTERMID     , @RECEIVEYMD);"
+
+        Try
+            Using SQLNLineLoadcmd As New SqlCommand(SQLNLineLoadStr, SQLcon)
+
+                Dim WW_DATENOW As DateTime = Date.Now
+                Dim FILENAME As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@FILENAME", SqlDbType.NVarChar)                 'ファイル名(EXCEL)
+                Dim REGISTRATIONDATE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@REGISTRATIONDATE", SqlDbType.Date) '登録年月日(EXCEL)
+                Dim LODDATE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LODDATE", SqlDbType.Date)                   '積込日(EXCEL)
+                Dim LINE As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LINE", SqlDbType.NVarChar)                         '回線(EXCEL)
+                Dim ARRSTATION As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@ARRSTATION", SqlDbType.NVarChar)             '着駅(EXCEL)
+                Dim TRAINNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar)                   '列車(EXCEL)
+                Dim POINT As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@POINT", SqlDbType.NVarChar)                       'ポイント(EXCEL)
+                Dim OIL As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@OIL", SqlDbType.NVarChar)                           '油種(EXCEL)
+                Dim TANKNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar)                     'タンク車№(EXCEL)
+                Dim TRAINNODETAIL As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@TRAINNODETAIL", SqlDbType.NVarChar)       '列車(EXCEL)
+                Dim LOADINGTRAINNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LOADINGTRAINNO", SqlDbType.NVarChar)     '列車(受注用)
+                Dim LOADINGTANKNO As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@LOADINGTANKNO", SqlDbType.NVarChar)       'タンク車№(受注用)
+
+                Dim DELFLG As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar)         '削除フラグ
+                Dim INITYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITYMD", SqlDbType.DateTime)       '登録年月日
+                Dim INITUSER As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITUSER", SqlDbType.NVarChar)     '登録ユーザーＩＤ
+                Dim INITTERMID As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@INITTERMID", SqlDbType.NVarChar) '登録端末
+                Dim UPDYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDYMD", SqlDbType.DateTime)         '更新年月日
+                Dim UPDUSER As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDUSER", SqlDbType.NVarChar)       '更新ユーザーＩＤ
+                Dim UPDTERMID As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@UPDTERMID", SqlDbType.NVarChar)   '更新端末
+                Dim RECEIVEYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime) '集信日時
+
+                For Each OIT0003EXLUProw As DataRow In OIT0003EXLUPtbl.Rows
+                    'ファイル名(EXCEL)
+                    FILENAME.Value = OIT0003EXLUProw("FILENAME")
+                    '登録年月日(EXCEL)
+                    REGISTRATIONDATE.Value = OIT0003EXLUProw("DATERECEIVEYMD")
+                    '積込日(EXCEL)
+                    LODDATE.Value = OIT0003EXLUProw("LODDATE")
+                    '回線(EXCEL)
+                    LINE.Value = OIT0003EXLUProw("LINE_HEADER")
+                    '着駅(EXCEL)
+                    ARRSTATION.Value = OIT0003EXLUProw("ARRSTATION_HEADER")
+                    '列車(EXCEL)
+                    TRAINNO.Value = OIT0003EXLUProw("TRAINNO_HEADER")
+                    'ポイント(EXCEL)
+                    POINT.Value = OIT0003EXLUProw("POINT")
+                    '油種(EXCEL)
+                    OIL.Value = OIT0003EXLUProw("OIL_DETAIL")
+                    'タンク車№(EXCEL)
+                    TANKNO.Value = OIT0003EXLUProw("TANKNO_DETAIL")
+                    '列車(EXCEL)
+                    TRAINNODETAIL.Value = OIT0003EXLUProw("TRAINNO_DETAIL")
+                    '列車(受注用)
+                    LOADINGTRAINNO.Value = OIT0003EXLUProw("TRAINNO")
+                    'タンク車№(受注用)
+                    LOADINGTANKNO.Value = OIT0003EXLUProw("TANKNO")
+
+                    '削除フラグ
+                    DELFLG.Value = C_DELETE_FLG.ALIVE
+                    '登録年月日
+                    INITYMD.Value = Date.Now
+                    '登録ユーザーＩＤ
+                    INITUSER.Value = Master.USERID
+                    '登録端末
+                    INITTERMID.Value = Master.USERTERMID
+                    '更新年月日
+                    UPDYMD.Value = Date.Now
+                    '更新ユーザーＩＤ
+                    UPDUSER.Value = Master.USERID
+                    '更新端末
+                    UPDTERMID.Value = Master.USERTERMID
+                    '集信日時
+                    RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    SQLNLineLoadcmd.CommandTimeout = 300
+                    SQLNLineLoadcmd.ExecuteNonQuery()
+                Next
+                'CLOSE
+                SQLNLineLoadcmd.Dispose()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_INSERT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 回線別積込取込(日新)TBL更新処理(JOT油種に変換)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UPDATE_NLINELOAD(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003EXLCHKtbl) Then
+            OIT0003EXLCHKtbl = New DataTable
+        End If
+
+        If OIT0003EXLCHKtbl.Columns.Count <> 0 Then
+            OIT0003EXLCHKtbl.Columns.Clear()
+        End If
+
+        OIT0003EXLCHKtbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLChkStr As String =
+              " SELECT " _
+            & "    OIM0029.value04   AS NISSHIN_OIL " _
+            & " ,  OIM0029.KEYCODE05 AS OILCODE " _
+            & " ,  OIM0029.KEYCODE06 AS OILNAME " _
+            & " ,  OIM0029.KEYCODE07 AS OILKANA " _
+            & " ,  OIM0029.KEYCODE08 AS SEGMENTOILCODE " _
+            & " ,  OIM0029.KEYCODE09 AS SEGMENTOILNAME " _
+            & " FROM OIL.OIM0029_CONVERT OIM0029 " _
+            & " WHERE OIM0029.CLASS     = @P01" _
+            & "   AND OIM0029.KEYCODE01 = @P02" _
+            & "   AND OIM0029.DELFLG   <> @P03"
+        Try
+            Using SQLChkcmd As New SqlCommand(SQLChkStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLChkcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '分類
+                Dim PARA02 As SqlParameter = SQLChkcmd.Parameters.Add("@P02", SqlDbType.NVarChar)     '受注営業所
+                Dim PARA03 As SqlParameter = SQLChkcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = "NISSHIN_OILMASTER"
+                PARA02.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLChkcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003EXLCHKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003EXLCHKtbl.Load(SQLdr)
+                End Using
+                'CLOSE
+                SQLChkcmd.Dispose()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_CHECK")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_CHECK"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        Try
+            '更新SQL文･･･回線別積込取込(日新)TBLの各項目をを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0012_NLINELOAD " _
+                    & "    SET LOADINGOILCODE          = @P05, " _
+                    & "        LOADINGOILNAME          = @P06, " _
+                    & "        LOADINGORDERINGTYPE     = @P07, " _
+                    & "        LOADINGORDERINGOILNAME  = @P08, " _
+                    & "        UPDYMD                  = @P09, " _
+                    & "        UPDUSER                 = @P10, " _
+                    & "        UPDTERMID               = @P11, " _
+                    & "        RECEIVEYMD              = @P12  " _
+                    & " WHERE " _
+                    & "     FILENAME = @P01 " _
+                    & " AND LODDATE  = @P02 " _
+                    & " AND OIL      = @P03 " _
+                    & " AND DELFLG  <> @P04 "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)              'ファイル名(EXCEL)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)                  '積込日(EXCEL)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar)              '油種(EXCEL)
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)           '削除フラグ
+            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)              '油種コード(JOT)
+            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)              '油種名(JOT)
+            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar)              '油種コード(受発注用)(JOT)
+            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar)              '油種名(受発注用)(JOT)
+            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.DateTime)  '更新年月日
+            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.NVarChar)  '更新端末
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.DateTime)  '集信日時
+
+            PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+            PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+            PARA04.Value = C_DELETE_FLG.DELETE
+            PARA09.Value = Date.Now
+            PARA10.Value = Master.USERID
+            PARA11.Value = Master.USERTERMID
+            PARA12.Value = C_DEFAULT_YMD
+
+            For Each OIT0003CHKrow In OIT0003EXLCHKtbl.Rows
+                PARA03.Value = OIT0003CHKrow("NISSHIN_OIL")
+                PARA05.Value = OIT0003CHKrow("OILCODE")
+                PARA06.Value = OIT0003CHKrow("OILNAME")
+                PARA07.Value = OIT0003CHKrow("SEGMENTOILCODE")
+                PARA08.Value = OIT0003CHKrow("SEGMENTOILNAME")
+
+                SQLcmd.ExecuteNonQuery()
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        Try
+            '追加SQL文･･･回線別積込取込(日新)WORK
+            Dim SQLNLineLoadStr As String =
+                  " DELETE FROM OIL.TMP0006_NLINELOAD; " _
+                & " INSERT INTO OIL.TMP0006_NLINELOAD " _
+                & " ( FILENAME      , REGISTRATIONDATE, LODDATE            , LINE" _
+                & " , ARRSTATION    , TRAINNO         , POINT              , OIL" _
+                & " , TANKNO        , TRAINNODETAIL   , LOADINGTRAINNO     , LOADINGTANKNO" _
+                & " , LOADINGOILCODE, LOADINGOILNAME  , LOADINGORDERINGTYPE, LOADINGORDERINGOILNAME" _
+                & " , DELFLG        , INITYMD         , INITUSER           , INITTERMID" _
+                & " , UPDYMD        , UPDUSER         , UPDTERMID          , RECEIVEYMD)"
+
+            SQLNLineLoadStr &=
+                  " SELECT" _
+                & "   FILENAME      , REGISTRATIONDATE, LODDATE            , LINE" _
+                & " , ARRSTATION    , TRAINNO         , POINT              , OIL" _
+                & " , TANKNO        , TRAINNODETAIL   , LOADINGTRAINNO     , LOADINGTANKNO" _
+                & " , LOADINGOILCODE, LOADINGOILNAME  , LOADINGORDERINGTYPE, LOADINGORDERINGOILNAME" _
+                & " , DELFLG        , INITYMD         , INITUSER           , INITTERMID" _
+                & " , UPDYMD        , UPDUSER         , UPDTERMID          , RECEIVEYMD" _
+                & " FROM OIL.OIT0012_NLINELOAD OIT0012" _
+                & " WHERE " _
+                & "     OIT0012.FILENAME = @P01" _
+                & " AND OIT0012.LODDATE  = @P02"
+
+            Using SQLNLineLoadcmd As New SqlCommand(SQLNLineLoadStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      'ファイル名
+                Dim PARA02 As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@P02", SqlDbType.Date)          '積置日
+
+                PARA01.Value = OIT0003EXLUPtbl.Rows(0)("FILENAME")
+                PARA02.Value = OIT0003EXLUPtbl.Rows(0)("LODDATE")
+
+                SQLNLineLoadcmd.CommandTimeout = 300
+                SQLNLineLoadcmd.ExecuteNonQuery()
+
+                'CLOSE
+                SQLNLineLoadcmd.Dispose()
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_NLINELOAD_WORK_INSERT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_NLINELOAD_WORK_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
 #End Region
 
     ' ******************************************************************************
@@ -1690,83 +2138,83 @@ Public Class OIT0003OrderList
                     CODENAME_get("ORDERSTATUS", OIT0003UPDrow("ORDERSTATUS"), OIT0003UPDrow("ORDERSTATUSNAME"), WW_DUMMY)
 
                     SQLcmd.ExecuteNonQuery()
+
+                    '### START 受注履歴テーブルの追加(2020/03/26) #############
+                    WW_InsertOrderHistory(SQLcon)
+                    '### END   ################################################
+
+                    '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
+                    For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
+                        Select Case strOrderSts
+                            Case BaseDllConst.CONST_ORDERSTATUS_100
+
+                                '### 何もしない####################
+
+                            '200:手配　～　310：手配完了
+                            Case BaseDllConst.CONST_ORDERSTATUS_200,
+                                 BaseDllConst.CONST_ORDERSTATUS_205,
+                                 BaseDllConst.CONST_ORDERSTATUS_210,
+                                 BaseDllConst.CONST_ORDERSTATUS_220,
+                                 BaseDllConst.CONST_ORDERSTATUS_230,
+                                 BaseDllConst.CONST_ORDERSTATUS_240,
+                                 BaseDllConst.CONST_ORDERSTATUS_250,
+                                 BaseDllConst.CONST_ORDERSTATUS_260,
+                                 BaseDllConst.CONST_ORDERSTATUS_270,
+                                 BaseDllConst.CONST_ORDERSTATUS_280,
+                                 BaseDllConst.CONST_ORDERSTATUS_290,
+                                 BaseDllConst.CONST_ORDERSTATUS_300,
+                                 BaseDllConst.CONST_ORDERSTATUS_305,
+                                 BaseDllConst.CONST_ORDERSTATUS_310,
+                                 BaseDllConst.CONST_ORDERSTATUS_320
+                                '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                                '引数１：所在地コード　⇒　変更なし(空白)
+                                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                                '引数３：積車区分　　　⇒　変更なし(空白)
+                                '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                                'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                '                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
+                                '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
+                                                    I_ActualEmparrDate:="", upActualEmparrDate:=True)
+
+                            '350：受注確定
+                            Case BaseDllConst.CONST_ORDERSTATUS_350
+                                StatusChk = True
+
+                                '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                                '引数１：所在地コード　⇒　変更あり(発駅)
+                                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                                '引数３：積車区分　　　⇒　変更なし(空白)
+                                WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                                    I_TANKNO:=OIT0003His2tblrow("TANKNO"),
+                                                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+
+                            '400：受入確認中, 450:受入確認中(受入日入力)
+                            Case BaseDllConst.CONST_ORDERSTATUS_400,
+                                 BaseDllConst.CONST_ORDERSTATUS_450
+
+                                '### 何もしない####################
+
+                            '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
+                            '　条件は追加しておく
+                            Case BaseDllConst.CONST_ORDERSTATUS_500,
+                                 BaseDllConst.CONST_ORDERSTATUS_550,
+                                 BaseDllConst.CONST_ORDERSTATUS_600,
+                                 BaseDllConst.CONST_ORDERSTATUS_700,
+                                 BaseDllConst.CONST_ORDERSTATUS_800,
+                                 BaseDllConst.CONST_ORDERSTATUS_900
+
+                                '### 何もしない####################
+
+                        End Select
+                    Next
                 End If
             Next
 
             'CLOSE
             SQLcmd.Dispose()
             SQLcmd = Nothing
-
-            '### START 受注履歴テーブルの追加(2020/03/26) #############
-            WW_InsertOrderHistory(SQLcon)
-            '### END   ################################################
-
-            '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
-            For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
-                Select Case strOrderSts
-                    Case BaseDllConst.CONST_ORDERSTATUS_100
-
-                        '### 何もしない####################
-
-                    '200:手配　～　310：手配完了
-                    Case BaseDllConst.CONST_ORDERSTATUS_200,
-                         BaseDllConst.CONST_ORDERSTATUS_205,
-                         BaseDllConst.CONST_ORDERSTATUS_210,
-                         BaseDllConst.CONST_ORDERSTATUS_220,
-                         BaseDllConst.CONST_ORDERSTATUS_230,
-                         BaseDllConst.CONST_ORDERSTATUS_240,
-                         BaseDllConst.CONST_ORDERSTATUS_250,
-                         BaseDllConst.CONST_ORDERSTATUS_260,
-                         BaseDllConst.CONST_ORDERSTATUS_270,
-                         BaseDllConst.CONST_ORDERSTATUS_280,
-                         BaseDllConst.CONST_ORDERSTATUS_290,
-                         BaseDllConst.CONST_ORDERSTATUS_300,
-                         BaseDllConst.CONST_ORDERSTATUS_305,
-                         BaseDllConst.CONST_ORDERSTATUS_310,
-                         BaseDllConst.CONST_ORDERSTATUS_320
-                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
-                        '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                        '                    I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
-                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
-                        WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
-                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
-
-                        '350：受注確定
-                    Case BaseDllConst.CONST_ORDERSTATUS_350
-                        StatusChk = True
-
-                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
-                        '引数１：所在地コード　⇒　変更あり(発駅)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
-                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"),
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
-
-                    '400：受入確認中, 450:受入確認中(受入日入力)
-                    Case BaseDllConst.CONST_ORDERSTATUS_400,
-                         BaseDllConst.CONST_ORDERSTATUS_450
-
-                        '### 何もしない####################
-
-                    '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
-                    '　条件は追加しておく
-                    Case BaseDllConst.CONST_ORDERSTATUS_500,
-                         BaseDllConst.CONST_ORDERSTATUS_550,
-                         BaseDllConst.CONST_ORDERSTATUS_600,
-                         BaseDllConst.CONST_ORDERSTATUS_700,
-                         BaseDllConst.CONST_ORDERSTATUS_800,
-                         BaseDllConst.CONST_ORDERSTATUS_900
-
-                        '### 何もしない####################
-
-                End Select
-            Next
 
             '受注進行ステータスの状態によって、貨車連結順序表を利用不可にする。
             Select Case strOrderSts
@@ -1855,6 +2303,10 @@ Public Class OIT0003OrderList
         Me.rbNegishiLoadBtn.Checked = False
         '積込予定(甲子)(ラジオボタン)
         Me.rbKinoeneLoadBtn.Checked = False
+        '### 20201106 START 指摘票No195(空回日報対応) #################################################
+        Me.rbKuukaiBtn.Checked = False
+        '### 20201106 END   指摘票No195(空回日報対応) #################################################
+        Me.rbFillingPointBtn.Checked = False
 
         '託送指示(ラジオボタン)を非表示
         Me.rbDeliveryBtn.Visible = False
@@ -1874,6 +2326,10 @@ Public Class OIT0003OrderList
         Me.rbNegishiLoadBtn.Visible = False
         '積込予定(甲子)(ラジオボタン)を非表示
         Me.rbKinoeneLoadBtn.Visible = False
+        '### 20201106 START 指摘票No195(空回日報対応) #################################################
+        Me.rbKuukaiBtn.Visible = False
+        '### 20201106 END   指摘票No195(空回日報対応) #################################################
+        Me.rbFillingPointBtn.Visible = False
 
         '列車番号(臨海)(テキストボックス)
         Me.txtReportRTrainNo.Text = ""
@@ -1895,11 +2351,13 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
+                '充填ポイント表(ラジオボタン)を表示
+                'Me.rbFillingPointBtn.Visible = True
 
             '◯甲子営業所
             Case BaseDllConst.CONST_OFFICECODE_011202
@@ -1908,8 +2366,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '積込予定(甲子)(ラジオボタン)を表示
                 Me.rbKinoeneLoadBtn.Visible = True
@@ -1921,19 +2379,23 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '入線方(ラジオボタン)を表示
                 Me.rbLineBtn.Visible = True
+                '### 20201106 START 指摘票No195(空回日報対応) #################################################
+                '空回日報(ラジオボタン)を表示
+                Me.rbKuukaiBtn.Visible = True
+                '### 20201106 END   指摘票No195(空回日報対応) #################################################
 
             '◯根岸営業所
             Case BaseDllConst.CONST_OFFICECODE_011402
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
@@ -1947,8 +2409,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             '◯三重塩浜営業所
@@ -1958,8 +2420,8 @@ Public Class OIT0003OrderList
                 '積込指示(ラジオボタン)を表示
                 Me.rbLoadBtn.Visible = True
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
-                'OT積込指示(ラジオボタン)を表示
-                Me.rbOTLoadBtn.Visible = True
+                ''OT積込指示(ラジオボタン)を表示
+                'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             Case Else
@@ -1995,7 +2457,9 @@ Public Class OIT0003OrderList
             AndAlso Me.rbShipBtn.Checked = False _
             AndAlso Me.rbLineBtn.Checked = False _
             AndAlso Me.rbNegishiLoadBtn.Checked = False _
-            AndAlso Me.rbKinoeneLoadBtn.Checked = False Then
+            AndAlso Me.rbKinoeneLoadBtn.Checked = False _
+            AndAlso Me.rbKuukaiBtn.Checked = False _
+            AndAlso Me.rbFillingPointBtn.Checked = False Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "帳票が未選択です。", needsPopUp:=True)
             Exit Sub
         End If
@@ -2012,11 +2476,11 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_010402
                 If Me.rbLoadBtn.Checked = True Then             '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoLoadCommonCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '★ 固定帳票(OT積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate("OTLOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoLoadCommonCreate(CONST_RPT_OTLOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -2028,14 +2492,18 @@ Public Class OIT0003OrderList
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoGoiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoGoiCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '☆ 固定帳票(出荷予定(五井))作成処理
-                    WW_TyohyoGoiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoGoiCreate(CONST_RPT_SHIPPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbFillingPointBtn.Checked = True Then '■充填ポイント表を選択
+                    '☆ 固定帳票(充填ポイント表(五井))作成処理
+                    WW_TyohyoGoiCreate(CONST_RPT_FILLINGPOINT, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -2047,14 +2515,14 @@ Public Class OIT0003OrderList
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoKinoeneCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoKinoeneCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbKinoeneLoadBtn.Checked = True Then  '■積込予定(甲子)を選択
                     '☆ 固定帳票(積込予定(甲子))作成処理
-                    WW_TyohyoKinoeneCreate("KINOENE_LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoKinoeneCreate(CONST_RPT_LOADPLAN_KINOENE, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -2066,14 +2534,20 @@ Public Class OIT0003OrderList
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoSodegauraCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoSodegauraCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbLineBtn.Checked = True Then         '■入線方を選択
                     '☆ 固定帳票(入線予定(袖ヶ浦))作成処理
-                    WW_TyohyoSodegauraCreate("LINEPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoSodegauraCreate(CONST_RPT_LINEPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbKuukaiBtn.Checked = True Then       '■空回日報を選択
+                    '### 20201106 START 指摘票No195(空回日報対応) #################################################
+                    '☆ 固定帳票(空回日報(袖ヶ浦))作成処理
+                    WW_TyohyoSodegauraCreate(CONST_RPT_KUUKAI_SODEGAURA, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    '### 20201106 END   指摘票No195(空回日報対応) #################################################
 
                 End If
 
@@ -2081,18 +2555,18 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_011402
                 If Me.rbLoadBtn.Checked = True Then             '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoNegishiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoNegishiCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
 
                 ElseIf Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '☆ 固定帳票(出荷予定(根岸))作成処理
-                    WW_TyohyoNegishiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoNegishiCreate(CONST_RPT_SHIPPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbNegishiLoadBtn.Checked = True Then  '■積込予定(根岸)を選択
                     '☆ 固定帳票(積込予定(根岸))作成処理
-                    WW_TyohyoNegishiCreate("NEGISHI_LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoNegishiCreate(CONST_RPT_LOADPLAN_NEGISHI, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -2100,12 +2574,11 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_012401
                 If Me.rbDeliveryBtn.Checked = True Then         '■託送指示を選択
                     '☆ 固定帳票(託送指示)作成処理
-                    WW_TyohyoYokkaichiCreate("DELIVERYPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoYokkaichiCreate(CONST_RPT_DELIVERYPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
-                    WW_TyohyoYokkaichiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoYokkaichiCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
@@ -2116,12 +2589,11 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_012402
                 If Me.rbDeliveryBtn.Checked = True Then         '■託送指示を選択
                     '☆ 固定帳票(託送指示)作成処理
-                    WW_TyohyoMieShiohamaCreate("DELIVERYPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoMieShiohamaCreate(CONST_RPT_DELIVERYPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
-                    WW_TyohyoMieShiohamaCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoMieShiohamaCreate(CONST_RPT_LOADPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbOTLoadBtn.Checked = True Then       '■OT積込指示を選択
                     '### ここにOT積込処理を追加 #########
@@ -2322,7 +2794,7 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             '固定帳票(積込予定(共通))作成処理
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
                     Dim url As String
                     Try
@@ -2336,7 +2808,7 @@ Public Class OIT0003OrderList
                 End Using
 
             '固定帳票(OT積込予定(共通))作成処理
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_OTLOADPLAN.xlsx", OIT0003Reporttbl)
                     Dim url As String
@@ -2367,19 +2839,19 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(積込予定)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(出荷予定(五井))押下
-            Case "SHIPPLAN"
+            Case CONST_RPT_SHIPPLAN
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
@@ -2401,6 +2873,28 @@ Public Class OIT0003OrderList
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
 
+            'ダウンロードボタン(充填ポイント表(五井))押下
+            Case CONST_RPT_FILLINGPOINT
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelGoiFillingPointDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
+                End Using
+
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_FILLINGPOINT.xlsx", OIT0003ReportGoitbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintGoiData(CONST_RPT_FILLINGPOINT, Me.txtReportLodDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
         End Select
 
     End Sub
@@ -2417,19 +2911,19 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(積込指示)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(積込予定(甲子))押下
-            Case "KINOENE_LOADPLAN"
+            Case CONST_RPT_LOADPLAN_KINOENE
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
@@ -2467,26 +2961,26 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(積込指示)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(入線方(袖ヶ浦))押下
-            Case "LINEPLAN"
+            Case CONST_RPT_LINEPLAN
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelSodegauraDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
+                    ExcelSodegauraLinePlanDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
                 '使用する帳票の確認
                 Dim tyohyoName As String = ""
@@ -2500,7 +2994,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintSodegauraData("LINEPLAN", Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text)
+                        url = repCbj.CreateExcelPrintSodegauraData(CONST_RPT_LINEPLAN, Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2508,6 +3002,31 @@ Public Class OIT0003OrderList
                     WF_PrintURL.Value = url
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
+
+            'ダウンロードボタン(空回日報(袖ヶ浦))押下
+            Case CONST_RPT_KUUKAI_SODEGAURA
+                '### 20201106 START 指摘票No195(空回日報対応) #################################################
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelSodegauraKuukaiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
+                End Using
+
+                Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+                '### 20201106 END   指摘票No195(空回日報対応) #################################################
 
         End Select
 
@@ -2522,7 +3041,7 @@ Public Class OIT0003OrderList
                                              ByVal officeCode As String)
 
         '【出荷予定(根岸)】 または【積込予定(根岸)】の場合
-        If tyohyoType = "SHIPPLAN" OrElse tyohyoType = "NEGISHI_LOADPLAN" Then
+        If tyohyoType = CONST_RPT_SHIPPLAN OrElse tyohyoType = CONST_RPT_LOADPLAN_NEGISHI Then
             '******************************
             '帳票表示データ取得処理
             '******************************
@@ -2538,23 +3057,36 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(積込予定)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
 
             'ダウンロードボタン(出荷予定(根岸))押下
-            Case "SHIPPLAN"
+            Case CONST_RPT_SHIPPLAN
+                '### 20201111 START 指摘票No193(全体)対応 #####################################################
+                '******************************
+                '帳票表示(計画枠)データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelPlanFrameDataGet(SQLcon)
+                End Using
+                '### 20201111 END   指摘票No193(全体)対応 #####################################################
+
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text)
+                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text,
+                                                                 dtFT:=OIT0003ItemGettbl,
+                                                                 dtPF:=OIT0003ReportPlanFrame)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2564,7 +3096,7 @@ Public Class OIT0003OrderList
                 End Using
 
             'ダウンロードボタン(積込予定(根岸))押下
-            Case "NEGISHI_LOADPLAN"
+            Case CONST_RPT_LOADPLAN_NEGISHI
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
@@ -2593,7 +3125,7 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(託送指示)押下
-            Case "DELIVERYPLAN"
+            Case CONST_RPT_DELIVERYPLAN
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
@@ -2616,12 +3148,12 @@ Public Class OIT0003OrderList
                 End Using
 
             'ダウンロードボタン(積込指示)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
@@ -2642,7 +3174,7 @@ Public Class OIT0003OrderList
         '******************************
         Select Case tyohyoType
             'ダウンロードボタン(託送指示)押下
-            Case "DELIVERYPLAN"
+            Case CONST_RPT_DELIVERYPLAN
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
@@ -2665,12 +3197,12 @@ Public Class OIT0003OrderList
                 End Using
 
             'ダウンロードボタン(積込指示)押下
-            Case "LOADPLAN"
+            Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(OT積込指示)押下
-            Case "OTLOADPLAN"
+            Case CONST_RPT_OTLOADPLAN
                 '### 20201014 START 指摘票No168(OT積込指示対応) ###############################################
                 '★ 固定帳票(OT積込予定(共通))作成処理
                 WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
@@ -2779,13 +3311,14 @@ Public Class OIT0003OrderList
             & " AND OIT0003.TANKNO <> '' " _
             & " AND OIT0003.DELFLG <> @P02 "
 
-        '◯OT積込指示書以外の場合
+        '★積置フラグ無し用SQL
         If tyohyoType <> "OTLOADPLAN" Then
-            '★積置フラグ無し用SQL
+            '◯積込指示書の場合
             SQLStrNashi &=
               SQLStrCmn _
             & " AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
         Else
+            '◯OT積込指示書の場合
             SQLStrNashi &= SQLStrCmn
         End If
 
@@ -2844,24 +3377,33 @@ Public Class OIT0003OrderList
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.ORDERSTATUS <= @P04 " _
 
-        '★OT積込指示書の場合、発日基準のため条件を追加
-        If tyohyoType = "OTLOADPLAN" Then
-            SQLStrCmn &=
-                  " AND OIT0002.DEPDATE = @P03 "
-        End If
-
-        '◯OT積込指示書以外の場合
+        '★積置フラグ無し用SQL
         If tyohyoType <> "OTLOADPLAN" Then
-            '★積置フラグ無し用SQL
+            '◯積込指示書の場合
             SQLStrNashi &= SQLStrCmn _
             & "   AND OIT0002.LODDATE = @P03 "
         Else
-            SQLStrNashi &= SQLStrCmn
+            '◯OT積込指示書の場合(発日基準)
+            SQLStrNashi &= SQLStrCmn _
+            & "   AND OIT0002.DEPDATE = @P03 "
         End If
 
         '★積置フラグ有り用SQL
-        SQLStrAri &= SQLStrCmn
-
+        If tyohyoType <> "OTLOADPLAN" Then
+            '◯積込指示書の場合
+            SQLStrAri &= SQLStrCmn
+        Else
+            '◯OT積込指示書の場合(発日基準)
+            If ChkEndMonthChk.Checked = False Then
+                SQLStrAri &= SQLStrCmn _
+                & "   AND OIT0002.DEPDATE = @P03 "
+            Else
+                '### 20201109 START 『(チェックボックス)当月積込、翌月発分を含める』がチェックされた場合 ##########
+                SQLStrAri &= SQLStrCmn _
+                & "   AND CONVERT(VARCHAR(6), OIT0002.DEPDATE, 112) = @P05 "
+                '### 20201109 END   『(チェックボックス)当月積込、翌月発分を含める』がチェックされた場合 ##########
+            End If
+        End If
 
         'Dim SQLStr As String =
         '      " SELECT " _
@@ -2937,8 +3479,8 @@ Public Class OIT0003OrderList
 
         SQLStrAri &=
               " ORDER BY" _
-            & "    OIT0003.SHIPPERSCODE" _
-            & "  , OIT0002.TRAINNO" _
+            & "    OIT0002.TRAINNO" _
+            & "  , OIT0003.SHIPPERSCODE" _
             & "  , STACKING" _
             & "  , OIM0024.PRIORITYNO"
         '& "  , OIT0003.OILCODE" _
@@ -2954,13 +3496,16 @@ Public Class OIT0003OrderList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '発日(翌月)
                 PARA01.Value = OFFICECDE
                 PARA02.Value = C_DELETE_FLG.DELETE
                 'PARA03.Value = "2020/5/29"
                 If Not String.IsNullOrEmpty(lodDate) Then
                     PARA03.Value = lodDate
+                    PARA05.Value = Format(Date.Parse(lodDate).AddMonths(1), "yyyyMM")
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                    PARA05.Value = Format(Now.AddMonths(1), "yyyyMM")
                 End If
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
 
@@ -3002,6 +3547,157 @@ Public Class OIT0003OrderList
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
+
+    ''' <summary>
+    ''' 帳票表示(充填ポイント表)(五井営業所)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelGoiFillingPointDataGet(ByVal SQLcon As SqlConnection,
+                                      Optional ByVal lodDate As String = Nothing)
+
+        If IsNothing(OIT0003ReportGoitbl) Then
+            OIT0003ReportGoitbl = New DataTable
+        End If
+
+        If OIT0003ReportGoitbl.Columns.Count <> 0 Then
+            OIT0003ReportGoitbl.Columns.Clear()
+        End If
+
+        OIT0003ReportGoitbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')          AS LODDATE" _
+            & " , OIT0002.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
+            & " , OIT0002.TOTALCNT                               AS TOTALCNT" _
+            & " , VIW0013.LINECNT                                AS LINE" _
+            & " , VIW0013.LOADINGPOINT                           AS LOADINGPOINT" _
+            & " , OIT0002.OILCODE                                AS OILCODE" _
+            & " , OIT0002.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIM0005.MODEL                                  AS MODEL" _
+            & " , OIT0002.TANKNO                                 AS TANKNO" _
+            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+            & " , OIT0002.TRAINNO                                AS TRAINNO" _
+            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0002.RETURNDATETRAIN                        AS RETURNDATETRAIN" _
+            & " FROM oil.VIW0013_OILFOR_GOI_FILLINGPOINT VIW0013 "
+
+        SQLStr &=
+              " LEFT JOIN (" _
+            & "        SELECT " _
+            & "          OIT0002.ORDERNO" _
+            & "        , OIT0002.LODDATE" _
+            & "        , OIT0002.TOTALTANKCH" _
+            & "        , OIT0002.ARRSTATION" _
+            & "        , OIT0002.ARRSTATIONNAME" _
+            & "        , OIT0002.TRAINNO" _
+            & "        , OIT0002.TRAINNAME" _
+            & "        , OIT0003.LOADINGIRILINETRAINNO" _
+            & "        , OIT0003.LINE" _
+            & "        , OIT0003.FILLINGPOINT" _
+            & "        , OIT0003.OILCODE" _
+            & "        , OIT0003.ORDERINGTYPE" _
+            & "        , OIT0003.TANKNO" _
+            & "        , OIT0003.RETURNDATETRAIN" _
+            & "        , SUM(1) OVER (PARTITION BY OIT0003.LOADINGIRILINETRAINNO ORDER BY OIT0003.LOADINGIRILINETRAINNO) AS TOTALCNT" _
+            & "        FROM oil.OIT0002_ORDER OIT0002 " _
+            & "        INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "              OIT0003.ORDERNO      = OIT0002.ORDERNO " _
+            & "          AND OIT0003.LOADINGIRILINETRAINNO <> '' " _
+            & "          AND OIT0003.DELFLG      <> @DELFLG " _
+            & "        WHERE OIT0002.OFFICECODE   = @OFFICECODE " _
+            & "          AND OIT0002.LODDATE      = @LODDATE " _
+            & "          AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
+            & "          AND OIT0002.DELFLG      <> @DELFLG" _
+            & " ) OIT0002 ON " _
+            & "     OIT0002.LOADINGIRILINETRAINNO = VIW0013.TRAINNO " _
+            & " AND OIT0002.LINE = VIW0013.LINECNT " _
+            & " AND OIT0002.FILLINGPOINT = VIW0013.LOADINGPOINT  "
+
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0002.TANKNO " _
+            & " AND OIM0005.DELFLG      <> @DELFLG "
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    VIW0013.TRAINNO" _
+            & "  , VIW0013.LINECNT" _
+            & "  , VIW0013.LOADINGPOINT"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 20)     '受注営業所コード
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)              '削除フラグ
+                Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.Date)                   '積込日
+                Dim P_ORDERSTATUS As SqlParameter = SQLcmd.Parameters.Add("@ORDERSTATUS", SqlDbType.NVarChar, 3)    '受注進行ステータス
+                P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011201
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    P_LODDATE.Value = lodDate
+                Else
+                    P_LODDATE.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportGoitbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportGoitbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                'Dim j As Integer = 1
+                'Dim svTrainName As String = ""
+                For Each OIT0003Reprow As DataRow In OIT0003ReportGoitbl.Rows
+                    i += 1
+                    OIT0003Reprow("LINECNT") = i        'LINECNT
+
+                    ''★列車番号が変わったら回線を増加し設定
+                    'If svTrainName <> "" _
+                    '            AndAlso svTrainName <> Convert.ToString(OIT0003Reprow("LOADINGIRILINETRAINNO")) Then
+                    '    j += 1
+                    '    OIT0003Reprow("LINE") = j
+                    'Else
+                    '    OIT0003Reprow("LINE") = j
+                    'End If
+                    'svTrainName = Convert.ToString(OIT0003Reprow("LOADINGIRILINETRAINNO"))
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LGOI EXCEL_FILLINGPOINTDATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LGOI EXCEL_FILLINGPOINTDATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0003ReportGoitbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
 
     ''' <summary>
     ''' 帳票表示(五井営業所)データ取得
@@ -3126,7 +3822,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
+            & "     OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
             & " AND OIM0029.KEYCODE02 = OIT0002.SHIPPERSCODE " _
             & " AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & " AND OIM0029.KEYCODE04 = '1' " _
@@ -3279,6 +3976,14 @@ Public Class OIT0003OrderList
         '    & "   END                                            AS SYARYONUMBER"
         '### 20201007 END   JXTG千葉車番を設定 ##################################################################
 
+        '### 20201021 START 指摘票対応(No185)全体 ###############################################################
+        SQLStr &=
+              " , CASE" _
+            & "   WHEN ORDERINFOTBL.LENGTHFLG = 'S' THEN '★'" _
+            & "   ELSE ''" _
+            & "   END                                            AS ATTENTION"
+        '### 20201021 END   指摘票対応(No185)全体 ###############################################################
+
         SQLStr &=
               " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _
             & " , ORDERINFOTBL.RESERVEDQUANTITY                  AS RESERVEDQUANTITY" _
@@ -3287,7 +3992,7 @@ Public Class OIT0003OrderList
             & "   ELSE '' " _
             & "   END                                            AS DELIVERYFIRST" _
             & " FROM oil.VIW0013_OILFOR_KINOENE_LOAD VIW0013 " _
-            & "  LEFT JOIN ( "
+            & "  INNER JOIN ( "
 
         '受注データ(KEY(甲子営業所、積込日))を取得し
         'タンク車マスタ(型式)、積込予約マスタ(予約数量)を設定
@@ -3298,6 +4003,7 @@ Public Class OIT0003OrderList
             & "      , OIT0003.TANKNO " _
             & "      , OIM0005.MODEL " _
             & "      , OIM0005.LOAD " _
+            & "      , OIM0005.LENGTHFLG " _
             & "      , OIM0005.JXTGTANKNUMBER2 " _
             & "      , OIT0003.OILCODE " _
             & "      , OIT0003.OILNAME " _
@@ -3330,7 +4036,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "       INNER JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "           OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "           OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "       AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & "       AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "       AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "       AND OIM0029.KEYCODE04 = '1' " _
@@ -3358,6 +4065,7 @@ Public Class OIT0003OrderList
             & "       AND OIM0021.DELFLG <> @P02 " _
             & "      WHERE OIT0002.OFFICECODE = @P01 " _
             & "      AND OIT0002.LODDATE = @P03 " _
+            & "      AND OIT0002.ORDERSTATUS <> @P04 " _
             & "  ) ORDERINFOTBL ON " _
             & "      VIW0013.RINKAITRAINNAME = ORDERINFOTBL.LOADINGIRILINETRAINNAME " _
             & "  AND VIW0013.SPOTNO = ORDERINFOTBL.FILLINGPOINT "
@@ -3372,6 +4080,7 @@ Public Class OIT0003OrderList
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar)     '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011202
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3379,6 +4088,7 @@ Public Class OIT0003OrderList
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3412,11 +4122,94 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
-    ''' 帳票表示(袖ヶ浦営業所)データ取得
+    ''' 帳票表示(空回日報(袖ヶ浦))データ取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelSodegauraDataGet(ByVal SQLcon As SqlConnection,
+    Protected Sub ExcelSodegauraKuukaiDataGet(ByVal SQLcon As SqlConnection,
+                                        Optional ByVal lodDate As String = Nothing,
+                                        Optional ByVal rTrainNo As String = Nothing)
+
+        If IsNothing(OIT0003ReportSodegauratbl) Then
+            OIT0003ReportSodegauratbl = New DataTable
+        End If
+
+        If OIT0003ReportSodegauratbl.Columns.Count <> 0 Then
+            OIT0003ReportSodegauratbl.Columns.Clear()
+        End If
+
+        OIT0003ReportSodegauratbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String = RSSQL.EmptyTurnDairy("OIT0003")
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)   '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 6)   '受注営業所コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.Date)          '積込日(予定)
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 3)    '受注進行ステータス
+                'PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+                PARA03.Value = BaseDllConst.CONST_OFFICECODE_011203
+                PARA04.Value = lodDate
+                PARA05.Value = BaseDllConst.CONST_ORDERSTATUS_900
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportSodegauratbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportSodegauratbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                Dim strTrainNosave As String = ""
+                For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+
+                    If strTrainNosave <> "" _
+                        AndAlso strTrainNosave <> Convert.ToString(OIT0003Reprow("TRAINNO")) Then
+                        i = 1
+                        OIT0003Reprow("LINECNT") = i        'LINECNT
+                    Else
+                        i += 1
+                        OIT0003Reprow("LINECNT") = i        'LINECNT
+                    End If
+                    'O_officeCode = Convert.ToString(OIT0003Reprow("OFFICECODE"))
+
+                    If OIT0003Reprow("RETURNDATETRAINNO").ToString() <> "" Then
+                        '返送列車
+                        CODENAME_get("CTRAINNUMBER", OIT0003Reprow("RETURNDATETRAINNO").ToString(), OIT0003Reprow("RETURNDATETRAIN").ToString(), WW_DUMMY)
+                        If OIT0003Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0003Reprow("RETURNDATETRAIN") = OIT0003Reprow("RETURNDATETRAINNO")
+                    End If
+                    strTrainNosave = Convert.ToString(OIT0003Reprow("TRAINNO"))
+                Next
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L EXCEL_SODEGAURA_KUUKAI_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L EXCEL_SODEGAURA_KUUKAI_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(入線方(袖ヶ浦))データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelSodegauraLinePlanDataGet(ByVal SQLcon As SqlConnection,
                                         Optional ByVal lodDate As String = Nothing,
                                         Optional ByVal rTrainNo As String = Nothing)
 
@@ -3526,7 +4319,8 @@ Public Class OIT0003OrderList
         '★変換用油種コードと紐づけ
         SQLStr &=
               "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
-            & "      OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
+            & "      OIM0029.CLASS = 'RINKAI_OILMASTER' " _
+            & "  AND OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
             & "  AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
             & "  AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
             & "  AND OIM0029.KEYCODE04 = '1' " _
@@ -3544,7 +4338,8 @@ Public Class OIT0003OrderList
 
         SQLStr &=
               " WHERE OIT0002.OFFICECODE = @P01 " _
-            & " AND OIT0002.LODDATE = @P03 "
+            & " AND OIT0002.LODDATE = @P03 " _
+            & " AND OIT0002.ORDERSTATUS <> @P05 "
 
         SQLStr &=
               " ORDER BY" _
@@ -3558,6 +4353,7 @@ Public Class OIT0003OrderList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)  '積込入線列車番号
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011203
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3566,6 +4362,7 @@ Public Class OIT0003OrderList
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
                 PARA04.Value = rTrainNo
+                PARA05.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3629,6 +4426,77 @@ Public Class OIT0003OrderList
 
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003ReportSodegauratbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(計画枠)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelPlanFrameDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003ReportPlanFrame) Then
+            OIT0003ReportPlanFrame = New DataTable
+        End If
+
+        If OIT0003ReportPlanFrame.Columns.Count <> 0 Then
+            OIT0003ReportPlanFrame.Columns.Clear()
+        End If
+
+        OIT0003ReportPlanFrame.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　出荷予定表(計画枠)取得用SQL
+        Dim SQLStr As String =
+            " SELECT " _
+            & "   OIM0003.OFFICECODE                             AS OFFICECODE" _
+            & " , OIM0003.SHIPPERCODE                            AS SHIPPERCODE" _
+            & " , OIM0003.OILCODE                                AS OILCODE" _
+            & " , OIM0003.OILNAME                                AS OILNAME" _
+            & " , OIM0003.SEGMENTOILCODE                         AS SEGMENTOILCODE" _
+            & " , OIM0003.SEGMENTOILNAME                         AS SEGMENTOILNAME" _
+            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , OIM0003.SHIPPINGPLAN                           AS SHIPPINGPLAN" _
+            & " , '0'                                            AS DELFLG" _
+            & " FROM oil.OIM0003_PRODUCT OIM0003 " _
+            & " WHERE " _
+            & "     OIM0003.OFFICECODE = @P01 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6) '受注営業所コード
+                PARA01.Value = BaseDllConst.CONST_OFFICECODE_011402
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportPlanFrame.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportPlanFrame.Load(SQLdr)
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LNEGISHI PLANFRAME_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LNEGISHI PLANFRAME_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0003ReportPlanFrame)
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -3802,6 +4670,31 @@ Public Class OIT0003OrderList
         SQLStrYobi &= SQLStrCmn
         '### 20201020 END   指摘票対応(No174)全体 ##################################################
 
+        '### 20201105 START 指摘票対応(No191) ####################################################################
+        If IsNothing(OIT0003ItemGettbl) Then
+            OIT0003ItemGettbl = New DataTable
+        End If
+
+        If OIT0003ItemGettbl.Columns.Count <> 0 Then
+            OIT0003ItemGettbl.Columns.Clear()
+        End If
+
+        OIT0003ItemGettbl.Clear()
+
+        '★値取得SQL(3号軽油のFROM, TOを取得(帳票に反映するため))
+        Dim SQLGetStr As String =
+              " SELECT " _
+            & "   OIM0003.OILCODE           AS OILCODE" _
+            & " , OIM0003.OILNAME           AS OILNAME" _
+            & " , OIM0003.SEGMENTOILCODE    AS SEGMENTOILCODE" _
+            & " , OIM0003.SEGMENTOILNAME    AS SEGMENTOILNAME" _
+            & " , OIM0003.ORDERFROMDATE     AS ORDERFROMDATE" _
+            & " , OIM0003.ORDERTODATE       AS ORDERTODATE" _
+            & " FROM oil.OIM0003_PRODUCT OIM0003 " _
+            & " WHERE OIM0003.OFFICECODE = @P01 " _
+            & "   AND OIM0003.OILCODE = @P02 "
+        '### 20201105 END   指摘票対応(No191) ####################################################################
+
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################
         '" SELECT " _
@@ -3874,7 +4767,8 @@ Public Class OIT0003OrderList
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
                   SQLYobicmd As New SqlCommand(SQLStrYobi, SQLcon),
-                  SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon)
+                  SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon),
+                  SQLGetcmd As New SqlCommand(SQLGetStr, SQLcon)
                 Dim PARALDP01 As SqlParameter = SQLLDPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 PARALDP01.Value = BaseDllConst.CONST_OFFICECODE_011402
 
@@ -3887,6 +4781,23 @@ Public Class OIT0003OrderList
                     '○ テーブル検索結果をテーブル格納
                     OIT0003WKtbl.Load(SQLLDPdr)
                 End Using
+
+                '### 20201105 START 指摘票対応(No191) ####################################################################
+                Dim PARAGET01 As SqlParameter = SQLGetcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARAGET02 As SqlParameter = SQLGetcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '油種コード
+                PARAGET01.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARAGET02.Value = BaseDllConst.CONST_K3Tank1
+
+                Using SQLGETdr As SqlDataReader = SQLGetcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLGETdr.FieldCount - 1
+                        OIT0003ItemGettbl.Columns.Add(SQLGETdr.GetName(index), SQLGETdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ItemGettbl.Load(SQLGETdr)
+                End Using
+                '### 20201105 END   指摘票対応(No191) ####################################################################
 
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
@@ -4450,6 +5361,7 @@ Public Class OIT0003OrderList
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
 
             '検索SQL文
             Dim SQLStr As String =
@@ -4530,6 +5442,10 @@ Public Class OIT0003OrderList
                         Next
                     Next
                 End If
+
+                'CLOSE
+                SQLcmd.Dispose()
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")

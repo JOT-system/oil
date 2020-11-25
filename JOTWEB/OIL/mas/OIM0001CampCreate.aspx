@@ -30,7 +30,31 @@
                 </div>
             </div>
 
+            <!-- 会社コード -->
+            <div class="inputItem" style="display:none">
+                <a id="LblCampCodeMy" class="requiredMark">会社コード</a>
+                <a class="ef" id="WF_CAMPCODE_MY" ondblclick="Field_DBclick('WF_CAMPCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE_MY');">
+                    <asp:TextBox ID="TxtCampCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                </a>
+                <a id="WF_CAMPNAME_MY">
+                    <asp:Label ID="txtCampNameMy" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
+            <!-- 運用部署 -->
+            <div class="inputItem" style="display:none">
+                <a id="LblOrgCodeMy" class="requiredMark">運用部署</a>
+                <a class="ef" id="WF_ORGCODE_MY" style="display:none" ondblclick="Field_DBclick('WF_ORGCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE_MY');">
+                    <asp:TextBox ID="TxtOrgCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                </a>TxtCampCode
+                <a id="WF_ORGNAME_MY" style="display:none">
+                    <asp:Label ID="txtOrgNameMy" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
             <div id="detailkeybox">
+
+
                 <p id="KEY_LINE_1">
                     <!-- 選択No -->
                     <span>
@@ -39,56 +63,47 @@
                     </span>
                 </p>
 
-                        <p id="KEY_LINE_2">
-                        <!-- 削除フラグ -->
-                        <span class="ef">
-                        <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                <p id="KEY_LINE_2">
+                    <!-- 削除フラグ -->
+                    <span class="ef">
+                        <asp:Label ID="LblDelFlg" runat="server" Text="削除フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                            <asp:TextBox ID="WF_DELFLG" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="WF_DELFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:TextBox ID="TxtDelFlg" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox></span>
+                        <asp:Label ID="LblDelFlgText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-
-
-
-
-
-
-
 
                 <p id="KEY_LINE_3">
                     <!-- 会社コード -->
                     <span class="ef" id="WF_CAMPCODE">
                         <asp:Label ID="LblCampCode" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="TxtStationCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
-<%--
-                        <span ondblclick="Field_DBclick('TxtCampCode'
-                            <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
-                        </span>
---%>
-                        <asp:Label ID="LblCampCodeText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+                        <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox></span>
+                        <asp:Label ID="LblCampCodetext" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
 
+                <p id="KEY_LINE_4">
                     <!-- 開始年月日 -->
                     <span class="ef" id="WF_STYMD">
                         <asp:Label ID="LblStymd" runat="server" Text="開始年月日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtStymd" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblStymdText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
-                <p id="KEY_LINE_4">
+                <p id="KEY_LINE_5">
                     <!-- 終了年月日 -->
                     <span class="ef" id="WF_ENDYMD">
-                        <asp:Label ID="LblEndymd" runat="server" Text="終了日付" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="LblEndymd" runat="server" Text="終了年月日" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtEndymd" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblEndymdText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
 
-                <p id="KEY_LINE_5">
+                <p id="KEY_LINE_6">
                     <!-- 会社名称 -->
                     <span class="ef" id="WF_NAME">
                         <asp:Label ID="LblName" runat="server" Text="会社名称" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -247,5 +262,7 @@
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 権限 -->
         </div>
+ 
+        </span>
  
 </asp:Content>

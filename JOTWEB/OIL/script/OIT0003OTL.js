@@ -128,3 +128,12 @@ function reportRadioButton() {
         txtObj.style.display = 'none';
     }
 }
+// ○ダウンロード処理
+function f_ExcelPrint() {
+    // リンク参照
+    window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
+    let url2 = document.getElementById("WF_PrintURL2");
+    if (url2 !== null) {
+        window.open(url2.value, "view2", "_blank");
+    }
+}

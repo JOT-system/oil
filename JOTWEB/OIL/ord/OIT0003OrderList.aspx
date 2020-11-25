@@ -176,6 +176,12 @@
             <li>
                 <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbKuukaiBtn" runat="server" GroupName="WF_SW" Text="空回日報" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbFillingPointBtn" runat="server" GroupName="WF_SW" Text="充填ポイント表" onclick="reportRadioButton();" />
+            </li>
         </ul>
     </div>
     <div id="divRTrainNo">
@@ -186,4 +192,13 @@
             </a>
         </span>
     </div>
+    <div id="divEndMonthChk">
+        <span id="spnEndMonthChk">
+            <asp:Label ID="lblEndMonthChkDmy" runat="server" Text="　　　　　　　　　"></asp:Label>
+            <a id="aEndMonthChk">
+                <asp:CheckBox ID="ChkEndMonthChk" runat="server" Text=" 当月積込、翌月発分を含める" />
+            </a>
+        </span>
+    </div>
+
 </asp:Content>

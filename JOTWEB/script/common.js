@@ -172,6 +172,10 @@ window.addEventListener('DOMContentLoaded', function () {
     /* ************************************  */
     commonSetHasOrderInfoToHighlight();
     /* ************************************  */
+    /* 受注進行ステータス行ハイライト        */
+    /* ************************************  */
+    commonSetHasOrderStatusToHighlight();
+    /* ************************************  */
     /* カスタムポップアップ                  */
     /* ************************************  */
     let dispCustomPopUpObj = document.getElementById('MF_SHOWCUSTOMOPOUP');
@@ -816,6 +820,37 @@ function f_dragEventCancel(event) {
 function f_ExcelPrint() {
     // リンク参照
     window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
+}
+// ○ダウンロード処理フォルダ固定でバッチでフォルダ指定ダウンロード(テスト用)
+// 対象[ダウンロードファイル名].batを生成し指定フォルダダウンロードバッチを作成する
+function f_ExcelPrintTsst() {
+    // リンク参照
+    let url = document.getElementById("WF_PrintURL").value;
+    // URLよりファイル名のみ抜き出し
+    let arr = url.split("/");
+    let fileName = arr[arr.length - 1];
+    // バッチコマンド生成
+    let textContents = "";
+    textContents = textContents + 'cd c:\r\n';
+    textContents = textContents + 'bitsadmin /transfer download \"' + url + '\" \"C:\\test\\' + fileName + '\"\r\n';
+    // コマンドテキストよりファイルBlob生成
+    var blob = new Blob([textContents], { "type": "text/plain" });
+    // ダウンロード処理実行
+    if (window.navigator.msSaveBlob) {
+        // ブラウザIEの場合こちらの分岐
+        window.navigator.msSaveBlob(blob, fileName + ".bat");
+        // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+        window.navigator.msSaveOrOpenBlob(blob, fileName + ".bat");
+    } else {
+        // ブラウザIE以外の場合はこちらの分岐
+        let downloadLink = document.createElement("a");
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.download = fileName + ".bat";
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
 }
 
 function f_PDFPrint() {
@@ -1496,6 +1531,64 @@ function commonSetHasOrderInfoToHighlight() {
             leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             //ワーニング（黄色）判定
             if (cellObj.textContent === '検査間近有' || cellObj.textContent === '前回揮発油') {
+                rightTableObj.rows[rowIdx].classList.add('warnInfo');
+                leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            }
+        }
+    }
+}
+
+/**
+ * 一覧表の受注進行ステータス列が存在する場合ハイライトする情報を仕込む(cssでハイライトは定義)
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonSetHasOrderStatusToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'ORDERSTATUSNAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent !== '受注受付' && cellObj.textContent !== '受注キャンセル') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            //ワーニング（黄色）判定
+            if (cellObj.textContent === '受注受付') {
                 rightTableObj.rows[rowIdx].classList.add('warnInfo');
                 leftTableObj.rows[rowIdx].classList.add('warnInfo');
             }
@@ -2264,9 +2357,11 @@ function commonBindEnterToVerticalTabStep() {
             if (textBoxes.length === j + 1) {
                 // 最後のテキストボックスは先頭のフィールド
                 nextTextFieldName = textBoxes[0].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[0].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             } else if (textBoxes.length > j + 1) {
                 nextTextFieldName = textBoxes[j + 1].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[j + 1].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             }
 

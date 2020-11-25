@@ -4251,7 +4251,34 @@ Public Class OIT0003OrderDetail
                         '### 20201013 START 指摘票対応(No153) ###################################
                         '(一覧)油種
                         If WF_FIELD.Value = "ORDERINGOILNAME" Then
-                            prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                            '○ LINECNT取得
+                            Dim WW_LINECNT As Integer = 0
+                            If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                            '○ 対象ヘッダー取得
+                            Dim updHeader = OIT0003tbl.AsEnumerable.
+                            FirstOrDefault(Function(x) CInt(x.Item("LINECNT")) = WW_LINECNT)
+                            If IsNothing(updHeader) Then Exit Sub
+
+                            '### 20201120 START 指摘票対応(No224)全体 #########################################################################
+                            '★荷受人ごとに取得するため、「荷受人」＋「受注営業所」をKEYとして設定
+                            prmData.Item(C_PARAMETERS.LP_COMPANY) = Me.TxtConsigneeCode.Text + prmData.Item(C_PARAMETERS.LP_COMPANY)
+
+                            '○積込日を設定
+                            'prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                            Dim strlodDate As String = ""
+                            '★積置フラグにチェックがある場合
+                            If updHeader.Item("STACKINGFLG") = "on" Then
+                                Try
+                                    strlodDate = Date.Parse(updHeader.Item("ACTUALLODDATE")).ToString("yyyy/MM/dd")
+                                Catch ex As Exception
+                                    strlodDate = Me.TxtLoadingDate.Text
+                                End Try
+                                prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = strlodDate
+                            Else
+                                prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = Me.TxtLoadingDate.Text
+                            End If
+                            '### 20201120 END   指摘票対応(No224)全体 #########################################################################
                         End If
                         '### 20201013 END   指摘票対応(No153) ###################################
 
@@ -13929,7 +13956,10 @@ Public Class OIT0003OrderDetail
         If Me.TxtOrderOfficeCode.Text = "" Then
             WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
         Else
-            WW_FixvalueMasterSearch("01" + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20201120 START 指摘票対応(No224)全体 #########################################################################
+            WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            'WW_FixvalueMasterSearch("01" + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20201120 END   指摘票対応(No224)全体 #########################################################################
             'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
         End If
 

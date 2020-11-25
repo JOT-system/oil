@@ -1122,7 +1122,13 @@ Public Structure CS0023XLSUPLOAD
                 ElseIf svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
                     svTraiNo = ""
                 Else
-                    dtrow("TRAINNO_DETAIL") = svTraiNo
+                    '○前回と同じ列車番号の場合
+                    If Convert.ToString(dtrow("TRAINNO_DETAIL")) = "" Then
+                        dtrow("TRAINNO_DETAIL") = svTraiNo
+                        '前回と異なる列車番号の場合
+                    Else
+                        svTraiNo = reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "")
+                    End If
                 End If
                 dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
                 dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))

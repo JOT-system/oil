@@ -728,9 +728,17 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_UPLOAD_ERR_TRAINNO_MESSAGE As String = "20081"
         ''' <summary>
-        ''' アップロード(油種数オーバー)エラーメッセージ
+        ''' アップロード(貨車アップロード(油種数オーバー))エラーメッセージ
         ''' </summary>
-        Public Const OIL_UPLOAD_ERR_OILOVER_MESSAGE As String = "20082"
+        Public Const OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE As String = "20082"
+        ''' <summary>
+        ''' アップロード(回線別積込予定表(油種数オーバー))エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_NEGISHI_LOAD_OILOVER_MESSAGE As String = "20083"
+        ''' <summary>
+        ''' アップロード(回線別積込予定表(油種数レス))エラーメッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_ERR_NEGISHI_LOAD_OILLESS_MESSAGE As String = "20084"
 #End Region
 
 

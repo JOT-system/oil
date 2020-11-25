@@ -70,6 +70,10 @@ Public Class OIT0003OrderDetail
     Private Const CONST_GOI_TRAINNO_8685 As String = "8685"         '8685レ
     Private Const CONST_KINOENE_TRAINNO_8685 As String = "8685"
 
+    '○ 仙台新港営業所における最大索引列車チェック対象の列車番号
+    Private Const CONST_SENDAI_TRAINNO_5081 As String = "5081"      '5081レ
+    Private Const CONST_SENDAI_TRAINNO_8081 As String = "8081"      '8081レ
+
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
@@ -5880,7 +5884,11 @@ Public Class OIT0003OrderDetail
         End If
 
         '### 20201028 START 根岸営業所(積込可能車数チェック)対応 #########################################
-        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+        '### 20201125 指摘票対応(No227) ##################################################################
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 _
+            OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 _
+                    AndAlso (Me.TxtTrainNo.Text = CONST_SENDAI_TRAINNO_5081 OrElse Me.TxtTrainNo.Text = CONST_SENDAI_TRAINNO_8081)) Then
+
             '〇 積込可能件数チェック
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -18059,6 +18067,15 @@ Public Class OIT0003OrderDetail
                     OIT0003WKtbl.Load(SQLdr)
                 End Using
 
+                '### 20201125 START 指摘票対応(No227)全体 ################################################################
+                '○仙台新港営業所(積置を除いた油種)における油種の出荷能力件数チェック
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then WW_CheckSendaiOil(OIT0003WKtbl, WW_ERRCODE)
+                If WW_ERRCODE = "ERR" Then
+                    Master.Output(C_MESSAGE_NO.OIL_SENDAI_TRAINCARS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Exit Sub
+                End If
+                '### 20201125 END   指摘票対応(No227)全体 ################################################################
+
                 '### 20201020 START 指摘票対応(No173)全体 ################################################################
                 '○甲子営業所(3号軽油TCH)における油種の出荷能力件数チェック
                 If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then WW_CheckKinoeneOil(OIT0003WKtbl)
@@ -18179,6 +18196,82 @@ Public Class OIT0003OrderDetail
         If O_RTN = C_MESSAGE_NO.NORMAL Then
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 仙台新港営業所(積置を除いた油種)における油種の出荷能力件数チェック
+    ''' </summary>
+    ''' <param name="OIT0003WKtbl"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckSendaiOil(ByVal OIT0003WKtbl As DataTable, ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim iTankCnt As Integer = OIT0003tbl.Select("STACKINGFLG<>'on'").Count
+
+        '○積置を除いた分が12車以内かチェック
+        If iTankCnt > 12 Then
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        Dim strBigOilcode As String = ""
+        Dim strBigOil As String = "ZZZZ"
+        Dim strTotal As String = "合計"
+        '○積置分だけカウントからマイナスする。
+        For Each OIT0003tab1row As DataRow In OIT0003tbl.Select("STACKINGFLG='on'")
+            strBigOilcode = ""
+            '★一致した油種(積分置)から-1する。
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If OIT0003tab1row("OILCODE") = OIT0003row("CHECKOILCODE") _
+                    AndAlso OIT0003tab1row("ORDERINGTYPE") = OIT0003row("SEGMENTOILCODE") Then
+                    OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+                    strBigOilcode = OIT0003row("BIGOILCODE")
+
+                    '★3号軽油は軽油としてカウントしているため軽油から-1する
+                ElseIf OIT0003tab1row("OILCODE") = BaseDllConst.CONST_K3Tank1 _
+                    AndAlso OIT0003row("CHECKOILCODE") = BaseDllConst.CONST_KTank1 Then
+                    OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+                    strBigOilcode = OIT0003row("BIGOILCODE")
+
+                End If
+            Next
+            '★一致した油種の大分類から-1する。
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If strBigOil = OIT0003row("CHECKOILCODE") _
+                    AndAlso strBigOilcode = OIT0003row("BIGOILCODE") Then
+                    OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+                End If
+            Next
+            '★一致した油種の合計から-1する。
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If strTotal = OIT0003row("CHECKOILNAME") _
+                    AndAlso strBigOilcode <> "" Then
+                    OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+                End If
+            Next
+        Next
+
+        '○ハイオクがある時、白油11車に変更
+        Dim iHGTankCnt As Integer = OIT0003WKtbl.Select("CHECKOILCODE='1001' AND TANKCOUNT>0").Count
+        If iHGTankCnt > 0 Then
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If strBigOil = OIT0003row("CHECKOILCODE") _
+                AndAlso OIT0003row("BIGOILCODE") = "W" Then
+                    OIT0003row("CHK_TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) + 1
+                End If
+            Next
+        End If
+
+        '○車数オーバーがないかチェック
+        For Each OIT0003Jderow As DataRow In OIT0003WKtbl.Rows
+            If Integer.Parse(OIT0003Jderow("TANKCOUNT")) <= Integer.Parse(OIT0003Jderow("CHK_TANKCOUNT")) Then
+                '★最大出荷能力以内の場合
+                OIT0003Jderow("JUDGE") = "0"
+            Else
+                '★最大出荷能力をオーバーしている場合
+                OIT0003Jderow("JUDGE") = "1"
+            End If
+        Next
 
     End Sub
 

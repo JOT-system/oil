@@ -5026,17 +5026,29 @@ Public Class OIT0003OrderList
         OIT0003ItemGettbl.Clear()
 
         '★値取得SQL(3号軽油のFROM, TOを取得(帳票に反映するため))
+        '### 20201126 START 指摘票対応(No230) ####################################################################
         Dim SQLGetStr As String =
               " SELECT " _
-            & "   OIM0003.OILCODE           AS OILCODE" _
-            & " , OIM0003.OILNAME           AS OILNAME" _
-            & " , OIM0003.SEGMENTOILCODE    AS SEGMENTOILCODE" _
-            & " , OIM0003.SEGMENTOILNAME    AS SEGMENTOILNAME" _
-            & " , OIM0003.ORDERFROMDATE     AS ORDERFROMDATE" _
-            & " , OIM0003.ORDERTODATE       AS ORDERTODATE" _
-            & " FROM oil.OIM0003_PRODUCT OIM0003 " _
-            & " WHERE OIM0003.OFFICECODE = @P01 " _
-            & "   AND OIM0003.OILCODE = @P02 "
+            & "   OIM0030.OILCODE           AS OILCODE" _
+            & " , OIM0030.SEGMENTOILCODE    AS SEGMENTOILCODE" _
+            & " , OIM0030.CONSIGNEECODE     AS CONSIGNEECODE" _
+            & " , OIM0030.ORDERFROMDATE     AS ORDERFROMDATE" _
+            & " , OIM0030.ORDERTODATE       AS ORDERTODATE" _
+            & " FROM oil.OIM0030_OILTERM OIM0030 " _
+            & " WHERE OIM0030.OFFICECODE = @P01 " _
+            & "   AND OIM0030.OILCODE = @P02 "
+        'Dim SQLGetStr As String =
+        '      " SELECT " _
+        '    & "   OIM0003.OILCODE           AS OILCODE" _
+        '    & " , OIM0003.OILNAME           AS OILNAME" _
+        '    & " , OIM0003.SEGMENTOILCODE    AS SEGMENTOILCODE" _
+        '    & " , OIM0003.SEGMENTOILNAME    AS SEGMENTOILNAME" _
+        '    & " , OIM0003.ORDERFROMDATE     AS ORDERFROMDATE" _
+        '    & " , OIM0003.ORDERTODATE       AS ORDERTODATE" _
+        '    & " FROM oil.OIM0003_PRODUCT OIM0003 " _
+        '    & " WHERE OIM0003.OFFICECODE = @P01 " _
+        '    & "   AND OIM0003.OILCODE = @P02 "
+        '### 20201126 END   指摘票対応(No230) ####################################################################
         '### 20201105 END   指摘票対応(No191) ####################################################################
 
 #Region "コメントアウト"

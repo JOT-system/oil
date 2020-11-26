@@ -226,7 +226,7 @@ Public Class OIM0009PlantSearch
 
                 '基地コード
                 If WF_FIELD.Value = "WF_PLANTCODE" Then
-                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "PLANTCODE")
+                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "PLANTMASTER")
                 End If
 
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -375,7 +375,7 @@ Public Class OIM0009PlantSearch
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "PLANTCODE"        '基地コード
-                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, I_VALUE)
+                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "PLANTMASTER")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

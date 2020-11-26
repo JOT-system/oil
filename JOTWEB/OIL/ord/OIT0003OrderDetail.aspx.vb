@@ -10752,6 +10752,13 @@ Public Class OIT0003OrderDetail
             SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
         End If
 
+        '### 20201126 START 指摘票対応(No233)全体 ################################
+        '受注キャンセルフラグ
+        If work.WF_SEL_ORDERCANCELFLG.Text = "0" Then
+            SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS <> '{0}'", BaseDllConst.CONST_ORDERSTATUS_900)
+        End If
+        '### 20201126 END   指摘票対応(No233)全体 ################################
+
         SQLStr &=
               " ORDER BY" _
             & "    OIT0002.ORDERNO"

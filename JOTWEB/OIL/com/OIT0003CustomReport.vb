@@ -1347,15 +1347,62 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '### 20201105 START 指摘票対応(No193) ####################################################################
 
             '### 20201105 START 指摘票対応(No191) ####################################################################
+            '### 20201126 START 指摘票対応(No230) ####################################################################
             '積込日
             rngHeaderArea = Me.ExcelWorkSheet.Range("E71")
             rngHeaderArea.Value = lodDate
-            '出荷開始日(3号軽油)
-            rngHeaderArea = Me.ExcelWorkSheet.Range("E72")
-            rngHeaderArea.Value = dtFT.Rows(0)("ORDERFROMDATE")
-            '出荷終了日(3号軽油)
-            rngHeaderArea = Me.ExcelWorkSheet.Range("E73")
-            rngHeaderArea.Value = dtFT.Rows(0)("ORDERTODATE")
+            For Each dtFTrow As DataRow In dtFT.Rows
+                Select Case Convert.ToString(dtFTrow("CONSIGNEECODE"))
+                    'JXTG北信油槽所
+                    Case BaseDllConst.CONST_CONSIGNEECODE_10
+                        '出荷開始日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E72")
+                        rngHeaderArea.Value = dtFTrow("ORDERFROMDATE")
+                        '出荷終了日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("E73")
+                        rngHeaderArea.Value = dtFTrow("ORDERTODATE")
+
+                    'JXTG甲府油槽所
+                    Case BaseDllConst.CONST_CONSIGNEECODE_20
+                        '出荷開始日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("F72")
+                        rngHeaderArea.Value = dtFTrow("ORDERFROMDATE")
+                        '出荷終了日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("F73")
+                        rngHeaderArea.Value = dtFTrow("ORDERTODATE")
+                    'OT宇都宮
+                    Case BaseDllConst.CONST_CONSIGNEECODE_53
+                        '出荷開始日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("G72")
+                        rngHeaderArea.Value = dtFTrow("ORDERFROMDATE")
+                        '出荷終了日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("G73")
+                        rngHeaderArea.Value = dtFTrow("ORDERTODATE")
+                    'OT高崎
+                    Case BaseDllConst.CONST_CONSIGNEECODE_54
+                        '出荷開始日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("H72")
+                        rngHeaderArea.Value = dtFTrow("ORDERFROMDATE")
+                        '出荷終了日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("H73")
+                        rngHeaderArea.Value = dtFTrow("ORDERTODATE")
+                    'OT八王子
+                    Case BaseDllConst.CONST_CONSIGNEECODE_55
+                        '出荷開始日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("I72")
+                        rngHeaderArea.Value = dtFTrow("ORDERFROMDATE")
+                        '出荷終了日(3号軽油)
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("I73")
+                        rngHeaderArea.Value = dtFTrow("ORDERTODATE")
+                End Select
+            Next
+            ''出荷開始日(3号軽油)
+            'rngHeaderArea = Me.ExcelWorkSheet.Range("E72")
+            'rngHeaderArea.Value = dtFT.Rows(0)("ORDERFROMDATE")
+            ''出荷終了日(3号軽油)
+            'rngHeaderArea = Me.ExcelWorkSheet.Range("E73")
+            'rngHeaderArea.Value = dtFT.Rows(0)("ORDERTODATE")
+            '### 20201126 END   指摘票対応(No230) ####################################################################
             '### 20201105 END   指摘票対応(No191) ####################################################################
 
         Catch ex As Exception

@@ -140,7 +140,11 @@ Public Class OIT0007FileInputList
             End If
             Dim flp As New FileLinkagePattern
             Dim settings = flp(work.WF_SEL_SALESOFFICECODE.Text)
-            Dim ext = (From itm In settings.InputExtention.Split(","c) Select """" & itm & """")
+            Dim inputExt As String = settings.InputExtention
+            If inputExt = "xlsx" Then
+                inputExt = inputExt & ",xls"
+            End If
+            Dim ext = (From itm In inputExt.Split(","c) Select """" & itm & """")
             If ext.Any Then
                 Me.AcceptExtentions = String.Join(",", ext)
             End If

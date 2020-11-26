@@ -1977,6 +1977,24 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
                 inputObj.classList.add('boxIcon');
             }
         }
+        /* 削除アイコンの追加 */
+        if (inputObj.classList.contains('iconOnly') && inputObj.classList.contains('showDeleteIcon')) {
+            let delIconElm = document.createElement('div');
+            let delInputObjId = inputObj.id;
+            let delObjId = delInputObjId + 'commonDelIcon';
+            let delIconElmImage = document.createElement('div');
+            delIconElm.appendChild(delIconElmImage);
+            delIconElm.id = delObjId;
+            delIconElm.classList.add('delIconArea');
+            insertAfter(delIconElm, inputObj);
+            delIconElm = document.getElementById(delObjId);
+            delIconElm.addEventListener('click', (function (delInputObjId) {
+                return function () {
+                    commonDeleteIconClick(delInputObjId);
+                };
+            })(delInputObjId), false);
+        }
+        /* アイコンの追加 */
         let iconElm = document.createElement('div');
         let inputObjId = inputObj.id;
         let orgWidth = inputObj.scrollWidth;
@@ -2024,6 +2042,66 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
         //currentWidth = iconElm.getComputedStyle()
         inputObj.style.width = "calc(100% + 1px)";
     }
+}
+/**
+ * 指定したノードの後ろにエレメントを追加する
+ * @param {Element} newItem 追加するノード
+ * @param {Element} target 追加するノード
+ * @return {undefined} なし
+ */
+function insertAfter(newItem, target) {
+    target.parentNode.insertBefore(newItem, target.nextSibling);
+}
+/**
+ * 削除アイコン押下時処理
+ * @param {string} objId 削除ボタンを押下したテキストボックスID
+ * @return {undefined} なし
+ */
+function commonDeleteIconClick(objId) {
+    let txtObj = document.getElementById(objId);
+    let comTargetNameObj = document.getElementById('MF_CommonDeleteItemName');
+    let comTargetRowObj = document.getElementById('MF_CommonDeleteRow');
+    let comTargetListIdObj = document.getElementById('MF_CommonDeleteListId');
+    let btnClickObj = document.getElementById('WF_ButtonClick');
+    let submitObj = document.getElementById('MF_SUBMIT');
+    // 対象のオブジェクト群が存在しない場合そのまま終了
+    if (txtObj === null) {
+        return;
+    }
+    if (btnClickObj === null) {
+        return;
+    }
+    if (submitObj === null) {
+        return;
+    }
+    // サーバー処理実行中ならそのままスキップ
+    if (submitObj.value === "TRUE") {
+        return;
+    }
+    if (comTargetNameObj === null) {
+        return;
+    }
+    if (comTargetRowObj === null) {
+        return;
+    }
+    if (comTargetListIdObj === null) {
+        return;
+    }
+    
+    if (txtObj.hasAttribute("rownum")) {
+        // テキストボックスにrownumの属性を持つ場合は行内に描画されたリストと判定
+        let parentPanelObj = txtObj.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+        comTargetListIdObj.value = parentPanelObj.id;
+        comTargetRowObj.value = txtObj.getAttribute("rownum");
+        comTargetNameObj.value = txtObj.dataset.fieldName;
+    } else {
+        // 通常時はテキストボックスのID保持
+        comTargetNameObj.value = txtObj.id;
+    }
+    // サーバー処理呼出しのサブミット
+    submitObj.value = "TRUE";
+    btnClickObj.value = "WF_ComDeleteIconClick";
+    document.forms[0].submit();
 }
 /**
  * ポップアップの背面操作禁止を解除

@@ -110,7 +110,14 @@ Public Class OIT0003OrderSearch
             TxtUnloading.Text = work.WF_SEL_UNLOADINGCODE.Text
             '状態
             TxtStatus.Text = work.WF_SEL_STATUSCODE.Text
-
+            '### 20201126 START 指摘票対応(No233)全体 ################################
+            '受注キャンセルフラグ
+            If work.WF_SEL_ORDERCANCELFLG.Text = "1" Then
+                Me.ChkOrderCancelFlg.Checked = True
+            Else
+                Me.ChkOrderCancelFlg.Checked = False
+            End If
+            '### 20201126 END   指摘票対応(No233)全体 ################################
         End If
 
         '営業所・列車番号・荷卸地・状態を入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -202,6 +209,15 @@ Public Class OIT0003OrderSearch
         '状態
         work.WF_SEL_STATUSCODE.Text = TxtStatus.Text
         work.WF_SEL_STATUS.Text = LblStatusName.Text
+
+        '### 20201126 START 指摘票対応(No233)全体 ################################
+        '受注キャンセルフラグ
+        If Me.ChkOrderCancelFlg.Checked = True Then
+            work.WF_SEL_ORDERCANCELFLG.Text = "1"
+        Else
+            work.WF_SEL_ORDERCANCELFLG.Text = "0"
+        End If
+        '### 20201126 END   指摘票対応(No233)全体 ################################
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then

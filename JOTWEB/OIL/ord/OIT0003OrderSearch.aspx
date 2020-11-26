@@ -99,6 +99,12 @@
                     <asp:Label ID="LblStatusName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
+            <!-- 受注キャンセルフラグ -->
+            <div class="inputItem">
+                <a id="WF_ORDERCANCELFLG">
+                    <asp:CheckBox ID="ChkOrderCancelFlg" runat="server" Text="受注キャンセルを含む" />
+                </a>
+            </div>
         </div>
     </div>
 

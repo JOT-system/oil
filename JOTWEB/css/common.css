@@ -705,6 +705,7 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     left:0em;
     width:1.4em;
     height:1.4em;
+    vertical-align:middle;
 }
 
 /* 実行画面 ヘッダー部 */

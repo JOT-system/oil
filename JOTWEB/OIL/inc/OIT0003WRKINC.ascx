@@ -27,6 +27,8 @@
     <asp:TextBox ID="WF_SEL_STATUSCODE" runat="server"></asp:TextBox>
     <!-- 状態名 -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>
+    <!-- 受注キャンセルフラグ -->
+    <asp:TextBox ID="WF_SEL_ORDERCANCELFLG" runat="server"></asp:TextBox>
 
     <!-- ■受注一覧用 -->
     <!-- 選択行 -->

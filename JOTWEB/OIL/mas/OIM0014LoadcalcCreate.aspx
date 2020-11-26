@@ -72,7 +72,7 @@
                     <!-- 積込チェック用油種コード -->
                     <span class="ef">
                         <asp:Label ID="WF_CHECKOILCODE_L" runat="server" Text="積込チェック用油種コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_BIGOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_BIGOILCODE');">
+                        <span ondblclick="Field_DBclick('WF_CHECKOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_CHECKOILCODE');">
                             <asp:TextBox ID="WF_CHECKOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="4"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_CHECKOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>

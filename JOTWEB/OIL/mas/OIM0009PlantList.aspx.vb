@@ -1479,6 +1479,9 @@ Public Class OIM0009PlantList
                 Case "PLANTCODE"        '基地コード
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SHIPPERCODE"      '荷主コード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
             End Select

@@ -739,6 +739,10 @@ Public Module Messages
         ''' アップロード(回線別積込予定表(油種数レス))エラーメッセージ
         ''' </summary>
         Public Const OIL_UPLOAD_ERR_NEGISHI_LOAD_OILLESS_MESSAGE As String = "20084"
+        ''' <summary>
+        ''' 列車牽引車数オーバー(仙台新港営業所用)
+        ''' </summary>
+        Public Const OIL_SENDAI_TRAINCARS_ERROR As String = "20085"
 #End Region
 
 

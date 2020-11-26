@@ -1244,8 +1244,8 @@ Public Class OILMasterPage
                 mMasterDeleteFieldInfo = New MasterDeleteFieldInfo
                 With mMasterDeleteFieldInfo
                     .FieldName = Me.MF_CommonDeleteItemName.Value
-                    .ListId = Me.MF_CommonDeleteRow.Value
-                    .LineCnt = Me.MF_CommonDeleteListId.Value
+                    .ListId = Me.MF_CommonDeleteListId.Value
+                    .LineCnt = Me.MF_CommonDeleteRow.Value
                 End With
                 Me.MF_CommonDeleteItemName.Value = ""
                 Me.MF_CommonDeleteRow.Value = ""

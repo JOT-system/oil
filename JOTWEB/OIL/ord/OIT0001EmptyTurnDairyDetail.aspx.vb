@@ -116,6 +116,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                             WF_RIGHTBOX_Change()
                         Case "WF_ListChange"            'リスト変更
                             WF_ListChange()
+                        Case "WF_ComDeleteIconClick"    'リスト削除
+                            WF_ListDelete()
                     End Select
 
                     '○ 一覧再表示処理
@@ -3119,6 +3121,33 @@ Public Class OIT0001EmptyTurnDairyDetail
             Case "JOINT"             '(一覧)ジョイント
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト削除時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListDelete()
+        '紐付けているリストのID
+        Dim ListId As String = Master.DELETE_FIELDINFO.ListId
+        'フィールド名
+        Dim FieldName As String = Master.DELETE_FIELDINFO.FieldName
+        '行番号
+        Dim LineCnt As String = Master.DELETE_FIELDINFO.LineCnt
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0001tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = LineCnt)
+        If IsNothing(updHeader) Then Exit Sub
+
+        Select Case FieldName
+            Case "JOINT"
+                updHeader.Item("JOINT") = ""
         End Select
 
         '○ 画面表示データ保存
@@ -7717,9 +7746,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
 
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")

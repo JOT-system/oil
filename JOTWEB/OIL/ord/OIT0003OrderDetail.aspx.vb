@@ -207,6 +207,8 @@ Public Class OIT0003OrderDetail
                             WF_RIGHTBOX_Change()
                         Case "WF_ListChange"                  'リスト変更
                             WF_ListChange()
+                        Case "WF_ComDeleteIconClick"          'リスト削除
+                            WF_ListDelete()
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
                         Case "btnChkLastOilConfirmYes"        '確認メッセージはいボタン押下(前回油種チェック)
@@ -7927,6 +7929,93 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+    End Sub
+#End Region
+
+#Region "リスト削除時処理"
+    ''' <summary>
+    ''' リスト削除時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListDelete()
+        '紐付けているリストのID
+        Dim ListId As String = Master.DELETE_FIELDINFO.ListId
+        'フィールド名
+        Dim FieldName As String = Master.DELETE_FIELDINFO.FieldName
+        '行番号
+        Dim LineCnt As String = Master.DELETE_FIELDINFO.LineCnt
+
+        Select Case ListId
+                'タンク車割当
+            Case "pnlListArea1"
+                WW_ListDelete_TAB1(FieldName, LineCnt)
+
+                '入換・積込指示
+            Case "pnlListArea2"
+                WW_ListDelete_TAB2(FieldName, LineCnt)
+
+                'タンク車明細
+            Case "pnlListArea3"
+                WW_ListDelete_TAB3(FieldName, LineCnt)
+
+                '費用入力
+            Case "pnlListArea4"
+                WW_ListDelete_TAB4(FieldName, LineCnt)
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト削除時処理(タンク車割当)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB1(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = I_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        Select Case I_FIELDNAME
+            Case "JOINT"
+                updHeader.Item("JOINT") = ""
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+    ''' <summary>
+    ''' リスト削除時処理(入換・積込指示)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB2(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
+
+    End Sub
+    ''' <summary>
+    ''' リスト削除時処理(タンク車明細)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB3(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl_tab3.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = I_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        Select Case I_FIELDNAME
+            Case "JOINT"
+                updHeader.Item("JOINT") = ""
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+    End Sub
+    ''' <summary>
+    ''' リスト削除時処理(費用入力)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB4(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
 
     End Sub
 #End Region
@@ -19514,9 +19603,10 @@ Public Class OIT0003OrderDetail
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         '### 20201019 START 指摘票対応(No172) #############################################
                         '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
@@ -19633,9 +19723,10 @@ Public Class OIT0003OrderDetail
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JOINT") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         '### 20201019 START 指摘票対応(No172) #############################################
                         '★ かつ、受注営業所が"011402"(根岸営業所)以外の場合
@@ -20207,10 +20298,12 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
                         Else
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
+
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")

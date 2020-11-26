@@ -667,7 +667,7 @@ Public Class OIT0007FileInputList
                     If detailTbl IsNot Nothing Then
                         Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
                         For Each dr As DataRow In hisDetailTbl.Rows
-                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                            'EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
                         Next
                         'ジャーナル登録
                         OutputJournal(detailTbl, "OIT0003_DETAIL")

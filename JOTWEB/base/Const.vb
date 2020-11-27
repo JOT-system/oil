@@ -511,6 +511,10 @@ Public Module BaseDllConst
     ''' 積込日エラー((一覧)積込日と(予定)発日チェック用)
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_105 As String = "105"
+    ''' <summary>
+    ''' 品種出荷期間エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_106 As String = "106"
 
     ''' <summary>
     ''' 失注（荷主都合）

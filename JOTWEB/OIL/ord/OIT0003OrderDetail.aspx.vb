@@ -6036,15 +6036,15 @@ Public Class OIT0003OrderDetail
         ReDisplayTabList()
 
         '### 20201126 START 指摘票対応(No222)全体 ################################
-        ''○ 油種の使用時期チェック
-        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '    SQLcon.Open()       'DataBase接続
-        '    WW_CheckOilUsePeriod(WW_ERRCODE, SQLcon)
-        '    If WW_ERRCODE = "ERR" Then
-        '        'Master.Output(C_MESSAGE_NO.OIL_CONSIGNEE_OILCODE_NG, C_MESSAGE_TYPE.ERR, strSubMsg, needsPopUp:=True)
-        '        Exit Sub
-        '    End If
-        'End Using
+        '○ 油種の使用時期チェック
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            WW_CheckOilUsePeriod(WW_ERRCODE, SQLcon)
+            If WW_ERRCODE = "ERR" Then
+                Master.Output(C_MESSAGE_NO.OIL_OILTERM_OVER_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+        End Using
         '### 20201126 END   指摘票対応(No222)全体 ################################
 
         '〇 荷受人油種チェック
@@ -17820,15 +17820,29 @@ Public Class OIT0003OrderDetail
                 '○油種マスタの開始終了の範囲に、設定した油種の積込日の使用時期が含まれているかチェック
                 For Each OIT0003ChkDrow As DataRow In OIT0003WKtbl.Rows
                     If Date.Parse(OIT0003ChkDrow("ORDERFROMDATE")) <= Date.Parse(OIT0003ChkDrow("LODDATE")) _
-                        AndAlso Date.Parse(OIT0003ChkDrow("LODDATE")) >= Date.Parse(OIT0003ChkDrow("ORDERTODATE")) Then
+                        AndAlso Date.Parse(OIT0003ChkDrow("LODDATE")) <= Date.Parse(OIT0003ChkDrow("ORDERTODATE")) Then
 
                         '### 使用時期の範囲内の場合は何もしない #######################
 
                     Else
                         '★使用時期範囲外の場合は、"1"(無効)とする。
                         OIT0003ChkDrow("USEPERIODCHECK") = "1"
+                        O_RTN = "ERR"
                     End If
                 Next
+
+                '○使用時期範囲外対象の油種を一覧に反映する。
+                For Each OIT0003ChkDrow As DataRow In OIT0003WKtbl.Select("USEPERIODCHECK='1'")
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        If Convert.ToString(OIT0003row("DETAILNO")) = Convert.ToString(OIT0003ChkDrow("DETAILNO")) Then
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_106
+                            CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                        End If
+                    Next
+                Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
 
             End Using
         Catch ex As Exception

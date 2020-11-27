@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIM0013WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:content id="OIM0013SH" contentplaceholderid="head" runat="server">
-<%--    <link href='<%=ResolveUrl("~/OIL/css/OIM0013S.css")%>' rel="stylesheet" type="text/css" />--%>
+    <link href='<%=ResolveUrl("~/OIL/css/OIM0013S.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0013S.js")%>'></script>
 </asp:content>
 

@@ -47,203 +47,179 @@
                         </span>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_3">
                     <!-- 営業所コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_OFFICECODE_L" runat="server" Text="営業所コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_OFFICECODE_L" runat="server" Text="営業所コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_OFFICECODE', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('WF_OFFICECODE');">
                             <asp:TextBox ID="WF_OFFICECODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_OFFICECODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_4">
+                <p id="KEY_LINE_3">
                     <!-- 荷主コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_SHIPPERCODE_L" runat="server" Text="荷主コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_SHIPPERCODE_L" runat="server" Text="荷主コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_SHIPPERCODE', <%=LIST_BOX_CLASSIFICATION.LC_JOINTLIST%>);" onchange="TextBox_change('WF_SHIPPERCODE');">
                         <asp:TextBox ID="WF_SHIPPERCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_SHIPPERCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_5">
                     <!-- 基地コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_PLANTCODE_L" runat="server" Text="基地コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_PLANTCODE_L" runat="server" Text="基地コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_PLANTCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_PLANTCODE');">
                             <asp:TextBox ID="WF_PLANTCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_PLANTCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_6">
+                <p id="KEY_LINE_4">
                     <!-- 油種大分類コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_BIGOILCODE_L" runat="server" Text="油種大分類コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_BIGOILCODE_L" runat="server" Text="油種大分類コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_BIGOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_BIGOILCODE');">
                             <asp:TextBox ID="WF_BIGOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_BIGOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_7">
                     <!-- 油種大分類名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_BIGOILNAME_L" runat="server" Text="油種大分類名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_BIGOILNAME_L" runat="server" Text="油種大分類名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_BIGOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="10"></asp:TextBox>
                         <asp:Label ID="WF_BIGOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_8">
+                <p id="KEY_LINE_5">
                     <!-- 油種大分類名カナ -->
                     <span class="ef">
-                        <asp:Label ID="WF_BIGOILKANA_L" runat="server" Text="油種大分類名カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_BIGOILKANA_L" runat="server" Text="油種大分類名カナ" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_BIGOILKANA" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="10"></asp:TextBox>
                         <asp:Label ID="WF_BIGOILKANA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_9">
                     <!-- 油種中分類コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_MIDDLEOILCODE_L" runat="server" Text="油種中分類コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_MIDDLEOILCODE_L" runat="server" Text="油種中分類コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_MIDDLEOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_MIDDLEOILCODE');">
                             <asp:TextBox ID="WF_MIDDLEOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_MIDDLEOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_10">
+                <p id="KEY_LINE_6">
                     <!-- 油種中分類名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_MIDDLEOILNAME_L" runat="server" Text="油種中分類名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_MIDDLEOILNAME_L" runat="server" Text="油種中分類名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_MIDDLEOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_MIDDLEOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_11">
                     <!-- 油種中分類名カナ -->
                     <span class="ef">
-                        <asp:Label ID="WF_MIDDLEOILKANA_L" runat="server" Text="油種中分類名カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_MIDDLEOILKANA_L" runat="server" Text="油種中分類名カナ" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_MIDDLEOILKANA" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_MIDDLEOILKANA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_12">
+                <p id="KEY_LINE_7">
                     <!-- 油種コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_OILCODE_L" runat="server" Text="油種コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_OILCODE_L" runat="server" Text="油種コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <asp:TextBox ID="WF_OILCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
                         <asp:Label ID="WF_OILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_13">
                     <!-- 油種名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_OILNAME_L" runat="server" Text="油種名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_OILNAME_L" runat="server" Text="油種名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_OILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_14">
+                <p id="KEY_LINE_8">
                     <!-- 油種名カナ -->
                     <span class="ef">
-                        <asp:Label ID="WF_OILKANA_L" runat="server" Text="油種名カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_OILKANA_L" runat="server" Text="油種名カナ" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OILKANA" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_OILKANA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_15">
                     <!-- 油種細分コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_SEGMENTOILCODE_L" runat="server" Text="油種細分コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_SEGMENTOILCODE_L" runat="server" Text="油種細分コード" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <asp:TextBox ID="WF_SEGMENTOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
                         <asp:Label ID="WF_SEGMENTOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_16">
+                <p id="KEY_LINE_9">
                     <!-- 油種名（細分） -->
                     <span class="ef">
-                        <asp:Label ID="WF_SEGMENTOILNAME_L" runat="server" Text="油種名（細分）" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_SEGMENTOILNAME_L" runat="server" Text="油種名（細分）" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_SEGMENTOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_SEGMENTOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_17">
                     <!-- OT油種コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_OTOILCODE_L" runat="server" Text="OT油種コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_OTOILCODE_L" runat="server" Text="OT油種コード" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_OTOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_OTOILCODE');">
                             <asp:TextBox ID="WF_OTOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="4"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_OTOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_18">
+                <p id="KEY_LINE_10">
                     <!-- OT油種名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_OTOILNAME_L" runat="server" Text="OT油種名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_OTOILNAME_L" runat="server" Text="OT油種名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OTOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_OTOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_19">
                     <!-- 荷主油種コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_SHIPPEROILCODE_L" runat="server" Text="荷主油種コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_SHIPPEROILCODE_L" runat="server" Text="荷主油種コード" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_SHIPPEROILCODE" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_SHIPPEROILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_20">
+                <p id="KEY_LINE_11">
                     <!-- 荷主油種名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_SHIPPEROILNAME_L" runat="server" Text="荷主油種名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_SHIPPEROILNAME_L" runat="server" Text="荷主油種名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_SHIPPEROILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_SHIPPEROILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_21">
                     <!-- 積込チェック用油種コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_CHECKOILCODE_L" runat="server" Text="積込チェック用油種コード " CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_CHECKOILCODE_L" runat="server" Text="積込チェック用油種コード " CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_CHECKOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
                         <asp:Label ID="WF_CHECKOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_22">
+                <p id="KEY_LINE_12">
                     <!-- 積込チェック用油種名 -->
                     <span class="ef">
-                        <asp:Label ID="WF_CHECKOILNAME_L" runat="server" Text="積込チェック用油種名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_CHECKOILNAME_L" runat="server" Text="積込チェック用油種名" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_CHECKOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="40"></asp:TextBox>
                         <asp:Label ID="WF_CHECKOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_23">
                     <!-- 在庫管理対象フラグ -->
                     <span class="ef">
-                        <asp:Label ID="WF_STOCKFLG_L" runat="server" Text="在庫管理対象フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_STOCKFLG_L" runat="server" Text="在庫管理対象フラグ" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_STOCKFLG', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_STOCKFLG');">
                             <asp:TextBox ID="WF_STOCKFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_STOCKFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_24">
+                <p id="KEY_LINE_13">
                     <!-- 受注登録可能期間FROM -->
                     <span class="ef">
-                        <asp:Label ID="WF_ORDERFROMDATE_L" runat="server" Text="受注登録可能期間FROM" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_ORDERFROMDATE_L" runat="server" Text="受注登録可能期間FROM" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_ORDERFROMDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_ORDERFROMDATE');">
                             <asp:TextBox ID="WF_ORDERFROMDATE" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_ORDERFROMDATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-                <p id="KEY_LINE_25">
                     <!-- 受注登録可能期間TO -->
                     <span class="ef">
-                        <asp:Label ID="WF_ORDERTODATE_L" runat="server" Text="受注登録可能期間TO" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_ORDERTODATE_L" runat="server" Text="受注登録可能期間TO" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_ORDERTODATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_ORDERTODATE');">
                             <asp:TextBox ID="WF_ORDERTODATE" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
                         </span>

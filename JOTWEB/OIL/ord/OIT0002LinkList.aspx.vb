@@ -3443,7 +3443,7 @@ Public Class OIT0002LinkList
                         Next
                         '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
                         If tankNoFlg = "0" Then
-                            For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
+                            For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0' AND TANKNO = ''")
                                 If Convert.ToString(OIT0002GETrow("ORDERINGOILNAME")) = Convert.ToString(OIT0002EXLUProw("OILNAME")) Then
                                     'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
                                     OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")
@@ -3514,7 +3514,7 @@ Public Class OIT0002LinkList
                             Next
                             '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
                             If tankNoFlg = "0" Then
-                                For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
+                                For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0' AND TANKNO = ''")
                                     If Convert.ToString(OIT0002GETrow("ORDERINGOILNAME")) = Convert.ToString(OIT0002EXLUProw("OILNAME")) Then
                                         'OIT0002EXLUProw("ORDERNO") = OIT0002GETrow("ORDERNO")
                                         OIT0002EXLUProw("DETAILNO") = OIT0002GETrow("DETAILNO")

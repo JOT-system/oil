@@ -2118,8 +2118,9 @@ Public Class OIT0003OrderDetail
                     End If
 
                     '★貨車連結順序アップロードから作成された新規受注データの場合
+                    '　※追記　受注明細画面以外から作成された新規受注データ
                     If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                        AndAlso OIT0003row("EMPTYTURNFLG") = "3" Then
+                        AndAlso OIT0003row("EMPTYTURNFLG") <> "0" Then
 
                         '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
                         '　※上記以外の営業所については、入力しないため値は未入力。
@@ -6033,6 +6034,18 @@ Public Class OIT0003OrderDetail
 
         '★ 各タブ(一覧)の再表示処理
         ReDisplayTabList()
+
+        '### 20201126 START 指摘票対応(No222)全体 ################################
+        ''○ 油種の使用時期チェック
+        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '    SQLcon.Open()       'DataBase接続
+        '    WW_CheckOilUsePeriod(WW_ERRCODE, SQLcon)
+        '    If WW_ERRCODE = "ERR" Then
+        '        'Master.Output(C_MESSAGE_NO.OIL_CONSIGNEE_OILCODE_NG, C_MESSAGE_TYPE.ERR, strSubMsg, needsPopUp:=True)
+        '        Exit Sub
+        '    End If
+        'End Using
+        '### 20201126 END   指摘票対応(No222)全体 ################################
 
         '〇 荷受人油種チェック
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -17722,6 +17735,118 @@ Public Class OIT0003OrderDetail
         'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
+
+    ''' <summary>
+    ''' 油種使用時期チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckOilUsePeriod(ByRef O_RTN As String, ByVal SQLcon As SqlConnection)
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        '○ チェックSQL
+        '　説明
+        '     タンク車割当で設定した油種について、荷受人ごとに設定されている開始終了日の範囲内かチェックする。
+
+        '油種使用時期チェック用
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   OIT0003.ORDERNO         AS ORDERNO " _
+            & " , OIT0003.DETAILNO        AS DETAILNO " _
+            & " , OIT0003.SHIPPERSCODE    AS SHIPPERSCODE " _
+            & " , OIT0003.OILCODE         AS OILCODE " _
+            & " , OIT0003.OILNAME         AS OILNAME " _
+            & " , OIT0003.ORDERINGTYPE    AS ORDERINGTYPE " _
+            & " , OIT0003.ORDERINGOILNAME AS ORDERINGOILNAME " _
+            & " , CASE " _
+            & "   WHEN OIT0003.STACKINGFLG = '2' THEN OIT0002.LODDATE " _
+            & "   ELSE OIT0003.ACTUALLODDATE " _
+            & "   END                     AS LODDATE" _
+            & " , OIM0030.ORDERFROMDATE   AS ORDERFROMDATE " _
+            & " , OIM0030.ORDERTODATE     AS ORDERTODATE " _
+            & " , '0'                     AS USEPERIODCHECK " _
+            & " FROM  OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.DELFLG <> @DELFLG "
+
+        SQLStr &=
+              " INNER JOIN oil.OIM0030_OILTERM OIM0030 ON " _
+            & "     OIM0030.OFFICECODE     = OIT0002.OFFICECODE " _
+            & " AND OIM0030.SHIPPERCODE    = OIT0003.SHIPPERSCODE " _
+            & " AND OIM0030.PLANTCODE      = OIT0002.BASECODE " _
+            & " AND OIM0030.CONSIGNEECODE  = OIT0002.CONSIGNEECODE " _
+            & " AND OIM0030.OILCODE        = OIT0003.OILCODE " _
+            & " AND OIM0030.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0030.DELFLG        <> @DELFLG "
+
+        SQLStr &=
+              " WHERE OIT0002.OFFICECODE = @OFFICECODE " _
+            & " AND OIT0002.ORDERNO      = @ORDERNO " _
+            & " AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
+            & " AND OIT0002.DELFLG      <> @DELFLG "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)           '受注№
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar)     '受注営業所コード
+                Dim P_ORDERSTATUS As SqlParameter = SQLcmd.Parameters.Add("@ORDERSTATUS", SqlDbType.NVarChar)   '受注進行ステータス
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar)             '削除フラグ
+                P_ORDERNO.Value = Me.TxtOrderNo.Text
+                P_OFFICECODE.Value = Me.TxtOrderOfficeCode.Text
+                P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
+                '○油種マスタの開始終了の範囲に、設定した油種の積込日の使用時期が含まれているかチェック
+                For Each OIT0003ChkDrow As DataRow In OIT0003WKtbl.Rows
+                    If Date.Parse(OIT0003ChkDrow("ORDERFROMDATE")) <= Date.Parse(OIT0003ChkDrow("LODDATE")) _
+                        AndAlso Date.Parse(OIT0003ChkDrow("LODDATE")) >= Date.Parse(OIT0003ChkDrow("ORDERTODATE")) Then
+
+                        '### 使用時期の範囲内の場合は何もしない #######################
+
+                    Else
+                        '★使用時期範囲外の場合は、"1"(無効)とする。
+                        OIT0003ChkDrow("USEPERIODCHECK") = "1"
+                    End If
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D CHECK_OILUSEPERIOD")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D CHECK_OILUSEPERIOD"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
 
     ''' <summary>
     ''' 荷受人油種チェック

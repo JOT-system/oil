@@ -18262,7 +18262,7 @@ Public Class OIT0003OrderDetail
 
         SQLStr &=
               " ) MERGE_TBL " _
-            & " LEFT JOIN ( " _
+            & " INNER JOIN ( " _
             & "      SELECT " _
             & "        OIM0014.PLANTCODE " _
             & "      , OIM0014.BIGOILCODE " _
@@ -18329,7 +18329,7 @@ Public Class OIT0003OrderDetail
 
                 Dim chkOilCode As String = ""
                 Dim chkOilCodeNegishi As String = ""
-                For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
+                For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Select("CHECKOILCODE<>'ZZZZ'")
                     '"1"(車数オーバー)
                     If OIT0003UPDrow("JUDGE") = "1" Then
 
@@ -18348,7 +18348,7 @@ Public Class OIT0003OrderDetail
 
                         Select Case OIT0003UPDrow("CHECKOILCODE")
                             '油種(白油・黒油)合計チェック
-                            Case "ZZZZ"
+                            Case "ZZZZ", "YYYY"
                                 WW_CheckMES1 = "積込可能(油種大分類毎)件数オーバー。"
                                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
 
@@ -18492,7 +18492,8 @@ Public Class OIT0003OrderDetail
             For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
                 If strBigOil = OIT0003row("CHECKOILCODE") _
                 AndAlso OIT0003row("BIGOILCODE") = "W" Then
-                    OIT0003row("CHK_TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) + 1
+                    OIT0003row("CHECKOILCODE") = "YYYY"
+                    OIT0003row("CHK_TANKCOUNT") = Integer.Parse(OIT0003row("CHK_TANKCOUNT")) + 1
                 End If
             Next
         End If

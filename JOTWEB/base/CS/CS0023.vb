@@ -1229,6 +1229,7 @@ Public Structure CS0023XLSUPLOAD
             'Excel終了＆リリース
             ExcelMemoryRelease(rng)
             CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+            Throw
             Exit Sub
         End Try
         Try

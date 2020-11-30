@@ -9851,7 +9851,9 @@ Public Class OIT0003OrderDetail
             Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar)  '更新端末
             Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.DateTime)  '集信日時
+            Dim PARA16 As SqlParameter = Nothing
 
+            Dim setFlg As Boolean = False
             For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
                 PARA01.Value = OIT0003tab2row("ORDERNO")
                 PARA02.Value = OIT0003tab2row("DETAILNO")
@@ -9867,7 +9869,10 @@ Public Class OIT0003OrderDetail
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
                         AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
 
-                    Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
+                    If setFlg = False Then
+                        PARA16 = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '発送順
+                        setFlg = True
+                    End If
 
                     '○発送順を営業所別で自動設定
                     Select Case Me.TxtOrderOfficeCode.Text
@@ -10033,8 +10038,23 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0003_DETAIL " _
-                    & "    SET SHIPORDER            = @P27, " _
-                    & "        CARSAMOUNT           = @P04, " _
+                    & "    SET SHIPORDER            = @P27, "
+
+            '### 20201130 START 指摘票対応(No218)全体 #############################################################
+            If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+                SQLStr &=
+                      "        LOADINGOUTLETORDER   = @P32, " _
+                    & "        LOADINGIRILINEORDER  = @P33, "
+            End If
+            '### 20201130 END   指摘票対応(No218)全体 #############################################################
+
+            SQLStr &=
+                      "        CARSAMOUNT           = @P04, " _
                     & "        JOINTCODE            = @P23, " _
                     & "        JOINT                = @P05, " _
                     & "        ACTUALLODDATE        = @P06, " _
@@ -10100,7 +10120,11 @@ Public Class OIT0003OrderDetail
             Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
             Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", System.Data.SqlDbType.NVarChar)  '更新端末
             Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", System.Data.SqlDbType.DateTime)  '集信日時
+            Dim PARA32 As SqlParameter = Nothing  '積込出線順
+            Dim PARA33 As SqlParameter = Nothing  '積込入線順
 
+            Dim intListCnt As Integer = OIT0003tbl_tab3.Select("DELFLG<>'1'").Count
+            Dim setFlg As Boolean = False
             For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
                 PARA01.Value = OIT0003tab3row("ORDERNO")
                 PARA02.Value = OIT0003tab3row("DETAILNO")
@@ -10108,6 +10132,27 @@ Public Class OIT0003OrderDetail
                 '発送順(★全角⇒半角変換)
                 'PARA27.Value = OIT0003tab3row("SHIPORDER")
                 PARA27.Value = StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)
+
+                '### 20201130 START 指摘票対応(No218)全体 #############################################################
+                If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+
+                    If setFlg = False Then
+                        PARA32 = SQLcmd.Parameters.Add("@P32", System.Data.SqlDbType.NVarChar)  '積込出線順
+                        PARA33 = SQLcmd.Parameters.Add("@P33", System.Data.SqlDbType.NVarChar)  '積込入線順
+                        setFlg = True
+                    End If
+
+                    '★タブ<タンク車明細>で設定した「発送順」⇒「積込出線順」に設定
+                    PARA32.Value = StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)
+                    '★全体の件数から積込出線順を引いた値を「積込入線順」に設定
+                    PARA33.Value = (intListCnt - Integer.Parse(StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)) + 1)
+                End If
+                '### 20201130 END   指摘票対応(No218)全体 #############################################################
 
                 Try
                     PARA04.Value = Decimal.Parse(OIT0003tab3row("CARSAMOUNT"))
@@ -15397,22 +15442,33 @@ Public Class OIT0003OrderDetail
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGIRILINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
 
-                '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
-                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                            AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '    ★甲子営業所(8685列車対応)※タブ<タンク車明細>にて設定するため空白を許可する。
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685 Then
+                    '### (空白)未チェック ####################################
 
-                    'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
+                    '★五井営業所(8681/8883列車対応)※タブ<タンク車明細>にて設定するため空白を許可する。
+                ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) Then
+                    '### (空白)未チェック ####################################
+                Else
+                    '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
+                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
-                    WW_CheckMES1 = "積込入線順未設定エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                    O_RTN = "ERR"
-                    O_Msg = "(一覧)積込入線順"
-                    Exit Sub
+                        'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
+
+                        WW_CheckMES1 = "積込入線順未設定エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                        O_RTN = "ERR"
+                        O_Msg = "(一覧)積込入線順"
+                        Exit Sub
+                    End If
                 End If
-
             End If
 
             '### 20200616 START((全体)No74対応) ######################################
@@ -15461,21 +15517,32 @@ Public Class OIT0003OrderDetail
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGOUTLETORDER") = "" And OIT0003row("DELFLG") = "0" Then
 
-                '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
-                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                            AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                    'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
+                '    ★甲子営業所(8685列車対応)※タブ<タンク車明細>にて設定するため空白を許可する。
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685 Then
+                    '### (空白)未チェック ####################################
 
-                    WW_CheckMES1 = "出線順未設定エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                    O_RTN = "ERR"
-                    O_Msg = "(一覧)出線順"
-                    Exit Sub
+                    '★五井営業所(8681/8883列車対応)※タブ<タンク車明細>にて設定するため空白を許可する。
+                ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) Then
+                    '### (空白)未チェック ####################################
+                Else
+                    '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
+                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                        'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
+
+                        WW_CheckMES1 = "出線順未設定エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                        O_RTN = "ERR"
+                        O_Msg = "(一覧)出線順"
+                        Exit Sub
+                    End If
                 End If
-
             End If
         Next
 

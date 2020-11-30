@@ -663,11 +663,18 @@ Public Class OIT0007FileInputList
                         Return
                     End If
                     '履歴テーブル登録
+                    Dim orderTbl As DataTable = GetUpdatedOrder(chkItems, SQLcon, sqlTran)
                     Dim detailTbl As DataTable = GetUpdatedOrderDetail(chkItems, SQLcon, sqlTran)
                     If detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
                         Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
+
                         For Each dr As DataRow In hisDetailTbl.Rows
-                            'EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
                         Next
                         'ジャーナル登録
                         OutputJournal(detailTbl, "OIT0003_DETAIL")
@@ -1061,7 +1068,7 @@ Public Class OIT0007FileInputList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of InputDataItem), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder

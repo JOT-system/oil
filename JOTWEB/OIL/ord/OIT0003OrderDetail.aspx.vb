@@ -20376,7 +20376,6 @@ Public Class OIT0003OrderDetail
                             If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
@@ -20384,8 +20383,11 @@ Public Class OIT0003OrderDetail
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
-
                                 '### 20200814 END  ((全体)No123対応) ######################################
+
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") Then
                                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _

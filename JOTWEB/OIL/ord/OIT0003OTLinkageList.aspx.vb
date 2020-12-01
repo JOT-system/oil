@@ -402,11 +402,14 @@ Public Class OIT0003OTLinkageList
             & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
+        'SQLStrNashi &=
+        '      SQLStrCmn _
+        '    & "   AND (    OIT0002.LODDATE     >= @P02" _
+        '    & "         OR OIT0002.DEPDATE     >= @TODAY) "
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
-
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn
@@ -501,7 +504,7 @@ Public Class OIT0003OTLinkageList
                         OIT0003row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0003row("LODDATE")) >= today Then
                         OIT0003row("CAN_RESERVED") = "1"
                     Else
                         OIT0003row("CAN_RESERVED") = "0"

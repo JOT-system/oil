@@ -416,7 +416,7 @@ Public Class OIT0007FileInputList
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
 
         '★積置フラグ有り用SQL
@@ -516,7 +516,7 @@ Public Class OIT0007FileInputList
                         OIT0007row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0007row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0007row("LODDATE")) >= today Then
                         OIT0007row("CAN_RESERVED") = "1"
                     Else
                         OIT0007row("CAN_RESERVED") = "0"

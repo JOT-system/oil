@@ -18495,9 +18495,9 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        If O_RTN = C_MESSAGE_NO.NORMAL Then
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        End If
+        'If O_RTN = C_MESSAGE_NO.NORMAL Then
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
 
     End Sub
 

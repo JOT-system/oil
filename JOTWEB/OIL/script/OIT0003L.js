@@ -219,4 +219,18 @@ function reportRadioButton() {
         }
     }
     // ### 20201106 END   OT積込指示(月末)対応 ##################################
+
+    let chkObj3 = document.getElementById('rbTankDispatchBtn');
+    let txtObj3 = document.getElementById('divTrainNo'); //←表示非表示切替用
+
+    if (chkObj3 === null) {
+        txtObj3.style.display = 'none'
+        //return;
+    } else {
+        if (chkObj3.checked) {
+            txtObj3.style.display = 'block'
+        } else {
+            txtObj3.style.display = 'none'
+        }
+    }
 }

@@ -313,9 +313,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("DEPDATE")
                 ExcelMemoryRelease(rngDetailArea)
+                ''### 20201203 START 指摘票対応(No247) ######################
+                ''○ 受入日(予定)
+                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("ACCDATE")
+                'ExcelMemoryRelease(rngDetailArea)
+                ''### 20201203 END   指摘票対応(No247) ######################
                 '◯ 備考
-                '### 20201014 START 備考欄への表示対応 ####################
-                ''### 出力項目（空白） #####################################
+                '### 20201014 START 備考欄への表示対応 #####################
                 rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
                 Dim Remark As String = ""
                 '★ジョイント
@@ -335,7 +340,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
 
-                '### 20201105 START 指摘票対応(No210)全体 ################################
+                '### 20201105 START 指摘票対応(No210)全体 ##################
                 '★「５０％運行分」※甲子営業所(2685列車)対応
                 If officeCode = BaseDllConst.CONST_OFFICECODE_011202 _
                     AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = "2685" Then
@@ -345,7 +350,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                         Remark &= vbCrLf + "「５０％運行分」"
                     End If
                 End If
-                '### 20201105 END   指摘票対応(No210)全体 ################################
+                '### 20201105 END   指摘票対応(No210)全体 ##################
 
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
@@ -357,7 +362,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 rngDetailArea.Value = Remark
                 ExcelMemoryRelease(rngDetailArea)
-                '### 20201014 END   備考欄への表示対応 ####################
+                '### 20201014 END   備考欄への表示対応 #####################
 
                 '★ 列車名・合計車数を退避
                 strTrainNameSave = PrintDatarow("TRAINNAME").ToString()

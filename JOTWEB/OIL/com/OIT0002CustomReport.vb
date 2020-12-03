@@ -268,7 +268,9 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 入　線 　列　車
                 rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
+                If Convert.ToString(PrintDatarow("LOADINGIRILINETRAINNO")) <> "" Then
+                    rngDetailArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
+                End If
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 着駅(本線列車)※自動設定のため未設定
                 'rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())

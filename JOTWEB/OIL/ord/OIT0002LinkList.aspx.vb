@@ -288,8 +288,10 @@ Public Class OIT0002LinkList
             & "    , ''                                                          AS OPERATION " _
             & "    , 1                                                           AS 'SELECT' " _
             & "    , 0                                                           AS HIDDEN " _
-            & "    , ISNULL(RTRIM(OIT0011.RLINKNO), '')                          AS RLINKNO " _
-            & "    , ISNULL(RTRIM(OIT0011.LINKNO), '')                           AS LINKNO "
+            & "    , ISNULL(RTRIM(OIT0011.RLINKNO), '')                          AS RLINKNO "
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        '& "    , ISNULL(RTRIM(OIT0011.LINKNO), '')                           AS LINKNO "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         SQLStr &=
               "    , ''                                                          AS INFO " _
@@ -300,11 +302,16 @@ Public Class OIT0002LinkList
             & "    , ''                                                          AS OFFICENAME " _
             & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), NULL)      AS EMPARRDATE "
 
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
         SQLStr &=
-              "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION " _
-            & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME " _
-            & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
+              "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
             & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                   AS RETSTATIONNAME "
+        'SQLStr &=
+        '      "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION " _
+        '    & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME " _
+        '    & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
+        '    & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                   AS RETSTATIONNAME "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         SQLStr &=
               "	   , COUNT(1)                                                    AS TOTALTANK "
@@ -349,18 +356,29 @@ Public Class OIT0002LinkList
             & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
             & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
 
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
         SQLStr &=
               " GROUP BY " _
             & "      OIT0011.RLINKNO " _
-            & "	    ,OIT0011.LINKNO " _
             & "	    ,OIT0004.TRAINNO " _
             & "	    ,OIT0004.TRAINNAME " _
             & "	    ,OIT0004.OFFICECODE " _
             & "	    ,OIT0004.EMPARRDATE " _
-            & "	    ,OIT0004.DEPSTATION " _
-            & "	    ,OIT0004.DEPSTATIONNAME " _
             & "	    ,OIT0004.RETSTATION " _
             & "	    ,OIT0004.RETSTATIONNAME "
+        'SQLStr &=
+        '      " GROUP BY " _
+        '    & "      OIT0011.RLINKNO " _
+        '    & "	    ,OIT0011.LINKNO " _
+        '    & "	    ,OIT0004.TRAINNO " _
+        '    & "	    ,OIT0004.TRAINNAME " _
+        '    & "	    ,OIT0004.OFFICECODE " _
+        '    & "	    ,OIT0004.EMPARRDATE " _
+        '    & "	    ,OIT0004.DEPSTATION " _
+        '    & "	    ,OIT0004.DEPSTATIONNAME " _
+        '    & "	    ,OIT0004.RETSTATION " _
+        '    & "	    ,OIT0004.RETSTATIONNAME "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         SQLStr &=
               " ORDER BY " _
@@ -1191,7 +1209,10 @@ Public Class OIT0002LinkList
         work.WF_SEL_RLINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("RLINKNO")
 
         '貨車連結順序表№
-        work.WF_SEL_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        work.WF_SEL_LINKNO.Text = ""
+        'work.WF_SEL_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         '情報
         work.WF_SEL_INFO.Text = OIT0002tbl.Rows(WW_LINECNT)("INFO")
@@ -1208,9 +1229,15 @@ Public Class OIT0002LinkList
         work.WF_SEL_OFFICENAME.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICENAME")
 
         '空車発駅（着駅）コード
-        work.WF_SEL_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        work.WF_SEL_DEPSTATION.Text = ""
+        'work.WF_SEL_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
         '空車発駅（着駅）名
-        work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        work.WF_SEL_DEPSTATIONNAME.Text = ""
+        'work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         '空車着駅（発駅）コード
         work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")

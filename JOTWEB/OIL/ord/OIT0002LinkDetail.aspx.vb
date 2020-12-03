@@ -5624,20 +5624,33 @@ Public Class OIT0002LinkDetail
             & "    , ''                                                          AS OPERATION " _
             & "    , 1                                                           AS 'SELECT' " _
             & "    , 0                                                           AS HIDDEN " _
-            & "    , ISNULL(RTRIM(OIT0011.RLINKNO), '')                          AS RLINKNO " _
-            & "    , ISNULL(RTRIM(OIT0011.LINKNO), '')                           AS LINKNO " _
-            & "    , ''                                                          AS INFO " _
+            & "    , ISNULL(RTRIM(OIT0011.RLINKNO), '')                          AS RLINKNO "
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        '& "    , ISNULL(RTRIM(OIT0011.LINKNO), '')                           AS LINKNO "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
+
+        SQLStr &=
+              "    , ''                                                          AS INFO " _
             & "    , ''                                                          AS ORDERINFONAME " _
             & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                          AS TRAINNO " _
             & "    , ISNULL(RTRIM(OIT0004.TRAINNAME), '')                        AS TRAINNAME " _
             & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                       AS OFFICECODE " _
             & "    , ''                                                          AS OFFICENAME " _
-            & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), NULL)      AS EMPARRDATE " _
-            & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION " _
-            & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME " _
-            & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
-            & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                   AS RETSTATIONNAME " _
-            & "	   , COUNT(1)                                                    AS TOTALTANK "
+            & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), NULL)      AS EMPARRDATE "
+
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
+        SQLStr &=
+              "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
+            & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                   AS RETSTATIONNAME "
+        'SQLStr &=
+        '      "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION " _
+        '    & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME " _
+        '    & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION " _
+        '    & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                   AS RETSTATIONNAME "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
+
+        SQLStr &=
+              "	   , COUNT(1)                                                    AS TOTALTANK "
 
         '油種(ハイオク)
         SQLStr &= String.Format("	   , SUM(CASE WHEN OIT0004.PREOILCODE ='{0}' Then 1 Else 0 End) AS HTANK ", BaseDllConst.CONST_HTank)
@@ -5678,18 +5691,29 @@ Public Class OIT0002LinkDetail
             & " AND OIT0004.DELFLG      <> @P02 " _
             & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' "
 
+        '### 20201203 START 指摘票対応(No234)全体 ####################################### 
         SQLStr &=
               " GROUP BY " _
             & "      OIT0011.RLINKNO " _
-            & "	    ,OIT0011.LINKNO " _
             & "	    ,OIT0004.TRAINNO " _
             & "	    ,OIT0004.TRAINNAME " _
             & "	    ,OIT0004.OFFICECODE " _
             & "	    ,OIT0004.EMPARRDATE " _
-            & "	    ,OIT0004.DEPSTATION " _
-            & "	    ,OIT0004.DEPSTATIONNAME " _
             & "	    ,OIT0004.RETSTATION " _
             & "	    ,OIT0004.RETSTATIONNAME "
+        'SQLStr &=
+        '      " GROUP BY " _
+        '    & "      OIT0011.RLINKNO " _
+        '    & "	    ,OIT0011.LINKNO " _
+        '    & "	    ,OIT0004.TRAINNO " _
+        '    & "	    ,OIT0004.TRAINNAME " _
+        '    & "	    ,OIT0004.OFFICECODE " _
+        '    & "	    ,OIT0004.EMPARRDATE " _
+        '    & "	    ,OIT0004.DEPSTATION " _
+        '    & "	    ,OIT0004.DEPSTATIONNAME " _
+        '    & "	    ,OIT0004.RETSTATION " _
+        '    & "	    ,OIT0004.RETSTATIONNAME "
+        '### 20201203 END   指摘票対応(No234)全体 ####################################### 
 
         SQLStr &=
               " ORDER BY " _

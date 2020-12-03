@@ -3244,7 +3244,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReportTankDispatchExcel(officeCode, OIT0003ReportSendaitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreatePrintData()
+                        url = repCbj.CreatePrintData(Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
                     Catch ex As Exception
                         Return
                     End Try
@@ -3472,7 +3472,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReportTankDispatchExcel(officeCode, OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreatePrintData()
+                        url = repCbj.CreatePrintData(Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
                     Catch ex As Exception
                         Return
                     End Try

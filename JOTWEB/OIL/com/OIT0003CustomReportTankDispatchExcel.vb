@@ -117,14 +117,14 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
     ''' 帳票作成処理
     ''' </summary>
     ''' <returns>ダウンロードURL</returns>
-    Public Function CreatePrintData() As String
+    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
             '◯ヘッダーの設定
-            EditHeaderArea()
+            EditHeaderArea(lodDate, trainNo)
 
             '◯明細の設定
             EditDetailArea()
@@ -145,17 +145,11 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea()
+    Private Sub EditHeaderArea(ByVal lodDate As String, ByVal trainNo As String)
 
-        Dim firstDr As DataRow = Nothing
-        Dim lodDate As String = Nothing
-        Dim trainNo As String = Nothing
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
-            firstDr = Me.PrintData.Rows(0)
-            lodDate = Convert.ToString(firstDr("ACTUALLODDATE"))
-            trainNo = Convert.ToString(firstDr("TRAINNO"))
 
             'タイトル(列車番号)
             rngHeaderArea = Me.ExcelWorkSheet.Range("B1")

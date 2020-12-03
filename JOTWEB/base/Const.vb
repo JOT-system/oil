@@ -932,6 +932,8 @@ Public Module BaseDllConst
     ''' Ａ重油
     ''' </summary>
     Public Const CONST_ATank As String = "2101"
+    Public Const CONST_ATank2 As String = "2102"
+    Public Const CONST_ATank3 As String = "2103"
 #End Region
 
 #Region "油種(コスモ石油)"

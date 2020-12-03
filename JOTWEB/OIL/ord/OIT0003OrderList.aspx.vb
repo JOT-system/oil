@@ -2445,12 +2445,13 @@ Public Class OIT0003OrderList
                     '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
                     For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
                         Select Case strOrderSts
-                            Case BaseDllConst.CONST_ORDERSTATUS_100
+                            'Case BaseDllConst.CONST_ORDERSTATUS_100
 
-                                '### 何もしない####################
+                            '    '### 何もしない####################
 
                             '200:手配　～　310：手配完了
-                            Case BaseDllConst.CONST_ORDERSTATUS_200,
+                            Case BaseDllConst.CONST_ORDERSTATUS_100,
+                                 BaseDllConst.CONST_ORDERSTATUS_200,
                                  BaseDllConst.CONST_ORDERSTATUS_205,
                                  BaseDllConst.CONST_ORDERSTATUS_210,
                                  BaseDllConst.CONST_ORDERSTATUS_220,

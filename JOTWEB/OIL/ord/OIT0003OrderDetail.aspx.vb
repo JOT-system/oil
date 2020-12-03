@@ -13466,9 +13466,9 @@ Public Class OIT0003OrderDetail
                 '### 臨海鉄道対応 ####################################################################################
                 '五井営業所、甲子営業所、袖ヶ浦営業所の場合
                 '積込列車番号の入力を可能とする。
-                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
                     '臨海鉄道対象のため有効にする。
                     WW_RINKAIFLG = True
@@ -18270,9 +18270,21 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '') AS CHECKOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.SEGMENTOILCODE), '') AS SEGMENTOILCODE" _
-            & " , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '') AS CHECKOILNAME" _
-            & " , COUNT(1)                                AS TANKCOUNT" _
-            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '') AS CHECKOILNAME"
+
+        '### 20201202 START 指摘票対応(No243)全体 ################################################################
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            SQLStr &=
+                  " , SUM(1) OVER(PARTITION BY OIM0003.CHECKOILCODE) AS TANKCOUNT" _
+                & " , ROW_NUMBER() OVER(PARTITION BY OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
+        Else
+            SQLStr &=
+                  " , COUNT(1)                                AS TANKCOUNT"
+        End If
+        '### 20201202 END   指摘票対応(No243)全体 ################################################################
+
+        SQLStr &=
+              " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
             & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "    AND OIT0003.DELFLG <> @P02" _
@@ -18287,8 +18299,13 @@ Public Class OIT0003OrderDetail
             & "        OIM0009.PLANTCODE      = OIM0003.PLANTCODE " _
             & "    AND OIM0009.DELFLG        <> @P02" _
             & " WHERE OIT0002.ORDERNO = @P01" _
-            & "    AND OIT0002.DELFLG <> @P02" _
-            & " GROUP BY " _
+            & "    AND OIT0002.DELFLG <> @P02"
+
+        '### 20201202 START 指摘票対応(No243)全体 ################################################################
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+        Else
+            SQLStr &=
+              " GROUP BY " _
             & "   OIM0003.PLANTCODE" _
             & " , OIM0009.PLANTNAME" _
             & " , OIT0003.LINE" _
@@ -18296,6 +18313,8 @@ Public Class OIT0003OrderDetail
             & " , OIM0003.CHECKOILCODE" _
             & " , OIM0003.SEGMENTOILCODE" _
             & " , OIM0003.CHECKOILNAME"
+        End If
+        '### 20201202 END   指摘票対応(No243)全体 ################################################################
 
         '基地コード毎の油種大分類件数一覧
         SQLStr &=
@@ -18309,8 +18328,17 @@ Public Class OIT0003OrderDetail
             & " , 'ZZZZ'                                  AS CHECKOILCODE" _
             & " , ''                                      AS SEGMENTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILNAME), '')   AS CHECKOILNAME" _
-            & " , COUNT(1)                                AS TANKCOUNT" _
-            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " , COUNT(1)                                AS TANKCOUNT"
+
+        '### 20201202 START 指摘票対応(No243)全体 ################################################################
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            SQLStr &=
+                  " , 1                                       AS RNUM"
+        End If
+        '### 20201202 END   指摘票対応(No243)全体 ################################################################
+
+        SQLStr &=
+              " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
             & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "    AND OIT0003.DELFLG <> @P02" _
@@ -18345,8 +18373,17 @@ Public Class OIT0003OrderDetail
             & " , ''                                      AS CHECKOILCODE" _
             & " , ''                                      AS SEGMENTOILCODE" _
             & " , '合計'                                  AS CHECKOILNAME" _
-            & " , COUNT(1)                                AS TANKCOUNT" _
-            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " , COUNT(1)                                AS TANKCOUNT"
+
+        '### 20201202 START 指摘票対応(No243)全体 ################################################################
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            SQLStr &=
+                  " , 1                                       AS RNUM"
+        End If
+        '### 20201202 END   指摘票対応(No243)全体 ################################################################
+
+        SQLStr &=
+              " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
             & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "    AND OIT0003.DELFLG <> @P02" _
@@ -18389,8 +18426,15 @@ Public Class OIT0003OrderDetail
             & " ) OIM0014 ON" _
             & "     OIM0014.PLANTCODE = MERGE_TBL.PLANTCODE " _
             & " AND OIM0014.BIGOILCODE = MERGE_TBL.BIGOILCODE " _
-            & " AND OIM0014.CHECKOILCODE = MERGE_TBL.CHECKOILCODE " _
-            & " ORDER BY LINE, NO "
+            & " AND OIM0014.CHECKOILCODE = MERGE_TBL.CHECKOILCODE "
+
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            SQLStr &=
+                  " AND MERGE_TBL.RNUM = 1 "
+        End If
+
+        SQLStr &=
+              " ORDER BY LINE, NO "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -18417,6 +18461,11 @@ Public Class OIT0003OrderDetail
                     Exit Sub
                 End If
                 '### 20201125 END   指摘票対応(No227)全体 ################################################################
+
+                '### 20201202 START 指摘票対応(No243)全体 ################################################################
+                '○五井営業所(コスモ千葉タンク車の油種毎)における油種の出荷能力件数チェック
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then WW_CheckGoiOil(OIT0003WKtbl)
+                '### 20201202 START 指摘票対応(No243)全体 ################################################################
 
                 '### 20201020 START 指摘票対応(No173)全体 ################################################################
                 '○甲子営業所(3号軽油TCH)における油種の出荷能力件数チェック
@@ -18566,7 +18615,10 @@ Public Class OIT0003OrderDetail
             For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
                 If OIT0003tab1row("OILCODE") = OIT0003row("CHECKOILCODE") _
                     AndAlso OIT0003tab1row("ORDERINGTYPE") = OIT0003row("SEGMENTOILCODE") Then
-                    OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+
+                    If Integer.Parse(OIT0003row("TANKCOUNT")) <> 0 Then
+                        OIT0003row("TANKCOUNT") = Integer.Parse(OIT0003row("TANKCOUNT")) - 1
+                    End If
                     strBigOilcode = OIT0003row("BIGOILCODE")
 
                     '★3号軽油は軽油としてカウントしているため軽油から-1する
@@ -18604,6 +18656,163 @@ Public Class OIT0003OrderDetail
                 End If
             Next
         End If
+
+        '○車数オーバーがないかチェック
+        For Each OIT0003Jderow As DataRow In OIT0003WKtbl.Rows
+            If Integer.Parse(OIT0003Jderow("TANKCOUNT")) <= Integer.Parse(OIT0003Jderow("CHK_TANKCOUNT")) Then
+                '★最大出荷能力以内の場合
+                OIT0003Jderow("JUDGE") = "0"
+            Else
+                '★最大出荷能力をオーバーしている場合
+                OIT0003Jderow("JUDGE") = "1"
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 五井営業所(コスモ千葉タンク車の油種毎)における油種の出荷能力件数チェック
+    ''' </summary>
+    ''' <param name="OIT0003WKtbl"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckGoiOil(ByVal OIT0003WKtbl As DataTable)
+
+        'コスモ千葉タンクチェック用コード
+        '　A001:１石・２石・３石別最大チェック(HG, RG)
+        '　A002:１石・２石・３石別最大チェック(WK, DGO, DGO-3)
+        '　A003:２石最大チェック(WK, DGO)
+        '　A004:２石最大チェック(DGO, DGO-3)
+        Dim chkCosmoOilCode As String() = {"A001", "A002", "A003", "A004"}
+        'コスモ千葉タンク件数用
+        Dim chkCosmoOilCnt As String() = {"7", "13", "11", "7"}
+
+        '○全体(合計)を変更
+        Dim strTotal As String = "合計"
+        For Each OIT0003row As DataRow In OIT0003WKtbl.Select("CHECKOILNAME='" + strTotal + "'")
+            '★全体の合計を22とする
+            If strTotal = OIT0003row("CHECKOILNAME") Then
+                OIT0003row("NO") = "7"
+                OIT0003row("CHK_TANKCOUNT") = "22"
+            End If
+        Next
+
+        '○油種の件数取得
+        Dim OilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+            '★油種毎に車数をカウント
+            Select Case Convert.ToString(OIT0003row("CHECKOILCODE"))
+                'ハイオク
+                Case BaseDllConst.CONST_HTank
+                    OilCnt(0) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'レギュラー
+                Case BaseDllConst.CONST_RTank
+                    OilCnt(1) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                '灯油
+                Case BaseDllConst.CONST_TTank
+                    OilCnt(2) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                '軽油
+                Case BaseDllConst.CONST_KTank1
+                    OilCnt(3) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                '３号軽油
+                Case BaseDllConst.CONST_K3Tank1
+                    OilCnt(4) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'ＬＳＡ－５
+                Case BaseDllConst.CONST_ATank
+                    OilCnt(5) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'ＡＦＯ－ＳＰ
+                Case BaseDllConst.CONST_ATank2
+                    OilCnt(6) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'ＡＦＯブレンド山岳
+                Case BaseDllConst.CONST_ATank3
+                    OilCnt(7) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'ＬＳＡ－１
+                Case BaseDllConst.CONST_LTank1
+                    OilCnt(8) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                'ＬＳＡ－ブレンド
+                Case BaseDllConst.CONST_LTank2
+                    OilCnt(9) += Integer.Parse(OIT0003row("TANKCOUNT"))
+            End Select
+        Next
+
+        '○１石・２石・３石別最大チェック(HG, RG)
+        Dim rowHgRgShipLimit As DataRow = OIT0003WKtbl.NewRow
+        'rowDgoShipLimit("LINECNT") = ""
+        rowHgRgShipLimit("NO") = "3"
+        rowHgRgShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+        rowHgRgShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+        'rowHgRgShipLimit("LINE") = ""
+        'rowHgRgShipLimit("BIGOILCODE") = ""
+        rowHgRgShipLimit("CHECKOILCODE") = chkCosmoOilCode(0)
+        'rowHgRgShipLimit("SEGMENTOILCODE") = ""
+        rowHgRgShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(HG, RG)"
+        rowHgRgShipLimit("TANKCOUNT") = OilCnt(0) + OilCnt(1)
+        'rowHgRgShipLimit("CHK_BIGOILCODE") = ""
+        rowHgRgShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(0)
+        rowHgRgShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(0)
+        rowHgRgShipLimit("JUDGE") = "0"
+
+        '積込可能車数チェックデータに追加
+        OIT0003WKtbl.Rows.Add(rowHgRgShipLimit)
+
+        '○１石・２石・３石別最大チェック(WK, DGO, DGO-3)
+        Dim rowWkDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
+        'rowDgoShipLimit("LINECNT") = ""
+        rowWkDgoShipLimit("NO") = "4"
+        rowWkDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+        rowWkDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+        'rowWkDgoShipLimit("LINE") = ""
+        'rowWkDgoShipLimit("BIGOILCODE") = ""
+        rowWkDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(1)
+        'rowWkDgoShipLimit("SEGMENTOILCODE") = ""
+        rowWkDgoShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(WK, DGO, DGO-3)"
+        rowWkDgoShipLimit("TANKCOUNT") = OilCnt(2) + OilCnt(3) + OilCnt(4)
+        'rowWkDgoShipLimit("CHK_BIGOILCODE") = ""
+        rowWkDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(1)
+        rowWkDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(1)
+        rowWkDgoShipLimit("JUDGE") = "0"
+
+        '積込可能車数チェックデータに追加
+        OIT0003WKtbl.Rows.Add(rowWkDgoShipLimit)
+
+        '○２石最大チェック(WK, DGO)
+        Dim rowWkDgoShip2Limit As DataRow = OIT0003WKtbl.NewRow
+        'rowDgoShipLimit("LINECNT") = ""
+        rowWkDgoShip2Limit("NO") = "5"
+        rowWkDgoShip2Limit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+        rowWkDgoShip2Limit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+        'rowWkDgoShip2Limit("LINE") = ""
+        'rowWkDgoShip2Limit("BIGOILCODE") = ""
+        rowWkDgoShip2Limit("CHECKOILCODE") = chkCosmoOilCode(2)
+        'rowWkDgoShip2Limit("SEGMENTOILCODE") = ""
+        rowWkDgoShip2Limit("CHECKOILNAME") = "２石最大チェック(WK, DGO)"
+        rowWkDgoShip2Limit("TANKCOUNT") = OilCnt(2) + OilCnt(3)
+        'rowWkDgoShip2Limit("CHK_BIGOILCODE") = ""
+        rowWkDgoShip2Limit("CHK_CHECKOILCODE") = chkCosmoOilCode(2)
+        rowWkDgoShip2Limit("CHK_TANKCOUNT") = chkCosmoOilCnt(2)
+        rowWkDgoShip2Limit("JUDGE") = "0"
+
+        '積込可能車数チェックデータに追加
+        OIT0003WKtbl.Rows.Add(rowWkDgoShip2Limit)
+
+        '○２石最大チェック(DGO)
+        Dim rowDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
+        'rowDgoShipLimit("LINECNT") = ""
+        rowDgoShipLimit("NO") = "6"
+        rowDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+        rowDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+        'rowDgoShipLimit("LINE") = ""
+        'rowDgoShipLimit("BIGOILCODE") = ""
+        rowDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(3)
+        'rowDgoShipLimit("SEGMENTOILCODE") = ""
+        rowDgoShipLimit("CHECKOILNAME") = "２石最大チェック(DGO, DGO-3)"
+        rowDgoShipLimit("TANKCOUNT") = OilCnt(3) + OilCnt(4)
+        'rowDgoShipLimit("CHK_BIGOILCODE") = ""
+        rowDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(3)
+        rowDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(3)
+        rowDgoShipLimit("JUDGE") = "0"
+
+        '積込可能車数チェックデータに追加
+        OIT0003WKtbl.Rows.Add(rowDgoShipLimit)
 
         '○車数オーバーがないかチェック
         For Each OIT0003Jderow As DataRow In OIT0003WKtbl.Rows

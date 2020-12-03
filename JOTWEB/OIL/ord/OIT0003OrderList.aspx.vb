@@ -3930,13 +3930,28 @@ Public Class OIT0003OrderList
         '    & "   AND OIT0002.ORDERSTATUS <= @P04 "
         '### 20200818 END   SQLの入換を実施 ####################################################
 
-        SQLStrAri &=
-              " ORDER BY" _
-            & "    OIT0002.TRAINNO" _
-            & "  , OIT0003.SHIPPERSCODE" _
-            & "  , STACKING" _
-            & "  , OIM0024.PRIORITYNO"
-        '& "  , OIT0003.OILCODE" _
+        '営業所における順序の設定
+        Select Case OFFICECDE
+            Case BaseDllConst.CONST_OFFICECODE_011203
+                '★袖ヶ浦営業所の場合
+                SQLStrAri &=
+                      " ORDER BY" _
+                    & "    OIT0002.CONSIGNEECODE DESC" _
+                    & "  , OIT0003.SHIPPERSCODE" _
+                    & "  , OIM0024.PRIORITYNO" _
+                    & "  , OIT0002.TRAINNO" _
+                    & "  , STACKING"
+
+            Case Else
+                '★上記以外の営業所
+                SQLStrAri &=
+                      " ORDER BY" _
+                    & "    OIT0002.TRAINNO" _
+                    & "  , OIT0003.SHIPPERSCODE" _
+                    & "  , STACKING" _
+                    & "  , OIM0024.PRIORITYNO"
+                '& "  , OIT0003.OILCODE" _
+        End Select
 
         '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
         SQLStrNashi &=

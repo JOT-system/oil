@@ -743,6 +743,10 @@ Public Module Messages
         ''' 列車牽引車数オーバー(仙台新港営業所用)
         ''' </summary>
         Public Const OIL_SENDAI_TRAINCARS_ERROR As String = "20085"
+        ''' <summary>
+        ''' 品種出荷期間オーバー
+        ''' </summary>
+        Public Const OIL_OILTERM_OVER_ERROR As String = "20086"
 #End Region
 
 

@@ -416,7 +416,7 @@ Public Class OIT0007FileInputList
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
 
         '★積置フラグ有り用SQL
@@ -516,7 +516,7 @@ Public Class OIT0007FileInputList
                         OIT0007row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0007row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0007row("LODDATE")) >= today Then
                         OIT0007row("CAN_RESERVED") = "1"
                     Else
                         OIT0007row("CAN_RESERVED") = "0"
@@ -663,11 +663,18 @@ Public Class OIT0007FileInputList
                         Return
                     End If
                     '履歴テーブル登録
+                    Dim orderTbl As DataTable = GetUpdatedOrder(chkItems, SQLcon, sqlTran)
                     Dim detailTbl As DataTable = GetUpdatedOrderDetail(chkItems, SQLcon, sqlTran)
                     If detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
                         Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
+
                         For Each dr As DataRow In hisDetailTbl.Rows
-                            'EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
                         Next
                         'ジャーナル登録
                         OutputJournal(detailTbl, "OIT0003_DETAIL")
@@ -1061,7 +1068,7 @@ Public Class OIT0007FileInputList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of InputDataItem), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder
@@ -1471,8 +1478,8 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
 
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) between 1 and 999 THEN '1000-' + DET.TANKNO  ")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) >= 1000           THEN '1001-' + DET.TANKNO  ")
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3) ")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
         sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
         sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
 

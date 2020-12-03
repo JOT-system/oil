@@ -402,11 +402,14 @@ Public Class OIT0003OTLinkageList
             & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
+        'SQLStrNashi &=
+        '      SQLStrCmn _
+        '    & "   AND (    OIT0002.LODDATE     >= @P02" _
+        '    & "         OR OIT0002.DEPDATE     >= @TODAY) "
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
-
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn
@@ -501,7 +504,7 @@ Public Class OIT0003OTLinkageList
                         OIT0003row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0003row("LODDATE")) >= today Then
                         OIT0003row("CAN_RESERVED") = "1"
                     Else
                         OIT0003row("CAN_RESERVED") = "0"
@@ -1571,8 +1574,8 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_KAI")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_POINT")
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) between 1 and 999 THEN '1000-' + DET.TANKNO  ")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) >= 1000           THEN '1001-' + DET.TANKNO  ")
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3)  ")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
         sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
         sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
         sqlStat.AppendLine("     , '0'          AS NEG_SETTEI_NUM")

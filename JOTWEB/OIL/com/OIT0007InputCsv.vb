@@ -143,7 +143,7 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
                     itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
                 End If
                 '取り込んだ予約番号を積込予定日と予約番号３桁に分離
-                If IsNumeric(itmData.InpReservedNo) AndAlso itmData.InpReservedNo.Length = 3 Then
+                If IsNumeric(itmData.InpReservedNo) AndAlso itmData.InpReservedNo.Length <= 3 Then
                     itmData.LodDate = itmData.UpdActualLodDate
                     itmData.ReservedNo = CInt(itmData.InpReservedNo).ToString("000")
                 End If

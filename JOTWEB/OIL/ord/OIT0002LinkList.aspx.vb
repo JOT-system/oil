@@ -58,6 +58,7 @@ Public Class OIT0002LinkList
                                             "交検",
                                             "回送(全検)",
                                             "回送(その他)"}         '指示内容
+    Private WW_OTTRANSPORT As String = "OT輸送"                     'OT輸送
 
     Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全件-他社負担(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_IDOU() As String = {"F120160", "F120260", "F120360"}      '移動-JOT負担発払(五井、甲子、袖ヶ浦)

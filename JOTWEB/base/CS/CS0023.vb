@@ -1423,6 +1423,15 @@ Public Structure CS0023XLSUPLOAD
                 rng = oSheet.Range("O" + jStart.ToString())
                 dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
+                '### 20201204 START 指摘票対応(No231)全体 #######################
+                'rng = oSheet.Range("P" + jStart.ToString())
+                'If rng.Text.ToString() = "OT輸送" Then
+                '    dt.Rows(i)("OTTRANSPORTFLG") = "1"
+                'Else
+                '    dt.Rows(i)("OTTRANSPORTFLG") = "2"
+                'End If
+                'ExcelMemoryRelease(rng)
+                '### 20201204 START 指摘票対応(No231)全体 #######################
                 rng = oSheet.Range("P" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
@@ -1927,6 +1936,9 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("LINE", Type.GetType("System.String"))
         dt.Columns.Add("POSITION", Type.GetType("System.String"))
         dt.Columns.Add("INLINETRAIN", Type.GetType("System.String"))
+        '### 20201204 START 指摘票対応(No231)全体 #######################
+        dt.Columns.Add("OTTRANSPORTFLG", Type.GetType("System.String"))
+        '### 20201204 END   指摘票対応(No231)全体 #######################
         dt.Columns.Add("LOADARRSTATION", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))

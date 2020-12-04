@@ -3844,7 +3844,8 @@ Public Class OIT0002LinkList
                     P_DETENTIONFLG.Value = "2"                              '留置可否フラグ
                     P_FIRSTRETURNFLG.Value = "2"                            '先返し可否フラグ
                     P_AFTERRETURNFLG.Value = "2"                            '後返し可否フラグ
-                    P_OTTRANSPORTFLG.Value = "2"                            'OT輸送可否フラグ
+                    P_OTTRANSPORTFLG.Value = OIT0002row("OTTRANSPORTFLG")   'OT輸送可否フラグ
+                    'P_OTTRANSPORTFLG.Value = "2"                            'OT輸送可否フラグ
 
                     P_ORDERINFO.Value = ""                                  '受注情報
                     P_SHIPPERSCODE.Value = OIT0002row("SHIPPERSCODE")       '荷主コード

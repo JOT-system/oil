@@ -1280,8 +1280,8 @@ Public Class OIT0003OTLinkageList
         '★積置フラグ無し用SQL
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND OIT0002.LODDATE >= @P03 "
-
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
+            & "         OR OIT0002.DEPDATE     >= @TODAY) "
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _
@@ -1308,12 +1308,13 @@ Public Class OIT0003OTLinkageList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARATODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '積込日
                 'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
-
+                PARATODAY.Value = Format(Now, "yyyy/MM/dd")
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
                 VALUE01.Value = iOURDAILYBRANCHC

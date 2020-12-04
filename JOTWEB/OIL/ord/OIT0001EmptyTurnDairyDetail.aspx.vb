@@ -753,9 +753,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OIT0001row("LINECNT") = i        'LINECNT
 
                     '受注情報
-                    CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), Convert.ToString(OIT0001row("ORDERINFONAME")), WW_DUMMY)
+                    CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
                     '返送列車
-                    CODENAME_get("CTRAINNUMBER", Convert.ToString(OIT0001row("RETURNDATETRAINNO")), Convert.ToString(OIT0001row("RETURNDATETRAIN")), WW_DUMMY)
+                    CODENAME_get("CTRAINNUMBER", Convert.ToString(OIT0001row("RETURNDATETRAINNO")), OIT0001row("RETURNDATETRAIN"), WW_DUMMY)
                     If Convert.ToString(OIT0001row("RETURNDATETRAIN")) = "" Then OIT0001row("RETURNDATETRAIN") = OIT0001row("RETURNDATETRAINNO")
 
                 Next
@@ -3604,7 +3604,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             iresult = Date.Parse(Convert.ToString(OIT0001row("ACTUALLODDATE"))).CompareTo(Date.Parse(Me.TxtDepDate.Text))
             If iresult = 1 Then
                 OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_105
-                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), Convert.ToString(OIT0001row("ORDERINFONAME")), WW_DUMMY)
+                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "(予定)発日で入力した日付より未来日のためエラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
@@ -3692,7 +3692,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             '前回黒油
             If WW_GetValue(2) = "1" AndAlso Convert.ToString(OIT0001row("DELFLG")) = "0" Then
                 OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
-                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), Convert.ToString(OIT0001row("ORDERINFONAME")), WW_DUMMY)
+                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
@@ -3703,7 +3703,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '前回揮発油
             ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso convert.ToString(OIT0001row("DELFLG")) = "0" Then
                 OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
-                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), Convert.ToString(OIT0001row("ORDERINFONAME")), WW_DUMMY)
+                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2

@@ -217,7 +217,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             rngHeaderArea.Value = Date.Parse(value).ToString("MM月dd日分", New Globalization.CultureInfo("ja-JP"))
             ExcelMemoryRelease(rngHeaderArea)
             '◯ 作成日(当日)
-            rngHeaderArea = Me.ExcelWorkSheet.Range("O1")
+            rngHeaderArea = Me.ExcelWorkSheet.Range("P1")
+            'rngHeaderArea = Me.ExcelWorkSheet.Range("O1")
             rngHeaderArea.Value = Now.AddDays(0).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
             ExcelMemoryRelease(rngHeaderArea)
         Catch ex As Exception
@@ -314,14 +315,15 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea.Value = PrintDatarow("DEPDATE")
                 ExcelMemoryRelease(rngDetailArea)
                 ''### 20201203 START 指摘票対応(No247) ######################
-                ''○ 受入日(予定)
-                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("ACCDATE")
-                'ExcelMemoryRelease(rngDetailArea)
+                '○ 受入日(予定)
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ACCDATE")
+                ExcelMemoryRelease(rngDetailArea)
                 ''### 20201203 END   指摘票対応(No247) ######################
                 '◯ 備考
                 '### 20201014 START 備考欄への表示対応 #####################
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
                 Dim Remark As String = ""
                 '★ジョイント
                 If PrintDatarow("JOINT").ToString <> "" Then

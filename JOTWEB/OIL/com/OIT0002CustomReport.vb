@@ -273,12 +273,12 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 End If
                 ExcelMemoryRelease(rngDetailArea)
                 '### 20201204 START 指摘票対応(No231)全体 #######################
-                ''◯ ＯＴ輸送(選択 OR 入力)
-                'rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
-                'If Convert.ToString(PrintDatarow("OTTRANSPORTFLG")) = "1" Then
-                '    rngDetailArea.Value = "OT輸送"
-                'End If
-                'ExcelMemoryRelease(rngDetailArea)
+                '◯ ＯＴ輸送(選択 OR 入力)
+                rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
+                If Convert.ToString(PrintDatarow("OTTRANSPORTFLG")) = "1" Then
+                    rngDetailArea.Value = "OT輸送"
+                End If
+                ExcelMemoryRelease(rngDetailArea)
                 '### 20201204 START 指摘票対応(No231)全体 #######################
                 '◯ 着駅(本線列車)※自動設定のため未設定
                 'rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
@@ -286,24 +286,29 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 'ExcelMemoryRelease(rngDetailArea)
 
                 '◯ ポラリス受注登録必須項目(本線列車)
-                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERTRAINNO")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ ポラリス受注登録必須項目(積込日)
-                rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("T" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERLODDATE")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ ポラリス受注登録必須項目(発日)
-                rngDetailArea = Me.ExcelWorkSheet.Range("T" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("U" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("T" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERDEPDATE")
                 ExcelMemoryRelease(rngDetailArea)
                 '### 20201111 START 指摘票対応(No190)全体 #####################
                 '◯ ポラリス受注登録必須項目(回送(着駅))
-                rngDetailArea = Me.ExcelWorkSheet.Range("U" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("U" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("FORWARDINGARRSTATION")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ ポラリス受注登録必須項目(回送(その他))
-                rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("W" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("FORWARDINGCONFIGURE")
                 '### 20201111 END   指摘票対応(No190)全体 #####################
                 ExcelMemoryRelease(rngDetailArea)

@@ -4081,7 +4081,7 @@ Public Class OIT0003OrderList
             & " WHERE " _
             & "     OIT0002.OFFICECODE = @OFFICECODE " _
             & "     AND OIT0002.TRAINNO = @TRAINNO " _
-            & "     AND OIT0002.SHIPPERSCODE = @SHIPPERSCODE " _
+            & "     AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "     AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "     AND OIT0002.DELFLG <> @DELFLG " _
             & "     AND OIT0003.ACTUALLODDATE = @LODDATE " _
@@ -5087,7 +5087,7 @@ Public Class OIT0003OrderList
             & " WHERE " _
             & "     OIT0002.OFFICECODE = @OFFICECODE " _
             & "     AND OIT0002.TRAINNO = @TRAINNO " _
-            & "     AND OIT0002.SHIPPERSCODE = @SHIPPERSCODE " _
+            & "     AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "     AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "     AND OIT0002.DELFLG <> @DELFLG " _
             & "     AND OIT0003.ACTUALLODDATE = @LODDATE " _

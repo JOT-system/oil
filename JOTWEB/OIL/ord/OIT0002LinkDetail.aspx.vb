@@ -56,6 +56,7 @@ Public Class OIT0002LinkDetail
                                             "交検",
                                             "回送(全検)",
                                             "回送(その他)"}         '指示内容
+    Private WW_OTTRANSPORT As String = "OT輸送"                     'OT輸送
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""

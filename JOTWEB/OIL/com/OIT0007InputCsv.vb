@@ -77,13 +77,13 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
                 Dim itmData As New OIT0007FileInputList.InputDataItem
                 itmData.InpRowNum = lineNo
                 '実績積込日（更新対象）
-                If IsNumeric(colItems(0)) AndAlso colItems(0).Length = 8 Then
-                    itmData.UpdActualLodDate = CInt(colItems(0)).ToString("0000/00/00") 'スラッシュ無し年月日をスラッシュ付きに変換
+                If IsNumeric(Trim(colItems(0))) AndAlso Trim(colItems(0)).Length = 8 Then
+                    itmData.UpdActualLodDate = CInt(Trim(colItems(0))).ToString("0000/00/00") 'スラッシュ無し年月日をスラッシュ付きに変換
                 End If
-                itmData.InpReservedNo = colItems(1)
-                itmData.InpTnkNo = colItems(2)
-                itmData.InpOilTypeName = colItems(3)
-                itmData.InpCarsAmount = colItems(8)
+                itmData.InpReservedNo = Trim(colItems(1))
+                itmData.InpTnkNo = Trim(colItems(2))
+                itmData.InpOilTypeName = Trim(colItems(3))
+                itmData.InpCarsAmount = Trim(colItems(8))
                 If IsNumeric(itmData.InpCarsAmount) = False OrElse
                    CDec(itmData.InpCarsAmount) >= 100 Then
                     '整数100以上、または数字以外が格納されている場合は対象外として判定
@@ -109,10 +109,12 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
         Dim lineNo As Integer = 1
         Dim retVal As New List(Of OIT0007FileInputList.InputDataItem)
         Using sr As New IO.StreamReader(Me.Fs, enc)
-            If Not sr.EndOfStream Then
-                '根岸一行目はヘッダーなので読み飛ばす
-                sr.ReadLine()
-            End If
+            '20201204 根岸はヘッダー付くはずだが田中さん連携ファイルにヘッダーがないのでこの処理コメント
+            'If Not sr.EndOfStream Then
+            '    '根岸一行目はヘッダーなので読み飛ばす
+            '    sr.ReadLine()
+            'End If
+            Dim isFirstRow As Boolean = True
             While Not sr.EndOfStream
                 Dim lineStr As String = sr.ReadLine()
                 'ありえないが空行の場合はスキップ
@@ -125,22 +127,35 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
                     'カラム数が11ではない場合対象外と判定
                     Continue While
                 End If
+                '先頭行がカラム名ヘッダーが判定
+                '20201204 根岸はヘッダー付くはずだが田中さん連携ファイルにヘッダーがないのでこの処理コメント0
+                '本当のファイルにはヘッダーが付く可能性が否定出来ないので念のためヘッダー判定追加
+                If isFirstRow Then
+                    isFirstRow = False
+                    If Not (IsNumeric(Trim(colItems(0))) AndAlso Trim(colItems(0)).Length = 8) Then
+                        Continue While
+                    End If
+                End If
                 Dim itmData As New OIT0007FileInputList.InputDataItem
                 itmData.InpRowNum = lineNo
                 '実績積込日（更新対象）
-                If IsNumeric(colItems(0)) AndAlso colItems(0).Length = 8 Then
-                    itmData.UpdActualLodDate = CInt(colItems(0)).ToString("0000/00/00") 'スラッシュ無し年月日をスラッシュ付きに変換
+                If IsNumeric(Trim(colItems(0))) AndAlso Trim(colItems(0)).Length = 8 Then
+                    itmData.UpdActualLodDate = CInt(Trim(colItems(0))).ToString("0000/00/00") 'スラッシュ無し年月日をスラッシュ付きに変換
                 End If
-                itmData.InpReservedNo = colItems(1)
-                itmData.InpTnkNo = colItems(5)
-                itmData.InpOilTypeName = colItems(6)
-                itmData.InpCarsAmount = colItems(10)
-                If IsNumeric(itmData.InpCarsAmount) AndAlso itmData.InpCarsAmount.Length = 5 Then
+                itmData.InpReservedNo = Trim(colItems(1))
+                itmData.InpTnkNo = Trim(colItems(5))
+                itmData.InpOilTypeName = Trim(colItems(6))
+                itmData.InpCarsAmount = Trim(colItems(10))
+                If IsNumeric(itmData.InpCarsAmount) AndAlso Not (CDec(itmData.InpCarsAmount.Length) > 100000) Then
                     '小数点なしの為左２桁＆小数点＆右３桁で文字連結
-                    itmData.InpCarsAmount = Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3) & "." & Right(itmData.InpCarsAmount, 3)
+                    Dim intVal As String = "000"
+                    If IsNumeric(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)) Then
+                        intVal = CDec(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)).ToString("00")
+                    End If
+                    itmData.InpCarsAmount = intVal & "." & Right(itmData.InpCarsAmount, 3)
                 Else
-                    'それ以外は書式エラーとする
-                    itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
+                        'それ以外は書式エラーとする
+                        itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
                 End If
                 '取り込んだ予約番号を積込予定日と予約番号３桁に分離
                 If IsNumeric(itmData.InpReservedNo) AndAlso itmData.InpReservedNo.Length <= 3 Then

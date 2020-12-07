@@ -2852,6 +2852,7 @@ Public Class OIT0003OrderDetail
                 SQLStr &=
                           " ORDER BY" _
                         & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                        & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)" _
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_HTank + "' THEN 1 ELSE 2 END" _
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_RTank + "' THEN 1 ELSE 2 END" _
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_TTank + "' THEN 1 ELSE 2 END" _
@@ -2861,8 +2862,7 @@ Public Class OIT0003OrderDetail
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_LTank1 + "' THEN 1 ELSE 2 END" _
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_ATank + "' THEN 1 ELSE 2 END" _
                         & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
-                        & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
-                        & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+                        & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)"
             Case Else
                 SQLStr &=
                           " ORDER BY" _

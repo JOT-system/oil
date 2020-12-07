@@ -3854,6 +3854,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')     AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')     AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')    AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')   AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')   AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')   AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')       AS BASECODE" _
@@ -3918,8 +3919,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001CHKDrow As DataRow In OIT0001WKtbl.Rows
 
+                    '### 20201207 START 在庫管理表から受注作成した場合はチェック対象 ####################################
+                    'If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
                     '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
-                    If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+                    If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 _
+                        AndAlso OIT0001CHKDrow("EMPTYTURNFLG") <> "2" Then Continue For
+                    '### 20201207 END   在庫管理表から受注作成した場合はチェック対象 ####################################
 
                     Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAIN, C_MESSAGE_TYPE.ERR, OIT0001CHKDrow("ORDERNO"), needsPopUp:=True)
 

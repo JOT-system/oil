@@ -52,6 +52,11 @@ Public Class OIT0002LinkList
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
 
+    '○ 貨車連結順序表(浜五井, 甲子, 北袖)
+    Private WW_ARRSTATIONCODE() As String = {"434103",
+                                             "434105",
+                                             "434108"}              '着駅
+
     '○ 貨車連結順序表アップロード用
     Private WW_ARTICLENAME() As String = {"検", "○"}               '品名
     Private WW_OBJECTIVENAME() As String = {"残車",
@@ -194,6 +199,27 @@ Public Class OIT0002LinkList
 
         '○ GridView初期設定
         GridViewInitialize()
+
+        '### 20201207 START 指摘票対応(No251)全体 ##############################
+        '○ 一覧で表示した内容を着駅ごとにサマリー
+        Dim officeCnt As Integer() = {0, 0, 0}
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            Select Case Convert.ToString(OIT0002row("OFFICECODE"))
+                '五井営業所
+                Case BaseDllConst.CONST_OFFICECODE_011201
+                    officeCnt(0) += Integer.Parse(OIT0002row("TOTALTANK"))
+                '甲子営業所
+                Case BaseDllConst.CONST_OFFICECODE_011202
+                    officeCnt(1) += Integer.Parse(OIT0002row("TOTALTANK"))
+                '袖ヶ浦営業所
+                Case BaseDllConst.CONST_OFFICECODE_011203
+                    officeCnt(2) += Integer.Parse(OIT0002row("TOTALTANK"))
+            End Select
+        Next
+        Me.LblGoiCnt.Text = Me.LblGoiCnt.Text.Replace("000", Convert.ToString(officeCnt(0)))
+        Me.LblKinoeneCnt.Text = Me.LblKinoeneCnt.Text.Replace("000", Convert.ToString(officeCnt(1)))
+        Me.LblSodegauraCnt.Text = Me.LblSodegauraCnt.Text.Replace("000", Convert.ToString(officeCnt(2)))
+        '### 20201207 END   指摘票対応(No251)全体 ##############################
 
     End Sub
 

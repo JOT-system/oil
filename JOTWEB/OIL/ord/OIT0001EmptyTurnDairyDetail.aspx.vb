@@ -82,7 +82,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                              "WF_CheckBoxSELECTWHOLESALE",
                              "WF_CheckBoxSELECTINSPECTION",
                              "WF_CheckBoxSELECTDETENTION",
-                             "WF_CheckBoxSELECTOTTRANSPORT"     'チェックボックス(選択)クリック
+                             "WF_CheckBoxSELECTOTTRANSPORT",
+                             "WF_CheckBoxSELECTUPGRADE"     'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
@@ -492,6 +493,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS FIRSTRETURNFLG" _
             & " , ''                                             AS AFTERRETURNFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
+            & " , ''                                             AS UPGRADEFLG" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -597,6 +599,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   WHEN '2' THEN ''" _
             & "   ELSE ''" _
             & "   END                                                AS OTTRANSPORTFLG" _
+            & " , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                AS UPGRADEFLG" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
@@ -1282,6 +1289,22 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                 Next
                 '### 20201110 END   指摘票No198対応 ############################################################
+
+                '### 20201207 END   指摘票No248対応 ############################################################
+            Case "WF_CheckBoxSELECTUPGRADE"
+                'チェックボックス判定
+                For Each OIT0001Drow As DataRow In OIT0001tbl.Rows
+                    If Convert.ToString(OIT0001Drow("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0001Drow("UPGRADEFLG")) = "on" Then
+                            OIT0001Drow("UPGRADEFLG") = ""
+                        Else
+                            OIT0001Drow("UPGRADEFLG") = "on"
+                        End If
+
+                        Exit For
+                    End If
+                Next
+                '### 20201207 END   指摘票No248対応 ############################################################
 
             Case Else
                 'チェックボックス判定
@@ -2223,6 +2246,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS FIRSTRETURNFLG" _
             & " , ''                                             AS AFTERRETURNFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
+            & " , ''                                             AS UPGRADEFLG" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -2543,14 +2567,13 @@ Public Class OIT0001EmptyTurnDairyDetail
         '前回黒油によるエラー
         If WW_ERRCODE = "ERR1" Then
             Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-
             Exit Sub
 
-            '前回揮発油,今回黒油、または灯軽油による警告
+            '前回揮発油,今回黒油、または灯軽油による警告(格上チェックあり)
         ElseIf WW_ERRCODE = "ERR2" Then
             'blnOilCheck = True
             WW_CHK_OILCODE = True
-            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR2, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
             'Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR,
             '  C_MESSAGE_TYPE.QUES,
             '  needsPopUp:=True,
@@ -2561,6 +2584,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             '  NoButtonId:="btnChkLastOilConfirmNo")
             '★警告のため、後続処理は実施
             WW_ERRCODE = C_MESSAGE_NO.NORMAL
+
+            '前回揮発油,今回黒油、または灯軽油による警告(格上チェックなし)
+        ElseIf WW_ERRCODE = "ERR3" Then
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+
         End If
 
         '○ 同一レコードチェック
@@ -3701,12 +3730,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'Exit Sub
 
                 '前回揮発油
-            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso convert.ToString(OIT0001row("DELFLG")) = "0" Then
-                OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
-                CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso Convert.ToString(OIT0001row("DELFLG")) = "0" Then
+
+                If Convert.ToString(OIT0001row("UPGRADEFLG")) = "on" Then
+                    OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                    CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+                Else
+                    OIT0001row("ORDERINFONAME") = "前回揮発油(確認)"
+                End If
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR2
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
 
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -3716,8 +3750,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
                 End Using
 
-                If O_RTN <> "ERR1" Then O_RTN = "ERR2"
-
+                If O_RTN <> "ERR1" Then
+                    If Convert.ToString(OIT0001row("UPGRADEFLG")) = "on" AndAlso O_RTN <> "ERR3" Then
+                        O_RTN = "ERR2"
+                    Else
+                        O_RTN = "ERR3"
+                    End If
+                End If
             Else
                 If Convert.ToString(OIT0001row("ORDERINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
                     OrElse Convert.ToString(OIT0001row("ORDERINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
@@ -5683,7 +5722,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    SET" _
             & "        TANKNO            = @P03, STACKINGFLG   = @P40" _
             & "        , WHOLESALEFLG    = @P51, INSPECTIONFLG = @P46, DETENTIONFLG = @P47, OTTRANSPORTFLG  = @P50" _
-            & "        , ORDERINFO       = @P34, SHIPPERSCODE  = @P23, SHIPPERSNAME = @P24" _
+            & "        , UPGRADEFLG      = @P52, ORDERINFO     = @P34, SHIPPERSCODE = @P23, SHIPPERSNAME    = @P24" _
             & "        , OILCODE         = @P05, OILNAME       = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
             & "        , RETURNDATETRAIN = @P07, JOINTCODE     = @P39, JOINT        = @P08, REMARK          = @P38" _
             & "        , ACTUALLODDATE   = @P41" _
@@ -5696,7 +5735,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
             & "        , STACKINGFLG     , WHOLESALEFLG        , INSPECTIONFLG      , DETENTIONFLG" _
-            & "        , FIRSTRETURNFLG  , AFTERRETURNFLG      , OTTRANSPORTFLG     , ORDERINFO" _
+            & "        , FIRSTRETURNFLG  , AFTERRETURNFLG      , OTTRANSPORTFLG     , UPGRADEFLG          , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
             & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
@@ -5710,7 +5749,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04" _
             & "        , @P40, @P51, @P46, @P47" _
-            & "        , @P48, @P49, @P50, @P34" _
+            & "        , @P48, @P49, @P50, @P52, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
             & "        , @P07, @P39, @P08" _
@@ -5738,6 +5777,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , FIRSTRETURNFLG" _
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
+            & "    , UPGRADEFLG" _
             & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
@@ -5811,6 +5851,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.NVarChar, 1)   '先返し可否フラグ
                 Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.NVarChar, 1)   '後返し可否フラグ
                 Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 1)   'OT輸送可否フラグ
+                '### 20201208 START 指摘票No248対応 ############################################################
+                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 1)   '格上可否フラグ
+                '### 20201208 START 指摘票No248対応 ############################################################
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
@@ -5907,6 +5950,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                         PARA50.Value = "2"
                     End If
                     '### 20201110 START 指摘票No198対応 ############################################################
+                    '### 20201208 START 指摘票No248対応 ############################################################
+                    '# 格上可否フラグ(1:格上あり 2:格上なし)
+                    If OIT0001row("UPGRADEFLG") = "on" Then
+                        PARA52.Value = "1"
+                    Else
+                        PARA52.Value = "2"
+                    End If
+                    '### 20201208 START 指摘票No248対応 ############################################################
 
                     PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
@@ -7640,6 +7691,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea.ID & "OTTRANSPORTFLG"
         Dim chkObjOTId As String
         '### 20201110 END   指摘票対応(No198)全体 ################################
+        '### 20201208 START 指摘票対応(No248)全体 ################################
+        Dim chkObjUP As CheckBox = Nothing
+        Dim chkObjIdWOUPcnt As String = "chk" & pnlListArea.ID & "UPGRADEFLG"
+        Dim chkObjUPId As String
+        '### 20201208 END   指摘票対応(No248)全体 ################################
         '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
         Dim loopdr As DataRow = Nothing
         '　データテーブルの行Index
@@ -7742,6 +7798,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                         End If
                     Next
                     '### 20201110 END   指摘票対応(No198)全体 ################################
+                    '### 20201208 START 指摘票対応(No248)全体 ################################
+                    chkObjUPId = chkObjIdWOUPcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjUP = Nothing
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjUP = DirectCast(cellObj.FindControl(chkObjUPId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjUP IsNot Nothing Then
+                            '格上可否フラグ(チェックボックス)を非活性
+                            chkObjUP.Enabled = False
+                            Exit For
+                        End If
+                    Next
+                    '### 20201208 END   指摘票対応(No248)全体 ################################
                 End If
                 rowIdx += 1
             Next
@@ -7797,10 +7866,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                     chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                     chkObjType = Convert.ToString(loopdr("STACKINGORDERNO"))
                     chkObjST = Nothing
-                    chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
-                    chkObjIN = Nothing
-                    chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
-                    chkObjDE = Nothing
                     For Each cellObj As TableCell In rowitem.Controls
                         chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                         'コントロールが見つかったら脱出
@@ -7819,6 +7884,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                             Exit For
                         End If
                     Next
+                    chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjIN = Nothing
                     For Each cellObj As TableCell In rowitem.Controls
                         chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
                         'コントロールが見つかったら脱出
@@ -7831,6 +7898,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                             End If
                         End If
                     Next
+                    chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjDE = Nothing
                     For Each cellObj As TableCell In rowitem.Controls
                         chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
                         'コントロールが見つかったら脱出
@@ -7862,6 +7931,21 @@ Public Class OIT0001EmptyTurnDairyDetail
                         End If
                     Next
                     '### 20201110 END   指摘票対応(No198)全体 ################################
+                    '### 20201208 START 指摘票対応(No248)全体 ################################
+                    chkObjUPId = chkObjIdWOUPcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjUP = Nothing
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjUP = DirectCast(cellObj.FindControl(chkObjUPId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjUP IsNot Nothing Then
+                            If work.WF_SEL_STATUS.Text <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                                '格上可否フラグ(チェックボックス)を非活性
+                                chkObjUP.Enabled = False
+                            End If
+                            Exit For
+                        End If
+                    Next
+                    '### 20201208 END   指摘票対応(No248)全体 ################################
                     For Each cellObj As TableCell In rowitem.Controls
                         '★受注営業所が仙台新港営業所の場合、(一覧)積込日(実績)の入力を許可する
                         '### 20201019 START 指摘票対応(No172) #############################################

@@ -3438,7 +3438,7 @@ Public Class OIT0002LinkDetail
                 CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
 
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection

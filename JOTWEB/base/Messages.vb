@@ -535,9 +535,9 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_CANCELLINE_NOTFOUND As String = "20035"
         ''' <summary>
-        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性ワーニング
         ''' </summary>
-        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR As String = "20036"
         ''' <summary>
         ''' 発送順序重複エラー
         ''' </summary>
@@ -656,9 +656,9 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_TANKNO_LOADDATE_USE As String = "20063"
         ''' <summary>
-        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性ワーニング(空回日報画面)
         ''' </summary>
-        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR2 As String = "20064"
         ''' <summary>
         ''' 指定タンク車№が所在地以外のためエラー
         ''' </summary>
@@ -747,6 +747,15 @@ Public Module Messages
         ''' 品種出荷期間オーバー
         ''' </summary>
         Public Const OIL_OILTERM_OVER_ERROR As String = "20086"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20087"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20088"
+
 #End Region
 
 

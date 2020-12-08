@@ -2797,7 +2797,7 @@ Public Class OIT0003OrderList
                 'タンク車発送実績(ラジオボタン)を表示
                 Me.rbTankDispatchBtn.Visible = True
                 '出荷実績
-                Me.rbActualShipBtn.Visible = True
+                'Me.rbActualShipBtn.Visible = True
 
             '◯根岸営業所
             Case BaseDllConst.CONST_OFFICECODE_011402
@@ -2834,7 +2834,7 @@ Public Class OIT0003OrderList
                 'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
                 '出荷実績
-                Me.rbActualShipBtn.Visible = True
+                'Me.rbActualShipBtn.Visible = True
 
             Case Else
                 '### すべてのラジオボタン非表示のまま ##########

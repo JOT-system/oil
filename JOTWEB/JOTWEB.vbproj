@@ -460,6 +460,7 @@
     <Compile Include="OIL\com\OIT0002CustomReport.vb" />
     <Compile Include="OIL\com\OIT0002CustomReportOLD.vb" />
     <Compile Include="OIL\com\OIT0003CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0003CustomReportActualShipExcel.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportTankDispatchExcel.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportReservedExcel.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportReservedCsv.vb" />

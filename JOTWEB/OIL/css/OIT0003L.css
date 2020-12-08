@@ -38,6 +38,9 @@ div[data-generated="1"] td:nth-child(4) {
 #txtReportRTrainNo {
     width: 150px !important;
 }
+#txtReportTrainNo {
+    width: 150px !important;
+}
 
 .calendarIconArea div {
     margin-top: calc(100% - 14px) !important;

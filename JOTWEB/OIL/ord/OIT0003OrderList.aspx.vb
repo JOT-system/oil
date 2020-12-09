@@ -1142,13 +1142,18 @@ Public Class OIT0003OrderList
                                 Case CONST_OFFICECODE_010402
                                     '■仙台新港
                                     If Me.rbTankDispatchBtn.Checked = True Then
-                                        'タンク車発送実績の場合、列車5090を除外する
-                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = "AND KEYCODE <> '5090'"
+                                        'タンク車発送実績の場合、発駅：仙台　着駅：盛岡を表示
+                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = "AND VALUE2 = '243202' AND VALUE3 = '2018'"
                                     End If
 
                                 Case CONST_OFFICECODE_011203
                                     '■袖ヶ浦
-                                    If Me.rbActualShipBtn.Checked = True Then
+                                    If Me.rbTankDispatchBtn.Checked = True Then
+                                        'タンク車発送実績の場合、発駅：袖ヶ浦　着駅：倉賀野（高崎）南松本の列車を表示
+                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = "AND VALUE2 = '434108' AND VALUE3 IN ('5141', '4113')"
+                                        '特定の列車を除外する
+                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND KEYCODE <> '5461'"
+                                    ElseIf Me.rbActualShipBtn.Checked = True Then
                                         '出荷実績の場合、発駅：袖ヶ浦　着駅：倉賀野（高崎）南松本の列車を表示
                                         prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = "AND VALUE2 = '434108' AND VALUE3 IN ('5141', '4113')"
                                     End If
@@ -5155,17 +5160,31 @@ Public Class OIT0003OrderList
         '　 説明　：　帳票表示用SQL
         Dim SQLStr As String =
               " SELECT " _
-            & "       0                                                AS LINECNT " _
-            & "     , ''                                               AS OPERATION " _
-            & "     , '0'                                              AS TIMSTP " _
-            & "     , 1                                                AS 'SELECT' " _
-            & "     , 0                                                AS HIDDEN " _
-            & "     , OIT0002.OFFICECODE                               AS OFFICECODE " _
-            & "     , OIT0003.ACTUALLODDATE                            AS ACTUALLODDATE " _
-            & "     , OIT0002.TRAINNO                                  AS TRAINNO " _
-            & "     , LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9)   AS SHIPPEROILCODE " _
-            & "     , OIT0003.CARSAMOUNT                               AS CARSAMOUNT " _
-            & "     , OIM0005.SAPSHELLTANKNUMBER                       AS SAPSHELLTANKNUMBER " _
+            & "       0                                            AS LINECNT " _
+            & "     , ''                                           AS OPERATION " _
+            & "     , '0'                                          AS TIMSTP " _
+            & "     , 1                                            AS 'SELECT' " _
+            & "     , 0                                            AS HIDDEN " _
+            & "     , OIT0002.OFFICECODE                           AS OFFICECODE " _
+            & "     , OIT0003.ACTUALLODDATE                        AS ACTUALLODDATE " _
+            & "     , OIT0002.TRAINNO                              AS TRAINNO " _
+            & "     , " _
+            & "     LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9) AS SHIPPEROILCODE " _
+            & "     , OIT0003.CARSAMOUNT                           AS CARSAMOUNT " _
+            & "     , OIM0005.SAPSHELLTANKNUMBER                   AS SAPSHELLTANKNUMBER " _
+            & "     , CASE " _
+            & "     LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9) " _
+            & "     WHEN '122100000' THEN 1 " _
+            & "     WHEN '121100000' THEN 2 " _
+            & "     WHEN '151100000' THEN 3 " _
+            & "     WHEN '161100000' THEN 4 " _
+            & "     WHEN '161350000' THEN 5 " _
+            & "     WHEN '211700000' THEN 6 " _
+            & "     WHEN '211110000' THEN 7 " _
+            & "     WHEN '213100000' THEN 8 " _
+            & "     WHEN '211100000' THEN 9 " _
+            & "     ELSE 99 " _
+            & "     END                                            AS SHIPPEROILCODESEQ " _
             & " FROM " _
             & "     OIL.OIT0002_ORDER OIT0002 " _
             & "     INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
@@ -5192,9 +5211,9 @@ Public Class OIT0003OrderList
             & "     OFFICECODE " _
             & "     , TRAINNO " _
             & "     , ACTUALLODDATE " _
-            & "     , SHIPPEROILCODE " _
-            & "     , CARSAMOUNT " _
-            & "     , SAPSHELLTANKNUMBER "
+            & "     , SHIPPEROILCODESEQ " _
+            & "     , SAPSHELLTANKNUMBER " _
+            & "     , CARSAMOUNT "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -5230,8 +5249,6 @@ Public Class OIT0003OrderList
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
                     i += 1
                     OIT0003Reprow("LINECNT") = i        'LINECNT
-
-
                 Next
 
             End Using

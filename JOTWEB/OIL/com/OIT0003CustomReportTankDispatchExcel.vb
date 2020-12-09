@@ -157,7 +157,7 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
 
             '出荷日(積込日)
             rngHeaderArea = Me.ExcelWorkSheet.Range("C3")
-            rngHeaderArea.Value = CDate(lodDate)
+            rngHeaderArea.Value = CDate(lodDate).ToString("yyyyMMdd")
 
         Catch ex As Exception
             Throw

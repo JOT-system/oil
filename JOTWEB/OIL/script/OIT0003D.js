@@ -341,6 +341,22 @@ function ChangeCheckBoxLight(listId) {
             }
         }
     }
+
+    //### 20201207 START 指摘票No248対応 ############################################################
+    // 格上可否フラグ
+    var chkObjsLight8 = objLightTable.querySelectorAll("input[id^='chk" + listId + "UPGRADEFLG']");
+    var spnObjsLight8 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "UPGRADEFLG']");
+    for (let i = 0; i < chkObjsLight8.length; i++) {
+
+        if (chkObjsLight8[i] !== null) {
+            if (spnObjsLight8[i].innerText === "on") {
+                chkObjsLight8[i].checked = true;
+            } else {
+                chkObjsLight8[i].checked = false;
+            }
+        }
+    }
+    //### 20201207 END   指摘票No248対応 ############################################################
 }
 
 
@@ -378,6 +394,11 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
         if (fieldName === 'OTTRANSPORTFLG') {
             surfix = 'OTTRANSPORT'
         }
+        //### 20201207 START 指摘票No248対応 ############################################################
+        if (fieldName === 'UPGRADEFLG') {
+            surfix = 'UPGRADE'
+        }
+        //### 20201207 END   指摘票No248対応 ############################################################
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;

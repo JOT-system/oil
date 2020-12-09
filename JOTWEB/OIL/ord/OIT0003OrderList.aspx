@@ -185,6 +185,9 @@
             <li>
                 <asp:RadioButton ID="rbTankDispatchBtn" runat="server" GroupName="WF_SW" Text="タンク車発送実績" onclick="reportRadioButton();" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbActualShipBtn" runat="server" GroupName="WF_SW" Text="出荷実績" onclick="reportRadioButton();" />
+            </li>
         </ul>
     </div>
     <div id="divRTrainNo">

@@ -2,10 +2,10 @@
 Imports Microsoft.Office.Interop
 Imports System.Runtime.InteropServices
 ''' <summary>
-''' タンク車発送実績Excel出力クラス（Excelベース）
+''' 出荷実績Excel出力クラス（Excelベース）
 ''' </summary>
-''' <remarks>実装営業所 : 仙台新港, 袖ヶ浦</remarks>
-Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposable
+''' <remarks>実装営業所 : 袖ヶ浦, 三重塩浜</remarks>
+Public Class OIT0003CustomReportActualShipExcel : Implements System.IDisposable
     ''' <summary>
     ''' エクセルアプリケーションオブジェクト
     ''' </summary>
@@ -46,14 +46,14 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
         Try
             Dim CS0050SESSION As New CS0050SESSION
             Dim templateParentFolderName As String = "OIT0003L"
-            Dim tempXlsFileName As String = "" 'TANKDISPATCH_[営業所コード].xlsxとする
-            tempXlsFileName = String.Format("TANKDISPATCH_{0}.xlsx", officeCode)
+            Dim tempXlsFileName As String = "" 'ACTUALSHIP_[営業所コード].xlsとする
+            tempXlsFileName = String.Format("ACTUALSHIP_{0}.xls", officeCode)
 
-            If officeCode = CONST_OFFICECODE_010402 OrElse
+            If officeCode = CONST_OFFICECODE_012402 OrElse
             officeCode = CONST_OFFICECODE_011203 Then
                 Me.OfficeCode = officeCode
             Else
-                '仙台新港営業所及び袖ヶ浦営業所以外は対応しない
+                '袖ヶ浦営業所及び三重塩浜以外は対応しない
                 Throw New Exception(String.Format("対応する営業所ではありません。{0}", officeCode))
             End If
 
@@ -119,7 +119,7 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
     ''' <returns>ダウンロードURL</returns>
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
 
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xls"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
@@ -132,7 +132,7 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
             '保存処理実行
             Dim saveExcelLock As New Object
             SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
-                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlExcel8)
             End SyncLock
             Me.ExcelBookObj.Close(False)
 
@@ -151,13 +151,15 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
 
         Try
 
-            'タイトル(列車番号)
-            rngHeaderArea = Me.ExcelWorkSheet.Range("B1")
-            rngHeaderArea.Value = String.Format("出荷実績表({0}列車)", trainNo)
+            '列車番号
+            rngHeaderArea = Me.ExcelWorkSheet.Range("G31")
+            rngHeaderArea.Value = String.Format("{0}列車", trainNo)
 
             '出荷日(積込日)
             rngHeaderArea = Me.ExcelWorkSheet.Range("C3")
-            rngHeaderArea.Value = CDate(lodDate).ToString("yyyyMMdd")
+            rngHeaderArea.Value = String.Format("{0}月", CDate(lodDate).Month)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("D3")
+            rngHeaderArea.Value = String.Format("{0}日", CDate(lodDate).Day)
 
         Catch ex As Exception
             Throw
@@ -175,15 +177,18 @@ Public Class OIT0003CustomReportTankDispatchExcel : Implements System.IDisposabl
 
             Dim i As Integer = 9
             For Each dr As DataRow In Me.PrintData.Rows
-                'コード
-                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
-                rngDetailArea.Value = dr("SHIPPEROILCODE")
+                '油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = dr("SHIPPEROILNAME")
+
                 '積載実数量
-                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
                 rngDetailArea.Value = CDec(dr("CARSAMOUNT")).ToString("#.##0")
+
                 'ﾀﾝｸ車番号
-                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
-                rngDetailArea.Value = dr("SAPSHELLTANKNUMBER")
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = dr("TANKNO")
+
                 i += 1
             Next dr
         Catch ex As Exception

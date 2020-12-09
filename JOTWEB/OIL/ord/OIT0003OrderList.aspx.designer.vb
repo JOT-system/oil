@@ -365,6 +365,15 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbTankDispatchBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''rbActualShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbActualShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
     '''lblReportRTrainNo コントロール。
     '''</summary>
     '''<remarks>

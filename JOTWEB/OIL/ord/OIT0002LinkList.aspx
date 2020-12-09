@@ -39,6 +39,29 @@
                     </div>
                 </div> <!-- End class=actionButtonBox -->
             </div> <!-- End class="Operation" -->
+            <div class="leftSide">
+                <span>　</span>
+                <span id="spnOfficeGoi" runat="server">
+                    <a >浜五井：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblGoiCnt" runat="server">000車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeKinoene" runat="server">
+                    <a >甲子：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblKinoeneCnt" runat="server">000車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeSodegaura" runat="server">
+                    <a >北袖：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblSodegauraCnt" runat="server">000車</asp:Label>
+                    </a>
+                </span>
+            </div>
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 

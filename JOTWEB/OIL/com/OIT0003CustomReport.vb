@@ -529,6 +529,12 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("UPGRADE").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
+                '### 20201209 START OT積込指示書(翌月発送対応) #########################
+                '★翌月発送
+                If PrintDatarow("NEXTMONTH").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("NEXTMONTH").ToString + "』"
+                End If
+                '### 20201209 END   OT積込指示書(翌月発送対応) #########################
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then

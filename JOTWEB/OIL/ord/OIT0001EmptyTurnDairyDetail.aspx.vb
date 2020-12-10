@@ -3439,6 +3439,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             End If
             '### 20200925 END  ((全体)No152対応) #####################################
 
+            '### 20201210 START 指摘票対応(No259) ####################################
+            '※他PCよりタンク車所在の変更が伴うことがあるため再度チェックする
+            '★タンク車№に紐づく情報を取得
+            WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+            '### 20201210 END   指摘票対応(No259) ####################################
+
             '### 20200915 START((全体)No139対応) ######################################
             '★指定したタンク車№が所属営業所以外の場合
             If Convert.ToString(OIT0001row("ORDERINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_102 _

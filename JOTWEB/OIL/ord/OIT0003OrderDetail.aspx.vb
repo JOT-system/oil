@@ -74,6 +74,10 @@ Public Class OIT0003OrderDetail
     Private Const CONST_SENDAI_TRAINNO_5081 As String = "5081"      '5081レ
     Private Const CONST_SENDAI_TRAINNO_8081 As String = "8081"      '8081レ
 
+    '○ 袖ヶ浦営業所における(一覧)第２荷受人の活性化対象の列車番号
+    Private Const CONST_SODEGAURA_TRAINNO_8877 As String = "8877"   '8877レ
+    Private Const CONST_SODEGAURA_TRAINNO_8883 As String = "8883"   '8883レ
+
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
@@ -20163,7 +20167,16 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
                         AndAlso Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
-                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        '### 20201209 START 指摘票対応(No258) ################################################
+                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                            AndAlso (Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8877 _
+                                     OrElse Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8883) Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                        '### 20201209 START 指摘票対応(No258) ################################################
                     End If
                 Next
                 rowIdx += 1
@@ -20296,7 +20309,16 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
                         AndAlso Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
-                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        '### 20201209 START 指摘票対応(No258) ################################################
+                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                            AndAlso (Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8877 _
+                                     OrElse Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8883) Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                        '### 20201209 START 指摘票対応(No258) ################################################                    End If
                     End If
                 Next
 

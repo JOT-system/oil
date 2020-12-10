@@ -19,19 +19,20 @@ Public Class OIT0002LinkList
     Inherits Page
 
     '○ 検索結果格納Table
-    Private OIT0002tbl As DataTable                                  '一覧格納用テーブル
-    Private OIT0002INPtbl As DataTable                               'チェック用テーブル
-    Private OIT0002UPDtbl As DataTable                               '更新用テーブル
-    Private OIT0002WKtbl As DataTable                                '作業用テーブル
-    Private OIT0002GETtbl As DataTable                               '取得用テーブル
-    Private OIT0002CMPtbl As DataTable                               '比較用テーブル
-    Private OIT0002EXLUPtbl As DataTable                             'EXCELアップロード用
-    Private OIT0002EXLDELtbl As DataTable                            'EXCELアップロード(削除)用
-    Private OIT0002EXLINStbl As DataTable                            'EXCELアップロード(追加(貨車連結表TBL))用
-    Private OIT0002EXLCHKtbl As DataTable                            'EXCELアップロード(チェック)用
-    Private OIT0002Fixvaltbl As DataTable                            '作業用テーブル(固定値マスタ取得用)
-    Private OIT0002His1tbl As DataTable                              '履歴格納用テーブル
-    Private OIT0002His2tbl As DataTable                              '履歴格納用テーブル
+    Private OIT0002tbl As DataTable                                 '一覧格納用テーブル
+    Private OIT0002INPtbl As DataTable                              'チェック用テーブル
+    Private OIT0002UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0002WKtbl As DataTable                               '作業用テーブル
+    Private OIT0002GETtbl As DataTable                              '取得用テーブル
+    Private OIT0002CMPtbl As DataTable                              '比較用テーブル
+    Private OIT0002EXLUPtbl As DataTable                            'EXCELアップロード用
+    Private OIT0002EXLDELtbl As DataTable                           'EXCELアップロード(削除)用
+    Private OIT0002EXLINStbl As DataTable                           'EXCELアップロード(追加(貨車連結表TBL))用
+    Private OIT0002EXLCHKtbl As DataTable                           'EXCELアップロード(チェック)用
+    Private OIT0002Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0002His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -51,6 +52,7 @@ Public Class OIT0002LinkList
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
 
     '○ 貨車連結順序表(浜五井, 甲子, 北袖)
     Private WW_ARRSTATIONCODE() As String = {"434103",
@@ -1022,26 +1024,144 @@ Public Class OIT0002LinkList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDownload_Click()
 
-        '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照  Table
-        CS0030REPORT.CS0030REPORT()
-        If Not isNormal(CS0030REPORT.ERR) Then
-            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Else
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
-            End If
+        '★選択(チェックボックス)が選択されていない場合
+        If OIT0002tbl.Select("OPERATION='on'").Count = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DOWNLOAD_LINKLIST_RTRAINUNSELECT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
 
-        '○ 別画面でExcelを表示
-        WF_PrintURL.Value = CS0030REPORT.URL
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        '★選択(チェックボックス)が複数ファイル指定されていないかチェック
+        Dim chkRlinkNo As String = ""
+        Dim chkOfficeName As String = ""
+        For Each OIT0002row As DataRow In OIT0002tbl.Select("OPERATION='on'", "RLINKNO")
+            '　　★返送列車を複数指定している場合
+            If chkRlinkNo <> "" _
+                AndAlso chkRlinkNo <> Convert.ToString(OIT0002row("RLINKNO")) Then
+                Master.Output(C_MESSAGE_NO.OIL_DOWNLOAD_LINKLIST_RTRAINMULTIPLE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+                '★着駅(営業所)を複数指定している場合
+            ElseIf chkOfficeName <> "" _
+                AndAlso chkOfficeName <> Convert.ToString(OIT0002row("OFFICENAME")) Then
+                Master.Output(C_MESSAGE_NO.OIL_DOWNLOAD_LINKLIST_OFFICEMULTIPLE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            chkRlinkNo = Convert.ToString(OIT0002row("RLINKNO"))
+            chkOfficeName = Convert.ToString(OIT0002row("OFFICENAME"))
+        Next
+
+        '******************************
+        '帳票表示データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            ExcelDataGet(SQLcon, chkRlinkNo)
+        End Using
+
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Using repCbj = New OIT0002CustomReport("OIT0002D", "OIT0002D" & ".xlsx", OIT0002Reporttbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData(chkOfficeName)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        ''### 共通帳票処理をコメント ##################################################################
+        ''○ 帳票出力
+        'CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
+        'CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        'CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        'CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
+        'CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        'CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照  Table
+        'CS0030REPORT.CS0030REPORT()
+        'If Not isNormal(CS0030REPORT.ERR) Then
+        '    If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '    Else
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
+        '    End If
+        '    Exit Sub
+        'End If
+
+        ''○ 別画面でExcelを表示
+        'WF_PrintURL.Value = CS0030REPORT.URL
+        'ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        ''#############################################################################################
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection, ByVal I_RLINKNO As String)
+
+        If IsNothing(OIT0002Reporttbl) Then
+            OIT0002Reporttbl = New DataTable
+        End If
+
+        If OIT0002Reporttbl.Columns.Count <> 0 Then
+            OIT0002Reporttbl.Columns.Clear()
+        End If
+
+        OIT0002Reporttbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String = RSSQL.PolarisDownload(WW_ARTICLENAME, WW_OBJECTIVENAME)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)           '貨車連結(臨海)順序表№
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)              '削除フラグ
+                Dim P_TANKSITUATION As SqlParameter = SQLcmd.Parameters.Add("@TANKSITUATION", SqlDbType.NVarChar)   'タンク車状況コード
+                P_RLINKNO.Value = I_RLINKNO
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_13
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002Reporttbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
+                    i += 1
+                    OIT0002Reprow("LINECNT") = i        'LINECNT
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0002Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

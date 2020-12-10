@@ -211,8 +211,8 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
                 valuesArray(2) = Convert.ToString(dr("EXTRADISCOUNTCODE")) '割引コード
                 valuesArray(3) = dr("TAKUSOUOILCODE") '品目コード
                 valuesArray(4) = dr("TRTYPE") '車種コード
-                valuesArray(5) = dr("TRAINNO") '貨車番号
-                valuesArray(6) = dr("TANKNUMBER") '列車番号
+                valuesArray(5) = dr("TANKNUMBER") '列車番号
+                valuesArray(6) = dr("TRAINNO") '貨車番号
                 valuesArray(7) = dr("ARRSTATIONNAME") '着駅名
                 valuesArray(8) = dr("TAKUSOUNAME")  '荷受人名
 

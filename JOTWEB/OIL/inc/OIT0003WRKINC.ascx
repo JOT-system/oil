@@ -270,6 +270,8 @@
     <!-- MAPID退避(受注明細画面への遷移制御のため) -->
     <asp:TextBox ID="WF_SEL_MAPIDBACKUP" runat="server"></asp:TextBox>
 
+    <!-- 実績日訂正フラグ -->
+    <asp:TextBox ID="WF_SEL_CORRECTIONDATEFLG" runat="server"></asp:TextBox>
     <!-- 手配連絡フラグ -->
     <asp:TextBox ID="WF_SEL_CONTACTFLG" runat="server"></asp:TextBox>
     <!-- 結果受理フラグ -->

@@ -29,6 +29,9 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <%-- 20201210 START 指摘票対応(No246) --%>
+                <input type="button" id="WF_ButtonCORRECTIONDATE" class="btn-sticky" value="実績日訂正" onclick="ButtonClick('WF_ButtonCORRECTIONDATE');" />
+                <%-- 20201210 END   指摘票対応(No246) --%>
                 <%-- 20200916 START 指摘票対応(No148) --%>
                 <input type="button" id="WF_ButtonBULKDATE" class="btn-sticky" value="実績日一括反映" onclick="ButtonClick('WF_ButtonBULKDATE');" />
                 <%-- 20200916 END   指摘票対応(No148) --%>
@@ -617,6 +620,9 @@
 --%>
                     </div>
                     <div class="rightSide">
+                        <%-- 20201210 START 指摘票対応(No246) --%>
+                        <input type="button" id="WF_ButtonCORRECTION_TAB3" class="btn-sticky" value="訂正更新"  onclick="ButtonClick('WF_ButtonCORRECTION_TAB3');" />
+                        <%-- 20201210 END   指摘票対応(No246) --%>
                         <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
                     </div>
                 </div>
@@ -691,6 +697,8 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 実績日訂正フラグ -->
+        <input id="WF_CORRECTIONDATEFLG" runat="server" value="" type="text" />
         <!-- 一括フラグ -->
         <input id="WF_BULKFLG" runat="server" value="" type="text" />
         <!-- 手配連絡フラグ -->

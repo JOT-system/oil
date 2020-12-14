@@ -15,6 +15,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 実績日訂正ボタン活性／非活性
+    if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
+        //活性
+        document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "disabled";
+    }
+
     //〇 実績日一括反映ボタン活性／非活性
     if (document.getElementById('WF_BULKFLG').value === "0") {
 
@@ -123,10 +133,23 @@ function InitDisplay() {
             if (document.getElementById('WF_MAPButtonControl').value === "3") {
                 //非活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
+
+                //〇 訂正ボタン活性／非活性
+                if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
+                    //非活性(訂正更新ボタン)
+                    document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "disabled";
+                }
+                else {
+                    //活性(訂正更新ボタン)
+                    document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "";
+                }
+
             }
             else {
                 //活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
+                //非活性(訂正更新ボタン)
+                document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "disabled";
             }
         }
         ////〇タブ４

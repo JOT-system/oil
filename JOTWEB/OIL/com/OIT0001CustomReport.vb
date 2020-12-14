@@ -169,13 +169,17 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer)
 
-        Dim iHeader(,) As Integer = {{3, 7, 9, 41}, {45, 49, 51, 83}, {87, 91, 93, 125}, {129, 133, 135, 167}}
+        Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0
 
         '◯ 営業所名
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i)))
         I_rngHeaderArea.Value = PrintDatarow("OFFICENAME")
+        ExcelMemoryRelease(I_rngHeaderArea)
+        '◯ 日付
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 4)))
+        I_rngHeaderArea.Value = Now.ToString("yyyy年MM月dd日")
         ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 向い先(着駅)
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 1)))
@@ -257,7 +261,11 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         '◯ タンク車番号
         I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("TANKNO")
+        If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
+            I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("TANKNO"))
+        Else
+            I_rngDetailArea.Value = PrintDatarow("TANKNO")
+        End If
         ExcelMemoryRelease(I_rngDetailArea)
         '◯ 前回油種
         I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())

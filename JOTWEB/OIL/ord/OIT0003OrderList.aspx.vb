@@ -3500,8 +3500,8 @@ Public Class OIT0003OrderList
                     ExcelSodegauraKuukaiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
 
-                'Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
-                Using repCbj = New OIT0001CustomReport("OIT0001D", "OIT0001D" & "_SODEGAURA.xlsx", OIT0003ReportSodegauratbl)
+                'Using repCbj = New OIT0001CustomReport("OIT0001D", "OIT0001D" & "_SODEGAURA.xlsx", OIT0003ReportSodegauratbl)
+                Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
                         url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA)

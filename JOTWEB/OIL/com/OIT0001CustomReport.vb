@@ -177,25 +177,52 @@ Public Class OIT0001CustomReport : Implements IDisposable
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i)))
         I_rngHeaderArea.Value = PrintDatarow("OFFICENAME")
         ExcelMemoryRelease(I_rngHeaderArea)
-        '◯ 日付
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 4)))
-        I_rngHeaderArea.Value = Now.ToString("yyyy年MM月dd日")
-        ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 向い先(着駅)
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 1)))
         I_rngHeaderArea.Value = PrintDatarow("ARRSTATIONNAME")
         ExcelMemoryRelease(I_rngHeaderArea)
         '### 20201019 START 指摘票対応(No177) ####################################
         '◎袖ヶ浦営業所の場合
-        '　かつ、列車No(5461⇒5972へ変更)
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 _
-            AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
-            I_rngHeaderArea.Value = strTrainNo(1)
+        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★列車No(5461⇒5972へ変更)
+            If Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
+                '◯ 列車No
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 1)))
+                I_rngHeaderArea.Value = strTrainNo(1)
+                ExcelMemoryRelease(I_rngHeaderArea)
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 3)))
+                I_rngHeaderArea.Value = strTrainNo(1)
+                ExcelMemoryRelease(I_rngHeaderArea)
+            Else
+                '◯ 列車No
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 1)))
+                I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+                ExcelMemoryRelease(I_rngHeaderArea)
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 3)))
+                I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+                ExcelMemoryRelease(I_rngHeaderArea)
+            End If
+            '◯ 日付
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("R" + Convert.ToString(iHeader(I_column, i + 4)))
+            I_rngHeaderArea.Value = Now.ToString("yyyy年MM月dd日")
             ExcelMemoryRelease(I_rngHeaderArea)
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
-            I_rngHeaderArea.Value = strTrainNo(1)
+            '◯ 積込日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("LODDATE")
             ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 発日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 積車着日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 受入日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("P" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+
         Else
             '◯ 列車No
             I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
@@ -204,25 +231,25 @@ Public Class OIT0001CustomReport : Implements IDisposable
             I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
             I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
             ExcelMemoryRelease(I_rngHeaderArea)
+
+            '◯ 積込日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("LODDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 発日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 積車着日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 受入日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
         End If
         '### 20201019 END   指摘票対応(No177) ####################################
-
-        '◯ 積込日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("LODDATE")
-        ExcelMemoryRelease(I_rngHeaderArea)
-        '◯ 発日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
-        ExcelMemoryRelease(I_rngHeaderArea)
-        '◯ 積車着日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
-        ExcelMemoryRelease(I_rngHeaderArea)
-        '◯ 受入日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
-        ExcelMemoryRelease(I_rngHeaderArea)
 
     End Sub
 
@@ -233,7 +260,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal I_rngDetailArea As Excel.Range,
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer,
-                                     ByRef I_OtOilName As String)
+                                     ByRef O_OtOilName As String)
 
         '◯ 車数
         I_rngDetailArea = Me.ExcelWorkSheet.Range("B" + I_column.ToString())
@@ -252,83 +279,91 @@ Public Class OIT0001CustomReport : Implements IDisposable
         I_rngDetailArea.Value = PrintDatarow("OTOILNAME")
         ExcelMemoryRelease(I_rngDetailArea)
         '◯ 車(OT油種毎の件数)
-        If I_OtOilName <> PrintDatarow("OTOILNAME").ToString() Then
+        If O_OtOilName <> PrintDatarow("OTOILNAME").ToString() Then
             I_rngDetailArea = Me.ExcelWorkSheet.Range("F" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("OTOILCTCNT")
             ExcelMemoryRelease(I_rngDetailArea)
         End If
-        I_OtOilName = PrintDatarow("OTOILNAME").ToString()
+        O_OtOilName = PrintDatarow("OTOILNAME").ToString()
 
-        '◯ タンク車番号
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
-        If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
-            I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("TANKNO"))
-        Else
-            I_rngDetailArea.Value = PrintDatarow("TANKNO")
-        End If
-        ExcelMemoryRelease(I_rngDetailArea)
-        '◯ 前回油種
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("LASTOTOILNAME")
-        'I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
-        ExcelMemoryRelease(I_rngDetailArea)
-
-        '### 20201008 START 指摘票対応(No156)全体 ###################################################
         '★袖ヶ浦営業所の場合
         If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ 順位
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
+                I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("TANKNO"))
+            Else
+                I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 前回油種(OT油種)
             I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("LASTOTOILNAME")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20201008 START 指摘票対応(No156)全体 ###################################################
+            '◯ 順位
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("SHIPORDER")
             ExcelMemoryRelease(I_rngDetailArea)
-        Else
-            '◯ 順位
-            '### 未使用項目 ###########################################
-        End If
-        '### 20201008 END   指摘票対応(No156)全体 ###################################################
-        '◯ 次回交検日
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("J" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
-        ExcelMemoryRelease(I_rngDetailArea)
-        '◯ 返送日列車
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
-        ExcelMemoryRelease(I_rngDetailArea)
-
-        '### 20200917 START 指摘票対応(No138)全体 ###################################################
-        '★袖ヶ浦営業所の場合(フォーマットが異なるため別設定)
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ FOC入線順
+            '### 20201008 END   指摘票対応(No156)全体 ###################################################
+            '◯ 次回交検日
             I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 返送日列車
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20200917 START 指摘票対応(No138)全体 ###################################################
+            '◯ FOC入線順
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("LINEORDER")
             ExcelMemoryRelease(I_rngDetailArea)
             '◯ 託送用コード
-            I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("P" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
             ExcelMemoryRelease(I_rngDetailArea)
+            '### 20200917 END   指摘票対応(No138)全体 ###################################################
+            '### 20201008 START 指摘票対応(No157)全体 ###################################################
+            '◯ 記事
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("R" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20201008 END   指摘票対応(No157)全体 ###################################################
         Else
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 前回油種
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 順位
+            '### 未使用項目 ###########################################
+            '◯ 次回交検日
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("J" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 返送日列車
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+            ExcelMemoryRelease(I_rngDetailArea)
             '◯ ジョイント先
             I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("JOINT")
             ExcelMemoryRelease(I_rngDetailArea)
             '◯ 割当元
             '### 未使用項目 ###########################################
-        End If
-        '### 20200917 END   指摘票対応(No138)全体 ###################################################
-
-        '### 20201008 START 指摘票対応(No157)全体 ###################################################
-        '★袖ヶ浦営業所の場合
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ 記事
-            I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
-            I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
-            ExcelMemoryRelease(I_rngDetailArea)
-        Else
             '◯ 記事
             I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("REMARK")
             ExcelMemoryRelease(I_rngDetailArea)
         End If
-        '### 20201008 END   指摘票対応(No157)全体 ###################################################
 
     End Sub
 

@@ -936,6 +936,43 @@ Public Module BaseDllConst
     Public Const CONST_ATank3 As String = "2103"
 #End Region
 
+#Region "油種名(受発注用)"
+    Public Const CONST_1001A As String = "ハイオク"
+    Public Const CONST_1101A As String = "レギュラー"
+
+    Public Const CONST_1301A As String = "灯油"
+    Public Const CONST_1302A As String = "未添加灯油"
+
+    Public Const CONST_1401A As String = "軽油"
+    Public Const CONST_1401D As String = "軽油１号"
+    Public Const CONST_1401E As String = "軽油２号"
+    Public Const CONST_1402B As String = "軽油５"
+    Public Const CONST_1403C As String = "軽油１０"
+    Public Const CONST_1404A As String = "３号軽油"
+    Public Const CONST_1404B As String = "３号軽油２０"
+    Public Const CONST_1404C As String = "３号軽油５０"
+    Public Const CONST_1404D As String = "３号軽油TCH"
+    Public Const CONST_1404E As String = "寒冷軽油"
+
+    Public Const CONST_1501A As String = "JP-8"
+
+    Public Const CONST_2101A As String = "Ａ重油"
+    Public Const CONST_2101B As String = "0.5A重油"
+    Public Const CONST_2101C As String = "LTA"
+    Public Const CONST_2101D As String = "ＬＳＡ－５"
+    Public Const CONST_2101E As String = "AFOーSP"
+    Public Const CONST_2101F As String = "ＬＳＡ－５（山岳）"
+    Public Const CONST_2101G As String = "AFOーSP（山岳）"
+    Public Const CONST_2101H As String = "AFOーブレンド（山岳）"
+
+    Public Const CONST_2201A As String = "ＬＳＡ"
+    Public Const CONST_2201B As String = "0.1A重油"
+    Public Const CONST_2201C As String = "ＬＳＡ－１"
+    Public Const CONST_2201D As String = "ＬＳＡーブレンド"
+    Public Const CONST_2201E As String = "ＬＳＡ－１（山岳）"
+    Public Const CONST_2201F As String = "ＬＳＡーブレンド（山岳）"
+#End Region
+
 #Region "油種(コスモ石油)"
     ''' <summary>
     ''' ハイオク

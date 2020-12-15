@@ -1302,6 +1302,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngFooterArea)
             End If
 
+            '受注オーダーにLTA油種が含まれているか確認
+            Dim iLTACnt As Integer = PrintData.Select("ORDERINGOILNAME='" + BaseDllConst.CONST_2101C + "'").Count
+            If iLTACnt >= 1 AndAlso rTrainNo = "401" Then
+                Dim clnLTA() As String = {"B", "D", "F", "H", "J", "L"}
+                For Each strLTA As String In clnLTA
+                    '○LTA油種が含まれている場合
+                    '　フッターの「A重油」⇒「ＬＴＡ」へ書き換える
+                    rngFooterArea = Me.ExcelWorkSheet.Range(strLTA + "54")
+                    rngFooterArea.Value = BaseDllConst.CONST_2101C
+                    ExcelMemoryRelease(rngFooterArea)
+                Next
+            End If
+
         Catch ex As Exception
             Throw
         Finally

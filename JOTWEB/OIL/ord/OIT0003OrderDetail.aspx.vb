@@ -4379,6 +4379,12 @@ Public Class OIT0003OrderDetail
                         '全表示のため設定をコメントにする。
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
 
+                        '(一覧)第2荷受人
+                    ElseIf WF_FIELD.Value = "SECONDCONSIGNEENAME" Then
+                        '★OT高崎のみ
+                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) =
+                            " AND KEYCODE = '" + BaseDllConst.CONST_CONSIGNEECODE_54 + "'"
+
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)

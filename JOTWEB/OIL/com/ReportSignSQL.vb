@@ -73,6 +73,8 @@
             & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
             & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
+            & " , OIM0003_LAST.OTOILCODE                         AS LASTOTOILCODE" _
+            & " , OIM0003_LAST.OTOILNAME                         AS LASTOTOILNAME" _
             & " , OTOILCT.OTOILCODE                              AS OTOILCTCODE" _
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
             & " , OIM0026.DELIVERYCODE                           AS DELIVERYCODE" _
@@ -93,7 +95,12 @@
             & " AND OIM0005.DELFLG <> @P02 " _
             & " LEFT JOIN oil.OIT0005_SHOZAI OIT0005 ON " _
             & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
-            & " AND OIT0005.DELFLG <> @P02 "
+            & " AND OIT0005.DELFLG <> @P02 " _
+            & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003_LAST ON " _
+            & "     OIM0003_LAST.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003_LAST.OILCODE = OIT0005.LASTOILCODE " _
+            & " AND OIM0003_LAST.SEGMENTOILCODE = OIT0005.PREORDERINGTYPE " _
+            & " AND OIM0003_LAST.DELFLG <> @P02 "
 
         '### 20200917 START 指摘票対応(No138)全体 ###################################################
         SQLStr &=

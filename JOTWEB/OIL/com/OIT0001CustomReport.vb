@@ -269,7 +269,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
         ExcelMemoryRelease(I_rngDetailArea)
         '◯ 前回油種
         I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
+        I_rngDetailArea.Value = PrintDatarow("LASTOTOILNAME")
+        'I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
         ExcelMemoryRelease(I_rngDetailArea)
 
         '### 20201008 START 指摘票対応(No156)全体 ###################################################

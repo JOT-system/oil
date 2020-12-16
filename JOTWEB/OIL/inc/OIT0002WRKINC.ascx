@@ -9,6 +9,7 @@
     <asp:TextBox ID="WF_SEL_SEARCH_BTRAINNO" runat="server"></asp:TextBox>   <!-- 返送列車番号 -->
     <asp:TextBox ID="WF_SEL_SEARCH_BTRAINNAME" runat="server"></asp:TextBox> <!-- 返送列車名 -->
     <asp:TextBox ID="WF_SEL_SEARCH_EMPARRDATE" runat="server"></asp:TextBox> <!-- 空車着日 -->
+    <asp:TextBox ID="WF_SEL_SEARCH_AVAILABLEDATE" runat="server"></asp:TextBox> <!-- 利用可能日 -->
 
     <asp:TextBox ID="WF_SEL_SELECT" runat="server"></asp:TextBox>           <!-- ステータス選択 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>          <!-- 選択行 -->

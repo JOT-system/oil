@@ -143,6 +143,15 @@ Public Class OIT0002LinkList
                 WF_MAPpermitcode.Value = "FALSE"
             End If
 
+            '### 20201216 START 指摘票対応(No263)全体 ####################################### 
+            '○ (過去)貨車連結順序表(活性・非活性)設定
+            If work.WF_SEL_SEARCH_AVAILABLEDATE.Text <> "" Then
+                WF_PastLinkList.Value = "TRUE"
+            Else
+                WF_PastLinkList.Value = "FALSE"
+            End If
+            '### 20201216 END   指摘票対応(No263)全体 ####################################### 
+
         Finally
             '○ 格納Table Close
             If Not IsNothing(OIT0002tbl) Then
@@ -370,8 +379,7 @@ Public Class OIT0002LinkList
               " FROM oil.OIT0011_RLINK OIT0011 " _
             & " INNER JOIN oil.OIT0004_LINK OIT0004 ON " _
             & "     OIT0004.LINKNO       = OIT0011.LINKNO " _
-            & " AND OIT0004.LINKDETAILNO = OIT0011.RLINKDETAILNO " _
-            & " AND OIT0004.STATUS       = '1' "
+            & " AND OIT0004.LINKDETAILNO = OIT0011.RLINKDETAILNO "
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '返送列車番号
@@ -379,9 +387,20 @@ Public Class OIT0002LinkList
             SQLStr &= String.Format(" AND OIT0004.TRAINNO      = '{0}'", work.WF_SEL_SEARCH_BTRAINNO.Text)
         End If
 
+        '### 20201216 START 指摘票対応(No263)全体 ####################################### 
+        If work.WF_SEL_SEARCH_AVAILABLEDATE.Text = "" Then
+            SQLStr &=
+              " AND OIT0004.STATUS       = '1' " _
+            & " AND OIT0004.EMPARRDATE  >= @P01 "
+        Else
+            SQLStr &=
+              " AND OIT0004.STATUS       = '2' " _
+            & String.Format(" AND OIT0004.AVAILABLEYMD = '{0}'", work.WF_SEL_SEARCH_AVAILABLEDATE.Text)
+        End If
+        '### 20201216 START 指摘票対応(No263)全体 ####################################### 
+
         SQLStr &=
-              " AND OIT0004.EMPARRDATE  >= @P01 " _
-            & " AND OIT0004.DELFLG      <> @P02 " _
+              " AND OIT0004.DELFLG      <> @P02 " _
             & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
             & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
 

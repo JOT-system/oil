@@ -106,6 +106,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- (過去)貨車連結順序表フラグ -->
+            <input id="WF_PastLinkList" runat="server" value="" type="text" />
             <!-- 権限 -->
         </div>
  

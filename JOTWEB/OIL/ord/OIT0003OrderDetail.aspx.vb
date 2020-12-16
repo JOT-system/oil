@@ -15732,7 +15732,9 @@ Public Class OIT0003OrderDetail
             '### 20201210 START 指摘票対応(No259) ####################################
             '※他PCよりタンク車所在の変更が伴うことがあるため再度チェックする
             '★タンク車№に紐づく情報を取得
-            WW_TANKNUMBER_FIND(OIT0003row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+            If OIT0003row("TANKNO") <> "" Then
+                WW_TANKNUMBER_FIND(OIT0003row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+            End If
             '### 20201210 END   指摘票対応(No259) ####################################
 
             '### 20200701 START((全体)No96対応) ######################################

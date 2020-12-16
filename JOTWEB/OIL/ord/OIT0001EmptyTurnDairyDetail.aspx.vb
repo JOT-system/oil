@@ -3442,7 +3442,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             '### 20201210 START 指摘票対応(No259) ####################################
             '※他PCよりタンク車所在の変更が伴うことがあるため再度チェックする
             '★タンク車№に紐づく情報を取得
-            WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+            If OIT0001row("TANKNO") <> "" Then
+                WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+            End If
             '### 20201210 END   指摘票対応(No259) ####################################
 
             '### 20200915 START((全体)No139対応) ######################################

@@ -2774,7 +2774,7 @@ Public Class OIT0003OrderList
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
                 '充填ポイント表(ラジオボタン)を表示
-                'Me.rbFillingPointBtn.Visible = True
+                Me.rbFillingPointBtn.Visible = True
 
             '◯甲子営業所
             Case BaseDllConst.CONST_OFFICECODE_011202

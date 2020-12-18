@@ -31,7 +31,7 @@
             & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
             & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
             & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
-            & " , OIT0002.EMPARRDATE                             AS EMPARRDATE" _
+            & " , OIT0002_OTHER.EMPARRDATE                       AS EMPARRDATE" _
             & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
             & " , OIT0003.ACTUALDEPDATE                          AS ACTUALDEPDATE" _
             & " , OIT0003.ACTUALARRDATE                          AS ACTUALARRDATE" _
@@ -55,6 +55,8 @@
             & " , OIT0003.JOINTCODE                              AS JOINTCODE" _
             & " , OIT0003.JOINT                                  AS JOINT" _
             & " , OIT0003.REMARK                                 AS REMARK" _
+            & " , OIT0003.SECONDCONSIGNEECODE                    AS SECONDCONSIGNEECODE" _
+            & " , OIT0003.SECONDCONSIGNEENAME                    AS SECONDCONSIGNEENAME" _
             & " , OIM0003.BIGOILCODE                             AS BIGOILCODE" _
             & " , OIM0003.BIGOILNAME                             AS BIGOILNAME" _
             & " , OIM0003.MIDDLEOILCODE                          AS MIDDLEOILCODE" _

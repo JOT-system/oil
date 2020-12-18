@@ -3987,7 +3987,12 @@ Public Class OIT0002LinkList
                         AndAlso Convert.ToString(OIT0002row("POSITION")) <> "" Then
                         '発送順
                         Try
-                            P_SHIPORDER.Value = (intListCnt - Integer.Parse(OIT0002row("POSITION")) + 1)
+                            '### 20201218 START 指摘票対応(No277)全体 #############################
+                            '★アップロード時点では発送順は設定しない
+                            '　※複数ファイルにて受注を作成する場合、発送順を設定できないため
+                            P_SHIPORDER.Value = ""
+                            'P_SHIPORDER.Value = (intListCnt - Integer.Parse(OIT0002row("POSITION")) + 1)
+                            '### 20201218 START 指摘票対応(No277)全体 #############################
                         Catch ex As Exception
                             P_SHIPORDER.Value = ""
                         End Try

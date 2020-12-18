@@ -311,6 +311,25 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "荷主"
+    ''' <summary>
+    ''' ENEOS
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0005700010 As String = "0005700010"
+    ''' <summary>
+    ''' コスモ
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0094000010 As String = "0094000010"
+    ''' <summary>
+    ''' 出光昭和シェル
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0122700010 As String = "0122700010"
+    ''' <summary>
+    ''' キグナス石油
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_9999999999 As String = "9999999999"
+#End Region
+
 #Region "基地"
     ''' <summary>
     ''' ENEOS仙台

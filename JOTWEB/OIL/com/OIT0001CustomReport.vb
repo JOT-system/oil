@@ -290,6 +290,17 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         '★袖ヶ浦営業所の場合
         If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+            '### 20201218 START 指摘票対応(No277)全体 #############################
+            '◯ 荷主名が「出光昭和シェル」の場合
+            If Convert.ToString(PrintDatarow("SHIPPERSNAME")) = "出光昭和シェル" Then
+                '◯ 荷主名
+                I_rngDetailArea = Me.ExcelWorkSheet.Range("C" + I_column.ToString())
+                I_rngDetailArea.Value = "出光興産"
+                ExcelMemoryRelease(I_rngDetailArea)
+            End If
+            '### 20201218 END   指摘票対応(No277)全体 #############################
+
             '◯ タンク車番号
             I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
             If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
@@ -337,7 +348,13 @@ Public Class OIT0001CustomReport : Implements IDisposable
             '◯ 記事
             I_rngDetailArea = Me.ExcelWorkSheet.Range("R" + I_column.ToString())
             'I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
-            I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+            '### 20201218 START 指摘票対応(No276)全体 ###################################################
+            If Convert.ToString(PrintDatarow("SECONDCONSIGNEECODE")) = BaseDllConst.CONST_CONSIGNEECODE_54 Then
+                I_rngDetailArea.Value = "構内取り"
+            Else
+                I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+            End If
+            '### 20201218 START 指摘票対応(No276)全体 ###################################################
             ExcelMemoryRelease(I_rngDetailArea)
             '### 20201008 END   指摘票対応(No157)全体 ###################################################
         Else

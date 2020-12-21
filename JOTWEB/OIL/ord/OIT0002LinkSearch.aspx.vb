@@ -109,6 +109,9 @@ Public Class OIT0002LinkSearch
             WF_ORG.Text = work.WF_SEL_ORG.Text                          '組織コード
             Me.TxtBTrainNo.Text = work.WF_SEL_SEARCH_BTRAINNO.Text      '返送列車番号
             Me.TxtEmparrDate.Text = work.WF_SEL_SEARCH_EMPARRDATE.Text  '空車着日
+            '### 20201216 START 指摘票対応(No263)全体 #######################################
+            Me.WF_STYMD_CODE.Text = work.WF_SEL_SEARCH_AVAILABLEDATE.Text   '利用可能日
+            '### 20201216 END   指摘票対応(No263)全体 #######################################
 
         End If
 
@@ -147,6 +150,7 @@ Public Class OIT0002LinkSearch
         Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
         Master.EraseCharToIgnore(TxtBTrainNo.Text)          '返送列車番号
         Master.EraseCharToIgnore(TxtEmparrDate.Text)        '空車着日
+        Master.EraseCharToIgnore(WF_STYMD_CODE.Text)        '利用可能日
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -160,6 +164,9 @@ Public Class OIT0002LinkSearch
         work.WF_SEL_SEARCH_BTRAINNO.Text = Me.TxtBTrainNo.Text      '返送列車番号
         work.WF_SEL_SEARCH_BTRAINNAME.Text = Me.LblBTrainNo.Text    '返送列車名
         work.WF_SEL_SEARCH_EMPARRDATE.Text = Me.TxtEmparrDate.Text  '空車着日
+        '### 20201216 START 指摘票対応(No263)全体 #######################################
+        work.WF_SEL_SEARCH_AVAILABLEDATE.Text = Me.WF_STYMD_CODE.Text   '利用可能日
+        '### 20201216 END   指摘票対応(No263)全体 #######################################
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -183,6 +190,7 @@ Public Class OIT0002LinkSearch
 
         O_RTN = ""
         Dim WW_TEXT As String = ""
+        Dim WW_STYMD As Date
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim dateErrFlag As String = ""
@@ -240,6 +248,25 @@ Public Class OIT0002LinkSearch
         Else
             Me.TxtEmparrDate.Text = CDate(Me.TxtEmparrDate.Text).ToString("yyyy/MM/dd")
         End If
+
+        '### 20201216 START 指摘票対応(No263)全体 #######################################
+        '○ 利用可能日
+        If Me.WF_STYMD_CODE.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", Me.WF_STYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(Me.WF_STYMD_CODE.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "利用可能日", needsPopUp:=True)
+                Me.WF_STYMD_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+        '### 20201216 END   指摘票対応(No263)全体 #######################################
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
@@ -416,6 +443,20 @@ Public Class OIT0002LinkSearch
                 End Try
                 Me.TxtEmparrDate.Focus()
 
+            Case "WF_STYMD"                  '利用可能日
+                '### 20201216 START 指摘票対応(No263)全体 #######################################
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.WF_STYMD_CODE.Text = ""
+                    Else
+                        Me.WF_STYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.WF_STYMD_CODE.Focus()
+                '### 20201216 END   指摘票対応(No263)全体 #######################################
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

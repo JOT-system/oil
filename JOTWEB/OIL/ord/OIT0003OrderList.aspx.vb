@@ -2362,7 +2362,8 @@ Public Class OIT0003OrderList
     ''' <param name="O_TEXT"></param>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String,
+                               Optional ByVal I_OFFICECODE As String = Nothing)
 
         O_TEXT = ""
         O_RTN = ""
@@ -2393,6 +2394,11 @@ Public Class OIT0003OrderList
 
                 Case "ORDERINFO"        '受注情報
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
+
+                Case "CTRAINNUMBER"     '列車番号(在線)
+                    If Not IsNothing(I_OFFICECODE) Then
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CTRAINNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE, "CTRAINNUMBER_FIND"))
+                    End If
 
             End Select
         Catch ex As Exception
@@ -2768,7 +2774,7 @@ Public Class OIT0003OrderList
                 '出荷予定(ラジオボタン)を表示
                 Me.rbShipBtn.Visible = True
                 '充填ポイント表(ラジオボタン)を表示
-                'Me.rbFillingPointBtn.Visible = True
+                Me.rbFillingPointBtn.Visible = True
 
             '◯甲子営業所
             Case BaseDllConst.CONST_OFFICECODE_011202
@@ -3500,6 +3506,7 @@ Public Class OIT0003OrderList
                     ExcelSodegauraKuukaiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
 
+                'Using repCbj = New OIT0001CustomReport("OIT0001D", "OIT0001D" & "_SODEGAURA.xlsx", OIT0003ReportSodegauratbl)
                 Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
@@ -4908,6 +4915,8 @@ Public Class OIT0003OrderList
 
                 Dim i As Integer = 0
                 Dim strTrainNosave As String = ""
+                Dim strRTrainNamesave As String = ""
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
 
                     If strTrainNosave <> "" _
@@ -4921,9 +4930,23 @@ Public Class OIT0003OrderList
                     'O_officeCode = Convert.ToString(OIT0003Reprow("OFFICECODE"))
 
                     If OIT0003Reprow("RETURNDATETRAINNO").ToString() <> "" Then
-                        '返送列車
-                        CODENAME_get("CTRAINNUMBER", OIT0003Reprow("RETURNDATETRAINNO").ToString(), OIT0003Reprow("RETURNDATETRAIN").ToString(), WW_DUMMY)
-                        If OIT0003Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0003Reprow("RETURNDATETRAIN") = OIT0003Reprow("RETURNDATETRAINNO")
+                        If OIT0003Reprow("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011203 Then
+                            '### 20201216 START 指摘票対応(No266)全体 ##################################################
+                            '返送列車
+                            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                            WW_FixvalueMasterSearch(BaseDllConst.CONST_OFFICECODE_011203, "CTRAINNUMBER_FIND", OIT0003Reprow("RETURNDATETRAINNO").ToString(), WW_GetValue)
+                            If WW_GetValue(3) = "" Then
+                                OIT0003Reprow("RETURNDATETRAIN") = OIT0003Reprow("RETURNDATETRAINNO")
+                            Else
+                                OIT0003Reprow("RETURNDATETRAIN") = WW_GetValue(3)
+                            End If
+                            '### 20201216 END   指摘票対応(No266)全体 ##################################################
+                        Else
+                            '返送列車
+                            CODENAME_get("CTRAINNUMBER", OIT0003Reprow("RETURNDATETRAINNO").ToString(), strRTrainNamesave, WW_DUMMY, I_OFFICECODE:=OIT0003Reprow("OFFICECODE"))
+                            OIT0003Reprow("RETURNDATETRAIN") = strRTrainNamesave
+                            If OIT0003Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0003Reprow("RETURNDATETRAIN") = OIT0003Reprow("RETURNDATETRAINNO")
+                        End If
                     End If
                     strTrainNosave = Convert.ToString(OIT0003Reprow("TRAINNO"))
                 Next

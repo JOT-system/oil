@@ -155,7 +155,14 @@ Public Class OIT0002LinkDetail
             Else
                 WF_CREATEFLG.Value = "2"
                 If WF_PANELFLG.Value <> "1" Then
-                    WF_PANELFLG.Value = "1"
+                    '### 20201216 START 指摘票対応(No263)全体 #######################################
+                    '○ (過去)貨車連結順序表(活性・非活性)設定
+                    If work.WF_SEL_SEARCH_AVAILABLEDATE.Text <> "" Then
+                        WF_PANELFLG.Value = "2"
+                    Else
+                        WF_PANELFLG.Value = "1"
+                    End If
+                    '### 20201216 END   指摘票対応(No263)全体 #######################################
                 End If
             End If
         Finally
@@ -550,7 +557,7 @@ Public Class OIT0002LinkDetail
                 & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
                 & "     OIT0004.LINKNO       = OIT0011.LINKNO" _
                 & " AND OIT0004.LINKDETAILNO = OIT0011.RLINKDETAILNO " _
-                & " AND OIT0004.STATUS       = '1' " _
+                & " AND OIT0004.STATUS       = @P12 " _
                 & " AND OIT0004.DELFLG      <> @P09 " _
                 & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
                 & "     OIT0011.TRUCKNO = OIM0005.TANKNUMBER " _
@@ -604,6 +611,7 @@ Public Class OIT0002LinkDetail
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Date)         '登録年月日
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar)     'タンク車状況コード
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar)     'ステータス
 
                 PARA01.Value = O_INSCNT
                 If work.WF_SEL_RLINKNO.Text <> "" Then
@@ -626,6 +634,15 @@ Public Class OIT0002LinkDetail
                 PARA09.Value = C_DELETE_FLG.DELETE
                 PARA10.Value = Now.ToString("yyyy/MM/dd")
                 PARA11.Value = BaseDllConst.CONST_TANKSITUATION_13
+
+                '### 20201216 START 指摘票対応(No263)全体 ####################################### 
+                '○ (過去)貨車連結順序表(活性・非活性)設定
+                If work.WF_SEL_SEARCH_AVAILABLEDATE.Text <> "" Then
+                    PARA12.Value = "2"
+                Else
+                    PARA12.Value = "1"
+                End If
+                '### 20201216 END   指摘票対応(No263)全体 ####################################### 
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -5990,7 +6007,10 @@ Public Class OIT0002LinkDetail
                     If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
 
                     '★(一覧)の営業所が受注営業所コード(テキストボックス)と不一致の場合は入力制限する。
-                ElseIf loopdr("OFFICECODE") <> work.WF_SEL_OFFICECODE.Text Then
+                    '### 20201216 指摘票対応(No263)全体 #############################################
+                    '★貨車連結順序表(検索)画面で利用可能日を設定している場合(過去の貨車連結順序表を表示)
+                ElseIf (loopdr("OFFICECODE") <> work.WF_SEL_OFFICECODE.Text) _
+                    OrElse work.WF_SEL_SEARCH_AVAILABLEDATE.Text <> "" Then
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _

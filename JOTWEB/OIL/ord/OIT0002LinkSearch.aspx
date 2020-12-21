@@ -65,6 +65,14 @@
                 </a>
                 <a id="WF_EMPARRDATE_SYMBOL_LABEL" >～</a>
             </div>
+            <!-- 利用可能日 -->
+            <div class="inputItem">
+                <a id="WF_STYMD_LABEL">利用可能日</a>
+                <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                </a>
+                <a id="WF_STYMD_REMARK_LABEL">※過去の貨車連結順序表を参照</a>
+            </div>
 
 <%-- ### 20200722 START 貨車連結順序表(検索)の見直しに伴い削除 ##########
             <!-- 空車着駅（発駅）コード -->

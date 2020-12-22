@@ -156,15 +156,7 @@ Public Class EntryHistory
                 .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = drOrder("TAKUSOUSTATUS")
                 .Add("BTRAINNO", SqlDbType.NVarChar).Value = drOrder("BTRAINNO")
                 .Add("BTRAINNAME", SqlDbType.NVarChar).Value = drOrder("BTRAINNAME")
-                Try
-                    .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
-                Catch ex As Exception
-                    If .Contains("ANASYORIFLG") Then
-                        .Item("ANASYORIFLG").Value = ""
-                    Else
-                        .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
@@ -246,29 +238,13 @@ Public Class EntryHistory
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
                 .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
-                Try
-                    .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = drOrder("WHOLESALEFLG")
-                Catch ex As Exception
-                    If .Contains("WHOLESALEFLG") Then
-                        .Item("WHOLESALEFLG").Value = ""
-                    Else
-                        .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = drOrder("WHOLESALEFLG")
                 .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
                 .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = drOrder("DETENTIONFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
-                Try
-                    .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = drOrder("UPGRADEFLG")
-                Catch ex As Exception
-                    If .Contains("UPGRADEFLG") Then
-                        .Item("UPGRADEFLG").Value = ""
-                    Else
-                        .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = drOrder("UPGRADEFLG")
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
@@ -313,24 +289,8 @@ Public Class EntryHistory
                 .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
                 .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
                 .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
-                Try
-                    .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
-                Catch ex As Exception
-                    If .Contains("ANASYORIFLG") Then
-                        .Item("ANASYORIFLG").Value = ""
-                    Else
-                        .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = drOrder("VOLSYORIFLG")
-                Catch ex As Exception
-                    If .Contains("VOLSYORIFLG") Then
-                        .Item("VOLSYORIFLG").Value = ""
-                    Else
-                        .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
+                .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = drOrder("VOLSYORIFLG")
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")

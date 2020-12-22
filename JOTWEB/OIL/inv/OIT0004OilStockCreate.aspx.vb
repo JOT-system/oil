@@ -2878,6 +2878,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.TAKUSOUSTATUS),'')    AS TAKUSOUSTATUS")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.BTRAINNO),'')         AS BTRAINNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.BTRAINNAME),'')       AS BTRAINNAME")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.ANASYORIFLG),'')      AS ANASYORIFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.DELFLG),'')           AS DELFLG")
         sqlStat.AppendLine("      ,format(ODR.INITYMD,'yyyy/MM/dd HH:mm:ss.fff')    AS INITYMD")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.INITUSER),'')         AS INITUSER")
@@ -2987,6 +2988,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.FIRSTRETURNFLG),'')          AS FIRSTRETURNFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.AFTERRETURNFLG),'')          AS AFTERRETURNFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.OTTRANSPORTFLG),'')          AS OTTRANSPORTFLG")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.UPGRADEFLG),'')              AS UPGRADEFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.ORDERINFO),'')               AS ORDERINFO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.SHIPPERSCODE),'')            AS SHIPPERSCODE")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.SHIPPERSNAME),'')            AS SHIPPERSNAME")
@@ -3031,6 +3033,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.PAYMENT),'')           AS PAYMENT")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.PAYMENTTAX),'')        AS PAYMENTTAX")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.TOTALPAYMENT),'')      AS TOTALPAYMENT")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.ANASYORIFLG),'')            AS ANASYORIFLG")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.VOLSYORIFLG),'')            AS VOLSYORIFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.DELFLG),'')            AS DELFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(format(DTL.INITYMD,'yyyy/MM/dd HH:mm:ss.fff')),'')    AS INITYMD")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.INITUSER),'')          AS INITUSER")
@@ -4336,7 +4340,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
         sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
         sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,BILLINGNO,KEIJYOYMD,")
-        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,BTRAINNO,BTRAINNAME,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,BTRAINNO,BTRAINNAME,ANASYORIFLG,")
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
         sqlStat.AppendLine("    VALUES")
@@ -4353,7 +4357,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
         sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
         sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@BILLINGNO,@KEIJYOYMD,")
-        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,@BTRAINNO,@BTRAINNAME,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,@BTRAINNO,@BTRAINNAME,@ANASYORIFLG,")
         sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
@@ -4458,6 +4462,7 @@ Public Class OIT0004OilStockCreate
                 .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = orderItm.TakusouStatus
                 .Add("BTRAINNO", SqlDbType.NVarChar).Value = orderItm.BTrainNo
                 .Add("BTRAINNAME", SqlDbType.NVarChar).Value = orderItm.BTrainName
+                .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = orderItm.AnaSyoriFlg
                 .Add("DELFLG", SqlDbType.NVarChar).Value = orderItm.DelFlg
                 .Add("INITYMD", SqlDbType.DateTime).Value = orderItm.InitYmd
                 .Add("INITUSER", SqlDbType.NVarChar).Value = orderItm.InitUser
@@ -4651,7 +4656,7 @@ Public Class OIT0004OilStockCreate
     Public Sub InsertOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("INSERT INTO OIL.OIT0003_DETAIL")
-        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGORDERNO,STACKINGFLG,WHOLESALEFLG,INSPECTIONFLG,DETENTIONFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
+        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGORDERNO,STACKINGFLG,WHOLESALEFLG,INSPECTIONFLG,DETENTIONFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,UPGRADEFLG,ORDERINFO,")
         sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,")
         sqlStat.AppendLine("    ORDERINGTYPE,ORDERINGOILNAME,")
         sqlStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
@@ -4665,11 +4670,11 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    LOADINGIRILINEORDER,LOADINGOUTLETTRAINNO,")
         sqlStat.AppendLine("    LOADINGOUTLETTRAINNAME,LOADINGOUTLETORDER,")
         sqlStat.AppendLine("    ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,RESERVEDNO,OTSENDCOUNT,DLRESERVEDCOUNT,DLTAKUSOUCOUNT,")
-        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,ANASYORIFLG,VOLSYORIFLG,")
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlStat.AppendLine("    VALUES")
-        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGORDERNO,@STACKINGFLG,@WHOLESALEFLG,@INSPECTIONFLG,@DETENTIONFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
+        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGORDERNO,@STACKINGFLG,@WHOLESALEFLG,@INSPECTIONFLG,@DETENTIONFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@UPGRADEFLG,@ORDERINFO,")
         sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,")
         sqlStat.AppendLine("    @ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
@@ -4683,7 +4688,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    @LOADINGIRILINEORDER,@LOADINGOUTLETTRAINNO,")
         sqlStat.AppendLine("    @LOADINGOUTLETTRAINNAME,@LOADINGOUTLETORDER,")
         sqlStat.AppendLine("    @ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,@RESERVEDNO,@OTSENDCOUNT,@DLRESERVEDCOUNT,@DLTAKUSOUCOUNT,")
-        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@ANASYORIFLG,@VOLSYORIFLG,")
         sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
 
@@ -4703,6 +4708,7 @@ Public Class OIT0004OilStockCreate
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = detailItem.FirstReturnFlg
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = detailItem.AfterReturnFlg
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = detailItem.OtTransportFlg
+                .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = detailItem.UpgradeFlg
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = detailItem.OrderInfo
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = detailItem.ShippersCode
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = detailItem.ShippersName
@@ -4747,6 +4753,10 @@ Public Class OIT0004OilStockCreate
                 .Add("PAYMENT", SqlDbType.NVarChar).Value = detailItem.Payment
                 .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = detailItem.PaymentTax
                 .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = detailItem.TotalPayment
+
+                .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = detailItem.AnaSyoriFlg
+                .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = detailItem.VolSyoriFlg
+
                 .Add("DELFLG", SqlDbType.NVarChar).Value = detailItem.DelFlg
                 .Add("INITYMD", SqlDbType.NVarChar).Value = detailItem.InitYmd
                 .Add("INITUSER", SqlDbType.NVarChar).Value = detailItem.InitUser
@@ -7266,6 +7276,7 @@ Public Class OIT0004OilStockCreate
             Me.TakusouStatus = "0"
             Me.BTrainNo = ""
             Me.BTrainName = ""
+            Me.AnaSyoriFlg = ""
             Me.DelFlg = C_DELETE_FLG.ALIVE
             Me.InitYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
             Me.InitUser = userID
@@ -7389,6 +7400,7 @@ Public Class OIT0004OilStockCreate
             Me.TakusouStatus = Convert.ToString(sqlDr("TAKUSOUSTATUS"))
             Me.BTrainNo = Convert.ToString(sqlDr("BTRAINNO"))
             Me.BTrainName = Convert.ToString(sqlDr("BTRAINNAME"))
+            Me.AnaSyoriFlg = Convert.ToString(sqlDr("ANASYORIFLG"))
             Me.DelFlg = Convert.ToString(sqlDr("DELFLG"))
             Me.InitYmd = Convert.ToString(sqlDr("INITYMD"))
             Me.InitUser = Convert.ToString(sqlDr("INITUSER"))
@@ -7902,6 +7914,12 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property BTrainName As String
         ''' <summary>
+        ''' 分析テーブル処理フラグ(1:取込済み)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property AnaSyoriFlg As String
+
+        ''' <summary>
         ''' 削除フラグ
         ''' </summary>
         ''' <returns></returns>
@@ -8059,7 +8077,7 @@ Public Class OIT0004OilStockCreate
                     "OTHER1OTANKCH", "OTHER2OTANKCH", "OTHER3OTANKCH", "OTHER4OTANKCH", "OTHER5OTANKCH",
                     "OTHER6OTANKCH", "OTHER7OTANKCH", "OTHER8OTANKCH", "OTHER9OTANKCH", "OTHER10OTANKCH",
                     "TOTALTANKCH", "TANKLINKNO", "TANKLINKNOMADE", "BILLINGNO", "KEIJYOYMD",
-                    "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT", "OTFILENAME", "RECEIVECOUNT", "OTSENDSTATUS", "RESERVEDSTATUS", "TAKUSOUSTATUS", "BTRAINNO", "BTRAINNAME",
+                    "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT", "OTFILENAME", "RECEIVECOUNT", "OTSENDSTATUS", "RESERVEDSTATUS", "TAKUSOUSTATUS", "BTRAINNO", "BTRAINNAME", "ANASYORIFLG",
                     "DELFLG", "INITYMD", "INITUSER", "INITTERMID", "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"}
                 For Each fieldName In fieldList
                     .Add(fieldName, GetType(String))
@@ -8166,6 +8184,7 @@ Public Class OIT0004OilStockCreate
             dr("TAKUSOUSTATUS") = Me.TakusouStatus
             dr("BTRAINNO") = Me.BTrainNo
             dr("BTRAINNAME") = Me.BTrainName
+            dr("ANASYORIFLG") = Me.AnaSyoriFlg
             dr("DELFLG") = Me.DelFlg
             dr("INITYMD") = Me.InitYmd
             dr("INITUSER") = Me.InitUser
@@ -8260,6 +8279,7 @@ Public Class OIT0004OilStockCreate
             Me.FirstReturnFlg = "2"
             Me.AfterReturnFlg = "2"
             Me.OtTransportFlg = "2"
+            Me.UpgradeFlg = "2"
             Me.OrderInfo = ""
             Me.ShippersCode = dispDataClass.Shipper
             Me.ShippersName = dispDataClass.ShipperName
@@ -8311,6 +8331,8 @@ Public Class OIT0004OilStockCreate
             Me.Payment = "0"
             Me.PaymentTax = "0"
             Me.TotalPayment = "0"
+            Me.AnaSyoriFlg = ""
+            Me.VolSyoriFlg = ""
             Me.DelFlg = C_DELETE_FLG.ALIVE
             Me.InitYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
             Me.InitUser = userID
@@ -8346,6 +8368,7 @@ Public Class OIT0004OilStockCreate
             Me.FirstReturnFlg = Convert.ToString(sqlDr("FIRSTRETURNFLG"))
             Me.AfterReturnFlg = Convert.ToString(sqlDr("AFTERRETURNFLG"))
             Me.OtTransportFlg = Convert.ToString(sqlDr("OTTRANSPORTFLG"))
+            Me.UpgradeFlg = Convert.ToString(sqlDr("UPGRADEFLG"))
             Me.OrderInfo = Convert.ToString(sqlDr("ORDERINFO"))
             Me.ShippersCode = Convert.ToString(sqlDr("SHIPPERSCODE"))
             Me.ShippersName = Convert.ToString(sqlDr("SHIPPERSNAME"))
@@ -8397,6 +8420,9 @@ Public Class OIT0004OilStockCreate
             Me.Payment = Convert.ToString(sqlDr("PAYMENT"))
             Me.PaymentTax = Convert.ToString(sqlDr("PAYMENTTAX"))
             Me.TotalPayment = Convert.ToString(sqlDr("TOTALPAYMENT"))
+
+            Me.AnaSyoriFlg = Convert.ToString(sqlDr("ANASYORIFLG"))
+            Me.VolSyoriFlg = Convert.ToString(sqlDr("VOLSYORIFLG"))
 
             Me.DelFlg = Convert.ToString(sqlDr("DELFLG"))
             Me.InitYmd = Convert.ToString(sqlDr("INITYMD"))
@@ -8478,6 +8504,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property OtTransportFlg As String
+        ''' <summary>
+        ''' 格上可否フラグ(１：格上あり、２：格上なし）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property UpgradeFlg As String
         ''' <summary>
         ''' 受注情報
         ''' </summary>
@@ -8699,6 +8730,17 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property TotalPayment As String
         ''' <summary>
+        ''' 分析テーブル処理フラグ (1:取込済み)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property AnaSyoriFlg As String
+        ''' <summary>
+        ''' 月間輸送量処理フラグ (1:取込済み)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property VolSyoriFlg As String
+
+        ''' <summary>
         ''' 削除フラグ
         ''' </summary>
         ''' <returns></returns>
@@ -8751,7 +8793,7 @@ Public Class OIT0004OilStockCreate
             Dim retDt As New DataTable
             With retDt.Columns
                 Dim fieldList As New List(Of String) From {
-                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGORDERNO", "STACKINGFLG", "WHOLESALEFLG", "INSPECTIONFLG", "DETENTIONFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "OTTRANSPORTFLG", "ORDERINFO",
+                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGORDERNO", "STACKINGFLG", "WHOLESALEFLG", "INSPECTIONFLG", "DETENTIONFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "OTTRANSPORTFLG", "UPGRADEFLG", "ORDERINFO",
                    "SHIPPERSCODE", "SHIPPERSNAME", "OILCODE", "OILNAME", "ORDERINGTYPE",
                    "ORDERINGOILNAME", "CARSNUMBER", "CARSAMOUNT", "RETURNDATETRAIN",
                    "JOINTCODE", "JOINT", "REMARK", "CHANGETRAINNO", "CHANGETRAINNAME",
@@ -8766,7 +8808,7 @@ Public Class OIT0004OilStockCreate
                    "ACTUALARRDATE", "ACTUALACCDATE",
                    "ACTUALEMPARRDATE", "RESERVEDNO", "OTSENDCOUNT", "DLRESERVEDCOUNT", "DLTAKUSOUCOUNT",
                    "SALSE", "SALSETAX", "TOTALSALSE",
-                   "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT",
+                   "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT", "ANASYORIFLG", "VOLSYORIFLG",
                    "DELFLG", "INITYMD", "INITUSER", "INITTERMID",
                    "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"
                  }
@@ -8790,6 +8832,7 @@ Public Class OIT0004OilStockCreate
             dr("FIRSTRETURNFLG") = Me.FirstReturnFlg
             dr("AFTERRETURNFLG") = Me.AfterReturnFlg
             dr("OTTRANSPORTFLG") = Me.OtTransportFlg
+            dr("UPGRADEFLG") = Me.UpgradeFlg
             dr("ORDERINFO") = Me.OrderInfo
             dr("SHIPPERSCODE") = Me.ShippersCode
             dr("SHIPPERSNAME") = Me.ShippersName
@@ -8834,6 +8877,8 @@ Public Class OIT0004OilStockCreate
             dr("PAYMENT") = Me.Payment
             dr("PAYMENTTAX") = Me.PaymentTax
             dr("TOTALPAYMENT") = Me.TotalPayment
+            dr("ANASYORIFLG") = Me.AnaSyoriFlg
+            dr("VOLSYORIFLG") = Me.VolSyoriFlg
             dr("DELFLG") = Me.DelFlg
             dr("INITYMD") = Me.InitYmd
             dr("INITUSER") = Me.InitUser

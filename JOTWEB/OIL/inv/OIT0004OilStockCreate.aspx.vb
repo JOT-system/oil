@@ -357,7 +357,7 @@ Public Class OIT0004OilStockCreate
         If setConsignee = "" Then
             Dim firstDay As Date
             Dim lastMonthDay As Date
-            With daysList.First.Value.ItemDate
+            With (From itm In daysList Where itm.Value.IsDispArea).First.Value.ItemDate
                 firstDay = New Date(.Year, .Month, 1)
                 lastMonthDay = firstDay.AddMonths(1).AddDays(1)
             End With
@@ -1133,8 +1133,9 @@ Public Class OIT0004OilStockCreate
     ''' <param name="baseDate">基準日</param>
     ''' <param name="daySpan">引数BaseDateを含む設定した日付情報を取得(初期値:7)</param>
     ''' <returns>キー：日付、値：日付アイテムクラス</returns>
-    ''' <remarks>基準日±発日期間の日付データを取得</remarks>
-    Private Function GetTargetDateList(sqlCon As SqlConnection, baseDate As String, Optional ByVal daySpan As Integer = 7, Optional isPrint As Boolean = False) As Dictionary(Of String, DaysItem)
+    ''' <remarks>基準日±発日期間の日付データを取得
+    ''' 2020/12/22 30日間表示に変更ByVal daySpan As Integer = 7 → 30</remarks>
+    Private Function GetTargetDateList(sqlCon As SqlConnection, baseDate As String, Optional ByVal daySpan As Integer = 30, Optional isPrint As Boolean = False) As Dictionary(Of String, DaysItem)
         Try
             Dim retVal As New Dictionary(Of String, DaysItem)
             '日付型に変換 検索条件よりわたってきている想定なので日付型に確実に変換できる想定
@@ -6424,13 +6425,14 @@ Public Class OIT0004OilStockCreate
         ''' <remarks>外部呼出用メソッド</remarks>
         Public Sub AutoSuggest(inventoryDays As Integer)
             '一旦0あり先頭
-            Dim fromDay As String = Me.StockDate.First.Value.KeyString
-            Dim toDay As String = Me.StockDate.First.Value.ItemDate.AddDays(inventoryDays - 1).ToString("yyyy/MM/dd")
+            Dim fromDay As String = (From itm In Me.StockDate Where itm.Value.IsDispArea).First.Value.KeyString
+            Dim toDay As String = (From itm In Me.StockDate Where itm.Value.IsDispArea).First.Value.ItemDate.AddDays(inventoryDays - 1).ToString("yyyy/MM/dd")
             '過去日を除く開始日＋inventryDaysが処理条件
             Dim targetDays = From itm In Me.StockDate
                              Where itm.Key >= fromDay AndAlso
                                    itm.Key <= toDay AndAlso
-                                   itm.Value.IsBeforeToday = False
+                                   itm.Value.IsBeforeToday = False AndAlso
+                                   itm.Value.IsDispArea
                              Order By itm.Key
                              Select itm.Key
             '処理日付が無ければそのまま終了

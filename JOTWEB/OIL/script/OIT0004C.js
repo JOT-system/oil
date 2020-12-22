@@ -23,6 +23,10 @@ function InitDisplay() {
     bindNumericKeyPressOnly(numInputBoxList);
     //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
+    //提案表積置列追加イベントバインド
+    bindAppendSuggestTsumiColumn();
+    //提案表のコンボボックス選択肢のデフォルト日数非表示処理
+    hideSuggestAccdaysDropDownItem();
     //油種表示非表示設定復元
     let hdnChgConsigneeFirstLoadObj = document.getElementById('hdnChgConsigneeFirstLoad');
 
@@ -148,6 +152,43 @@ function summarySuggestValues(suggestColTextList, summaryColText, miSummaryColTe
         }
     }
 }
+/* 提案表の積置列追加削除ボタンイベント */
+function bindAppendSuggestTsumiColumn() {
+    let appendButtonList = document.querySelectorAll('.suggestDayAddRemove');
+    if (appendButtonList === null) {
+        return;
+    }
+    if (appendButtonList.length === 0) {
+        return;
+    }
+
+}
+/* 提案表の発日日数非表示処理 */
+function hideSuggestAccdaysDropDownItem() {
+    let dropDonwObjList = document.querySelectorAll('.ddlSuggestAccdays');
+
+    if (dropDonwObjList === null) {
+        return;
+    }
+    if (dropDonwObjList.length === 0) {
+        return;
+    }
+    for (let i = 0; i < dropDonwObjList.length; i++) {
+        let ddlObj = dropDonwObjList[i];
+        let hideVal = ddlObj.dataset.hideval;
+        if (hideVal === null) {
+            continue;
+        }
+
+        let ddlHideItem = ddlObj.querySelector("option[value='" + hideVal + "']");
+        if (ddlHideItem === null) {
+            continue;
+        }
+        ddlObj.removeChild(ddlHideItem);
+    }
+
+
+}
 /* 油種行の表示非表示切替イベントバインド */
 function bindDipsOiltypeStockList() {
     let listDispObj = document.getElementById('lstDispStockOilType');
@@ -250,7 +291,7 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
         let suggestSecondColInsideDiv = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"])');
         let suggestSecondColInsideDivWithOutMi = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"]):not([data-mi])').length;
         let wholeHeight = suggestSecondColInsideDiv.length * 24;
-        let titleHeight = (suggestSecondColInsideDivWithOutMi - 3) * 24;
+        let titleHeight = (suggestSecondColInsideDivWithOutMi - 4) * 24;
         let mititleHeight = (suggestSecondColInsideDiv.length - suggestSecondColInsideDivWithOutMi) * 24;
         suggestListObj.style.height = wholeHeight.toString() + 'px';
         suggestListLeftTitle.style.height = titleHeight.toString() + 'px';

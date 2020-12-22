@@ -15642,6 +15642,7 @@ Public Class OIT0003OrderDetail
             If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
 
                 '### 20201110 START 指摘票対応(No218)全体 #############################################################
+                '### 20201222 三重塩浜営業所も対象 ####################################################################
                 If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
                         AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681) _
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -15649,7 +15650,8 @@ Public Class OIT0003OrderDetail
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
                         AndAlso Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8685) _
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) Then
+                        AndAlso Me.TxtTrainNo.Text = CONST_KINOENE_TRAINNO_8685) _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
 
                     '### タブ<タンク車割当>でのチェックは不要(※タブ<タンク車明細>にて必須チェックとする) #############
                     WW_SHIPORDER = "0"

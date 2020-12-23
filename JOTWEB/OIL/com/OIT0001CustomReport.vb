@@ -309,6 +309,12 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 I_rngDetailArea.Value = PrintDatarow("TANKNO")
             End If
             ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 油種(OT油種)
+            If Convert.ToString(PrintDatarow("OTOILNAME")) = "軽油3" Then
+                I_rngDetailArea = Me.ExcelWorkSheet.Range("E" + I_column.ToString())
+                I_rngDetailArea.Value = "3ケ"
+                ExcelMemoryRelease(I_rngDetailArea)
+            End If
             '◯ 前回油種(OT油種)
             I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
             If Convert.ToString(PrintDatarow("LASTOTOILNAME")) = "軽油3" Then

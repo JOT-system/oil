@@ -41,6 +41,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private PrintData As DataTable
     Private xlProcId As Integer
 
+    Private KinoeneYusoujyoName As String = "OIREC(大阪国際石油精製)"
+
     Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
 
@@ -145,7 +147,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Case "LOADPLAN"
                     '***** TODO処理 ここから *****
                     '◯ヘッダーの設定
-                    EditLoadHeaderArea(lodDate)
+                    EditLoadHeaderArea(lodDate, officeCode)
                     '◯明細の設定
                     EditLoadDetailArea(officeCode)
                     '***** TODO処理 ここまで *****
@@ -193,7 +195,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(積込指示書(共通))
     ''' </summary>
-    Private Sub EditLoadHeaderArea(ByVal lodDate As String)
+    Private Sub EditLoadHeaderArea(ByVal lodDate As String, ByVal officeCode As String)
         Dim rngHeaderArea As Excel.Range = Nothing
         'Dim value As String = Now.AddDays(1).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
 
@@ -201,7 +203,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
             For Each PrintDatarow As DataRow In PrintData.Rows
                 '◯ 基地名
                 rngHeaderArea = Me.ExcelWorkSheet.Range("B1")
-                rngHeaderArea.Value = PrintDatarow("BASENAME")
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 Then
+                    rngHeaderArea.Value = KinoeneYusoujyoName
+                Else
+                    rngHeaderArea.Value = PrintDatarow("BASENAME")
+                End If
                 ExcelMemoryRelease(rngHeaderArea)
                 ''◯ 積込日
                 'Dim value As String = PrintDatarow("LODDATE").ToString

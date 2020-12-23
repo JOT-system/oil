@@ -1809,11 +1809,22 @@ Public Class OIT0003OrderDetail
 
         OIT0003tbl.Clear()
 
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データを受注テーブルから取得する
         Dim SQLStr As String = ""
         Dim SQLTempTblStr As String = ""
+        Dim SQLRTrainStr As String = ""
 
         SQLTempTblStr =
                   " DELETE FROM OIL.TMP0001ORDER; " _
@@ -2079,8 +2090,32 @@ Public Class OIT0003OrderDetail
         End If
         SQLTempTblStr &= SQLStr
 
+        SQLRTrainStr =
+              " SELECT " _
+            & "   OIT0011.INLINETRAIN " _
+            & " , COUNT(1) CNT " _
+            & " FROM oil.OIT0011_RLINK OIT0011 " _
+            & " INNER JOIN ( " _
+            & "   SELECT " _
+            & "     OIT0002.LODDATE " _
+            & "   , OIT0003.LOADINGIRILINETRAINNO " _
+            & "   FROM oil.OIT0003_DETAIL OIT0003 " _
+            & "   INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "       OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & "   AND OIT0002.DELFLG <> @P02 " _
+            & "   WHERE OIT0003.ORDERNO = @P01 " _
+            & "   GROUP BY " _
+            & "     OIT0002.LODDATE " _
+            & "   , OIT0003.LOADINGIRILINETRAINNO " _
+            & " ) DETAIL ON" _
+            & "     DETAIL.LODDATE = OIT0011.LOADINGLODDATE " _
+            & " AND DETAIL.LOADINGIRILINETRAINNO = OIT0011.INLINETRAIN " _
+            & " GROUP BY " _
+            & "   OIT0011.INLINETRAIN"
+
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
+                  SQLRTraincmd As New SqlCommand(SQLRTrainStr, SQLcon)
                 Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.Int)          '明細数(新規作成)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
@@ -2164,6 +2199,22 @@ Public Class OIT0003OrderDetail
                     WW_ORDERCNT = OIT0003tbl.Rows.Count
                 End Using
 
+                '列車(臨海)別の件数取得用
+                Dim PARARTRAIN01 As SqlParameter = SQLRTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARARTRAIN02 As SqlParameter = SQLRTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARARTRAIN01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARARTRAIN02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLRTraincmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
                 Dim i As Integer = 0
                 '〇 一覧の件数取得
                 Dim intListCnt As Integer = OIT0003tbl.Rows.Count
@@ -2185,6 +2236,7 @@ Public Class OIT0003OrderDetail
                         '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
                         '　※上記以外の営業所については、入力しないため値は未入力。
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                            intListCnt = OIT0003WKtbl.Rows(0)("CNT")
                             Try
                                 '発送順を自動設定(貨物駅入線順の値の逆値を設定する)
                                 OIT0003row("SHIPORDER") = (intListCnt - Integer.Parse(OIT0003row("LINEORDER")) + 1)

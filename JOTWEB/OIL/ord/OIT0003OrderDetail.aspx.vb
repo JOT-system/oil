@@ -9202,7 +9202,7 @@ Public Class OIT0003OrderDetail
             & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, OTTRANSPORTFLG = @P46" _
             & "        , UPGRADEFLG          = @P55, SHIPPERSCODE         = @P23, SHIPPERSNAME  = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE  = @P35" _
-            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE     = @P39, JOINT        = @P08" _
+            & "        , ORDERINGOILNAME     = @P36, JOINTCODE            = @P39, JOINT         = @P08" _
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
             & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
             & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
@@ -9222,7 +9222,7 @@ Public Class OIT0003OrderDetail
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG     , UPGRADEFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
-            & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN    , JOINTCODE           , JOINT" _
+            & "        , CARSNUMBER           , CARSAMOUNT             , JOINTCODE          , JOINT" _
             & "        , CHANGETRAINNO        , CHANGETRAINNAME        , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION     , SECONDARRSTATIONNAME   , CHANGERETSTATION   , CHANGERETSTATIONNAME" _
             & "        , LOADINGIRILINEORDER  , LOADINGOUTLETORDER     , ACTUALLODDATE" _
@@ -9237,7 +9237,7 @@ Public Class OIT0003OrderDetail
             & "        , @P42, @P45, @P46, @P55" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
-            & "        , @P06, @P25, @P07, @P39, @P08" _
+            & "        , @P06, @P25, @P39, @P08" _
             & "        , @P26, @P38, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
             & "        , @P43, @P44, @P47" _
@@ -9275,7 +9275,6 @@ Public Class OIT0003OrderDetail
             & "    , ORDERINGOILNAME" _
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
-            & "    , RETURNDATETRAIN" _
             & "    , JOINTCODE" _
             & "    , JOINT" _
             & "    , CHANGETRAINNO" _
@@ -9348,7 +9347,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 40)  '油種名(受発注用)
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
+                'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
                 Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar)      'ジョイントコード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
@@ -9456,7 +9455,7 @@ Public Class OIT0003OrderDetail
                     PARA36.Value = OIT0003row("ORDERINGOILNAME")      '油種名(受発注用)
                     PARA06.Value = "1"                                '車数
                     PARA25.Value = "0"                                '数量
-                    PARA07.Value = DBNull.Value                       '返送日列車
+                    'PARA07.Value = DBNull.Value                       '返送日列車
                     'PARA39.Value = DBNull.Value                       'ジョイントコード
                     PARA39.Value = OIT0003row("JOINTCODE")            'ジョイントコード
                     'PARA08.Value = DBNull.Value                       'ジョイント

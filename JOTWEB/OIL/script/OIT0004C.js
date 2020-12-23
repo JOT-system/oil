@@ -48,6 +48,8 @@ function InitDisplay() {
     commonBindMonthPicker();
     //ENEOSチェックイベントバインド
     bindEneosCheckBox();
+
+
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -173,21 +175,51 @@ function hideSuggestAccdaysDropDownItem() {
     if (dropDonwObjList.length === 0) {
         return;
     }
+    
     for (let i = 0; i < dropDonwObjList.length; i++) {
         let ddlObj = dropDonwObjList[i];
         let hideVal = ddlObj.dataset.hideval;
         if (hideVal === null) {
             continue;
         }
-
-        let ddlHideItem = ddlObj.querySelector("option[value='" + hideVal + "']");
-        if (ddlHideItem === null) {
-            continue;
+        let lodDate = new Date(ddlObj.dataset.loddate);
+        
+        let optionObjects = ddlObj.options;
+        for (let j = optionObjects.length - 1; j >= 0; j--) {
+            let optionObj = optionObjects[j];
+            if (optionObj.value === hideVal) {
+                ddlObj.removeChild(optionObj);
+                continue;
+            }
+            let opVal = 0;
+            if (optionObj.value === '') {
+                opVal = Number(hideVal);
+            } else {
+                opVal = Number(optionObj.value);
+            }
+            let accDate = new Date(ddlObj.dataset.loddate);
+            accDate.setDate(accDate.getDate() + opVal);
+            optionObj.text = formatDateItm(accDate,'MM/dd');
         }
-        ddlObj.removeChild(ddlHideItem);
+
+        //let ddlHideItem = ddlObj.querySelector("option[value='" + hideVal + "']");
+        //if (ddlHideItem === null) {
+        //    continue;
+        //}
+        //ddlObj.removeChild(ddlHideItem);
     }
 
 
+}
+/* 日付書式変換処理 */
+function formatDateItm(date, format) {
+
+    format = format.replace(/yyyy/, date.getFullYear());
+    format = format.replace(/MM/, ("00" + String(date.getMonth() + 1)).slice(-2));
+    format = format.replace(/M/, date.getMonth() + 1);
+    format = format.replace(/dd/, ("00" + String(date.getDate())).slice(-2));
+    format = format.replace(/d/, date.getDate());
+    return format;
 }
 /* 油種行の表示非表示切替イベントバインド */
 function bindDipsOiltypeStockList() {

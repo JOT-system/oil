@@ -83,7 +83,7 @@
                         </asp:Repeater>--%>
                         <%--  積置きの画面表示なし？ --%>
                         <div class="suggestHDays">
-                            <span class="suggestHdaysText">受入日日数</span>
+                            <span class="suggestHdaysText">受入日</span>
                         </div>
                     </div>
                     <%--  二列目 --%>
@@ -211,6 +211,7 @@
                                             <asp:DropDownList ID="ddlSuggestAddDays" runat="server" 
                                                 CssClass="ddlSuggestAccdays" 
                                                 data-hideval='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.AccDays %>' 
+                                                data-loddate='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.ItemDate.ToString("yyyy/MM/dd") %>'
                                                 SelectedValue='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).AccAddDays %>'  
                                                 Enabled='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsBeforeToday = True OrElse
                                                                             Me.pnlSuggestList.Attributes.Keys.Cast(Of String).Contains("data-otmode"),
@@ -218,17 +219,17 @@
                                                                                                                                                     "True") %>'
                                                 >
                                                 <asp:ListItem Text="" Value=""></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;0" Value="0"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;1" Value="1"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;2" Value="2"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;3" Value="3"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;4" Value="4"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;5" Value="5"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;6" Value="6"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;7" Value="7"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;8" Value="8"></asp:ListItem>
-                                                <asp:ListItem Text="&ensp;9" Value="9"></asp:ListItem>
-                                                <asp:ListItem Text="10" Value="10"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="0"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="1"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="2"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="3"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="4"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="5"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="6"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="7"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="8"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="9"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="10"></asp:ListItem>
                                             </asp:DropDownList>
                                         </span>
                                     </div>

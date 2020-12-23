@@ -99,52 +99,52 @@
 }
 /* 提案表列車No、油種チェックボックス、油種ごとのテキストボックスセルの幅 */
 #divSuggestList > div.dataColumn > div.values > div {
-    width:65px;
-    min-width:65px;
-    max-width:65px;
+    width:70px;
+    min-width:70px;
+    max-width:70px;
 }
 /* 提案表列車Noが6個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has6Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ６倍 */
-    width : calc(65px * 6);
-    min-width: calc(65px * 6);
-    max-width: calc(65px * 6);
+    width : calc(70px * 6);
+    min-width: calc(70px * 6);
+    max-width: calc(70px * 6);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが5個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has5Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ５倍 */
-    width : calc(65px * 5);
-    min-width: calc(65px * 5);
-    max-width: calc(65px * 5);
+    width : calc(70px * 5);
+    min-width: calc(70px * 5);
+    max-width: calc(70px * 5);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが4個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has4Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ４倍 */
-    width : calc(65px * 4);
-    min-width: calc(65px * 4);
-    max-width: calc(65px * 4);
+    width : calc(70px * 4);
+    min-width: calc(70px * 4);
+    max-width: calc(70px * 4);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが3個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has3Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ３倍 */
-    width : calc(65px * 3);
-    min-width: calc(65px * 3);
-    max-width: calc(65px * 3);
+    width : calc(70px * 3);
+    min-width: calc(70px * 3);
+    max-width: calc(70px * 3);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが2個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has2Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ２倍 */
-    width : calc(65px * 2);
-    min-width: calc(65px * 2);
-    max-width: calc(65px * 2);
+    width : calc(70px * 2);
+    min-width: calc(70px * 2);
+    max-width: calc(70px * 2);
     display:flex;
     flex-wrap:wrap;
 }
@@ -301,8 +301,8 @@
     border-radius: 3px;
 }
 #divSuggestList .values select {
-    padding-left:16px;
-    text-align:right;
+    /*padding-left:16px;
+    text-align:right;*/
 }
 
 /* *********************** */

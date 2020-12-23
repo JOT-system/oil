@@ -70,6 +70,13 @@ Public Class OIT0002LinkList
     Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全件-他社負担(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_IDOU() As String = {"F120160", "F120260", "F120360"}      '移動-JOT負担発払(五井、甲子、袖ヶ浦)
 
+    '○ 名義所有者コード
+    Private WW_OWNERCODE01() As String = {"01", "日本石油輸送"}
+    Private WW_OWNERCODE11() As String = {"11", "日本オイルターミナル"}
+    '○ リース先コード
+    Private WW_LEASECODE11() As String = {"11", "日本オイルターミナル"}
+    Private WW_LEASECODE71() As String = {"71", "在日米軍"}
+
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
@@ -213,23 +220,30 @@ Public Class OIT0002LinkList
 
         '### 20201207 START 指摘票対応(No251)全体 ##############################
         '○ 一覧で表示した内容を着駅ごとにサマリー
-        Dim officeCnt As Integer() = {0, 0, 0}
+        Dim officeJOTCnt As Integer() = {0, 0, 0}
+        Dim officeOTCnt As Integer() = {0, 0, 0}
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
             Select Case Convert.ToString(OIT0002row("OFFICECODE"))
                 '五井営業所
                 Case BaseDllConst.CONST_OFFICECODE_011201
-                    officeCnt(0) += Integer.Parse(OIT0002row("TOTALTANK"))
+                    officeJOTCnt(0) += Integer.Parse(OIT0002row("JOT_TOTALTANK"))
+                    officeOTCnt(0) += Integer.Parse(OIT0002row("OT_TOTALTANK"))
                 '甲子営業所
                 Case BaseDllConst.CONST_OFFICECODE_011202
-                    officeCnt(1) += Integer.Parse(OIT0002row("TOTALTANK"))
+                    officeJOTCnt(1) += Integer.Parse(OIT0002row("JOT_TOTALTANK"))
+                    officeOTCnt(1) += Integer.Parse(OIT0002row("OT_TOTALTANK"))
                 '袖ヶ浦営業所
                 Case BaseDllConst.CONST_OFFICECODE_011203
-                    officeCnt(2) += Integer.Parse(OIT0002row("TOTALTANK"))
+                    officeJOTCnt(2) += Integer.Parse(OIT0002row("JOT_TOTALTANK"))
+                    officeOTCnt(2) += Integer.Parse(OIT0002row("OT_TOTALTANK"))
             End Select
         Next
-        Me.LblGoiCnt.Text = Me.LblGoiCnt.Text.Replace("000", Convert.ToString(officeCnt(0)))
-        Me.LblKinoeneCnt.Text = Me.LblKinoeneCnt.Text.Replace("000", Convert.ToString(officeCnt(1)))
-        Me.LblSodegauraCnt.Text = Me.LblSodegauraCnt.Text.Replace("000", Convert.ToString(officeCnt(2)))
+        Me.LblGoiCnt.Text = Me.LblGoiCnt.Text.Replace("000", Convert.ToString(officeJOTCnt(0)))
+        Me.LblGoiOTCnt.Text = Me.LblGoiOTCnt.Text.Replace("000", Convert.ToString(officeOTCnt(0)))
+        Me.LblKinoeneCnt.Text = Me.LblKinoeneCnt.Text.Replace("000", Convert.ToString(officeJOTCnt(1)))
+        Me.LblKinoeneOTCnt.Text = Me.LblKinoeneOTCnt.Text.Replace("000", Convert.ToString(officeOTCnt(1)))
+        Me.LblSodegauraCnt.Text = Me.LblSodegauraCnt.Text.Replace("000", Convert.ToString(officeJOTCnt(2)))
+        Me.LblSodegauraOTCnt.Text = Me.LblSodegauraOTCnt.Text.Replace("000", Convert.ToString(officeOTCnt(2)))
         '### 20201207 END   指摘票対応(No251)全体 ##############################
 
     End Sub
@@ -354,6 +368,12 @@ Public Class OIT0002LinkList
         SQLStr &=
               "	   , COUNT(1)                                                    AS TOTALTANK "
 
+        '### 20201222 START 指摘票対応(No278)全体 ####################################### 
+        SQLStr &=
+              "	   , SUM( CASE WHEN OIM0005_JOT.TANKNUMBER <> '' THEN 1 ELSE 0 END ) AS JOT_TOTALTANK " _
+           & "	   , SUM( CASE WHEN OIM0005_OT.TANKNUMBER <> '' THEN 1 ELSE 0 END )  AS OT_TOTALTANK "
+        '### 20201222 END   指摘票対応(No278)全体 ####################################### 
+
         '油種(ハイオク)
         SQLStr &= String.Format("	   , SUM(CASE WHEN OIT0004.PREOILCODE ='{0}' Then 1 Else 0 End) AS HTANK ", BaseDllConst.CONST_HTank)
         '油種(レギュラー)
@@ -397,11 +417,27 @@ Public Class OIT0002LinkList
               " AND OIT0004.STATUS       = '2' " _
             & String.Format(" AND OIT0004.AVAILABLEYMD = '{0}'", work.WF_SEL_SEARCH_AVAILABLEDATE.Text)
         End If
-        '### 20201216 START 指摘票対応(No263)全体 ####################################### 
+        '### 20201216 END   指摘票対応(No263)全体 ####################################### 
 
         SQLStr &=
-              " AND OIT0004.DELFLG      <> @P02 " _
-            & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
+              " AND OIT0004.DELFLG      <> @P02 "
+
+        '### 20201222 START 指摘票対応(No278)全体 ####################################### 
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005_JOT ON " _
+            & " OIM0005_JOT.TANKNUMBER = OIT0004.TANKNUMBER " _
+            & String.Format(" AND (OIM0005_JOT.OWNERCODE = '{0}' AND OIM0005_JOT.LEASECODE = '') ", WW_OWNERCODE01(0)) _
+            & " AND OIM0005_JOT.DELFLG <> @P02 "
+
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005_OT ON " _
+            & " OIM0005_OT.TANKNUMBER = OIT0004.TANKNUMBER " _
+            & String.Format(" AND (OIM0005_OT.OWNERCODE = '{0}' OR (OIM0005_OT.LEASECODE IN ('{1}','{2}'))) ", WW_OWNERCODE11(0), WW_LEASECODE11(0), WW_LEASECODE71(0)) _
+            & " AND OIM0005_OT.DELFLG <> @P02 "
+        '### 20201222 END   指摘票対応(No278)全体 ####################################### 
+
+        SQLStr &=
+              " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
             & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
 
         '### 20201203 START 指摘票対応(No234)全体 ####################################### 

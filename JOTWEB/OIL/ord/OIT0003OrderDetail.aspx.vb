@@ -5982,6 +5982,18 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '### 20201222 START((全体)No272対応) ######################################
+        '○ 出荷期間内の油種チェック(対象：甲子営業所、袖ヶ浦営業所)
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+            WW_CheckShipPeriod(WW_ERRCODE)
+            If WW_ERRCODE = "ERR" Then
+                Exit Sub
+            End If
+        End If
+        '### 20201222 END  ((全体)No272対応) ######################################
+
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -13613,12 +13625,30 @@ Public Class OIT0003OrderDetail
                 End If
 
             Else
-                For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
-
-                    For i = 1 To O_VALUE.Length
-                        O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                If IsNothing(I_PARA01) Then
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                        Next
                     Next
-                Next
+                ElseIf I_PARA01 = "1" Then
+                    Dim i As Integer = 0
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                        Try
+                            If OIT0003WKrow("STYMD") <= Date.Parse(Me.TxtLoadingDate.Text) _
+                                AndAlso OIT0003WKrow("ENDYMD") >= Date.Parse(Me.TxtLoadingDate.Text) Then
+                                O_VALUE(0) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
+                                O_VALUE(1) = OIT0003WKrow("VALUE3")
+                                O_VALUE(2) = OIT0003WKrow("VALUE2")
+                                O_VALUE(3) = OIT0003WKrow("VALUE1")
+                                'O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
+                                'i += 1
+                            End If
+                        Catch ex As Exception
+                            Exit For
+                        End Try
+                    Next
+                End If
             End If
 
         Catch ex As Exception
@@ -16894,6 +16924,68 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
+    End Sub
+
+    ''' <summary>
+    ''' 出荷期間内の油種チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckShipPeriod(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_OfficeCode As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case Me.TxtOrderOfficeCode.Text
+            '○　甲子営業所
+            Case BaseDllConst.CONST_OFFICECODE_011202
+                '★　積込日(予定)が油種(３号軽油TCH)の出荷期間に含まれているかチェック
+                WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text,
+                                        "PRODUCTPATTERN_FT_SEG",
+                                        "1404D",
+                                        WW_GetValue,
+                                        I_PARA01:="1")
+
+                If WW_GetValue(0) <> "" Then
+                    '油種チェック(３号軽油)
+                    For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='1404' AND ORDERINGTYPE='A'")
+                        '「３号軽油」⇒「３号軽油TCH」へ変更
+                        OIT0003row("OILCODE") = WW_GetValue(0)
+                        OIT0003row("OILNAME") = WW_GetValue(1)
+                        OIT0003row("ORDERINGTYPE") = WW_GetValue(2)
+                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(3)
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl)
+                End If
+
+            '○　袖ヶ浦営業所
+            Case BaseDllConst.CONST_OFFICECODE_011203
+                '★　積込日(予定)が油種(LTA)の出荷期間に含まれているかチェック
+                WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text,
+                                        "PRODUCTPATTERN_FT_SEG",
+                                        "2101C",
+                                        WW_GetValue,
+                                        I_PARA01:="1")
+
+                If WW_GetValue(0) <> "" Then
+                    '油種チェック(0.5A重油)
+                    For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='2101' AND ORDERINGTYPE='B'")
+                        '「0.5A重油」⇒「LTA」へ変更
+                        OIT0003row("OILCODE") = WW_GetValue(0)
+                        OIT0003row("OILNAME") = WW_GetValue(1)
+                        OIT0003row("ORDERINGTYPE") = WW_GetValue(2)
+                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(3)
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl)
+                End If
+        End Select
     End Sub
 
     ''' <summary>

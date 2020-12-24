@@ -2063,6 +2063,13 @@ Public Class OIT0003OrderDetail
                         & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                         & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+
+                    '### 20201224 START 指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
+                Case BaseDllConst.CONST_OFFICECODE_012402
+                    SQLStr &=
+                          " ORDER BY" _
+                        & "    OIT0003.DETAILNO"
+                    '### 20201224 END   指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
                 Case Else
                     SQLStr &=
                           " ORDER BY" _
@@ -2960,6 +2967,14 @@ Public Class OIT0003OrderDetail
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_ATank + "' THEN 1 ELSE 2 END" _
                         & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)"
+
+                '### 20201224 START 指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
+            Case BaseDllConst.CONST_OFFICECODE_012402
+                SQLStr &=
+                          " ORDER BY" _
+                        & "    OIT0003.DETAILNO"
+                '### 20201224 END   指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
+
             Case Else
                 SQLStr &=
                           " ORDER BY" _

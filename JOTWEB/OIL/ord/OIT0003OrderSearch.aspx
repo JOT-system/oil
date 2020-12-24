@@ -65,7 +65,7 @@
                 <a id="WF_DATE_SYMBOL"><span>～</span></a>
             </div>
             <!-- 発日 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none;">
                 <a id="WF_DEPDATE_LABEL">(予定)発日</a>
                 <a class="ef" id="WF_DEPDATE" ondblclick="Field_DBclick('TxtDepDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="TxtDepDateStart" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>

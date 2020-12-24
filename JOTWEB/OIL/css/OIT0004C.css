@@ -258,12 +258,27 @@
     background-image:none;
     display:none;
 }
-/* 提案表日付期間ドロップダウン設定 */
+/* 日付枠の黒ボーダー */
+.suggestDate {
+    border-top-color: black !important;
+    border-left-color: black !important;
+    border-right-color: black !important;
+}
+div.dataColumn > div:nth-child(2) > div {
+    border-left-color: black !important;
+}
 
+div.dataColumn:nth-last-child(2) > div:last-child > div {
+    border-right-color: black !important;
+}
+div.dataColumn > div.values > div:last-child {
+    border-bottom-color: black !important;
+}
+/* 提案表日付期間ドロップダウン設定 */
 .suggestHDays {
-    position:relative;
-    border-bottom:red !important;
-    height:22px !important;
+    position: relative;
+    border-bottom: red !important;
+    height: 22px !important;
 }
 .suggestHdaysText {
     position: absolute;

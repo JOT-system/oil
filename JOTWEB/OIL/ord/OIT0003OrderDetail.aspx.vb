@@ -1809,11 +1809,22 @@ Public Class OIT0003OrderDetail
 
         OIT0003tbl.Clear()
 
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データを受注テーブルから取得する
         Dim SQLStr As String = ""
         Dim SQLTempTblStr As String = ""
+        Dim SQLRTrainStr As String = ""
 
         SQLTempTblStr =
                   " DELETE FROM OIL.TMP0001ORDER; " _
@@ -2079,8 +2090,32 @@ Public Class OIT0003OrderDetail
         End If
         SQLTempTblStr &= SQLStr
 
+        SQLRTrainStr =
+              " SELECT " _
+            & "   OIT0011.INLINETRAIN " _
+            & " , COUNT(1) CNT " _
+            & " FROM oil.OIT0011_RLINK OIT0011 " _
+            & " INNER JOIN ( " _
+            & "   SELECT " _
+            & "     OIT0002.LODDATE " _
+            & "   , OIT0003.LOADINGIRILINETRAINNO " _
+            & "   FROM oil.OIT0003_DETAIL OIT0003 " _
+            & "   INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "       OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & "   AND OIT0002.DELFLG <> @P02 " _
+            & "   WHERE OIT0003.ORDERNO = @P01 " _
+            & "   GROUP BY " _
+            & "     OIT0002.LODDATE " _
+            & "   , OIT0003.LOADINGIRILINETRAINNO " _
+            & " ) DETAIL ON" _
+            & "     DETAIL.LODDATE = OIT0011.LOADINGLODDATE " _
+            & " AND DETAIL.LOADINGIRILINETRAINNO = OIT0011.INLINETRAIN " _
+            & " GROUP BY " _
+            & "   OIT0011.INLINETRAIN"
+
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
+                  SQLRTraincmd As New SqlCommand(SQLRTrainStr, SQLcon)
                 Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.Int)          '明細数(新規作成)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
@@ -2164,6 +2199,22 @@ Public Class OIT0003OrderDetail
                     WW_ORDERCNT = OIT0003tbl.Rows.Count
                 End Using
 
+                '列車(臨海)別の件数取得用
+                Dim PARARTRAIN01 As SqlParameter = SQLRTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARARTRAIN02 As SqlParameter = SQLRTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARARTRAIN01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARARTRAIN02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLRTraincmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
                 Dim i As Integer = 0
                 '〇 一覧の件数取得
                 Dim intListCnt As Integer = OIT0003tbl.Rows.Count
@@ -2186,6 +2237,7 @@ Public Class OIT0003OrderDetail
                         '　※上記以外の営業所については、入力しないため値は未入力。
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                             Try
+                                intListCnt = OIT0003WKtbl.Rows(0)("CNT")
                                 '発送順を自動設定(貨物駅入線順の値の逆値を設定する)
                                 OIT0003row("SHIPORDER") = (intListCnt - Integer.Parse(OIT0003row("LINEORDER")) + 1)
                             Catch ex As Exception
@@ -9150,7 +9202,7 @@ Public Class OIT0003OrderDetail
             & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, OTTRANSPORTFLG = @P46" _
             & "        , UPGRADEFLG          = @P55, SHIPPERSCODE         = @P23, SHIPPERSNAME  = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE  = @P35" _
-            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE     = @P39, JOINT        = @P08" _
+            & "        , ORDERINGOILNAME     = @P36, JOINTCODE            = @P39, JOINT         = @P08" _
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
             & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
             & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
@@ -9170,7 +9222,7 @@ Public Class OIT0003OrderDetail
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG     , UPGRADEFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
-            & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN    , JOINTCODE           , JOINT" _
+            & "        , CARSNUMBER           , CARSAMOUNT             , JOINTCODE          , JOINT" _
             & "        , CHANGETRAINNO        , CHANGETRAINNAME        , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION     , SECONDARRSTATIONNAME   , CHANGERETSTATION   , CHANGERETSTATIONNAME" _
             & "        , LOADINGIRILINEORDER  , LOADINGOUTLETORDER     , ACTUALLODDATE" _
@@ -9185,7 +9237,7 @@ Public Class OIT0003OrderDetail
             & "        , @P42, @P45, @P46, @P55" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
-            & "        , @P06, @P25, @P07, @P39, @P08" _
+            & "        , @P06, @P25, @P39, @P08" _
             & "        , @P26, @P38, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
             & "        , @P43, @P44, @P47" _
@@ -9223,7 +9275,6 @@ Public Class OIT0003OrderDetail
             & "    , ORDERINGOILNAME" _
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
-            & "    , RETURNDATETRAIN" _
             & "    , JOINTCODE" _
             & "    , JOINT" _
             & "    , CHANGETRAINNO" _
@@ -9296,7 +9347,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 40)  '油種名(受発注用)
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
+                'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
                 Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar)      'ジョイントコード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
@@ -9404,7 +9455,7 @@ Public Class OIT0003OrderDetail
                     PARA36.Value = OIT0003row("ORDERINGOILNAME")      '油種名(受発注用)
                     PARA06.Value = "1"                                '車数
                     PARA25.Value = "0"                                '数量
-                    PARA07.Value = DBNull.Value                       '返送日列車
+                    'PARA07.Value = DBNull.Value                       '返送日列車
                     'PARA39.Value = DBNull.Value                       'ジョイントコード
                     PARA39.Value = OIT0003row("JOINTCODE")            'ジョイントコード
                     'PARA08.Value = DBNull.Value                       'ジョイント

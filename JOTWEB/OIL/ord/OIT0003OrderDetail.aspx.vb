@@ -2236,8 +2236,8 @@ Public Class OIT0003OrderDetail
                         '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
                         '　※上記以外の営業所については、入力しないため値は未入力。
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                            intListCnt = OIT0003WKtbl.Rows(0)("CNT")
                             Try
+                                intListCnt = OIT0003WKtbl.Rows(0)("CNT")
                                 '発送順を自動設定(貨物駅入線順の値の逆値を設定する)
                                 OIT0003row("SHIPORDER") = (intListCnt - Integer.Parse(OIT0003row("LINEORDER")) + 1)
                             Catch ex As Exception

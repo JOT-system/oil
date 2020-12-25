@@ -6148,7 +6148,12 @@ Public Class OIT0003OrderDetail
 
                 WW_CheckTrainShipRepeat(WW_ERRCODE, SQLcon)
                 If WW_ERRCODE = "ERR" Then
-                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Dim Errmsg As String = ""
+                    If OIT0003WK5tbl.Rows(0)("ORDERNO") <> "" Then
+                        Errmsg = String.Format("※受注Ｎｏ：{0}を確認してください。", OIT0003WK5tbl.Rows(0)("ORDERNO"))
+                        Errmsg &= "<br>　同一列車、同一発日で登録されています。"
+                    End If
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:=Errmsg, needsPopUp:=True)
                     Exit Sub
                 End If
             End Using
@@ -6586,7 +6591,12 @@ Public Class OIT0003OrderDetail
 
                 WW_CheckTrainShipRepeat(WW_ERRCODE, SQLcon, dt:=OIT0003tbl_tab3)
                 If WW_ERRCODE = "ERR" Then
-                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Dim Errmsg As String = ""
+                    If OIT0003WK5tbl.Rows(0)("ORDERNO") <> "" Then
+                        Errmsg = String.Format("※受注Ｎｏ：{0}を確認してください。", OIT0003WK5tbl.Rows(0)("ORDERNO"))
+                        Errmsg &= "<br>　同一列車、同一発日で登録されています。"
+                    End If
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:=Errmsg, needsPopUp:=True)
                     Exit Sub
                 End If
             End Using
@@ -15737,7 +15747,7 @@ Public Class OIT0003OrderDetail
                 '### 20200902 END   発送順チェック追加("0"の場合はエラーとする) ###################################
 
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
-                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="", needsPopUp:=True)
                     WW_CheckMES1 = "発送順重複エラー。"
                     WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
                     WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
@@ -16265,7 +16275,7 @@ Public Class OIT0003OrderDetail
                 '### 20200902 END   発送順チェック追加("0"の場合はエラーとする) ###################################
 
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
-                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="", needsPopUp:=True)
                     WW_CheckMES1 = "発送順重複エラー。"
                     WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
                     WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
@@ -17475,8 +17485,8 @@ Public Class OIT0003OrderDetail
 
                             WW_CheckMES1 = "発送順(同一の列車番号)重複。"
                             WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
-                            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                            'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                            'WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                            WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003CHKDrow, chkFlg:="2")
                             O_RTN = "ERR"
 
                             '受注明細TBLの受注情報を更新
@@ -19861,6 +19871,7 @@ Public Class OIT0003OrderDetail
     ''' <param name="MESSAGE1"></param>
     ''' <param name="MESSAGE2"></param>
     ''' <param name="OIT0003row"></param>
+    ''' <param name="chkFlg"></param>
     ''' <remarks></remarks>
     Protected Sub WW_CheckListERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String,
                                   Optional ByVal OIT0003row As DataRow = Nothing,
@@ -19881,6 +19892,17 @@ Public Class OIT0003OrderDetail
                 End If
                 WW_ERR_MES &= ControlChars.NewLine & "  --> 油種出荷件数       =" & OIT0003row("TANKCOUNT") & " , "
                 WW_ERR_MES &= ControlChars.NewLine & "  --> 最大出荷能力       =" & OIT0003row("CHK_TANKCOUNT")
+            ElseIf chkFlg = "2" Then
+                WW_ERR_MES = ControlChars.NewLine & "  --> オーダー№         =" & OIT0003row("ORDERNO") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 本線列車           =" & OIT0003row("TRAINNO") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 発送順             =" & OIT0003row("SHIPORDER") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 発駅               =" & OIT0003row("DEPSTATIONNAME") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 着駅               =" & OIT0003row("ARRSTATIONNAME") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 積込日             =" & OIT0003row("LODDATE") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 発日               =" & OIT0003row("DEPDATE") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 積車着日           =" & OIT0003row("ARRDATE") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 受入日             =" & OIT0003row("ACCDATE") & " , "
+                WW_ERR_MES &= ControlChars.NewLine & "  --> 空車着日           =" & OIT0003row("EMPARRDATE")
             Else
                 WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIT0003row("LINECNT") & " , "
                 WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主               =" & OIT0003row("SHIPPERSNAME") & " , "

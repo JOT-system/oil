@@ -767,6 +767,11 @@ Public Module Messages
         ''' ダウンロード(貨車連結順序表一覧画面(着駅(営業所)複数選択))エラーメッセージ
         ''' </summary>
         Public Const OIL_DOWNLOAD_LINKLIST_OFFICEMULTIPLE_ERROR As String = "20091"
+        ''' <summary>
+        ''' (根岸営業所)「灯油＋３号軽油＝１０両以上」の場合の確認メッセージ
+        ''' </summary>
+        Public Const OIL_KEROSENE_3DIESEL_MSG As String = "20092"
+
 
 #End Region
 

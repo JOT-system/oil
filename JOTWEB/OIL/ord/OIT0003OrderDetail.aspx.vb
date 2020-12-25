@@ -227,6 +227,9 @@ Public Class OIT0003OrderDetail
                             WW_BulkDateSet()
                         Case "btnChkBulkDateConfirmNo"        '確認メッセージいいえボタン押下((実績)日付一括入力チェック)
 
+                        Case "btnChkKerosene3DieselConfirmYes",
+                             "btnChkKerosene3DieselConfirmNo"   '確認メッセージボタン押下(「灯油＋３号軽油＝１０両以上」チェック)
+                            WW_Kerosene3DieselSet(WF_ButtonClick.Value)
                     End Select
 
                     '○ 一覧再表示処理
@@ -1065,6 +1068,10 @@ Public Class OIT0003OrderDetail
         '実績日訂正フラグの初期化
         work.WF_SEL_CORRECTIONDATEFLG.Text = "0"
         '### 20201210 END   指摘票対応(No246) #######################################
+
+        '### 20201225 START 指摘票対応(No291) #######################################
+        work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
+        '### 20201225 END   指摘票対応(No291) #######################################
 
     End Sub
 
@@ -5921,7 +5928,7 @@ Public Class OIT0003OrderDetail
         If WF_DetailMView.ActiveViewIndex = "0" Then
             '割当確定ボタン押下時
             Me.WW_UPBUTTONFLG = "1"
-            '### 20200812 START(指摘票(全体)No121) #########################################
+            '### 20200812 START(指摘票(全体)No121) ######################################
             '★初期化
             work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
             '手配連絡フラグ("0"(未連絡))
@@ -5930,7 +5937,10 @@ Public Class OIT0003OrderDetail
             work.WF_SEL_RESULTFLG.Text = "0"
             '託送指示フラグ("0"(未手配))
             work.WF_SEL_DELIVERYFLG.Text = "0"
-            '### 20200812 END  (指摘票(全体)No121) #########################################
+            '### 20200812 END  (指摘票(全体)No121) ######################################
+            '### 20201225 START 指摘票対応(No291) #######################################
+            work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
+            '### 20201225 END   指摘票対応(No291) #######################################
             WW_ButtonUPDATE_TAB1()
 
             'タブ「入換・積込指示」
@@ -6092,6 +6102,20 @@ Public Class OIT0003OrderDetail
                 If WW_ERRCODE = "ERR3" Then
                     Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     Exit Sub
+                ElseIf WW_ERRCODE = "ERR4" Then
+                    '### 20201225 START 指摘票対応(No291) #######################################
+                    '「灯油＋３号軽油＝１０両以上」の場合はメッセージにて確認
+                    Master.Output(C_MESSAGE_NO.OIL_KEROSENE_3DIESEL_MSG,
+                      C_MESSAGE_TYPE.QUES,
+                      needsPopUp:=True,
+                      messageBoxTitle:="",
+                      IsConfirm:=True,
+                      YesButtonId:="btnChkKerosene3DieselConfirmYes",
+                      needsConfirmNgToPostBack:=True,
+                      NoButtonId:="btnChkKerosene3DieselConfirmNo")
+
+                    Exit Sub
+                    '### 20201225 END   指摘票対応(No291) #######################################
                 End If
             End Using
         End If
@@ -7173,6 +7197,27 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         If Not Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
 
+    End Sub
+
+    ''' <summary>
+    ''' (根岸営業所)「灯油＋３号軽油＝１０両以上」確認メッセージ後処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_Kerosene3DieselSet(ByVal chkFieldName As String)
+
+        Select Case chkFieldName
+            Case "btnChkKerosene3DieselConfirmNo"
+                Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+
+            Case "btnChkKerosene3DieselConfirmYes"
+                '★"1"(承認)※「灯油＋３号軽油＝１０両以上」
+                work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "1"
+
+                '○割当確定ボタン押下処理(再度実施)
+                WW_ButtonUPDATE_TAB1()
+
+        End Select
     End Sub
 
 
@@ -18712,6 +18757,7 @@ Public Class OIT0003OrderDetail
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
         Dim WW_FlagTab() As String = {"TAB1", "TAB2", "TAB3", "TAB4"}
+        Dim WW_NegishiOilCheck As Boolean = False
 
         If IsNothing(OIT0003WKtbl) Then
             OIT0003WKtbl = New DataTable
@@ -18984,7 +19030,7 @@ Public Class OIT0003OrderDetail
 
                 '### 20201028 START 根岸営業所(積込可能車数チェック)対応 #################################################
                 '○根岸営業所(灯油＋３号軽油)における油種の出荷能力件数チェック
-                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then WW_CheckNegishiOil(OIT0003WKtbl)
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then WW_CheckNegishiOil(OIT0003WKtbl, WW_NegishiOilCheck)
                 '### 20201028 END   根岸営業所(積込可能車数チェック)対応 #################################################
 
                 Dim i As Integer = 0
@@ -19076,7 +19122,15 @@ Public Class OIT0003OrderDetail
                             WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow, chkFlg:="1")
 
                         End If
-                        O_RTN = "ERR3"
+
+                        '### 20201225 START 指摘票対応(No291) #######################################
+                        '★根岸営業所チェックNGの場合は警告メッセージとするため"ERR4"とする
+                        If WW_NegishiOilCheck = True Then
+                            O_RTN = "ERR4"
+                        Else
+                            O_RTN = "ERR3"
+                        End If
+                        '### 20201225 END   指摘票対応(No291) #######################################
                         'Exit Sub
                     End If
                 Next
@@ -19400,7 +19454,7 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <param name="OIT0003WKtbl"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckNegishiOil(ByVal OIT0003WKtbl As DataTable)
+    Protected Sub WW_CheckNegishiOil(ByVal OIT0003WKtbl As DataTable, ByRef chkOilFlg As Boolean)
         'O_RTN = C_MESSAGE_NO.NORMAL
 
         '○車数オーバーのデータがある場合は、処理を抜ける。
@@ -19457,10 +19511,21 @@ Public Class OIT0003OrderDetail
             rowKeroDieselShipLimit("CHK_BIGOILCODE") = "W"
             rowKeroDieselShipLimit("CHK_CHECKOILCODE") = BaseDllConst.CONST_K3Tank1
             rowKeroDieselShipLimit("CHK_TANKCOUNT") = iKeroDieselShipLimit
-            rowKeroDieselShipLimit("JUDGE") = "1"
+
+            '### 20201225 START 指摘票対応(No291) #######################################
+            '★"1"(承認)※「灯油＋３号軽油＝１０両以上」の場合は正常と判断
+            If work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "1" Then
+                rowKeroDieselShipLimit("JUDGE") = "0"
+            Else
+                rowKeroDieselShipLimit("JUDGE") = "1"
+            End If
+            '### 20201225 END   指摘票対応(No291) #######################################
 
             '積込可能車数チェックデータに追加
             OIT0003WKtbl.Rows.Add(rowKeroDieselShipLimit)
+
+            'チェックNGの場合はTRUEとする。
+            chkOilFlg = True
         End If
 
     End Sub

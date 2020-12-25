@@ -234,6 +234,9 @@
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_LINK_DELFLG" runat="server"></asp:TextBox>
 
+    <!-- (根岸営業所)「灯油＋３号軽油＝１０両以上」フラグ -->
+    <asp:TextBox ID="WG_SEL_KEROSENE_3DIESEL_FLG" runat="server"></asp:TextBox>
+
     <!-- ■受注手配（費用入力）用 -->
     <!-- 支払請求№ -->
     <asp:TextBox ID="WF_SEL_BILLINGNO" runat="server"></asp:TextBox>

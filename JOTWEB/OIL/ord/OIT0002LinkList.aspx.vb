@@ -5291,6 +5291,7 @@ Public Class OIT0002LinkList
             & " , ISNULL(RTRIM(OIM0007.TRAINNO), '')                    AS TRAINNO" _
             & " , ISNULL(RTRIM(OIM0007.TRAINNAME), '')                  AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIM0007.OTTRAINNO), '')                  AS OTTRAINNO" _
+            & " , ISNULL(RTRIM(OIM0007.TSUMI), '')                      AS TSUMI" _
             & " , CASE" _
             & "   WHEN OIM0007.TSUMI = 'N' THEN ISNULL(RTRIM(OIM0007.JRTRAINNO1), '')" _
             & "   ELSE '' END                                           AS JRTRAINNO1" _
@@ -5360,7 +5361,7 @@ Public Class OIT0002LinkList
                     '★ポラリス(託送指示)が選択されている場合はSKIP
                     If Convert.ToString(OIT0002EXLUProw("OBJECTIVENAME")) <> "" Then Continue For
 
-                    For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Rows
+                    For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Select(Nothing, "TSUMI")
                         '★発駅・着駅が異なる場合はSKIP
                         If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") _
                             AndAlso OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For

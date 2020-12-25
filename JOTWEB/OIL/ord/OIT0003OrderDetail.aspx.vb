@@ -6240,8 +6240,21 @@ Public Class OIT0003OrderDetail
         '### 20200622 START((全体)No81対応) ######################################
         '◯発送順(MAX値)と列車(油種)数のチェック
         If Integer.Parse(Me.TxtTotalCnt_w.Text) < Integer.Parse(WW_SHIPORDER) Then
-            Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+            'Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            'Exit Sub
+            '★(袖ヶ浦営業所)コウショウ高崎向け構内取りの考慮
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                AndAlso (Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8877 _
+                         OrElse Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8883) Then
+                '############################################################################
+                ' 2020/12/25 構内取り対応
+                ' 8877レ＋8883レ(構内取り)の場合は、２つのオーダーで発送順が決まるため
+                ' 発送順の値が油種の最大件数より大きくてもエラーとしない。 
+                '############################################################################
+            Else
+                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
         '### 20200622 END  ((全体)No81対応) ######################################
 
@@ -6530,17 +6543,28 @@ Public Class OIT0003OrderDetail
         '### 20200622 START((全体)No81対応) ######################################
         '◯発送順(MAX値)と列車(油種)数のチェック
         If Integer.Parse(Me.TxtTotal_c.Text) < Integer.Parse(WW_SHIPORDER) Then
-            Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            '★(袖ヶ浦営業所)コウショウ高崎向け構内取りの考慮
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                AndAlso (Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8877 _
+                         OrElse Me.TxtTrainNo.Text = CONST_SODEGAURA_TRAINNO_8883) Then
+                '############################################################################
+                ' 2020/12/25 構内取り対応
+                ' 8877レ＋8883レ(構内取り)の場合は、２つのオーダーで発送順が決まるため
+                ' 発送順の値が油種の最大件数より大きくてもエラーとしない。 
+                '############################################################################
+            Else
+                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-            For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
-                If OIT0003tab3row("SHIPORDER") = WW_SHIPORDER Then
-                    OIT0003tab3row.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_80
-                    CODENAME_get("ORDERINFO", OIT0003tab3row.Item("ORDERINFO"), OIT0003tab3row.Item("ORDERINFONAME"), WW_DUMMY)
-                End If
-            Next
-            Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+                For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    If OIT0003tab3row("SHIPORDER") = WW_SHIPORDER Then
+                        OIT0003tab3row.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_80
+                        CODENAME_get("ORDERINFO", OIT0003tab3row.Item("ORDERINFO"), OIT0003tab3row.Item("ORDERINFONAME"), WW_DUMMY)
+                    End If
+                Next
+                Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
-            Exit Sub
+                Exit Sub
+            End If
         Else
             For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
                 If OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_80 Then

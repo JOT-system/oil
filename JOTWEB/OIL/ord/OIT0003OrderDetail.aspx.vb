@@ -17467,6 +17467,10 @@ Public Class OIT0003OrderDetail
                         End If
                     Next
                 Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
+
                 If O_RTN = "ERR" Then Exit Sub
 
             End Using

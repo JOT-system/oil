@@ -283,6 +283,9 @@ Public Class OIT0003OrderList
         Me.rbTankDispatchBtn.Visible = False
         Me.rbActualShipBtn.Visible = False
 
+        '(帳票)積込日に翌日を設定
+        Me.txtReportLodDate.Text = Format(Now.AddDays(1), "yyyy/MM/dd")
+
         ''帳票のポップアップを閉じる
         'Master.HideCustomPopUp()
         '##############################################################################################

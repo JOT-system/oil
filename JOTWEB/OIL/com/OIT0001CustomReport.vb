@@ -171,7 +171,9 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
         If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
-            iHeader = {{6, 10, 12, 37, 7}, {46, 50, 52, 77, 47}, {86, 90, 92, 117, 87}, {126, 130, 132, 157, 127}}
+            iHeader = {{6, 10, 12, 37, 7}, {45, 49, 51, 76, 46}, {84, 88, 90, 115, 85}, {123, 127, 129, 154, 124}}
+        'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
+        '    iHeader = {{6, 10, 12, 37, 7}, {46, 50, 52, 77, 47}, {86, 90, 92, 117, 87}, {126, 130, 132, 157, 127}}
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0
 
@@ -464,10 +466,12 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Try
             Dim j As Integer = 0                            '次明細切り替え時用
             Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 55, 95, 135}
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 54, 93, 132}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 55, 95, 135}
             Dim i As Integer = iTate(j)
             Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 77, 117, 157}
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 76, 115, 154}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 77, 117, 157}
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""

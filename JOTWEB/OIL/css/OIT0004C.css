@@ -261,18 +261,28 @@
 /* 日付枠の黒ボーダー */
 .suggestDate {
     border-top-color: black !important;
+    border-top-width: 2px !important;
     border-left-color: black !important;
+    border-left-width: 2px !important;
     border-right-color: black !important;
+    border-right-width: 2px !important;
 }
 div.dataColumn > div:nth-child(2) > div {
     border-left-color: black !important;
+    border-left-width: 2px !important;
 }
 
 div.dataColumn:nth-last-child(2) > div:last-child > div {
     border-right-color: black !important;
+    border-right-width: 2px !important;
 }
 div.dataColumn > div.values > div:last-child {
     border-bottom-color: black !important;
+    border-bottom-width: 2px !important;
+}
+div[data-hasmiitem="True"] div.dataColumn > div.values > div[data-oilcode='Summary']:not(.mi) {
+    border-bottom-color: black !important;
+    border-bottom-width: 2px !important;
 }
 /* 提案表日付期間ドロップダウン設定 */
 .suggestHDays {

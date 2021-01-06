@@ -54,7 +54,7 @@
             <div class="listTitle">受注提案タンク車数</div>
             <asp:FormView ID="frvSuggest" runat="server" RenderOuterTable="false" ClientIDMode="Predictable">
                 <HeaderTemplate>
-                    <div id="divSuggestList" style='height:calc(<%# Eval("OilTypeCount") + 3 + 1  %> * 24px)'>
+                    <div id="divSuggestList" style='height:calc(<%# Eval("OilTypeCount") + 3 + 1  %> * 24px)' data-hasmiitem='<%# Eval("HasMoveInsideItem") %>'>
                 </HeaderTemplate>
                 <ItemTemplate>
                     <%--  一列目 --%>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                     <%--  二列目 --%>
-                    <div class="oilTypeColumn">
+                    <div class="oilTypeColumn" >
                         <div><span>日付</span></div>
                         <div><span>列車</span></div>
                         <div><span>油種</span></div>

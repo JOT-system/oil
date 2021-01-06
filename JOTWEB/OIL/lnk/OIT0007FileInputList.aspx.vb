@@ -1486,9 +1486,11 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
 
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3) ")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
-        sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3) ")
+        'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
+        'sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
+        sqlStat.AppendLine("     , TNK.JXTGTANKNUMBER4 AS NEG_KASHANO")
+
         sqlStat.AppendLine("     , RIGHT('00000' + convert(nvarchar,convert(int,PRD.SHIPPEROILCODE)),5) AS NEG_SHIPPEROILCODE")
 
 

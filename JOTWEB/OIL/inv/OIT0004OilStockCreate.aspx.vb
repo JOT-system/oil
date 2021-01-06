@@ -1714,11 +1714,11 @@ Public Class OIT0004OilStockCreate
         End If
         sqlStat.AppendLine("SELECT DTL.OILCODE")
         'sqlStat.AppendLine("     , format(ODR.ACTUALLODDATE,'yyyy/MM/dd') AS TARGETDATE")
-        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStat.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStat.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
         If isHokushin Then
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '5463' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '2085' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '2085' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '5463' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '8471' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
 
             'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '5463' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT1 ")
@@ -1726,9 +1726,13 @@ Public Class OIT0004OilStockCreate
             'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '8471' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT3 ")
 
         Else
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.FIRSTRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.AFTERRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN (ODR.TRAINNO IN ('83') AND DTL.AFTERRETURNFLG = '1') OR (ODR.TRAINNO = '81' AND DTL.AFTERRETURNFLG = '1') THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
+
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.FIRSTRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.AFTERRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
 
             'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.FIRSTRETURNFLG = '1' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT1 ")
             'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT2 ")
@@ -1740,7 +1744,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStat.AppendLine("   AND DTL.OILCODE is not null")
         'sqlStat.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @FROMDATE AND @TODATE")
-        sqlStat.AppendLine(" WHERE ODR.LODDATE  BETWEEN @FROMDATE AND @TODATE")
+        sqlStat.AppendLine(" WHERE ODR.ACCDATE  BETWEEN @FROMDATE AND @TODATE")
         sqlStat.AppendLine("   AND ODR.ACTUALLODDATE is not null")
         sqlStat.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStat.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
@@ -1770,10 +1774,10 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStat.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         'sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACTUALLODDATE")
-        sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+        sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
 
         Dim sqlZaikoTrainAmount As New StringBuilder
-        sqlZaikoTrainAmount.AppendLine("SELECT format(STOCKYMD,'yyyy/MM/dd') AS TARGETDATE")
+        sqlZaikoTrainAmount.AppendLine("SELECT format(ACCYMD,'yyyy/MM/dd') AS TARGETDATE")
         If isHokushin Then
             sqlZaikoTrainAmount.AppendLine("      ,TRAINNO")
         End If
@@ -1789,18 +1793,18 @@ Public Class OIT0004OilStockCreate
         'sqlZaikoTrainAmount.AppendLine("      ,SUM(LTANK1)  AS LTANK1")
         'sqlZaikoTrainAmount.AppendLine("      ,SUM(ATANK1)  AS ATANK1")
         sqlZaikoTrainAmount.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK")
-        sqlZaikoTrainAmount.AppendLine(" WHERE STOCKYMD   BETWEEN @FROMDATE AND @TODATE")
+        sqlZaikoTrainAmount.AppendLine(" WHERE ACCYMD   BETWEEN @FROMDATE AND @TODATE")
         sqlZaikoTrainAmount.AppendLine("   AND OFFICECODE    = @OFFICECODE")
         sqlZaikoTrainAmount.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
         sqlZaikoTrainAmount.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
         sqlZaikoTrainAmount.AppendLine("   AND DELFLG        =  @DELFLG")
         sqlZaikoTrainAmount.AppendLine("   AND RTANK1 + HTANK1 + TTANK1 + MTTANK1 + KTANK1 + K3TANK1 + LTANK1 + ATANK1 > 0")
         If isHokushin Then
-            sqlZaikoTrainAmount.AppendLine(" GROUP BY STOCKYMD,TRAINNO")
-            sqlZaikoTrainAmount.AppendLine(" ORDER BY STOCKYMD,TRAINNO")
+            sqlZaikoTrainAmount.AppendLine(" GROUP BY ACCYMD,TRAINNO")
+            sqlZaikoTrainAmount.AppendLine(" ORDER BY ACCYMD,TRAINNO")
         Else
-            sqlZaikoTrainAmount.AppendLine(" GROUP BY STOCKYMD")
-            sqlZaikoTrainAmount.AppendLine(" ORDER BY STOCKYMD")
+            sqlZaikoTrainAmount.AppendLine(" GROUP BY ACCYMD")
+            sqlZaikoTrainAmount.AppendLine(" ORDER BY ACCYMD")
         End If
 
 
@@ -1888,9 +1892,9 @@ Public Class OIT0004OilStockCreate
                         If isHokushin Then
                             Dim trainNum As String = Convert.ToString(sqlDr("TRAINNO"))
                             Select Case trainNum
-                                Case "5463"
-                                    dateValue.Print1stPositionVal = amount
                                 Case "2085"
+                                    dateValue.Print1stPositionVal = amount
+                                Case "5463"
                                     dateValue.Print2ndPositionVal = amount
                                 Case "8471"
                                     dateValue.Print3rdPositionVal = amount

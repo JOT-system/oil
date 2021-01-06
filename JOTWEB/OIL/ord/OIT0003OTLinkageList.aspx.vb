@@ -1563,9 +1563,11 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , PRD.SHIPPEROILNAME") '荷主油種名
         sqlStat.AppendLine("     , ODR.SHIPPERSCODE")
         sqlStat.AppendLine("     , ODR.CONSIGNEECODE")
-        sqlStat.AppendLine("     , CCNV.VALUE01 AS CONSIGNEECONVCODE")
-        sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
-        sqlStat.AppendLine("     , CCNV.VALUE03 AS TRANSNAME") '便名 現状袖ヶ浦のみ
+        sqlStat.AppendLine("     , CASE WHEN ISNULL(DET.SECONDCONSIGNEECODE,'') = '' THEN CCNV.VALUE01 ELSE CMICNV.VALUE01 END AS CONSIGNEECONVCODE")
+        'sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
+        sqlStat.AppendLine("     , CASE WHEN ISNULL(DET.SECONDCONSIGNEECODE,'') = '' THEN CCNV.VALUE02 ELSE CMICNV.VALUE02 END AS CONSIGNEECONVVALUE")
+        'sqlStat.AppendLine("     , CCNV.VALUE03 AS TRANSNAME") '便名 現状袖ヶ浦のみ
+        sqlStat.AppendLine("     , CASE WHEN ISNULL(DET.SECONDCONSIGNEECODE,'') = '' THEN CCNV.VALUE03 ELSE CMICNV.VALUE03 END AS TRANSNAME")
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
         sqlStat.AppendLine("     , '1'          AS KINO_DATAKBN")
@@ -1586,7 +1588,7 @@ Public Class OIT0003OTLinkageList
 
         sqlStat.AppendLine("     , '計画済'    AS SOD_STATUS")    '袖ヶ浦ステータス
         sqlStat.AppendLine("     , ''          AS SOD_SHELL_ORDERNO") '袖ヶ浦SHELL受注番号
-        sqlStat.AppendLine("     , '0'          AS SOD_TRANS_KBN") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , '0'         AS SOD_TRANS_KBN") '袖ヶ浦輸送方法
         sqlStat.AppendLine("     , PRD.SHIPPEROILCODE + '00000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '課税' ELSE 'その他' END AS SOD_TAX_KBN") '袖ヶ浦課税区分
         sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
@@ -1691,6 +1693,13 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND SCNV.KEYCODE02      = ODR.SHIPPERSCODE")
         sqlStat.AppendLine("   AND SCNV.DELFLG         = @DELFLG")
         '変換マスタ（荷主）結合ここまで↑
+        '変換マスタ（荷受人（構内取））結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CMICNV")
+        sqlStat.AppendLine("    ON CMICNV.CLASS          = 'RESERVED_NIUKE'")
+        sqlStat.AppendLine("   AND CMICNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND CMICNV.KEYCODE02      = DET.SECONDCONSIGNEECODE")
+        sqlStat.AppendLine("   AND CMICNV.DELFLG         = @DELFLG")
+        '変換マスタ（荷受人（構内取））結合ここまで↑
         sqlStat.AppendLine(" WHERE ODR.ORDERSTATUS <= @ORDERSTATUS")
         sqlStat.AppendLine("   AND ODR.DELFLG       = @DELFLG")
         sqlStat.AppendFormat("   AND ODR.ORDERNO     IN({0})", selectedOrderNoInStat).AppendLine()

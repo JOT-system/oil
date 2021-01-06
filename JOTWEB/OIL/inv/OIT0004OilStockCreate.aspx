@@ -90,7 +90,7 @@
                     <div class="oilTypeColumn" >
                         <div><span>日付</span></div>
                         <div><span>列車</span></div>
-                        <div><span>油種</span></div>
+                        <div><span>受注作成</span></div>
                         <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
                                 <div data-title="suggestValue"

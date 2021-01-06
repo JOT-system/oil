@@ -8,9 +8,17 @@
     width: calc(100% - 20px);
     height: calc(100% - 20px);
 }
+#WF_ButtonUPDATE {
+    color: #b6c12b;
+    border: solid 1px #b6c12b;
+}
+#WF_ButtonUPDATE:hover {
+    background: #b6c12b;
+    color: #fff;
+}
 /* 各表名称のDiv */
 .listTitle {
-    margin-top:10px;
+    margin-top: 10px;
 }
 /* 上部テキストボックス */
 #WF_INVENTORYDAYS,
@@ -577,8 +585,11 @@ div.oilTypeData {
     color: #FFFFFF;
 }
 /* 見出し色 */
-#divStockList div.col2 div, #divStockList div.col4 div, #divSuggestList div.values div:nth-child(2){
+#divStockList div.col2 div, #divStockList div.col4 div, #divSuggestList div.values div:nth-child(2) {
     background-color:#64A466;
+}
+#divSuggestList div.values div:nth-child(2) {
+    background-color: darkslategray;
 }
 /* 付帯情報色 */
 #divStockList div.col3 div, #divStockList div.col5 div{

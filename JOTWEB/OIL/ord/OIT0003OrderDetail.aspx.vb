@@ -15687,8 +15687,9 @@ Public Class OIT0003OrderDetail
                              OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) Then
                     '### (空白)未チェック ####################################
                 Else
-                    '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
-                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    '★五井・甲子営業所の場合、[発送順区分]が"1"(発送)のみチェック対象
+                    If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
                         OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
                         OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
@@ -15762,8 +15763,9 @@ Public Class OIT0003OrderDetail
                              OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) Then
                     '### (空白)未チェック ####################################
                 Else
-                    '★甲子営業所の場合のみ、[発送順区分]が"1"(発送)のみチェック対象
-                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    '★五井・甲子営業所の場合、[発送順区分]が"1"(発送)のみチェック対象
+                    If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
                         OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "1") _
                         OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then

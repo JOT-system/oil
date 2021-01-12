@@ -311,6 +311,37 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "貨物駅(営業所指定駅)"
+    ''' <summary>
+    ''' 仙台北港(仙台新港営業所)
+    ''' </summary>
+    Public Const CONST_STATION_243202 As String = "243202"
+    ''' <summary>
+    ''' 浜五井(五井営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434103 As String = "434103"
+    ''' <summary>
+    ''' 甲子(甲子営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434105 As String = "434105"
+    ''' <summary>
+    ''' 北袖(袖ヶ浦営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434108 As String = "434108"
+    ''' <summary>
+    ''' 根岸(根岸営業所)
+    ''' </summary>
+    Public Const CONST_STATION_4532 As String = "4532"
+    ''' <summary>
+    ''' 四日市(四日市営業所)
+    ''' </summary>
+    Public Const CONST_STATION_5510 As String = "5510"
+    ''' <summary>
+    ''' 塩浜(三重塩浜営業所)
+    ''' </summary>
+    Public Const CONST_STATION_5512 As String = "5512"
+#End Region
+
 #Region "荷主"
     ''' <summary>
     ''' ENEOS

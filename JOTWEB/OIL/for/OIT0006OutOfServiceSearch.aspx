@@ -58,9 +58,9 @@
                 </a>
             </div>
 
-            <!-- 年月日((予定)発日) -->
+            <!-- 年月日(登録日) -->
             <div class="inputItem">
-                <a id="WF_DATE_LABEL" class="requiredMark">(予定)発日</a>
+                <a id="WF_DATE_LABEL" class="requiredMark">登録日</a>
                 <a class="ef" id="WF_DATE" ondblclick="Field_DBclick('TxtDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="TxtDateStart" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
                 </a>
@@ -68,7 +68,7 @@
             </div>
 
             <!-- 列車番号 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none">
                 <a id="WF_TRAINNO_LABEL">列車番号</a>
                 <a class="ef" id="WF_TRAINNO">
                     <asp:TextBox ID="TxtTrainNumber" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
@@ -76,7 +76,7 @@
             </div>
 
             <!-- 状態 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none">
                 <a id="WF_STATUS_LABEL">状態</a>
                 <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS%>);" onchange="TextBox_change('TxtStatus');">
                     <asp:TextBox ID="TxtStatus" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
@@ -87,7 +87,7 @@
             </div>
 
             <!-- 目的 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none">
                 <a id="WF_OBJECTIVE_LABEL">目的</a>
                 <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
                     <asp:TextBox ID="TxtObjective" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
@@ -98,7 +98,7 @@
             </div>
 
             <!-- 着駅 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none">
                 <a id="WF_ARRSTATION_LABEL">着駅</a>
                 <a class="ef" id="WF_ARRSTATION" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstationCode');">
                     <asp:TextBox ID="TxtArrstationCode" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>

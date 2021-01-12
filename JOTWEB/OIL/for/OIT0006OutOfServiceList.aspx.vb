@@ -290,6 +290,12 @@ Public Class OIT0006OutOfServiceList
             & " , ISNULL(FORMAT(OIT0006.EMPARRDATE, 'yyyy/MM/dd'), '')        AS EMPARRDATE" _
             & " , ISNULL(FORMAT(OIT0006.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')  AS ACTUALEMPARRDATE" _
             & " , ISNULL(RTRIM(OIT0006.TOTALTANK), '')   　           AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALREPAIR), '')   　         AS TOTALREPAIR" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALMC), '')   　             AS TOTALMC" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALINSPECTION), '')   　     AS TOTALINSPECTION" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALALLINSPECTION), '')   　  AS TOTALALLINSPECTION" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALINDWELLING), '')   　     AS TOTALINDWELLING" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALMOVE), '')   　           AS TOTALMOVE" _
             & " , ISNULL(RTRIM(OIT0006.ORDERNO), '')                  AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0006.KEIJYOYMD, 'yyyy/MM/dd'), '')         AS KEIJYOYMD" _
             & " , ISNULL(RTRIM(OIT0006.SALSE), '')                   AS SALSE" _
@@ -310,7 +316,8 @@ Public Class OIT0006OutOfServiceList
             & "        OIS0015_2.CLASS   = 'KAISOUINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0006.KAISOUINFO " _
             & " WHERE OIT0006.DELFLG     <> @P3" _
-            & "   AND OIT0006.DEPDATE    >= @P2"
+            & "   AND OIT0006.KAISOUYMD  >= @P2"
+        '& "   AND OIT0006.DEPDATE    >= @P2"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '営業所

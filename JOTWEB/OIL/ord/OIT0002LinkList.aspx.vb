@@ -3015,7 +3015,11 @@ Public Class OIT0002LinkList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0007_KAISOUDETAIL" _
             & "    SET" _
-            & "        SHIPORDER               = @SHIPORDER            , TANKNO                  = @TANKNO" _
+            & "        TRAINNO                 = @TRAINNO              , TRAINNAME               = @TRAINNAME" _
+            & "        , OBJECTIVECODE         = @OBJECTIVECODE        , KAISOUTYPE              = @KAISOUTYPE" _
+            & "        , SHIPORDER             = @SHIPORDER            , TANKNO                  = @TANKNO" _
+            & "        , DEPSTATION            = @DEPSTATION           , DEPSTATIONNAME          = @DEPSTATIONNAME" _
+            & "        , ARRSTATION            = @ARRSTATION           , ARRSTATIONNAME          = @ARRSTATIONNAME" _
             & "        , DELFLG                = @DELFLG" _
             & "        , UPDYMD                = @UPDYMD               , UPDUSER                 = @UPDUSER" _
             & "        , UPDTERMID             = @UPDTERMID            , RECEIVEYMD              = @RECEIVEYMD" _
@@ -3024,21 +3028,25 @@ Public Class OIT0002LinkList
             & "        AND DETAILNO = @DETAILNO" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0007_KAISOUDETAIL" _
-            & "        ( KAISOUNO     , DETAILNO     , SHIPORDER    , TANKNO" _
-            & "        , KAMOKU       , KAISOUINFO   , CARSNUMBER   , REMARK" _
-            & "        , ACTUALDEPDATE, ACTUALARRDATE, ACTUALACCDATE, ACTUALEMPARRDATE" _
-            & "        , SALSE        , SALSETAX     , TOTALSALSE" _
-            & "        , PAYMENT      , PAYMENTTAX   , TOTALPAYMENT" _
-            & "        , DELFLG       , INITYMD      , INITUSER     , INITTERMID" _
-            & "        , UPDYMD       , UPDUSER      , UPDTERMID    , RECEIVEYMD)" _
+            & "        ( KAISOUNO     , DETAILNO      , TRAINNO      , TRAINNAME" _
+            & "        , OBJECTIVECODE, KAISOUTYPE    , SHIPORDER    , TANKNO" _
+            & "        , KAMOKU       , KAISOUINFO    , CARSNUMBER   , REMARK" _
+            & "        , DEPSTATION   , DEPSTATIONNAME, ARRSTATION   , ARRSTATIONNAME" _
+            & "        , ACTUALDEPDATE, ACTUALARRDATE , ACTUALACCDATE, ACTUALEMPARRDATE" _
+            & "        , SALSE        , SALSETAX      , TOTALSALSE" _
+            & "        , PAYMENT      , PAYMENTTAX    , TOTALPAYMENT" _
+            & "        , DELFLG       , INITYMD       , INITUSER     , INITTERMID" _
+            & "        , UPDYMD       , UPDUSER       , UPDTERMID    , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @KAISOUNO     , @DETAILNO     , @SHIPORDER    , @TANKNO" _
-            & "        , @KAMOKU       , @KAISOUINFO   , @CARSNUMBER   , @REMARK" _
-            & "        , @ACTUALDEPDATE, @ACTUALARRDATE, @ACTUALACCDATE, @ACTUALEMPARRDATE" _
-            & "        , @SALSE        , @SALSETAX     , @TOTALSALSE" _
-            & "        , @PAYMENT      , @PAYMENTTAX   , @TOTALPAYMENT" _
-            & "        , @DELFLG       , @INITYMD      , @INITUSER     , @INITTERMID" _
-            & "        , @UPDYMD       , @UPDUSER      , @UPDTERMID    , @RECEIVEYMD) ;" _
+            & "        ( @KAISOUNO     , @DETAILNO      , @TRAINNO      , @TRAINNAME" _
+            & "        , @OBJECTIVECODE, @KAISOUTYPE    , @SHIPORDER    , @TANKNO" _
+            & "        , @KAMOKU       , @KAISOUINFO    , @CARSNUMBER   , @REMARK" _
+            & "        , @DEPSTATION   , @DEPSTATIONNAME, @ARRSTATION   , @ARRSTATIONNAME" _
+            & "        , @ACTUALDEPDATE, @ACTUALARRDATE , @ACTUALACCDATE, @ACTUALEMPARRDATE" _
+            & "        , @SALSE        , @SALSETAX      , @TOTALSALSE" _
+            & "        , @PAYMENT      , @PAYMENTTAX    , @TOTALPAYMENT" _
+            & "        , @DELFLG       , @INITYMD       , @INITUSER     , @INITTERMID" _
+            & "        , @UPDYMD       , @UPDUSER       , @UPDTERMID    , @RECEIVEYMD) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
 
@@ -3047,12 +3055,20 @@ Public Class OIT0002LinkList
               " SELECT" _
             & "    KAISOUNO" _
             & "    , DETAILNO" _
+            & "    , TRAINNO" _
+            & "    , TRAINNAME" _
+            & "    , OBJECTIVECODE" _
+            & "    , KAISOUTYPE" _
             & "    , SHIPORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , KAISOUINFO" _
             & "    , CARSNUMBER" _
             & "    , REMARK" _
+            & "    , DEPSTATION" _
+            & "    , DEPSTATIONNAME" _
+            & "    , ARRSTATION" _
+            & "    , ARRSTATIONNAME" _
             & "    , ACTUALDEPDATE" _
             & "    , ACTUALARRDATE" _
             & "    , ACTUALACCDATE" _
@@ -3081,12 +3097,20 @@ Public Class OIT0002LinkList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar, 11)         '回送№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)          '回送明細№
+                Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar)               '本線列車
+                Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar)           '本線列車名
+                Dim P_OBJECTIVECODE As SqlParameter = SQLcmd.Parameters.Add("@OBJECTIVECODE", SqlDbType.NVarChar)   '目的
+                Dim P_KAISOUTYPE As SqlParameter = SQLcmd.Parameters.Add("@KAISOUTYPE", SqlDbType.NVarChar)         '回送パターン
                 Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", SqlDbType.NVarChar, 2)        '発送順
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)              'タンク車№
                 Dim P_KAMOKU As SqlParameter = SQLcmd.Parameters.Add("@KAMOKU", SqlDbType.NVarChar)                 '費用科目
                 Dim P_KAISOUINFO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUINFO", SqlDbType.NVarChar, 2)      '回送情報
                 Dim P_CARSNUMBER As SqlParameter = SQLcmd.Parameters.Add("@CARSNUMBER", SqlDbType.Int)              '車数
                 Dim P_REMARK As SqlParameter = SQLcmd.Parameters.Add("@REMARK", SqlDbType.NVarChar)                 '備考
+                Dim P_DEPSTATION As SqlParameter = SQLcmd.Parameters.Add("@DEPSTATION", SqlDbType.NVarChar)         '発駅コード
+                Dim P_DEPSTATIONNAME As SqlParameter = SQLcmd.Parameters.Add("@DEPSTATIONNAME", SqlDbType.NVarChar) '発駅名
+                Dim P_ARRSTATION As SqlParameter = SQLcmd.Parameters.Add("@ARRSTATION", SqlDbType.NVarChar)         '着駅コード
+                Dim P_ARRSTATIONNAME As SqlParameter = SQLcmd.Parameters.Add("@ARRSTATIONNAME", SqlDbType.NVarChar) '着駅名
                 Dim P_ACTUALDEPDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALDEPDATE", SqlDbType.Date)       '発日（実績）
                 Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", SqlDbType.Date)       '積車着日（実績）
                 Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", SqlDbType.Date)       '受入日（実績）
@@ -3120,12 +3144,63 @@ Public Class OIT0002LinkList
 
                     P_KAISOUNO.Value = OIT0002row("KAISOUNO")       '回送№
                     P_DETAILNO.Value = OIT0002row("KAISOUDETAILNO") '回送明細№
+                    P_TRAINNO.Value = OIT0002row("LOADINGTRAINNO")  '本線列車
+                    P_TRAINNAME.Value = ""                          '本線列車名
+                    '★目的
+                    'P_OBJECTIVECODE.Value = ""                      '目的
+                    Select Case OIT0002row("OBJECTIVENAME")
+                        '○回送(全件)
+                        Case WW_OBJECTIVENAME(2)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_23
+                        '○回送(その他)
+                        Case WW_OBJECTIVENAME(3)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_25
+                    End Select
+
+                    '★回送パターン(目的、及び営業所別で設定)
+                    'P_KAISOUTYPE.Value = ""                         '回送パターン
+                    Select Case OIT0002row("OBJECTIVENAME")
+                        '○回送(全件)
+                        Case WW_OBJECTIVENAME(2)
+                            '★全件-他社負担(F120*40)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(2)
+                            End Select
+                        '○回送(その他)
+                        Case WW_OBJECTIVENAME(3)
+                            '★移動-JOT負担発払(F120*60)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(2)
+                            End Select
+                    End Select
+
                     P_SHIPORDER.Value = ""                          '発送順
                     P_TANKNO.Value = OIT0002row("TRUCKNO")          'タンク車№
                     P_KAMOKU.Value = ""                             '費用科目
                     P_KAISOUINFO.Value = ""                         '回送情報
                     P_CARSNUMBER.Value = 1                          '車数
                     P_REMARK.Value = ""                             '備考
+                    P_DEPSTATION.Value = OIT0002row("RETSTATION")               '発駅コード
+                    P_DEPSTATIONNAME.Value = OIT0002row("ARRSTATIONNAME")       '発駅名
+                    P_ARRSTATION.Value = OIT0002row("FORWARDINGARRSTATIONCODE") '着駅コード
+                    P_ARRSTATIONNAME.Value = OIT0002row("FORWARDINGARRSTATION") '着駅名
+
                     P_ACTUALDEPDATE.Value = DBNull.Value            '発日（実績）
                     P_ACTUALARRDATE.Value = DBNull.Value            '積車着日（実績）
                     P_ACTUALACCDATE.Value = DBNull.Value            '受入日（実績）

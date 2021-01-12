@@ -27,7 +27,8 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
-                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                <input type="button" id="WF_ButtonDELIVERY" style="display:none" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="回送登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>
@@ -75,7 +76,7 @@
                     </a>
                 </span>
                 <!-- ■　目的　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_OBJECTIVE_LABEL">目的</a>
                     <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
                         <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="2"></asp:TextBox>
@@ -98,7 +99,7 @@
                     </a>
                 </span>
                 <!-- ■　本線列車　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
                     <%-- 20200911 START 本線列車の入力を自由入力に変更(指摘票No130) --%>
                     <%--<a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">--%>
@@ -110,18 +111,18 @@
                     </a>
                 </span>
                 <!-- ■　タンク車数　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_TANKCNT_LABEL" class="requiredMark">タンク車数</a>
                     <a class="ef" id="WF_TANKCNT">
                         <asp:TextBox ID="TxtTankCnt" runat="server" onblur="MsgClear();" MaxLength="2"></asp:TextBox>
                     </a>
-                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="明細を作る" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <%--<input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="明細を作る" onclick="ButtonClick('WF_ButtonINSERT');" />--%>
                 </span>
                 <span></span>
                 <span></span>
 
                 <!-- ■　回送パターン　■ -->
-                <span class="doubleItem">
+                <span class="doubleItem" style="display:none">
                     <a id="WF_KAISOUTYPE_LABEL" class="requiredMark">回送パターン</a>
                     <a class="ef" id="WF_KAISOUTYPE" ondblclick="Field_DBclick('TxtKaisouType', <%=LIST_BOX_CLASSIFICATION.LC_KAISOUTYPE%>);" onchange="TextBox_change('TxtKaisouType');">
                         <asp:TextBox ID="TxtKaisouType" runat="server" ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -130,7 +131,7 @@
                 </span>
                 <span></span>
                 <!-- ■　運賃フラグ　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_FAREFLG_LABEL" class="requiredMark">片道</a>
                     <a id="WF_FAREFLG" onchange="ButtonClick('WF_CheckBoxSELECTFAREFLG');">
                         <asp:CheckBox ID="ChkFareFlg" runat="server" />
@@ -140,7 +141,7 @@
                 <span></span>
 
                 <!-- ■　発駅　■ -->
-                <span class="left">
+                <span class="left" style="display:none">
                     <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
                     <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('TxtDepstationCode');">
                         <asp:TextBox ID="TxtDepstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
@@ -154,7 +155,7 @@
                     </span>
                 </span>
                 <!-- ■　着駅　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
                     <a class="ef" id="WF_ARRSTATIONCODE" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('TxtArrstationCode');">
                         <asp:TextBox ID="TxtArrstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
@@ -169,7 +170,7 @@
                 </span>
                 <span></span>
                 <!-- ■　(予定)発日　■ -->
-                <span class="left">
+                <span class="left" style="display:none">
                     <a id="WF_DEPDATE_LABEL" class="requiredMark">(予定)発日</a>
                     <a class="ef" id="WF_DEPDATE" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtDepDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -177,7 +178,7 @@
                 </span>
 
                 <!-- ■　(予定)着日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ARRDATE" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtArrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -185,7 +186,7 @@
                 </span>
 
                 <!-- ■　(予定)受入日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ACCDATE_LABEL" class="requiredMark">受入日</a>
                     <a class="ef" id="WF_ACCDATE" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtAccDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -193,7 +194,7 @@
                 </span>
 
                 <!-- ■　(予定)発駅戻り日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_EMPARRDATE_LABEL" class="requiredMark">発駅戻り日</a>
                     <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -202,7 +203,7 @@
                 <span></span>
 
                 <!-- ■　(実績)発日　■ -->
-                <span class="left">
+                <span class="left" style="display:none">
                     <a id="WF_ACTUALDEPDATE_LABEL" class="requiredMark">(実績)発日</a>
                     <a class="ef" id="WF_ACTUALDEPDATE" ondblclick="Field_DBclick('TxtActualDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualDepDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -210,7 +211,7 @@
                 </span>
 
                 <!-- ■　(実績)着日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ACTUALARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ACTUALARRDATE" ondblclick="Field_DBclick('TxtActualArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualArrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -218,7 +219,7 @@
                 </span>
 
                 <!-- ■　(実績)受入日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ACTUALACCDATE_LABEL" class="requiredMark">受入日</a>
                     <a class="ef" id="WF_ACTUALACCDATE" ondblclick="Field_DBclick('TxtActualAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualAccDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -226,7 +227,7 @@
                 </span>
 
                 <!-- ■　(実績)発駅戻り日　■ -->
-                <span>
+                <span style="display:none">
                     <a id="WF_ACTUALEMPARRDATE_LABEL" class="requiredMark">発駅戻り日</a>
                     <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActualEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
@@ -234,6 +235,60 @@
                 </span>
                 <span></span>
             </asp:Panel> <!-- END pnlHeaderInput -->
+            <!-- 回送パターン表示エリア -->
+            <div class="summaryAreaWrapper">
+                <!-- 回送パターン数 -->
+                <div class="summaryArea">
+                    <!-- ■　回送パターン　■ -->
+                    <span>
+                        <a>&nbsp;</a>
+                        <a id="WF_OILTANKCNT_LABEL" class="requiredMark">回送パターン</a>
+                    </span>
+                    <!-- ■　目的（修理）　■ -->
+                    <span>
+                        <a id="WF_REPAIR_LABEL">修理</a>
+                        <a class="ef" id="WF_REPAIR">
+                            <asp:TextBox ID="TxtRepair" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                    <!-- ■　目的（ＭＣ）　■ -->
+                    <span>
+                        <a id="WF_MC_LABEL">ＭＣ</a>
+                        <a class="ef" id="WF_MC">
+                            <asp:TextBox ID="TxtMC" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                    <!-- ■　目的（交検）　■ -->
+                    <span>
+                        <a id="WF_INSPECTION_LABEL">交検</a>
+                        <a class="ef" id="WF_INSPECTION">
+                            <asp:TextBox ID="TxtInspection" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                    <!-- ■　目的（全検）　■ -->
+                    <span>
+                        <a id="WF_ALLINSPECTION_LABEL">全検</a>
+                        <a class="ef" id="WF_ALLINSPECTION">
+                            <asp:TextBox ID="TxtALLInspection" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                    <!-- ■　目的（留置）　■ -->
+                    <span>
+                        <a id="WF_INDWELLING_LABEL">疎開留置</a>
+                        <a class="ef" id="WF_INDWELLING">
+                            <asp:TextBox ID="TxtIndwelling" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                    <!-- ■　目的（移動）　■ -->
+                    <span>
+                        <a id="WF_MOVE_LABEL">移動</a>
+                        <a class="ef" id="WF_MOVE">
+                            <asp:TextBox ID="TxtMove" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
+                        </a>
+                    </span>
+                </div>
+            </div>
+
         </div> <!-- END headerDispArea -->
     </div> <!-- END headerbox -->
 

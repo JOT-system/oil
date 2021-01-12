@@ -195,38 +195,11 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             //document.getElementById('WF_LeftMViewChange').value = 20;
             document.getElementById('WF_LeftMViewChange').value = 65;
         }
-        else if (fieldNM === "OILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 24;
+        else if (fieldNM === "KAISOUTYPENAME") {
+            document.getElementById('WF_LeftMViewChange').value = 58;
         }
-        else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
-        }
-        else if (fieldNM === "SHIPPERSNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 42;
-        }
-        else if (fieldNM === "RETURNDATETRAIN") {
-            document.getElementById('WF_LeftMViewChange').value = 17;
-        }
-        else if (fieldNM === "LOADINGIRILINETRAINNO") {
-            document.getElementById('WF_LeftMViewChange').value = 47;
-        }
-        else if (fieldNM === "LOADINGOUTLETTRAINNO") {
-            document.getElementById('WF_LeftMViewChange').value = 48;
-        }
-        else if (fieldNM === "LINE") {
-            document.getElementById('WF_LeftMViewChange').value = 49;
-        }
-        else if (fieldNM === "SECONDCONSIGNEENAME") {
-            document.getElementById('WF_LeftMViewChange').value = 43;
-        }
-        else if (fieldNM === "SECONDARRSTATIONNAME") {
+        else if (fieldNM === "ARRSTATIONNAME") {
             document.getElementById('WF_LeftMViewChange').value = 51;
-        }
-        else if (fieldNM === "FILLINGPOINT") {
-            document.getElementById('WF_LeftMViewChange').value = 52;
-        }
-        else if (fieldNM === "JOINT") {
-            document.getElementById('WF_LeftMViewChange').value = 53;
         }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 

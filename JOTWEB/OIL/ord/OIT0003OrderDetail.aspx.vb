@@ -20978,14 +20978,19 @@ Public Class OIT0003OrderDetail
                             '積込可否フラグ(チェックボックス)を非活性
                             If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                            '    ### 20210112 START 指摘票対応(No320) #####################################
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
+                                '### 20210112 END   指摘票対応(No320) #####################################
+
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
+                                '### 20210112 START 指摘票対応(No320) #####################################
                                 '### 20200814 END  ((全体)No123対応) ######################################
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _

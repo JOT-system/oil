@@ -5930,8 +5930,13 @@ Public Class OIT0003OrderDetail
                 ' 発送順の値が油種の最大件数より大きくてもエラーとしない。 
                 '############################################################################
             Else
-                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                Exit Sub
+                '★★一旦チェックは仙台新港営業所のみとし、他の営業所ではチェックしない
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Exit Sub
+                Else
+                    '### チェックはスルー ########################################
+                End If
             End If
         End If
         '### 20200622 END  ((全体)No81対応) ######################################

@@ -6889,10 +6889,12 @@ Public Class OIT0006OutOfServiceDetail
                 CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
                 Exit Sub
             ElseIf stUseNo = "K" Then
-                '★指定したタンク車№が回送オーダー中の場合
-                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_108
-                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
-                Exit Sub
+                If Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
+                    '★指定したタンク車№が他の回送でオーダー中の場合
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_108
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                    Exit Sub
+                End If
             End If
         Catch ex As Exception
         End Try

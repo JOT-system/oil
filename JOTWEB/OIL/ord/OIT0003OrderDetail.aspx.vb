@@ -6534,6 +6534,8 @@ Public Class OIT0003OrderDetail
                 WW_UpdateOrderBilling(SQLcon)
                 '受注明細費用(TBL)追加・更新
                 WW_UpdateOrderDetailBilling(SQLcon)
+                '受注(TBL)更新
+                WW_UpdateOrder_TAB4(SQLcon)
             End If
 
         End Using

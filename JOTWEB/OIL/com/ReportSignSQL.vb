@@ -410,6 +410,7 @@
         & " , ''                                                    AS BRANCH" _
         & " , ISNULL(RTRIM(VIW0012.CALCKBN), '')                    AS CALCKBN" _
         & " , ISNULL(RTRIM(VIW0012.CALCKBNNAME), '')                AS CALCKBNNAME" _
+        & " , ISNULL(RTRIM(VIW0012.JROILTYPE), '')                  AS JROILTYPE" _
         & " , ISNULL(RTRIM(VIW0012.FARE), '')                       AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -418,6 +419,10 @@
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT1), '')                  AS DISCOUNT1" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT2), '')                  AS DISCOUNT2" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT3), '')                  AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT4), '')                  AS DISCOUNT4" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT5), '')                  AS DISCOUNT5" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT6), '')                  AS DISCOUNT6" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT7), '')                  AS DISCOUNT7" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNTFARE), '')               AS APPLYCHARGE" _
         & " , ''                                                    AS RETURNFARE" _
         & " , ISNULL(RTRIM(VIW0012.INVOICECODE), '')                AS INVOICECODE" _

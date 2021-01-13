@@ -771,6 +771,10 @@ Public Module Messages
         ''' (根岸営業所)「灯油＋３号軽油＝１０両以上」の場合の確認メッセージ
         ''' </summary>
         Public Const OIL_KEROSENE_3DIESEL_MSG As String = "20092"
+        ''' <summary>
+        ''' タンク車(受注(回送)オーダー中)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_USEORDER_ERROR As String = "20093"
 
 
 #End Region

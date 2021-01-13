@@ -150,7 +150,7 @@
                 <span>
                     <span>
                         <a id="WF_DEPSTATIONNAME">
-                            <asp:Label ID="LblDepstationName" runat="server">JXTG</asp:Label>
+                            <asp:Label ID="LblDepstationName" runat="server"></asp:Label>
                         </a>
                     </span>
                 </span>
@@ -164,7 +164,7 @@
                 <span class ="left">
                     <span>
                         <a id="WF_ARRSTATIONNAME">
-                            <asp:Label ID="LblArrstationName" runat="server">JXTG</asp:Label>
+                            <asp:Label ID="LblArrstationName" runat="server"></asp:Label>
                         </a>
                     </span>
                 </span>

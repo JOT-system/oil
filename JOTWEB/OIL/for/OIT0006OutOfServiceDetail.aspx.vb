@@ -623,6 +623,7 @@ Public Class OIT0006OutOfServiceDetail
             & " , ''                                             AS ACTUALEMPARRDATE" _
             & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
+            & " , ''                                             AS USEORDERNO" _
             & " FROM sys.all_objects "
 
             '明細データダブルクリック
@@ -692,6 +693,7 @@ Public Class OIT0006OutOfServiceDetail
                 & " , ISNULL(FORMAT(OIT0007.ACTUALEMPARRDATE, 'yyyy/MM/dd'), NULL)  AS ACTUALEMPARRDATE" _
                 & " , ISNULL(RTRIM(OIT0007.REMARK), '')                             AS REMARK" _
                 & " , ISNULL(RTRIM(OIT0006.DELFLG), '')                             AS DELFLG" _
+                & " , ''                                                            AS USEORDERNO" _
                 & " FROM OIL.OIT0006_KAISOU OIT0006 " _
                 & " INNER JOIN OIL.OIT0007_KAISOUDETAIL OIT0007 ON " _
                 & "       OIT0007.KAISOUNO = OIT0006.KAISOUNO" _
@@ -762,6 +764,11 @@ Public Class OIT0006OutOfServiceDetail
                         CODENAME_get("KAISOUPATTERN", OIT0006row("KAISOUTYPE"), OIT0006row("KAISOUTYPENAME"), WW_DUMMY)
                     End If
 
+                    'タンク車№(ステータスの取得)
+                    If OIT0006row("TANKNO") <> "" Then
+                        'タンク車№に紐づく情報を取得・設定
+                        WW_TANKNUMBER_FIND(OIT0006row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+                    End If
                 Next
             End Using
         Catch ex As Exception
@@ -2327,6 +2334,7 @@ Public Class OIT0006OutOfServiceDetail
             & " , ''                                             AS ACTUALEMPARRDATE" _
             & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
+            & " , ''                                             AS USEORDERNO" _
             & " FROM sys.all_objects "
 
         Try
@@ -4257,6 +4265,33 @@ Public Class OIT0006OutOfServiceDetail
                 Exit Sub
             End If
 
+            '★指定したタンク車№が受注オーダー中の場合
+            If OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_107 _
+                AndAlso OIT0006row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.OIL_TANKNO_USEORDER_ERROR, C_MESSAGE_TYPE.ERR,
+                              I_PARA01:="受注No(" + OIT0006row("USEORDERNO") + ")で使用中",
+                              needsPopUp:=True)
+
+                WW_CheckMES1 = "タンク車No受注オーダー使用中。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKNO_USEORDER_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            '★指定したタンク車№が回送オーダー中の場合
+            If OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_108 _
+                AndAlso OIT0006row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.OIL_TANKNO_USEORDER_ERROR, C_MESSAGE_TYPE.ERR,
+                              I_PARA01:="回送No(" + OIT0006row("USEORDERNO") + ")で使用中",
+                              needsPopUp:=True)
+
+                WW_CheckMES1 = "タンク車No回送オーダー使用中。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKNO_USEORDER_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
             '### 20200701 START((全体)No96対応) ######################################
             '★指定したタンク車№が所属営業所以外の場合
             If OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102 _
@@ -4286,8 +4321,10 @@ Public Class OIT0006OutOfServiceDetail
             '### 20200831 END   タンク車の所在地コード確認 ###########################
         Next
 
-        '○ 正常メッセージ
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+        If O_RTN = C_MESSAGE_NO.NORMAL Then
+            '○ 正常メッセージ
+            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+        End If
 
     End Sub
 
@@ -6841,6 +6878,24 @@ Public Class OIT0006OutOfServiceDetail
         Else
             OIT0006row("JRALLINSPECTIONALERT") = ""
         End If
+
+        Dim stUseNo As String = ""
+        Try
+            OIT0006row("USEORDERNO") = WW_GetValue(12)
+            stUseNo = WW_GetValue(12).Substring(0, 1)
+            If stUseNo = "O" Then
+                '★指定したタンク車№が受注オーダー中の場合
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_107
+                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                Exit Sub
+            ElseIf stUseNo = "K" Then
+                '★指定したタンク車№が回送オーダー中の場合
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_108
+                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                Exit Sub
+            End If
+        Catch ex As Exception
+        End Try
 
         '### 20200701 START((全体)No96対応) ######################################
         '★指定したタンク車№が所属営業所以外の場合

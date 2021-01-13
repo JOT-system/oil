@@ -565,6 +565,14 @@ Public Module BaseDllConst
     ''' 品種出荷期間エラー
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_106 As String = "106"
+    ''' <summary>
+    ''' 受注オーダー中
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_107 As String = "107"
+    ''' <summary>
+    ''' 回送オーダー中
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_108 As String = "108"
 
     ''' <summary>
     ''' 失注（荷主都合）

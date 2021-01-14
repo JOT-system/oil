@@ -362,6 +362,19 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtKaisouOrderOffice.Text = work.WF_SEL_KAISOUSALESOFFICE.Text
             Me.TxtKaisouOrderOfficeCode.Text = work.WF_SEL_KAISOUSALESOFFICECODE.Text
 
+            '目的(修理)
+            Me.TxtRepair.Text = work.WF_SEL_REPAIR.Text
+            '目的(ＭＣ)
+            Me.TxtMC.Text = work.WF_SEL_MC.Text
+            '目的(交検)
+            Me.TxtInspection.Text = work.WF_SEL_INSPECTION.Text
+            '目的(全検)
+            Me.TxtALLInspection.Text = work.WF_SEL_ALLINSPECTION.Text
+            '目的(疎開留置)
+            Me.TxtIndwelling.Text = work.WF_SEL_INDWELLING.Text
+            '目的(移動)
+            Me.TxtMove.Text = work.WF_SEL_MOVE.Text
+
             '作成モード(１：新規登録)
         Else
             Me.TxtKaisouOrderOffice.Text = work.WF_SEL_SALESOFFICE.Text
@@ -2596,13 +2609,23 @@ Public Class OIT0006OutOfServiceDetail
         '○回送進行ステータスが"250"(手配中)の場合
         If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 Then
             '★回送進行ステータス(回送完了)チェック
-            '　目的(移動)以外の回送パターンがすべて空車着日の設定済みの場合
+            '　目的(移動)以外の回送パターンがすべて発駅戻り日が設定済みの場合
             If OIT0006tbl.Select("OBJECTIVECODE<>'25' AND ISNULL(ACTUALEMPARRDATE,'')=''").Count = 0 Then
-                '★回送進行ステータスを"500"(回送完了)に変更する。
-                CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_500, Me.TxtKaisouStatus.Text, WW_DUMMY)
-                work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500
-                work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
-                strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+                '★発駅戻り日が未来日日付かチェック
+                Dim iFutureCnt As Integer = 0
+                For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE<>'" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
+                    If OIT0006row("ACTUALEMPARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        iFutureCnt += 1
+                    End If
+                Next
+                '★発駅戻り日が未来日日付で存在しない場合
+                If iFutureCnt = 0 Then
+                    '★回送進行ステータスを"500"(回送完了)に変更する。
+                    CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_500, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                    work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500
+                    work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
+                    strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+                End If
             End If
         End If
 
@@ -6921,8 +6944,10 @@ Public Class OIT0006OutOfServiceDetail
         '### 20200831 START タンク車の所在地コード確認 ###########################
         '★指定したタンク車№が、発駅以外の所在地の場合
         If WW_GetValue(15) <> OIT0006row("DEPSTATION") Then
-            OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
-            CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+            If Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+            End If
         ElseIf OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
             OIT0006row("KAISOUINFO") = ""
             OIT0006row("KAISOUINFONAME") = ""

@@ -720,6 +720,19 @@ Public Class OIT0006OutOfServiceList
         '合計車数
         work.WF_SEL_TANKCARTOTAL.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALTANK")
 
+        '目的(修理)
+        work.WF_SEL_REPAIR.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALREPAIR")
+        '目的(ＭＣ)
+        work.WF_SEL_MC.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALMC")
+        '目的(交検)
+        work.WF_SEL_INSPECTION.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALINSPECTION")
+        '目的(全検)
+        work.WF_SEL_ALLINSPECTION.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALALLINSPECTION")
+        '目的(疎開留置)
+        work.WF_SEL_INDWELLING.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALINDWELLING")
+        '目的(移動)
+        work.WF_SEL_MOVE.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALMOVE")
+
         '発日(予定)
         work.WF_SEL_DEPDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("DEPDATE")
         '着日(予定)

@@ -69,6 +69,7 @@ Public Class OIT0006OutOfServiceDetail
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
     Private WW_UPBUTTONFLG As String = "0"                          '登録・更新用ボタンフラグ(0:回送登録, 1:割当更新, 2:割当確定, 3:明細更新, 4:訂正更新)
+    Private WW_IDO_TANKNO_FLG As String = "0"                       '目的(移動)で本日付で移動する場合の確認メッセージ用フラグ(0:メッセージ表示, 1:YES, 2:NO)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -89,6 +90,7 @@ Public Class OIT0006OutOfServiceDetail
 
                     '◯ フラグ初期化
                     Me.WW_UPBUTTONFLG = "0"
+                    Me.WW_IDO_TANKNO_FLG = "0"
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
                             WF_ButtonDELIVERY_Click()
@@ -148,11 +150,12 @@ Public Class OIT0006OutOfServiceDetail
                             WF_ListChange()
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
-                            'Case "btnChkLastOilConfirmYes"        '確認メッセージはいボタン押下(前回油種チェック)
-                            '    '画面表示設定処理(受注進行ステータス)
-                            '    WW_ScreenOrderStatusSet()
-                            'Case "btnChkLastOilConfirmNo"         '確認メッセージいいえボタン押下(前回油種チェック)
-                            '    '### 特になし ###########
+                        Case "btnChkIdoSpecifyOfficeConfirmYes" '確認メッセージはいボタン押下(目的(移動)でタンク車ステータスを更新確認)
+                            Me.WW_IDO_TANKNO_FLG = "1"
+                            Me.WW_UPBUTTONFLG = "2"
+                        Case "btnChkIdoSpecifyOfficeConfirmNo"  '確認メッセージいいえボタン押下(目的(移動)でタタンク車ステータスを更新確認)
+                            Me.WW_IDO_TANKNO_FLG = "2"
+                            Me.WW_UPBUTTONFLG = "2"
                     End Select
 
                     '○ 一覧再表示処理
@@ -515,11 +518,11 @@ Public Class OIT0006OutOfServiceDetail
         '〇タブ「費用入力」表示用
         GridViewInitializeTab2()
 
-        '★回送進行ステータス"100"(回送受付)の場合は更新しない
-        If work.WF_SEL_KAISOUSTATUS.Text <> BaseDllConst.CONST_KAISOUSTATUS_100 Then
-            '〇タンク車所在の更新
-            WW_TankShozaiSet()
-        End If
+        ''★回送進行ステータス"100"(回送受付)の場合は更新しない
+        'If work.WF_SEL_KAISOUSTATUS.Text <> BaseDllConst.CONST_KAISOUSTATUS_100 Then
+        '    '〇タンク車所在の更新
+        '    WW_TankShozaiSet()
+        'End If
 
     End Sub
 
@@ -6480,6 +6483,10 @@ Public Class OIT0006OutOfServiceDetail
 
             '(一覧)で設定しているタンク車をKEYに更新(※目的(移動)のみ)
             For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
+
+                '★割当確定ボタン以外のボタンを押下した場合はSKIP
+                If Me.WW_UPBUTTONFLG <> "2" Then Continue For
+
                 'タンク車№
                 P_TANKNUMBER.Value = OIT0006row("TANKNO")
 
@@ -6490,55 +6497,80 @@ Public Class OIT0006OutOfServiceDetail
                          BaseDllConst.CONST_STATION_434105, BaseDllConst.CONST_STATION_434108,
                          BaseDllConst.CONST_STATION_4532, BaseDllConst.CONST_STATION_5510, BaseDllConst.CONST_STATION_5512
 
-                        '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                        If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
-                            '○所属営業所コード
-                            P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                            '○所在地コード(着駅)
-                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                            ''○所在地コード(発駅)
-                            'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
-                            '○タンク車状態コード
-                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
-                            '○タンク車状況コード
-                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
-                            '○使用受注№
-                            P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
+                        '★初回は確認メッセージを表示する
+                        If Me.WW_IDO_TANKNO_FLG = "0" Then
 
-                            '★着日が設定
-                        Else
-                            '○所属営業所コード(※各駅の所属営業所を設定)
-                            Select Case OIT0006row("ARRSTATION")
+                            '目的が移動で営業所指定の場合は、タンク車ステータスを更新する旨をメッセージにて確認
+                            Master.Output(C_MESSAGE_NO.OIL_KAISOU_IDO_TANKNO_STATUSSET_MSG,
+                                          C_MESSAGE_TYPE.QUES,
+                                          needsPopUp:=True,
+                                          messageBoxTitle:="",
+                                          IsConfirm:=True,
+                                          YesButtonId:="btnChkIdoSpecifyOfficeConfirmYes",
+                                          needsConfirmNgToPostBack:=True,
+                                          NoButtonId:="btnChkIdoSpecifyOfficeConfirmNo")
+
+                            Continue For
+
+                            '★★ポップアップ「OK」ボタン押下時
+                        ElseIf Me.WW_IDO_TANKNO_FLG = "1" Then
+                            '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
+                            If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                                '○所属営業所コード
+                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                                '○所在地コード(着駅)
+                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                                ''○所在地コード(発駅)
+                                'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                                '○タンク車状態コード
+                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
+                                '○タンク車状況コード
+                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
+                                '○使用受注№
+                                P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
+
+                                '★着日が設定
+                            Else
+                                '○所属営業所コード(※各駅の所属営業所を設定)
+                                Select Case OIT0006row("ARRSTATION")
                                 '仙台北港
-                                Case BaseDllConst.CONST_STATION_243202
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_010402
+                                    Case BaseDllConst.CONST_STATION_243202
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_010402
                                 '浜五井
-                                Case BaseDllConst.CONST_STATION_434103
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011201
+                                    Case BaseDllConst.CONST_STATION_434103
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011201
                                 '甲子
-                                Case BaseDllConst.CONST_STATION_434105
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011202
+                                    Case BaseDllConst.CONST_STATION_434105
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011202
                                 '北袖
-                                Case BaseDllConst.CONST_STATION_434108
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011203
+                                    Case BaseDllConst.CONST_STATION_434108
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011203
                                 '根岸
-                                Case BaseDllConst.CONST_STATION_4532
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011402
+                                    Case BaseDllConst.CONST_STATION_4532
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011402
                                 '四日市
-                                Case BaseDllConst.CONST_STATION_5510
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012401
+                                    Case BaseDllConst.CONST_STATION_5510
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012401
                                 '塩浜
-                                Case BaseDllConst.CONST_STATION_5512
-                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012402
-                            End Select
-                            '○所在地コード(着駅)
-                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                            '○タンク車状態コード
-                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
-                            '○タンク車状況コード
-                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
-                            '○使用受注№
-                            P_USEORDERNO.Value = ""
+                                    Case BaseDllConst.CONST_STATION_5512
+                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012402
+                                End Select
+                                '○所在地コード(着駅)
+                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                                '○タンク車状態コード
+                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                                '○タンク車状況コード
+                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
+                                '○使用受注№
+                                P_USEORDERNO.Value = ""
+                            End If
+
+                            '★★ポップアップ「NG」ボタン押下時
+                        ElseIf Me.WW_IDO_TANKNO_FLG = "2" Then
+
+                            '### 所在更新しない ###########################################
+                            Continue For
+
                         End If
 
                         '上記以外の着駅

@@ -775,6 +775,10 @@ Public Module Messages
         ''' タンク車(受注(回送)オーダー中)エラーメッセージ
         ''' </summary>
         Public Const OIL_TANKNO_USEORDER_ERROR As String = "20093"
+        ''' <summary>
+        ''' 回送登録時の移動(指定営業所の場合)のタンク車所在ステータス更新確認メッセージ
+        ''' </summary>
+        Public Const OIL_KAISOU_IDO_TANKNO_STATUSSET_MSG As String = "20094"
 
 
 #End Region

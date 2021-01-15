@@ -585,6 +585,7 @@
                         <input type="button" id="WF_ButtonLINE_ADD_TAB1" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
                     </div>
                     <div class="rightSide">
+                        <input type="button" id="WF_ButtonUPDATE_KARI_TAB1" class="btn-sticky" value="割当更新"  onclick="ButtonClick('WF_ButtonUPDATE_KARI_TAB1');" />
                         <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="割当確定"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
                         <input type="button" id="WF_ButtonCANCEL_TAB1" class="btn-sticky" value="割当解除"  onclick="ButtonClick('WF_ButtonCANCEL_TAB1');" />
                     </div>

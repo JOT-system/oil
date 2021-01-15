@@ -95,7 +95,7 @@ Public Class OIT0003OrderDetail
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
-    Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:割当確定, 2:入力内容登録, 3:明細更新, 4:訂正更新)
+    Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:割当確定, 2:入力内容登録, 3:明細更新, 4:訂正更新, 5:割当更新)
 
     Private WW_ORDERCNT As Integer = 0                              '受注TBLの件数を設定(0件の場合は貨車連結順序表のみと判断するため)
 
@@ -197,7 +197,9 @@ Public Class OIT0003OrderDetail
                              "WF_ButtonLINE_ADD_TAB3",
                              "WF_ButtonLINE_ADD_TAB4"
                             WF_ButtonLINE_ADD_Click()
-                        Case "WF_ButtonUPDATE_TAB1",          '更新ボタン押下
+                        Case "WF_ButtonUPDATE_KARI_TAB1"      '割当更新ボタン押下
+                            WF_ButtonUPDATE_KARI_Click()
+                        Case "WF_ButtonUPDATE_TAB1",          '確定ボタン押下
                              "WF_ButtonUPDATE_TAB2",
                              "WF_ButtonUPDATE_TAB3",
                              "WF_ButtonUPDATE_TAB4"
@@ -3141,8 +3143,13 @@ Public Class OIT0003OrderDetail
         '〇 画面表示設定処理
         WW_ScreenEnabledSet()
 
-        '〇タンク車所在の更新
-        WW_TankShozaiSet()
+        '### 20210115 START 指摘票対応(No321)全体 #########################################################
+        '★割当更新ボタン押下時は所在の更新は実施しない
+        If Me.WW_UPBUTTONFLG <> "5" Then
+            '〇タンク車所在の更新
+            WW_TankShozaiSet()
+        End If
+        '### 20210115 END   指摘票対応(No321)全体 #########################################################
 
     End Sub
 
@@ -5591,6 +5598,20 @@ Public Class OIT0003OrderDetail
 #End Region
 
     ''' <summary>
+    ''' 割当更新ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonUPDATE_KARI_Click()
+        '割当更新ボタン押下時
+        Me.WW_UPBUTTONFLG = "5"
+        WW_ButtonUPDATE_TAB1()
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' 更新ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -5658,7 +5679,9 @@ Public Class OIT0003OrderDetail
         End If
 
         '### 20200818 START (一覧)タンク車Noがすべて割当されてない場合は更新のみ実施 #####################
-        If OIT0003tbl.Select("TANKNO = '' AND DELFLG = '0'").Count <> 0 Then
+        '### 20210115 指摘票対応(No321)全体 ##############################################################
+        If OIT0003tbl.Select("TANKNO = '' AND DELFLG = '0'").Count <> 0 _
+            OrElse Me.WW_UPBUTTONFLG = "5" Then
             '受注DB追加・更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続

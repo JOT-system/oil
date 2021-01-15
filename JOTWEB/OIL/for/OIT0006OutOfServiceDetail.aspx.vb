@@ -68,7 +68,7 @@ Public Class OIT0006OutOfServiceDetail
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
-    Private WW_UPBUTTONFLG As String = "0"                          '登録・更新用ボタンフラグ(1:回送登録, 2:割当確定, 3:明細更新, 4:訂正更新)
+    Private WW_UPBUTTONFLG As String = "0"                          '登録・更新用ボタンフラグ(0:回送登録, 1:割当更新, 2:割当確定, 3:明細更新, 4:訂正更新)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -121,14 +121,18 @@ Public Class OIT0006OutOfServiceDetail
                         Case "WF_ButtonLINE_ADD_TAB1",        '行追加ボタン押下
                              "WF_ButtonLINE_ADD_TAB2"
                             WF_ButtonLINE_ADD_Click()
-                        Case "WF_ButtonUPDATE_TAB1",          '更新ボタン押下
+                        Case "WF_ButtonUPDATE_KARI_TAB1"      '割当更新ボタン押下
+                            WW_TAB1_SW = "0"
+                            Me.WW_UPBUTTONFLG = "1"
+                            WF_ButtonUPDATE_Click()
+                        Case "WF_ButtonUPDATE_TAB1",          '割当確定ボタン押下
                              "WF_ButtonUPDATE_TAB2"
                             WW_TAB1_SW = "1"
-                            Me.WW_UPBUTTONFLG = "1"
+                            Me.WW_UPBUTTONFLG = "2"
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonUPDATE_MEISAI_TAB1"    '明細更新ボタン押下
                             WW_TAB1_SW = "2"
-                            Me.WW_UPBUTTONFLG = "2"
+                            Me.WW_UPBUTTONFLG = "3"
                             WF_ButtonUPDATE_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
@@ -199,13 +203,18 @@ Public Class OIT0006OutOfServiceDetail
 
             End If
 
-            '◯回送進行ステータスが250:手配完了以降のステータスに変更された場合
+            '◯回送進行ステータスが250:手配完了～500:回送完了までのステータスに変更された場合
             If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_300 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_350 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_400 _
-                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 _
-                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 Then
+
+                'タブ「タンク車割当」の割当確定ボタンを非活性
+                WF_MAPButtonControl.Value = "1"
+
+                '◯回送進行ステータスが500:回送完了以降のステータスに変更された場合
+            ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_550 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_600 _
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_700 _
@@ -213,7 +222,7 @@ Public Class OIT0006OutOfServiceDetail
                 OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_900 Then
 
                 'タブ「タンク車割当」のボタンをすべて非活性
-                WF_MAPButtonControl.Value = "1"
+                WF_MAPButtonControl.Value = "2"
 
             End If
 
@@ -506,8 +515,11 @@ Public Class OIT0006OutOfServiceDetail
         '〇タブ「費用入力」表示用
         GridViewInitializeTab2()
 
-        '〇タンク車所在の更新
-        WW_TankShozaiSet()
+        '★回送進行ステータス"100"(回送受付)の場合は更新しない
+        If work.WF_SEL_KAISOUSTATUS.Text <> BaseDllConst.CONST_KAISOUSTATUS_100 Then
+            '〇タンク車所在の更新
+            WW_TankShozaiSet()
+        End If
 
     End Sub
 
@@ -826,8 +838,11 @@ Public Class OIT0006OutOfServiceDetail
         '〇 画面表示設定処理
         WW_ScreenEnabledSet()
 
-        '〇タンク車所在の更新
-        WW_TankShozaiSet()
+        '★回送登録、割当確定、明細更新ボタン押下時のみ更新
+        If WW_UPBUTTONFLG = "0" OrElse WW_UPBUTTONFLG = "2" OrElse WW_UPBUTTONFLG = "3" Then
+            '〇タンク車所在の更新
+            WW_TankShozaiSet()
+        End If
 
     End Sub
 
@@ -2457,13 +2472,22 @@ Public Class OIT0006OutOfServiceDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonUPDATE_Click()
 
+        WW_ERRCODE = C_MESSAGE_NO.NORMAL
+
         '〇 選択されたタブ一覧の各更新ボタン押下時の制御
         'タブ「タンク車割当」
         If WF_DetailMView.ActiveViewIndex = "0" Then
 
-            If WW_TAB1_SW = "1" Then
+            If WW_TAB1_SW = "0" Then
+                '割当更新ボタン押下時
+                WW_ButtonUPDATE_TAB1(WW_ERRCODE)
+
+            ElseIf WW_TAB1_SW = "1" Then
                 '割当確定ボタン押下時
-                WW_ButtonUPDATE_TAB1()
+                WW_ButtonUPDATE_TAB1(WW_ERRCODE)
+                If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+                    WW_ButtonUPDATE_MEISAI_TAB1()
+                End If
 
             ElseIf WW_TAB1_SW = "2" Then
                 '明細更新ボタン押下時
@@ -2484,7 +2508,8 @@ Public Class OIT0006OutOfServiceDetail
     ''' 割当確定ボタン押下時処理(タブ「タンク車割当」)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_ButtonUPDATE_TAB1()
+    Protected Sub WW_ButtonUPDATE_TAB1(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ エラーレポート準備
         rightview.SetErrorReport("")
@@ -2495,12 +2520,14 @@ Public Class OIT0006OutOfServiceDetail
         '○ 関連チェック
         WW_Check(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
+            O_RTN = "ERR"
             Exit Sub
         End If
 
         '〇 (一覧)年月日妥当性チェック
         WW_CheckListValidityDate(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
+            O_RTN = "ERR"
             Exit Sub
         End If
 #Region "### 20200106 新画面に整理後、不要と判断(廃止) #########################################################"
@@ -2563,6 +2590,11 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
+        '★割当更新ボタン押下時はステータスを更新しない
+        If Me.WW_UPBUTTONFLG = "1" Then
+            Exit Sub
+        End If
+
         '画面表示設定処理(回送進行ステータス)
         WW_ScreenKaisouStatusSet()
 
@@ -2583,8 +2615,9 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '● 日付妥当性チェック(実績(日付))
-        WW_CheckActualValidityDate(WW_ERRCODE)
+        '● 日付妥当性チェック(発駅戻り日)
+        WW_CheckListActualValidityDate(WW_ERRCODE)
+        'WW_CheckActualValidityDate(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
             Exit Sub
         End If
@@ -3482,7 +3515,12 @@ Public Class OIT0006OutOfServiceDetail
                 For Each OIT0006row As DataRow In OIT0006tbl.Rows
                     'DB更新
                     PARA02.Value = OIT0006row("DETAILNO")         '回送明細№
-                    PARA31.Value = OIT0006row("TRAINNO")          '本線列車
+                    '本線列車
+                    If OIT0006row("TRAINNO") <> "" Then
+                        PARA31.Value = Integer.Parse(OIT0006row("TRAINNO")).ToString("0000")
+                    Else
+                        PARA31.Value = OIT0006row("TRAINNO")
+                    End If
                     PARA32.Value = OIT0006row("TRAINNAME")        '本線列車名
                     PARA33.Value = OIT0006row("OBJECTIVECODE")    '目的
                     PARA34.Value = OIT0006row("KAISOUTYPE")       '回送パターン
@@ -3721,28 +3759,28 @@ Public Class OIT0006OutOfServiceDetail
                 PARA12.Value = OIT0006row("REMARK")
 
                 '発日（実績）
-                If OIT0006row("ACTUALDEPDATE") = "" Then
+                If Convert.ToString(OIT0006row("ACTUALDEPDATE")) = "" Then
                     PARA04.Value = DBNull.Value
                 Else
                     PARA04.Value = OIT0006row("ACTUALDEPDATE")
                 End If
 
                 '着日（実績）
-                If OIT0006row("ACTUALARRDATE") = "" Then
+                If Convert.ToString(OIT0006row("ACTUALARRDATE")) = "" Then
                     PARA05.Value = DBNull.Value
                 Else
                     PARA05.Value = OIT0006row("ACTUALARRDATE")
                 End If
 
                 '受入日（実績）
-                If OIT0006row("ACTUALACCDATE") = "" Then
+                If Convert.ToString(OIT0006row("ACTUALACCDATE")) = "" Then
                     PARA06.Value = DBNull.Value
                 Else
                     PARA06.Value = OIT0006row("ACTUALACCDATE")
                 End If
 
                 '発駅戻り日（実績）
-                If OIT0006row("ACTUALEMPARRDATE") = "" Then
+                If Convert.ToString(OIT0006row("ACTUALEMPARRDATE")) = "" Then
                     PARA07.Value = DBNull.Value
                 Else
                     PARA07.Value = OIT0006row("ACTUALEMPARRDATE")
@@ -4279,13 +4317,20 @@ Public Class OIT0006OutOfServiceDetail
 
             '(一覧)着日(空白チェック)
             If OIT0006row("ACTUALARRDATE") = "" And OIT0006row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)着日", needsPopUp:=True)
+                '★目的(移動)の場合は必須なのでエラーとする。
+                If OIT0006row("OBJECTIVECODE") = BaseDllConst.CONST_OBJECTCODE_25 Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)着日", needsPopUp:=True)
+                    OIT0006row("KAISOUINFONAME") = "着日未設定エラー"
 
-                WW_CheckMES1 = "着日未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
-                O_RTN = "ERR"
-                Exit Sub
+                    WW_CheckMES1 = "着日未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Else
+                OIT0006row("KAISOUINFO") = ""
+                OIT0006row("KAISOUINFONAME") = ""
             End If
 
             '★指定したタンク車№が受注オーダー中の場合
@@ -4832,7 +4877,7 @@ Public Class OIT0006OutOfServiceDetail
     End Sub
 
     ''' <summary>
-    ''' (一覧)年月日妥当性チェック
+    ''' (一覧)年月日妥当性チェック(割当確定ボタン押下時)
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
@@ -4869,16 +4914,22 @@ Public Class OIT0006OutOfServiceDetail
             End If
 
             '(一覧)着日 と　現在日付を比較
-            iresult = Date.Parse(OIT0006row("ACTUALARRDATE")).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_92
-                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+            '★着日は任意項目のため、設定されている場合チェックする。
+            If Convert.ToString(OIT0006row("ACTUALARRDATE")) <> "" Then
+                iresult = Date.Parse(OIT0006row("ACTUALARRDATE")).CompareTo(DateTime.Today)
+                If iresult = -1 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_93
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
 
-                WW_CheckMES1 = "(一覧)着日の日付は過去日のためエラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Continue For
+                    WW_CheckMES1 = "(一覧)着日の日付は過去日のためエラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Continue For
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
             Else
                 OIT0006row("KAISOUINFO") = ""
                 OIT0006row("KAISOUINFONAME") = ""
@@ -4894,6 +4945,7 @@ Public Class OIT0006OutOfServiceDetail
 
         '○ (一覧)日付妥当性チェック
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
+            If Convert.ToString(OIT0006row("ACTUALARRDATE")) = "" Then Continue For
             '例) iresult = dt1.Date.CompareTo(dt2.Date)
             '    iresultの意味
             '     0 : dt1とdt2は同じ日
@@ -4902,7 +4954,7 @@ Public Class OIT0006OutOfServiceDetail
             '(予定)発日 と　(予定)着日を比較
             iresult = Date.Parse(OIT0006row("ACTUALDEPDATE")).CompareTo(Date.Parse(OIT0006row("ACTUALARRDATE")))
             If iresult = 1 Then
-                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_92
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_93
                 CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "(一覧)着日で入力した日付が(一覧)発日より過去日のためエラー。"
@@ -4923,8 +4975,162 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
+        '○ (一覧)日付妥当性チェック
+        For Each OIT0006row As DataRow In OIT0006tbl.Rows
+            If Convert.ToString(OIT0006row("ACTUALEMPARRDATE")) = "" Then Continue For
+            '例) iresult = dt1.Date.CompareTo(dt2.Date)
+            '    iresultの意味
+            '     0 : dt1とdt2は同じ日
+            '    -1 : dt1はdt2より前の日
+            '     1 : dt1はdt2より後の日
+            Try
+                '着日 と　発駅戻り日を比較
+                iresult = Date.Parse(OIT0006row("ACTUALARRDATE")).CompareTo(Date.Parse(OIT0006row("ACTUALEMPARRDATE")))
+                If iresult = 1 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_109
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "(一覧)発駅戻り日で入力した日付が(一覧)着日より過去日のためエラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Continue For
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
+
+            Catch ex As Exception
+                '★着日は任意項目のため、未設定の場合は発日と比較する。
+                '発日 と　発駅戻り日を比較
+                iresult = Date.Parse(OIT0006row("ACTUALDEPDATE")).CompareTo(Date.Parse(OIT0006row("ACTUALEMPARRDATE")))
+                If iresult = 1 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_109
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "(一覧)発駅戻り日で入力した日付が(一覧)発日より過去日のためエラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Continue For
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
+
+            End Try
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0006tbl)
+        Next
+        '(一覧)日付妥当性チェックがエラーの場合
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)着日 > (一覧)発駅戻り日", needsPopUp:=True)
+            Exit Sub
+        End If
+
     End Sub
 
+    ''' <summary>
+    ''' (一覧)年月日妥当性チェック(明細更新ボタン押下時)
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckListActualValidityDate(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim iresult As Integer
+
+        '○ (一覧)過去日付チェック
+        For Each OIT0006row As DataRow In OIT0006tbl.Rows
+            If Convert.ToString(OIT0006row("ACTUALEMPARRDATE")) = "" Then Continue For
+            '例) iresult = dt1.Date.CompareTo(dt2.Date)
+            '    iresultの意味
+            '     0 : dt1とdt2は同じ日
+            '    -1 : dt1はdt2より前の日
+            '     1 : dt1はdt2より後の日
+            '(一覧)発駅戻り日 と　現在日付を比較
+            iresult = Date.Parse(OIT0006row("ACTUALEMPARRDATE")).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_109
+                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(一覧)発日の日付は過去日のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Continue For
+            Else
+                OIT0006row("KAISOUINFO") = ""
+                OIT0006row("KAISOUINFONAME") = ""
+            End If
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0006tbl)
+        Next
+        '(一覧)過去日付チェックがエラーの場合
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)日付", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '○ (一覧)日付妥当性チェック
+        For Each OIT0006row As DataRow In OIT0006tbl.Rows
+            If Convert.ToString(OIT0006row("ACTUALEMPARRDATE")) = "" Then Continue For
+            '例) iresult = dt1.Date.CompareTo(dt2.Date)
+            '    iresultの意味
+            '     0 : dt1とdt2は同じ日
+            '    -1 : dt1はdt2より前の日
+            '     1 : dt1はdt2より後の日
+            Try
+                '着日 と　発駅戻り日を比較
+                iresult = Date.Parse(OIT0006row("ACTUALARRDATE")).CompareTo(Date.Parse(OIT0006row("ACTUALEMPARRDATE")))
+                If iresult = 1 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_109
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "(一覧)発駅戻り日で入力した日付が(一覧)着日より過去日のためエラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Continue For
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
+
+            Catch ex As Exception
+                '★着日は任意項目のため、未設定の場合は発日と比較する。
+                '発日 と　発駅戻り日を比較
+                iresult = Date.Parse(OIT0006row("ACTUALDEPDATE")).CompareTo(Date.Parse(OIT0006row("ACTUALEMPARRDATE")))
+                If iresult = 1 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_109
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "(一覧)発駅戻り日で入力した日付が(一覧)発日より過去日のためエラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Continue For
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
+
+            End Try
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0006tbl)
+        Next
+        '(一覧)日付妥当性チェックがエラーの場合
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)着日 > (一覧)発駅戻り日", needsPopUp:=True)
+            Exit Sub
+        End If
+
+    End Sub
 
     ''' <summary>
     ''' エラーレポート編集
@@ -5599,10 +5805,11 @@ Public Class OIT0006OutOfServiceDetail
             For Each rowitem As TableRow In tblObj.Rows
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 For Each cellObj As TableCell In rowitem.Controls
-                    '(実績)発日, (実績)着日, (実績)受入日を入力可能(読取専用)とする。
+                    '(実績)発日, (実績)着日, (実績)受入日, 着駅を入力可能(読取専用)とする。
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
@@ -5640,7 +5847,8 @@ Public Class OIT0006OutOfServiceDetail
 
                 For Each cellObj As TableCell In rowitem.Controls
 
-                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TRAINNO") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                     End If
@@ -5736,8 +5944,9 @@ Public Class OIT0006OutOfServiceDetail
                             '    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             'End If
                         Case Else
-                            '(実績)発駅戻り日は入力不可とする。
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                            '(実績)発駅戻り日, 記事欄は入力不可とする。
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "REMARK") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                     End Select
@@ -6180,7 +6389,7 @@ Public Class OIT0006OutOfServiceDetail
                 & "    ,   UPDTERMID       = @UPDTERMID " _
                 & "    ,   RECEIVEYMD      = @RECEIVEYMD  " _
                 & "  WHERE TANKNUMBER      = @TANKNUMBER  " _
-                & "    AND (USEORDERNO     = '' OR USEORDERNO = @USEORDERNO) " _
+                & "    AND (ISNULL(USEORDERNO,'')     = '' OR USEORDERNO = @USEORDERNO) " _
                 & "    AND DELFLG         <> @DELFLG; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -6282,11 +6491,13 @@ Public Class OIT0006OutOfServiceDetail
                          BaseDllConst.CONST_STATION_4532, BaseDllConst.CONST_STATION_5510, BaseDllConst.CONST_STATION_5512
 
                         '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                        If OIT0006row("ACTUALARRDATE") < Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
                             '○所属営業所コード
                             P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                            '○所在地コード(発駅)
-                            P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                            '○所在地コード(着駅)
+                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                            ''○所在地コード(発駅)
+                            'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
                             '○タンク車状態コード
                             P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
                             '○タンク車状況コード
@@ -6333,7 +6544,7 @@ Public Class OIT0006OutOfServiceDetail
                         '上記以外の着駅
                     Case Else
                         '    ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                        If Convert.ToString(OIT0006row("ACTUALARRDATE")) < Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        If Convert.ToString(OIT0006row("ACTUALARRDATE")) > Now.AddDays(0).ToString("yyyy/MM/dd") Then
                             '○所属営業所コード
                             P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
                             '○所在地コード(着駅)
@@ -6365,6 +6576,7 @@ Public Class OIT0006OutOfServiceDetail
                 P_EMPARRDATE.Value = DBNull.Value
                 P_ACTUALEMPARRDATE.Value = DBNull.Value
 
+                SQLcmd.ExecuteNonQuery()
             Next
 
             'CLOSE
@@ -6804,6 +7016,19 @@ Public Class OIT0006OutOfServiceDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_TANKNUMBER_FIND(ByRef OIT0006row As DataRow, Optional ByVal I_CMPCD As String = Nothing)
+
+        '★回送進行ステータスが"500"(回送完了)以降はチェックしない
+        If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_550 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_600 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_700 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_800 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_900 Then
+
+            Exit Sub
+
+        End If
+
         Dim WW_TANKNUMBER As String = OIT0006row("TANKNO")
         Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
@@ -6912,29 +7137,62 @@ Public Class OIT0006OutOfServiceDetail
                 CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
                 Exit Sub
             ElseIf stUseNo = "K" Then
+                '★指定したタンク車№が他の回送でオーダー中の場合
                 If Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
-                    '★指定したタンク車№が他の回送でオーダー中の場合
                     OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_108
-                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                    Select Case WW_GetValue(16)
+                        '状況(11:修理)
+                        Case BaseDllConst.CONST_TANKSITUATION_11
+                            OIT0006row("KAISOUINFONAME") = "修理で回送中です"
+                        '状況(12:ＭＣ)
+                        Case BaseDllConst.CONST_TANKSITUATION_12
+                            OIT0006row("KAISOUINFONAME") = "MCに回送中です"
+                        '状況(13:交検)
+                        Case BaseDllConst.CONST_TANKSITUATION_13
+                            OIT0006row("KAISOUINFONAME") = "交検で回送中です"
+                        '状況(14:全検)
+                        Case BaseDllConst.CONST_TANKSITUATION_14
+                            OIT0006row("KAISOUINFONAME") = "全検で回送中です"
+                        '状況(15:留置)
+                        Case BaseDllConst.CONST_TANKSITUATION_15
+                            OIT0006row("KAISOUINFONAME") = WW_GetValue(8) + "で留置中です"
+                        '状況(8:回送中(移動))
+                        Case BaseDllConst.CONST_TANKSITUATION_08
+                            Dim idoStationNM As String = ""
+                            CODENAME_get("DEPSTATION", WW_GetValue(15), idoStationNM, WW_DUMMY)
+                            OIT0006row("KAISOUINFONAME") = idoStationNM + "(移動先)に回送しています"
+                        Case Else
+                            CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                    End Select
                     Exit Sub
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
                 End If
             End If
         Catch ex As Exception
+            OIT0006row("KAISOUINFO") = ""
+            OIT0006row("KAISOUINFONAME") = ""
         End Try
 
         '### 20200701 START((全体)No96対応) ######################################
         '★指定したタンク車№が所属営業所以外の場合
         If WW_GetValue(13) <> Me.TxtKaisouOrderOfficeCode.Text Then
-            '### 20200819 START 管轄支店コード(11001(OT本社))対応 ####################
-            If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 Then
-                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
-                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
-                Exit Sub
+            If Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
+                '### 20200819 START 管轄支店コード(11001(OT本社))対応 ####################
+                If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 Then
+                    OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
+                    CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+                    Exit Sub
+                Else
+                    OIT0006row("KAISOUINFO") = ""
+                    OIT0006row("KAISOUINFONAME") = ""
+                End If
+                '### 20200819 END   管轄支店コード(11001(OT本社))対応 ####################
             Else
                 OIT0006row("KAISOUINFO") = ""
                 OIT0006row("KAISOUINFONAME") = ""
             End If
-            '### 20200819 END   管轄支店コード(11001(OT本社))対応 ####################
         ElseIf OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102 Then
             OIT0006row("KAISOUINFO") = ""
             OIT0006row("KAISOUINFONAME") = ""

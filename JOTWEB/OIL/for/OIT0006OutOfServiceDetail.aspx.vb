@@ -2645,24 +2645,35 @@ Public Class OIT0006OutOfServiceDetail
         '○回送進行ステータスが"250"(手配中)の場合
         If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 Then
             '★回送進行ステータス(回送完了)チェック
+            Dim iFutureCnt As Integer = 0
             '　目的(移動)以外の回送パターンがすべて発駅戻り日が設定済みの場合
             If OIT0006tbl.Select("OBJECTIVECODE<>'25' AND ISNULL(ACTUALEMPARRDATE,'')=''").Count = 0 Then
                 '★発駅戻り日が未来日日付かチェック
-                Dim iFutureCnt As Integer = 0
                 For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE<>'" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
                     If OIT0006row("ACTUALEMPARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
                         iFutureCnt += 1
                     End If
                 Next
-                '★発駅戻り日が未来日日付で存在しない場合
-                If iFutureCnt = 0 Then
-                    '★回送進行ステータスを"500"(回送完了)に変更する。
-                    CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_500, Me.TxtKaisouStatus.Text, WW_DUMMY)
-                    work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500
-                    work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
-                    strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
-                End If
             End If
+            '目的(移動)の回送パターンがすべて着日が設定済みの場合
+            If OIT0006tbl.Select("OBJECTIVECODE='25' AND ISNULL(ACTUALARRDATE,'')=''").Count = 0 Then
+                '★着日が未来日日付かチェック
+                For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
+                    If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        iFutureCnt += 1
+                    End If
+                Next
+            End If
+
+            '★未来日日付で存在しない場合
+            If iFutureCnt = 0 Then
+                '★回送進行ステータスを"500"(回送完了)に変更する。
+                CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_500, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500
+                work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
+                strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+            End If
+
         End If
 
 #Region "### 20200106 新画面に整理後、不要と判断(廃止) #########################################################"
@@ -5860,14 +5871,24 @@ Public Class OIT0006OutOfServiceDetail
                     Select Case work.WF_SEL_KAISOUSTATUS.Text
                         '手配完了
                         Case BaseDllConst.CONST_KAISOUSTATUS_250
-                            '(実績)発日, (実績)着日, (実績)受入日を入力可能(読取専用)とする。
+                            '(実績)発日, (実績)受入日を入力可能(読取専用)とする。
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "KAISOUTYPENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
+
+                            '(実績)着日
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") Then
+                                If loopdr("OBJECTIVECODE") = BaseDllConst.CONST_OBJECTCODE_25 Then
+                                    '(目的(移動))入力可能(読取専用)とする。
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                Else
+                                    '(目的(移動)以外)入力不可とする。
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
                             End If
 
 #Region "### 20200106 新画面に整理後、不要と判断(廃止) #########################################################"

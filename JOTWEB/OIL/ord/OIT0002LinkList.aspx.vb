@@ -1589,6 +1589,15 @@ Public Class OIT0002LinkList
                         WW_ERRCODE = "ERR"
                         Exit For
                     End Try
+                    '# 位置(桁数)チェック
+                    If Convert.ToString(OIT0002EXLUProw("POSITION")).Length >= 3 Then
+                        '★3桁以上で設定されている場合はエラー
+                        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した位置の桁数が3桁以上で設定されています。再度確認をおねがいします。", needsPopUp:=True)
+                        WW_ERRCODE = "ERR"
+                        Exit For
+                    End If
+
                 Next
                 If WW_ERRCODE = "ERR" Then Exit Sub
             End If

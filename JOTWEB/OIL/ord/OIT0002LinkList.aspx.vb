@@ -29,6 +29,7 @@ Public Class OIT0002LinkList
     Private OIT0002EXLDELtbl As DataTable                           'EXCELアップロード(削除)用
     Private OIT0002EXLINStbl As DataTable                           'EXCELアップロード(追加(貨車連結表TBL))用
     Private OIT0002EXLCHKtbl As DataTable                           'EXCELアップロード(チェック)用
+    Private OIT0002EXLOILCVTtbl As DataTable                        'EXCELアップロード(油種変換)用
     Private OIT0002Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0002His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
@@ -1650,6 +1651,16 @@ Public Class OIT0002LinkList
                 Master.Output(C_MESSAGE_NO.OIL_UPLOAD_ERR_TRAINNO_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
                 Exit Sub
             End If
+
+            '### 20210118 START ポラリスと入用(油種変換)チェック対応 ########################################
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                '★油種変換(JOT油種に変換)
+                WW_PolarisOilConvert(SQLcon)
+            End Using
+            '### 20210118 END   ポラリスと入用(油種変換)チェック対応 ########################################
+
         End If
         '### 20201026 END   本線列車のチェック対応 ######################################################
 
@@ -5581,6 +5592,94 @@ Public Class OIT0002LinkList
 
             End If
         Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 油種変換(JOT油種に変換)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_PolarisOilConvert(ByVal SQLcon As SqlConnection)
+        'O_RTN = C_MESSAGE_NO.NORMAL
+
+        'アップロードデータ(油種変換)データ取得用
+        If IsNothing(OIT0002EXLOILCVTtbl) Then
+            OIT0002EXLOILCVTtbl = New DataTable
+        End If
+
+        If OIT0002EXLOILCVTtbl.Columns.Count <> 0 Then
+            OIT0002EXLOILCVTtbl.Columns.Clear()
+        End If
+
+        OIT0002EXLOILCVTtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを変換マスタから取得する
+        Dim SQLStr As String =
+            " SELECT " _
+            & "   0                                         AS LINECNT" _
+            & " , OIM0029.KEYCODE01                         AS OFFICECODE" _
+            & " , OIM0029.KEYCODE02                         AS OFFICENAME" _
+            & " , OIM0029.KEYCODE03                         AS DEPSTATION" _
+            & " , OIM0029.KEYCODE04                         AS DEPSTATIONNAME" _
+            & " , OIM0029.KEYCODE05                         AS DAILYREPORTCODE" _
+            & " , OIM0029.KEYCODE06                         AS DAILYREPORTOILNAME" _
+            & " , OIM0029.VALUE01                           AS OILCODE" _
+            & " , OIM0029.VALUE02                           AS ORDERINGTYPE" _
+            & " , OIM0029.VALUE03                           AS ORDERINGOILNAME" _
+            & " , OIM0029.VALUE04                           AS OILCODE_GOI" _
+            & " , OIM0029.VALUE05                           AS ORDERINGTYPE_GOI" _
+            & " , OIM0029.VALUE06                           AS ORDERINGOILNAME_GOI" _
+            & " FROM oil.OIM0029_CONVERT OIM0029 " _
+            & " WHERE OIM0029.CLASS   = 'POLARIS_OILCONVERT' " _
+            & "   AND OIM0029.DELFLG <> @DELFLG "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar)           '削除フラグ
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002EXLOILCVTtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002EXLOILCVTtbl.Load(SQLdr)
+                End Using
+
+                '★油種(京葉臨海)⇒油種（JOT）に変換
+                For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("DAILYREPORTCODE<>''")
+                    For Each OIT0002EXLOILCVTrow As DataRow In OIT0002EXLOILCVTtbl.Rows
+                        If OIT0002EXLUProw("ARRSTATIONCODE") = OIT0002EXLOILCVTrow("DEPSTATION") _
+                            AndAlso OIT0002EXLUProw("DAILYREPORTCODE") = OIT0002EXLOILCVTrow("DAILYREPORTCODE") Then
+
+                            '★★五井営業所で積込後の着駅が「南松本」の場合
+                            If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
+                                AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本	" Then
+                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
+                            Else
+                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
+                            End If
+                            Exit For
+                        End If
+                    Next
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L POLARISOILCONVERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L POLARISOILCONVERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

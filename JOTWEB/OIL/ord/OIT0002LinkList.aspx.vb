@@ -2258,6 +2258,12 @@ Public Class OIT0002LinkList
                     ElseIf useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "1" Then
                         'タンク車指示(運用指示)
                         OBJECTIVENAME.Value = OIT0002EXLUProw("OBJECTIVENAME")
+                        '### 20210118 START ポラリスと入用(油種変換)チェック対応 ##################
+                        '日報コード(運用指示)
+                        DAILYREPORTCODE.Value = OIT0002EXLUProw("DAILYREPORTCODE")
+                        '日報油種(運用指示)
+                        DAILYREPORTOILNAME.Value = OIT0002EXLUProw("DAILYREPORTOILNAME")
+                        '### 20210118 END   ポラリスと入用(油種変換)チェック対応 ##################
                         '油種(運用指示)
                         OILNAME.Value = ""
                         '回転(運用指示)

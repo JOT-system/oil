@@ -1557,9 +1557,19 @@ Public Class OIT0002LinkList
             If useFlg = "4" Then
                 '○必須項目チェック(本線列車設定時のチェック)
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+                    Dim dtInspectionDate As Date
                     Dim iTrainNo As Integer
                     Dim dtLodDate As Date
                     Dim dtDepDate As Date
+                    '# 交検日チェック
+                    Try
+                        dtInspectionDate = Date.Parse(OIT0002EXLUProw("INSPECTIONDATE"))
+                    Catch ex As Exception
+                        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した交検年月日の日付形式が不正です。再度確認をおねがいします。", needsPopUp:=True)
+                        WW_ERRCODE = "ERR"
+                        Exit For
+                    End Try
                     '# 本線列車チェック
                     Try
                         iTrainNo = Integer.Parse(OIT0002EXLUProw("LOADINGTRAINNO"))
@@ -2026,7 +2036,7 @@ Public Class OIT0002LinkList
                 & " ( RLINKNO       , RLINKDETAILNO  , FILENAME        , AGOBEHINDFLG        , REGISTRATIONDATE" _
                 & " , TRAINNO       , CONVENTIONAL   , CONVENTIONALTIME, SERIALNUMBER        , TRUCKSYMBOL        , TRUCKNO" _
                 & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME     , INSPECTIONDATE      , CONVERSIONAMOUNT" _
-                & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME  , OBJECTIVENAME" _
+                & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME  , OBJECTIVENAME       , DAILYREPORTCODE    , DAILYREPORTOILNAME" _
                 & " , OILNAME       , LINE           , POSITION        , INLINETRAIN         , LOADARRSTATION" _
                 & " , LOADINGTRAINNO, LOADINGLODDATE , LOADINGDEPDATE  , FORWARDINGARRSTATION, FORWARDINGCONFIGURE" _
                 & " , CURRENTCARTOTAL, EXTEND        , CONVERSIONTOTAL , LINKNO              , ORDERNO            , DETAILNO" _
@@ -2038,7 +2048,7 @@ Public Class OIT0002LinkList
                 & " ( @RLINKNO        , @RLINKDETAILNO  , @FILENAME        , @AGOBEHINDFLG        , @REGISTRATIONDATE" _
                 & " , @TRAINNO        , @CONVENTIONAL   , @CONVENTIONALTIME, @SERIALNUMBER        , @TRUCKSYMBOL        , @TRUCKNO" _
                 & " , @DEPSTATIONNAME , @ARRSTATIONNAME , @ARTICLENAME     , @INSPECTIONDATE      , @CONVERSIONAMOUNT" _
-                & " , @ARTICLE        , @ARTICLETRAINNO , @ARTICLEOILNAME  , @OBJECTIVENAME" _
+                & " , @ARTICLE        , @ARTICLETRAINNO , @ARTICLEOILNAME  , @OBJECTIVENAME       , @DAILYREPORTCODE    , @DAILYREPORTOILNAME" _
                 & " , @OILNAME        , @LINE           , @POSITION        , @INLINETRAIN         , @LOADARRSTATION" _
                 & " , @LOADINGTRAINNO , @LOADINGLODDATE , @LOADINGDEPDATE  , @FORWARDINGARRSTATION, @FORWARDINGCONFIGURE" _
                 & " , @CURRENTCARTOTAL, @EXTEND         , @CONVERSIONTOTAL , @LINKNO              , @ORDERNO            , @DETAILNO" _
@@ -2094,6 +2104,10 @@ Public Class OIT0002LinkList
                 Dim ARTICLEOILNAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@ARTICLEOILNAME", SqlDbType.NVarChar)       '記事(油種)
                 ' ### 運送指示書(項目) START #########################################################################
                 Dim OBJECTIVENAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@OBJECTIVENAME", SqlDbType.NVarChar)         'タンク車指示(運用指示)
+                '### 20210118 START ポラリスと入用(油種変換)チェック対応 ##################
+                Dim DAILYREPORTCODE As SqlParameter = SQLRLinkcmd.Parameters.Add("@DAILYREPORTCODE", SqlDbType.NVarChar)       '日報コード(運用指示)
+                Dim DAILYREPORTOILNAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@DAILYREPORTOILNAME", SqlDbType.NVarChar) '日報油種(運用指示)
+                '### 20210118 END   ポラリスと入用(油種変換)チェック対応 ##################
                 Dim OILNAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@OILNAME", SqlDbType.NVarChar)                     '油種(運用指示)
                 Dim LINE As SqlParameter = SQLRLinkcmd.Parameters.Add("@LINE", SqlDbType.NVarChar)                           '回転(運用指示)
                 Dim POSITION As SqlParameter = SQLRLinkcmd.Parameters.Add("@POSITION", SqlDbType.NVarChar)                   '位置(運用指示)
@@ -2205,6 +2219,12 @@ Public Class OIT0002LinkList
                     If useFlg = "4" Then
                         'タンク車指示(運用指示)
                         OBJECTIVENAME.Value = OIT0002EXLUProw("OBJECTIVENAME")
+                        '### 20210118 START ポラリスと入用(油種変換)チェック対応 ##################
+                        '日報コード(運用指示)
+                        DAILYREPORTCODE.Value = OIT0002EXLUProw("DAILYREPORTCODE")
+                        '日報油種(運用指示)
+                        DAILYREPORTOILNAME.Value = OIT0002EXLUProw("DAILYREPORTOILNAME")
+                        '### 20210118 END   ポラリスと入用(油種変換)チェック対応 ##################
                         '油種(運用指示)
                         OILNAME.Value = OIT0002EXLUProw("OILNAME")
                         '回転(運用指示)

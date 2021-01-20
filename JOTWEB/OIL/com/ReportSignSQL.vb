@@ -241,6 +241,8 @@
             & " , OIT0011.EXTEND                                 AS EXTEND" _
             & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
             & " , OIT0011.OBJECTIVENAME                          AS OBJECTIVENAME" _
+            & " , OIT0011.DAILYREPORTCODE                        AS DAILYREPORTCODE" _
+            & " , OIT0011.DAILYREPORTOILNAME                     AS DAILYREPORTOILNAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _

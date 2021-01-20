@@ -167,7 +167,8 @@ Public Class OIT0003OrderDetail
                              "WF_CheckBoxSELECTFIRSTRETURN",
                              "WF_CheckBoxSELECTAFTERRETURN",
                              "WF_CheckBoxSELECTOTTRANSPORT",
-                             "WF_CheckBoxSELECTUPGRADE"       'チェックボックス(選択)クリック
+                             "WF_CheckBoxSELECTUPGRADE",
+                             "WF_CheckBoxSELECTDOWNGRADE"     'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"          'フィールドチェンジ
                             WF_FIELD_Change()
@@ -1554,6 +1555,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
             & " , ''                                             AS UPGRADEFLG" _
+            & " , ''                                             AS DOWNGRADEFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -1683,6 +1685,11 @@ Public Class OIT0003OrderDetail
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
                 & "   END                                                           AS UPGRADEFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '')" _
+                & "   WHEN '0' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                           AS DOWNGRADEFLG" _
                 & " , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALLODDATE" _
                 & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                          AS JOINTCODE" _
                 & " , ISNULL(RTRIM(OIT0003.JOINT), '')                              AS JOINT" _
@@ -2066,6 +2073,11 @@ Public Class OIT0003OrderDetail
             & "   WHEN '2' THEN ''" _
             & "   ELSE ''" _
             & "   END                                                           AS UPGRADEFLG" _
+            & " , CASE ISNULL(RTRIM(TMP0001.UPGRADEFLG), '')" _
+            & "   WHEN '0' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                           AS DOWNGRADEFLG" _
             & " , ISNULL(FORMAT(TMP0001.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALLODDATE" _
             & " , ISNULL(RTRIM(TMP0001.JOINTCODE), '')                          AS JOINTCODE" _
             & " , ISNULL(RTRIM(TMP0001.JOINT), '')                              AS JOINT" _
@@ -4260,7 +4272,7 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If
-
+                        Exit For
                     End If
                 Next
 
@@ -4295,6 +4307,7 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl.Rows(i)("OTTRANSPORTFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20200717 END  ((全体)No199対応) ######################################
@@ -4302,18 +4315,34 @@ Public Class OIT0003OrderDetail
                 '### 20201207 END   指摘票No248対応 #######################################
             Case "WF_CheckBoxSELECTUPGRADE"
                 'チェックボックス判定
-                For Each OIT0003Drow As DataRow In OIT0003tbl.Rows
+                For Each OIT0003Drow As DataRow In OIT0003tbl.Select("LINECNT='" + WF_SelectedIndex.Value + "'")
                     If Convert.ToString(OIT0003Drow("LINECNT")) = WF_SelectedIndex.Value Then
                         If Convert.ToString(OIT0003Drow("UPGRADEFLG")) = "on" Then
                             OIT0003Drow("UPGRADEFLG") = ""
                         Else
                             OIT0003Drow("UPGRADEFLG") = "on"
+                            OIT0003Drow("DOWNGRADEFLG") = ""
                         End If
-
                         Exit For
                     End If
                 Next
                 '### 20201207 END   指摘票No248対応 #######################################
+
+                '### 20210120 END   指摘票No300対応 #######################################
+            Case "WF_CheckBoxSELECTDOWNGRADE"
+                'チェックボックス判定
+                For Each OIT0003Drow As DataRow In OIT0003tbl.Select("LINECNT='" + WF_SelectedIndex.Value + "'")
+                    If Convert.ToString(OIT0003Drow("LINECNT")) = WF_SelectedIndex.Value Then
+                        If Convert.ToString(OIT0003Drow("DOWNGRADEFLG")) = "on" Then
+                            OIT0003Drow("DOWNGRADEFLG") = ""
+                        Else
+                            OIT0003Drow("DOWNGRADEFLG") = "on"
+                            OIT0003Drow("UPGRADEFLG") = ""
+                        End If
+                        Exit For
+                    End If
+                Next
+                '### 20210120 END   指摘票No300対応 #######################################
 
             Case Else
                 'チェックボックス判定
@@ -4324,6 +4353,7 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl.Rows(i)("OPERATION") = "on"
                         End If
+                        Exit For
                     End If
                 Next
         End Select
@@ -5333,6 +5363,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
             & " , ''                                             AS UPGRADEFLG" _
+            & " , ''                                             AS DOWNGRADEFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -9234,9 +9265,11 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA46.Value = "2"
                     End If
-                    '# 格上可否フラグ(1:格上あり 2:格上なし)
+                    '# 格上可否フラグ(0:格下あり 1:格上あり 2:なし)
                     If OIT0003row("UPGRADEFLG") = "on" Then
                         PARA55.Value = "1"
+                    ElseIf OIT0003row("DOWNGRADEFLG") = "on" Then
+                        PARA55.Value = "0"
                     Else
                         PARA55.Value = "2"
                     End If

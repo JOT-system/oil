@@ -275,7 +275,7 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '◯ 充 填 線(位　置)
                 rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
                 'rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("FILLINGPOINT")
+                rngDetailArea.Value = PrintDatarow("POSITION")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 入　線 　列　車(選択 OR 入力)
                 rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())

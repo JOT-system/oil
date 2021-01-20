@@ -268,7 +268,8 @@
         '### 20201002 END   変換マスタに移行したため修正 ########################
 
         SQLStr &=
-              " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+              " , OIT0011.POSITION                               AS POSITION" _
+            & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _

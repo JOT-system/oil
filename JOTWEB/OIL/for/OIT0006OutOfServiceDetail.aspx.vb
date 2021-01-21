@@ -1142,6 +1142,11 @@ Public Class OIT0006OutOfServiceDetail
                 Catch ex As Exception
                     OIT0006row("ACTUALARRDATE") = ""
                 End Try
+                Try
+                    OIT0006row("ACTUALEMPARRDATE") = Now.AddDays(Integer.Parse(OIT0006GETrow("DEPSTATIONRTNDAYS"))).ToString("yyyy/MM/dd")
+                Catch ex As Exception
+                    OIT0006row("ACTUALEMPARRDATE") = ""
+                End Try
             Next
         Next
     End Sub
@@ -1912,6 +1917,11 @@ Public Class OIT0006OutOfServiceDetail
                                     updHeader.Item("ACTUALARRDATE") = Now.AddDays(Integer.Parse(OIT0006GETrow("ARRDAYS"))).ToString("yyyy/MM/dd")
                                 Catch ex As Exception
                                     updHeader.Item("ACTUALARRDATE") = ""
+                                End Try
+                                Try
+                                    updHeader.Item("ACTUALEMPARRDATE") = Now.AddDays(Integer.Parse(OIT0006GETrow("DEPSTATIONRTNDAYS"))).ToString("yyyy/MM/dd")
+                                Catch ex As Exception
+                                    updHeader.Item("ACTUALEMPARRDATE") = ""
                                 End Try
                             Next
 
@@ -7028,6 +7038,7 @@ Public Class OIT0006OutOfServiceDetail
             & " , OIM0029.VALUE06                 AS ARRSTATIONNAME" _
             & " , OIM0029.VALUE07                 AS DEPDAYS" _
             & " , OIM0029.VALUE08                 AS ARRDAYS" _
+            & " , OIM0029.VALUE09                 AS DEPSTATIONRTNDAYS" _
             & " FROM OIL.OIM0029_CONVERT OIM0029 " _
             & " WHERE OIM0029.CLASS = 'KAISOU_PATTERNMASTER' "
         '& " AND OIM0029.KEYCODE04 = 'def' "

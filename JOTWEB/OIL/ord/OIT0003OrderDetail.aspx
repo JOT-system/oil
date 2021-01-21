@@ -35,9 +35,13 @@
                 <%-- 20200916 START 指摘票対応(No148) --%>
                 <input type="button" id="WF_ButtonBULKDATE" class="btn-sticky" value="実績日一括反映" onclick="ButtonClick('WF_ButtonBULKDATE');" />
                 <%-- 20200916 END   指摘票対応(No148) --%>
-                <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
-                <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
-                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                <%-- 20210121 START ボタンの非表示(廃止) --%>
+                <div style="display:none;">
+                    <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
+                    <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
+                    <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                </div>
+                <%-- 20210121 END   ボタンの非表示(廃止) --%>
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>

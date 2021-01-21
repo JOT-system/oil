@@ -6208,6 +6208,15 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
 
+        '### 20210121 START 内部で自動でボタン押下処理を進めるようにする。 ################################# 
+        '手配連絡ボタン押下
+        WF_ButtonCONTACT_Click()
+        '結果受理ボタン押下
+        WF_ButtonRESULT_Click()
+        '託送指示ボタン押下
+        WF_ButtonDELIVERY_Click()
+        '### 20210121 END   内部で自動でボタン押下処理を進めるようにする。 ################################# 
+
         '★ 各タブ(一覧)の再表示処理
         ReDisplayTabList()
 

@@ -4088,8 +4088,8 @@ Public Class OIT0003OrderList
                     SQLStrAri &=
                       " ORDER BY" _
                     & "    OIT0002.TRAINNO" _
-                    & "  , OIT0003.SHIPPERSCODE" _
                     & "  , STACKING" _
+                    & "  , OIT0003.SHIPPERSCODE" _
                     & "  , OIM0024.PRIORITYNO"
                     '& "  , OIT0003.OILCODE" _
                 End If

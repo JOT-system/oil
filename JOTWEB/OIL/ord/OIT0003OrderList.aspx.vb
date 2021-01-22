@@ -1985,6 +1985,7 @@ Public Class OIT0003OrderList
            & " ORDER BY " _
            & "       TMP0006.LOADINGTRAINNO" _
            & "     , TMP0006.LINE" _
+           & "     , TMP0006.TRAINNODETAIL" _
            & "     , TMP0006.POINT "
 
         Try
@@ -2071,12 +2072,6 @@ Public Class OIT0003OrderList
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-                Dim shipOrderTbl As DataTable = OIT0003EXLINStbl.AsEnumerable().CopyToDataTable()
-                shipOrderTbl.Columns.Add("SHIPORDERGROUP", GetType(String))
-
-                Dim shipOrderQuery As IEnumerable(Of DataRow) = shipOrderTbl.AsEnumerable()
-                shipOrderQuery = shipOrderQuery.Select(Of DataRow)(Function(ByVal r As DataRow) r.Item(""))
-
 
                 '回線別積込取込(日新)の【タンク車No】を受注データに紐づけする。
                 Dim strTrainNo As String = ""
@@ -2115,7 +2110,7 @@ Public Class OIT0003OrderList
 
                         '発送順をリセット
                         shipOderAsc = 1
-                        shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("") = OIT0003INSrow("")).Count
+                        shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("LOADINGTRAINNO") = Convert.ToString(OIT0003INSrow("LOADINGTRAINNO"))).Count
                     End If
 
                     '★受注データの油種と回線別積込取込(日新)の油種が一致したらタンク車№を設定

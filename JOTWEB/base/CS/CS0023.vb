@@ -1095,6 +1095,17 @@ Public Structure CS0023XLSUPLOAD
                 jStart = 7
                 jPoint = 1
                 For z As Integer = 0 To jEnd
+
+                    rng = oSheet.Range(sCellDetailYoko2(i) + (jStart + 1).ToString())
+                    Dim trainNoDetail As String = rng.Text.ToString()
+                    ExcelMemoryRelease(rng)
+                    If trainNoDetail = "テスト積車" Then
+                        jStart += 2
+                        jPoint += 1
+                        j += 1
+                        Continue For
+                    End If
+
                     dt.Rows.Add(dt.NewRow())
                     dt.Rows(j)("FILENAME") = excelFileName
                     dt.Rows(j)("DATERECEIVEYMD") = Date.Parse(sCellTitleYMDC).ToString("yyyy/MM/dd")
@@ -1124,22 +1135,22 @@ Public Structure CS0023XLSUPLOAD
             '★指定された列車の再設定
             Dim svTraiNo As String = ""
             Dim reg = New Regex("[①-⑨]")
-            Dim regHalf = New Regex("[^０-９]")
             For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
                 If svTraiNo = "" Then
-                    svTraiNo = reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "")
-                ElseIf svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
-                    svTraiNo = ""
+                    svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
+                ElseIf reg.Replace(svTraiNo, "") = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
+                    dtrow("TRAINNO_DETAIL") = svTraiNo
                 Else
                     '○前回と同じ列車番号の場合
-                    If Convert.ToString(dtrow("TRAINNO_DETAIL")) = "" Then
+                    If Convert.ToString(dtrow("TRAINNO_DETAIL")) = "" OrElse
+                        reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "") = svTraiNo Then
                         dtrow("TRAINNO_DETAIL") = svTraiNo
                         '前回と異なる列車番号の場合
                     Else
-                        svTraiNo = reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "")
+                        svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
                     End If
                 End If
-                dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
+                dtrow("TRAINNO") = StrConv(reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
                 dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))
             Next
 

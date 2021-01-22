@@ -290,6 +290,12 @@ Public Class OIT0006OutOfServiceList
             & " , ISNULL(FORMAT(OIT0006.EMPARRDATE, 'yyyy/MM/dd'), '')        AS EMPARRDATE" _
             & " , ISNULL(FORMAT(OIT0006.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')  AS ACTUALEMPARRDATE" _
             & " , ISNULL(RTRIM(OIT0006.TOTALTANK), '')   　           AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALREPAIR), '')   　         AS TOTALREPAIR" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALMC), '')   　             AS TOTALMC" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALINSPECTION), '')   　     AS TOTALINSPECTION" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALALLINSPECTION), '')   　  AS TOTALALLINSPECTION" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALINDWELLING), '')   　     AS TOTALINDWELLING" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALMOVE), '')   　           AS TOTALMOVE" _
             & " , ISNULL(RTRIM(OIT0006.ORDERNO), '')                  AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0006.KEIJYOYMD, 'yyyy/MM/dd'), '')         AS KEIJYOYMD" _
             & " , ISNULL(RTRIM(OIT0006.SALSE), '')                   AS SALSE" _
@@ -310,7 +316,8 @@ Public Class OIT0006OutOfServiceList
             & "        OIS0015_2.CLASS   = 'KAISOUINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0006.KAISOUINFO " _
             & " WHERE OIT0006.DELFLG     <> @P3" _
-            & "   AND OIT0006.DEPDATE    >= @P2"
+            & "   AND OIT0006.KAISOUYMD  >= @P2"
+        '& "   AND OIT0006.DEPDATE    >= @P2"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '営業所
@@ -713,6 +720,19 @@ Public Class OIT0006OutOfServiceList
         '合計車数
         work.WF_SEL_TANKCARTOTAL.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALTANK")
 
+        '目的(修理)
+        work.WF_SEL_REPAIR.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALREPAIR")
+        '目的(ＭＣ)
+        work.WF_SEL_MC.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALMC")
+        '目的(交検)
+        work.WF_SEL_INSPECTION.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALINSPECTION")
+        '目的(全検)
+        work.WF_SEL_ALLINSPECTION.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALALLINSPECTION")
+        '目的(疎開留置)
+        work.WF_SEL_INDWELLING.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALINDWELLING")
+        '目的(移動)
+        work.WF_SEL_MOVE.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALMOVE")
+
         '発日(予定)
         work.WF_SEL_DEPDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("DEPDATE")
         '着日(予定)
@@ -1009,25 +1029,31 @@ Public Class OIT0006OutOfServiceList
                          BaseDllConst.CONST_KAISOUSTATUS_250,
                          BaseDllConst.CONST_KAISOUSTATUS_300
                         '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
-                        '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0006His2tblrow("TANKNO"))
-
-                    '350：受注確定
-                    Case BaseDllConst.CONST_KAISOUSTATUS_350
-                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0006His2tblrow("TANKNO"))
+                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        WW_UpdateTankShozai(OIT0006His2tblrow("DEPSTATION"),
+                                            "3",
+                                            "",
+                                            BaseDllConst.CONST_TANKSITUATION_01,
+                                            I_TANKNO:=OIT0006His2tblrow("TANKNO"))
 
-                    '400：受入確認中, 450:受入確認中(受入日入力)
-                    Case BaseDllConst.CONST_KAISOUSTATUS_400,
-                         BaseDllConst.CONST_KAISOUSTATUS_450
+#Region "### 20200115 新画面に整理後、不要と判断(廃止) #########################################################"
+                    ''350：受注確定
+                    'Case BaseDllConst.CONST_KAISOUSTATUS_350
+                    '    '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                    '    '引数１：所在地コード　⇒　変更あり(発駅)
+                    '    '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    '    '引数３：積車区分　　　⇒　変更なし(空白)
+                    '    WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0006His2tblrow("TANKNO"))
 
-                        '### 何もしない####################
+                    ''400：受入確認中, 450:受入確認中(受入日入力)
+                    'Case BaseDllConst.CONST_KAISOUSTATUS_400,
+                    '     BaseDllConst.CONST_KAISOUSTATUS_450
 
+                    '    '### 何もしない####################
+#End Region
                     '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
                     '　条件は追加しておく
                     Case BaseDllConst.CONST_KAISOUSTATUS_500,
@@ -1094,6 +1120,7 @@ Public Class OIT0006OutOfServiceList
     Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
+                                      ByVal I_SITUATION As String,
                                       Optional ByVal I_TANKNO As String = Nothing)
 
         Try
@@ -1118,6 +1145,10 @@ Public Class OIT0006OutOfServiceList
             '積車区分
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
             ''空車着日（予定）
             'If upEmparrDate = True Then

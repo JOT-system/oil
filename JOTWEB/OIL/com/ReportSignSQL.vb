@@ -241,6 +241,8 @@
             & " , OIT0011.EXTEND                                 AS EXTEND" _
             & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
             & " , OIT0011.OBJECTIVENAME                          AS OBJECTIVENAME" _
+            & " , OIT0011.DAILYREPORTCODE                        AS DAILYREPORTCODE" _
+            & " , OIT0011.DAILYREPORTOILNAME                     AS DAILYREPORTOILNAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
@@ -266,7 +268,8 @@
         '### 20201002 END   変換マスタに移行したため修正 ########################
 
         SQLStr &=
-              " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+              " , OIT0011.POSITION                               AS POSITION" _
+            & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
@@ -410,6 +413,7 @@
         & " , ''                                                    AS BRANCH" _
         & " , ISNULL(RTRIM(VIW0012.CALCKBN), '')                    AS CALCKBN" _
         & " , ISNULL(RTRIM(VIW0012.CALCKBNNAME), '')                AS CALCKBNNAME" _
+        & " , ISNULL(RTRIM(VIW0012.JROILTYPE), '')                  AS JROILTYPE" _
         & " , ISNULL(RTRIM(VIW0012.FARE), '')                       AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -418,6 +422,10 @@
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT1), '')                  AS DISCOUNT1" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT2), '')                  AS DISCOUNT2" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNT3), '')                  AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT4), '')                  AS DISCOUNT4" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT5), '')                  AS DISCOUNT5" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT6), '')                  AS DISCOUNT6" _
+        & " , ISNULL(RTRIM(VIW0012.DISCOUNT7), '')                  AS DISCOUNT7" _
         & " , ISNULL(RTRIM(VIW0012.DISCOUNTFARE), '')               AS APPLYCHARGE" _
         & " , ''                                                    AS RETURNFARE" _
         & " , ISNULL(RTRIM(VIW0012.INVOICECODE), '')                AS INVOICECODE" _

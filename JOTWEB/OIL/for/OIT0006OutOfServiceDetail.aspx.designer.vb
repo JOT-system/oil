@@ -275,6 +275,60 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents TxtActualEmparrDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtRepair コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtRepair As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtMC コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtMC As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtInspection コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtInspection As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtALLInspection コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtALLInspection As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtIndwelling コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtIndwelling As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtMove コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtMove As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_Dtab01 コントロール。
     '''</summary>
     '''<remarks>

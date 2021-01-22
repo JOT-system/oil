@@ -35,9 +35,13 @@
                 <%-- 20200916 START 指摘票対応(No148) --%>
                 <input type="button" id="WF_ButtonBULKDATE" class="btn-sticky" value="実績日一括反映" onclick="ButtonClick('WF_ButtonBULKDATE');" />
                 <%-- 20200916 END   指摘票対応(No148) --%>
-                <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
-                <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
-                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                <%-- 20210121 START ボタンの非表示(廃止) --%>
+                <div style="display:none;">
+                    <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
+                    <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
+                    <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                </div>
+                <%-- 20210121 END   ボタンの非表示(廃止) --%>
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
@@ -585,8 +589,9 @@
                         <input type="button" id="WF_ButtonLINE_ADD_TAB1" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="割当確定"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
-                        <input type="button" id="WF_ButtonCANCEL_TAB1" class="btn-sticky" value="割当解除"  onclick="ButtonClick('WF_ButtonCANCEL_TAB1');" />
+                        <input type="button" id="WF_ButtonUPDATE_KARI_TAB1" class="btn-sticky" value="一時保存"  onclick="ButtonClick('WF_ButtonUPDATE_KARI_TAB1');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="確定"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
+                        <input type="button" id="WF_ButtonCANCEL_TAB1" class="btn-sticky" value="解除"  onclick="ButtonClick('WF_ButtonCANCEL_TAB1');" />
                     </div>
                 </div>
                 <!-- 一覧レイアウト -->

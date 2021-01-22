@@ -1411,20 +1411,33 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("OBJECTIVENAME") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
+                '### 20210118 START ポラリスと入用(油種変換)チェック対応 ########
                 rng = oSheet.Range("L" + jStart.ToString())
-                dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                dt.Rows(i)("DAILYREPORTCODE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("M" + jStart.ToString())
-                dt.Rows(i)("LINE") = rng.Text.ToString()
+                dt.Rows(i)("DAILYREPORTOILNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                dt.Rows(i)("OILNAME") = ""
+                'rng = oSheet.Range("L" + jStart.ToString())
+                'dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                '### 20210118 START ポラリスと入用(油種変換)チェック対応 ########
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("N" + jStart.ToString())
-                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                'rng = oSheet.Range("M" + jStart.ToString())
+                dt.Rows(i)("LINE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("O" + jStart.ToString())
+                'rng = oSheet.Range("N" + jStart.ToString())
+                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("P" + jStart.ToString())
+                'rng = oSheet.Range("O" + jStart.ToString())
                 dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201204 START 指摘票対応(No231)全体 #######################
-                rng = oSheet.Range("P" + jStart.ToString())
+                rng = oSheet.Range("Q" + jStart.ToString())
+                'rng = oSheet.Range("P" + jStart.ToString())
                 If rng.Text.ToString() = "OT輸送" Then
                     dt.Rows(i)("OTTRANSPORTFLG") = "1"
                 Else
@@ -1432,29 +1445,29 @@ Public Structure CS0023XLSUPLOAD
                 End If
                 ExcelMemoryRelease(rng)
                 '### 20201204 START 指摘票対応(No231)全体 #######################
-                rng = oSheet.Range("Q" + jStart.ToString())
-                'rng = oSheet.Range("P" + jStart.ToString())
+                rng = oSheet.Range("R" + jStart.ToString())
+                'rng = oSheet.Range("Q" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
-                ExcelMemoryRelease(rng)
-                rng = oSheet.Range("S" + jStart.ToString())
-                'rng = oSheet.Range("R" + jStart.ToString())
-                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("T" + jStart.ToString())
                 'rng = oSheet.Range("S" + jStart.ToString())
-                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("U" + jStart.ToString())
                 'rng = oSheet.Range("T" + jStart.ToString())
+                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("V" + jStart.ToString())
+                'rng = oSheet.Range("U" + jStart.ToString())
                 dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
-                rng = oSheet.Range("V" + jStart.ToString())
-                'rng = oSheet.Range("U" + jStart.ToString())
-                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
-                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("W" + jStart.ToString())
                 'rng = oSheet.Range("V" + jStart.ToString())
+                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("X" + jStart.ToString())
+                'rng = oSheet.Range("W" + jStart.ToString())
                 dt.Rows(i)("FORWARDINGCONFIGURE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
@@ -1938,6 +1951,10 @@ Public Structure CS0023XLSUPLOAD
         '### 20201111 START 指摘票対応(No190)全体 #######################
         dt.Columns.Add("OBJECTIVENAME", Type.GetType("System.String")).DefaultValue = ""
         '### 20201111 END   指摘票対応(No190)全体 #######################
+        '### 20210118 START 油種変換対応 ################################
+        dt.Columns.Add("DAILYREPORTCODE", Type.GetType("System.String"))
+        dt.Columns.Add("DAILYREPORTOILNAME", Type.GetType("System.String"))
+        '### 20210118 END   油種変換対応 ################################
         dt.Columns.Add("OILNAME", Type.GetType("System.String"))
         dt.Columns.Add("LINE", Type.GetType("System.String"))
         dt.Columns.Add("POSITION", Type.GetType("System.String"))

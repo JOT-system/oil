@@ -222,6 +222,7 @@ function reportRadioButton() {
 
     let chkObj3 = document.getElementById('rbTankDispatchBtn');
     let chkObj3_2 = document.getElementById('rbActualShipBtn');
+    let chkObj3_3 = document.getElementById('rbConcatOederBtn');
     let txtObj3 = document.getElementById('divTrainNo'); //←表示非表示切替用
 
     let isVisitTxtObj3 = false
@@ -231,6 +232,9 @@ function reportRadioButton() {
     if (chkObj3_2 !== null) {
         isVisitTxtObj3 = chkObj3_2.checked | isVisitTxtObj3
     }
+    if (chkObj3_3 !== null) {
+        isVisitTxtObj3 = chkObj3_3.checked | isVisitTxtObj3
+    }
 
     if (isVisitTxtObj3) {
         txtObj3.style.display = 'block'
@@ -238,3 +242,40 @@ function reportRadioButton() {
         txtObj3.style.display = 'none'
     }
 }
+
+// ○ダウンロード処理
+function f_ExcelPrint() {
+    // リンク参照
+    let urlObj = document.getElementById("WF_PrintURL");
+    if (urlObj !== null) {
+        if (isJSON(urlObj.value)) {
+            let urlList = JSON.parse(urlObj.value);
+            for (i = 0; i < urlList.length; i++) {
+                if (urlList[i].url !== null) {
+                    win = window.open(urlList[i].url, "view" + i, "_blank");
+                    win.unload = function () {
+
+                    }
+                }
+            }
+        } else {
+            if (urlObj.value !== null) {
+                window.open(urlObj.value, "view", "_blank");
+            }
+        }
+    }
+}
+
+// JSON判定
+function isJSON(arg) {
+    arg = (typeof arg === "function") ? arg() : arg;
+    if (typeof arg !== "string") {
+        return false;
+    }
+    try {
+        arg = (!JSON) ? eval("(" + arg + ")") : JSON.parse(arg);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};

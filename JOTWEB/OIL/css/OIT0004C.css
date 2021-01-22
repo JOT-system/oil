@@ -8,6 +8,7 @@
     width: calc(100% - 20px);
     height: calc(100% - 20px);
 }
+/*
 #WF_ButtonUPDATE {
     color: #b6c12b;
     border: solid 1px #b6c12b;
@@ -15,6 +16,15 @@
 #WF_ButtonUPDATE:hover {
     background: #b6c12b;
     color: #fff;
+}
+*/
+#WF_ButtonUPDATE {
+    border: solid 1px #b6c12b;
+    background: #b6c12b;
+    color: #fff;
+}
+#WF_ButtonUPDATE:hover {
+    background: #5e6216;
 }
 /* 各表名称のDiv */
 .listTitle {
@@ -588,9 +598,6 @@ div.oilTypeData {
 #divStockList div.col2 div, #divStockList div.col4 div, #divSuggestList div.values div:nth-child(2) {
     background-color:#64A466;
 }
-#divSuggestList div.values div:nth-child(2) {
-    background-color: darkslategray;
-}
 /* 付帯情報色 */
 #divStockList div.col3 div, #divStockList div.col5 div{
     background-color:#A6D5AE;
@@ -675,6 +682,10 @@ div.oilTypeData {
 #divSuggestList div.dataColumn.week0 > div.suggestDate, #divSuggestList div.dataColumn.week0 > div.values > div, #divSuggestList div.dataColumn.holiday1 > div.suggestDate, #divSuggestList div.dataColumn.holiday1 > div.values > div, #divStockList div.dateItem div.week0, #divStockList div.oilTypeData div.week0, #divStockList div.oilTypeData div.week0 > div, #divStockList div.dateItem div.holiday1, #divStockList div.oilTypeData div.holiday1, #divStockList div.oilTypeData div.holiday1 > div {
     color: #14171A;
     background-color: rgb(248,203,173) !important;
+}
+/* チェックボックス背景色上書き */
+#divSuggestList div.dataColumn div.values div:nth-child(2) {
+    background-color: darkslategray !important;
 }
 /* ************************** */
 /* 提案表の日付増殖ボタン     */

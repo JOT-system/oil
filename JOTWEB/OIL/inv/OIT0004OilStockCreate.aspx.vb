@@ -230,8 +230,6 @@ Public Class OIT0004OilStockCreate
             dispDataObj = GetMoveInsideData(sqlCon, dispDataObj)
             '既登録データ取得
             dispDataObj = GetTargetStockData(sqlCon, dispDataObj)
-            '過去日以外の日付について受入数取得
-            dispDataObj = GetReciveFromOrder(sqlCon, dispDataObj)
             '列車運行情報の取得
             dispDataObj = GetTrainOperation(sqlCon, dispDataObj)
             dispDataObj.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, dispDataObj)
@@ -256,9 +254,9 @@ Public Class OIT0004OilStockCreate
                 dispDataObj.MiDispData = GetLastShipAverage(sqlCon, dispDataObj.MiDispData)
                 '既登録データ取得
                 dispDataObj.MiDispData = GetTargetStockData(sqlCon, dispDataObj.MiDispData)
-                '過去日以外の日付について受入数取得
-                dispDataObj.MiDispData = GetReciveFromOrder(sqlCon, dispDataObj.MiDispData)
                 dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
+                '当日の日付について受入数を受注より取得
+                dispDataObj.MiDispData = GetReciveFromOrder(sqlCon, dispDataObj.MiDispData)
                 dispDataObj.MiDispData.RecalcStockList(False)
                 'メインクラスに構内取り情報を紐づけ（参照設定）
                 For Each suggestListItem In dispDataObj.SuggestList
@@ -269,7 +267,8 @@ Public Class OIT0004OilStockCreate
                 Next 'suggestListItem
             Else
                 dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
-
+                '当日の日付について受入数を受注より取得
+                dispDataObj = GetReciveFromOrder(sqlCon, dispDataObj)
             End If
             '既登録データ抽出
             If dispDataObj.TrainOperationList IsNot Nothing AndAlso
@@ -628,12 +627,16 @@ Public Class OIT0004OilStockCreate
         End Using
         'コンストラクタで生成したデータを画面に貼り付け
         '1.提案リスト
-        If dispValues.ShowSuggestList = False Then
-            pnlSuggestList.Visible = False
-        Else
+        If dispValues.ShowSuggestList = True Then
             pnlSuggestList.Visible = True
             frvSuggest.DataSource = New Object() {dispValues}
             frvSuggest.DataBind()
+        ElseIf dispValues.IsOtTrainMode AndAlso dispValues.SuggestList IsNot Nothing AndAlso dispValues.SuggestList.Count > 0 Then
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
+        Else
+            pnlSuggestList.Visible = False
         End If
         '2.比重リスト
         repWeightList.DataSource = dispValues.OilTypeList
@@ -780,8 +783,7 @@ Public Class OIT0004OilStockCreate
             If targetMonth = "" Then
                 printData = GetPrintTrainAmount(sqlCon, printData)
             End If
-            '過去日以外の日付について受入数取得
-            printData = GetReciveFromOrder(sqlCon, printData)
+
             '列車運行情報の取得
             printData = GetTrainOperation(sqlCon, printData)
             printData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, printData)
@@ -815,10 +817,11 @@ Public Class OIT0004OilStockCreate
                 If targetMonth = "" Then
                     printData.MiDispData = GetPrintTrainAmount(sqlCon, printData.MiDispData)
                 End If
-                '過去日以外の日付について受入数取得
-                printData.MiDispData = GetReciveFromOrder(sqlCon, printData.MiDispData)
+
                 printData.MiDispData = GetPrintUkeireTrainNum(sqlCon, printData.MiDispData, True, printData.Consignee)
                 printData = GetUkeireOilstock(sqlCon, printData)
+                '過去日以外の日付について受入数取得
+                printData.MiDispData = GetReciveFromOrder(sqlCon, printData.MiDispData)
                 printData.MiDispData.RecalcStockList(False)
                 'メインクラスに構内取り情報を紐づけ（参照設定）
                 For Each suggestListItem In printData.SuggestList
@@ -829,6 +832,8 @@ Public Class OIT0004OilStockCreate
                 Next 'suggestListItem
             Else
                 printData = GetUkeireOilstock(sqlCon, printData)
+                '過去日以外の日付について受入数取得
+                printData = GetReciveFromOrder(sqlCon, printData)
             End If
             '取得値を元に再計算
             printData.RecalcStockList(False)
@@ -941,14 +946,31 @@ Public Class OIT0004OilStockCreate
             sqlStr.AppendLine(" INNER JOIN OIL.OIM0004_STATION    ARRST")
             sqlStr.AppendLine("         ON ARRST.STATIONCODE + ARRST.BRANCH = TR.ARRSTATION")
             sqlStr.AppendLine("        AND ARRST.DELFLG     = @DELFLG")
-            sqlStr.AppendLine(" WHERE FX.CAMPCODE   = @SALESOFFICE")
-            sqlStr.AppendLine("   AND FX.VALUE5     = @CONSIGNEECODE")
-            sqlStr.AppendLine("   AND FX.DELFLG     = @DELFLG")
-            sqlStr.AppendLine("   AND TR.OFFICECODE = @SALESOFFICE")
-            sqlStr.AppendLine("   AND TR.DELFLG     = @DELFLG")
-            sqlStr.AppendLine(" ORDER BY TR.ZAIKOSORT,TR.TRAINNO,TR.TSUMI")
 
 
+            '三重塩浜-JONET松本特殊処理:5461列車枠の生成
+            If salesOffice = "012402" AndAlso consignee = "40" Then
+                sqlStr.AppendLine(" WHERE ((     FX.CAMPCODE   = @SALESOFFICE")
+                sqlStr.AppendLine("          AND FX.VALUE5     = @CONSIGNEECODE")
+                sqlStr.AppendLine("          AND TR.OFFICECODE = @SALESOFFICE")
+                sqlStr.AppendLine("         ) ")
+                sqlStr.AppendLine("       OR (     FX.CAMPCODE   = '011203'")
+                sqlStr.AppendLine("            AND FX.VALUE5     =  @CONSIGNEECODE")
+                sqlStr.AppendLine("            AND TR.OFFICECODE = '011203'")
+                sqlStr.AppendLine("            AND TR.TRAINNO    = '5461'")
+                sqlStr.AppendLine("         ) ")
+                sqlStr.AppendLine("        ) ")
+                sqlStr.AppendLine("    AND FX.DELFLG     = @DELFLG")
+                sqlStr.AppendLine("    AND TR.DELFLG     = @DELFLG")
+                sqlStr.AppendLine("    AND TR.DELFLG     = @DELFLG")
+            Else
+                sqlStr.AppendLine(" WHERE FX.CAMPCODE   = @SALESOFFICE")
+                sqlStr.AppendLine("   AND FX.VALUE5     = @CONSIGNEECODE")
+                sqlStr.AppendLine("   AND FX.DELFLG     = @DELFLG")
+                sqlStr.AppendLine("   AND TR.OFFICECODE = @SALESOFFICE")
+                sqlStr.AppendLine("   AND TR.DELFLG     = @DELFLG")
+            End If
+            sqlStr.AppendLine(" ORDER BY TR.OFFICECODE DESC,TR.ZAIKOSORT,TR.TRAINNO,TR.TSUMI")
             Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
                 With sqlCmd.Parameters
                     .Add("@CLASS", SqlDbType.NVarChar).Value = "PATTERNMASTER"
@@ -984,6 +1006,10 @@ Public Class OIT0004OilStockCreate
                             .PatCode = Convert.ToString(sqlDr("PATCODE")),
                             .PatName = Convert.ToString(sqlDr("PATNAME"))
                             }
+                        '三重塩浜-JONET松本特殊処理:5461列車枠の生成 表示は列車番号ではなく富士石油
+                        If salesOffice = "012402" AndAlso consignee = "40" AndAlso trainCode = "5461" Then
+                            tlItem.DispTrainNo = "富士"
+                        End If
                         '重複列車番号はスキップ
                         If resultVal.ContainsKey(tlItem.TrainNo) Then
                             Continue While
@@ -1229,7 +1255,16 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("      ,FV.VALUE7   AS SHIPPEROILNAME")
         sqlStr.AppendLine("      ,FV.VALUE8   AS BIGOILCODE")
         sqlStr.AppendLine("      ,FV.VALUE10  AS MIDDLEOILCODE")
+        sqlStr.AppendLine("      ,format(isnull(OTM.ORDERFROMDATE,convert(date,'1900/1/1')),'yyyy/MM/dd') AS ORDERFROMDATE")
+        sqlStr.AppendLine("      ,format(isnull(OTM.ORDERTODATE,  convert(date,'9999/12/31')),'yyyy/MM/dd') AS ORDERTODATE")
         sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
+        sqlStr.AppendLine("  LEFT JOIN OIL.OIM0030_OILTERM OTM ")
+        sqlStr.AppendLine("         ON OTM.OFFICECODE     = @CAMPCODE")
+        sqlStr.AppendLine("        AND OTM.SHIPPERCODE    = @SHIPPERSCODE")
+        sqlStr.AppendLine("        AND OTM.OILCODE        = FV.KEYCODE")
+        sqlStr.AppendLine("        AND OTM.SEGMENTOILCODE = FV.VALUE2")
+        sqlStr.AppendLine("        AND OTM.CONSIGNEECODE  = @CONSIGNEE")
+        sqlStr.AppendLine("        AND OTM.DELFLG         = @DELFLG")
         sqlStr.AppendLine(" WHERE FV.CAMPCODE  = @CAMPCODE")
         sqlStr.AppendLine("   AND FV.CLASS     = @CLASS")
         sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
@@ -1299,6 +1334,8 @@ Public Class OIT0004OilStockCreate
 
             Dim bigOilCode As String
             Dim midOilCode As String
+            Dim orderFromDate As String
+            Dim orderToDate As String
             Dim oilItm As OilItem
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 While sqlDr.Read
@@ -1312,13 +1349,17 @@ Public Class OIT0004OilStockCreate
                     shipperOilName = Convert.ToString(sqlDr("SHIPPEROILNAME"))
                     bigOilCode = Convert.ToString(sqlDr("BIGOILCODE"))
                     midOilCode = Convert.ToString(sqlDr("MIDDLEOILCODE"))
+                    orderFromDate = Convert.ToString(sqlDr("ORDERFROMDATE"))
+                    orderToDate = Convert.ToString(sqlDr("ORDERTODATE"))
                     oilItm = New OilItem(oilCode, oilName, bigOilCode, midOilCode) With {
                     .SegmentOilCode = segmentOilCode,
                     .SegmentOilName = segmentOilName,
                     .OtOilCode = otOilCode,
                     .OtOilName = otOilName,
                     .ShipperOilCode = shipperOilCode,
-                    .ShipperOilName = shipperOilName
+                    .ShipperOilName = shipperOilName,
+                    .OrderFromDate = orderFromDate,
+                    .OrderToDate = orderToDate
                     }
                     retVal.Add(oilItm.OilCode, oilItm)
                 End While
@@ -1387,14 +1428,17 @@ Public Class OIT0004OilStockCreate
     ''' <param name="sqlCon"></param>
     ''' <param name="dispData"></param>
     ''' <returns></returns>
-    ''' <remarks>受入予定数を設定（過去は在庫テーブルからとる？）</remarks>
+    ''' <remarks>受入予定数を設定当日のみ取得
+    ''' TODO :: 川崎の足しこみ！！！</remarks>
     Private Function GetReciveFromOrder(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
         'Return retVal '2020/4/24 受注より取得は廃止(完全に不要と判明したら関数まるまる削除）
         '検索値の設定(過去日じゃない日付リストを取得）
+        '当日のみ書き換え
         Dim qdataVal = From itm In dispData.StockDate
                        Order By itm.Value.KeyString
+                       Where itm.Value.ItemDate.ToString("yyyy/MM/dd") = Now.ToString("yyyy/MM/dd")
                        Select itm.Value.KeyString
         '全て過去日の場合は在庫テーブルから取得するためオーダーから取得しない
         If qdataVal.Any = False Then
@@ -1456,6 +1500,7 @@ Public Class OIT0004OilStockCreate
                 If sqlDr.HasRows Then
                     Dim oilCode As String
                     Dim recvVal As Decimal = 0D
+                    Dim kawasakiVol As Decimal = 0D
                     Dim targetDate As String = ""
                     While sqlDr.Read
                         oilCode = Convert.ToString(sqlDr("OILCODE"))
@@ -1464,9 +1509,14 @@ Public Class OIT0004OilStockCreate
                             Continue While
                         End If
                         targetDate = Convert.ToString(sqlDr("TARGETDATE"))
+
+                        kawasakiVol = 0
+                        If dispData.SalesOffice = "011203" AndAlso {"30", "54"}.Contains(dispData.Consignee) Then
+                            kawasakiVol = dispData.GetSummarySuggestValue(targetDate, oilCode, True)
+                        End If
                         With retVal.StockList(oilCode)
                             If .StockItemList.ContainsKey(targetDate) Then
-                                recvVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT")))
+                                recvVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT"))) + kawasakiVol
                                 With .StockItemList(targetDate)
                                     .Receive = recvVal.ToString
                                 End With
@@ -2180,7 +2230,14 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
         sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
-        sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        'sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        If dispData.SalesOffice = "012402" AndAlso dispData.Consignee = "40" Then
+            sqlStr.AppendLine("   AND (   (ODR.OFFICECODE      = @OFFICECODE)")
+            sqlStr.AppendLine("        OR (ODR.OFFICECODE      = '011203' AND ODR.TRAINNO='5461')")
+            sqlStr.AppendLine("       )")
+        Else
+            sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        End If
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         '荷主取得条件(JOINTコード考慮)↓
         sqlStr.AppendLine("   AND ((     DTL.SHIPPERSCODE   = @SHIPPERSCODE")
@@ -2240,7 +2297,8 @@ Public Class OIT0004OilStockCreate
                             Continue While
                         End If
                         '過去日の場合も設定しない
-                        If retVal.SuggestList(targetDate).DayInfo.IsBeforeToday AndAlso isGetAlldays = False Then
+                        'If retVal.SuggestList(targetDate).DayInfo.IsBeforeToday AndAlso isGetAlldays = False Then
+                        If retVal.SuggestList(targetDate).DayInfo.IsPastDay AndAlso isGetAlldays = False Then
                             Continue While
                         End If
 
@@ -2954,6 +3012,18 @@ Public Class OIT0004OilStockCreate
                     retVal.Add(retItm.OrderNo, retItm)
                 End While
             End Using 'sqlDr
+            '三重塩浜特殊処理
+            If dispData.SalesOffice = "012402" AndAlso dispData.Consignee = "40" Then
+                With sqlCmd.Parameters
+                    .Item("@OFFICECODE").Value = "011203"
+                End With
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        retItm = New OrderItem(sqlDr)
+                        retVal.Add(retItm.OrderNo, retItm)
+                    End While
+                End Using 'sqlDr
+            End If
         End Using 'sqlCmd
         Return retVal
     End Function
@@ -3373,9 +3443,14 @@ Public Class OIT0004OilStockCreate
                 paramPreVol.Value = stockItem.LastShipmentAve '前週平均出荷量
                 '日付別ループ
                 For Each daysValue In stockItem.StockItemList.Values
-                    If daysValue.DaysItem.IsPastDay Then
+                    'If daysValue.DaysItem.IsPastDay Then
+                    '    Continue For
+                    'End If
+                    '過去日も保存対象とする(画面範囲表示での過去日※未来は画面範囲外でも受入日で跳ねる影響がある為対応)
+                    If daysValue.DaysItem.IsPastDay AndAlso daysValue.DaysItem.IsDispArea = False Then
                         Continue For
                     End If
+
                     paramStockYmd.Value = daysValue.DaysItem.ItemDate   '在庫年月日
                     paramStockDay.Value = daysValue.Retentiondays       '保有日数
                     paramPreStock.Value = daysValue.LastEveningStock    '前日夕在庫
@@ -5421,6 +5496,8 @@ Public Class OIT0004OilStockCreate
         '提案表画面データの入力項目を画面情報保持クラスに反映
         If retVal.ShowSuggestList = True Then
             SetDispSuggestItemValue(retVal, repValArea)
+        ElseIf retVal.IsOtTrainMode AndAlso retVal.SuggestList IsNot Nothing AndAlso retVal.SuggestList.Count > 0 Then
+            SetDispSuggestItemValue(retVal, repValArea)
         End If
         '在庫表画面データの入力項目を画面情報保持クラスに反映
         SetDispStockItemValue(retVal, repStockObj)
@@ -5573,10 +5650,8 @@ Public Class OIT0004OilStockCreate
                 stockListItm.SendTextClientId = sendObj.ClientID
                 stockListItm.MorningStock = morningStockVal
                 stockListItm.MorningStockClientId = morningStockObj.ClientID
-                If dispDataClass.ShowSuggestList = False Then
-                    stockListItm.Receive = receiveVal
-                    stockListItm.ReceiveClientId = receiveObj.ClientID
-                End If
+                stockListItm.Receive = receiveVal
+                stockListItm.ReceiveClientId = receiveObj.ClientID
                 stockListItm.ReceiveFromLorry = receiveFromLorryVal
                 stockListItm.ReceiveFromLorryClientId = receiveFromLorryObj.ClientID
             Next repStockValItem
@@ -5687,6 +5762,16 @@ Public Class OIT0004OilStockCreate
         ''' <remarks>年月0パディング済で格納想定</remarks>
         Public Property ToMd As String
         ''' <summary>
+        ''' 受注登録可能期間FROM
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OrderFromDate As String
+        ''' <summary>
+        ''' 受注登録可能期間TO
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OrderToDate As String
+        ''' <summary>
         ''' 平均積高(帳票用：前年同月の輸送数量 ÷ 車数）
         ''' </summary>
         ''' <returns></returns>
@@ -5772,6 +5857,8 @@ Public Class OIT0004OilStockCreate
             retVal.IsOilTypeSwitch = Me.IsOilTypeSwitch
             retVal.FromMd = Me.FromMd
             retVal.ToMd = Me.ToMd
+            retVal.OrderFromDate = Me.OrderFromDate
+            retVal.OrderToDate = Me.OrderToDate
             retVal.PrintStockAmountAverage = Me.PrintStockAmountAverage
             Return retVal
         End Function
@@ -5786,6 +5873,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property TrainNo As String
+        ''' <summary>
+        ''' 画面表示の列車番号(現状は三重塩浜の5461を画面上は富士石油と表示するため利用)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DispTrainNo As String = ""
         ''' <summary>
         ''' 列車名
         ''' </summary>
@@ -5898,6 +5990,7 @@ Public Class OIT0004OilStockCreate
         ''' <param name="maxVolume">列車最大受入数</param>
         Public Sub New(trainNo As String, trainName As String, maxVolume As Decimal)
             Me.TrainNo = trainNo
+            Me.DispTrainNo = trainNo
             Me.TrainName = trainName
             Me.MaxVolume = maxVolume
         End Sub
@@ -6311,9 +6404,9 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <param name="dateKey">日付(yyyy/MM/dd形式)※受入日</param>
         ''' <param name="oilCode">油種コード</param>
+        ''' <param name="onlyKawasaki">川崎のみ取得フラグ(True:川崎のみ取得,False(初期):すべて取得</param>
         ''' <returns></returns>
-
-        Private Function GetSummarySuggestValue(dateKey As String, oilCode As String) As Decimal
+        Public Function GetSummarySuggestValue(dateKey As String, oilCode As String, Optional onlyKawasaki As Boolean = False) As Decimal
             Dim retVal As Decimal = 0
             'ありえないが対象の日付データkeyが無ければ例外Throw
             If Me.SuggestList.ContainsKey(dateKey) = False Then
@@ -6336,6 +6429,13 @@ Public Class OIT0004OilStockCreate
 
                     Dim targetDay As String = CDate(dateKey).AddDays(accDays).ToString("yyyy/MM/dd")
                     If Not daysItems.DayInfo.KeyString = targetDay Then
+                        Continue For
+                    End If
+                    '三重塩浜の5461列車の車数は含めない
+                    If tgtItm.TrainInfo.TrainNo = "012402" AndAlso Me.SalesOffice = "5461" Then
+                        Continue For
+                    End If
+                    If onlyKawasaki AndAlso tgtItm.TrainInfo.TrainNo <> "川崎" Then
                         Continue For
                     End If
                     'チェックをしている値のみ合計する
@@ -6372,6 +6472,10 @@ Public Class OIT0004OilStockCreate
                 End If
                 '当日の油種ごとのオブジェクトループ
                 For Each itm In stockListItm.StockItemList.Values
+                    '過去日は再計算しない
+                    If itm.DaysItem.IsPastDay Then
+                        Continue For
+                    End If
                     '再計算対象日を指定した場合、一致するまでスキップ
                     If procDay <> "" AndAlso itm.DaysItem.KeyString <> procDay Then
                         Continue For
@@ -6408,6 +6512,8 @@ Public Class OIT0004OilStockCreate
                     '◆受入数 (提案リストの値)
                     If Me.ShowSuggestList = True AndAlso itm.DaysItem.IsBeforeToday = False AndAlso needsSumSuggestValue Then
                         '提案リスト表示時
+                        itm.Receive = GetSummarySuggestValue(itmDate, oilCode).ToString
+                    ElseIf Me.IsOtTrainMode AndAlso Me.SuggestList IsNot Nothing AndAlso Me.SuggestList.Count > 0 AndAlso needsSumSuggestValue Then
                         itm.Receive = GetSummarySuggestValue(itmDate, oilCode).ToString
                     Else
                         'itm.Receive = 0 '？？？？？ここはどうする
@@ -7173,8 +7279,13 @@ Public Class OIT0004OilStockCreate
             Me.TrainNo = chkItm.trainInfo.TrainNo
             Me.TrainName = chkItm.trainInfo.TrainName
             Me.OrderYmd = Now.ToString("yyyy/MM/dd")
-            Me.OfficeCode = dispDataClass.SalesOffice
-            Me.OfficeName = dispDataClass.SalesOfficeName
+            If dispDataClass.SalesOffice = "012402" AndAlso dispDataClass.Consignee = "40" AndAlso chkItm.trainInfo.TrainNo = "5461" Then
+                Me.OfficeCode = "011203"
+                Me.OfficeName = "袖ヶ浦営業所"
+            Else
+                Me.OfficeCode = dispDataClass.SalesOffice
+                Me.OfficeName = dispDataClass.SalesOfficeName
+            End If
             Me.OrderType = chkItm.trainInfo.PatCode
             Me.ShippersCode = dispDataClass.Shipper
             Me.ShippersName = dispDataClass.ShipperName

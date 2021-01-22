@@ -160,6 +160,10 @@ Public Class OIT0003OTLinkageSearch
                 Me.LblSalesOfficeName.Text = topListItem.Text
             End If
             work.WF_SEL_CAN_BYPASS_SERACH.Text = "1"
+        ElseIf work.WF_SEL_SALESOFFICECODE.Text <> "" Then
+            Me.TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
+            Me.LblSalesOfficeName.Text = work.WF_SEL_SALESOFFICE.Text
+            work.WF_SEL_CAN_BYPASS_SERACH.Text = "1"
         Else
             work.WF_SEL_CAN_BYPASS_SERACH.Text = ""
         End If

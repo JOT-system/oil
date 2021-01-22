@@ -755,6 +755,47 @@ Public Module Messages
         ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20088"
+        ''' <summary>
+        ''' ダウンロード(貨車連結順序表一覧画面(返送列車未選択))エラーメッセージ
+        ''' </summary>
+        Public Const OIL_DOWNLOAD_LINKLIST_RTRAINUNSELECT_ERROR As String = "20089"
+        ''' <summary>
+        ''' ダウンロード(貨車連結順序表一覧画面(返送列車複数選択))エラーメッセージ
+        ''' </summary>
+        Public Const OIL_DOWNLOAD_LINKLIST_RTRAINMULTIPLE_ERROR As String = "20090"
+        ''' <summary>
+        ''' ダウンロード(貨車連結順序表一覧画面(着駅(営業所)複数選択))エラーメッセージ
+        ''' </summary>
+        Public Const OIL_DOWNLOAD_LINKLIST_OFFICEMULTIPLE_ERROR As String = "20091"
+        ''' <summary>
+        ''' (根岸営業所)「灯油＋３号軽油＝１０両以上」の場合の確認メッセージ
+        ''' </summary>
+        Public Const OIL_KEROSENE_3DIESEL_MSG As String = "20092"
+        ''' <summary>
+        ''' タンク車(受注(回送)オーダー中)エラーメッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_USEORDER_ERROR As String = "20093"
+        ''' <summary>
+        ''' 回送登録時の移動(指定営業所の場合)のタンク車所在ステータス更新確認メッセージ
+        ''' </summary>
+        Public Const OIL_KAISOU_IDO_TANKNO_STATUSSET_MSG As String = "20094"
+        ''' <summary>
+        ''' 前回油種での格上げに伴う整合性ワーニング
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_UPGRADE_WAR As String = "20095"
+        ''' <summary>
+        ''' 前回油種での格下げに伴う整合性ワーニング
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_DOWNGRADE_WAR As String = "20096"
+        ''' <summary>
+        ''' 前回油種での格上げに伴う整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_UPGRADE_ERROR As String = "20097"
+        ''' <summary>
+        ''' 前回油種での格下げに伴う整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_DOWNGRADE_ERROR As String = "20098"
+
 
 #End Region
 

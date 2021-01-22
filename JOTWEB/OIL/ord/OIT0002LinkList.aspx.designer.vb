@@ -50,6 +50,15 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents LblGoiCnt As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''LblGoiItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblGoiItem As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''spnOfficeKinoene コントロール。
     '''</summary>
     '''<remarks>
@@ -68,6 +77,15 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents LblKinoeneCnt As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''LblKinoeneItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblKinoeneItem As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''spnOfficeSodegaura コントロール。
     '''</summary>
     '''<remarks>
@@ -84,6 +102,96 @@ Partial Public Class OIT0002LinkList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblSodegauraCnt As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblSodegauraItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblSodegauraItem As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''spnOfficeGoiOT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents spnOfficeGoiOT As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''LblGoiOTCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblGoiOTCnt As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblGoiOTItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblGoiOTItem As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''spnOfficeKinoeneOT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents spnOfficeKinoeneOT As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''LblKinoeneOTCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblKinoeneOTCnt As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblKinoeneOTItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblKinoeneOTItem As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''spnOfficeSodegauraOT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents spnOfficeSodegauraOT As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''LblSodegauraOTCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblSodegauraOTCnt As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblSodegauraOTItem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblSodegauraOTItem As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''pnlListArea コントロール。
@@ -237,6 +345,15 @@ Partial Public Class OIT0002LinkList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_PastLinkList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_PastLinkList As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

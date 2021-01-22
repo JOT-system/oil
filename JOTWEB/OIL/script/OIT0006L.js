@@ -97,7 +97,8 @@ function ChangeOrgUse(obj, lineCnt) {
             continue;
         }
 
-        if (chkStatus === "回送キャンセル") {
+        if (chkStatus === "回送キャンセル"
+            || chkStatus === "回送完了") {
             chkObj.disabled = true;
             trlst[i].getElementsByTagName("td")[2].disabled = true;
         } else {

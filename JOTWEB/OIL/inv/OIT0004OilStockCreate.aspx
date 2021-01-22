@@ -54,7 +54,7 @@
             <div class="listTitle">受注提案タンク車数</div>
             <asp:FormView ID="frvSuggest" runat="server" RenderOuterTable="false" ClientIDMode="Predictable">
                 <HeaderTemplate>
-                    <div id="divSuggestList" style='height:calc(<%# Eval("OilTypeCount") + 3  %> * 24px)'>
+                    <div id="divSuggestList" style='height:calc(<%# Eval("OilTypeCount") + 3 + 1  %> * 24px)' data-hasmiitem='<%# Eval("HasMoveInsideItem") %>'>
                 </HeaderTemplate>
                 <ItemTemplate>
                     <%--  一列目 --%>
@@ -69,10 +69,10 @@
                         <asp:PlaceHolder ID="phmiSuggestLeftRectTitle" runat="server" Visible='<%# Eval("HasMoveInsideItem") %>'>
                             <div id="miSuggestLeftRecvTitle" style='height:calc(<%#  If(Eval("HasMoveInsideItem"), DirectCast(Eval("MiDispData"), DispDataClass).SuggestOilNameList.Count, "0") %> * 24px)'>
                                 <span data-tiptext='<%# String.Format("構内取り {6}営業所:{0}({1}) {6}荷主:{2}({3}) {6}油槽所:{4}({5}) ",
-                                                                                                                       Eval("MiSalesOfficeName"), Eval("MiSalesOffice"),
-                                                                                                                       Eval("MiShippersName"), Eval("MiShippersCode"),
-                                                                                                                       Eval("MiConsigneeName"), Eval("MiConsignee"),
-                                                                                                                       ControlChars.CrLf) %>'
+                                                                                                                                   Eval("MiSalesOfficeName"), Eval("MiSalesOffice"),
+                                                                                                                                   Eval("MiShippersName"), Eval("MiShippersCode"),
+                                                                                                                                   Eval("MiConsigneeName"), Eval("MiConsignee"),
+                                                                                                                                   ControlChars.CrLf) %>'
                                     >構内取り</span>
                             </div>
                         </asp:PlaceHolder>
@@ -82,12 +82,15 @@
                             </ItemTemplate>
                         </asp:Repeater>--%>
                         <%--  積置きの画面表示なし？ --%>
+                        <div class="suggestHDays">
+                            <span class="suggestHdaysText">受入日</span>
+                        </div>
                     </div>
                     <%--  二列目 --%>
-                    <div class="oilTypeColumn">
+                    <div class="oilTypeColumn" >
                         <div><span>日付</span></div>
                         <div><span>列車</span></div>
-                        <div><span>油種</span></div>
+                        <div><span>受注作成</span></div>
                         <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
                                 <div data-title="suggestValue"
@@ -113,9 +116,12 @@
                             </ItemTemplate>
                         </asp:Repeater>
                         <%-- 構内取り用の油種 --%>
+                        <div>
+                            <span>&nbsp;</span>
+                        </div>
                     </div>
                     <%-- 三列目以降 --%>
-                    <asp:Repeater ID="repSuggestItem" runat="server"  DataSource='<%# Eval("SuggestList") %>' >
+                    <asp:Repeater ID="repSuggestItem" runat="server"  DataSource='<%# Eval("SuggestListDisplay") %>' >
                         <ItemTemplate>
                             <div class='dataColumn has<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).SuggestOrderItem.Count %>Col week<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.IsHoliday, "1", "0") %>'  >
                             <%-- 日付部分 --%>
@@ -124,6 +130,7 @@
                                 <span <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.IsHoliday, "data-tiptext='" & DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.HolidayName & "'", "") %>>
                                     <%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.DispDate %>
                                 </span>
+                                <span class="suggestDayAddRemove" data-listkey='<%# Eval("Key") %>' > <%# "＋" %> </span>
                                 <asp:HiddenField ID="hdnSuggestListKey" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                             </div>
                             <%--列車・チェック・値のリピーター--%> 
@@ -133,15 +140,15 @@
                                     <div class="values">
                                     <%--  列車 --%>
                                     <div class="trainNo"
-                                         data-ispastday='<%#If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsBeforeToday = True,
-                                                                                                                                        "True",
-                                                                                                                                        "False") %>'>
+                                         data-ispastday='<%#If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
+                                                                                                                                                                "True",
+                                                                                                                                                                "False") %>'>
                                         <div class="lockImgArea <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>">
                                             <asp:HiddenField ID="hdnTrainLock" runat="server" 
                                                 Value='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>'
                                                  />
                                         </div>
-                                        <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# Eval("Key") %>
+                                        <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.DispTrainNo %>
                                             <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
                                     </div>
@@ -150,9 +157,9 @@
                                         <span>
                                             <asp:CheckBox ID="chkSuggest" runat="server" 
                                             Checked='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).CheckValue %>'
-                                            Enabled ='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsBeforeToday = True,
-                                                                                                                            "False",
-                                                                                                                            "True") %>'    />
+                                            Enabled ='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
+                                                                                                                                                    "False",
+                                                                                                                                                    "True") %>'    />
                                         </span>
                                     </div>
                                     <%--  各種値 --%>
@@ -164,16 +171,15 @@
                                                              data-midoilcode='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.MiddleOilCode %>'
                                                              data-bigoilcode='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.BigOilCode %>'
                                                              <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE,
-                                                                                                                               "data-tiptext='最大牽引車数:" & DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).TrainInfo.MaxVolume & "'",
-                                                                                                                               "") %> >
+                                                                                                                                           "data-tiptext='最大牽引車数:" & DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).TrainInfo.MaxVolume & "'",
+                                                                                                                                           "") %> >
                                                 <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode %>'  />
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE _
-                                                                                                                                                    OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True _
-                                                                                                                                                    OrElse Me.pnlSuggestList.Attributes.Keys.Cast(Of String).Contains("data-otmode"),
-                                                                                                                                        "False",
-                                                                                                                                        "True") %>'></asp:TextBox>
+                                                                                            OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsPastDay = True,
+                                                                                                "False",
+                                                                                                "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>
@@ -187,18 +193,44 @@
                                                              data-midoilcode='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.MiddleOilCode %>'
                                                              data-bigoilcode='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.BigOilCode %>'
                                                              <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE,
-                                                                                                                               "data-tiptext='最大牽引車数:" & DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).TrainInfo.MaxVolume & "'",
-                                                                                                                               "") %> >
+                                                                                                                                           "data-tiptext='最大牽引車数:" & DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).TrainInfo.MaxVolume & "'",
+                                                                                                                                           "") %> >
                                                 <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode %>'  />
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" data-mi="1" 
                                                     Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE _
-                                                                                                    OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True,
-                                                                                                    "False",
-                                                                                                    "True") %>'></asp:TextBox>
+                                                                                                                            OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsPastDay = True,
+                                                                                                                            "False",
+                                                                                                                            "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>
+                                    <div>
+                                        <span>
+                                            <asp:DropDownList ID="ddlSuggestAddDays" runat="server" 
+                                                CssClass="ddlSuggestAccdays" 
+                                                data-hideval='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.AccDays %>' 
+                                                data-loddate='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.ItemDate.ToString("yyyy/MM/dd") %>'
+                                                SelectedValue='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).AccAddDays %>'  
+                                                Enabled='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
+                                                                                                                                                                            "False",
+                                                                                                                                                                            "True") %>'
+                                                >
+                                                <asp:ListItem Text="" Value=""></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="0"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="1"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="2"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="3"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="4"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="5"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="6"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="7"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="8"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="9"></asp:ListItem>
+                                                <asp:ListItem Text="&ensp;" Value="10"></asp:ListItem>
+                                            </asp:DropDownList>
+                                        </span>
+                                    </div>
                                     </div>
                                 </ItemTemplate>
                             </asp:Repeater>
@@ -315,7 +347,7 @@
                                 </div>
 
                                 <%-- 日付毎の各値 --%>
-                                <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).StockItemList %>'>
+                                <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).StockItemListDisplay %>'>
                                     <ItemTemplate>
                                         <div class='colStockValue week<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsHoliday, "1", "0") %>' >
                                             <asp:HiddenField ID="hdnDateKey" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.KeyString %>' />
@@ -324,17 +356,17 @@
                                                     <%-- 初日のみテキストボックス表示 --%>
                                                     <asp:TextBox ID="txtMorningStock" runat="server" 
                                                         Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock),
-                                                                                             Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0"),
-                                                                                             DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock) %>'
-                                                        Visible='<%# If(Container.ItemIndex = 0, True, False) %>'
+                                                                                                         Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0"),
+                                                                                                         DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock) %>'
+                                                        Visible='<%# If(Container.ItemIndex = 0, True, True) %>'
                                                         data-textfield="MorningStock"
-                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsPastDay,
-                                                                                    "False",
-                                                                                    "True") %>' >
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday,
+                                                                                                                        "True",
+                                                                                                                        "False") %>' >
                                                     </asp:TextBox>
                                                     <asp:Label ID="lblMorningStock" runat="server" 
                                                         Text='<%# Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0") %>'
-                                                        Visible='<%# If(Container.ItemIndex = 0, False, True) %>'></asp:Label>
+                                                        Visible='<%# If(Container.ItemIndex = 0, False, False) %>'></asp:Label>
                                                 </span>
                                             </div>
                                             <div><%--朝在庫D/S除--%>
@@ -356,27 +388,27 @@
                                                 <span class='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) AndAlso DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive < 0, "minus", "") %>'>
                                                     <asp:TextBox ID="txtReceive" runat="server" 
                                                         Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive),
-                                                                                                         Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive).ToString("#,##0"),
-                                                                                                         DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) %>'
-                                                        Visible='<%# If(pnlSuggestList.Visible, False, True) %>'
+                                                                                                                     Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive).ToString("#,##0"),
+                                                                                                                     DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) %>'
+                                                        Visible='<%# If(pnlSuggestList.Visible, True, True) %>'
                                                         data-textfield="Receive"
-                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsPastDay,
-                                                                                    "False",
-                                                                                    "True") %>' >
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday,
+                                                                                                                                    "True",
+                                                                                                                                    "False") %>' >
                                                     </asp:TextBox>
                                                     <asp:Label ID="lblReceive" runat="server" 
                                                         Text='<%# Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive).ToString("#,##0") %>'
-                                                        Visible='<%# If(pnlSuggestList.Visible, True, False) %>'></asp:Label>
+                                                        Visible='<%# If(pnlSuggestList.Visible, False, False) %>'></asp:Label>
                                                 </span>
                                             </div>
                                             <div class="receiveFromLorry"><%-- ﾛｰﾘｰ受入 --%>
                                                 <span class="stockinputtext">
                                                     <asp:TextBox ID="txtReceiveFromLorry" runat="server" Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry),
-                                                                                                                                 Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry).ToString("#,##0"),
-                                                                                                                                 DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry) %>'
-                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsPastDay,
-                                                                                    "False",
-                                                                                    "True") %>'>
+                                                                                                                                             Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry).ToString("#,##0"),
+                                                                                                                                             DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry) %>'
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday,
+                                                                                                                        "True",
+                                                                                                                        "True") %>'>
                                                     </asp:TextBox>
                                                 </span>
                                             </div>
@@ -388,11 +420,11 @@
                                             <div><%--払出--%>
                                                 <span class="stockinputtext">
                                                     <asp:TextBox ID="txtSend" runat="server" Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send),
-                                                                                                         Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send).ToString("#,##0"),
-                                                                                                         DirectCast(Eval("Value"), DispDataClass.StockListItem).Send) %>'
-                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsPastDay,
-                                                                                    "False",
-                                                                                    "True") %>'>
+                                                                                                                     Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send).ToString("#,##0"),
+                                                                                                                     DirectCast(Eval("Value"), DispDataClass.StockListItem).Send) %>'
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday,
+                                                                                                                        "True",
+                                                                                                                        "True") %>'>
                                                     </asp:TextBox>
                                                 </span>
                                             </div>
@@ -458,6 +490,8 @@
             <asp:HiddenField ID="hdnChgConsigneeFirstLoad" runat="server" Value="0" />
             <!-- 帳票設定表示状態保持用 -->
             <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
+            <!-- 提案表の日付追加・削除ボタン押下元情報保持 -->
+            <asp:HiddenField ID="hdnSuggestDateAddRemoveKey" runat="server" value="" EnableViewState ="false" />
             <!-- 権限 -->
         </div>
  

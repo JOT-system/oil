@@ -1557,10 +1557,27 @@ Public Class OIT0002LinkList
             If useFlg = "4" Then
                 '○必須項目チェック(本線列車設定時のチェック)
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+                    'Dim iTankNo As Integer
                     Dim dtInspectionDate As Date
                     Dim iTrainNo As Integer
                     Dim dtLodDate As Date
                     Dim dtDepDate As Date
+                    ''# 番号(タンク車№)チェック
+                    'If Convert.ToString(OIT0002EXLUProw("TRUCKNO")) = "" Then
+                    '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                    '              "ポラリスで設定した番号(タンク車№)が未設定です。再度確認をおねがいします。", needsPopUp:=True)
+                    '    WW_ERRCODE = "ERR"
+                    '    Exit For
+                    'Else
+                    '    Try
+                    '        iTankNo = Integer.Parse(OIT0002EXLUProw("TRUCKNO"))
+                    '    Catch ex As Exception
+                    '        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                    '              "ポラリスで設定した番号(タンク車№)が数値ではありません。再度確認をおねがいします。", needsPopUp:=True)
+                    '        WW_ERRCODE = "ERR"
+                    '        Exit For
+                    '    End Try
+                    'End If
                     '# 交検日チェック
                     Try
                         dtInspectionDate = Date.Parse(OIT0002EXLUProw("INSPECTIONDATE"))
@@ -2037,7 +2054,7 @@ Public Class OIT0002LinkList
                 & " , TRAINNO       , CONVENTIONAL   , CONVENTIONALTIME, SERIALNUMBER        , TRUCKSYMBOL        , TRUCKNO" _
                 & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME     , INSPECTIONDATE      , CONVERSIONAMOUNT" _
                 & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME  , OBJECTIVENAME       , DAILYREPORTCODE    , DAILYREPORTOILNAME" _
-                & " , OILNAME       , LINE           , POSITION        , INLINETRAIN         , LOADARRSTATION" _
+                & " , OILNAME       , LINE           , POSITION        , INLINETRAIN         , LOADARRSTATION     , LOADINGKTRAINNO" _
                 & " , LOADINGTRAINNO, LOADINGLODDATE , LOADINGDEPDATE  , FORWARDINGARRSTATION, FORWARDINGCONFIGURE" _
                 & " , CURRENTCARTOTAL, EXTEND        , CONVERSIONTOTAL , LINKNO              , ORDERNO            , DETAILNO" _
                 & " , DELFLG        , INITYMD        , INITUSER        , INITTERMID" _
@@ -2049,7 +2066,7 @@ Public Class OIT0002LinkList
                 & " , @TRAINNO        , @CONVENTIONAL   , @CONVENTIONALTIME, @SERIALNUMBER        , @TRUCKSYMBOL        , @TRUCKNO" _
                 & " , @DEPSTATIONNAME , @ARRSTATIONNAME , @ARTICLENAME     , @INSPECTIONDATE      , @CONVERSIONAMOUNT" _
                 & " , @ARTICLE        , @ARTICLETRAINNO , @ARTICLEOILNAME  , @OBJECTIVENAME       , @DAILYREPORTCODE    , @DAILYREPORTOILNAME" _
-                & " , @OILNAME        , @LINE           , @POSITION        , @INLINETRAIN         , @LOADARRSTATION" _
+                & " , @OILNAME        , @LINE           , @POSITION        , @INLINETRAIN         , @LOADARRSTATION     , @LOADINGKTRAINNO" _
                 & " , @LOADINGTRAINNO , @LOADINGLODDATE , @LOADINGDEPDATE  , @FORWARDINGARRSTATION, @FORWARDINGCONFIGURE" _
                 & " , @CURRENTCARTOTAL, @EXTEND         , @CONVERSIONTOTAL , @LINKNO              , @ORDERNO            , @DETAILNO" _
                 & " , @DELFLG         , @INITYMD        , @INITUSER        , @INITTERMID" _
@@ -2113,6 +2130,9 @@ Public Class OIT0002LinkList
                 Dim POSITION As SqlParameter = SQLRLinkcmd.Parameters.Add("@POSITION", SqlDbType.NVarChar)                   '位置(運用指示)
                 Dim INLINETRAIN As SqlParameter = SQLRLinkcmd.Parameters.Add("@INLINETRAIN", SqlDbType.NVarChar)             '入線列車(運用指示)
                 Dim LOADARRSTATION As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADARRSTATION", SqlDbType.NVarChar)       '着駅(運用指示)
+                '### 20210121 START 向き先複数駅ある列車対応 ##############################
+                Dim LOADINGKTRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGKTRAINNO", SqlDbType.NVarChar)       '本線列車(運用指示)
+                '### 20210121 END   向き先複数駅ある列車対応 ##############################
                 Dim LOADINGTRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGTRAINNO", SqlDbType.NVarChar)       '本線列車(運用指示)
                 Dim LOADINGLODDATE As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGLODDATE", SqlDbType.NVarChar)       '積込日(運用指示)
                 Dim LOADINGDEPDATE As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGDEPDATE", SqlDbType.NVarChar)       '発日(運用指示)
@@ -2235,6 +2255,10 @@ Public Class OIT0002LinkList
                         INLINETRAIN.Value = OIT0002EXLUProw("INLINETRAIN")
                         '着駅(運用指示)
                         LOADARRSTATION.Value = OIT0002EXLUProw("LOADARRSTATION")
+                        '### 20210121 START 向き先複数駅ある列車対応 ##############################
+                        '空回日報列車(運用指示)
+                        LOADINGKTRAINNO.Value = OIT0002EXLUProw("LOADINGKTRAINNO")
+                        '### 20210121 END   向き先複数駅ある列車対応 ##############################
                         '本線列車(運用指示)
                         LOADINGTRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO")
                         '積込日(運用指示)
@@ -2258,12 +2282,12 @@ Public Class OIT0002LinkList
                     ElseIf useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "1" Then
                         'タンク車指示(運用指示)
                         OBJECTIVENAME.Value = OIT0002EXLUProw("OBJECTIVENAME")
-                        '### 20210118 START ポラリスと入用(油種変換)チェック対応 ##################
+                        '### 20210118 START 油種変換対応 ##########################################
                         '日報コード(運用指示)
-                        DAILYREPORTCODE.Value = OIT0002EXLUProw("DAILYREPORTCODE")
+                        DAILYREPORTCODE.Value = ""
                         '日報油種(運用指示)
-                        DAILYREPORTOILNAME.Value = OIT0002EXLUProw("DAILYREPORTOILNAME")
-                        '### 20210118 END   ポラリスと入用(油種変換)チェック対応 ##################
+                        DAILYREPORTOILNAME.Value = ""
+                        '### 20210118 END   油種変換対応 ##########################################
                         '油種(運用指示)
                         OILNAME.Value = ""
                         '回転(運用指示)
@@ -2274,6 +2298,10 @@ Public Class OIT0002LinkList
                         INLINETRAIN.Value = ""
                         '着駅(運用指示)
                         LOADARRSTATION.Value = ""
+                        '### 20210121 START 向き先複数駅ある列車対応 ##############################
+                        '空回日報列車(運用指示)
+                        LOADINGKTRAINNO.Value = ""
+                        '### 20210121 END   向き先複数駅ある列車対応 ##############################
                         '本線列車(運用指示)
                         LOADINGTRAINNO.Value = ""
                         '積込日(運用指示)
@@ -2465,10 +2493,10 @@ Public Class OIT0002LinkList
 
             '### 20201002 START 変換マスタに移行したため修正 ########################
             SQLStr &=
-                  " , ISNULL(OIM0029.KEYCODE05, OIT0005.LASTOILCODE)        AS PREOILCODE" _
-                & " , ISNULL(OIM0029.KEYCODE06, OIT0005.LASTOILNAME)        AS PREOILNAME" _
-                & " , ISNULL(OIM0029.KEYCODE08, OIT0005.PREORDERINGTYPE)    AS PREORDERINGTYPE" _
-                & " , ISNULL(OIM0029.KEYCODE09, OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME"
+                  " , ISNULL(OIM0029.KEYCODE05, ISNULL(OIT0005.LASTOILCODE, ''))        AS PREOILCODE" _
+                & " , ISNULL(OIM0029.KEYCODE06, ISNULL(OIT0005.LASTOILNAME, ''))        AS PREOILNAME" _
+                & " , ISNULL(OIM0029.KEYCODE08, ISNULL(OIT0005.PREORDERINGTYPE, ''))    AS PREORDERINGTYPE" _
+                & " , ISNULL(OIM0029.KEYCODE09, ISNULL(OIT0005.PREORDERINGOILNAME, '')) AS PREORDERINGOILNAME"
             'SQLStr &=
             '      " , ISNULL(TMP0005.OILCODE, OIT0005.LASTOILCODE)     AS PREOILCODE" _
             '    & " , ISNULL(TMP0005.OILNAME, OIT0005.LASTOILNAME)     AS PREOILNAME" _

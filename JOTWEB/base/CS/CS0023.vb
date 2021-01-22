@@ -1449,25 +1449,30 @@ Public Structure CS0023XLSUPLOAD
                 'rng = oSheet.Range("Q" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
+                '### 20210121 START 向き先複数駅ある列車対応 ####################
                 rng = oSheet.Range("T" + jStart.ToString())
-                'rng = oSheet.Range("S" + jStart.ToString())
-                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
+                dt.Rows(i)("LOADINGKTRAINNO") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
+                '### 20210121 END   向き先複数駅ある列車対応 ####################
                 rng = oSheet.Range("U" + jStart.ToString())
                 'rng = oSheet.Range("T" + jStart.ToString())
-                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 rng = oSheet.Range("V" + jStart.ToString())
                 'rng = oSheet.Range("U" + jStart.ToString())
+                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("W" + jStart.ToString())
+                'rng = oSheet.Range("V" + jStart.ToString())
                 dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
-                rng = oSheet.Range("W" + jStart.ToString())
-                'rng = oSheet.Range("V" + jStart.ToString())
-                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
-                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("X" + jStart.ToString())
                 'rng = oSheet.Range("W" + jStart.ToString())
+                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("Y" + jStart.ToString())
+                'rng = oSheet.Range("X" + jStart.ToString())
                 dt.Rows(i)("FORWARDINGCONFIGURE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
@@ -1963,6 +1968,9 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("OTTRANSPORTFLG", Type.GetType("System.String"))
         '### 20201204 END   指摘票対応(No231)全体 #######################
         dt.Columns.Add("LOADARRSTATION", Type.GetType("System.String"))
+        '### 20210121 START 向き先複数駅ある列車対応 ####################
+        dt.Columns.Add("LOADINGKTRAINNO", Type.GetType("System.String"))
+        '### 20210121 END   向き先複数駅ある列車対応 ####################
         dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGDEPDATE", Type.GetType("System.String"))

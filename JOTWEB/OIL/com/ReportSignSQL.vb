@@ -273,6 +273,7 @@
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
+            & " , OIT0011.LOADINGKTRAINNO                        AS LOADINGKTRAINNO" _
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "' THEN OIT0011.LOADINGTRAINNO" _

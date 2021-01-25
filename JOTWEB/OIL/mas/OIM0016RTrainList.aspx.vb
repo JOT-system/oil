@@ -2,7 +2,7 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' 列車マスタ（臨海）登録（実行）
+''' 列車番号(臨海)マスタ(一覧)
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIM0016RTrainList
@@ -294,6 +294,14 @@ Public Class OIM0016RTrainList
             andFlg = True
         End If
 
+        '削除フラグ
+        If andFlg Then
+            SQLStrBldr.AppendLine("     AND ")
+        Else
+            SQLStrBldr.AppendLine(" WHERE ")
+        End If
+        SQLStrBldr.AppendLine("     OIM0016.DELFLG = @P0 ")
+
         '○ ソート
         SQLStrBldr.AppendLine(" ORDER BY ")
         SQLStrBldr.AppendLine("     OIM0016.OFFICECODE ")
@@ -305,6 +313,7 @@ Public Class OIM0016RTrainList
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 管轄受注営業所
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)     ' 入線出線区分
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Int, 4)          ' 回線
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.NVarChar, 1)     ' 削除フラグ
 
                 PARA1.Value = work.WF_SEL_OFFICECODE.Text
                 PARA2.Value = work.WF_SEL_IOKBN.Text
@@ -313,7 +322,7 @@ Public Class OIM0016RTrainList
                 Else
                     PARA3.Value = Int32.Parse(work.WF_SEL_LINE.Text)
                 End If
-
+                PARA0.Value = C_DELETE_FLG.ALIVE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

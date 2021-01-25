@@ -327,6 +327,14 @@ Public Class OIM0017TrainOperationList
             andFlg = True
         End If
 
+        '削除フラグ
+        If andFlg Then
+            SQLStrBldr.AppendLine("     AND ")
+        Else
+            SQLStrBldr.AppendLine(" WHERE ")
+        End If
+        SQLStrBldr.AppendLine("     OIM0017.DELFLG = @P0 ")
+
         '○ ソート
         SQLStrBldr.AppendLine(" ORDER BY ")
         SQLStrBldr.AppendLine("     OIM0017.OFFICECODE ")
@@ -362,6 +370,9 @@ Public Class OIM0017TrainOperationList
                     Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 7)
                     PARA6.Value = work.WF_SEL_ARRSTATION.Text
                 End If
+                ' 削除フラグ
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.NVarChar, 1)
+                PARA0.Value = C_DELETE_FLG.ALIVE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

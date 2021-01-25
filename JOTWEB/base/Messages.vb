@@ -795,6 +795,14 @@ Public Module Messages
         ''' 前回油種での格下げに伴う整合性エラー
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_DOWNGRADE_ERROR As String = "20098"
+        ''' <summary>
+        ''' 前回油種での格上げに伴う整合性ワーニング(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_UPGRADE_WAR2 As String = "20099"
+        ''' <summary>
+        ''' 前回油種での格下げに伴う整合性ワーニング(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_DOWNGRADE_WAR2 As String = "20100"
 
 
 #End Region

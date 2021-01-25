@@ -416,7 +416,7 @@ Public Class OIT0007FileInputList
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
 
         '★積置フラグ有り用SQL
@@ -516,7 +516,7 @@ Public Class OIT0007FileInputList
                         OIT0007row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0007row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0007row("LODDATE")) >= today Then
                         OIT0007row("CAN_RESERVED") = "1"
                     Else
                         OIT0007row("CAN_RESERVED") = "0"
@@ -1419,15 +1419,23 @@ Public Class OIT0007FileInputList
             '取り込んだファイルと比較不一致なら油種不一致
             If Not retItm.InpOilTypeName = oilName Then
                 retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OilUnMatch
+                Continue For
             End If
             '車番チェック
             If Not retItm.InpTnkNo = tankNo Then
                 retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.TankUnmatch
+                Continue For
             End If
             '受注ステータスチェック(200：手配～310：手配完了の間であること）
             If Not (Convert.ToString(targetRow("ORDERSTATUS")) >= BaseDllConst.CONST_ORDERSTATUS_200 AndAlso
                     Convert.ToString(targetRow("ORDERSTATUS")) <= BaseDllConst.CONST_ORDERSTATUS_310) Then
                 retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusCannotAccept
+                If Convert.ToString(targetRow("ORDERSTATUS")) = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                    retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusCancel
+                ElseIf Convert.ToString(targetRow("ORDERSTATUS")) < BaseDllConst.CONST_ORDERSTATUS_200 Then
+                    retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusBackToBefore200
+                End If
+                Continue For
             End If
             '出荷実績0チェック
             If IsNumeric(retItm.InpCarsAmount) AndAlso CDec(retItm.InpCarsAmount) = 0 Then
@@ -1478,10 +1486,12 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
 
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) between 1 and 999 THEN '1000-' + DET.TANKNO  ")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,ODR.TRAINNO) >= 1000           THEN '1001-' + DET.TANKNO  ")
-        sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
-        sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3) ")
+        'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
+        'sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
+        sqlStat.AppendLine("     , TNK.JXTGTANKNUMBER4 AS NEG_KASHANO")
+
+        sqlStat.AppendLine("     , RIGHT('00000' + convert(nvarchar,convert(int,PRD.SHIPPEROILCODE)),5) AS NEG_SHIPPEROILCODE")
 
 
 
@@ -1997,9 +2007,17 @@ Public Class OIT0007FileInputList
             ''' </summary>
             TankUnmatch = 32
             ''' <summary>
-            ''' 受注ステータスが登録範囲外
+            ''' 受注ステータスが登録範囲外(実績登録済みです。)
             ''' </summary>
             OrderStatusCannotAccept = 64
+            ''' <summary>
+            ''' 受注ステータスが登録ｷｬﾝｾﾙ(受注がキャンセルされています)
+            ''' </summary>
+            OrderStatusCancel = 128
+            ''' <summary>
+            ''' 受注ステータスが受注受付に戻される(タンク車割当が確定していないです)
+            ''' </summary>
+            OrderStatusBackToBefore200 = 256
             ''' <summary>
             ''' 本来ありえないが同一の予約番号、積込予定日で複数合致した場合
             ''' </summary>
@@ -2076,7 +2094,11 @@ Public Class OIT0007FileInputList
                     Case CheckReasonCodes.TankUnmatch
                         Return "車番不一致"
                     Case CheckReasonCodes.OrderStatusCannotAccept
-                        Return "受注状況が実績数量を登録出来る範囲ではありません。"
+                        Return "実績登録済みです"
+                    Case CheckReasonCodes.OrderStatusCancel
+                        Return "受注がキャンセルされています"
+                    Case CheckReasonCodes.OrderStatusBackToBefore200
+                        Return "タンク車割当が確定していないです"
                     Case CheckReasonCodes.TooMenyOrderInfo
                         '本来ありえない想定だが念の為
                         Return "受注結果複数"

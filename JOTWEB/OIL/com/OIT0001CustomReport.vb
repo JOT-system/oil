@@ -51,50 +51,58 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, excelFileName As String, printDataClass As DataTable)
-        Dim CS0050SESSION As New CS0050SESSION
-        Me.PrintData = printDataClass
-        Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+        Try
+            Dim CS0050SESSION As New CS0050SESSION
+            Me.PrintData = printDataClass
+            Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                       "PRINTFORMAT",
                                                       C_DEFAULT_DATAKEY,
                                                       mapId, excelFileName)
-        Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+            Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                    "PRINTWORK",
                                                    CS0050SESSION.USERID)
-        'ディレクトリが存在しない場合は生成
-        If IO.Directory.Exists(Me.UploadRootPath) = False Then
-            IO.Directory.CreateDirectory(Me.UploadRootPath)
-        End If
-        '前日プリフィックスのアップロードファイルが残っていた場合は削除
-        Dim targetFiles = IO.Directory.GetFiles(Me.UploadRootPath, "*.*")
-        Dim keepFilePrefix As String = Now.ToString("yyyyMMdd")
-        For Each targetFile In targetFiles
-            Dim fileName As String = IO.Path.GetFileName(targetFile)
-            '今日の日付が先頭のファイル名の場合は残す
-            If fileName.StartsWith(keepFilePrefix) Then
-                Continue For
+            'ディレクトリが存在しない場合は生成
+            If IO.Directory.Exists(Me.UploadRootPath) = False Then
+                IO.Directory.CreateDirectory(Me.UploadRootPath)
             End If
-            Try
-                IO.File.Delete(targetFile)
-            Catch ex As Exception
-                '削除時のエラーは無視
-            End Try
-        Next targetFile
-        'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
+            '前日プリフィックスのアップロードファイルが残っていた場合は削除
+            Dim targetFiles = IO.Directory.GetFiles(Me.UploadRootPath, "*.*")
+            Dim keepFilePrefix As String = Now.ToString("yyyyMMdd")
+            For Each targetFile In targetFiles
+                Dim fileName As String = IO.Path.GetFileName(targetFile)
+                '今日の日付が先頭のファイル名の場合は残す
+                If fileName.StartsWith(keepFilePrefix) Then
+                    Continue For
+                End If
+                Try
+                    IO.File.Delete(targetFile)
+                Catch ex As Exception
+                    '削除時のエラーは無視
+                End Try
+            Next targetFile
+            'URLのルートを表示
+            Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
 
-        'Excelアプリケーションオブジェクトの生成
-        Me.ExcelAppObj = New Excel.Application
-        ExcelAppObj.DisplayAlerts = False
-        Dim xlHwnd As IntPtr = CType(Me.ExcelAppObj.Hwnd, IntPtr)
-        GetWindowThreadProcessId(xlHwnd, Me.xlProcId)
-        'Excelワークブックオブジェクトの生成
-        Me.ExcelBooksObj = Me.ExcelAppObj.Workbooks
-        Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
+            'Excelアプリケーションオブジェクトの生成
+            Me.ExcelAppObj = New Excel.Application
+            ExcelAppObj.DisplayAlerts = False
+            Dim xlHwnd As IntPtr = CType(Me.ExcelAppObj.Hwnd, IntPtr)
+            GetWindowThreadProcessId(xlHwnd, Me.xlProcId)
+            'Excelワークブックオブジェクトの生成
+            Me.ExcelBooksObj = Me.ExcelAppObj.Workbooks
+            Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
-        Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("空回日報"), Excel.Worksheet)
-        'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+            Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("空回日報"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+
+        Catch ex As Exception
+            If Me.xlProcId <> 0 Then
+                ExcelProcEnd()
+            End If
+            Throw
+        End Try
     End Sub
 
     ''' <summary>
@@ -161,47 +169,93 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer)
 
-        Dim iHeader(,) As Integer = {{3, 7, 9, 41}, {45, 49, 51, 83}, {87, 91, 93, 125}, {129, 133, 135, 167}}
+        Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
+            iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+        'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
+        '    iHeader = {{6, 10, 12, 37, 7}, {45, 49, 51, 76, 46}, {84, 88, 90, 115, 85}, {123, 127, 129, 154, 124}}
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0
 
         '◯ 営業所名
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i)))
-        I_rngHeaderArea.Value = PrintDatarow("OFFICENAME")
+        I_rngHeaderArea.Value = Convert.ToString(PrintDatarow("OFFICENAME")) + " 作成"
+        ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 向い先(着駅)
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 1)))
         I_rngHeaderArea.Value = PrintDatarow("ARRSTATIONNAME")
-
+        ExcelMemoryRelease(I_rngHeaderArea)
         '### 20201019 START 指摘票対応(No177) ####################################
         '◎袖ヶ浦営業所の場合
-        '　かつ、列車No(5461⇒5972へ変更)
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 _
-            AndAlso Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
-            I_rngHeaderArea.Value = strTrainNo(1)
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
-            I_rngHeaderArea.Value = strTrainNo(1)
+        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★列車No(5461⇒5972へ変更)
+            If Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
+                '◯ 列車No
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("P" + Convert.ToString(iHeader(I_column, i + 1)))
+                'I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 1)))
+                I_rngHeaderArea.Value = strTrainNo(1)
+                ExcelMemoryRelease(I_rngHeaderArea)
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 3)))
+                I_rngHeaderArea.Value = strTrainNo(1)
+                ExcelMemoryRelease(I_rngHeaderArea)
+            Else
+                '◯ 列車No
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("P" + Convert.ToString(iHeader(I_column, i + 1)))
+                'I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 1)))
+                I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+                ExcelMemoryRelease(I_rngHeaderArea)
+                I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 3)))
+                I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+                ExcelMemoryRelease(I_rngHeaderArea)
+            End If
+            '◯ 日付
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("R" + Convert.ToString(iHeader(I_column, i + 4)))
+            I_rngHeaderArea.Value = Now.ToString("yyyy年MM月dd日")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 積込日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("LODDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 発日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 積車着日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 受入日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("P" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+
         Else
             '◯ 列車No
             I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
             I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+            ExcelMemoryRelease(I_rngHeaderArea)
             I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
             I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+            ExcelMemoryRelease(I_rngHeaderArea)
+
+            '◯ 積込日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("LODDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 発日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 積車着日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            '◯ 受入日（予定）
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
+            I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
+            ExcelMemoryRelease(I_rngHeaderArea)
         End If
         '### 20201019 END   指摘票対応(No177) ####################################
-
-        '◯ 積込日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("LODDATE")
-        '◯ 発日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("J" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
-        '◯ 積車着日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
-        '◯ 受入日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
-        I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
 
     End Sub
 
@@ -212,82 +266,137 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal I_rngDetailArea As Excel.Range,
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer,
-                                     ByRef I_OtOilName As String)
+                                     ByRef O_OtOilName As String)
 
         '◯ 車数
         I_rngDetailArea = Me.ExcelWorkSheet.Range("B" + I_column.ToString())
         I_rngDetailArea.Value = PrintDatarow("LINECNT")
+        ExcelMemoryRelease(I_rngDetailArea)
         '◯ 荷主名
         I_rngDetailArea = Me.ExcelWorkSheet.Range("C" + I_column.ToString())
         I_rngDetailArea.Value = PrintDatarow("SHIPPERSNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
         '◯ 在庫発駅(発駅)
         I_rngDetailArea = Me.ExcelWorkSheet.Range("D" + I_column.ToString())
         I_rngDetailArea.Value = PrintDatarow("DEPSTATIONNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
         '◯ 油種(OT油種)
         I_rngDetailArea = Me.ExcelWorkSheet.Range("E" + I_column.ToString())
         I_rngDetailArea.Value = PrintDatarow("OTOILNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
         '◯ 車(OT油種毎の件数)
-        If I_OtOilName <> PrintDatarow("OTOILNAME").ToString() Then
+        If O_OtOilName <> PrintDatarow("OTOILNAME").ToString() Then
             I_rngDetailArea = Me.ExcelWorkSheet.Range("F" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("OTOILCTCNT")
+            ExcelMemoryRelease(I_rngDetailArea)
         End If
-        I_OtOilName = PrintDatarow("OTOILNAME").ToString()
+        O_OtOilName = PrintDatarow("OTOILNAME").ToString()
 
-        '◯ タンク車番号
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("TANKNO")
-        '◯ 前回油種
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
-
-        '### 20201008 START 指摘票対応(No156)全体 ###################################################
         '★袖ヶ浦営業所の場合
         If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ 順位
+
+            '### 20201218 START 指摘票対応(No277)全体 #############################
+            '◯ 荷主名が「出光昭和シェル」の場合
+            If Convert.ToString(PrintDatarow("SHIPPERSNAME")) = "出光昭和シェル" Then
+                '◯ 荷主名
+                I_rngDetailArea = Me.ExcelWorkSheet.Range("C" + I_column.ToString())
+                I_rngDetailArea.Value = "出光興産"
+                ExcelMemoryRelease(I_rngDetailArea)
+            End If
+            '### 20201218 END   指摘票対応(No277)全体 #############################
+
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
+                I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("TANKNO"))
+            Else
+                I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 油種(OT油種)
+            If Convert.ToString(PrintDatarow("OTOILNAME")) = "軽油3" Then
+                I_rngDetailArea = Me.ExcelWorkSheet.Range("E" + I_column.ToString())
+                I_rngDetailArea.Value = "3ケ"
+                ExcelMemoryRelease(I_rngDetailArea)
+            End If
+            '◯ 前回油種(OT油種)
             I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("LASTOTOILNAME")) = "軽油3" Then
+                I_rngDetailArea.Value = "3ケ"
+            Else
+                I_rngDetailArea.Value = PrintDatarow("LASTOTOILNAME")
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20201008 START 指摘票対応(No156)全体 ###################################################
+            '◯ 順位
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("SHIPORDER")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20201008 END   指摘票対応(No156)全体 ###################################################
+            '◯ 次回交検日
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 返送日列車
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20200917 START 指摘票対応(No138)全体 ###################################################
+            '◯ FOC入線順
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("LINEORDER")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 託送用コード
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("P" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20200917 END   指摘票対応(No138)全体 ###################################################
+            '### 20201008 START 指摘票対応(No157)全体 ###################################################
+            '◯ 記事
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("R" + I_column.ToString())
+            'I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
+            '### 20201218 START 指摘票対応(No276)全体 ###################################################
+            If Convert.ToString(PrintDatarow("SECONDCONSIGNEECODE")) = BaseDllConst.CONST_CONSIGNEECODE_54 Then
+                I_rngDetailArea.Value = "構内取り"
+            Else
+                I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+            End If
+            '### 20201218 START 指摘票対応(No276)全体 ###################################################
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20201008 END   指摘票対応(No157)全体 ###################################################
         Else
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 前回油種
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
+            ExcelMemoryRelease(I_rngDetailArea)
             '◯ 順位
             '### 未使用項目 ###########################################
-        End If
-        '### 20201008 END   指摘票対応(No156)全体 ###################################################
-        '◯ 次回交検日
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("J" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
-        '◯ 返送日列車
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
-        I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
-
-        '### 20200917 START 指摘票対応(No138)全体 ###################################################
-        '★袖ヶ浦営業所の場合(フォーマットが異なるため別設定)
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ FOC入線順
-            I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
-            I_rngDetailArea.Value = PrintDatarow("LINEORDER")
-            '◯ 託送用コード
-            I_rngDetailArea = Me.ExcelWorkSheet.Range("M" + I_column.ToString())
-            I_rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
-        Else
+            '◯ 次回交検日
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("J" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ 返送日列車
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+            ExcelMemoryRelease(I_rngDetailArea)
             '◯ ジョイント先
             I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("JOINT")
+            ExcelMemoryRelease(I_rngDetailArea)
             '◯ 割当元
             '### 未使用項目 ###########################################
-        End If
-        '### 20200917 END   指摘票対応(No138)全体 ###################################################
-
-        '### 20201008 START 指摘票対応(No157)全体 ###################################################
-        '★袖ヶ浦営業所の場合
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            '◯ 記事
-            I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
-            I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
-        Else
             '◯ 記事
             I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("REMARK")
+            ExcelMemoryRelease(I_rngDetailArea)
         End If
-        '### 20201008 END   指摘票対応(No157)全体 ###################################################
 
     End Sub
 
@@ -322,6 +431,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Try
             Dim i As Integer = 12
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then i = 15
             Dim strOtOilNameSave As String = ""
             For Each PrintDatarow As DataRow In PrintData.Rows
 
@@ -331,10 +441,15 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 i += 1
             Next
 
-            '◯ 合計
-            rngDetailArea = Me.ExcelWorkSheet.Range("G41")
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '◯ 合計
+                rngDetailArea = Me.ExcelWorkSheet.Range("G37")
+            Else
+                '◯ 合計
+                rngDetailArea = Me.ExcelWorkSheet.Range("G41")
+            End If
             rngDetailArea.Value = PrintData.Rows.Count.ToString() + "車"
-
+            ExcelMemoryRelease(rngDetailArea)
         Catch ex As Exception
             Throw
         Finally
@@ -353,8 +468,12 @@ Public Class OIT0001CustomReport : Implements IDisposable
         Try
             Dim j As Integer = 0                            '次明細切り替え時用
             Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 53, 91, 129}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 54, 93, 132}
             Dim i As Integer = iTate(j)
             Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 75, 113, 151}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 76, 115, 154}
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
@@ -369,6 +488,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     '◯ 合計
                     rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
                     rngDetailArea.Value = Convert.ToString(z) + "車"
+                    ExcelMemoryRelease(rngDetailArea)
                     '★次明細用として合計,油種(保存)を初期化
                     z = 0
                     strOtOilNameSave = ""
@@ -395,7 +515,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             '◯ 合計
             rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
             rngDetailArea.Value = Convert.ToString(z) + "車"
-
+            ExcelMemoryRelease(rngDetailArea)
         Catch ex As Exception
             Throw
         Finally
@@ -461,19 +581,26 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End Try
             End If
             ExcelMemoryRelease(ExcelAppObj)
-            Try
-                '念のため当処理で起動したプロセスが残っていたらKill
-                Dim xproc As Process = Process.GetProcessById(Me.xlProcId)
-                If Not xproc.HasExited Then
-                    xproc.Kill()
-                End If
-            Catch ex As Exception
-            End Try
 
         End If
+        ExcelProcEnd()
         disposedValue = True
     End Sub
-
+    ''' <summary>
+    ''' Excelプロセスの終了
+    ''' </summary>
+    Private Sub ExcelProcEnd()
+        ExcelMemoryRelease(ExcelAppObj)
+        Try
+            '念のため当処理で起動したプロセスが残っていたらKill
+            Dim xproc As Process = Process.GetProcessById(Me.xlProcId)
+            System.Threading.Thread.Sleep(200) 'Waitかけないとプロセスが終了しきらない為
+            If Not xproc.HasExited Then
+                xproc.Kill()
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
     ' TODO: 上の Dispose(disposing As Boolean) にアンマネージド リソースを解放するコードが含まれる場合にのみ Finalize() をオーバーライドします。
     'Protected Overrides Sub Finalize()
     '    ' このコードを変更しないでください。クリーンアップ コードを上の Dispose(disposing As Boolean) に記述します。

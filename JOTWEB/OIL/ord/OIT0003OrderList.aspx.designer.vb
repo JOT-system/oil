@@ -356,6 +356,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbFillingPointBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''rbTankDispatchBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbTankDispatchBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbActualShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbActualShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
     '''lblReportRTrainNo コントロール。
     '''</summary>
     '''<remarks>
@@ -372,6 +390,24 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''lblReportTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportTrainNo As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''lblEndMonthChkDmy コントロール。

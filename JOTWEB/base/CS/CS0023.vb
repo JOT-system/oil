@@ -1044,8 +1044,10 @@ Public Structure CS0023XLSUPLOAD
             '★日付(年月日(曜日))※作成日
             rng = oSheet.Range("AE2")
             sCellTitleYMDC = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             rng = oSheet.Range("AF2")
             sCellTitleYMDC += rng.Text.ToString()
+            ExcelMemoryRelease(rng)
 
             Dim i As Integer = 0
             '★日付(年月日(曜日))※積込日
@@ -1053,6 +1055,7 @@ Public Structure CS0023XLSUPLOAD
                 rng = oSheet.Range(sCellTitleYokorow + "3")
                 sCellTitleYMD(i) = rng.Text.ToString()
                 sCellTitleYMDL += rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 i += 1
             Next
 
@@ -1061,10 +1064,13 @@ Public Structure CS0023XLSUPLOAD
             For Each sCellTitlePointYokorow As String In sCellTitlePointYoko
                 rng = oSheet.Range(sCellTitlePointYokorow + "4")
                 sCellTitleLine(i) = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range(sCellTitlePointYokorow + "5")
                 sCellTitleArrstation(i) = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range(sCellTitlePointYokorow + "6")
                 sCellTitleTrainNo(i) = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 i += 1
             Next
 
@@ -1100,10 +1106,13 @@ Public Structure CS0023XLSUPLOAD
                     dt.Rows(j)("POINT") = jPoint
                     rng = oSheet.Range(sCellDetailYoko1(i) + jStart.ToString())
                     dt.Rows(j)("OIL_DETAIL") = rng.Text.ToString()
+                    ExcelMemoryRelease(rng)
                     rng = oSheet.Range(sCellDetailYoko2(i) + jStart.ToString())
                     dt.Rows(j)("TANKNO_DETAIL") = rng.Text.ToString()
+                    ExcelMemoryRelease(rng)
                     rng = oSheet.Range(sCellDetailYoko2(i) + (jStart + 1).ToString())
                     dt.Rows(j)("TRAINNO_DETAIL") = rng.Text.ToString()
+                    ExcelMemoryRelease(rng)
 
                     jStart += 2
                     jPoint += 1
@@ -1249,11 +1258,13 @@ Public Structure CS0023XLSUPLOAD
             '◯アップロードファイルの見分け用
             rng = oSheet.Range("A1")
             sCellPolarisType = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             rng = oSheet.Range("B4")
             sCellSortingType = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             rng = oSheet.Range("A4")
             sCellTrainType = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '############################################################################
             'ファイルの見分けは下記の通りとする
             '　useFlg："0"(仕分分解報告(運用指示書あり))
@@ -1329,21 +1340,24 @@ Public Structure CS0023XLSUPLOAD
             '　日付
             rng = oSheet.Range("D4")
             sCellTitle(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　列車
             rng = oSheet.Range("E2")
             sCellTitle(1) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯フッター情報取得
             '　現車
             rng = oSheet.Range("C39")
             sCellFooter(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　延長
             rng = oSheet.Range("E39")
             sCellFooter(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　換算
             rng = oSheet.Range("H39")
             sCellFooter(2) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯明細情報取得
             ExcelUploadRLinkItemSet(dt)
 
@@ -1364,50 +1378,103 @@ Public Structure CS0023XLSUPLOAD
 
                 rng = oSheet.Range("A" + jStart.ToString())
                 dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("B" + jStart.ToString())
                 dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("C" + jStart.ToString())
                 dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("D" + jStart.ToString())
                 dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("E" + jStart.ToString())
                 dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("F" + jStart.ToString())
                 dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("G" + jStart.ToString())
                 dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("H" + jStart.ToString())
                 dt.Rows(i)("ARTICLE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("I" + jStart.ToString())
                 dt.Rows(i)("INSPECTIONDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 ' ### 運送指示書(項目) START ####################################
                 '### 20201111 START 指摘票対応(No190)全体 #######################
                 rng = oSheet.Range("K" + jStart.ToString())
                 dt.Rows(i)("OBJECTIVENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
+                '### 20210118 START ポラリスと入用(油種変換)チェック対応 ########
                 rng = oSheet.Range("L" + jStart.ToString())
-                dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                dt.Rows(i)("DAILYREPORTCODE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("M" + jStart.ToString())
-                dt.Rows(i)("LINE") = rng.Text.ToString()
+                dt.Rows(i)("DAILYREPORTOILNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                dt.Rows(i)("OILNAME") = ""
+                'rng = oSheet.Range("L" + jStart.ToString())
+                'dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                '### 20210118 START ポラリスと入用(油種変換)チェック対応 ########
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("N" + jStart.ToString())
-                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                'rng = oSheet.Range("M" + jStart.ToString())
+                dt.Rows(i)("LINE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("O" + jStart.ToString())
-                dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                'rng = oSheet.Range("N" + jStart.ToString())
+                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("P" + jStart.ToString())
-                dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
+                'rng = oSheet.Range("O" + jStart.ToString())
+                dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '### 20201204 START 指摘票対応(No231)全体 #######################
+                rng = oSheet.Range("Q" + jStart.ToString())
+                'rng = oSheet.Range("P" + jStart.ToString())
+                If rng.Text.ToString() = "OT輸送" Then
+                    dt.Rows(i)("OTTRANSPORTFLG") = "1"
+                Else
+                    dt.Rows(i)("OTTRANSPORTFLG") = "2"
+                End If
+                ExcelMemoryRelease(rng)
+                '### 20201204 START 指摘票対応(No231)全体 #######################
                 rng = oSheet.Range("R" + jStart.ToString())
-                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
-                rng = oSheet.Range("S" + jStart.ToString())
-                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                'rng = oSheet.Range("Q" + jStart.ToString())
+                dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '### 20210121 START 向き先複数駅ある列車対応 ####################
                 rng = oSheet.Range("T" + jStart.ToString())
-                dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
-                '### 20201111 START 指摘票対応(No190)全体 #######################
+                dt.Rows(i)("LOADINGKTRAINNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '### 20210121 END   向き先複数駅ある列車対応 ####################
                 rng = oSheet.Range("U" + jStart.ToString())
-                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
+                'rng = oSheet.Range("T" + jStart.ToString())
+                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("V" + jStart.ToString())
+                'rng = oSheet.Range("U" + jStart.ToString())
+                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("W" + jStart.ToString())
+                'rng = oSheet.Range("V" + jStart.ToString())
+                dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '### 20201111 START 指摘票対応(No190)全体 #######################
+                rng = oSheet.Range("X" + jStart.ToString())
+                'rng = oSheet.Range("W" + jStart.ToString())
+                dt.Rows(i)("FORWARDINGARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                rng = oSheet.Range("Y" + jStart.ToString())
+                'rng = oSheet.Range("X" + jStart.ToString())
                 dt.Rows(i)("FORWARDINGCONFIGURE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 '### 20201111 START 指摘票対応(No190)全体 #######################
                 ' ### 運送指示書(項目) END   ####################################
 
@@ -1447,27 +1514,32 @@ Public Structure CS0023XLSUPLOAD
             '　後から
             rng = oSheet.Range("F2")
             sCellAgoBehind(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　前から
             rng = oSheet.Range("H2")
             sCellAgoBehind(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　日付
             rng = oSheet.Range("E5")
             sCellTitle(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　列車
             rng = oSheet.Range("B4")
             sCellTitle(1) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯フッター情報取得
             '　現車
             rng = oSheet.Range("C39")
             sCellFooter(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　延長
             rng = oSheet.Range("E39")
             sCellFooter(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　換算
             rng = oSheet.Range("H39")
             sCellFooter(2) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯明細情報取得
             ExcelUploadRLinkItemSet(dt)
 
@@ -1492,40 +1564,66 @@ Public Structure CS0023XLSUPLOAD
 
                 rng = oSheet.Range("A" + jStart.ToString())
                 dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("B" + jStart.ToString())
                 dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("C" + jStart.ToString())
                 dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("D" + jStart.ToString())
                 dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("E" + jStart.ToString())
                 dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("F" + jStart.ToString())
                 dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 dt.Rows(i)("INSPECTIONDATE") = ""
+
                 rng = oSheet.Range("G" + jStart.ToString())
                 dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("H" + jStart.ToString())
                 dt.Rows(i)("ARTICLE") = rng.Text.ToString()
-
+                ExcelMemoryRelease(rng)
                 ' ### 運送指示書(項目) START ####################################
                 rng = oSheet.Range("J" + jStart.ToString())
                 dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 '回転(回線)は未存在のため(空文字)
                 dt.Rows(i)("LINE") = ""
                 rng = oSheet.Range("K" + jStart.ToString())
                 dt.Rows(i)("POSITION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("L" + jStart.ToString())
                 dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("M" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("O" + jStart.ToString())
                 dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("P" + jStart.ToString())
                 dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("Q" + jStart.ToString())
                 dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 ' ### 運送指示書(項目) END   ####################################
 
                 dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
@@ -1564,26 +1662,31 @@ Public Structure CS0023XLSUPLOAD
             '　後から
             rng = oSheet.Range("F4")
             sCellAgoBehind(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　前から
             rng = oSheet.Range("H4")
             sCellAgoBehind(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　日付
             rng = oSheet.Range("B8")
             sCellTitle(0) = rng.Text.ToString()
             '　列車
             rng = oSheet.Range("F8")
             sCellTitle(1) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯フッター情報取得
             '　現車
             rng = oSheet.Range("C42")
             sCellFooter(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　延長
             rng = oSheet.Range("E42")
             sCellFooter(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　換算
             rng = oSheet.Range("H42")
             sCellFooter(2) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
 
             '◯明細情報取得
             ExcelUploadRLinkItemSet(dt)
@@ -1609,27 +1712,36 @@ Public Structure CS0023XLSUPLOAD
 
                 rng = oSheet.Range("A" + jStart.ToString())
                 dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("B" + jStart.ToString())
                 dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("C" + jStart.ToString())
                 dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("D" + jStart.ToString())
                 dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("E" + jStart.ToString())
                 dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("F" + jStart.ToString())
                 dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 dt.Rows(i)("INSPECTIONDATE") = ""
                 rng = oSheet.Range("G" + jStart.ToString())
                 dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("H" + jStart.ToString())
                 dt.Rows(i)("ARTICLE") = rng.Text.ToString()
-
+                ExcelMemoryRelease(rng)
                 ' ### 運送指示書(項目) START ####################################
                 dt.Rows(i)("OILNAME") = ""
                 dt.Rows(i)("LINE") = ""
@@ -1683,24 +1795,27 @@ Public Structure CS0023XLSUPLOAD
             '　日付
             rng = oSheet.Range("F5")
             sCellTitle(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　列車
             rng = oSheet.Range("A4")
             sCellTitle(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　時間
             rng = oSheet.Range("C4")
             sCellTitle(2) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯フッター情報取得
             '　現車
             rng = oSheet.Range("C39")
             sCellFooter(0) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
             '　延長
             rng = oSheet.Range("E39")
             sCellFooter(1) = rng.Text.ToString()
             '　換算
             rng = oSheet.Range("H39")
             sCellFooter(2) = rng.Text.ToString()
-
+            ExcelMemoryRelease(rng)
             '◯明細情報取得
             ExcelUploadRLinkItemSet(dt)
 
@@ -1726,42 +1841,60 @@ Public Structure CS0023XLSUPLOAD
 
                 rng = oSheet.Range("A" + jStart.ToString())
                 dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("B" + jStart.ToString())
                 dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("C" + jStart.ToString())
                 dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("D" + jStart.ToString())
                 dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
 
                 rng = oSheet.Range("E" + jStart.ToString())
                 dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("F" + jStart.ToString())
                 dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 rng = oSheet.Range("G" + jStart.ToString())
                 dt.Rows(i)("INSPECTIONDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
                 dt.Rows(i)("CONVERSIONAMOUNT") = ""
                 dt.Rows(i)("ARTICLE") = ""
 
                 ' ### 運送指示書(項目) START ####################################
                 rng = oSheet.Range("I" + jStart.ToString())
                 dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("J" + jStart.ToString())
                 dt.Rows(i)("LINE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("K" + jStart.ToString())
                 dt.Rows(i)("POSITION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("L" + jStart.ToString())
                 dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("M" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("O" + jStart.ToString())
                 dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("P" + jStart.ToString())
                 dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 rng = oSheet.Range("Q" + jStart.ToString())
                 dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
                 ' ### 運送指示書(項目) END   ####################################
 
                 dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
@@ -1823,11 +1956,21 @@ Public Structure CS0023XLSUPLOAD
         '### 20201111 START 指摘票対応(No190)全体 #######################
         dt.Columns.Add("OBJECTIVENAME", Type.GetType("System.String")).DefaultValue = ""
         '### 20201111 END   指摘票対応(No190)全体 #######################
+        '### 20210118 START 油種変換対応 ################################
+        dt.Columns.Add("DAILYREPORTCODE", Type.GetType("System.String"))
+        dt.Columns.Add("DAILYREPORTOILNAME", Type.GetType("System.String"))
+        '### 20210118 END   油種変換対応 ################################
         dt.Columns.Add("OILNAME", Type.GetType("System.String"))
         dt.Columns.Add("LINE", Type.GetType("System.String"))
         dt.Columns.Add("POSITION", Type.GetType("System.String"))
         dt.Columns.Add("INLINETRAIN", Type.GetType("System.String"))
+        '### 20201204 START 指摘票対応(No231)全体 #######################
+        dt.Columns.Add("OTTRANSPORTFLG", Type.GetType("System.String"))
+        '### 20201204 END   指摘票対応(No231)全体 #######################
         dt.Columns.Add("LOADARRSTATION", Type.GetType("System.String"))
+        '### 20210121 START 向き先複数駅ある列車対応 ####################
+        dt.Columns.Add("LOADINGKTRAINNO", Type.GetType("System.String"))
+        '### 20210121 END   向き先複数駅ある列車対応 ####################
         dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGDEPDATE", Type.GetType("System.String"))

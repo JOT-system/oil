@@ -15,6 +15,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 実績日訂正ボタン活性／非活性
+    if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
+        //活性
+        document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "disabled";
+    }
+
     //〇 実績日一括反映ボタン活性／非活性
     if (document.getElementById('WF_BULKFLG').value === "0") {
 
@@ -89,6 +99,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
             }
@@ -99,6 +110,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
                 document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "";
             }
@@ -123,10 +135,23 @@ function InitDisplay() {
             if (document.getElementById('WF_MAPButtonControl').value === "3") {
                 //非活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
+
+                //〇 訂正ボタン活性／非活性
+                if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
+                    //非活性(訂正更新ボタン)
+                    document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "disabled";
+                }
+                else {
+                    //活性(訂正更新ボタン)
+                    document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "";
+                }
+
             }
             else {
                 //活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
+                //非活性(訂正更新ボタン)
+                document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "disabled";
             }
         }
         ////〇タブ４
@@ -143,6 +168,7 @@ function InitDisplay() {
             document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
         }
@@ -341,6 +367,38 @@ function ChangeCheckBoxLight(listId) {
             }
         }
     }
+
+    //### 20201207 START 指摘票No248対応 ############################################################
+    // 格上可否フラグ
+    var chkObjsLight8 = objLightTable.querySelectorAll("input[id^='chk" + listId + "UPGRADEFLG']");
+    var spnObjsLight8 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "UPGRADEFLG']");
+    for (let i = 0; i < chkObjsLight8.length; i++) {
+
+        if (chkObjsLight8[i] !== null) {
+            if (spnObjsLight8[i].innerText === "on") {
+                chkObjsLight8[i].checked = true;
+            } else {
+                chkObjsLight8[i].checked = false;
+            }
+        }
+    }
+    //### 20201207 END   指摘票No248対応 ############################################################
+
+    //### 20210120 START 指摘票No300対応 ############################################################
+    // 格下可否フラグ
+    var chkObjsLight9 = objLightTable.querySelectorAll("input[id^='chk" + listId + "DOWNGRADEFLG']");
+    var spnObjsLight9 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "DOWNGRADEFLG']");
+    for (let i = 0; i < chkObjsLight9.length; i++) {
+
+        if (chkObjsLight9[i] !== null) {
+            if (spnObjsLight9[i].innerText === "on") {
+                chkObjsLight9[i].checked = true;
+            } else {
+                chkObjsLight9[i].checked = false;
+            }
+        }
+    }
+    //### 20210120 END   指摘票No300対応 ############################################################
 }
 
 
@@ -378,6 +436,16 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
         if (fieldName === 'OTTRANSPORTFLG') {
             surfix = 'OTTRANSPORT'
         }
+        //### 20201207 START 指摘票No248対応 ############################################################
+        if (fieldName === 'UPGRADEFLG') {
+            surfix = 'UPGRADE'
+        }
+        //### 20201207 END   指摘票No248対応 ############################################################
+        //### 20210120 START 指摘票No300対応 ############################################################
+        if (fieldName === 'DOWNGRADEFLG') {
+            surfix = 'DOWNGRADE'
+        }
+        //### 20210120 END   指摘票No300対応 ############################################################
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;

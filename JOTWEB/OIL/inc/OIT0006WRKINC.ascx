@@ -71,6 +71,19 @@
     <!-- タンク車合計 -->
     <asp:TextBox ID="WF_SEL_TANKCARTOTAL" runat="server"></asp:TextBox>
 
+    <!-- 目的(修理) -->
+    <asp:TextBox ID="WF_SEL_REPAIR" runat="server"></asp:TextBox>
+    <!-- 目的(ＭＣ) -->
+    <asp:TextBox ID="WF_SEL_MC" runat="server"></asp:TextBox>
+    <!-- 目的(交検) -->
+    <asp:TextBox ID="WF_SEL_INSPECTION" runat="server"></asp:TextBox>
+    <!-- 目的(全検) -->
+    <asp:TextBox ID="WF_SEL_ALLINSPECTION" runat="server"></asp:TextBox>
+    <!-- 目的(疎開留置) -->
+    <asp:TextBox ID="WF_SEL_INDWELLING" runat="server"></asp:TextBox>
+    <!-- 目的(移動) -->
+    <asp:TextBox ID="WF_SEL_MOVE" runat="server"></asp:TextBox>
+
     <!-- 発日(予定) -->
     <asp:TextBox ID="WF_SEL_DEPDATE" runat="server"></asp:TextBox>
     <!-- 着日(予定) -->

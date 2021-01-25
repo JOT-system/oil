@@ -16,11 +16,24 @@ function InitDisplay() {
 
     //更新ボタン活性／非活性
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
-        //活性
-        document.getElementById("WF_ButtonALLSELECT").disabled = "";
-        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonINSERT").disabled = "";
+
+        //### 20201216 START 指摘票対応(No263)全体 #######################################
+        // (過去)貨車連結順序表の場合
+        if (document.getElementById('WF_PastLinkList').value === "TRUE") {
+            //非活性 
+            document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
+            document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
+            document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
+            document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        } else {
+            //活性
+            document.getElementById("WF_ButtonALLSELECT").disabled = "";
+            document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
+            document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
+            document.getElementById("WF_ButtonINSERT").disabled = "";
+        }
+        //### 20201216 END   指摘票対応(No263)全体 #######################################
+
     } else {
         //非活性 
         document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";

@@ -182,6 +182,12 @@
             <li>
                 <asp:RadioButton ID="rbFillingPointBtn" runat="server" GroupName="WF_SW" Text="充填ポイント表" onclick="reportRadioButton();" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbTankDispatchBtn" runat="server" GroupName="WF_SW" Text="タンク車発送実績" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbActualShipBtn" runat="server" GroupName="WF_SW" Text="出荷実績" onclick="reportRadioButton();" />
+            </li>
         </ul>
     </div>
     <div id="divRTrainNo">
@@ -189,6 +195,14 @@
             <asp:Label ID="lblReportRTrainNo" runat="server" Text="列車番号(臨海)"></asp:Label>
             <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
                 <asp:TextBox ID="txtReportRTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+    <div id="divTrainNo">
+        <span id="spnTrainNo">
+            <asp:Label ID="lblReportTrainNo" runat="server" Text="列車番号"></asp:Label>
+            <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
+                <asp:TextBox ID="txtReportTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
     </div>

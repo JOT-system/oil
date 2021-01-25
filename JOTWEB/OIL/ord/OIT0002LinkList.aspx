@@ -39,6 +39,58 @@
                     </div>
                 </div> <!-- End class=actionButtonBox -->
             </div> <!-- End class="Operation" -->
+            <div class="leftSide">
+                <span>　【ＪＯＴ車数】</span>
+                <span id="spnOfficeGoi" runat="server">
+                    <a >浜五井：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblGoiCnt" runat="server">000</asp:Label>
+                        <asp:Label ID="LblGoiItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeKinoene" runat="server">
+                    <a >甲子：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblKinoeneCnt" runat="server">000</asp:Label>
+                    </a>
+                    <a>
+                        <asp:Label ID="LblKinoeneItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeSodegaura" runat="server">
+                    <a >北袖：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblSodegauraCnt" runat="server">000</asp:Label>
+                        <asp:Label ID="LblSodegauraItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+                <span>　　【ＯＴ車数】</span>
+                <span id="spnOfficeGoiOT" runat="server">
+                    <a >浜五井：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblGoiOTCnt" runat="server">000</asp:Label>
+                        <asp:Label ID="LblGoiOTItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeKinoeneOT" runat="server">
+                    <a >甲子：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblKinoeneOTCnt" runat="server">000</asp:Label>
+                        <asp:Label ID="LblKinoeneOTItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+                <span>　</span>
+                <span id="spnOfficeSodegauraOT" runat="server">
+                    <a >北袖：</a>
+                    <a class="ef">
+                        <asp:Label ID="LblSodegauraOTCnt" runat="server">000</asp:Label>
+                        <asp:Label ID="LblSodegauraOTItem" runat="server">車</asp:Label>
+                    </a>
+                </span>
+            </div>
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 
@@ -83,6 +135,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- (過去)貨車連結順序表フラグ -->
+            <input id="WF_PastLinkList" runat="server" value="" type="text" />
             <!-- 権限 -->
         </div>
  

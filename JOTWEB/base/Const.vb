@@ -311,6 +311,56 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "貨物駅(営業所指定駅)"
+    ''' <summary>
+    ''' 仙台北港(仙台新港営業所)
+    ''' </summary>
+    Public Const CONST_STATION_243202 As String = "243202"
+    ''' <summary>
+    ''' 浜五井(五井営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434103 As String = "434103"
+    ''' <summary>
+    ''' 甲子(甲子営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434105 As String = "434105"
+    ''' <summary>
+    ''' 北袖(袖ヶ浦営業所)
+    ''' </summary>
+    Public Const CONST_STATION_434108 As String = "434108"
+    ''' <summary>
+    ''' 根岸(根岸営業所)
+    ''' </summary>
+    Public Const CONST_STATION_4532 As String = "4532"
+    ''' <summary>
+    ''' 四日市(四日市営業所)
+    ''' </summary>
+    Public Const CONST_STATION_5510 As String = "5510"
+    ''' <summary>
+    ''' 塩浜(三重塩浜営業所)
+    ''' </summary>
+    Public Const CONST_STATION_5512 As String = "5512"
+#End Region
+
+#Region "荷主"
+    ''' <summary>
+    ''' ENEOS
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0005700010 As String = "0005700010"
+    ''' <summary>
+    ''' コスモ
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0094000010 As String = "0094000010"
+    ''' <summary>
+    ''' 出光昭和シェル
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_0122700010 As String = "0122700010"
+    ''' <summary>
+    ''' キグナス石油
+    ''' </summary>
+    Public Const CONST_SHIPPERCODE_9999999999 As String = "9999999999"
+#End Region
+
 #Region "基地"
     ''' <summary>
     ''' ENEOS仙台
@@ -515,6 +565,18 @@ Public Module BaseDllConst
     ''' 品種出荷期間エラー
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_106 As String = "106"
+    ''' <summary>
+    ''' 受注オーダー中
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_107 As String = "107"
+    ''' <summary>
+    ''' 回送オーダー中
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_108 As String = "108"
+    ''' <summary>
+    ''' 日付(発駅戻り日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_109 As String = "109"
 
     ''' <summary>
     ''' 失注（荷主都合）
@@ -932,6 +994,45 @@ Public Module BaseDllConst
     ''' Ａ重油
     ''' </summary>
     Public Const CONST_ATank As String = "2101"
+    Public Const CONST_ATank2 As String = "2102"
+    Public Const CONST_ATank3 As String = "2103"
+#End Region
+
+#Region "油種名(受発注用)"
+    Public Const CONST_1001A As String = "ハイオク"
+    Public Const CONST_1101A As String = "レギュラー"
+
+    Public Const CONST_1301A As String = "灯油"
+    Public Const CONST_1302A As String = "未添加灯油"
+
+    Public Const CONST_1401A As String = "軽油"
+    Public Const CONST_1401D As String = "軽油１号"
+    Public Const CONST_1401E As String = "軽油２号"
+    Public Const CONST_1402B As String = "軽油５"
+    Public Const CONST_1403C As String = "軽油１０"
+    Public Const CONST_1404A As String = "３号軽油"
+    Public Const CONST_1404B As String = "３号軽油２０"
+    Public Const CONST_1404C As String = "３号軽油５０"
+    Public Const CONST_1404D As String = "３号軽油TCH"
+    Public Const CONST_1404E As String = "寒冷軽油"
+
+    Public Const CONST_1501A As String = "JP-8"
+
+    Public Const CONST_2101A As String = "Ａ重油"
+    Public Const CONST_2101B As String = "0.5A重油"
+    Public Const CONST_2101C As String = "LTA"
+    Public Const CONST_2101D As String = "ＬＳＡ－５"
+    Public Const CONST_2101E As String = "AFOーSP"
+    Public Const CONST_2101F As String = "ＬＳＡ－５（山岳）"
+    Public Const CONST_2101G As String = "AFOーSP（山岳）"
+    Public Const CONST_2101H As String = "AFOーブレンド（山岳）"
+
+    Public Const CONST_2201A As String = "ＬＳＡ"
+    Public Const CONST_2201B As String = "0.1A重油"
+    Public Const CONST_2201C As String = "ＬＳＡ－１"
+    Public Const CONST_2201D As String = "ＬＳＡーブレンド"
+    Public Const CONST_2201E As String = "ＬＳＡ－１（山岳）"
+    Public Const CONST_2201F As String = "ＬＳＡーブレンド（山岳）"
 #End Region
 
 #Region "油種(コスモ石油)"

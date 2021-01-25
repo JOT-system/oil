@@ -219,4 +219,22 @@ function reportRadioButton() {
         }
     }
     // ### 20201106 END   OT積込指示(月末)対応 ##################################
+
+    let chkObj3 = document.getElementById('rbTankDispatchBtn');
+    let chkObj3_2 = document.getElementById('rbActualShipBtn');
+    let txtObj3 = document.getElementById('divTrainNo'); //←表示非表示切替用
+
+    let isVisitTxtObj3 = false
+    if (chkObj3 !== null) {
+        isVisitTxtObj3 = chkObj3.checked | isVisitTxtObj3
+    }
+    if (chkObj3_2 !== null) {
+        isVisitTxtObj3 = chkObj3_2.checked | isVisitTxtObj3
+    }
+
+    if (isVisitTxtObj3) {
+        txtObj3.style.display = 'block'
+    } else {
+        txtObj3.style.display = 'none'
+    }
 }

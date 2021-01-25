@@ -252,7 +252,7 @@
             </div>
             <div class="rightSide">
                 <%--<input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="空回日報確定" onclick="ButtonClick('WF_ButtonUPDATE');" />--%>
-                <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="受注登録に進む" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="受注登録" onclick="ButtonClick('WF_ButtonUPDATE');" />
             </div>
         </div>
         <div id="listWrapper" class="listWrapper">

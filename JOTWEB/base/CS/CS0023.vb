@@ -1135,6 +1135,7 @@ Public Structure CS0023XLSUPLOAD
             '★指定された列車の再設定
             Dim svTraiNo As String = ""
             Dim reg = New Regex("[①-⑨]")
+            Dim regHalf = New Regex("[^０-９]")
             For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
                 If svTraiNo = "" Then
                     svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
@@ -1150,7 +1151,7 @@ Public Structure CS0023XLSUPLOAD
                         svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
                     End If
                 End If
-                dtrow("TRAINNO") = StrConv(reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
+                dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
                 dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))
             Next
 

@@ -2053,6 +2053,11 @@ Public Class OIT0003OrderList
             & " ,  OIT0003.OILNAME         AS OILNAME " _
             & " ,  OIT0003.ORDERINGTYPE    AS ORDERINGTYPE " _
             & " ,  OIT0003.ORDERINGOILNAME AS ORDERINGOILNAME " _
+            & " ,  CASE " _
+            & "      WHEN ISNULL(OIT0003.SECONDCONSIGNEECODE, '') <> '' " _
+            & "        THEN OIT0003.SECONDCONSIGNEECODE " _
+            & "      ELSE OIT0002.CONSIGNEECODE " _
+            & "    END                     AS CONSIGNEECODE " _
             & " ,  '0'                     AS USEFLAG " _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
@@ -2113,7 +2118,10 @@ Public Class OIT0003OrderList
 
                         '発送順をリセット
                         shipOderAsc = 1
-                        shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("LOADINGTRAINNO") = Convert.ToString(OIT0003INSrow("LOADINGTRAINNO"))).Count
+                        'shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("LOADINGTRAINNO") = Convert.ToString(OIT0003INSrow("LOADINGTRAINNO"))).Count
+                        shipOderDesc = OIT0003EXLODRtbl.AsEnumerable.
+                            Where(Function(x As DataRow) x("USEFLAG") = "0").
+                            Where(Function(x As DataRow) x("TRAINNO") = OIT0003INSrow("LOADINGTRAINNO")).Count
                     End If
 
                     '★受注データの油種と回線別積込取込(日新)の油種が一致したらタンク車№を設定
@@ -2123,8 +2131,14 @@ Public Class OIT0003OrderList
                             OIT0003ODRrow("TANKNO") = OIT0003INSrow("LOADINGTANKNO")
                             OIT0003ODRrow("USEFLAG") = "1"
                             OIT0003INSrow("USEFLAG") = "1"
-                            OIT0003INSrow("SHIPODER") = shipOderAsc.ToString
-                            shipOderAsc += 1
+                            If (OIT0003ODRrow("CONSIGNEECODE") = "10" OrElse OIT0003ODRrow("CONSIGNEECODE") = "20") Then
+                                '北信と甲府は発送順を昇順にする。その他は降順。
+                                OIT0003ODRrow("SHIPORDER") = shipOderAsc.ToString
+                                shipOderAsc += 1
+                            Else
+                                OIT0003ODRrow("SHIPORDER") = shipOderDesc.ToString
+                                shipOderDesc -= 1
+                            End If
                             Exit For
 
                             '★★未添加灯油は北信と甲府。OTは逆に未添加灯油はなく灯油。
@@ -2136,8 +2150,14 @@ Public Class OIT0003OrderList
                             OIT0003ODRrow("TANKNO") = OIT0003INSrow("LOADINGTANKNO")
                             OIT0003ODRrow("USEFLAG") = "1"
                             OIT0003INSrow("USEFLAG") = "1"
-                            OIT0003INSrow("SHIPODER") = shipOderDesc.ToString
-                            shipOderDesc -= 1
+                            If (OIT0003ODRrow("CONSIGNEECODE") = "10" OrElse OIT0003ODRrow("CONSIGNEECODE") = "20") Then
+                                '北信と甲府は発送順を昇順にする。その他は降順。
+                                OIT0003ODRrow("SHIPORDER") = shipOderAsc.ToString
+                                shipOderAsc += 1
+                            Else
+                                OIT0003ODRrow("SHIPORDER") = shipOderDesc.ToString
+                                shipOderDesc -= 1
+                            End If
                             Exit For
                         End If
                     Next
@@ -2160,7 +2180,7 @@ Public Class OIT0003OrderList
                     Exit Sub
                 Else
                     '○(受注明細TBL)タンク車№更新
-                    'If OIT0003EXLODRALLtbl.Rows.Count <> 0 Then WW_UpdateOrderTankNo(SQLcon, OIT0003EXLODRALLtbl)
+                    If OIT0003EXLODRALLtbl.Rows.Count <> 0 Then WW_UpdateOrderTankNo(SQLcon, OIT0003EXLODRALLtbl)
                 End If
 
                 'CLOSE

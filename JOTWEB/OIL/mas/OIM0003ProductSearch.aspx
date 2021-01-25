@@ -32,7 +32,7 @@
             <div class="inputItem">
                 <a id="LblOfficeCode">営業所コード</a>
                 <span ondblclick="Field_DBclick('WF_OFFICECODE', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('WF_OFFICECODE');">
-                    <asp:TextBox ID="WF_OFFICECODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                    <asp:TextBox ID="WF_OFFICECODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_OFFICECODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
@@ -41,7 +41,7 @@
             <div class="inputItem">
                 <a id="WF_SHIPPERCODE_LABEL" >荷主コード</a>
                 <span ondblclick="Field_DBclick('WF_SHIPPERCODE', <%=LIST_BOX_CLASSIFICATION.LC_JOINTLIST%>);" onchange="TextBox_change('WF_SHIPPERCODE');">
-                    <asp:TextBox ID="WF_SHIPPERCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                    <asp:TextBox ID="WF_SHIPPERCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_SHIPPERCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
@@ -50,7 +50,7 @@
             <div class="inputItem">
                 <a id="WF_PLANTCODE_LABEL" >基地コード</a>
                 <span ondblclick="Field_DBclick('WF_PLANTCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_PLANTCODE');">
-                    <asp:TextBox ID="WF_PLANTCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                    <asp:TextBox ID="WF_PLANTCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_PLANTCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
@@ -59,7 +59,7 @@
             <div class="inputItem">
                 <a id="WF_BIGOILCODE_LABEL" >油種大分類コード</a>
                 <span ondblclick="Field_DBclick('WF_BIGOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_BIGOILCODE');">
-                    <asp:TextBox ID="WF_BIGOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                    <asp:TextBox ID="WF_BIGOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_BIGOILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
@@ -68,7 +68,7 @@
             <div class="inputItem">
                 <a id="WF_MIDDLEOILCODE_LABEL" >油種中分類コード</a>
                 <span ondblclick="Field_DBclick('WF_MIDDLEOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_MIDDLEOILCODE');">
-                    <asp:TextBox ID="WF_MIDDLEOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                    <asp:TextBox ID="WF_MIDDLEOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_MIDDLEOILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
@@ -77,7 +77,7 @@
             <div class="inputItem">
                 <a id="WF_OILCODE_LABEL" >油種コード</a>
                 <span ondblclick="Field_DBclick('WF_OILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_OILCODE');">
-                    <asp:TextBox ID="WF_OILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                    <asp:TextBox ID="WF_OILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
                 </span>
                 <asp:Label ID="WF_OILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>

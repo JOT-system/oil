@@ -643,6 +643,11 @@ Public Class OIM0012NiukeList
                                 Exit Sub
                             End If
                         Next
+
+                        '削除フラグを1:削除に更新した場合
+                        If OIM0012row("DELFLG") <> C_DELETE_FLG.ALIVE Then
+                            DeleteOilTerm(OIM0012row("CONSIGNEECODE"), SQLcon)
+                        End If
                     End If
                 Next
             End Using
@@ -662,6 +667,123 @@ Public Class OIM0012NiukeList
 
     End Sub
 
+    ''' <summary>
+    ''' 品種出荷期間マスタ削除
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub DeleteOilTerm(ByRef WK_CONSIGNEECODE As String, ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " UPDATE OIL.OIM0030_OILTERM" _
+            & " SET" _
+            & "     DELFLG        = @P00" _
+            & "     , UPDYMD      = @P02" _
+            & "     , UPDUSER     = @P03" _
+            & "     , UPDTERMID   = @P04" _
+            & "     , RECEIVEYMD  = @P05" _
+            & " WHERE" _
+            & "     CONSIGNEECODE = @P01" _
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " SELECT" _
+            & "     DELFLG" _
+            & "     , OFFICECODE" _
+            & "     , SHIPPERCODE" _
+            & "     , PLANTCODE" _
+            & "     , OILCODE" _
+            & "     , SEGMENTOILCODE" _
+            & "     , CONSIGNEECODE" _
+            & "     , ORDERFROMDATE" _
+            & "     , ORDERTODATE" _
+            & "     , INITYMD" _
+            & "     , INITUSER" _
+            & "     , INITTERMID" _
+            & "     , UPDYMD" _
+            & "     , UPDUSER" _
+            & "     , UPDTERMID" _
+            & "     , RECEIVEYMD" _
+            & "     , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "     OIL.OIM0030_OILTERM" _
+            & " WHERE" _
+            & "     CONSIGNEECODE = @P01"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 10)          '荷受人コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.DateTime)              '更新年月日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)          '更新ユーザーＩＤ
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)          '更新端末
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.DateTime)              '集信日時
+
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 10)      '荷受人コード
+
+                Dim WW_DATENOW As DateTime = Date.Now
+                Dim OIM0030UPDtbl As DataTable = Nothing
+
+                'DB更新
+                PARA00.Value = C_DELETE_FLG.DELETE
+                PARA01.Value = WK_CONSIGNEECODE
+                PARA02.Value = WW_DATENOW
+                PARA03.Value = Master.USERID
+                PARA04.Value = Master.USERTERMID
+                PARA05.Value = C_DEFAULT_YMD
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                '更新ジャーナル出力
+                JPARA01.Value = WK_CONSIGNEECODE
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0030UPDtbl) Then
+                        OIM0030UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0030UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0030UPDtbl.Clear()
+                    OIM0030UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0030UPDrow As DataRow In OIM0030UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0030_OILTERM"
+                    CS0020JOURNAL.ACTION = "UPDATE(DELETE)"
+                    CS0020JOURNAL.ROW = OIM0030UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0012L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0030 UPDATE(DELETE)"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
 
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理

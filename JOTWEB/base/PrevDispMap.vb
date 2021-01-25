@@ -261,6 +261,18 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIM0017C As String = "ASP.OIL_MAS_OIM0017TRAINOPERATIONCREATE_ASPX"
         ''' <summary>
+        ''' 勘定科目マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0019S As String = "ASP.OIL_MAS_OIM0019ACCOUNTSEARCH_ASPX"
+        ''' <summary>
+        ''' 勘定科目マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0019L As String = "ASP.OIL_MAS_OIM0019ACCOUNTLIST_ASPX"
+        ''' <summary>
+        ''' 勘定科目マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0019C As String = "ASP.OIL_MAS_OIM0019ACCOUNTCREATE_ASPX"
+        ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIM0020S As String = "ASP.OIL_MAS_OIM0020GUIDANCESEARCH_ASPX"
@@ -287,27 +299,27 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 列車マスタ (返送)メンテナンス（検索）
         ''' </summary>
-        Public Const OIM0022S As String = "ASP.OIL_MAS_OIM0022BTRAINSEARCH_ASPX"
+        Public Const OIM0023S As String = "ASP.OIL_MAS_OIM0023BTRAINSEARCH_ASPX"
         ''' <summary>
         ''' 列車マスタ (返送)メンテナンス（一覧）
         ''' </summary>
-        Public Const OIM0022L As String = "ASP.OIL_MAS_OIM0022BTRAINLIST_ASPX"
+        Public Const OIM0023L As String = "ASP.OIL_MAS_OIM0023BTRAINLIST_ASPX"
         ''' <summary>
         ''' 列車マスタ (返送)メンテナンス（登録）
         ''' </summary>
-        Public Const OIM0022C As String = "ASP.OIL_MAS_OIM0022BTRAINCREATE_ASPX"
+        Public Const OIM0023C As String = "ASP.OIL_MAS_OIM0023BTRAINCREATE_ASPX"
         ''' <summary>
         ''' 積込優先油種マスタメンテナンス（検索）
         ''' </summary>
-        Public Const OIM0023S As String = "ASP.OIL_MAS_OIM0023PRIORITYSEARCH_ASPX"
+        Public Const OIM0024S As String = "ASP.OIL_MAS_OIM0024PRIORITYSEARCH_ASPX"
         ''' <summary>
         ''' 積込優先油種マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const OIM0023L As String = "ASP.OIL_MAS_OIM0023PRIORITYLIST_ASPX"
+        Public Const OIM0024L As String = "ASP.OIL_MAS_OIM0024PRIORITYLIST_ASPX"
         ''' <summary>
         ''' 積込優先油種マスタメンテナンス（登録）
         ''' </summary>
-        Public Const OIM0023C As String = "ASP.OIL_MAS_OIM0023PRIORITYCREATE_ASPX"
+        Public Const OIM0024C As String = "ASP.OIL_MAS_OIM0024PRIORITYCREATE_ASPX"
         ''' <summary>
         ''' 組織マスタメンテナンス（検索）
         ''' </summary>

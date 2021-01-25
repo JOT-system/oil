@@ -680,6 +680,24 @@ Partial Public Class OIM0003ProductCreate
     Protected WithEvents WF_ORDERTODATE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_OILTERMTBL_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OILTERMTBL_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_OILTERMTBL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OILTERMTBL As Global.System.Web.UI.WebControls.GridView
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

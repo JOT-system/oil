@@ -154,6 +154,13 @@ Public Class OIM0003ProductList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 登録画面からの遷移で、DB更新メッセージが設定されている場合
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0003C AndAlso
+            Not String.IsNullOrEmpty(work.WF_SEL_DBUPDATE_MESSAGE.Text) Then
+            Master.Output(work.WF_SEL_DBUPDATE_MESSAGE.Text, C_MESSAGE_TYPE.INF)
+        End If
+        work.WF_SEL_DBUPDATE_MESSAGE.Text = ""
+
     End Sub
 
     ''' <summary>

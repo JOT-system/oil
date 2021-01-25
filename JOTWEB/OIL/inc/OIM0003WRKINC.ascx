@@ -40,6 +40,9 @@
     <asp:TextBox ID="WF_SEL_ORDERFROMDATE" runat="server"></asp:TextBox>        <!-- 受注登録可能期間FROM -->
     <asp:TextBox ID="WF_SEL_ORDERTODATE" runat="server"></asp:TextBox>          <!-- 受注登録可能期間TO -->
     <asp:TextBox ID="WF_SEL_DELFLG2" runat="server"></asp:TextBox>              <!-- 削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERMTBL" runat="server"></asp:TextBox>           <!-- 品種出荷期間TBL -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>               <!-- 更新データ(退避用) -->
 
+    <!-- DB更新メッセージ表示用 -->
+    <asp:TextBox ID="WF_SEL_DBUPDATE_MESSAGE" runat="server"></asp:TextBox>     <!-- DB更新メッセージ -->
 </div>

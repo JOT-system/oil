@@ -26,3 +26,24 @@
     left: 15px;
     cursor: pointer;
 }
+
+table.WF_OILTERMTBL {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+table.WF_OILTERMTBL input.WF_TEXTBOX_CSS {
+    width: 100%;
+}
+
+table.WF_OILTERMTBL td.WF_OILTERMTBL_TD2 div.calendarIconArea div {
+    margin-top: 0px;
+}
+
+table.WF_OILTERMTBL td.WF_OILTERMTBL_TD3 div.calendarIconArea div {
+    margin-top: 0px;
+}
+
+table.WF_OILTERMTBL td.WF_OILTERMTBL_TD4 div.boxIconArea div {
+    margin-top: 0px;
+}

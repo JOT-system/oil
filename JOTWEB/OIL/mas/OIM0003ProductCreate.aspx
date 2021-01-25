@@ -24,7 +24,7 @@
                     <div class="leftSide">
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="表更新" onclick="ButtonClick('WF_UPDATE');" />
+                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="DB更新" onclick="ButtonClick('WF_UPDATE');" />
                         <input type="button" id="WF_CLEAR" class="btn-sticky" value="クリア"  onclick="ButtonClick('WF_CLEAR');" />
                     </div>
                 </div>
@@ -225,6 +225,48 @@
                         </span>
                         <asp:Label ID="WF_ORDERTODATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
+                <p id="KEY_LINE_15">
+                    <asp:Label ID="WF_OILTERMTBL_L" runat="server" Text="品種出荷期間" CssClass="WF_TEXT_LABEL"></asp:Label>
+                    <asp:GridView ID="WF_OILTERMTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" Visible="true" ShowFooter="false" CssClass="WF_OILTERMTBL">
+                        <Columns>
+                            <asp:TemplateField Visible="False">
+                                <ItemTemplate>
+                                    <asp:Label ID="WF_OILTERMTBL_CONSIGNEECODE" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEECODE") %>' />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderStyle-CssClass="WF_OILTERMTBL_TH1" ItemStyle-CssClass="WF_OILTERMTBL_TD1">
+                                <HeaderTemplate>荷受人</HeaderTemplate>
+                                <ItemTemplate>
+                                    <asp:Label ID="WF_OILTERMTBL_CONSIGNEENAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEENAME")%>' />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderStyle-CssClass="WF_OILTERMTBL_TH2" ItemStyle-CssClass="WF_OILTERMTBL_TD2" ControlStyle-CssClass="WF_TEXTBOX_CSS calendarIcon">
+                                <HeaderTemplate>受注登録可能期間FROM</HeaderTemplate>
+                                <ItemTemplate>
+                                    <span ondblclick="Field_DBclick('WF_OILTERMTBL_ORDERFROMDATE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>' , <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_OILTERMTBL_ORDERFROMDATE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
+                                        <asp:TextBox ID="WF_OILTERMTBL_ORDERFROMDATE" runat="server" Text='<%# Bind("ORDERFROMDATE")%>' />
+                                    </span>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderStyle-CssClass="WF_OILTERMTBL_TH3" ItemStyle-CssClass="WF_OILTERMTBL_TD3" ControlStyle-CssClass="WF_TEXTBOX_CSS calendarIcon">
+                                <HeaderTemplate>受注登録可能期間TO</HeaderTemplate>
+                                <ItemTemplate>
+                                    <span ondblclick="Field_DBclick('WF_OILTERMTBL_ORDERTODATE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_OILTERMTBL_ORDERTODATE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
+                                        <asp:TextBox ID="WF_OILTERMTBL_ORDERTODATE" runat="server" Text='<%# Bind("ORDERTODATE")%>' />
+                                    </span>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderStyle-CssClass="WF_OILTERMTBL_TH4" ItemStyle-CssClass="WF_OILTERMTBL_TD4" ControlStyle-CssClass="WF_TEXTBOX_CSS boxIcon iconOnly">
+                                <HeaderTemplate>削除フラグ</HeaderTemplate>
+                                <ItemTemplate>
+                                    <span ondblclick="Field_DBclick('WF_OILTERMTBL_DELFLG<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_OILTERMTBL_DELFLG<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
+                                        <asp:TextBox ID="WF_OILTERMTBL_DELFLG" ReadOnly="true" runat="server" Text='<%# Bind("DELFLG")%>' />
+                                    </span>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
                 </p>
             </div>
         </div>

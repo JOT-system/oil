@@ -15,6 +15,10 @@ Public Class OIM0003ProductCreate
     Private OIM0003INPtbl As DataTable                              'チェック用テーブル
     Private OIM0003UPDtbl As DataTable                              '更新用テーブル
 
+    Private OIM0030tbl As DataTable                                 '品種出荷期間テーブル
+    Private OIM0030INPtbl As DataTable                              '品種出荷期間更新チェック用テーブル
+    Private OIM0030UPDtbl As DataTable                              '品種出荷期間更新用テーブル
+
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
 
@@ -51,6 +55,7 @@ Public Class OIM0003ProductCreate
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
+                    '品種マスタ
                     Master.RecoverTable(OIM0003tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
@@ -107,6 +112,24 @@ Public Class OIM0003ProductCreate
                 OIM0003UPDtbl.Clear()
                 OIM0003UPDtbl.Dispose()
                 OIM0003UPDtbl = Nothing
+            End If
+
+            If Not IsNothing(OIM0030tbl) Then
+                OIM0030tbl.Clear()
+                OIM0030tbl.Dispose()
+                OIM0030tbl = Nothing
+            End If
+
+            If Not IsNothing(OIM0030INPtbl) Then
+                OIM0030INPtbl.Clear()
+                OIM0030INPtbl.Dispose()
+                OIM0030INPtbl = Nothing
+            End If
+
+            If Not IsNothing(OIM0030UPDtbl) Then
+                OIM0030UPDtbl.Clear()
+                OIM0030UPDtbl.Dispose()
+                OIM0030UPDtbl = Nothing
             End If
         End Try
 
@@ -260,6 +283,104 @@ Public Class OIM0003ProductCreate
         WF_DELFLG.Text = work.WF_SEL_DELFLG2.Text
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
+        '荷受人マスタ＆品種出荷期間マスタテーブル
+        GetNIUKEWithOILTERM()
+        WF_OILTERMTBL.DataSource = OIM0030tbl
+        WF_OILTERMTBL.DataBind()
+
+    End Sub
+
+    ''' <summary>
+    ''' 荷受人マスタ＆品種出荷期間マスタ取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GetNIUKEWithOILTERM()
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            'DataBase接続
+            SQLcon.Open()
+
+            '○ 対象データ取得
+            Dim SQLStr As String =
+                  " SELECT" _
+                & "    ISNULL(RTRIM(OIM0012.CONSIGNEECODE), '')                  AS CONSIGNEECODE" _
+                & "    , ISNULL(RTRIM(OIM0012.CONSIGNEENAME), '')                AS CONSIGNEENAME" _
+                & "    , ISNULL(FORMAT(OIM0030.ORDERFROMDATE, 'yyyy/MM/dd'), '') AS ORDERFROMDATE" _
+                & "    , ISNULL(FORMAT(OIM0030.ORDERTODATE, 'yyyy/MM/dd'), '')   AS ORDERTODATE" _
+                & "    , ISNULL(RTRIM(OIM0030.DELFLG), '')                       AS DELFLG" _
+                & " FROM" _
+                & "    oil.OIM0012_NIUKE OIM0012" _
+                & "    LEFT OUTER JOIN (" _
+                & "        SELECT" _
+                & "            OIM0030.CONSIGNEECODE" _
+                & "            , OIM0030.ORDERFROMDATE" _
+                & "            , OIM0030.ORDERTODATE" _
+                & "            , OIM0030.DELFLG" _
+                & "        FROM" _
+                & "            oil.OIM0030_OILTERM OIM0030" _
+                & "            INNER JOIN oil.OIM0003_PRODUCT OIM0003" _
+                & "                ON  OIM0030.OFFICECODE     = OIM0003.OFFICECODE" _
+                & "                AND OIM0030.SHIPPERCODE    = OIM0003.SHIPPERCODE" _
+                & "                AND OIM0030.PLANTCODE      = OIM0003.PLANTCODE" _
+                & "                AND OIM0030.OILCODE        = OIM0003.OILCODE" _
+                & "                AND OIM0030.SEGMENTOILCODE = OIM0003.SEGMENTOILCODE" _
+                & "        WHERE" _
+                & "            OIM0003.OFFICECODE     = @P01" _
+                & "        AND OIM0003.SHIPPERCODE    = @P02" _
+                & "        AND OIM0003.PLANTCODE      = @P03" _
+                & "        AND OIM0003.OILCODE        = @P04" _
+                & "        AND OIM0003.SEGMENTOILCODE = @P05" _
+                & "    ) OIM0030" _
+                & "    ON OIM0030.CONSIGNEECODE = OIM0012.CONSIGNEECODE" _
+                & " WHERE" _
+                & "    OIM0012.DELFLG <> @P00"
+
+            Try
+                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   '削除フラグ
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   '営業所コード
+                    Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10)  '荷主コード
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 4)   '基地コード
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)   '油種コード
+                    Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)   '油種細分コード
+
+                    PARA00.Value = C_DELETE_FLG.DELETE
+                    PARA01.Value = WF_OFFICECODE.Text
+                    PARA02.Value = WF_SHIPPERCODE.Text
+                    PARA03.Value = WF_PLANTCODE.Text
+                    PARA04.Value = WF_OILCODE.Text
+                    PARA05.Value = WF_SEGMENTOILCODE.Text
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                        OIM0030tbl = New DataTable
+
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0030tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIM0030tbl.Load(SQLdr)
+
+                        If OIM0030tbl.Rows.Count <= 0 Then
+                            '荷受人マスタのデータ未存在エラー
+                            Master.Output(Messages.C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR)
+                        End If
+                    End Using
+                End Using
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0003C SELECT GetNIUKEWithOILTERM")
+
+                CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+                CS0011LOGWrite.INFPOSI = "DB:OIM0003C GetNIUKEWithOILTERM"
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = ex.ToString()
+                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+
+                Exit Sub
+            End Try
+        End Using
     End Sub
 
     ''' <summary>
@@ -271,20 +392,20 @@ Public Class OIM0003ProductCreate
         '○ 対象データ取得
         Dim SQLStr As String =
               " SELECT" _
-            & "    OFFICECODE" _
-            & "    , SHIPPERCODE" _
-            & "    , PLANTCODE" _
-            & "    , OILCODE" _
-            & "    , SEGMENTOILCODE" _
+            & "     ISNULL(RTRIM(OIM0003.OFFICECODE), '')                       AS OFFICECODE" _
+            & "     , ISNULL(RTRIM(OIM0003.SHIPPERCODE), '')                    AS SHIPPERCODE" _
+            & "     , ISNULL(RTRIM(OIM0003.PLANTCODE), '')                      AS PLANTCODE" _
+            & "     , ISNULL(RTRIM(OIM0003.OILCODE), '')                        AS OILCODE" _
+            & "     , ISNULL(RTRIM(OIM0003.SEGMENTOILCODE), '')                 AS SEGMENTOILCODE" _
             & " FROM" _
-            & "    OIL.OIM0003_PRODUCT" _
+            & "     OIL.OIM0003_PRODUCT OIM0003" _
             & " WHERE" _
-            & "    OFFICECODE         =  @P01" _
-            & "    AND SHIPPERCODE    =  @P02" _
-            & "    AND PLANTCODE      =  @P03" _
-            & "    AND OILCODE        =  @P04" _
-            & "    AND SEGMENTOILCODE =  @P05" _
-            & "    AND DELFLG         <> @P06"
+            & "     OIM0003.OFFICECODE         =  @P01" _
+            & "     AND OIM0003.SHIPPERCODE    =  @P02" _
+            & "     AND OIM0003.PLANTCODE      =  @P03" _
+            & "     AND OIM0003.OILCODE        =  @P04" _
+            & "     AND OIM0003.SEGMENTOILCODE =  @P05" _
+            & "     AND OIM0003.DELFLG         <> @P06"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -361,6 +482,21 @@ Public Class OIM0003ProductCreate
         '○ 項目チェック
         INPTableCheck(WW_ERR_SW)
 
+        '〇 DB更新
+        If isNormal(WW_ERR_SW) Then
+
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                '品種マスタ更新
+                UpdateMasterProduct(SQLcon)
+
+                '品種出荷期間マスタ更新
+                UpdateMasterOilTerm(SQLcon)
+            End Using
+        End If
+
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0003tbl_UPD()
@@ -370,18 +506,17 @@ Public Class OIM0003ProductCreate
         Master.SaveTable(OIM0003tbl, work.WF_SEL_INPTBL.Text)
 
         '○ メッセージ表示
+        work.WF_SEL_DBUPDATE_MESSAGE.Text = ""
         If WW_ERR_SW = "" Then
             Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
         Else
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
+                work.WF_SEL_DBUPDATE_MESSAGE.Text = C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL
             ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
                 Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "営業所コード,荷主コード,基地コード,油種コード,油種細分コード,削除フラグ", needsPopUp:=True)
-
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-
             End If
         End If
 
@@ -491,8 +626,63 @@ Public Class OIM0003ProductCreate
         '○ チェック用テーブルに登録する
         OIM0003INPtbl.Rows.Add(OIM0003INProw)
 
-    End Sub
+        '品種出荷期間テーブル
+        OIM0030INPtbl = New DataTable()
+        OIM0030INPtbl.Columns.Add("OFFICECODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("SHIPPERCODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("PLANTCODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("OILCODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("SEGMENTOILCODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("CONSIGNEECODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("ORDERFROMDATE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("ORDERTODATE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("DELFLG", System.Type.GetType("System.String"))
 
+        For Each row As GridViewRow In WF_OILTERMTBL.Rows
+            Dim WW_CONSIGNEECODE As String = ""
+            Dim WW_ORDERFROMDATE As String = ""
+            Dim WW_ORDERTODATE As String = ""
+            Dim WW_DELFLG As String = ""
+            Dim addRow As DataRow = OIM0030INPtbl.NewRow
+
+            '品種出荷期間テーブルの荷受人コード
+            If row.FindControl("WF_OILTERMTBL_CONSIGNEECODE") IsNot Nothing Then
+                WW_CONSIGNEECODE = DirectCast(row.FindControl("WF_OILTERMTBL_CONSIGNEECODE"), Label).Text
+            End If
+            '品種出荷期間テーブルの受注登録可能期間FROM
+            If row.FindControl("WF_OILTERMTBL_ORDERFROMDATE") IsNot Nothing Then
+                WW_ORDERFROMDATE = DirectCast(row.FindControl("WF_OILTERMTBL_ORDERFROMDATE"), TextBox).Text
+            End If
+            '品種出荷期間テーブルの受注登録可能期間TO
+            If row.FindControl("WF_OILTERMTBL_ORDERTODATE") IsNot Nothing Then
+                WW_ORDERTODATE = DirectCast(row.FindControl("WF_OILTERMTBL_ORDERTODATE"), TextBox).Text
+            End If
+            '品種出荷期間テーブルの受注登録可能期間削除フラグ
+            If row.FindControl("WF_OILTERMTBL_DELFLG") IsNot Nothing Then
+                WW_DELFLG = DirectCast(row.FindControl("WF_OILTERMTBL_DELFLG"), TextBox).Text
+            End If
+
+            'いずれの項目も設定されていない行は更新＆チェック対象外
+            If String.IsNullOrEmpty(WW_ORDERFROMDATE) AndAlso
+                String.IsNullOrEmpty(WW_ORDERTODATE) AndAlso
+                String.IsNullOrEmpty(WW_DELFLG) Then
+                Continue For
+            End If
+
+            '更新対象に追加
+            addRow("OFFICECODE") = WF_OFFICECODE.Text
+            addRow("SHIPPERCODE") = WF_SHIPPERCODE.Text
+            addRow("PLANTCODE") = WF_PLANTCODE.Text
+            addRow("OILCODE") = WF_OILCODE.Text
+            addRow("SEGMENTOILCODE") = WF_SEGMENTOILCODE.Text
+            addRow("CONSIGNEECODE") = WW_CONSIGNEECODE
+            addRow("ORDERFROMDATE") = WW_ORDERFROMDATE
+            addRow("ORDERTODATE") = WW_ORDERTODATE
+            addRow("DELFLG") = WW_DELFLG
+            OIM0030INPtbl.Rows.Add(addRow)
+        Next
+
+    End Sub
 
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
@@ -523,27 +713,29 @@ Public Class OIM0003ProductCreate
 
         '○ 状態をクリア
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
-            Select Case OIM0003row("OPERATION")
-                Case C_LIST_OPERATION_CODE.NODATA
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                    WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
+            'Select Case OIM0003row("OPERATION")
+            '    Case C_LIST_OPERATION_CODE.NODATA
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
-                Case C_LIST_OPERATION_CODE.NODISP
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                    WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
+            '    Case C_LIST_OPERATION_CODE.NODISP
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
-                Case C_LIST_OPERATION_CODE.SELECTED
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
-                    WW_ERR_SW = C_MESSAGE_NO.NORMAL
+            '    Case C_LIST_OPERATION_CODE.SELECTED
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
-                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                    WW_ERR_SW = C_MESSAGE_NO.NORMAL
+            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
-                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                    WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End Select
+            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            '        WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End Select
+            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            WW_ERR_SW = C_MESSAGE_NO.NORMAL
         Next
 
         '○ 画面表示データ保存
@@ -578,7 +770,6 @@ Public Class OIM0003ProductCreate
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
@@ -610,6 +801,22 @@ Public Class OIM0003ProductCreate
                             Case WF_ORDERTODATE.ID
                                 '受注登録可能期間TO
                                 .WF_Calendar.Text = WF_ORDERTODATE.Text
+                            Case Else
+                                Dim rowIdx As Integer
+                                '品種出荷期間テーブルの受注登録可能期間FROM
+                                If WW_FIELD.Contains("WF_OILTERMTBL_ORDERFROMDATE") Then
+                                    Integer.TryParse(WW_FIELD.Substring(WW_FIELD.Length - 3), rowIdx)
+                                    If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE") IsNot Nothing Then
+                                        .WF_Calendar.Text = DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE"), TextBox).Text
+                                    End If
+                                End If
+                                '品種出荷期間テーブルの受注登録可能期間TO
+                                If WW_FIELD.Contains("WF_OILTERMTBL_ORDERTODATE") Then
+                                    Integer.TryParse(WW_FIELD.Substring(WW_FIELD.Length - 3), rowIdx)
+                                    If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE") IsNot Nothing Then
+                                        .WF_Calendar.Text = DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE"), TextBox).Text
+                                    End If
+                                End If
                         End Select
                         .ActiveCalendar()
 
@@ -642,6 +849,11 @@ Public Class OIM0003ProductCreate
                             Case WF_DELFLG.ID
                                 '削除フラグ
                                 prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
+                            Case Else
+                                '品種出荷期間テーブルの削除フラグ
+                                If WW_FIELD.Contains("WF_OILTERMTBL_DELFLG") Then
+                                    prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
+                                End If
                         End Select
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -783,6 +995,36 @@ Public Class OIM0003ProductCreate
                     WF_DELFLG.Text = WW_SelectValue
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
+                Case Else
+                    Dim rowIdx As Integer
+                    Dim WW_TextBox As TextBox = Nothing
+                    '品種出荷期間テーブルの受注登録可能期間FROM
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_ORDERFROMDATE") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE") IsNot Nothing Then
+                            WW_TextBox = DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE"), TextBox)
+                            WW_TextBox.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            WW_TextBox.Focus()
+                        End If
+                    End If
+                    '品種出荷期間テーブルの受注登録可能期間TO
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_ORDERTODATE") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE") IsNot Nothing Then
+                            WW_TextBox = DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE"), TextBox)
+                            WW_TextBox.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            WW_TextBox.Focus()
+                        End If
+                    End If
+                    '品種出荷期間テーブルの削除フラグ
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_DELFLG") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_DELFLG") IsNot Nothing Then
+                            WW_TextBox = DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_DELFLG"), TextBox)
+                            WW_TextBox.Text = WW_SelectValue
+                            WW_TextBox.Focus()
+                        End If
+                    End If
             End Select
         Else
         End If
@@ -834,6 +1076,30 @@ Public Class OIM0003ProductCreate
                 Case WF_DELFLG.ID
                     '削除フラグ
                     WF_DELFLG.Focus()
+                Case Else
+                    Dim rowIdx As Integer
+                    '品種出荷期間テーブルの受注登録可能期間FROM
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_ORDERFROMDATE") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE") IsNot Nothing Then
+                            DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERFROMDATE"), TextBox).Focus()
+                        End If
+                    End If
+                    '品種出荷期間テーブルの受注登録可能期間TO
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_ORDERTODATE") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE") IsNot Nothing Then
+                            DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_ORDERTODATE"), TextBox).Focus()
+                        End If
+                    End If
+                    '品種出荷期間テーブルの削除フラグ
+                    If WF_FIELD.Value.Contains("WF_OILTERMTBL_DELFLG") Then
+                        Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+                        If WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_DELFLG") IsNot Nothing Then
+                            DirectCast(WF_OILTERMTBL.Rows(rowIdx - 1).FindControl("WF_OILTERMTBL_DELFLG"), TextBox).Focus()
+                        End If
+                    End If
+
             End Select
         Else
         End If
@@ -845,7 +1111,6 @@ Public Class OIM0003ProductCreate
         WF_RightboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -876,10 +1141,546 @@ Public Class OIM0003ProductCreate
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
+
+    ''' <summary>
+    ''' 品種マスタ登録・更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMasterProduct(ByVal SQLcon As SqlConnection)
+
+        '○ DB更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0003_PRODUCT" _
+            & "    WHERE" _
+            & "        OFFICECODE         = @P01" _
+            & "        AND SHIPPERCODE    = @P02" _
+            & "        AND PLANTCODE      = @P03" _
+            & "        AND OILCODE        = @P10" _
+            & "        AND SEGMENTOILCODE = @P13;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0003_PRODUCT" _
+            & "    SET" _
+            & "        OFFICECODE     = @P01" _
+            & "        , SHIPPERCODE    = @P02" _
+            & "        , PLANTCODE      = @P03" _
+            & "        , BIGOILCODE     = @P04" _
+            & "        , BIGOILNAME     = @P05" _
+            & "        , BIGOILKANA     = @P06" _
+            & "        , MIDDLEOILCODE  = @P07" _
+            & "        , MIDDLEOILNAME  = @P08" _
+            & "        , MIDDLEOILKANA  = @P09" _
+            & "        , OILCODE        = @P10" _
+            & "        , OILNAME        = @P11" _
+            & "        , OILKANA        = @P12" _
+            & "        , SEGMENTOILCODE = @P13" _
+            & "        , SEGMENTOILNAME = @P14" _
+            & "        , OTOILCODE      = @P15" _
+            & "        , OTOILNAME      = @P16" _
+            & "        , SHIPPEROILCODE = @P17" _
+            & "        , SHIPPEROILNAME = @P18" _
+            & "        , CHECKOILCODE   = @P19" _
+            & "        , CHECKOILNAME   = @P20" _
+            & "        , STOCKFLG       = @P21" _
+            & "        , ORDERFROMDATE  = @P22" _
+            & "        , ORDERTODATE    = @P23" _
+            & "        , DELFLG         = @P24" _
+            & "        , UPDYMD         = @P28" _
+            & "        , UPDUSER        = @P29" _
+            & "        , UPDTERMID      = @P30" _
+            & "        , RECEIVEYMD     = @P31" _
+            & "    WHERE" _
+            & "        OFFICECODE         = @P01" _
+            & "        AND SHIPPERCODE    = @P02" _
+            & "        AND PLANTCODE      = @P03" _
+            & "        AND OILCODE        = @P10" _
+            & "        AND SEGMENTOILCODE = @P13;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0003_PRODUCT" _
+            & "        ( OFFICECODE" _
+            & "        , SHIPPERCODE" _
+            & "        , PLANTCODE" _
+            & "        , BIGOILCODE" _
+            & "        , BIGOILNAME" _
+            & "        , BIGOILKANA" _
+            & "        , MIDDLEOILCODE" _
+            & "        , MIDDLEOILNAME" _
+            & "        , MIDDLEOILKANA" _
+            & "        , OILCODE" _
+            & "        , OILNAME" _
+            & "        , OILKANA" _
+            & "        , SEGMENTOILCODE" _
+            & "        , SEGMENTOILNAME" _
+            & "        , OTOILCODE" _
+            & "        , OTOILNAME" _
+            & "        , SHIPPEROILCODE" _
+            & "        , SHIPPEROILNAME" _
+            & "        , CHECKOILCODE" _
+            & "        , CHECKOILNAME" _
+            & "        , STOCKFLG" _
+            & "        , ORDERFROMDATE" _
+            & "        , ORDERTODATE" _
+            & "        , DELFLG" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , RECEIVEYMD )" _
+            & "    VALUES" _
+            & "        ( @P01" _
+            & "        , @P02" _
+            & "        , @P03" _
+            & "        , @P04" _
+            & "        , @P05" _
+            & "        , @P06" _
+            & "        , @P07" _
+            & "        , @P08" _
+            & "        , @P09" _
+            & "        , @P10" _
+            & "        , @P11" _
+            & "        , @P12" _
+            & "        , @P13" _
+            & "        , @P14" _
+            & "        , @P15" _
+            & "        , @P16" _
+            & "        , @P17" _
+            & "        , @P18" _
+            & "        , @P19" _
+            & "        , @P20" _
+            & "        , @P21" _
+            & "        , @P22" _
+            & "        , @P23" _
+            & "        , @P24" _
+            & "        , @P25" _
+            & "        , @P26" _
+            & "        , @P27" _
+            & "        , @P31 );" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " SELECT" _
+            & "    OFFICECODE" _
+            & "    , SHIPPERCODE" _
+            & "    , PLANTCODE" _
+            & "    , BIGOILCODE" _
+            & "    , BIGOILNAME" _
+            & "    , BIGOILKANA" _
+            & "    , MIDDLEOILCODE" _
+            & "    , MIDDLEOILNAME" _
+            & "    , MIDDLEOILKANA" _
+            & "    , OILCODE" _
+            & "    , OILNAME" _
+            & "    , OILKANA" _
+            & "    , SEGMENTOILCODE" _
+            & "    , SEGMENTOILNAME" _
+            & "    , OTOILCODE" _
+            & "    , OTOILNAME" _
+            & "    , SHIPPEROILCODE" _
+            & "    , SHIPPEROILNAME" _
+            & "    , CHECKOILCODE" _
+            & "    , CHECKOILNAME" _
+            & "    , STOCKFLG" _
+            & "    , ORDERFROMDATE" _
+            & "    , ORDERTODATE" _
+            & "    , DELFLG" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP AS bigint) AS TIMSTP" _
+            & " FROM" _
+            & "    OIL.OIM0003_PRODUCT" _
+            & " WHERE" _
+            & "    OFFICECODE         = @P01" _
+            & "    AND SHIPPERCODE    = @P02" _
+            & "    AND PLANTCODE      = @P03" _
+            & "    AND OILCODE        = @P04" _
+            & "    AND SEGMENTOILCODE = @P05;"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)           '営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10)          '荷主コード
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 4)           '基地コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)           '油種大分類コード
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 10)          '油種大分類名
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10)          '油種大分類名カナ
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)           '油種中分類コード
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20)          '油種中分類名
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)          '油種中分類名カナ
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4)           '油種コード
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 40)          '油種名
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40)          '油種名カナ
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 1)           '油種細分コード
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 40)          '油種名（細分）
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4)           'OT油種コード
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 10)          'OT油種名
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)          '荷主油種コード
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 40)          '荷主油種名
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4)           '積込チェック用油種コード
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40)          '積込チェック用油種名
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 1)           '在庫管理対象フラグ
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Date)                  '受注登録可能期間FROM
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.Date)                  '受注登録可能期間TO
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.DateTime)              '登録年月日
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 20)          '登録ユーザーID
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 20)          '登録端末
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.DateTime)              '更新年月日
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 20)          '更新ユーザーID
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          '更新端末
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime)              '集信日時
+
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 6)        '営業所コード
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 10)       '荷主コード
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 4)        '基地コード
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 4)        '油種コード
+                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 1)        '油種細分コード
+
+                For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
+                    If Trim(OIM0003INProw("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
+                        Trim(OIM0003INProw("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
+                        Trim(OIM0003INProw("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
+                        Dim WW_DATENOW As DateTime = Date.Now
+
+                        'DB更新
+                        PARA01.Value = OIM0003INProw("OFFICECODE")
+                        PARA02.Value = OIM0003INProw("SHIPPERCODE")
+                        PARA03.Value = OIM0003INProw("PLANTCODE")
+                        PARA04.Value = OIM0003INProw("BIGOILCODE")
+                        PARA05.Value = OIM0003INProw("BIGOILNAME")
+                        PARA06.Value = OIM0003INProw("BIGOILKANA")
+                        PARA07.Value = OIM0003INProw("MIDDLEOILCODE")
+                        PARA08.Value = OIM0003INProw("MIDDLEOILNAME")
+                        PARA09.Value = OIM0003INProw("MIDDLEOILKANA")
+                        PARA10.Value = OIM0003INProw("OILCODE")
+                        PARA11.Value = OIM0003INProw("OILNAME")
+                        PARA12.Value = OIM0003INProw("OILKANA")
+                        PARA13.Value = OIM0003INProw("SEGMENTOILCODE")
+                        PARA14.Value = OIM0003INProw("SEGMENTOILNAME")
+                        PARA15.Value = OIM0003INProw("OTOILCODE")
+                        PARA16.Value = OIM0003INProw("OTOILNAME")
+                        PARA17.Value = OIM0003INProw("SHIPPEROILCODE")
+                        PARA18.Value = OIM0003INProw("SHIPPEROILNAME")
+                        PARA19.Value = OIM0003INProw("CHECKOILCODE")
+                        PARA20.Value = OIM0003INProw("CHECKOILNAME")
+                        PARA21.Value = OIM0003INProw("STOCKFLG")
+
+                        If String.IsNullOrEmpty(OIM0003INProw("ORDERFROMDATE")) Then
+                            PARA22.Value = DBNull.Value
+                        Else
+                            PARA22.Value = OIM0003INProw("ORDERFROMDATE")
+                        End If
+
+                        If String.IsNullOrEmpty(OIM0003INProw("ORDERTODATE")) Then
+                            PARA23.Value = DBNull.Value
+                        Else
+                            PARA23.Value = OIM0003INProw("ORDERTODATE")
+                        End If
+
+                        PARA24.Value = OIM0003INProw("DELFLG")
+                        PARA25.Value = WW_DATENOW
+                        PARA26.Value = Master.USERID
+                        PARA27.Value = Master.USERTERMID
+                        PARA28.Value = WW_DATENOW
+                        PARA29.Value = Master.USERID
+                        PARA30.Value = Master.USERTERMID
+                        PARA31.Value = C_DEFAULT_YMD
+
+                        SQLcmd.CommandTimeout = 300
+                        SQLcmd.ExecuteNonQuery()
+
+                        OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                        '更新ジャーナル出力
+                        JPARA01.Value = OIM0003INProw("OFFICECODE")
+                        JPARA02.Value = OIM0003INProw("SHIPPERCODE")
+                        JPARA03.Value = OIM0003INProw("PLANTCODE")
+                        JPARA04.Value = OIM0003INProw("OILCODE")
+                        JPARA05.Value = OIM0003INProw("SEGMENTOILCODE")
+
+                        Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                            If IsNothing(OIM0003UPDtbl) Then
+                                OIM0003UPDtbl = New DataTable
+
+                                For index As Integer = 0 To SQLdr.FieldCount - 1
+                                    OIM0003UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                Next
+                            End If
+
+                            OIM0003UPDtbl.Clear()
+                            OIM0003UPDtbl.Load(SQLdr)
+                        End Using
+
+                        For Each OIM0003UPDrow As DataRow In OIM0003UPDtbl.Rows
+                            CS0020JOURNAL.TABLENM = "OIM0003L"
+                            CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                            CS0020JOURNAL.ROW = OIM0003UPDrow
+                            CS0020JOURNAL.CS0020JOURNAL()
+                            If Not isNormal(CS0020JOURNAL.ERR) Then
+                                Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                                CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                                CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                                CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                                CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                                CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+
+                                WW_ERR_SW = CS0020JOURNAL.ERR
+                                Exit Sub
+                            End If
+                        Next
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0003L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0003L UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+
+            WW_ERR_SW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 品種出荷期間マスタ登録・更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMasterOilTerm(ByVal SQLcon As SqlConnection)
+
+        '○ DB更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0030_OILTERM" _
+            & "    WHERE" _
+            & "        OFFICECODE         = @P01" _
+            & "        AND SHIPPERCODE    = @P02" _
+            & "        AND PLANTCODE      = @P03" _
+            & "        AND OILCODE        = @P04" _
+            & "        AND SEGMENTOILCODE = @P05" _
+            & "        AND CONSIGNEECODE  = @P06;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0030_OILTERM" _
+            & "    SET" _
+            & "        ORDERFROMDATE    = @P07" _
+            & "        , ORDERTODATE    = @P08" _
+            & "        , DELFLG         = @P09" _
+            & "        , UPDYMD         = @P13" _
+            & "        , UPDUSER        = @P14" _
+            & "        , UPDTERMID      = @P15" _
+            & "        , RECEIVEYMD     = @P16" _
+            & "    WHERE" _
+            & "        OFFICECODE         = @P01" _
+            & "        AND SHIPPERCODE    = @P02" _
+            & "        AND PLANTCODE      = @P03" _
+            & "        AND OILCODE        = @P04" _
+            & "        AND SEGMENTOILCODE = @P05" _
+            & "        AND CONSIGNEECODE  = @P06;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0030_OILTERM" _
+            & "        ( OFFICECODE" _
+            & "        , SHIPPERCODE" _
+            & "        , PLANTCODE" _
+            & "        , OILCODE" _
+            & "        , SEGMENTOILCODE" _
+            & "        , CONSIGNEECODE" _
+            & "        , ORDERFROMDATE" _
+            & "        , ORDERTODATE" _
+            & "        , DELFLG" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , RECEIVEYMD )" _
+            & "    VALUES" _
+            & "        ( @P01" _
+            & "        , @P02" _
+            & "        , @P03" _
+            & "        , @P04" _
+            & "        , @P05" _
+            & "        , @P06" _
+            & "        , @P07" _
+            & "        , @P08" _
+            & "        , @P09" _
+            & "        , @P10" _
+            & "        , @P11" _
+            & "        , @P12" _
+            & "        , @P16 );" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " SELECT" _
+            & "    OFFICECODE" _
+            & "    , SHIPPERCODE" _
+            & "    , PLANTCODE" _
+            & "    , OILCODE" _
+            & "    , SEGMENTOILCODE" _
+            & "    , CONSIGNEECODE" _
+            & "    , ORDERFROMDATE" _
+            & "    , ORDERTODATE" _
+            & "    , DELFLG" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP AS bigint) AS TIMSTP" _
+            & " FROM" _
+            & "    OIL.OIM0030_OILTERM" _
+            & " WHERE" _
+            & "    OFFICECODE         = @P01" _
+            & "    AND SHIPPERCODE    = @P02" _
+            & "    AND PLANTCODE      = @P03" _
+            & "    AND OILCODE        = @P04" _
+            & "    AND SEGMENTOILCODE = @P05" _
+            & "    AND CONSIGNEECODE  = @P06;"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)           '営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10)          '荷主コード
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 4)           '基地コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)           '油種コード
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)           '油種細分コード
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10)          '荷受人コード
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Date)                  '受注登録可能期間FROM
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.Date)                  '受注登録可能期間TO
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.DateTime)              '登録年月日
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)          '登録ユーザーID
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 20)          '登録端末
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.DateTime)              '更新年月日
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 20)          '更新ユーザーID
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)          '更新端末
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.DateTime)              '集信日時
+
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 6)        '営業所コード
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 10)       '荷主コード
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 4)        '基地コード
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 4)        '油種コード
+                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 1)        '油種細分コード
+                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 10)       '荷受人コード
+
+                For Each OIM0030INProw As DataRow In OIM0030INPtbl.Rows
+
+                    Dim WW_DATENOW As DateTime = Date.Now
+
+                    'DB更新
+                    PARA01.Value = OIM0030INProw("OFFICECODE")
+                    PARA02.Value = OIM0030INProw("SHIPPERCODE")
+                    PARA03.Value = OIM0030INProw("PLANTCODE")
+                    PARA04.Value = OIM0030INProw("OILCODE")
+                    PARA05.Value = OIM0030INProw("SEGMENTOILCODE")
+                    PARA06.Value = OIM0030INProw("CONSIGNEECODE")
+                    PARA07.Value = OIM0030INProw("ORDERFROMDATE")
+                    PARA08.Value = OIM0030INProw("ORDERTODATE")
+                    PARA09.Value = OIM0030INProw("DELFLG")
+                    PARA10.Value = WW_DATENOW
+                    PARA11.Value = Master.USERID
+                    PARA12.Value = Master.USERTERMID
+                    PARA13.Value = WW_DATENOW
+                    PARA14.Value = Master.USERID
+                    PARA15.Value = Master.USERTERMID
+                    PARA16.Value = C_DEFAULT_YMD
+
+                    SQLcmd.CommandTimeout = 300
+                    SQLcmd.ExecuteNonQuery()
+
+                    '更新ジャーナル出力
+                    JPARA01.Value = OIM0030INProw("OFFICECODE")
+                    JPARA02.Value = OIM0030INProw("SHIPPERCODE")
+                    JPARA03.Value = OIM0030INProw("PLANTCODE")
+                    JPARA04.Value = OIM0030INProw("OILCODE")
+                    JPARA05.Value = OIM0030INProw("SEGMENTOILCODE")
+                    JPARA06.Value = OIM0030INProw("CONSIGNEECODE")
+
+                    Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                        If IsNothing(OIM0030UPDtbl) Then
+                            OIM0030UPDtbl = New DataTable
+
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIM0030UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        OIM0030UPDtbl.Clear()
+                        OIM0030UPDtbl.Load(SQLdr)
+                    End Using
+
+                    For Each OIM0030UPDrow As DataRow In OIM0030UPDtbl.Rows
+                        CS0020JOURNAL.TABLENM = "OIM0030_OILTERM"
+                        CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                        CS0020JOURNAL.ROW = OIM0030UPDrow
+                        CS0020JOURNAL.CS0020JOURNAL()
+                        If Not isNormal(CS0020JOURNAL.ERR) Then
+                            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+
+                            WW_ERR_SW = CS0020JOURNAL.ERR
+                            Exit Sub
+                        End If
+                    Next
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0003C OIM0030_OILTERM UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0003C OIM0030_OILTERM UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+
+            WW_ERR_SW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
 
     ''' <summary>
     ''' 入力値チェック
@@ -1247,8 +2048,9 @@ Public Class OIM0003ProductCreate
                     If dateErrFlag = "1" Then
                         WW_CheckMES1 = "・更新できないレコード(受注登録可能期間FROM入力エラー)です。"
                         WW_CheckMES2 = WW_CS0024FCHECKERR
-                        O_RTN = "ERR"
-                        Exit Sub
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     Else
                         OIM0003INProw("ORDERFROMDATE") = CDate(OIM0003INProw("ORDERFROMDATE")).ToString("yyyy/MM/dd")
                     End If
@@ -1270,8 +2072,9 @@ Public Class OIM0003ProductCreate
                     If dateErrFlag = "1" Then
                         WW_CheckMES1 = "・更新できないレコード(受注登録可能期間TO入力エラー)です。"
                         WW_CheckMES2 = WW_CS0024FCHECKERR
-                        O_RTN = "ERR"
-                        Exit Sub
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     Else
                         OIM0003INProw("ORDERTODATE") = CDate(OIM0003INProw("ORDERTODATE")).ToString("yyyy/MM/dd")
                     End If
@@ -1296,8 +2099,7 @@ Public Class OIM0003ProductCreate
             End If
 
             '一意制約チェック
-            '同一レコードの更新の場合、チェック対象外
-            '2020/06/16杉山修正
+            '同一レコードの更新の場合、更新内容チェックを行う
             If OIM0003INProw("OFFICECODE") = work.WF_SEL_OFFICECODE2.Text AndAlso
                 OIM0003INProw("SHIPPERCODE") = work.WF_SEL_SHIPPERCODE2.Text AndAlso
                 OIM0003INProw("PLANTCODE") = work.WF_SEL_PLANTCODE2.Text AndAlso
@@ -1327,6 +2129,128 @@ Public Class OIM0003ProductCreate
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                 End If
+            End If
+
+            '品種出荷期間テーブルのチェック
+            If WW_LINE_ERR = "" AndAlso OIM0030INPtbl.Rows.Count > 0 Then
+                For Each OIM0030INProw As DataRow In OIM0030INPtbl.Rows
+
+                    '品種出荷期間テーブルの受注登録可能期間FROM(バリデーションチェック）
+                    Master.CheckField(Master.USERCAMP, "OILTERM_ORDERFROMDATE", OIM0030INProw("ORDERFROMDATE"),
+                                      WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    If isNormal(WW_CS0024FCHECKERR) Then
+                        If Not String.IsNullOrEmpty(OIM0030INProw("ORDERFROMDATE")) Then
+                            '年月日チェック
+                            WW_CheckDate(OIM0030INProw("ORDERFROMDATE"),
+                                         "品種出荷期間.受注登録可能期間FROM",
+                                         WW_CS0024FCHECKERR, dateErrFlag)
+                            If dateErrFlag = "1" Then
+                                WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間FROM入力エラー)です。"
+                                WW_CheckMES2 = WW_CS0024FCHECKERR
+                                WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                WW_LINE_ERR = "ERR"
+                                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                            Else
+                                '品種マスタと品種出荷期間マスタの受注登録可能期間FROM相関チェック
+                                If Not String.IsNullOrEmpty(OIM0003INProw("ORDERFROMDATE")) Then
+                                    If CDate(OIM0030INProw("ORDERFROMDATE")).CompareTo(CDate(OIM0003INProw("ORDERFROMDATE"))) < 0 Then
+                                        WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間FROM < 品種.受注登録可能期間FROM)です。"
+                                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                                        WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                        WW_LINE_ERR = "ERR"
+                                        O_RTN = C_MESSAGE_NO.START_END_DATE_RELATION_ERROR
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Else
+                        WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間FROM入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+
+                    '品種出荷期間テーブルの受注登録可能期間TO(バリデーションチェック）
+                    Master.CheckField(Master.USERCAMP, "OILTERM_ORDERTODATE", OIM0030INProw("ORDERTODATE"),
+                                      WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    If isNormal(WW_CS0024FCHECKERR) Then
+                        If Not String.IsNullOrEmpty(OIM0030INProw("ORDERTODATE")) Then
+                            '年月日チェック
+                            WW_CheckDate(OIM0030INProw("ORDERTODATE"), "品種出荷期間.受注登録可能期間TO",
+                                         WW_CS0024FCHECKERR, dateErrFlag)
+                            If dateErrFlag = "1" Then
+                                WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間TO入力エラー)です。"
+                                WW_CheckMES2 = WW_CS0024FCHECKERR
+                                WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                WW_LINE_ERR = "ERR"
+                                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                            Else
+                                '品種マスタと品種出荷期間マスタの受注登録可能期間TO相関チェック
+                                If Not String.IsNullOrEmpty(OIM0003INProw("ORDERTODATE")) Then
+                                    If CDate(OIM0030INProw("ORDERTODATE")).CompareTo(CDate(OIM0003INProw("ORDERTODATE"))) > 0 Then
+                                        WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間TO > 品種.受注登録可能期間TO)です。"
+                                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                                        WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                        WW_LINE_ERR = "ERR"
+                                        O_RTN = C_MESSAGE_NO.START_END_DATE_RELATION_ERROR
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Else
+                        WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間TO入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+
+                    '品種出荷期間テーブルの受注登録可能期間FROM-TOチェック
+                    If Not String.IsNullOrEmpty(OIM0030INProw("ORDERFROMDATE")) AndAlso
+                        Not String.IsNullOrEmpty(OIM0030INProw("ORDERTODATE")) Then
+                        If CDate(OIM0030INProw("ORDERFROMDATE")).CompareTo(CDate(OIM0030INProw("ORDERTODATE"))) > 0 Then
+                            WW_CheckMES1 = "・更新できないレコード(品種出荷期間.受注登録可能期間FROM > 同TO)です。"
+                            WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                            WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                            WW_LINE_ERR = "ERR"
+                            O_RTN = C_MESSAGE_NO.START_END_DATE_RELATION_ERROR
+                        End If
+                    End If
+
+                    '削除フラグ(バリデーションチェック）
+                    Master.CheckField(Master.USERCAMP, "DELFLG", OIM0030INProw("DELFLG"),
+                                      WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    If isNormal(WW_CS0024FCHECKERR) Then
+                        If Not String.IsNullOrEmpty(OIM0030INProw("DELFLG")) Then
+                            '値存在チェック
+                            CODENAME_get("DELFLG", OIM0030INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                            If Not isNormal(WW_RTN_SW) Then
+                                WW_CheckMES1 = "・更新できないレコード(品種出荷期間.削除フラグ入力エラー)です。"
+                                WW_CheckMES2 = "マスタに存在しません。"
+                                WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                WW_LINE_ERR = "ERR"
+                                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                            Else
+                                '品種マスタ本体が削除されているのに、品種出荷期間マスタが削除でない場合
+                                If OIM0003INProw("DELFLG") = C_DELETE_FLG.DELETE AndAlso
+                                    OIM0030INProw("DELFLG") <> C_DELETE_FLG.DELETE Then
+                                    WW_CheckMES1 = "・更新できないレコード(品種出荷期間.削除フラグ不一致エラー)です。"
+                                    WW_CheckMES2 = "品種マスタの削除フラグが無効に設定されています。"
+                                    WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                                    WW_LINE_ERR = "ERR"
+                                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                                End If
+                            End If
+                        End If
+                    Else
+                        WW_CheckMES1 = "・更新できないレコード(品種出荷期間.削除フラグ入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR_OILTERM(WW_CheckMES1, WW_CheckMES2, OIM0030INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                Next
             End If
 
             If WW_LINE_ERR = "" Then
@@ -1429,6 +2353,37 @@ Public Class OIM0003ProductCreate
 
     End Sub
 
+    ''' <summary>
+    ''' エラーレポート編集(品種出荷期間マスタ)
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIM0030row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckERR_OILTERM(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0030row As DataRow = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIM0030row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 営業所コード             =" & OIM0030row("OFFICECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主コード               =" & OIM0030row("SHIPPERCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 基地コード               =" & OIM0030row("PLANTCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種コード               =" & OIM0030row("OILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種細分コード           =" & OIM0030row("SEGMENTOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷受人コード             =" & OIM0030row("CONSIGNEECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間FROM     =" & OIM0030row("ORDERFROMDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間TO       =" & OIM0030row("ORDERTODATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ               =" & OIM0030row("DELFLG")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+
 
     ''' <summary>
     ''' OIM0003tbl更新
@@ -1438,69 +2393,123 @@ Public Class OIM0003ProductCreate
 
         '○ 画面状態設定
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
-            Select Case OIM0003row("OPERATION")
-                Case C_LIST_OPERATION_CODE.NODATA
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                Case C_LIST_OPERATION_CODE.NODISP
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                Case C_LIST_OPERATION_CODE.SELECTED
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-            End Select
+            'Select Case OIM0003row("OPERATION")
+            '    Case C_LIST_OPERATION_CODE.NODATA
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            '    Case C_LIST_OPERATION_CODE.NODISP
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            '    Case C_LIST_OPERATION_CODE.SELECTED
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            'End Select
+            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
         Next
 
         '○ 追加変更判定
-        For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
+        'For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
 
-            'エラーレコード読み飛ばし
-            If OIM0003INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
-                Continue For
-            End If
+        '    'エラーレコード読み飛ばし
+        '    If OIM0003INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+        '        Continue For
+        '    End If
 
-            OIM0003INProw.Item("OPERATION") = CONST_INSERT
+        '    OIM0003INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
-            For Each OIM0003row As DataRow In OIM0003tbl.Rows
-                If OIM0003row("OFFICECODE") = OIM0003INProw("OFFICECODE") AndAlso
-                    OIM0003row("SHIPPERCODE") = OIM0003INProw("SHIPPERCODE") AndAlso
-                    OIM0003row("PLANTCODE") = OIM0003INProw("PLANTCODE") AndAlso
-                    OIM0003row("OILCODE") = OIM0003INProw("OILCODE") AndAlso
-                    OIM0003row("SEGMENTOILCODE") = OIM0003INProw("SEGMENTOILCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
-                        OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
-                    Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
-                        OIM0003INProw("OPERATION") = CONST_UPDATE
-                        Exit For
-                    End If
+        '    'KEY項目が等しい時
+        '    For Each OIM0003row As DataRow In OIM0003tbl.Rows
+        '        If OIM0003row("OFFICECODE") = OIM0003INProw("OFFICECODE") AndAlso
+        '            OIM0003row("SHIPPERCODE") = OIM0003INProw("SHIPPERCODE") AndAlso
+        '            OIM0003row("PLANTCODE") = OIM0003INProw("PLANTCODE") AndAlso
+        '            OIM0003row("OILCODE") = OIM0003INProw("OILCODE") AndAlso
+        '            OIM0003row("SEGMENTOILCODE") = OIM0003INProw("SEGMENTOILCODE") Then
+        '            'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+        '            If OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
+        '                OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+        '            Else
+        '                'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+        '                OIM0003INProw("OPERATION") = CONST_UPDATE
+        '                Exit For
+        '            End If
 
-                    Exit For
+        '            Exit For
 
-                End If
-            Next
-        Next
+        '        End If
+        '    Next
+        'Next
 
         '○ 変更有無判定　&　入力値反映
         For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
-            Select Case OIM0003INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0003INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0003INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0003INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0003INProw)
-            End Select
+            'Select Case OIM0003INProw("OPERATION")
+            '    Case CONST_UPDATE
+            '        TBL_UPDATE_SUB(OIM0003INProw)
+            '    Case CONST_INSERT
+            '        TBL_INSERT_SUB(OIM0003INProw)
+            '    Case CONST_PATTERNERR
+            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+            '        TBL_INSERT_SUB(OIM0003INProw)
+            '    Case C_LIST_OPERATION_CODE.ERRORED
+            '        TBL_ERR_SUB(OIM0003INProw)
+            'End Select
+            TBL_REPLACE_SUB(OIM0003INProw)
         Next
 
     End Sub
 
+    ''' <summary>
+    ''' 更新データの一覧更新・追加処理
+    ''' </summary>
+    ''' <param name="OIM0003INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_REPLACE_SUB(ByRef OIM0003INProw As DataRow)
+
+        Dim WK_FOUNDFLG As Boolean = False  '同一キーレコード発見フラグ
+
+        For Each OIM0003row As DataRow In OIM0003tbl.Rows
+
+            '同一レコードか判定
+            If OIM0003INProw("OFFICECODE") = OIM0003row("OFFICECODE") AndAlso
+                OIM0003INProw("SHIPPERCODE") = OIM0003row("SHIPPERCODE") AndAlso
+                OIM0003INProw("PLANTCODE") = OIM0003row("PLANTCODE") AndAlso
+                OIM0003INProw("OILCODE") = OIM0003row("OILCODE") AndAlso
+                OIM0003INProw("SEGMENTOILCODE") = OIM0003row("SEGMENTOILCODE") Then
+
+                '同一キーレコード発見
+                WK_FOUNDFLG = True
+
+                '画面入力テーブル項目設定
+                OIM0003INProw("LINECNT") = OIM0003row("LINECNT")
+                OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                OIM0003INProw("TIMSTP") = OIM0003row("TIMSTP")
+                OIM0003INProw("SELECT") = 1
+                OIM0003INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIM0003row.ItemArray = OIM0003INProw.ItemArray
+
+                Exit For
+            End If
+        Next
+
+        '同一キーレコードが発見できなかった場合、一覧に行を追加する
+        If Not WK_FOUNDFLG Then
+
+            Dim OIM0003row As DataRow = OIM0003tbl.NewRow
+            OIM0003row.ItemArray = OIM0003INProw.ItemArray
+            OIM0003row("LINECNT") = OIM0003tbl.Rows.Count + 1   '末尾に追加
+            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            OIM0003row("TIMSTP") = "0"
+            OIM0003row("SELECT") = 1
+            OIM0003row("HIDDEN") = 0
+            OIM0003tbl.Rows.Add(OIM0003row)
+
+        End If
+
+    End Sub
+
+#Region "不使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -1587,6 +2596,7 @@ Public Class OIM0003ProductCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得

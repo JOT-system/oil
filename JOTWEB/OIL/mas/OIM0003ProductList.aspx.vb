@@ -306,6 +306,14 @@ Public Class OIM0003ProductList
             End If
             SQLStr &= "OIM0003.OFFICECODE = @P2"
             isAnyWhere = True
+        Else
+            If isAnyWhere Then
+                SQLStr &= "    AND "
+            Else
+                SQLStr &= " WHERE "
+            End If
+            isAnyWhere = True
+            SQLStr &= "OIM0003.OFFICECODE IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P2)"
         End If
         '荷主コード
         If Not String.IsNullOrEmpty(work.WF_SEL_SHIPPERCODE.Text) Then
@@ -376,9 +384,11 @@ Public Class OIM0003ProductList
                     PARA1.Value = work.WF_SEL_DELFLG.Text
                 End If
                 '営業所コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                 If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                     PARA2.Value = work.WF_SEL_OFFICECODE.Text
+                Else
+                    PARA2.Value = Master.USER_ORG
                 End If
                 '荷主コード
                 If Not String.IsNullOrEmpty(work.WF_SEL_SHIPPERCODE.Text) Then

@@ -361,11 +361,12 @@ Public Class OIM0003ProductList
         SQLStr &=
               " ORDER BY" _
             & "    OIM0003.OFFICECODE" _
+            & "    , OIM0003.OILCODE" _
+            & "    , OIM0003.SEGMENTOILCODE" _
             & "    , OIM0003.SHIPPERCODE" _
             & "    , OIM0003.PLANTCODE" _
             & "    , OIM0003.BIGOILCODE" _
-            & "    , OIM0003.MIDDLEOILCODE" _
-            & "    , OIM0003.OILCODE"
+            & "    , OIM0003.MIDDLEOILCODE"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

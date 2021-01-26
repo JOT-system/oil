@@ -1534,7 +1534,10 @@ function commonSetHasOrderInfoToHighlight() {
             rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             //ワーニング（黄色）判定
-            if (cellObj.textContent === '検査間近有' || cellObj.textContent === '前回揮発油') {
+            if (cellObj.textContent === '検査間近有'
+                || cellObj.textContent === '前回黒油'
+                || cellObj.textContent === '前回揮発油'
+                || cellObj.textContent === '前回灯軽油') {
                 rightTableObj.rows[rowIdx].classList.add('warnInfo');
                 leftTableObj.rows[rowIdx].classList.add('warnInfo');
             }
@@ -1586,7 +1589,10 @@ function commonSetHasKaisouInfoToHighlight() {
             rightTableObj.rows[rowIdx].classList.add('hasKaisouInfoValue');
             leftTableObj.rows[rowIdx].classList.add('hasKaisouInfoValue');
             //ワーニング（黄色）判定
-            if (cellObj.textContent === '検査間近有' || cellObj.textContent === '前回揮発油') {
+            if (cellObj.textContent === '検査間近有'
+                || cellObj.textContent === '前回黒油'
+                || cellObj.textContent === '前回揮発油'
+                || cellObj.textContent === '前回灯軽油') {
                 rightTableObj.rows[rowIdx].classList.add('warnInfo');
                 leftTableObj.rows[rowIdx].classList.add('warnInfo');
             }

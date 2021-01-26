@@ -224,8 +224,7 @@ Public Class OIT0003OrderDetail
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
                         Case "btnChkLastOilConfirmYes"        '確認メッセージはいボタン押下(前回油種チェック)
-                            '画面表示設定処理(受注進行ステータス)
-                            WW_ScreenOrderStatusSet()
+                            btnChkLastOilConfirmYes()
                         Case "btnChkLastOilConfirmNo"         '確認メッセージいいえボタン押下(前回油種チェック)
                         Case "btnChkBulkDateConfirmYes"       '確認メッセージはいボタン押下((実績)日付一括入力チェック)
                             WW_BulkDateSet()
@@ -5754,11 +5753,12 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
 
-            '前回揮発油,今回黒油、または灯軽油による警告(格上チェックあり)
+            '前回油種での格上に伴う整合性ワーニング(格上チェックあり)
         ElseIf WW_ERRCODE = "ERR2" _
             AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
             blnOilCheck = True
-            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR,
+            'Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR,
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_UPGRADE_WAR,
               C_MESSAGE_TYPE.QUES,
               needsPopUp:=True,
               messageBoxTitle:="",
@@ -5767,9 +5767,28 @@ Public Class OIT0003OrderDetail
               needsConfirmNgToPostBack:=True,
               NoButtonId:="btnChkLastOilConfirmNo")
 
-            '前回揮発油,今回黒油、または灯軽油による警告(格上チェックなし)
+            '前回油種での格上げに伴う整合性エラー(格上チェックなし)
         ElseIf WW_ERRCODE = "ERR3" Then
-            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_UPGRADE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="割当確定", needsPopUp:=True)
+            'Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+
+            '前回油種での格下に伴う整合性ワーニング(格下チェックあり)
+        ElseIf WW_ERRCODE = "ERR4" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            blnOilCheck = True
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_DOWNGRADE_WAR,
+              C_MESSAGE_TYPE.QUES,
+              needsPopUp:=True,
+              messageBoxTitle:="",
+              IsConfirm:=True,
+              YesButtonId:="btnChkLastOilConfirmYes",
+              needsConfirmNgToPostBack:=True,
+              NoButtonId:="btnChkLastOilConfirmNo")
+
+            '前回油種での格下に伴う整合性エラー(格下チェックなし)
+        ElseIf WW_ERRCODE = "ERR5" Then
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_DOWNGRADE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="割当確定", needsPopUp:=True)
             Exit Sub
 
         End If
@@ -7309,7 +7328,7 @@ Public Class OIT0003OrderDetail
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Exit Sub
-            Else
+            ElseIf OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102 Then
                 OIT0003row("ORDERINFO") = ""
                 OIT0003row("ORDERINFONAME") = ""
             End If
@@ -8334,6 +8353,17 @@ Public Class OIT0003OrderDetail
                 '費用入力
                 WF_Dtab04.CssClass = "selected"
         End Select
+    End Sub
+
+    ''' <summary>
+    ''' 確認メッセージはいボタン押下(前回油種チェック)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub btnChkLastOilConfirmYes()
+
+        '画面表示設定処理(受注進行ステータス)
+        WW_ScreenOrderStatusSet()
+
     End Sub
 
     ''' <summary>
@@ -17123,13 +17153,14 @@ Public Class OIT0003OrderDetail
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim WW_GetValue = {"", "", "", "", "", "", "", ""}
+        Dim WW_ChkUpGrad As Boolean = False
 
         '前回油種と油種の整合性チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
             WW_GetValue = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
-            '前回黒油
+            '★NG油種(前回黒油)
             If WW_GetValue(2) = "1" AndAlso OIT0003row("DELFLG") = "0" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -17140,18 +17171,28 @@ Public Class OIT0003OrderDetail
                 O_RTN = "ERR1"
                 'Exit Sub
 
-                '前回揮発油
-            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso OIT0003row("DELFLG") = "0" Then
+                '★格上げ確認
+            ElseIf WW_GetValue(2) = "2" AndAlso OIT0003row("DELFLG") = "0" Then
 
                 If Convert.ToString(OIT0003row("UPGRADEFLG")) = "on" Then
-                    OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                    Select Case WW_GetValue(3)
+                        Case "前回黒油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
+                        Case "前回揮発油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                        Case "前回灯軽油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_104
+                    End Select
+                    'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Else
-                    OIT0003row("ORDERINFONAME") = "前回揮発油(確認)"
+                    OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格上)"
+                    'OIT0003row("ORDERINFONAME") = "前回揮発油(確認)"
                 End If
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_UPGRADE_WAR
+                'WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_WAR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
 
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -17166,11 +17207,50 @@ Public Class OIT0003OrderDetail
                         O_RTN = "ERR2"
                     Else
                         O_RTN = "ERR3"
+                        WW_ChkUpGrad = True
                     End If
                 End If
+
+                '★格下げ確認
+            ElseIf WW_GetValue(2) = "3" AndAlso OIT0003row("DELFLG") = "0" Then
+                If Convert.ToString(OIT0003row("DOWNGRADEFLG")) = "on" Then
+                    Select Case WW_GetValue(3)
+                        Case "前回黒油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
+                        Case "前回揮発油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                        Case "前回灯軽油"
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_104
+                    End Select
+                    CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                Else
+                    OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格下)"
+                End If
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_DOWNGRADE_WAR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '受注明細TBLの受注情報を更新
+                    WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+                End Using
+
+                '★★格上げチェックエラーがない場合のみ、格下げチェックを行う。
+                If O_RTN <> "ERR1" AndAlso WW_ChkUpGrad = False Then
+                    If Convert.ToString(OIT0003row("DOWNGRADEFLG")) = "on" AndAlso O_RTN <> "ERR5" Then
+                        O_RTN = "ERR4"
+                    Else
+                        O_RTN = "ERR5"
+                    End If
+                End If
+
             Else
                 If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
-                    OrElse OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
+                    OrElse OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 _
+                    OrElse OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_104 Then
                     OIT0003row("ORDERINFO") = ""
                     OIT0003row("ORDERINFONAME") = ""
                 End If
@@ -20826,6 +20906,12 @@ Public Class OIT0003OrderDetail
         Dim chkObjUPId As String
         '### 20201208 END   指摘票No248対応 ####################################
 
+        '### 20210125 START 指摘票No300対応 ####################################
+        Dim chkObjDOWN As CheckBox = Nothing
+        Dim chkObjIdWODOWNcnt As String = "chk" & pnlListArea1.ID & "DOWNGRADEFLG"
+        Dim chkObjDOWNId As String
+        '### 20210125 END   指摘票No300対応 ####################################
+
         '受注進行ステータスが"受注受付"の場合
         '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
         '※但し、受注営業所が"010402"(仙台新港営業所)以外の場合は、積込日を読取専用(入力不可)とする。
@@ -21020,6 +21106,19 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '### 20201208 END   指摘票対応(No248)全体 ################################
+                '### 20210125 START 指摘票対応(No300)全体 ################################
+                chkObjDOWNId = chkObjIdWODOWNcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjDOWN = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjDOWN = DirectCast(cellObj.FindControl(chkObjDOWNId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjDOWN IsNot Nothing Then
+                        '格上可否フラグ(チェックボックス)を非活性
+                        chkObjDOWN.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '### 20210125 END   指摘票対応(No300)全体 ################################
 
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -21148,7 +21247,6 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '### 20201110 END   指摘票No199対応 ####################################
-
                 '### 20201208 START 指摘票対応(No248)全体 ################################
                 chkObjUPId = chkObjIdWOUPcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjUP = Nothing
@@ -21162,6 +21260,19 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '### 20201208 END   指摘票対応(No248)全体 ################################
+                '### 20210125 START 指摘票対応(No300)全体 ################################
+                chkObjDOWNId = chkObjIdWODOWNcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjDOWN = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjDOWN = DirectCast(cellObj.FindControl(chkObjDOWNId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjDOWN IsNot Nothing Then
+                        '格上可否フラグ(チェックボックス)を非活性
+                        chkObjDOWN.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '### 20210125 END   指摘票対応(No300)全体 ################################
 
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _

@@ -266,10 +266,12 @@ Public Class OIM0016RTrainList
         Dim andFlg As Boolean = False
 
         ' 管轄受注営業所
+        SQLStrBldr.AppendLine(" WHERE ")
+        andFlg = True
         If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-            SQLStrBldr.AppendLine(" WHERE ")
             SQLStrBldr.AppendLine("     OIM0016.OFFICECODE = @P1 ")
-            andFlg = True
+        Else
+            SQLStrBldr.AppendLine("     OIM0016.OFFICECODE IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P1) ")
         End If
 
         ' 入線出線区分
@@ -315,13 +317,24 @@ Public Class OIM0016RTrainList
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Int, 4)          ' 回線
                 Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.NVarChar, 1)     ' 削除フラグ
 
-                PARA1.Value = work.WF_SEL_OFFICECODE.Text
+                '管轄受注営業所
+                If String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
+                    PARA1.Value = Master.USER_ORG
+                Else
+                    PARA1.Value = work.WF_SEL_OFFICECODE.Text
+                End If
+
+                '入線出線区分
                 PARA2.Value = work.WF_SEL_IOKBN.Text
+
+                '回線
                 If String.IsNullOrEmpty(work.WF_SEL_LINE.Text) Then
                     PARA3.Value = 0
                 Else
                     PARA3.Value = Int32.Parse(work.WF_SEL_LINE.Text)
                 End If
+
+                '削除フラグ
                 PARA0.Value = C_DELETE_FLG.ALIVE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

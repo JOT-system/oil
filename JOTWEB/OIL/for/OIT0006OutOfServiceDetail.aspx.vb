@@ -6598,9 +6598,37 @@ Public Class OIT0006OutOfServiceDetail
 
                             '★★ポップアップ「NG」ボタン押下時
                         ElseIf Me.WW_IDO_TANKNO_FLG = "2" Then
+                            '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
+                            If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                                '○所属営業所コード
+                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                                '○所在地コード(着駅)
+                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                                ''○所在地コード(発駅)
+                                'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                                '○タンク車状態コード
+                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
+                                '○タンク車状況コード
+                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
+                                '○使用受注№
+                                P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
 
-                            '### 所在更新しない ###########################################
-                            Continue For
+                                '★着日が設定
+                            Else
+                                '○所属営業所コード(NGなので所在地はそのまま)
+                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                                '○所在地コード(着駅)
+                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                                '○タンク車状態コード
+                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                                '○タンク車状況コード
+                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
+                                '○使用受注№
+                                P_USEORDERNO.Value = ""
+                            End If
+
+                            ''### 所在更新しない ###########################################
+                            'Continue For
 
                         End If
 
@@ -6636,7 +6664,11 @@ Public Class OIT0006OutOfServiceDetail
                 End Select
 
                 '空車着日
-                P_EMPARRDATE.Value = DBNull.Value
+                If Convert.ToString(OIT0006row("ACTUALARRDATE")) <> "" Then
+                    P_EMPARRDATE.Value = OIT0006row("ACTUALARRDATE")
+                Else
+                    P_EMPARRDATE.Value = DBNull.Value
+                End If
                 P_ACTUALEMPARRDATE.Value = DBNull.Value
 
                 SQLcmd.ExecuteNonQuery()

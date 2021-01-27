@@ -2771,6 +2771,19 @@ Public Class OIT0001EmptyTurnDairyDetail
             MAPDataGet(SQLcon, 0)
         End Using
 
+        '### 20200916 START 「500：輸送完了」以降のステータスはチェックを実施しない ################
+        If work.WF_SEL_STATUS.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
+            '★受注オーダーが存在する場合
+            If OIT0001tbl.Rows.Count <> 0 Then
+                For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                    If Convert.ToString(OIT0001row("TANKNO")) = "" Then Continue For
+                    '★タンク車№に紐づく情報を取得
+                    WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+                Next
+            End If
+        End If
+        '### 20200916 END   「500：輸送完了」以降のステータスはチェックを実施しない ################
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
 

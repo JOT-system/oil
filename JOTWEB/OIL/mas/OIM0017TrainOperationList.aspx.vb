@@ -265,11 +265,13 @@ Public Class OIM0017TrainOperationList
         '○ 条件指定
         Dim andFlg As Boolean = False
 
+        SQLStrBldr.AppendLine(" WHERE ")
+        andFlg = True
         ' 管轄受注営業所
         If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-            SQLStrBldr.AppendLine(" WHERE ")
             SQLStrBldr.AppendLine("     OIM0017.OFFICECODE = @P1 ")
-            andFlg = True
+        Else
+            SQLStrBldr.AppendLine("     OIM0017.OFFICECODE IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P1) ")
         End If
 
         ' JOT列車番号
@@ -346,9 +348,11 @@ Public Class OIM0017TrainOperationList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
                 If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then   ' 営業所
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
                     PARA1.Value = work.WF_SEL_OFFICECODE.Text
+                Else
+                    PARA1.Value = Master.USER_ORG
                 End If
                 If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNO.Text) Then      ' JOT列車番号
                     Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 4)

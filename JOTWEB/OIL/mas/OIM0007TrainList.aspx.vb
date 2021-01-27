@@ -289,6 +289,10 @@ Public Class OIM0007TrainList
             SQLStrBldr.AppendLine(" WHERE ")
             SQLStrBldr.AppendLine("     OIM0007.OFFICECODE = @P1 ")
             andFlg = True
+        Else
+            SQLStrBldr.AppendLine(" WHERE ")
+            SQLStrBldr.AppendLine("     OIM0007.OFFICECODE IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P1) ")
+            andFlg = True
         End If
 
         ' 本線列車番号
@@ -313,6 +317,15 @@ Public Class OIM0007TrainList
             andFlg = True
         End If
 
+        '削除フラグ
+        If andFlg Then
+            SQLStrBldr.AppendLine("     AND ")
+        Else
+            SQLStrBldr.AppendLine(" WHERE ")
+        End If
+        SQLStrBldr.AppendLine("     OIM0007.DELFLG = @P0 ")
+
+
         '○ ソート
         SQLStrBldr.AppendLine(" ORDER BY ")
         SQLStrBldr.AppendLine("     OIM0007.OFFICECODE ")
@@ -323,13 +336,26 @@ Public Class OIM0007TrainList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' JOT車番
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 営業所
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 4)     ' 本線列車番号
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)     ' 積置フラグ
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.NVarChar, 1)     ' 削除フラグ
 
-                PARA1.Value = work.WF_SEL_OFFICECODE.Text
+                '営業所
+                If String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
+                    PARA1.Value = Master.USER_ORG
+                Else
+                    PARA1.Value = work.WF_SEL_OFFICECODE.Text
+                End If
+
+                '本線車番
                 PARA2.Value = work.WF_SEL_TRAINNO.Text
+
+                '積置フラグ
                 PARA3.Value = work.WF_SEL_TSUMI.Text
+
+                '削除フラグ
+                PARA0.Value = C_DELETE_FLG.ALIVE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

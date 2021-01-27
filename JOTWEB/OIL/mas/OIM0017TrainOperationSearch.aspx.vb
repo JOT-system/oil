@@ -87,9 +87,6 @@ Public Class OIM0017TrainOperationSearch
             Master.GetFirstValue(work.WF_SEL_OFFICECODE.Text, "OFFICECODE", WF_OFFICECODE.Text)     ' 管轄受注営業所
             Master.GetFirstValue(work.WF_SEL_TRAINNO.Text, "TRAINNO", WF_TRAINNO.Text)              ' JOT列車番号
             Master.GetFirstValue(work.WF_SEL_WORKINGDATE.Text, "WORKINGDATE", WF_WORKINGDATE.Text)  ' 運行日
-            'Master.GetFirstValue(work.WF_SEL_TSUMI.Text, "TSUMI", WF_TSUMI.Text)                    ' 積置フラグ
-            'Master.GetFirstValue(work.WF_SEL_DEPSTATION.Text, "DEPSTATION", WF_DEPSTATION.Text)     ' 発駅コード
-            'Master.GetFirstValue(work.WF_SEL_ARRSTATION.Text, "ARRSTATION", WF_ARRSTATION.Text)     ' 着駅コード
 
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0017L Then
             ' 実行画面（一覧）からの遷移
@@ -98,9 +95,6 @@ Public Class OIM0017TrainOperationSearch
             WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text    ' 管轄受注営業所
             WF_TRAINNO.Text = work.WF_SEL_TRAINNO.Text          ' JOT列車番号
             WF_WORKINGDATE.Text = work.WF_SEL_WORKINGDATE.Text  ' 運行日
-            'WF_TSUMI.Text = work.WF_SEL_TSUMI.Text              ' 積置フラグ
-            'WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION.Text    ' 発駅コード
-            'WF_ARRSTATION.Text = work.WF_SEL_ARRSTATION.Text    ' 着駅コード
 
         End If
 
@@ -130,9 +124,6 @@ Public Class OIM0017TrainOperationSearch
         Master.EraseCharToIgnore(WF_OFFICECODE.Text)        ' 管轄受注営業所
         Master.EraseCharToIgnore(WF_TRAINNO.Text)           ' JOT列車番号
         Master.EraseCharToIgnore(WF_WORKINGDATE.Text)       ' 運行日
-        'Master.EraseCharToIgnore(WF_TSUMI.Text)             ' 積置フラグ
-        'Master.EraseCharToIgnore(WF_DEPSTATION.Text)        ' 発駅コード
-        'Master.EraseCharToIgnore(WF_ARRSTATION.Text)        ' 着駅コード
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -144,9 +135,6 @@ Public Class OIM0017TrainOperationSearch
         work.WF_SEL_OFFICECODE.Text = WF_OFFICECODE.Text    ' 管轄受注営業所
         work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text          ' JOT列車番号
         work.WF_SEL_WORKINGDATE.Text = WF_WORKINGDATE.Text  ' 運行日
-        'work.WF_SEL_TSUMI.Text = WF_TSUMI.Text              ' 積置フラグ
-        'work.WF_SEL_DEPSTATION.Text = WF_DEPSTATION.Text    ' 発駅コード
-        'work.WF_SEL_ARRSTATION.Text = WF_ARRSTATION.Text    ' 着駅コード
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -231,63 +219,6 @@ Public Class OIM0017TrainOperationSearch
             O_RTN = "ERR"
             Exit Sub
         End If
-        '' 積置フラグ
-        'Master.CheckField(Master.USERCAMP, "TSUMI", WF_TSUMI.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    If WF_TSUMI.Text <> "" Then
-        '        CODENAME_get("TSUMI", WF_TSUMI.Text, WF_TSUMI_TEXT.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "積置フラグ : " & WF_TSUMI.Text, needsPopUp:=True)
-        '            WF_TSUMI.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "積置フラグ", needsPopUp:=True)
-        '    WF_TSUMI.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-        '' 発駅コード
-        'Master.CheckField(Master.USERCAMP, "DEPSTATION", WF_DEPSTATION.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    If WF_DEPSTATION.Text <> "" Then
-        '        CODENAME_get("STATION", WF_DEPSTATION.Text, WF_DEPSTATION_TEXT.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "発駅コード : " & WF_DEPSTATION.Text, needsPopUp:=True)
-        '            WF_DEPSTATION.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "発駅コード", needsPopUp:=True)
-        '    WF_DEPSTATION.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-        '' 着駅コード
-        'Master.CheckField(Master.USERCAMP, "ARRSTATION", WF_ARRSTATION.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    If WF_ARRSTATION.Text <> "" Then
-        '        CODENAME_get("STATION", WF_ARRSTATION.Text, WF_ARRSTATION_TEXT.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "着駅コード : " & WF_ARRSTATION.Text, needsPopUp:=True)
-        '            WF_ARRSTATION.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "着駅コード", needsPopUp:=True)
-        '    WF_ARRSTATION.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
@@ -372,14 +303,6 @@ Public Class OIM0017TrainOperationSearch
                         If WF_FIELD.Value = WF_TRAINNO.ID Then
                             prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text)
                         End If
-                        '' 積置フラグ
-                        'If WF_FIELD.Value = WF_TSUMI.ID Then
-                        '    prmData = work.CreateFIXParam(Master.USERCAMP, "TSUMI")
-                        'End If
-                        '' 発駅コード/着駅コード
-                        'If WF_FIELD.Value = WF_DEPSTATION.ID Or WF_FIELD.Value = WF_ARRSTATION.ID Then
-                        '    prmData = work.CreateFIXParam(Master.USERCAMP, "STATION")
-                        'End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -456,18 +379,6 @@ Public Class OIM0017TrainOperationSearch
                 Catch ex As Exception
                 End Try
                 WF_WORKINGDATE.Focus()
-                'Case WF_TSUMI.ID                ' 積置フラグ
-                '    WF_TSUMI.Text = WW_SelectValue
-                '    WF_TSUMI_TEXT.Text = WW_SelectText
-                '    WF_TSUMI.Focus()
-                'Case WF_DEPSTATION.ID           ' 発駅コード
-                '    WF_DEPSTATION.Text = WW_SelectValue
-                '    WF_DEPSTATION_TEXT.Text = WW_SelectText
-                '    WF_DEPSTATION.Focus()
-                'Case WF_ARRSTATION.ID           ' 着駅コード
-                '    WF_ARRSTATION.Text = WW_SelectValue
-                '    WF_ARRSTATION_TEXT.Text = WW_SelectText
-                '    WF_ARRSTATION.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -491,12 +402,6 @@ Public Class OIM0017TrainOperationSearch
                 WF_TRAINNO.Focus()
             Case WF_WORKINGDATE.ID      ' 運行日
                 WF_WORKINGDATE.Focus()
-                'Case WF_TSUMI.ID            ' 積置フラグ
-                '    WF_TSUMI.Focus()
-                'Case WF_DEPSTATION.ID       ' 発駅コード
-                '    WF_DEPSTATION.Focus()
-                'Case WF_ARRSTATION.ID       ' 発駅コード
-                '    WF_ARRSTATION.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -567,12 +472,6 @@ Public Class OIM0017TrainOperationSearch
                 Case "TRAINNO"      ' JOT列車番号
                     prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "TSUMI"        ' 積置フラグ
-                    '    prmData = work.CreateFIXParam(Master.USERCAMP, "TSUMI")
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "STATION"      ' 駅
-                    '    prmData = work.CreateFIXParam(Master.USERCAMP)
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

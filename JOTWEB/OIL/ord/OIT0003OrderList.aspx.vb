@@ -2085,7 +2085,6 @@ Public Class OIT0003OrderList
                 Dim strTrainNo As String = ""
                 Dim shipOderAsc As Integer = 0
                 Dim shipOderDesc As Integer = 0
-                'Dim i As Integer = 0
                 For Each OIT0003INSrow In OIT0003EXLINStbl.Rows
 
                     '初回、または列車№が変更されたら、受注データを再度取得する。
@@ -2118,7 +2117,6 @@ Public Class OIT0003OrderList
 
                         '発送順をリセット
                         shipOderAsc = 1
-                        'shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("LOADINGTRAINNO") = Convert.ToString(OIT0003INSrow("LOADINGTRAINNO"))).Count
                         shipOderDesc = OIT0003EXLODRtbl.AsEnumerable.
                             Where(Function(x As DataRow) x("USEFLAG") = "0").
                             Where(Function(x As DataRow) x("TRAINNO") = OIT0003INSrow("LOADINGTRAINNO")).Count
@@ -2692,6 +2690,7 @@ Public Class OIT0003OrderList
             Dim SQLStr As String =
                 " UPDATE OIL.OIT0003_DETAIL " _
                 & "    SET TANKNO      = @TANKNO, " _
+                & "        SHIPORDER   = @SHIPORDER, " _
                 & "        UPDYMD      = @UPDYMD, " _
                 & "        UPDUSER     = @UPDUSER, " _
                 & "        UPDTERMID   = @UPDTERMID, " _
@@ -2706,6 +2705,7 @@ Public Class OIT0003OrderList
             Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
             Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
             Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", System.Data.SqlDbType.NVarChar)
+            Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", System.Data.SqlDbType.NVarChar)
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
@@ -2721,6 +2721,7 @@ Public Class OIT0003OrderList
                 P_ORDERNO.Value = OIT0003ODRrow("ORDERNO")
                 P_DETAILNO.Value = OIT0003ODRrow("DETAILNO")
                 P_TANKNO.Value = OIT0003ODRrow("TANKNO")
+                P_SHIPORDER.Value = OIT0003ODRrow("SHIPORDER")
 
                 SQLcmd.ExecuteNonQuery()
             Next

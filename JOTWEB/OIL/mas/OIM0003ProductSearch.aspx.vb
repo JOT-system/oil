@@ -381,7 +381,7 @@ Public Class OIM0003ProductSearch
                 Select Case WF_FIELD.Value
                     Case WF_OFFICECODE.ID
                         '営業所コード
-                        prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, WF_OFFICECODE.Text)
+                        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG)
                     Case WF_SHIPPERCODE.ID
                         '荷主コード
                         prmData = work.CreateFIXParam(Master.USERCAMP, "JOINTMASTER")

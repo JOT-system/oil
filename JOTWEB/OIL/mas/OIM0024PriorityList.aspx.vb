@@ -260,6 +260,8 @@ Public Class OIM0024PriorityList
         '管轄営業所
         If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
             SQLStr &= "    AND OIM0024.OFFICECODE     = @P2"
+        Else
+            SQLStr &= "    AND OIM0024.OFFICECODE     IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P2)"
         End If
 
         '油種コード
@@ -287,9 +289,11 @@ Public Class OIM0024PriorityList
                 PARA1.Value = C_DELETE_FLG.DELETE
 
                 '管轄営業所
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                 If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                     PARA2.Value = work.WF_SEL_OFFICECODE.Text
+                Else
+                    PARA2.Value = Master.USER_ORG
                 End If
 
                 '油種コード

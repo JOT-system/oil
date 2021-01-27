@@ -263,6 +263,8 @@ Public Class OIM0021LoadReserveList
         '管轄営業所
         If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
             SQLStr &= "    AND OIM0021.OFFICECODE     = @P2"
+        Else
+            SQLStr &= "    AND OIM0021.OFFICECODE     IN (SELECT OFFICECODE FROM OIL.VIW0003_OFFICECHANGE WHERE ORGCODE = @P2)"
         End If
 
         '適用開始年月日
@@ -304,9 +306,11 @@ Public Class OIM0021LoadReserveList
                 PARA1.Value = C_DELETE_FLG.DELETE
 
                 '管轄営業所
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                 If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)
                     PARA2.Value = work.WF_SEL_OFFICECODE.Text
+                Else
+                    PARA2.Value = Master.USER_ORG
                 End If
 
                 '適用開始年月日

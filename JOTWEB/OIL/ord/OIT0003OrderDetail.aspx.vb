@@ -17366,10 +17366,10 @@ Public Class OIT0003OrderDetail
                     '油種チェック(３号軽油)
                     For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='1404' AND ORDERINGTYPE='A'")
                         '「３号軽油」⇒「３号軽油TCH」へ変更
-                        OIT0003row("OILCODE") = WW_GetValue(0)
-                        OIT0003row("OILNAME") = WW_GetValue(1)
-                        OIT0003row("ORDERINGTYPE") = WW_GetValue(2)
-                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(3)
+                        OIT0003row("OILCODE") = "1404"
+                        OIT0003row("OILNAME") = WW_GetValue(2)
+                        OIT0003row("ORDERINGTYPE") = WW_GetValue(1)
+                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(0)
                     Next
                     '○ 画面表示データ保存
                     Master.SaveTable(OIT0003tbl)
@@ -17388,10 +17388,10 @@ Public Class OIT0003OrderDetail
                     '油種チェック(0.5A重油)
                     For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='2101' AND ORDERINGTYPE='B'")
                         '「0.5A重油」⇒「LTA」へ変更
-                        OIT0003row("OILCODE") = WW_GetValue(0)
-                        OIT0003row("OILNAME") = WW_GetValue(1)
-                        OIT0003row("ORDERINGTYPE") = WW_GetValue(2)
-                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(3)
+                        OIT0003row("OILCODE") = "2101"
+                        OIT0003row("OILNAME") = WW_GetValue(2)
+                        OIT0003row("ORDERINGTYPE") = WW_GetValue(1)
+                        OIT0003row("ORDERINGOILNAME") = WW_GetValue(0)
                     Next
                     '○ 画面表示データ保存
                     Master.SaveTable(OIT0003tbl)

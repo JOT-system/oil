@@ -1987,8 +1987,8 @@ Public Class OIT0003OrderList
            & " WHERE TMP0006.LOADINGTRAINNO <> '' " _
            & " ORDER BY " _
            & "       TMP0006.LOADINGTRAINNO" _
-           & "     , TMP0006.LINE" _
            & "     , TMP0006.TRAINNODETAIL" _
+           & "     , TMP0006.LINE" _
            & "     , TMP0006.POINT "
 
         Try

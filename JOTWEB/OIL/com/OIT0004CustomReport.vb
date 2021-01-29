@@ -280,6 +280,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 pasteOffset = pasteOffset + 1
                 ExcelMemoryRelease(rngPasteOffset)
             Next
+
             '構内取りが無ければ油種の設定はしない
             If Me.PrintData.HasMoveInsideItem = False Then
                 Exit Try '油種設定のTry Catchスコープの脱出
@@ -363,6 +364,10 @@ Public Class OIT0004CustomReport : Implements IDisposable
                     bdrBtm.LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(bdrBtm)
                     ExcelMemoryRelease(bdrs)
+                    '改ページ挿入
+                    rngValueSet = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", miFirstRowNum))
+                    rngValueSet.PageBreak = Excel.XlPageBreak.xlPageBreakManual
+                    ExcelMemoryRelease(rngValueSet)
                 End If
 
                 pasteOffset = pasteOffset + 1
@@ -422,6 +427,15 @@ Public Class OIT0004CustomReport : Implements IDisposable
             rngDateSet = DirectCast(rngColumns(3, 1), Excel.Range)
             rngDateSet.Value = Me.PrintData.StockDate.Values.First.ItemDate
             ExcelMemoryRelease(rngDateSet)
+            '最右に列改ページ挿入
+            Dim rngPageColStart = Me.ExcelWorkSheet.Range("G3")
+            Dim rngPageColEnd = rngPageColStart.End(Excel.XlDirection.xlToRight)
+            Dim lastCol As String = rngPageColEnd.Address(True, False).Split("$"c)(0)
+            ExcelMemoryRelease(rngPageColEnd)
+            ExcelMemoryRelease(rngPageColStart)
+            Dim ps As Excel.PageSetup = Me.ExcelWorkSheet.PageSetup
+            ps.PrintArea = "A:" & lastCol
+            ExcelMemoryRelease(ps)
             '休日の印を付ける
             rngDateSet = DirectCast(rngColumns(2, 1), Excel.Range)
             Dim rngHollidaySet As Excel.Range = Nothing
@@ -495,7 +509,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 '在庫部分
                 Dim morningStock(,) As Object '初日のみ設定他は数式の為1セル
                 Dim pastDaysCnt As Integer = 0 '朝在庫保持日数
-                Dim qPastDaysCnt = (From daysItm In prnItm.StockDate.Values Where daysItm.IsPastDay)
+                Dim qPastDaysCnt = (From daysItm In prnItm.StockDate.Values Where daysItm.IsBeforeToday)
                 If qPastDaysCnt.Any Then
                     pastDaysCnt = qPastDaysCnt.Count - 1
                 End If

@@ -1433,6 +1433,7 @@ Public Class OIT0004OilStockCreate
     Private Function GetReciveFromOrder(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
+        Return retVal '2021/01/17 廃止（書き換えは夜間バッチのみ）
         'Return retVal '2020/4/24 受注より取得は廃止(完全に不要と判明したら関数まるまる削除）
         '検索値の設定(過去日じゃない日付リストを取得）
         '当日のみ書き換え
@@ -2596,6 +2597,7 @@ Public Class OIT0004OilStockCreate
         End If
         For Each fieldName In oilCodeToFieldNameList.Values
             sqlStr.AppendFormat("      ,ISNULL(SUM(UOS.{0}{1}),0)            AS {0}", fieldName, fieldSuffix)
+            sqlStr.AppendFormat("      ,ISNULL(SUM(CASE WHEN UOS.TRAINNO='川崎' THEN UOS.{0}{1} ELSE 0 END),0)  AS {0}_KAWASAKI", fieldName, fieldSuffix)
         Next
         sqlStr.AppendLine("  FROM      OIL.OIT0009_UKEIREOILSTOCK  UOS")
         sqlStr.AppendLine(" WHERE UOS.STOCKYMD BETWEEN @DATE_FROM AND @DATE_TO")
@@ -2650,6 +2652,7 @@ Public Class OIT0004OilStockCreate
         'End If
         '固定ベース
         Dim officeCodes As New Dictionary(Of String, String)
+        Dim isKawasakiCalc As Boolean = False
         '増幅するパターンの場合
         '出光シェル+JONET松本、ENEOS+OT宇都宮、コスモ+OT郡山、コスモ+OT松本
         If dispData.Consignee = "40" AndAlso dispData.Shipper = "0122700010" Then
@@ -2664,6 +2667,10 @@ Public Class OIT0004OilStockCreate
         ElseIf dispData.Consignee = "56" AndAlso dispData.Shipper = "0094000010" Then
             officeCodes.Add("011201", "五井")
             officeCodes.Add("012401", "四日市")
+        ElseIf (dispData.Consignee = "30" AndAlso dispData.Shipper = "0122700010") OrElse isMiData Then
+            officeCodes.Add(dispData.SalesOffice, dispData.SalesOfficeName.Replace("営業所", ""))
+            officeCodes.Add("kawasaki", "川崎")
+            isKawasakiCalc = True
         Else
             '上記以外は検索条件通り
             officeCodes.Add(dispData.SalesOffice, dispData.SalesOfficeName.Replace("営業所", ""))
@@ -2696,14 +2703,25 @@ Public Class OIT0004OilStockCreate
                 Dim officeCode As String = Convert.ToString(dr("OFFICECODE"))
                 Dim dateString As String = Convert.ToString(dr("TARGETDATE"))
                 Dim carNum As Decimal = CDec(dr(oilCodeItm.Value))
+                Dim kawasakiCarNum As Decimal = CDec(dr(oilCodeItm.Value & "_KAWASAKI"))
+                If isKawasakiCalc = False Then
+                    kawasakiCarNum = 0
+                End If
                 If retVal.PrintTrainNums.ContainsKey(oilCode) Then
                     With retVal.PrintTrainNums(oilCode)
                         If .PrintTrainNumList.ContainsKey(officeCode) Then
                             With .PrintTrainNumList(officeCode)
                                 If .PrintTrainItems.ContainsKey(dateString) Then
-                                    .PrintTrainItems(dateString).TrainNum = carNum
+                                    .PrintTrainItems(dateString).TrainNum = carNum - kawasakiCarNum
                                 End If
                             End With
+                            If isKawasakiCalc Then
+                                With .PrintTrainNumList("kawasaki")
+                                    If .PrintTrainItems.ContainsKey(dateString) Then
+                                        .PrintTrainItems(dateString).TrainNum = kawasakiCarNum
+                                    End If
+                                End With
+                            End If
                         End If
                     End With
                 End If

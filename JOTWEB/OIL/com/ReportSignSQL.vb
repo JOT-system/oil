@@ -388,7 +388,7 @@
         & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')             AS ARRSTATIONNAME" _
         & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')              AS CONSIGNEECODE" _
         & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')              AS CONSIGNEENAME" _
-        & " , ISNULL(RTRIM(OIT0002.KEIJYOYMD), FORMAT(GETDATE(), 'yyyy/MM/dd'))             AS KEIJYOYMD" _
+        & " , ISNULL(RTRIM(OIT0003.ACTUALLODDATE), FORMAT(GETDATE(), 'yyyy/MM/dd'))             AS KEIJYOYMD" _
         & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                    AS TRAINNO" _
         & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')                  AS TRAINNAME" _
         & " , ISNULL(RTRIM(OIM0005.MODEL), '')                      AS MODEL" _
@@ -450,6 +450,7 @@
         & "       AND VIW0012.ARRSTATION = OIT0002.ARRSTATION" _
         & "       AND VIW0012.CONSIGNEECODE = CASE WHEN OIT0003.SECONDCONSIGNEECODE = '' THEN OIT0002.CONSIGNEECODE ELSE OIT0003.SECONDCONSIGNEECODE END" _
         & "       AND VIW0012.LOAD = OIM0005.LOAD"
+        '& " , ISNULL(RTRIM(OIT0002.KEIJYOYMD), FORMAT(GETDATE(), 'yyyy/MM/dd'))             AS KEIJYOYMD" _
 
         '★輸送形態が"M"(請負OT混載)の場合
         If I_OFFICECODE <> BaseDllConst.CONST_OFFICECODE_010402 AndAlso I_TRKBN = BaseDllConst.CONST_TRKBN_M Then
@@ -824,6 +825,202 @@
         & SQLFromStr2 _
         & " WHERE OIT0002.ORDERNO = @P01 " _
         & " AND OIT0002.DELFLG <> @P02 "
+
+        Return SQLStr
+    End Function
+
+    ''' <summary>
+    ''' 空回日報(OT連携)比較用SQL
+    ''' </summary>
+    ''' <remarks>OT連携されたデータと空回日報との比較を表示する際のSQLを設定</remarks>
+    Public Function EmptyTurnDairyOTCompare()
+        Dim SQLStr As String = ""
+
+        Return SQLStr
+    End Function
+
+    ''' <summary>
+    ''' 受注(OT連携)比較用SQL
+    ''' </summary>
+    ''' <remarks>OT連携されたデータと受注との比較を表示する際のSQLを設定</remarks>
+    Public Function OrderOTCompare()
+
+        '★初回作成主体
+        Dim SQLComStr1 As String =
+              " SELECT " _
+            & "   TMP0001.LINECNT                                AS LINECNT" _
+            & " , TMP0001.OPERATION1                             AS OPERATION" _
+            & " , TMP0001.TIMSTP                                 AS TIMSTP" _
+            & " , TMP0001.SELECT1                                AS 'SELECT'" _
+            & " , TMP0001.HIDDEN                                 AS HIDDEN" _
+            & " , TMP0001.ORDERNO                                AS ORDERNO" _
+            & " , TMP0001.DETAILNO                               AS DETAILNO" _
+            & " , TMP0001.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , TMP0001.SHIPPERSNAME                           AS SHIPPERSNAME" _
+            & " , TMP0001.BASECODE                               AS BASECODE" _
+            & " , TMP0001.BASENAME                               AS BASENAME" _
+            & " , TMP0001.CONSIGNEECODE                          AS CONSIGNEECODE" _
+            & " , TMP0001.CONSIGNEENAME                          AS CONSIGNEENAME" _
+            & " , TMP0001.ORDERINFO                              AS ORDERINFO" _
+            & " , TMP0001.ORDERINFONAME                          AS ORDERINFONAME" _
+            & " , TMP0001.OILCODE                                AS OILCODE" _
+            & " , TMP0001.OILNAME                                AS OILNAME" _
+            & " , TMP0001.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , TMP0001.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , OIT0017.OILCODE                                AS OTOILCODE" _
+            & " , OIT0017.OILNAME                                AS OILNAMEOTOILNAME" _
+            & " , OIT0017.ORDERINGTYPE                           AS OTORDERINGTYPE" _
+            & " , OIT0017.ORDERINGOILNAME                        AS OTORDERINGOILNAME" _
+            & " , TMP0001.TANKQUOTA                              AS TANKQUOTA" _
+            & " , TMP0001.LINKNO                                 AS LINKNO" _
+            & " , TMP0001.LINKDETAILNO                           AS LINKDETAILNO" _
+            & " , TMP0001.SHIPORDER                              AS SHIPORDER" _
+            & " , TMP0001.TANKNO                                 AS TANKNO" _
+            & " , OIT0017.TANKNO                                 AS OTTANKNO" _
+            & " , TMP0001.TANKSTATUS                             AS TANKSTATUS" _
+            & " , TMP0001.LINEORDER                              AS LINEORDER" _
+            & " , TMP0001.MODEL                                  AS MODEL" _
+            & " , TMP0001.JRINSPECTIONALERT                      AS JRINSPECTIONALERT" _
+            & " , TMP0001.JRINSPECTIONALERTSTR                   AS JRINSPECTIONALERTSTR" _
+            & " , TMP0001.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
+            & " , TMP0001.JRALLINSPECTIONALERT                   AS JRALLINSPECTIONALERT" _
+            & " , TMP0001.JRALLINSPECTIONALERTSTR                AS JRALLINSPECTIONALERTSTR" _
+            & " , TMP0001.JRALLINSPECTIONDATE                    AS JRALLINSPECTIONDATE" _
+            & " , TMP0001.EMPTYTURNFLG                           AS EMPTYTURNFLG" _
+            & " , TMP0001.STACKINGORDERNO                        AS STACKINGORDERNO" _
+            & " , TMP0001.STACKINGFLG                            AS STACKINGFLG" _
+            & " , TMP0001.OTTRANSPORTFLG                         AS OTTRANSPORTFLG" _
+            & " , TMP0001.UPGRADEFLG                             AS UPGRADEFLG" _
+            & " , TMP0001.DOWNGRADEFLG                           AS DOWNGRADEFLG" _
+            & " , TMP0001.ACTUALLODDATE                          AS ACTUALLODDATE" _
+            & " , TMP0001.JOINTCODE                              AS JOINTCODE" _
+            & " , TMP0001.JOINT                                  AS JOINT" _
+            & " , TMP0001.LASTOILCODE                            AS LASTOILCODE" _
+            & " , TMP0001.LASTOILNAME                            AS LASTOILNAME" _
+            & " , TMP0001.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
+            & " , TMP0001.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
+            & " , TMP0001.CHANGETRAINNO                          AS CHANGETRAINNO" _
+            & " , TMP0001.CHANGETRAINNAME                        AS CHANGETRAINNAME" _
+            & " , TMP0001.SECONDCONSIGNEECODE                    AS SECONDCONSIGNEECODE" _
+            & " , TMP0001.SECONDCONSIGNEENAME                    AS SECONDCONSIGNEENAME" _
+            & " , TMP0001.SECONDARRSTATION                       AS SECONDARRSTATION" _
+            & " , TMP0001.SECONDARRSTATIONNAME                   AS SECONDARRSTATIONNAME" _
+            & " , TMP0001.CHANGERETSTATION                       AS CHANGERETSTATION" _
+            & " , TMP0001.CHANGERETSTATIONNAME                   AS CHANGERETSTATIONNAME" _
+            & " , TMP0001.USEORDERNO                             AS USEORDERNO" _
+            & " , TMP0001.DELFLG                                 AS DELFLG"
+
+        '★2回目以降作成主体
+        Dim SQLComStr2 As String =
+              " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , ''                                             AS TIMSTP" _
+            & " , '1'                                            AS 'SELECT'" _
+            & " , '0'                                            AS HIDDEN" _
+            & " , OIT0017.ORDERNO                                AS ORDERNO" _
+            & " , OIT0017.DETAILNO                               AS DETAILNO" _
+            & " , OIT0017.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , OIT0017.SHIPPERSNAME                           AS SHIPPERSNAME" _
+            & " , OIT0016.BASECODE                               AS BASECODE" _
+            & " , OIT0016.BASENAME                               AS BASENAME" _
+            & " , OIT0016.CONSIGNEECODE                          AS CONSIGNEECODE" _
+            & " , OIT0016.CONSIGNEENAME                          AS CONSIGNEENAME" _
+            & " , ''                              AS ORDERINFO" _
+            & " , ''                              AS ORDERINFONAME" _
+            & " , OIT0017.OILCODE                                AS OILCODE" _
+            & " , OIT0017.OILNAME                                AS OILNAME" _
+            & " , OIT0017.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0017.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , OIT0017.OILCODE                                AS OTOILCODE" _
+            & " , OIT0017.OILNAME                                AS OILNAMEOTOILNAME" _
+            & " , OIT0017.ORDERINGTYPE                           AS OTORDERINGTYPE" _
+            & " , OIT0017.ORDERINGOILNAME                        AS OTORDERINGOILNAME" _
+            & " , '未割当'                                       AS TANKQUOTA" _
+            & " , ''                                             AS LINKNO" _
+            & " , ''                                             AS LINKDETAILNO" _
+            & " , ''                                             AS SHIPORDER" _
+            & " , ''                                             AS TANKNO" _
+            & " , OIT0017.TANKNO                                 AS OTTANKNO" _
+            & " , ''                                             AS TANKSTATUS" _
+            & " , ''                                             AS LINEORDER" _
+            & " , ''                                             AS MODEL" _
+            & " , ''                                             AS JRINSPECTIONALERT" _
+            & " , ''                                             AS JRINSPECTIONALERTSTR" _
+            & " , ''                                             AS JRINSPECTIONDATE" _
+            & " , ''                                             AS JRALLINSPECTIONALERT" _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
+            & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , '1'                                            AS EMPTYTURNFLG" _
+            & " , ''                                             AS STACKINGORDERNO" _
+            & " , ''                                             AS STACKINGFLG" _
+            & " , ''                                             AS OTTRANSPORTFLG" _
+            & " , ''                                             AS UPGRADEFLG" _
+            & " , ''                                             AS DOWNGRADEFLG" _
+            & " , NULL                                           AS ACTUALLODDATE" _
+            & " , ''                                             AS JOINTCODE" _
+            & " , ''                                             AS JOINT" _
+            & " , ''                                             AS LASTOILCODE" _
+            & " , ''                                             AS LASTOILNAME" _
+            & " , ''                                             AS PREORDERINGTYPE" _
+            & " , ''                                             AS PREORDERINGOILNAME" _
+            & " , ''                                             AS CHANGETRAINNO" _
+            & " , ''                                             AS CHANGETRAINNAME" _
+            & " , ''                                             AS SECONDCONSIGNEECODE" _
+            & " , ''                                             AS SECONDCONSIGNEENAME" _
+            & " , ''                                             AS SECONDARRSTATION" _
+            & " , ''                                             AS SECONDARRSTATIONNAME" _
+            & " , ''                                             AS CHANGERETSTATION" _
+            & " , ''                                             AS CHANGERETSTATIONNAME" _
+            & " , ''                                             AS USEORDERNO" _
+            & " , ''                                             AS DELFLG"
+
+        '○油種、タンク車(完全一致)
+        Dim SQLStr As String =
+              SQLComStr1 _
+            & " FROM oil.TMP0001ORDER TMP0001 " _
+            & " INNER JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
+            & "     OIT0017.ORDERNO = TMP0001.ORDERNO " _
+            & " AND OIT0017.OILCODE = TMP0001.OILCODE " _
+            & " AND OIT0017.ORDERINGTYPE = TMP0001.ORDERINGTYPE " _
+            & " AND OIT0017.TANKNO = TMP0001.TANKNO "
+
+        '○油種のみ一致(タンク車未設定)
+        SQLStr &=
+              "UNION ALL" _
+            & SQLComStr1 _
+            & " FROM oil.TMP0001ORDER TMP0001 " _
+            & " LEFT JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
+            & "     OIT0017.ORDERNO = TMP0001.ORDERNO " _
+            & " AND OIT0017.OILCODE = TMP0001.OILCODE " _
+            & " AND OIT0017.ORDERINGTYPE = TMP0001.ORDERINGTYPE " _
+            & " WHERE ISNULL(OIT0017.TANKNO,'') = '' "
+
+        '○2回目以降でデータ削除された場合
+        SQLStr &=
+              "UNION ALL" _
+            & SQLComStr1 _
+            & " FROM oil.TMP0001ORDER TMP0001 " _
+            & " LEFT JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
+            & "     OIT0017.ORDERNO = TMP0001.ORDERNO " _
+            & " AND OIT0017.OILCODE = TMP0001.OILCODE " _
+            & " AND OIT0017.ORDERINGTYPE = TMP0001.ORDERINGTYPE " _
+            & " AND OIT0017.TANKNO = TMP0001.TANKNO " _
+            & " WHERE ISNULL(OIT0017.TANKNO,'') = '' "
+
+        '○2回目でデータ追加された場合
+        SQLStr &=
+              "UNION ALL" _
+            & SQLComStr2 _
+            & " FROM oil.OIT0017_OTDETAIL OIT0017 " _
+            & " INNER JOIN oil.OIT0016_OTORDER OIT0016 ON " _
+            & "     OIT0016.ORDERNO = OIT0017.ORDERNO " _
+            & " LEFT JOIN oil.TMP0001ORDER TMP0001 ON " _
+            & " OIT0017.ORDERNO = TMP0001.ORDERNO " _
+            & " AND OIT0017.OILCODE = TMP0001.OILCODE " _
+            & " AND OIT0017.ORDERINGTYPE = TMP0001.ORDERINGTYPE " _
+            & " AND OIT0017.TANKNO = TMP0001.TANKNO " _
+            & " WHERE ISNULL(TMP0001.TANKNO,'') = '' "
 
         Return SQLStr
     End Function

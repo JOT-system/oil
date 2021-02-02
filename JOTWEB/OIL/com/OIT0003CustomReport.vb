@@ -524,7 +524,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("STACKING").ToString <> "" Then
                     '郡山向け５０９０列車については『積置』の記載は不要
                     If PrintDatarow("TRAINNO").ToString <> "5090" Then
-                        Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                        '★翌月発送については『積置』の記載は不要
+                        If PrintDatarow("NEXTMONTH").ToString = "" Then
+                            Remark &= "『" + PrintDatarow("STACKING").ToString + "』"
+                        End If
                     End If
                 End If
                 '★交検

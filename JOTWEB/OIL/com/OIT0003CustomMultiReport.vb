@@ -36,17 +36,31 @@ Public Class OIT0003CustomMultiReport
     Public Shared Function CreateTankDispatch(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As List(Of String)
         Dim urlList As New List(Of String)
 
-        'グループ化（油層所毎）
-        Dim group = printDataClass.AsEnumerable.
+
+        If printDataClass IsNot Nothing AndAlso printDataClass.Rows.Count > 0 Then
+            'グループ化（油層所毎）
+            Dim group = printDataClass.AsEnumerable.
                     GroupBy(Function(g As DataRow) Tuple.Create(g.Item("CONSIGNEECODE").ToString())).
                     Select(Function(g) New With {.consigneeCode = g.Key.Item1, .dataTable = g.CopyToDataTable}).ToList()
-
-        'グループ毎に作成
-        For Each item In group
-            Using repCbj = New TankDispatch(mapId, officeCode, item.dataTable)
+            'グループ毎に作成
+            Try
+                For Each item In group
+                    Using repCbj = New TankDispatch(mapId, officeCode, item.dataTable)
+                        Dim url As String
+                        url = repCbj.CreatePrintData(lodDate, trainNo, item.consigneeCode)
+                        If Not String.IsNullOrWhiteSpace(url) Then
+                            urlList.Add(url)
+                        End If
+                    End Using
+                Next
+            Catch ex As Exception
+                Throw
+            End Try
+        Else
+            Using repCbj = New TankDispatch(mapId, officeCode, printDataClass)
                 Dim url As String
                 Try
-                    url = repCbj.CreatePrintData(lodDate, trainNo, item.consigneeCode)
+                    url = repCbj.CreatePrintData(lodDate, trainNo, Nothing)
                 Catch ex As Exception
                     Throw
                 End Try
@@ -54,7 +68,7 @@ Public Class OIT0003CustomMultiReport
                     urlList.Add(url)
                 End If
             End Using
-        Next
+        End If
 
         Return urlList
     End Function
@@ -82,13 +96,6 @@ End Class
 ''' </summary>
 Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
 
-    'Private _ExcelAppObj As Excel.Application
-    'Private _ExcelBooksObj As Excel.Workbooks
-    'Private _ExcelBookObj As Excel.Workbook
-    'Private _ExcelWorkSheets As Excel.Sheets
-    'Private _ExcelWorkSheet As Excel.Worksheet
-    'Private _ExcelTempSheet As Excel.Worksheet
-
     ''' <summary>
     ''' エクセルアプリケーションオブジェクト
     ''' </summary>
@@ -111,6 +118,15 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     ''' エクセルシートオブジェクト
     ''' </summary>
     Protected ExcelWorkSheet As Excel.Worksheet
+
+    ''' <summary>
+    ''' エクセルブックオブジェクト
+    ''' </summary>
+    Protected ExcelTempBookObj As Excel.Workbook
+    ''' <summary>
+    ''' エクセルシートコレクション
+    ''' </summary>
+    Protected ExcelTempSheets As Excel.Sheets
     ''' <summary>
     ''' 一時作業シート
     ''' </summary>
@@ -122,8 +138,9 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     Protected ExcelTemplatePath As String = ""
     Protected UploadRootPath As String = ""
     Protected UrlRoot As String = ""
-    Protected PrintData As DataTable
     Protected xlProcId As Integer
+    Protected OfficeCode As String
+    Protected PrintData As DataTable
 
     Protected Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
@@ -163,21 +180,81 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
             'Excelアプリケーションオブジェクトの生成
             ExcelAppObj = New Excel.Application
             ExcelAppObj.DisplayAlerts = False
+            ExcelAppObj.SheetsInNewWorkbook = 1
             Dim xlHwnd As IntPtr = CType(ExcelAppObj.Hwnd, IntPtr)
             GetWindowThreadProcessId(xlHwnd, xlProcId)
 
-            'Excelワークブックオブジェクトの生成
             ExcelBooksObj = ExcelAppObj.Workbooks
-            ExcelBookObj = ExcelBooksObj.Open(ExcelTemplatePath,
-                                                    UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
-                                                    [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
+
+            'Excelワークブックオブジェクトの生成
+            ExcelTempBookObj = ExcelBooksObj.Open(ExcelTemplatePath,
+                                                UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
+                                                [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
+            ExcelTempSheets = ExcelTempBookObj.Worksheets
+
+            Dim searchList As New List(Of String)
+            searchList.Add(String.Format("TEMPLATE_{0}", OfficeCode))
+            searchList.Add("TEMPLATE")
+
+            Dim templateSheetIndex As Integer = 1
+            For Each searchName As String In searchList
+                If templateSheetIndex > 1 Then
+                    Exit For
+                End If
+                For Each sheet As Excel.Worksheet In ExcelTempSheets
+                    If sheet.Name.Equals(searchName) Then
+                        templateSheetIndex = sheet.Index
+                        ExcelMemoryRelease(sheet)
+                        Exit For
+                    End If
+                    ExcelMemoryRelease(sheet)
+                Next
+            Next
+            ExcelMemoryRelease(ExcelTempSheet)
+            ExcelTempSheet = DirectCast(ExcelTempSheets(templateSheetIndex), Excel.Worksheet)
+
+            ExcelMemoryRelease(ExcelBookObj)
+            ExcelBookObj = ExcelBooksObj.Add()
+            ExcelMemoryRelease(ExcelWorkSheets)
             ExcelWorkSheets = ExcelBookObj.Worksheets
+            ExcelMemoryRelease(ExcelWorkSheet)
             ExcelWorkSheet = DirectCast(ExcelWorkSheets.Item(1), Excel.Worksheet)
+            ExcelTempSheet.Copy(After:=ExcelWorkSheet)
+            ExcelWorkSheet.Delete()
+            ExcelMemoryRelease(ExcelWorkSheet)
+            ExcelWorkSheet = DirectCast(ExcelWorkSheets.Item(1), Excel.Worksheet)
+
 
         Catch ex As Exception
             If xlProcId <> 0 Then
                 ExcelProcEnd()
             End If
+            Throw
+        End Try
+    End Sub
+
+    Protected Sub SetTemplateSheet(ByVal sheetName As String, Optional ByVal defaultSheetName As String = "TEMPLATE")
+        Try
+            Dim searchList As New List(Of String)
+            searchList.Add(sheetName)
+            searchList.Add(defaultSheetName)
+
+            Dim templateSheetIndex As Integer = 1
+            For Each searchName As String In searchList
+                If templateSheetIndex > 1 Then
+                    Exit For
+                End If
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    If sheet.Name.Equals(searchName) Then
+                        templateSheetIndex = sheet.Index
+                        ExcelMemoryRelease(sheet)
+                        Exit For
+                    End If
+                    ExcelMemoryRelease(sheet)
+                Next
+            Next
+            ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
+        Catch ex As Exception
             Throw
         End Try
     End Sub
@@ -235,6 +312,18 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
         End If
         'Excel 作業シートオブジェクトの解放
         ExcelMemoryRelease(ExcelTempSheet)
+        'Excel Sheetコレクションの解放
+        ExcelMemoryRelease(ExcelTempSheets)
+        'Excel Bookオブジェクトを閉じる
+        If ExcelTempBookObj IsNot Nothing Then
+            Try
+                'ExcelBookObj.Close(Excel.XlSaveAction.xlDoNotSaveChanges)
+                ExcelTempBookObj.Close(False)
+            Catch ex As Exception
+            End Try
+        End If
+        ExcelMemoryRelease(ExcelTempBookObj)
+
         'Excel Sheetオブジェクトの解放
         ExcelMemoryRelease(ExcelWorkSheet)
         'Excel Sheetコレクションの解放
@@ -247,8 +336,8 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
             Catch ex As Exception
             End Try
         End If
-
         ExcelMemoryRelease(ExcelBookObj)
+
         'Excel Bookコレクションの解放
         ExcelMemoryRelease(ExcelBooksObj)
         'Excel Appの終了
@@ -268,12 +357,23 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     Protected Sub ExcelProcEnd()
         ExcelMemoryRelease(ExcelAppObj)
         Try
-            '念のため当処理で起動したプロセスが残っていたらKill
+            'プロセスの状態を確認
+            '（待機時間が短すぎるとプロセス終了されているか判断できないためある程度確保）
             Dim xproc As Process = Process.GetProcessById(xlProcId)
-            System.Threading.Thread.Sleep(200) 'Waitかけないとプロセスが終了しきらない為
+            For index = 1 To 50
+                If Not xproc.HasExited Then
+                    xproc.Refresh()
+                    System.Threading.Thread.Sleep(200)
+                Else
+                    Exit For
+                End If
+            Next
+
+            '念のため当処理で起動したプロセスが残っていたらKill
             If Not xproc.HasExited Then
                 xproc.Kill()
             End If
+
         Catch ex As Exception
         End Try
     End Sub
@@ -304,13 +404,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 9
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 20
 
-    Private OfficeCode As String = ""
-
     Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
         Try
-            Init(mapId, TEMP_XLS_FILE_NAME)
             Me.PrintData = printDataClass
             Me.OfficeCode = officeCode
+            Init(mapId, TEMP_XLS_FILE_NAME)
         Catch ex As Exception
             If xlProcId <> 0 Then
                 ExcelProcEnd()
@@ -318,7 +416,6 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             Throw
         End Try
     End Sub
-
 
     ''' <summary>
     ''' 帳票作成処理
@@ -331,37 +428,15 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
         Try
 
-            Dim searchList As New List(Of String)
-            searchList.Add(String.Format("TEMPLATE_{0}", OfficeCode))
-            searchList.Add("TEMPLATE")
-
-            Dim templateSheetIndex As Integer = 1
-            For Each searchName As String In searchList
-                If templateSheetIndex > 1 Then
-                    Exit For
-                End If
-                For Each sheet As Excel.Worksheet In ExcelWorkSheets
-                    If sheet.Name.Equals(searchName) Then
-                        templateSheetIndex = sheet.Index
-                        Exit For
-                    End If
-                Next
-            Next
-
-            ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
-            ExcelTempSheet.Copy()
-
-            ExcelBookObj = ExcelAppObj.ActiveWorkbook
-            ExcelWorkSheets = ExcelBookObj.Sheets
-            ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
             ExcelWorkSheet.Name = "出荷実績表"
 
-            For rowIndex As Integer = 0 To PrintData.Rows.Count Step DETAIL_AREA_ROWS_COUNT
-
+            Dim rowIndex As Integer = 0
+            Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
+            Do
                 '○テンプレートシート複製
-                ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
                 If rowIndex > 0 Then
                     ExcelTempSheet.Copy(After:=ExcelWorkSheet)
+                    ExcelMemoryRelease(ExcelWorkSheet)
                     ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
                     ExcelWorkSheet.Name = String.Format("出荷実績表({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
                 End If
@@ -372,8 +447,8 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                 '◯明細の設定
                 EditDetailArea(rowIndex)
 
-            Next
-
+                rowIndex += DETAIL_AREA_ROWS_COUNT
+            Loop While rowIndex < maxRowIndex
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -398,12 +473,15 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             '列車番号
             rngHeaderArea = ExcelWorkSheet.Range("G31")
             rngHeaderArea.Value = String.Format("{0}列車", trainNo)
+            ExcelMemoryRelease(rngHeaderArea)
 
             '出荷日(積込日)
             rngHeaderArea = ExcelWorkSheet.Range("C3")
             rngHeaderArea.Value = String.Format("{0}月", CDate(lodDate).Month)
+            ExcelMemoryRelease(rngHeaderArea)
             rngHeaderArea = ExcelWorkSheet.Range("D3")
             rngHeaderArea.Value = String.Format("{0}日", CDate(lodDate).Day)
+            ExcelMemoryRelease(rngHeaderArea)
 
             '出荷基地名
             rngHeaderArea = ExcelWorkSheet.Range("C4")
@@ -413,6 +491,7 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                 Case CONST_OFFICECODE_012402
                     rngHeaderArea.Value = "昭和四日市石油"
             End Select
+            ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
             Throw
@@ -466,14 +545,17 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"
                 End Select
+                ExcelMemoryRelease(rngDetailArea)
 
                 '積載実数量
                 rngDetailArea = ExcelWorkSheet.Range("C" + r.index.ToString())
                 rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString("#.##0")
+                ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号
                 rngDetailArea = ExcelWorkSheet.Range("D" + r.index.ToString())
                 rngDetailArea.Value = r.row("TANKNO")
+                ExcelMemoryRelease(rngDetailArea)
             Next
 
         Catch ex As Exception
@@ -495,13 +577,11 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 9
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 20
 
-    Private OfficeCode As String = ""
-
     Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
         Try
-            Init(mapId, TEMP_XLS_FILE_NAME)
             PrintData = printDataClass
             Me.OfficeCode = officeCode
+            Init(mapId, TEMP_XLS_FILE_NAME)
         Catch ex As Exception
             If xlProcId <> 0 Then
                 ExcelProcEnd()
@@ -516,38 +596,16 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
-            'CreateNewPage
-            Dim searchList As New List(Of String)
-            searchList.Add(String.Format("TEMPLATE_{0}", OfficeCode))
-            searchList.Add("TEMPLATE")
-
-            Dim templateSheetIndex As Integer = 1
-            For Each searchName As String In searchList
-                If templateSheetIndex > 1 Then
-                    Exit For
-                End If
-                For Each sheet As Excel.Worksheet In ExcelWorkSheets
-                    If sheet.Name.Equals(searchName) Then
-                        templateSheetIndex = sheet.Index
-                        Exit For
-                    End If
-                Next
-            Next
-
-            ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
-            ExcelTempSheet.Copy()
-
-            ExcelBookObj = ExcelAppObj.ActiveWorkbook
-            ExcelWorkSheets = ExcelBookObj.Sheets
-            ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
             ExcelWorkSheet.Name = "タンク車発送実績"
 
-            For rowIndex As Integer = 0 To PrintData.Rows.Count Step DETAIL_AREA_ROWS_COUNT
+            Dim rowIndex As Integer = 0
+            Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
+            Do
 
                 '○NextPage
-                ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
                 If rowIndex > 0 Then
                     ExcelTempSheet.Copy(After:=ExcelWorkSheet)
+                    ExcelMemoryRelease(ExcelWorkSheet)
                     ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
                     ExcelWorkSheet.Name = String.Format("タンク車発送実績({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
                 End If
@@ -558,7 +616,8 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 '◯明細の設定
                 EditDetailArea(rowIndex)
 
-            Next
+                rowIndex += DETAIL_AREA_ROWS_COUNT
+            Loop While rowIndex < maxRowIndex
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -584,36 +643,36 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
             'タイトル(列車番号)
             rngHeaderArea = ExcelWorkSheet.Range("B1")
             rngHeaderArea.Value = String.Format("出荷実績表({0}列車)", trainNo)
+            ExcelMemoryRelease(rngHeaderArea)
 
             '出荷日(積込日)
             rngHeaderArea = ExcelWorkSheet.Range("C3")
             rngHeaderArea.Value = CDate(lodDate).ToString("yyyyMMdd")
+            ExcelMemoryRelease(rngHeaderArea)
 
             '出荷基地
             Select Case OfficeCode
                 Case CONST_OFFICECODE_010402
                     rngHeaderArea = ExcelWorkSheet.Range("C4")
                     rngHeaderArea.Value = "ENEOS仙台"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("D4")
                     rngHeaderArea.Value = "P061"
                 Case CONST_OFFICECODE_011203
                     rngHeaderArea = ExcelWorkSheet.Range("C4")
                     rngHeaderArea.Value = "富士石油"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("D4")
                     rngHeaderArea.Value = "P055"
             End Select
-
-            ''受入基地取得
-            'Dim consigneeCode As String = ""
-            'If PrintData.Rows.Count > 0 Then
-            '    consigneeCode = PrintData.Rows.Item(0).Item("CONSIGNEECODE").ToString()
-            'End If
+            ExcelMemoryRelease(rngHeaderArea)
 
             '受入基地
             Select Case OfficeCode
                 Case CONST_OFFICECODE_010402
                     rngHeaderArea = ExcelWorkSheet.Range("G4")
                     rngHeaderArea.Value = "JOT盛岡"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("H4")
                     rngHeaderArea.Value = "ZP310"
                 Case CONST_OFFICECODE_011203
@@ -621,38 +680,47 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                         Case "53"
                             rngHeaderArea = ExcelWorkSheet.Range("G4")
                             rngHeaderArea.Value = "宇都宮"
+                            ExcelMemoryRelease(rngHeaderArea)
                             rngHeaderArea = ExcelWorkSheet.Range("H4")
                             rngHeaderArea.Value = "ZP342"
                         Case "54"
                             rngHeaderArea = ExcelWorkSheet.Range("G4")
                             rngHeaderArea.Value = "JOT高崎"
+                            ExcelMemoryRelease(rngHeaderArea)
                             rngHeaderArea = ExcelWorkSheet.Range("H4")
                             rngHeaderArea.Value = "ZP343"
                         Case "30"
                             rngHeaderArea = ExcelWorkSheet.Range("G4")
                             rngHeaderArea.Value = "高崎"
+                            ExcelMemoryRelease(rngHeaderArea)
                             rngHeaderArea = ExcelWorkSheet.Range("H4")
                             rngHeaderArea.Value = "ZP154"
                     End Select
             End Select
+            ExcelMemoryRelease(rngHeaderArea)
 
             '取扱営業所名
             Select Case OfficeCode
                 Case CONST_OFFICECODE_010402
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
                     rngHeaderArea.Value = "日本石油輸送㈱"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("D6")
                     rngHeaderArea.Value = "仙台新港営業所"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
                 Case CONST_OFFICECODE_011203
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
                     rngHeaderArea.Value = "日本石油輸送㈱"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("D6")
                     rngHeaderArea.Value = "袖ケ浦営業"
+                    ExcelMemoryRelease(rngHeaderArea)
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
             End Select
+            ExcelMemoryRelease(rngHeaderArea)
 
             '輸送経路
             Select Case OfficeCode
@@ -676,7 +744,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                             rngHeaderArea.Value = "T00021"
                     End Select
             End Select
-
+            ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
             Throw
@@ -702,14 +770,17 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 'コード
                 rngDetailArea = ExcelWorkSheet.Range("C" + r.index.ToString())
                 rngDetailArea.Value = r.row("OILCODE")
+                ExcelMemoryRelease(rngDetailArea)
 
                 '積載実数量
                 rngDetailArea = ExcelWorkSheet.Range("D" + r.index.ToString())
                 rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString("#.##0")
+                ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号
                 rngDetailArea = ExcelWorkSheet.Range("E" + r.index.ToString())
                 rngDetailArea.Value = r.row("TANKNUMBER")
+                ExcelMemoryRelease(rngDetailArea)
             Next
 
         Catch ex As Exception
@@ -731,13 +802,11 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 6
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 23
 
-    Private OfficeCode As String = ""
-
     Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
         Try
-            Init(mapId, TEMP_XLS_FILE_NAME)
             PrintData = printDataClass
             Me.OfficeCode = officeCode
+            Init(mapId, TEMP_XLS_FILE_NAME)
         Catch ex As Exception
             If xlProcId <> 0 Then
                 ExcelProcEnd()
@@ -752,38 +821,16 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
-            'CreateNewPage
-            Dim searchList As New List(Of String)
-            searchList.Add(String.Format("TEMPLATE_{0}", OfficeCode))
-            searchList.Add("TEMPLATE")
 
-            Dim templateSheetIndex As Integer = 1
-            For Each searchName As String In searchList
-                If templateSheetIndex > 1 Then
-                    Exit For
-                End If
-                For Each sheet As Excel.Worksheet In ExcelWorkSheets
-                    If sheet.Name.Equals(searchName) Then
-                        templateSheetIndex = sheet.Index
-                        Exit For
-                    End If
-                Next
-            Next
-
-            ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
-            ExcelTempSheet.Copy()
-
-            ExcelBookObj = ExcelAppObj.ActiveWorkbook
-            ExcelWorkSheets = ExcelBookObj.Sheets
-            ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
             ExcelWorkSheet.Name = "連結順序票"
 
-            For rowIndex As Integer = 0 To PrintData.Rows.Count Step DETAIL_AREA_ROWS_COUNT
-
+            Dim rowIndex As Integer = 0
+            Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
+            Do
                 '○NextPage
-                ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
                 If rowIndex > 0 Then
                     ExcelTempSheet.Copy(After:=ExcelWorkSheet)
+                    ExcelMemoryRelease(ExcelWorkSheet)
                     ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
                     ExcelWorkSheet.Name = String.Format("連結順序票({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
                 End If
@@ -794,7 +841,8 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                 '◯明細の設定
                 EditDetailArea(rowIndex)
 
-            Next
+                rowIndex += DETAIL_AREA_ROWS_COUNT
+            Loop While rowIndex < maxRowIndex
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -820,14 +868,18 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
             '出荷日(積込日)
             rngHeaderArea = Me.ExcelWorkSheet.Range("AA4")
             rngHeaderArea.Value = CDate(lodDate).ToString("yyyy") & "年"
+            ExcelMemoryRelease(rngHeaderArea)
             rngHeaderArea = Me.ExcelWorkSheet.Range("AB4")
             rngHeaderArea.Value = CDate(lodDate).ToString("MM")
+            ExcelMemoryRelease(rngHeaderArea)
             rngHeaderArea = Me.ExcelWorkSheet.Range("AD4")
             rngHeaderArea.Value = CDate(lodDate).ToString("dd")
+            ExcelMemoryRelease(rngHeaderArea)
 
             'タイトル(列車番号)
             rngHeaderArea = Me.ExcelWorkSheet.Range("AG4")
             rngHeaderArea.Value = trainNo
+            ExcelMemoryRelease(rngHeaderArea)
 
             '明細データから取得
             If Me.PrintData IsNot Nothing AndAlso Me.PrintData.Rows.Count > 0 Then
@@ -837,36 +889,43 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                 Dim tankCount As Integer = query.Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AI4")
                 rngHeaderArea.Value = IIf(tankCount > 0, String.Format("{0}車", tankCount.ToString()), "車")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'PG
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1001")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH13")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'RG
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1101")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH14")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'KR
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1301")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH15")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'GO
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1401")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH16")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'AFO
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("2101")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH17")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
                 'LSA
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("2201")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH18")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
+                ExcelMemoryRelease(rngHeaderArea)
 
             End If
 
@@ -922,10 +981,12 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"
                 End Select
+                ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号
                 rngDetailArea = Me.ExcelWorkSheet.Range("Z" + r.index.ToString())
                 rngDetailArea.Value = r.row("TANKNO")
+                ExcelMemoryRelease(rngDetailArea)
             Next
         Catch ex As Exception
             Throw

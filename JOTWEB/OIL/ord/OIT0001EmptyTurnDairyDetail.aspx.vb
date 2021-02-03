@@ -682,11 +682,22 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " AND OIT0002.DELFLG <> @P2"
 
             '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
-            SQLStr &=
+            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20210203 START ソート順(荷主－積込日－油種－車番)仙台新港営業所対応 #######################
+                SQLStr &=
+                  " ORDER BY" _
+                & "    OIT0003.SHIPPERSCODE" _
+                & " ,  ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+                '### 20210203 END   ソート順(荷主－積込日－油種－車番)仙台新港営業所対応 #######################
+            Else
+                SQLStr &=
                   " ORDER BY" _
                 & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
                 & " ,  OIM0024.PRIORITYNO" _
                 & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+            End If
             'SQLStr &=
             '  " ORDER BY" _
             '& "    OIM0024.PRIORITYNO" _

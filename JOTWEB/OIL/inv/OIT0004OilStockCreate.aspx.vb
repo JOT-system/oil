@@ -1308,11 +1308,29 @@ Public Class OIT0004OilStockCreate
         sqlPrintAmountAvarage.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlPrintAmountAvarage.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlPrintAmountAvarage.AppendLine(" GROUP BY DTL.OILCODE")
-
+        'LTA対応 LTAの有効期間を抽出
+        Dim sqlLtaStat As New StringBuilder
+        sqlLtaStat.AppendLine("SELECT  format(isnull(OTM.ORDERFROMDATE,convert(date,'1900/1/1')),'yyyy/MM/dd') AS ORDERFROMDATE")
+        sqlLtaStat.AppendLine("       ,format(isnull(OTM.ORDERTODATE,  convert(date,'9999/12/31')),'yyyy/MM/dd') AS ORDERTODATE")
+        sqlLtaStat.AppendLine("       ,isnull(PRD.SEGMENTOILNAME,'') AS SEGMENTOILNAME")
+        sqlLtaStat.AppendLine("  FROM      OIL.OIM0030_OILTERM OTM ")
+        sqlLtaStat.AppendLine("  LEFT JOIN OIL.OIM0003_PRODUCT PRD")
+        sqlLtaStat.AppendLine("         ON PRD.OFFICECODE     = @CAMPCODE")
+        sqlLtaStat.AppendLine("        AND PRD.SHIPPERCODE    = @SHIPPERSCODE")
+        sqlLtaStat.AppendLine("        AND PRD.OILCODE        = OTM.OILCODE")
+        sqlLtaStat.AppendLine("        AND PRD.SEGMENTOILCODE = 'C'")
+        sqlLtaStat.AppendLine("        AND PRD.DELFLG         = @DELFLG")
+        sqlLtaStat.AppendLine(" WHERE OTM.OFFICECODE     = @CAMPCODE")
+        sqlLtaStat.AppendLine("   AND OTM.SHIPPERCODE    = @SHIPPERSCODE")
+        sqlLtaStat.AppendLine("   AND OTM.OILCODE        = '2101'")
+        sqlLtaStat.AppendLine("   AND OTM.SEGMENTOILCODE = 'C'")
+        sqlLtaStat.AppendLine("   AND OTM.CONSIGNEECODE  = @CONSIGNEE")
+        sqlLtaStat.AppendLine("   AND OTM.DELFLG         = @DELFLG")
+        sqlLtaStat.AppendLine("   AND DATEDIFF(day,OTM.ORDERFROMDATE, OTM.ORDERTODATE) + 1 < 365")
         'DBより取得を行い取得情報付与
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             Dim paramCampCode = sqlCmd.Parameters.Add("@CAMPCODE", SqlDbType.NVarChar)
-            Dim paramClass = sqlCmd.Parameters.Add("@CLASS", SqlDbType.NVarChar)
+            Dim paramClass = sqlCmd.Parameters.Add("@Class", SqlDbType.NVarChar)
             '2つのSQLで変わらない（or不要なパラメータ)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
@@ -1359,8 +1377,11 @@ Public Class OIT0004OilStockCreate
                     .ShipperOilCode = shipperOilCode,
                     .ShipperOilName = shipperOilName,
                     .OrderFromDate = orderFromDate,
-                    .OrderToDate = orderToDate
+                    .OrderToDate = orderToDate,
+                    .ModifiedLtaSegmentFrom = "",
+                    .ModifiedLtaSegmentTo = ""
                     }
+
                     retVal.Add(oilItm.OilCode, oilItm)
                 End While
             End Using 'sqlDr
@@ -1396,6 +1417,29 @@ Public Class OIT0004OilStockCreate
             For Each key In removeKeys
                 retVal.Remove(key)
             Next
+            'LTA期間の取得(コスモかつ袖ヶ浦、三重塩浜営業所限定）
+            If shipper = "0122700010" AndAlso {"011203", "011402"}.Contains(salesOffice) AndAlso
+               retVal.ContainsKey("2101") Then
+                sqlCmd.CommandText = sqlLtaStat.ToString
+                paramCampCode.Value = salesOffice 'Default
+                '書き換え対象の重油クラスを取得
+                Dim aOilItem = retVal("2101")
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        'ありえないが先頭レコードのみ取得
+                        Dim ltaFrom = Convert.ToString(sqlDr("ORDERFROMDATE"))
+                        Dim ltaTo = Convert.ToString(sqlDr("ORDERTODATE"))
+                        If IsDate(ltaFrom) AndAlso IsDate(ltaTo) Then
+                            aOilItem.ModifiedLtaSegmentFrom = ltaFrom
+                            aOilItem.ModifiedLtaSegmentTo = ltaTo
+                            aOilItem.ModifiedSegmentName = Convert.ToString(sqlDr("SEGMENTOILNAME"))
+                        End If
+                        Exit While
+                    End While
+                End Using
+            End If
+
+
             '帳票用の前年同月平均積高の取得
             If printMonth <> "" Then
                 Dim fromDate As String = CDate(printMonth & "/01").AddYears(-1).ToString("yyyy/MM/dd")
@@ -1449,8 +1493,8 @@ Public Class OIT0004OilStockCreate
         Dim dateFrom As String = qdataVal.First '過去日ではない内最初
         Dim dateTo As String = qdataVal.Last    '過去日ではない内最後
         'ACCDATE[受入日（予定）]を元に取得（変更の場合は条件と抽出両方の項目忘れずに）
-        sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("  　 , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("Select DTL.OILCODE")
+        sqlStr.AppendLine("  　 , Format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS AMOUNT")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
@@ -5790,6 +5834,19 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property OrderToDate As String
         ''' <summary>
+        ''' Segmentコード変更From
+        ''' </summary>
+        Public Property ModifiedLtaSegmentFrom As String
+        ''' <summary>
+        ''' Segmentコード変更To
+        ''' </summary>
+        Public Property ModifiedLtaSegmentTo As String
+        ''' <summary>
+        ''' 変更油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ModifiedSegmentName As String
+        ''' <summary>
         ''' 平均積高(帳票用：前年同月の輸送数量 ÷ 車数）
         ''' </summary>
         ''' <returns></returns>
@@ -5878,6 +5935,9 @@ Public Class OIT0004OilStockCreate
             retVal.OrderFromDate = Me.OrderFromDate
             retVal.OrderToDate = Me.OrderToDate
             retVal.PrintStockAmountAverage = Me.PrintStockAmountAverage
+            retVal.ModifiedLtaSegmentFrom = Me.ModifiedLtaSegmentFrom
+            retVal.ModifiedLtaSegmentTo = Me.ModifiedLtaSegmentTo
+            retVal.ModifiedSegmentName = Me.ModifiedSegmentName
             Return retVal
         End Function
     End Class
@@ -8420,6 +8480,12 @@ Public Class OIT0004OilStockCreate
             Me.OilName = chkOilVal.OilInfo.OilName
             Me.OrderingType = chkOilVal.OilInfo.SegmentOilCode
             Me.OrderingOilName = chkOilVal.OilInfo.SegmentOilName
+            If chkOilVal.OilInfo.ModifiedLtaSegmentFrom <> "" AndAlso
+               chkOilVal.OilInfo.ModifiedLtaSegmentFrom <= chkOilVal.DayInfo.ItemDate.ToString("yyyy/MM/dd") AndAlso
+               chkOilVal.OilInfo.ModifiedLtaSegmentTo >= chkOilVal.DayInfo.ItemDate.ToString("yyyy/MM/dd") Then
+                Me.OrderingType = "C"
+                Me.OrderingOilName = chkOilVal.OilInfo.ModifiedSegmentName
+            End If
             Me.CarsNumber = "1"
             Me.CarsAmount = "0"
             Me.ReturnDateTrain = ""

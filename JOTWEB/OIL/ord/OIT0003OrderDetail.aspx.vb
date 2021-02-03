@@ -10620,6 +10620,7 @@ Public Class OIT0003OrderDetail
             & "        , DISCOUNT3       = @DISCOUNT3      , DISCOUNT4   = @DISCOUNT4" _
             & "        , DISCOUNT5       = @DISCOUNT5      , DISCOUNT6   = @DISCOUNT6" _
             & "        , DISCOUNT7       = @DISCOUNT7      , APPLYCHARGE = @APPLYCHARGE" _
+            & "        , AMOUNT          = @AMOUNT         , TAX         = @TAX        , CONSUMPTIONTAX = @CONSUMPTIONTAX" _
             & "        , INVOICECODE     = @INVOICECODE    , INVOICENAME = @INVOICENAME" _
             & "        , INVOICEDEPTNAME = @INVOICEDEPTNAME" _
             & "        , PAYEECODE       = @PAYEECODE      , PAYEENAME   = @PAYEENAME" _
@@ -10653,6 +10654,7 @@ Public Class OIT0003OrderDetail
             & "        , CALCKBN         , CALCKBNNAME         , JROILTYPE          , CHARGE" _
             & "        , DISCOUNT1       , DISCOUNT2           , DISCOUNT3          , DISCOUNT4" _
             & "        , DISCOUNT5       , DISCOUNT6           , DISCOUNT7          , APPLYCHARGE" _
+            & "        , AMOUNT          , TAX                 , CONSUMPTIONTAX" _
             & "        , INVOICECODE     , INVOICENAME         , INVOICEDEPTNAME" _
             & "        , PAYEECODE       , PAYEENAME           , PAYEEDEPTNAME" _
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
@@ -10673,6 +10675,7 @@ Public Class OIT0003OrderDetail
             & "        , @CALCKBN         , @CALCKBNNAME         , @JROILTYPE          , @CHARGE" _
             & "        , @DISCOUNT1       , @DISCOUNT2           , @DISCOUNT3          , @DISCOUNT4" _
             & "        , @DISCOUNT5       , @DISCOUNT6           , @DISCOUNT7          , @APPLYCHARGE" _
+            & "        , @AMOUNT          , @TAX                 , @CONSUMPTIONTAX" _
             & "        , @INVOICECODE     , @INVOICENAME         , @INVOICEDEPTNAME" _
             & "        , @PAYEECODE       , @PAYEENAME           , @PAYEEDEPTNAME" _
             & "        , @DELFLG          , @INITYMD             , @INITUSER           , @INITTERMID" _
@@ -10741,6 +10744,9 @@ Public Class OIT0003OrderDetail
             & "    , DISCOUNT6" _
             & "    , DISCOUNT7" _
             & "    , APPLYCHARGE" _
+            & "    , AMOUNT" _
+            & "    , TAX" _
+            & "    , CONSUMPTIONTAX" _
             & "    , INVOICECODE" _
             & "    , INVOICENAME" _
             & "    , INVOICEDEPTNAME" _
@@ -10838,6 +10844,11 @@ Public Class OIT0003OrderDetail
                 Dim P_DISCOUNT6 As SqlParameter = SQLcmd.Parameters.Add("@DISCOUNT6", SqlDbType.Money)              '割引額6
                 Dim P_DISCOUNT7 As SqlParameter = SQLcmd.Parameters.Add("@DISCOUNT7", SqlDbType.Money)              '割引額7
                 Dim P_APPLYCHARGE As SqlParameter = SQLcmd.Parameters.Add("@APPLYCHARGE", SqlDbType.Money)          '料金（割引後）
+                '### 20210202 START 指摘票対応(No337)全体 ################################
+                Dim P_AMOUNT As SqlParameter = SQLcmd.Parameters.Add("@AMOUNT", SqlDbType.Money)                    '金額
+                Dim P_TAX As SqlParameter = SQLcmd.Parameters.Add("@TAX", SqlDbType.Money)                          '税額
+                Dim P_CONSUMPTIONTAX As SqlParameter = SQLcmd.Parameters.Add("@CONSUMPTIONTAX", SqlDbType.Decimal)  '消費税
+                '### 20210202 END   指摘票対応(No337)全体 ################################
                 Dim P_INVOICECODE As SqlParameter = SQLcmd.Parameters.Add("@INVOICECODE", SqlDbType.NVarChar, 10)           '請求先コード
                 Dim P_INVOICENAME As SqlParameter = SQLcmd.Parameters.Add("@INVOICENAME", SqlDbType.NVarChar, 40)           '請求先名
                 Dim P_INVOICEDEPTNAME As SqlParameter = SQLcmd.Parameters.Add("@INVOICEDEPTNAME", SqlDbType.NVarChar, 40)   '請求先部門名
@@ -10923,6 +10934,20 @@ Public Class OIT0003OrderDetail
                     P_DISCOUNT6.Value = OIT0003INPtab4row("DISCOUNT6")
                     P_DISCOUNT7.Value = OIT0003INPtab4row("DISCOUNT7")
                     P_APPLYCHARGE.Value = OIT0003INPtab4row("APPLYCHARGE")
+                    '### 20210202 START 指摘票対応(No337)全体 ################################
+                    Select Case OIT0003INPtab4row("CALCKBN")
+                        Case "1"
+                            P_AMOUNT.Value = OIT0003INPtab4row("CARSNUMBER") * OIT0003INPtab4row("APPLYCHARGE")
+                            P_TAX.Value = OIT0003INPtab4row("CARSNUMBER") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                        Case "2"
+                            P_AMOUNT.Value = OIT0003INPtab4row("CARSAMOUNT") * OIT0003INPtab4row("APPLYCHARGE")
+                            P_TAX.Value = OIT0003INPtab4row("CARSAMOUNT") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                        Case "3"
+                            P_AMOUNT.Value = OIT0003INPtab4row("LOAD") * OIT0003INPtab4row("APPLYCHARGE")
+                            P_TAX.Value = OIT0003INPtab4row("LOAD") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                    End Select
+                    P_CONSUMPTIONTAX.Value = work.WF_SEL_CONSUMPTIONTAX.Text
+                    '### 20210202 END   指摘票対応(No337)全体 ################################
                     P_INVOICECODE.Value = OIT0003INPtab4row("INVOICECODE")
                     P_INVOICENAME.Value = OIT0003INPtab4row("INVOICENAME")
                     P_INVOICEDEPTNAME.Value = OIT0003INPtab4row("INVOICEDEPTNAME")

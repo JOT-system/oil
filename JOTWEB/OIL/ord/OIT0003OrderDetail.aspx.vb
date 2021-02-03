@@ -2791,7 +2791,7 @@ Public Class OIT0003OrderDetail
                 & " , '1'                                                AS CALCACCOUNT" _
                 & " , '1'                                                AS AKAKURO" _
                 & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
-                & " , TMP0002.KEIJYOYMD                                  AS KEIJYOYMD" _
+                & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM') + '/01'       AS KEIJYOYMD" _
                 & " , TMP0002.ACCOUNTCODE + '　' + TMP0002.SEGMENTCODE   AS ACCSEGCODE" _
                 & " , TMP0002.ACCOUNTNAME + '　' + TMP0002.SEGMENTNAME   AS ACCSEGNAME" _
                 & " , TMP0002.ACCOUNTCODE                                AS ACCOUNTCODE" _
@@ -2842,7 +2842,7 @@ Public Class OIT0003OrderDetail
         SQLStr &=
                 " GROUP BY TMP0002.ORDERNO, TMP0002.SHIPPERSCODE, TMP0002.SHIPPERSNAME" _
               & " , TMP0002.BASECODE, TMP0002.BASENAME, TMP0002.OFFICECODE, TMP0002.OFFICENAME" _
-              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME, TMP0002.KEIJYOYMD" _
+              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME, FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')" _
               & " , TMP0002.ACCOUNTCODE, TMP0002.ACCOUNTNAME, TMP0002.SEGMENTCODE, TMP0002.SEGMENTNAME" _
               & " , TMP0002.BREAKDOWNCODE, TMP0002.BREAKDOWN, TMP0002.CALCKBN, TMP0002.CALCKBNNAME, TMP0002.APPLYCHARGE" _
               & " , TMP0002.INVOICECODE, TMP0002.INVOICENAME, TMP0002.INVOICEDEPTNAME" _

@@ -682,11 +682,22 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " AND OIT0002.DELFLG <> @P2"
 
             '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
-            SQLStr &=
+            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                '### 20210203 START ソート順(荷主－積込日－油種－車番)仙台新港営業所対応 #######################
+                SQLStr &=
+                  " ORDER BY" _
+                & "    OIT0003.SHIPPERSCODE" _
+                & " ,  ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+                '### 20210203 END   ソート順(荷主－積込日－油種－車番)仙台新港営業所対応 #######################
+            Else
+                SQLStr &=
                   " ORDER BY" _
                 & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
                 & " ,  OIM0024.PRIORITYNO" _
                 & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+            End If
             'SQLStr &=
             '  " ORDER BY" _
             '& "    OIM0024.PRIORITYNO" _
@@ -2631,6 +2642,18 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         End If
 
+        '### 20201222 START((全体)No272対応) ######################################
+        '○ 出荷期間内の油種チェック(対象：甲子営業所、袖ヶ浦営業所)
+        If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+            OrElse work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+            WW_CheckShipPeriod(WW_ERRCODE)
+            If WW_ERRCODE = "ERR" Then
+                Exit Sub
+            End If
+        End If
+        '### 20201222 END  ((全体)No272対応) ######################################
+
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -2770,6 +2793,19 @@ Public Class OIT0001EmptyTurnDairyDetail
             work.WF_SEL_CREATEFLG.Text = "2"
             MAPDataGet(SQLcon, 0)
         End Using
+
+        '### 20200916 START 「500：輸送完了」以降のステータスはチェックを実施しない ################
+        If work.WF_SEL_STATUS.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
+            '★受注オーダーが存在する場合
+            If OIT0001tbl.Rows.Count <> 0 Then
+                For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                    If Convert.ToString(OIT0001row("TANKNO")) = "" Then Continue For
+                    '★タンク車№に紐づく情報を取得
+                    WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+                Next
+            End If
+        End If
+        '### 20200916 END   「500：輸送完了」以降のステータスはチェックを実施しない ################
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
@@ -3864,6 +3900,68 @@ Public Class OIT0001EmptyTurnDairyDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
 
+    End Sub
+
+    ''' <summary>
+    ''' 出荷期間内の油種チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckShipPeriod(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_OfficeCode As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case work.WF_SEL_SALESOFFICECODE.Text
+            '○　甲子営業所
+            Case BaseDllConst.CONST_OFFICECODE_011202
+                '★　積込日(予定)が油種(３号軽油TCH)の出荷期間に含まれているかチェック
+                WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + BaseDllConst.CONST_OFFICECODE_011202,
+                                        "PRODUCTPATTERN_FT_SEG",
+                                        "1404D",
+                                        WW_GetValue,
+                                        I_PARA01:="1")
+
+                If WW_GetValue(0) <> "" Then
+                    '油種チェック(３号軽油)
+                    For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='1404' AND ORDERINGTYPE='A'")
+                        '「３号軽油」⇒「３号軽油TCH」へ変更
+                        OIT0001row("OILCODE") = "1404"
+                        OIT0001row("OILNAME") = WW_GetValue(2)
+                        OIT0001row("ORDERINGTYPE") = WW_GetValue(1)
+                        OIT0001row("ORDERINGOILNAME") = WW_GetValue(0)
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0001tbl)
+                End If
+
+            '○　袖ヶ浦営業所
+            Case BaseDllConst.CONST_OFFICECODE_011203
+                '★　積込日(予定)が油種(LTA)の出荷期間に含まれているかチェック
+                WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + BaseDllConst.CONST_OFFICECODE_011203,
+                                        "PRODUCTPATTERN_FT_SEG",
+                                        "2101C",
+                                        WW_GetValue,
+                                        I_PARA01:="1")
+
+                If WW_GetValue(0) <> "" Then
+                    '油種チェック(0.5A重油)
+                    For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='2101' AND ORDERINGTYPE='B'")
+                        '「0.5A重油」⇒「LTA」へ変更
+                        OIT0001row("OILCODE") = "2101"
+                        OIT0001row("OILNAME") = WW_GetValue(2)
+                        OIT0001row("ORDERINGTYPE") = WW_GetValue(1)
+                        OIT0001row("ORDERINGOILNAME") = WW_GetValue(0)
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0001tbl)
+                End If
+        End Select
     End Sub
 
     ''' <summary>

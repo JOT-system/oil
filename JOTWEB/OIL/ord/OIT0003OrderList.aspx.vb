@@ -523,6 +523,8 @@ Public Class OIT0003OrderList
         '状態(受注進行ステータス)
         If Not String.IsNullOrEmpty(work.WF_SEL_STATUSCODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
+        Else
+            SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS < '{0}'", BaseDllConst.CONST_ORDERSTATUS_500)
         End If
 
         '### 20201126 START 指摘票対応(No233)全体 ################################
@@ -1987,8 +1989,8 @@ Public Class OIT0003OrderList
            & " WHERE TMP0006.LOADINGTRAINNO <> '' " _
            & " ORDER BY " _
            & "       TMP0006.LOADINGTRAINNO" _
-           & "     , TMP0006.LINE" _
            & "     , TMP0006.TRAINNODETAIL" _
+           & "     , TMP0006.LINE" _
            & "     , TMP0006.POINT "
 
         Try
@@ -2085,7 +2087,6 @@ Public Class OIT0003OrderList
                 Dim strTrainNo As String = ""
                 Dim shipOderAsc As Integer = 0
                 Dim shipOderDesc As Integer = 0
-                'Dim i As Integer = 0
                 For Each OIT0003INSrow In OIT0003EXLINStbl.Rows
 
                     '初回、または列車№が変更されたら、受注データを再度取得する。
@@ -2118,7 +2119,6 @@ Public Class OIT0003OrderList
 
                         '発送順をリセット
                         shipOderAsc = 1
-                        'shipOderDesc = OIT0003EXLINStbl.AsEnumerable.Where(Function(x As DataRow) x.Item("LOADINGTRAINNO") = Convert.ToString(OIT0003INSrow("LOADINGTRAINNO"))).Count
                         shipOderDesc = OIT0003EXLODRtbl.AsEnumerable.
                             Where(Function(x As DataRow) x("USEFLAG") = "0").
                             Where(Function(x As DataRow) x("TRAINNO") = OIT0003INSrow("LOADINGTRAINNO")).Count
@@ -2692,6 +2692,7 @@ Public Class OIT0003OrderList
             Dim SQLStr As String =
                 " UPDATE OIL.OIT0003_DETAIL " _
                 & "    SET TANKNO      = @TANKNO, " _
+                & "        SHIPORDER   = @SHIPORDER, " _
                 & "        UPDYMD      = @UPDYMD, " _
                 & "        UPDUSER     = @UPDUSER, " _
                 & "        UPDTERMID   = @UPDTERMID, " _
@@ -2706,6 +2707,7 @@ Public Class OIT0003OrderList
             Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
             Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
             Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", System.Data.SqlDbType.NVarChar)
+            Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", System.Data.SqlDbType.NVarChar)
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
@@ -2721,6 +2723,7 @@ Public Class OIT0003OrderList
                 P_ORDERNO.Value = OIT0003ODRrow("ORDERNO")
                 P_DETAILNO.Value = OIT0003ODRrow("DETAILNO")
                 P_TANKNO.Value = OIT0003ODRrow("TANKNO")
+                P_SHIPORDER.Value = OIT0003ODRrow("SHIPORDER")
 
                 SQLcmd.ExecuteNonQuery()
             Next
@@ -4502,7 +4505,7 @@ Public Class OIT0003OrderList
             & "     INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "         OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "     AND OIT0003.DELFLG <> @P02 " _
-            & "     AND OIT0003.OTTRANSPORTFLG = @P04 " _
+            & "     AND OIT0003.OTTRANSPORTFLG IN (@P04,@P07) " _
             & "     WHERE " _
             & "         OIT0002.OFFICECODE = @P01 " _
             & "     AND OIT0002.DELFLG <> @P02 " _
@@ -4560,14 +4563,22 @@ Public Class OIT0003OrderList
         '    & " AND TMP0005.SEGMENTOILCODE = OIT0002.ORDERINGTYPE "
         '### 20201002 END   変換マスタに移行したため修正 ########################
 
-        '請負用データ取得用
-        Dim SQLStrADD As String =
+        Dim SQLStrADDOther As String =
               SQLStr _
-            & " WHERE VIW0013.No <> @P05 " _
+            & " WHERE VIW0013.No IN ('2','3','4','5') " _
             & " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT"
 
+        '請負用データ取得用(倉賀野)
+        Dim SQLStrADD As String =
+              SQLStr _
+            & " WHERE VIW0013.No = @P05 " _
+            & " ORDER BY" _
+            & "    VIW0013.No" _
+            & "  , VIW0013.ZAIKOSORT"
+
+        'OT用(倉賀野)
         SQLStr &=
               " WHERE VIW0013.No = @P05 " _
             & " ORDER BY" _
@@ -4575,13 +4586,15 @@ Public Class OIT0003OrderList
             & "  , VIW0013.ZAIKOSORT"
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLADDcmd As New SqlCommand(SQLStrADD, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLADDcmd As New SqlCommand(SQLStrADD, SQLcon),
+                  SQLADDOTHcmd As New SqlCommand(SQLStrADDOther, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011201
                 PARA02.Value = C_DELETE_FLG.DELETE
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_900
@@ -4592,6 +4605,7 @@ Public Class OIT0003OrderList
                 End If
                 'OT輸送可否("1"(OT輸送あり))
                 PARA04.Value = "1"
+                PARA07.Value = "1"
                 PARA05.Value = "1"
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -4603,12 +4617,38 @@ Public Class OIT0003OrderList
                     OIT0003ReportGoitbl.Load(SQLdr)
                 End Using
 
+                Dim PARAADDOTH01 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARAADDOTH02 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARAADDOTH03 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARAADDOTH04 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 5)  'OT輸送可否フラグ
+                'Dim PARAADDOTH05 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
+                Dim PARAADDOTH06 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '受注進行ステータス
+                Dim PARAADDOTH07 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 5)  'OT輸送可否フラグ
+                PARAADDOTH01.Value = BaseDllConst.CONST_OFFICECODE_011201
+                PARAADDOTH02.Value = C_DELETE_FLG.DELETE
+                PARAADDOTH06.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    PARAADDOTH03.Value = lodDate
+                Else
+                    PARAADDOTH03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+
+                'OT輸送可否("2"(OT輸送なし))
+                PARAADDOTH04.Value = "1"
+                PARAADDOTH07.Value = "2"
+                'PARAADDOTH05.Value = "6"
+                Using SQLdr As SqlDataReader = SQLADDOTHcmd.ExecuteReader()
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportGoitbl.Load(SQLdr)
+                End Using
+
                 Dim PARAADD01 As SqlParameter = SQLADDcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARAADD02 As SqlParameter = SQLADDcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARAADD03 As SqlParameter = SQLADDcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARAADD04 As SqlParameter = SQLADDcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 Dim PARAADD05 As SqlParameter = SQLADDcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
                 Dim PARAADD06 As SqlParameter = SQLADDcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '受注進行ステータス
+                Dim PARAADD07 As SqlParameter = SQLADDcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 PARAADD01.Value = BaseDllConst.CONST_OFFICECODE_011201
                 PARAADD02.Value = C_DELETE_FLG.DELETE
                 PARAADD06.Value = BaseDllConst.CONST_ORDERSTATUS_900
@@ -4620,7 +4660,8 @@ Public Class OIT0003OrderList
 
                 'OT輸送可否("2"(OT輸送なし))
                 PARAADD04.Value = "2"
-                PARAADD05.Value = "1"
+                PARAADD07.Value = "2"
+                PARAADD05.Value = "6"
                 Using SQLdr As SqlDataReader = SQLADDcmd.ExecuteReader()
                     '○ テーブル検索結果をテーブル格納
                     OIT0003ReportGoitbl.Load(SQLdr)

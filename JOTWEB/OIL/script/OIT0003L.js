@@ -235,7 +235,7 @@ function reportRadioButton() {
     if (chkObj3_3 !== null) {
         isVisitTxtObj3 = chkObj3_3.checked | isVisitTxtObj3
     }
-
+    
     if (isVisitTxtObj3) {
         txtObj3.style.display = 'block'
     } else {
@@ -245,6 +245,7 @@ function reportRadioButton() {
 
 // ○ダウンロード処理
 function f_ExcelPrint() {
+    
     // リンク参照
     let urlObj = document.getElementById("WF_PrintURL");
     if (urlObj !== null) {
@@ -252,10 +253,7 @@ function f_ExcelPrint() {
             let urlList = JSON.parse(urlObj.value);
             for (i = 0; i < urlList.length; i++) {
                 if (urlList[i].url !== null) {
-                    win = window.open(urlList[i].url, "view" + i, "_blank");
-                    win.unload = function () {
-
-                    }
+                    window.open(urlList[i].url, "view" + i, "_blank");
                 }
             }
         } else {

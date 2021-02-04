@@ -305,7 +305,6 @@ Public Class OIT0001EmptyTurnDairyList
             & "   AND OIT0002.DELFLG       <> @P3" _
             & "   AND OIT0002.ORDERSTATUS  <> @P4" _
             & "   AND OIT0002.EMPTYTURNFLG <> '2'"
-        '& "   AND OIT0002.TRAINNO    = @P4"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '列車番号

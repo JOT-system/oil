@@ -176,7 +176,7 @@ Public Class OIM0003ProductCreate
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        '○ 検索画面からの遷移
+        '○ 一覧画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0003L Then
             'Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
@@ -284,10 +284,116 @@ Public Class OIM0003ProductCreate
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
         '荷受人マスタ＆品種出荷期間マスタテーブル
-        GetNIUKEWithOILTERM()
+        If String.IsNullOrEmpty(work.WF_SEL_OILTERM_CONSIGNEECODE_01.Text) Then
+            GetNIUKEWithOILTERM()
+        Else
+            SetNIUKEWithOILTERM()
+        End If
+
         WF_OILTERMTBL.DataSource = OIM0030tbl
         WF_OILTERMTBL.DataBind()
 
+    End Sub
+
+    ''' <summary>
+    ''' 品種Mレコードから品種出荷期間Mの設定
+    ''' </summary>
+    Protected Sub SetNIUKEWithOILTERM()
+        OIM0030tbl = New DataTable
+        OIM0030tbl.Columns.Add("CONSIGNEECODE", Type.GetType("System.String"))
+        OIM0030tbl.Columns.Add("CONSIGNEENAME", Type.GetType("System.String"))
+        OIM0030tbl.Columns.Add("ORDERFROMDATE", Type.GetType("System.String"))
+        OIM0030tbl.Columns.Add("ORDERTODATE", Type.GetType("System.String"))
+        OIM0030tbl.Columns.Add("DELFLG", Type.GetType("System.String"))
+        Dim OIM0030row As DataRow
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_01.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_01.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_01.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_01.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_01.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_02.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_02.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_02.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_02.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_02.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_03.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_03.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_03.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_03.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_03.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_04.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_04.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_04.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_04.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_04.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_05.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_05.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_05.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_05.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_05.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_06.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_06.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_06.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_06.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_06.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_07.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_07.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_07.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_07.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_07.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_08.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_08.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_08.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_08.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_08.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_09.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_09.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_09.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_09.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_09.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_10.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_10.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_10.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_10.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_10.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
+
+        OIM0030row = OIM0030tbl.NewRow
+        OIM0030row("CONSIGNEECODE") = work.WF_SEL_OILTERM_CONSIGNEECODE_11.Text
+        OIM0030row("CONSIGNEENAME") = work.WF_SEL_OILTERM_CONSIGNEENAME_11.Text
+        OIM0030row("ORDERFROMDATE") = work.WF_SEL_OILTERM_ORDERFROMDATE_11.Text
+        OIM0030row("ORDERTODATE") = work.WF_SEL_OILTERM_ORDERTODATE_11.Text
+        OIM0030row("DELFLG") = work.WF_SEL_OILTERM_DELFLG_11.Text
+        OIM0030tbl.Rows.Add(OIM0030row)
     End Sub
 
     ''' <summary>
@@ -634,12 +740,14 @@ Public Class OIM0003ProductCreate
         OIM0030INPtbl.Columns.Add("OILCODE", System.Type.GetType("System.String"))
         OIM0030INPtbl.Columns.Add("SEGMENTOILCODE", System.Type.GetType("System.String"))
         OIM0030INPtbl.Columns.Add("CONSIGNEECODE", System.Type.GetType("System.String"))
+        OIM0030INPtbl.Columns.Add("CONSIGNEENAME", System.Type.GetType("System.String"))
         OIM0030INPtbl.Columns.Add("ORDERFROMDATE", System.Type.GetType("System.String"))
         OIM0030INPtbl.Columns.Add("ORDERTODATE", System.Type.GetType("System.String"))
         OIM0030INPtbl.Columns.Add("DELFLG", System.Type.GetType("System.String"))
 
         For Each row As GridViewRow In WF_OILTERMTBL.Rows
             Dim WW_CONSIGNEECODE As String = ""
+            Dim WW_CONSIGNEENAME As String = ""
             Dim WW_ORDERFROMDATE As String = ""
             Dim WW_ORDERTODATE As String = ""
             Dim WW_DELFLG As String = ""
@@ -648,6 +756,10 @@ Public Class OIM0003ProductCreate
             '品種出荷期間テーブルの荷受人コード
             If row.FindControl("WF_OILTERMTBL_CONSIGNEECODE") IsNot Nothing Then
                 WW_CONSIGNEECODE = DirectCast(row.FindControl("WF_OILTERMTBL_CONSIGNEECODE"), Label).Text
+            End If
+            '品種出荷期間テーブルの荷受人名
+            If row.FindControl("WF_OILTERMTBL_CONSIGNEENAME") IsNot Nothing Then
+                WW_CONSIGNEENAME = DirectCast(row.FindControl("WF_OILTERMTBL_CONSIGNEENAME"), Label).Text
             End If
             '品種出荷期間テーブルの受注登録可能期間FROM
             If row.FindControl("WF_OILTERMTBL_ORDERFROMDATE") IsNot Nothing Then
@@ -662,13 +774,6 @@ Public Class OIM0003ProductCreate
                 WW_DELFLG = DirectCast(row.FindControl("WF_OILTERMTBL_DELFLG"), TextBox).Text
             End If
 
-            'いずれの項目も設定されていない行は更新＆チェック対象外
-            If String.IsNullOrEmpty(WW_ORDERFROMDATE) AndAlso
-                String.IsNullOrEmpty(WW_ORDERTODATE) AndAlso
-                String.IsNullOrEmpty(WW_DELFLG) Then
-                Continue For
-            End If
-
             '更新対象に追加
             addRow("OFFICECODE") = WF_OFFICECODE.Text
             addRow("SHIPPERCODE") = WF_SHIPPERCODE.Text
@@ -676,6 +781,7 @@ Public Class OIM0003ProductCreate
             addRow("OILCODE") = WF_OILCODE.Text
             addRow("SEGMENTOILCODE") = WF_SEGMENTOILCODE.Text
             addRow("CONSIGNEECODE") = WW_CONSIGNEECODE
+            addRow("CONSIGNEENAME") = WW_CONSIGNEENAME
             addRow("ORDERFROMDATE") = WW_ORDERFROMDATE
             addRow("ORDERTODATE") = WW_ORDERTODATE
             addRow("DELFLG") = WW_DELFLG
@@ -713,29 +819,18 @@ Public Class OIM0003ProductCreate
 
         '○ 状態をクリア
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
-            'Select Case OIM0003row("OPERATION")
-            '    Case C_LIST_OPERATION_CODE.NODATA
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
-
-            '    Case C_LIST_OPERATION_CODE.NODISP
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
-
-            '    Case C_LIST_OPERATION_CODE.SELECTED
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
-            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
-
-            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-            '        WW_ERR_SW = C_MESSAGE_NO.NORMAL
-
-            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-            '        WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            'End Select
-            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
             WW_ERR_SW = C_MESSAGE_NO.NORMAL
+            Select Case OIM0003row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA, C_LIST_OPERATION_CODE.NODISP
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End Select
         Next
 
         '○ 画面表示データ保存
@@ -1601,6 +1696,13 @@ Public Class OIM0003ProductCreate
 
                     Dim WW_DATENOW As DateTime = Date.Now
 
+                    '受注登録可能期間FROM、同TO、削除フラグのいずれの項目も設定されていない行は更新対象外
+                    If String.IsNullOrEmpty(OIM0030INProw("ORDERFROMDATE")) AndAlso
+                        String.IsNullOrEmpty(OIM0030INProw("ORDERTODATE")) AndAlso
+                        String.IsNullOrEmpty(OIM0030INProw("DELFLG")) Then
+                        Continue For
+                    End If
+
                     'DB更新
                     PARA01.Value = OIM0030INProw("OFFICECODE")
                     PARA02.Value = OIM0030INProw("SHIPPERCODE")
@@ -2135,6 +2237,13 @@ Public Class OIM0003ProductCreate
             If WW_LINE_ERR = "" AndAlso OIM0030INPtbl.Rows.Count > 0 Then
                 For Each OIM0030INProw As DataRow In OIM0030INPtbl.Rows
 
+                    '受注登録可能期間FROM、同TO、削除フラグのいずれの項目も設定されていない行はチェック対象外
+                    If String.IsNullOrEmpty(OIM0030INProw("ORDERFROMDATE")) AndAlso
+                        String.IsNullOrEmpty(OIM0030INProw("ORDERTODATE")) AndAlso
+                        String.IsNullOrEmpty(OIM0030INProw("DELFLG")) Then
+                        Continue For
+                    End If
+
                     '品種出荷期間テーブルの受注登録可能期間FROM(バリデーションチェック）
                     Master.CheckField(Master.USERCAMP, "OILTERM_ORDERFROMDATE", OIM0030INProw("ORDERFROMDATE"),
                                       WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -2393,68 +2502,127 @@ Public Class OIM0003ProductCreate
 
         '○ 画面状態設定
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
-            'Select Case OIM0003row("OPERATION")
-            '    Case C_LIST_OPERATION_CODE.NODATA
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            '    Case C_LIST_OPERATION_CODE.NODISP
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            '    Case C_LIST_OPERATION_CODE.SELECTED
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-            '    Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-            '        OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-            'End Select
-            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            Select Case OIM0003row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA, C_LIST_OPERATION_CODE.NODISP, C_LIST_OPERATION_CODE.SELECTED
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
         Next
-
-        '○ 追加変更判定
-        'For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
-
-        '    'エラーレコード読み飛ばし
-        '    If OIM0003INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
-        '        Continue For
-        '    End If
-
-        '    OIM0003INProw.Item("OPERATION") = CONST_INSERT
-
-        '    'KEY項目が等しい時
-        '    For Each OIM0003row As DataRow In OIM0003tbl.Rows
-        '        If OIM0003row("OFFICECODE") = OIM0003INProw("OFFICECODE") AndAlso
-        '            OIM0003row("SHIPPERCODE") = OIM0003INProw("SHIPPERCODE") AndAlso
-        '            OIM0003row("PLANTCODE") = OIM0003INProw("PLANTCODE") AndAlso
-        '            OIM0003row("OILCODE") = OIM0003INProw("OILCODE") AndAlso
-        '            OIM0003row("SEGMENTOILCODE") = OIM0003INProw("SEGMENTOILCODE") Then
-        '            'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-        '            If OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
-        '                OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
-        '            Else
-        '                'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
-        '                OIM0003INProw("OPERATION") = CONST_UPDATE
-        '                Exit For
-        '            End If
-
-        '            Exit For
-
-        '        End If
-        '    Next
-        'Next
 
         '○ 変更有無判定　&　入力値反映
         For Each OIM0003INProw As DataRow In OIM0003INPtbl.Rows
-            'Select Case OIM0003INProw("OPERATION")
-            '    Case CONST_UPDATE
-            '        TBL_UPDATE_SUB(OIM0003INProw)
-            '    Case CONST_INSERT
-            '        TBL_INSERT_SUB(OIM0003INProw)
-            '    Case CONST_PATTERNERR
-            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-            '        TBL_INSERT_SUB(OIM0003INProw)
-            '    Case C_LIST_OPERATION_CODE.ERRORED
-            '        TBL_ERR_SUB(OIM0003INProw)
-            'End Select
             TBL_REPLACE_SUB(OIM0003INProw)
         Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 品種出荷期間M更新レコードを品種Mレコードにコピーする
+    ''' </summary>
+    ''' <param name="OIM0003row">品種Mのレコード行</param>
+    Private Sub CopyOIM0030RowToOIM0003Row(ByRef OIM0003row As DataRow)
+
+        If OIM0030INPtbl.Rows.Count > 0 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(0)
+            OIM0003row("OILTERM_CONSIGNEECODE_01") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_01") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_01") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_01") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_01") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 1 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(1)
+            OIM0003row("OILTERM_CONSIGNEECODE_02") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_02") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_02") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_02") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_02") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 2 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(2)
+            OIM0003row("OILTERM_CONSIGNEECODE_03") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_03") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_03") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_03") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_03") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 3 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(3)
+            OIM0003row("OILTERM_CONSIGNEECODE_04") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_04") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_04") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_04") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_04") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 4 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(4)
+            OIM0003row("OILTERM_CONSIGNEECODE_05") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_05") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_05") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_05") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_05") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 5 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(5)
+            OIM0003row("OILTERM_CONSIGNEECODE_06") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_06") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_06") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_06") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_06") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 6 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(6)
+            OIM0003row("OILTERM_CONSIGNEECODE_07") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_07") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_07") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_07") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_07") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 7 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(7)
+            OIM0003row("OILTERM_CONSIGNEECODE_08") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_08") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_08") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_08") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_08") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 8 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(8)
+            OIM0003row("OILTERM_CONSIGNEECODE_09") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_09") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_09") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_09") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_09") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 9 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(9)
+            OIM0003row("OILTERM_CONSIGNEECODE_10") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_10") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_10") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_10") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_10") = OIM0030INProw("DELFLG")
+        End If
+
+        If OIM0030INPtbl.Rows.Count > 10 Then
+            Dim OIM0030INProw As DataRow = OIM0030INPtbl.Rows(10)
+            OIM0003row("OILTERM_CONSIGNEECODE_11") = OIM0030INProw("CONSIGNEECODE")
+            OIM0003row("OILTERM_CONSIGNEENAME_11") = OIM0030INProw("CONSIGNEENAME")
+            OIM0003row("OILTERM_ORDERFROMDATE_11") = OIM0030INProw("ORDERFROMDATE")
+            OIM0003row("OILTERM_ORDERTODATE_11") = OIM0030INProw("ORDERTODATE")
+            OIM0003row("OILTERM_DELFLG_11") = OIM0030INProw("DELFLG")
+        End If
 
     End Sub
 
@@ -2486,8 +2654,10 @@ Public Class OIM0003ProductCreate
                 OIM0003INProw("SELECT") = 1
                 OIM0003INProw("HIDDEN") = 0
 
-                '項目テーブル項目設定
+                'テーブル項目設定
                 OIM0003row.ItemArray = OIM0003INProw.ItemArray
+                '品種出荷期間マスタ項目設定
+                CopyOIM0030RowToOIM0003Row(OIM0003row)
 
                 Exit For
             End If
@@ -2497,12 +2667,17 @@ Public Class OIM0003ProductCreate
         If Not WK_FOUNDFLG Then
 
             Dim OIM0003row As DataRow = OIM0003tbl.NewRow
-            OIM0003row.ItemArray = OIM0003INProw.ItemArray
             OIM0003row("LINECNT") = OIM0003tbl.Rows.Count + 1   '末尾に追加
             OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
             OIM0003row("TIMSTP") = "0"
             OIM0003row("SELECT") = 1
             OIM0003row("HIDDEN") = 0
+
+            'テーブル項目設定
+            OIM0003row.ItemArray = OIM0003INProw.ItemArray
+            '品種出荷期間マスタ項目設定
+            CopyOIM0030RowToOIM0003Row(OIM0003row)
+
             OIM0003tbl.Rows.Add(OIM0003row)
 
         End If

@@ -1945,7 +1945,15 @@ Public Class OIT0002LinkList
             & "    , ISNULL(RTRIM(OIT0011.ORDERNO), '')  AS ORDERNO " _
             & "    , ISNULL(RTRIM(OIT0011.DETAILNO), '') AS DETAILNO " _
             & "    , ISNULL(RTRIM(OIT0011.TRUCKNO), '')  AS TRUCKNO " _
+            & "    , OIT0002.ORDERSTATUS                 AS ORDERSTATUS " _
+            & "    , OIT0002.DELFLG                      AS ORDER_DELFLG " _
+            & "    , OIT0003.DELFLG                      AS DETAIL_DELFLG " _
             & " FROM oil.OIT0011_RLINK OIT0011 " _
+            & " INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
+            & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
             & " WHERE " _
             & "     OIT0011.LINKNO          <> '' " _
             & " AND OIT0011.REGISTRATIONDATE = @P01 " _
@@ -1997,8 +2005,14 @@ Public Class OIT0002LinkList
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") _
                             AndAlso OIT0002Exlrow("ORDERNO") <> "" Then
-                                OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
-                                OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
+                                '### 20210204 START 指摘票対応(No340)全体 ############################################
+                                If OIT0002Exlrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 _
+                                    AndAlso OIT0002Exlrow("ORDER_DELFLG") <> C_DELETE_FLG.DELETE _
+                                    AndAlso OIT0002Exlrow("DETAIL_DELFLG") <> C_DELETE_FLG.DELETE Then
+                                    OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
+                                    OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
+                                End If
+                                '### 20210204 END   指摘票対応(No340)全体 ############################################
                             End If
                         Next
                     Next

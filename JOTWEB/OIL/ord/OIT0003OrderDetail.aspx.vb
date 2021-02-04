@@ -11553,6 +11553,8 @@ Public Class OIT0003OrderDetail
         '状態(受注進行ステータス)
         If Not String.IsNullOrEmpty(work.WF_SEL_STATUSCODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
+        Else
+            SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS < '{0}'", BaseDllConst.CONST_ORDERSTATUS_500)
         End If
 
         '### 20201126 START 指摘票対応(No233)全体 ################################

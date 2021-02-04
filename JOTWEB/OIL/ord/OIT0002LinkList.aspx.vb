@@ -1945,6 +1945,9 @@ Public Class OIT0002LinkList
             & "    , ISNULL(RTRIM(OIT0011.ORDERNO), '')  AS ORDERNO " _
             & "    , ISNULL(RTRIM(OIT0011.DETAILNO), '') AS DETAILNO " _
             & "    , ISNULL(RTRIM(OIT0011.TRUCKNO), '')  AS TRUCKNO " _
+            & "    , OIT0002.TRAINNO                     AS TRAINNO " _
+            & "    , OIT0002.SHIPPERSCODE                AS SHIPPERSCODE " _
+            & "    , OIT0002.SHIPPERSNAME                AS SHIPPERSNAME " _
             & "    , OIT0002.ORDERSTATUS                 AS ORDERSTATUS " _
             & "    , OIT0002.DELFLG                      AS ORDER_DELFLG " _
             & "    , OIT0003.DELFLG                      AS DETAIL_DELFLG " _
@@ -2006,11 +2009,19 @@ Public Class OIT0002LinkList
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") _
                             AndAlso OIT0002Exlrow("ORDERNO") <> "" Then
                                 '### 20210204 START 指摘票対応(No340)全体 ############################################
-                                If OIT0002Exlrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 _
+                                If OIT0002ExlUProw("LOADINGTRAINNO") = OIT0002Exlrow("TRAINNO") _
+                                    AndAlso OIT0002Exlrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 _
                                     AndAlso OIT0002Exlrow("ORDER_DELFLG") <> C_DELETE_FLG.DELETE _
                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") <> C_DELETE_FLG.DELETE Then
                                     OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
+                                ElseIf OIT0002ExlUProw("LOADINGTRAINNO") <> OIT0002Exlrow("TRAINNO") _
+                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
+
+                                    '★前回登録した受注明細の内容が今回とで変更されている場合
+                                    '　前回登録した受注明細のデータの中身を消去する。
+                                    WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
+
                                 End If
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
                             End If
@@ -5976,6 +5987,106 @@ Public Class OIT0002LinkList
             Exit Sub
 
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注明細TBL)情報更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderInfoStatus(ByVal SQLcon As SqlConnection, ByVal I_TYPE As String, ByVal OIT0002row As DataRow)
+
+        Try
+            'DataBase接続文字
+            'Dim SQLcon = CS0050SESSION.getConnection
+            'SQLcon.Open() 'DataBase接続(Open)
+
+            Dim SQLStr As String =
+                  " UPDATE OIL.OIT0003_DETAIL " _
+                & "    SET "
+
+            '更新SQL文
+            Select Case I_TYPE
+                '★受注明細の中身を消去(初期化)
+                Case "ERASURE"
+                    SQLStr &=
+                      "        SHIPORDER               = '', " _
+                    & "        LINEORDER               = '', " _
+                    & "        TANKNO                  = '', " _
+                    & "        STACKINGFLG             = '2', " _
+                    & "        WHOLESALEFLG            = '2', " _
+                    & "        INSPECTIONFLG           = '2', " _
+                    & "        DETENTIONFLG            = '2', " _
+                    & "        FIRSTRETURNFLG          = '2', " _
+                    & "        AFTERRETURNFLG          = '2', " _
+                    & "        OTTRANSPORTFLG          = '2', " _
+                    & String.Format("        SHIPPERSCODE            = '{0}', ", OIT0002row("SHIPPERSCODE")) _
+                    & String.Format("        SHIPPERSNAME            = '{0}', ", OIT0002row("SHIPPERSNAME")) _
+                    & "        RETURNDATETRAIN         = '', " _
+                    & "        FILLINGPOINT            = '', " _
+                    & "        LINE                    = '', " _
+                    & "        LOADINGIRILINETRAINNO   = '', " _
+                    & "        LOADINGIRILINETRAINNAME = '', " _
+                    & "        LOADINGIRILINEORDER     = '', " _
+                    & "        LOADINGOUTLETTRAINNO    = '', " _
+                    & "        LOADINGOUTLETTRAINNAME  = '', " _
+                    & "        LOADINGOUTLETORDER      = '', "
+                '★受注明細TBLの削除フラグを更新(無効)
+                Case "DELFLG"
+                    SQLStr &=
+                        "        DELFLG      = @DELFLG, "
+            End Select
+
+            SQLStr &=
+                  "        UPDYMD      = @UPDYMD, " _
+                & "        UPDUSER     = @UPDUSER, " _
+                & "        UPDTERMID   = @UPDTERMID, " _
+                & "        RECEIVEYMD  = @RECEIVEYMD  " _
+                & "  WHERE ORDERNO     = @ORDERNO  " _
+                & "    AND DETAILNO    = @DETAILNO  " _
+                & "    AND DELFLG     <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            P_ORDERNO.Value = OIT0002row("ORDERNO")
+            P_DETAILNO.Value = OIT0002row("DETAILNO")
+            P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L_ORDERSTS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L_ORDERSTS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

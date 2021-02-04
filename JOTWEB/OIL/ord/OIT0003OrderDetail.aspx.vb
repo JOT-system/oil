@@ -2791,7 +2791,7 @@ Public Class OIT0003OrderDetail
                 & " , '1'                                                AS CALCACCOUNT" _
                 & " , '1'                                                AS AKAKURO" _
                 & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
-                & " , TMP0002.KEIJYOYMD                                  AS KEIJYOYMD" _
+                & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM') + '/01'       AS KEIJYOYMD" _
                 & " , TMP0002.ACCOUNTCODE + '　' + TMP0002.SEGMENTCODE   AS ACCSEGCODE" _
                 & " , TMP0002.ACCOUNTNAME + '　' + TMP0002.SEGMENTNAME   AS ACCSEGNAME" _
                 & " , TMP0002.ACCOUNTCODE                                AS ACCOUNTCODE" _
@@ -2842,7 +2842,7 @@ Public Class OIT0003OrderDetail
         SQLStr &=
                 " GROUP BY TMP0002.ORDERNO, TMP0002.SHIPPERSCODE, TMP0002.SHIPPERSNAME" _
               & " , TMP0002.BASECODE, TMP0002.BASENAME, TMP0002.OFFICECODE, TMP0002.OFFICENAME" _
-              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME, TMP0002.KEIJYOYMD" _
+              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME, FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')" _
               & " , TMP0002.ACCOUNTCODE, TMP0002.ACCOUNTNAME, TMP0002.SEGMENTCODE, TMP0002.SEGMENTNAME" _
               & " , TMP0002.BREAKDOWNCODE, TMP0002.BREAKDOWN, TMP0002.CALCKBN, TMP0002.CALCKBNNAME, TMP0002.APPLYCHARGE" _
               & " , TMP0002.INVOICECODE, TMP0002.INVOICENAME, TMP0002.INVOICEDEPTNAME" _
@@ -11553,6 +11553,8 @@ Public Class OIT0003OrderDetail
         '状態(受注進行ステータス)
         If Not String.IsNullOrEmpty(work.WF_SEL_STATUSCODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
+        Else
+            SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS < '{0}'", BaseDllConst.CONST_ORDERSTATUS_500)
         End If
 
         '### 20201126 START 指摘票対応(No233)全体 ################################
@@ -18621,16 +18623,23 @@ Public Class OIT0003OrderDetail
             & " , SUM(VIW0006_JR3.CNT)                      AS TRAINCARS" _
             & " , ISNULL(RTRIM(VIW0006_JR3.MAXTANK3), '')   AS MAXTANK" _
             & " FROM ( " _
-            & "       SELECT VIW0006.* " _
-            & "       FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
-            & "       WHERE VIW0006.ORDERNO = @P01 " _
-            & "      ) VIW0006_BASE " _
-            & " INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR3 ON" _
-            & "        VIW0006_BASE.JRTRAINNO3  = VIW0006_JR3.JRTRAINNO3 " _
-            & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR3.MERGEDAY" _
-            & "    AND VIW0006_BASE.JRTRAINNO3 <> ''" _
-            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR3.LODDATE" _
-            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR3.DEPDATE" _
+            & "     SELECT DISTINCT " _
+            & "           VIW0006_JR3.ORDERNO " _
+            & "         , VIW0006_JR3.JRTRAINNO3 " _
+            & "         , VIW0006_JR3.CNT " _
+            & "         , VIW0006_JR3.MAXTANK3 " _
+            & "     FROM ( " _
+            & "           SELECT VIW0006.* " _
+            & "           FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
+            & "           WHERE VIW0006.ORDERNO = @P01 " _
+            & "          ) VIW0006_BASE " _
+            & "     INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR3 ON" _
+            & "            VIW0006_BASE.JRTRAINNO3  = VIW0006_JR3.JRTRAINNO3 " _
+            & "        AND VIW0006_BASE.MERGEDAY    = VIW0006_JR3.MERGEDAY" _
+            & "        AND VIW0006_BASE.JRTRAINNO3 <> ''" _
+            & "        AND VIW0006_BASE.LODDATE = VIW0006_JR3.LODDATE" _
+            & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR3.DEPDATE" _
+            & " ) VIW0006_JR3 " _
             & " GROUP BY " _
             & "   VIW0006_JR3.JRTRAINNO3" _
             & " , VIW0006_JR3.MAXTANK3"

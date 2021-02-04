@@ -7195,6 +7195,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)
         End If
 
+        SQLStr &= String.Format("    AND OIT0002.ORDERSTATUS < '{0}'", BaseDllConst.CONST_ORDERSTATUS_500)
+
         SQLStr &=
               " ORDER BY" _
             & "    OIT0002.ORDERNO"

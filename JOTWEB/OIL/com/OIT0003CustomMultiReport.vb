@@ -100,12 +100,10 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     ''' エクセルアプリケーションオブジェクト
     ''' </summary>
     Protected ExcelAppObj As Excel.Application
-
     ''' <summary>
     ''' エクセルブックコレクション
     ''' </summary>
     Protected ExcelBooksObj As Excel.Workbooks
-
     ''' <summary>
     ''' エクセルブックオブジェクト
     ''' </summary>
@@ -115,22 +113,13 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     ''' </summary>
     Protected ExcelWorkSheets As Excel.Sheets
     ''' <summary>
-    ''' エクセルシートオブジェクト
+    ''' エクセル作業シート
     ''' </summary>
-    Protected ExcelWorkSheet As Excel.Worksheet
-
+    Protected ReadOnly Property ExcelWorkSheet As Excel.Worksheet
     ''' <summary>
-    ''' エクセルブックオブジェクト
+    ''' エクセル一時作業シート
     ''' </summary>
-    Protected ExcelTempBookObj As Excel.Workbook
-    ''' <summary>
-    ''' エクセルシートコレクション
-    ''' </summary>
-    Protected ExcelTempSheets As Excel.Sheets
-    ''' <summary>
-    ''' 一時作業シート
-    ''' </summary>
-    Protected ExcelTempSheet As Excel.Worksheet
+    Protected ReadOnly Property ExcelTempSheet As Excel.Worksheet
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -138,14 +127,32 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
     Protected ExcelTemplatePath As String = ""
     Protected UploadRootPath As String = ""
     Protected UrlRoot As String = ""
-    Protected xlProcId As Integer
-    Protected OfficeCode As String
-    Protected PrintData As DataTable
 
+    ''' <summary>
+    ''' エクセルアプリケーションのプロセスID
+    ''' </summary>
+    Protected xlProcId As Integer
+
+    ''' <summary>
+    ''' 出力対象のシート名
+    ''' </summary>
+    Protected OutputSheetNames As New List(Of String)
+
+    ''' <summary>
+    ''' プロセスID取得
+    ''' </summary>
+    ''' <param name="hwnd"></param>
+    ''' <param name="lpdwProcessId"></param>
+    ''' <returns></returns>
     Protected Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
 
-    Protected Sub Init(mapId As String, excelFileName As String)
+    ''' <summary>
+    ''' コンストラクタ
+    ''' </summary>
+    ''' <param name="mapId"></param>
+    ''' <param name="excelFileName"></param>
+    Protected Sub New(mapId As String, excelFileName As String)
         Try
             Dim CS0050SESSION As New CS0050SESSION
             ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
@@ -187,43 +194,10 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
             ExcelBooksObj = ExcelAppObj.Workbooks
 
             'Excelワークブックオブジェクトの生成
-            ExcelTempBookObj = ExcelBooksObj.Open(ExcelTemplatePath,
+            ExcelBookObj = ExcelBooksObj.Open(ExcelTemplatePath,
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
-            ExcelTempSheets = ExcelTempBookObj.Worksheets
-
-            Dim searchList As New List(Of String)
-            searchList.Add(String.Format("TEMPLATE_{0}", OfficeCode))
-            searchList.Add("TEMPLATE")
-
-            Dim templateSheetIndex As Integer = 1
-            For Each searchName As String In searchList
-                If templateSheetIndex > 1 Then
-                    Exit For
-                End If
-                For Each sheet As Excel.Worksheet In ExcelTempSheets
-                    If sheet.Name.Equals(searchName) Then
-                        templateSheetIndex = sheet.Index
-                        ExcelMemoryRelease(sheet)
-                        Exit For
-                    End If
-                    ExcelMemoryRelease(sheet)
-                Next
-            Next
-            ExcelMemoryRelease(ExcelTempSheet)
-            ExcelTempSheet = DirectCast(ExcelTempSheets(templateSheetIndex), Excel.Worksheet)
-
-            ExcelMemoryRelease(ExcelBookObj)
-            ExcelBookObj = ExcelBooksObj.Add()
-            ExcelMemoryRelease(ExcelWorkSheets)
             ExcelWorkSheets = ExcelBookObj.Worksheets
-            ExcelMemoryRelease(ExcelWorkSheet)
-            ExcelWorkSheet = DirectCast(ExcelWorkSheets.Item(1), Excel.Worksheet)
-            ExcelTempSheet.Copy(After:=ExcelWorkSheet)
-            ExcelWorkSheet.Delete()
-            ExcelMemoryRelease(ExcelWorkSheet)
-            ExcelWorkSheet = DirectCast(ExcelWorkSheets.Item(1), Excel.Worksheet)
-
 
         Catch ex As Exception
             If xlProcId <> 0 Then
@@ -233,31 +207,52 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
         End Try
     End Sub
 
-    Protected Sub SetTemplateSheet(ByVal sheetName As String, Optional ByVal defaultSheetName As String = "TEMPLATE")
+    ''' <summary>
+    ''' Excel作業シート設定
+    ''' </summary>
+    ''' <param name="sheetName"></param>
+    Protected Function TrySetExcelWorkSheet(ByVal sheetName As String, Optional ByVal templateSheetName As String = Nothing) As Boolean
+        Dim result As Boolean = False
         Try
-            Dim searchList As New List(Of String)
-            searchList.Add(sheetName)
-            searchList.Add(defaultSheetName)
-
-            Dim templateSheetIndex As Integer = 1
-            For Each searchName As String In searchList
-                If templateSheetIndex > 1 Then
-                    Exit For
-                End If
-                For Each sheet As Excel.Worksheet In ExcelWorkSheets
-                    If sheet.Name.Equals(searchName) Then
-                        templateSheetIndex = sheet.Index
-                        ExcelMemoryRelease(sheet)
-                        Exit For
-                    End If
-                    ExcelMemoryRelease(sheet)
-                Next
+            ExcelMemoryRelease(_ExcelWorkSheet)
+            ExcelMemoryRelease(_ExcelTempSheet)
+            Dim allSeetName As New Dictionary(Of String, Integer)
+            For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                allSeetName.Add(sheet.Name, sheet.Index)
+                ExcelMemoryRelease(sheet)
             Next
-            ExcelTempSheet = DirectCast(ExcelWorkSheets(templateSheetIndex), Excel.Worksheet)
+            If Not String.IsNullOrWhiteSpace(templateSheetName) AndAlso allSeetName.ContainsKey(templateSheetName) Then
+                _ExcelWorkSheet = DirectCast(ExcelWorkSheets(allSeetName.Item(templateSheetName)), Excel.Worksheet)
+                _ExcelTempSheet = DirectCast(ExcelWorkSheets(allSeetName.Last.Value), Excel.Worksheet)
+                _ExcelWorkSheet.Copy(After:=_ExcelTempSheet)
+                ExcelMemoryRelease(_ExcelWorkSheet)
+                ExcelMemoryRelease(_ExcelTempSheet)
+                _ExcelWorkSheet = DirectCast(ExcelWorkSheets(ExcelWorkSheets.Count), Excel.Worksheet)
+
+                Dim newSheetName As String = sheetName
+                Dim sheetCount As Integer = 1
+                While allSeetName.ContainsKey(newSheetName)
+                    sheetCount += 1
+                    newSheetName = String.Format("{0} ({1})", sheetName, sheetCount)
+                End While
+                _ExcelWorkSheet.Name = newSheetName
+
+                result = True
+
+            ElseIf Not String.IsNullOrWhiteSpace(sheetName) AndAlso allSeetName.ContainsKey(sheetName) Then
+                _ExcelWorkSheet = DirectCast(ExcelWorkSheets(allSeetName.Item(sheetName)), Excel.Worksheet)
+                result = True
+            End If
         Catch ex As Exception
             Throw
+        Finally
+            If Not result Then
+                ExcelMemoryRelease(_ExcelWorkSheet)
+            End If
+            ExcelMemoryRelease(_ExcelTempSheet)
         End Try
-    End Sub
+        Return result
+    End Function
 
     Protected Sub ExcelSaveAs(filePath As String)
         Try
@@ -312,18 +307,6 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
         End If
         'Excel 作業シートオブジェクトの解放
         ExcelMemoryRelease(ExcelTempSheet)
-        'Excel Sheetコレクションの解放
-        ExcelMemoryRelease(ExcelTempSheets)
-        'Excel Bookオブジェクトを閉じる
-        If ExcelTempBookObj IsNot Nothing Then
-            Try
-                'ExcelBookObj.Close(Excel.XlSaveAction.xlDoNotSaveChanges)
-                ExcelTempBookObj.Close(False)
-            Catch ex As Exception
-            End Try
-        End If
-        ExcelMemoryRelease(ExcelTempBookObj)
-
         'Excel Sheetオブジェクトの解放
         ExcelMemoryRelease(ExcelWorkSheet)
         'Excel Sheetコレクションの解放
@@ -404,17 +387,16 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 9
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 20
 
-    Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
-        Try
-            Me.PrintData = printDataClass
-            Me.OfficeCode = officeCode
-            Init(mapId, TEMP_XLS_FILE_NAME)
-        Catch ex As Exception
-            If xlProcId <> 0 Then
-                ExcelProcEnd()
-            End If
-            Throw
-        End Try
+    Protected OfficeCode As String
+    Protected PrintData As DataTable
+
+    Public Sub New(mapId As String, ByVal officeCode As String, printDataClass As DataTable)
+        MyBase.New(mapId, TEMP_XLS_FILE_NAME)
+        Me.OfficeCode = officeCode
+        Me.PrintData = printDataClass
+
+        '○作業シート設定
+        TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
     End Sub
 
     ''' <summary>
@@ -428,17 +410,17 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
         Try
 
-            ExcelWorkSheet.Name = "出荷実績表"
-
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
             Do
-                '○テンプレートシート複製
                 If rowIndex > 0 Then
-                    ExcelTempSheet.Copy(After:=ExcelWorkSheet)
-                    ExcelMemoryRelease(ExcelWorkSheet)
-                    ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
-                    ExcelWorkSheet.Name = String.Format("出荷実績表({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
+                    '○作業シート設定
+                    TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
+                End If
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
                 End If
 
                 '◯ヘッダーの設定
@@ -449,6 +431,26 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
                 rowIndex += DETAIL_AREA_ROWS_COUNT
             Loop While rowIndex < maxRowIndex
+
+            '○出力シートのみ残す
+            If OutputSheetNames IsNot Nothing AndAlso OutputSheetNames.Any() Then
+                ExcelMemoryRelease(ExcelWorkSheet)
+                ExcelMemoryRelease(ExcelTempSheet)
+                Dim allSeetName As New Dictionary(Of String, Integer)
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    allSeetName.Add(sheet.Name, sheet.Index)
+                    ExcelMemoryRelease(sheet)
+                Next
+                For Each sheetName As String In allSeetName.
+                    Where(Function(x) Not OutputSheetNames.Contains(x.Key)).
+                    OrderByDescending(Function(x) x.Value).
+                    Select(Function(x) x.Key).ToList()
+
+                    If TrySetExcelWorkSheet(sheetName) Then
+                        ExcelWorkSheet.Delete()
+                    End If
+                Next
+            End If
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -577,17 +579,16 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 9
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 20
 
-    Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
-        Try
-            PrintData = printDataClass
-            Me.OfficeCode = officeCode
-            Init(mapId, TEMP_XLS_FILE_NAME)
-        Catch ex As Exception
-            If xlProcId <> 0 Then
-                ExcelProcEnd()
-            End If
-            Throw
-        End Try
+    Protected OfficeCode As String
+    Protected PrintData As DataTable
+
+    Public Sub New(mapId As String, ByVal officeCode As String, printDataClass As DataTable)
+        MyBase.New(mapId, TEMP_XLS_FILE_NAME)
+        Me.OfficeCode = officeCode
+        Me.PrintData = printDataClass
+
+        '○作業シート設定
+        TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
     End Sub
 
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String, ByVal consigneeCode As String) As String
@@ -596,7 +597,8 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
-            ExcelWorkSheet.Name = "タンク車発送実績"
+            '○作業シート設定
+            TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_{0}", OfficeCode))
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
@@ -604,10 +606,13 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '○NextPage
                 If rowIndex > 0 Then
-                    ExcelTempSheet.Copy(After:=ExcelWorkSheet)
-                    ExcelMemoryRelease(ExcelWorkSheet)
-                    ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
-                    ExcelWorkSheet.Name = String.Format("タンク車発送実績({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
+                    '○作業シート設定
+                    TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_{0}", OfficeCode))
+                End If
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
                 End If
 
                 '◯ヘッダーの設定
@@ -618,6 +623,26 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 rowIndex += DETAIL_AREA_ROWS_COUNT
             Loop While rowIndex < maxRowIndex
+
+            '○出力シートのみ残す
+            If OutputSheetNames IsNot Nothing AndAlso OutputSheetNames.Any() Then
+                ExcelMemoryRelease(ExcelWorkSheet)
+                ExcelMemoryRelease(ExcelTempSheet)
+                Dim allSeetName As New Dictionary(Of String, Integer)
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    allSeetName.Add(sheet.Name, sheet.Index)
+                    ExcelMemoryRelease(sheet)
+                Next
+                For Each sheetName As String In allSeetName.
+                    Where(Function(x) Not OutputSheetNames.Contains(x.Key)).
+                    OrderByDescending(Function(x) x.Value).
+                    Select(Function(x) x.Key).ToList()
+
+                    If TrySetExcelWorkSheet(sheetName) Then
+                        ExcelWorkSheet.Delete()
+                    End If
+                Next
+            End If
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -802,17 +827,16 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 6
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 23
 
-    Public Sub New(ByVal mapId As String, ByVal officeCode As String, printDataClass As DataTable)
-        Try
-            PrintData = printDataClass
-            Me.OfficeCode = officeCode
-            Init(mapId, TEMP_XLS_FILE_NAME)
-        Catch ex As Exception
-            If xlProcId <> 0 Then
-                ExcelProcEnd()
-            End If
-            Throw
-        End Try
+    Protected OfficeCode As String
+    Protected PrintData As DataTable
+
+    Public Sub New(mapId As String, ByVal officeCode As String, printDataClass As DataTable)
+        MyBase.New(mapId, TEMP_XLS_FILE_NAME)
+        Me.OfficeCode = officeCode
+        Me.PrintData = printDataClass
+
+        '○作業シート設定
+        TrySetExcelWorkSheet("連結順序票", "TEMPLATE")
     End Sub
 
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
@@ -822,17 +846,18 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
         Try
 
-            ExcelWorkSheet.Name = "連結順序票"
-
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
             Do
                 '○NextPage
                 If rowIndex > 0 Then
-                    ExcelTempSheet.Copy(After:=ExcelWorkSheet)
-                    ExcelMemoryRelease(ExcelWorkSheet)
-                    ExcelWorkSheet = DirectCast(ExcelBookObj.ActiveSheet, Excel.Worksheet)
-                    ExcelWorkSheet.Name = String.Format("連結順序票({0})", CInt(rowIndex / DETAIL_AREA_ROWS_COUNT) + 1)
+                    '○作業シート設定
+                    TrySetExcelWorkSheet("連結順序票", "TEMPLATE")
+                End If
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
                 End If
 
                 '◯ヘッダーの設定
@@ -843,6 +868,26 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
                 rowIndex += DETAIL_AREA_ROWS_COUNT
             Loop While rowIndex < maxRowIndex
+
+            '○出力シートのみ残す
+            If OutputSheetNames IsNot Nothing AndAlso OutputSheetNames.Any() Then
+                ExcelMemoryRelease(ExcelWorkSheet)
+                ExcelMemoryRelease(ExcelTempSheet)
+                Dim allSeetName As New Dictionary(Of String, Integer)
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    allSeetName.Add(sheet.Name, sheet.Index)
+                    ExcelMemoryRelease(sheet)
+                Next
+                For Each sheetName As String In allSeetName.
+                    Where(Function(x) Not OutputSheetNames.Contains(x.Key)).
+                    OrderByDescending(Function(x) x.Value).
+                    Select(Function(x) x.Key).ToList()
+
+                    If TrySetExcelWorkSheet(sheetName) Then
+                        ExcelWorkSheet.Delete()
+                    End If
+                Next
+            End If
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)

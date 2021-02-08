@@ -67,8 +67,8 @@
                         <span>チェックが付いた受注の数量を更新しますよろしいですか？</span>
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_ButtonUpadteAmount" class="btn-sticky" value="更新"   onclick="ButtonClick('WF_ButtonUpadteAmount');" />
-                        <input type="button" id="btnCloseThisConfirm" class="btn-sticky" value="ｷｬﾝｾﾙ"  onclick="closeThisConfirm();" />
+                        <input type="button" id="WF_ButtonUpadteAmount" class="btn-sticky" value="実績取込"   onclick="ButtonClick('WF_ButtonUpadteAmount');" />
+                        <input type="button" id="btnCloseThisConfirm" class="btn-sticky" value="メニューへ"  onclick="closeThisConfirm();" />
                     </div>
                 </div>
                 <div id="divInputResultWrapper">

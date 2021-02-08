@@ -651,21 +651,27 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Public Sub New()
             Me.ColorSettings = New Dictionary(Of String, OilTypeColorSetting)
             'ハイオク
-            Me.ColorSettings.Add("1001", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
+            'Me.ColorSettings.Add("1001", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
+            Me.ColorSettings.Add("1001", New OilTypeColorSetting(RGB(245, 142, 126), RGB(20, 23, 26)))
             'レギュラー
-            Me.ColorSettings.Add("1101", New OilTypeColorSetting(RGB(255, 192, 0), RGB(255, 255, 255)))
+            'Me.ColorSettings.Add("1101", New OilTypeColorSetting(RGB(255, 192, 0), RGB(255, 255, 255)))
+            Me.ColorSettings.Add("1101", New OilTypeColorSetting(RGB(223, 32, 32), RGB(255, 255, 255)))
             '灯油
-            Me.ColorSettings.Add("1301", New OilTypeColorSetting(RGB(255, 255, 255), RGB(20, 23, 26)))
+            'Me.ColorSettings.Add("1301", New OilTypeColorSetting(RGB(255, 255, 255), RGB(20, 23, 26)))
+            Me.ColorSettings.Add("1301", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
             '未添加灯油
-            Me.ColorSettings.Add("1302", New OilTypeColorSetting(RGB(221, 245, 253), RGB(20, 23, 26)))
+            'Me.ColorSettings.Add("1302", New OilTypeColorSetting(RGB(221, 245, 253), RGB(20, 23, 26)))
+            Me.ColorSettings.Add("1302", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
             '軽油
             Me.ColorSettings.Add("1401", New OilTypeColorSetting(RGB(0, 176, 80), RGB(255, 255, 255)))
             '3号軽油
             Me.ColorSettings.Add("1404", New OilTypeColorSetting(RGB(146, 208, 80), RGB(255, 255, 255)))
             'A重油
-            Me.ColorSettings.Add("2101", New OilTypeColorSetting(RGB(0, 112, 192), RGB(255, 255, 255)))
+            'Me.ColorSettings.Add("2101", New OilTypeColorSetting(RGB(0, 112, 192), RGB(255, 255, 255)))
+            Me.ColorSettings.Add("2101", New OilTypeColorSetting(RGB(0, 3, 194), RGB(255, 255, 255)))
             'LSA
-            Me.ColorSettings.Add("2201", New OilTypeColorSetting(RGB(0, 176, 240), RGB(255, 255, 255)))
+            'Me.ColorSettings.Add("2201", New OilTypeColorSetting(RGB(0, 176, 240), RGB(255, 255, 255)))
+            Me.ColorSettings.Add("2201", New OilTypeColorSetting(RGB(240, 116, 0), RGB(255, 255, 255)))
         End Sub
         ''' <summary>
         ''' 油種別の色情報取得

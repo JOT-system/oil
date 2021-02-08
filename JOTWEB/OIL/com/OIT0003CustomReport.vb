@@ -976,17 +976,17 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Continue For
                 End If
 
-                'OT列車番号の出力
+                '荷主の出力
                 rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
                 ExcelMemoryRelease(rngDetailArea)
                 '荷受人の出力
-                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
-                ExcelMemoryRelease(rngDetailArea)
-                '荷主の出力
                 rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
                 ExcelMemoryRelease(rngDetailArea)
 
                 Select Case PrintDatarow("OILCODE").ToString()
@@ -1321,17 +1321,17 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Continue For
                 End If
 
-                'OT列車番号の出力
+                '荷主の出力
                 rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
                 ExcelMemoryRelease(rngDetailArea)
                 '荷受人の出力
-                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
-                ExcelMemoryRelease(rngDetailArea)
-                '荷主の出力
                 rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
                 ExcelMemoryRelease(rngDetailArea)
 
                 Select Case PrintDatarow("OILCODE").ToString()

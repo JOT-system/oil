@@ -18,6 +18,7 @@
     color: #fff;
 }
 */
+/* 在庫表更新ボタンのカスタマイズ */
 #WF_ButtonUPDATE {
     border: solid 1px #b6c12b;
     background: #b6c12b;
@@ -25,6 +26,16 @@
 }
 #WF_ButtonUPDATE:hover {
     background: #5e6216;
+}
+/* 受注作成ボタンのカスタマイズ */
+#WF_ButtonORDERLIST {
+    border: solid 1px #2bb6c1;
+    background: #2bb6c1;
+    color: #fff;
+}
+
+#WF_ButtonORDERLIST:hover {
+    background: #0C3337;
 }
 /* 各表名称のDiv */
 .listTitle {
@@ -615,21 +626,24 @@ div.oilTypeData {
 /* ハイオク */
 #divSuggestList div[data-title=suggestValue][data-oilcode="1001"], #divStockList div.oilTypeData[data-oilcode="1001"] div.col1 > div {
     color: #14171A;
-    background-color: rgb(255,255,0);
+    /* background-color: rgb(255,255,0); */
+    background-color: rgb(245, 142, 126);
 }
 /* レギュラー */
 #divSuggestList div[data-title=suggestValue][data-oilcode="1101"], #divStockList div.oilTypeData[data-oilcode="1101"] div.col1 > div {
-    background-color: rgb(255,192,0);
+    /*background-color: rgb(255,192,0);*/
+    background-color: rgb(223, 32, 32);
 }
 /* 灯油 */
 #divSuggestList div[data-title=suggestValue][data-oilcode="1301"], #divStockList div.oilTypeData[data-oilcode="1301"] div.col1 > div {
     color: #14171A;
-    background-color: rgb(255,255,255);
+    /*background-color: rgb(255,255,255);*/
+    background-color: rgb(255,255,0);
 }
 /* 未添加灯油 */
 #divSuggestList div[data-title=suggestValue][data-oilcode="1302"], #divStockList div.oilTypeData[data-oilcode="1302"] div.col1 > div {
     color: #14171A;
-    background-color: rgb(221,245,253);
+    background-color: rgb(255,255,0);
 }
 /* 軽油 */
 #divSuggestList div[data-title=suggestValue][data-oilcode="1401"], #divStockList div.oilTypeData[data-oilcode="1401"] div.col1 > div {
@@ -641,11 +655,13 @@ div.oilTypeData {
 }
 /* A重油 */
 #divSuggestList div[data-title=suggestValue][data-oilcode="2101"], #divStockList div.oilTypeData[data-oilcode="2101"] div.col1 > div {
-    background-color: rgb(0,112,192);
+    /*background-color: rgb(0,112,192);*/
+    background-color: rgb(0, 3, 194);
 }
 /* LSA */
 #divSuggestList div[data-title=suggestValue][data-oilcode="2201"], #divStockList div.oilTypeData[data-oilcode="2201"] div.col1 > div {
-    background-color: rgb(0,176,240);
+    /*background-color: rgb(0,176,240);*/
+    background-color: rgb(240, 116, 0);
 }
 /* ****************** */
 /* 日付部分の土日編集 */

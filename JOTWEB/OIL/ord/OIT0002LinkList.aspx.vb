@@ -439,7 +439,8 @@ Public Class OIT0002LinkList
 
         SQLStr &=
               " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
-            & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
+            & " AND ISNULL(OIT0011.LINKNO,'') <> '' " _
+            & " AND OIT0011.DELFLG <> @P02 "
 
         '### 20201203 START 指摘票対応(No234)全体 ####################################### 
         SQLStr &=
@@ -1952,9 +1953,9 @@ Public Class OIT0002LinkList
             & "    , OIT0002.DELFLG                      AS ORDER_DELFLG " _
             & "    , OIT0003.DELFLG                      AS DETAIL_DELFLG " _
             & " FROM oil.OIT0011_RLINK OIT0011 " _
-            & " INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & " LEFT JOIN oil.OIT0002_ORDER OIT0002 ON " _
             & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
-            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & " LEFT JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
             & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
             & " WHERE " _

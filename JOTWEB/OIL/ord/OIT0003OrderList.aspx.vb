@@ -4016,7 +4016,7 @@ Public Class OIT0003OrderList
             & "   END                                            AS INSPECTION " _
             & "	, CASE " _
             & "   WHEN OIM0003_LASTOIL.MIDDLEOILCODE ='2' AND OIM0003_OIL.MIDDLEOILCODE = '1' " _
-            & "	      THEN '格　上' " _
+            & "	      THEN '格上' " _
             & "	      ELSE '' " _
             & "   END                                            AS UPGRADE "
 

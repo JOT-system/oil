@@ -347,7 +347,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "(端切)" + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
 
                 '### 20201105 START 指摘票対応(No210)全体 ##################
@@ -538,7 +539,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
                 '### 20201209 START OT積込指示書(翌月発送対応) #########################
                 '★翌月発送

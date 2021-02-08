@@ -1235,22 +1235,27 @@ Public Class OIT0003OTLinkageList
             & " AND OIM0010.BRANCH = '1' " _
             & " AND OIM0010.KBN = 'O' " _
             & " AND OIM0010.DEFAULTKBN = 'def' " _
-            & " AND OIM0010.DELFLG <> @P02 " _
-            & " LEFT JOIN (SELECT  " _
+            & " AND OIM0010.DELFLG <> @P02 "
+
+        SQLStrCmn &=
+              " LEFT JOIN (SELECT  " _
             & "              OIM0005.TANKNUMBER " _
             & "            , CASE  " _
             & "              WHEN OIM0005.MODEL = 'タキ1000' THEN 100000 + CONVERT(INT, OIM0005.TANKNUMBER) " _
             & "              ELSE OIM0005.TANKNUMBER " _
             & "              END AS MODELTANKNO " _
-            & "            , CASE  " _
-            & "              WHEN CONVERT(VARCHAR, OIM0005.LOAD) <> '44.0' THEN '' " _
-            & "              ELSE CONVERT(VARCHAR, CONVERT(INT, OIM0005.LOAD)) " _
-            & "              END AS LOAD " _
+            & "            , CONVERT(INT, OIM0005.LOAD) AS LOAD " _
             & "            , OIM0005.DELFLG " _
             & "            FROM oil.OIM0005_TANK OIM0005) OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
-            & " AND OIM0005.DELFLG <> @P02 " _
-            & " LEFT JOIN OIL.OIM0025_OTLINKAGE OIM0025 ON " _
+            & " AND OIM0005.DELFLG <> @P02 "
+        '& "            , CASE  " _
+        '& "              WHEN CONVERT(VARCHAR, OIM0005.LOAD) <> '44.0' THEN '' " _
+        '& "              ELSE CONVERT(VARCHAR, CONVERT(INT, OIM0005.LOAD)) " _
+        '& "              END AS LOAD " _
+
+        SQLStrCmn &=
+              " LEFT JOIN OIL.OIM0025_OTLINKAGE OIM0025 ON " _
             & "     OIM0025.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0025.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
             & " AND OIM0025.PLANTCODE = OIT0002.BASECODE " _
@@ -1351,6 +1356,11 @@ Public Class OIT0003OTLinkageList
                     'i += 1
                     'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
+                Next
+
+                '★積込日を[yyyymmdd]⇒[yymmdd]に変換
+                For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                    OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
                 Next
 
             End Using

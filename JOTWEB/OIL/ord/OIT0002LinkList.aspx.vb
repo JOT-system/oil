@@ -1947,6 +1947,8 @@ Public Class OIT0002LinkList
             & "    , ISNULL(RTRIM(OIT0011.DETAILNO), '') AS DETAILNO " _
             & "    , ISNULL(RTRIM(OIT0011.TRUCKNO), '')  AS TRUCKNO " _
             & "    , OIT0002.TRAINNO                     AS TRAINNO " _
+            & "    , OIT0002.LODDATE                     AS LODDATE " _
+            & "    , OIT0002.DEPDATE                     AS DEPDATE " _
             & "    , OIT0002.SHIPPERSCODE                AS SHIPPERSCODE " _
             & "    , OIT0002.SHIPPERSNAME                AS SHIPPERSNAME " _
             & "    , OIT0002.ORDERSTATUS                 AS ORDERSTATUS " _
@@ -2011,13 +2013,14 @@ Public Class OIT0002LinkList
                             AndAlso OIT0002Exlrow("ORDERNO") <> "" Then
                                 '### 20210204 START 指摘票対応(No340)全体 ############################################
                                 If OIT0002ExlUProw("LOADINGTRAINNO") = OIT0002Exlrow("TRAINNO") _
+                                    AndAlso OIT0002ExlUProw("LOADINGLODDATE") = OIT0002Exlrow("LODDATE") _
+                                    AndAlso OIT0002ExlUProw("LOADINGDEPDATE") = OIT0002Exlrow("DEPDATE") _
                                     AndAlso OIT0002Exlrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 _
                                     AndAlso OIT0002Exlrow("ORDER_DELFLG") <> C_DELETE_FLG.DELETE _
                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") <> C_DELETE_FLG.DELETE Then
                                     OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
-                                ElseIf OIT0002ExlUProw("LOADINGTRAINNO") <> OIT0002Exlrow("TRAINNO") _
-                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
+                                ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
 
                                     '★前回登録した受注明細の内容が今回とで変更されている場合
                                     '　前回登録した受注明細のデータの中身を消去する。

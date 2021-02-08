@@ -37,6 +37,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003FIDtbl_tab3 As DataTable                         '検索用1テーブル(タブ３用)
     Private OIT0003FID2tbl_tab3 As DataTable                        '検索用2テーブル(タブ３用)(受注TBLから情報を取得)
     'Private OIT0003FIDtbl_tab4 As DataTable                         '検索用テーブル(タブ４用)
+    Private OIT0003NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -839,10 +840,11 @@ Public Class OIT0003OrderDetail
 
         'オーダー№
         If work.WF_SEL_ORDERNUMBER.Text = "" Then
-            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
-            WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
-            work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
-            Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+            '★新規受注NO取得(登録する直前に取得)
+            'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+            'WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
+            'work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
+            'Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         Else
             Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         End If
@@ -8795,6 +8797,12 @@ Public Class OIT0003OrderDetail
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+
+                '★新規受注NO取得処理(登録する直前に取得)
+                If work.WF_SEL_ORDERNUMBER.Text = "" Then
+                    WW_GetNewOrderNo(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+                End If
 
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -22165,6 +22173,57 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' 新規受注NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0003NEWORDERNOtbl) Then
+            OIT0003NEWORDERNOtbl = New DataTable
+        End If
+
+        If OIT0003NEWORDERNOtbl.Columns.Count <> 0 Then
+            OIT0003NEWORDERNOtbl.Columns.Clear()
+        End If
+
+        OIT0003NEWORDERNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003NEWORDERNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0003NEWORDERNOtbl.Rows(0)("ORDERNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D GET_NEWORDERNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D GET_NEWORDERNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

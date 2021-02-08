@@ -34,6 +34,7 @@ Public Class OIT0002LinkList
     Private OIT0002His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
+    Private OIT0002NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -3812,10 +3813,12 @@ Public Class OIT0002LinkList
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
+                '★新規受注NO取得処理(登録する直前に取得)
+                Dim sOrderNo As String = ""
                 '受注№取得
-                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-                WW_FixvalueMasterSearch("ZZ", "NEWORDERNOGET", "", WW_GetValue)
-                Dim sOrderNo As String = WW_GetValue(0)
+                'Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch("ZZ", "NEWORDERNOGET", "", WW_GetValue)
+                'Dim sOrderNo As String = WW_GetValue(0)
 
                 '退避用
                 Dim sOrderContent() As String = {"", "", "", "", "", ""}
@@ -3898,12 +3901,13 @@ Public Class OIT0002LinkList
 
                         '★受注TBLに存在しない場合
                         If OIT0002GETtbl.Rows.Count = 0 Then
+                            WW_GetNewOrderNo(SQLcon, sOrderNo)
                             OIT0002EXLUProw("ORDERNO") = sOrderNo
                             OIT0002EXLUProw("DETAILNO") = "001"
 
-                            '次回用に受注Noをカウント
-                            iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
-                            sOrderNo = sOrderNo.Substring(0, 9) + iNum.ToString("00")
+                            ''次回用に受注Noをカウント
+                            'iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
+                            'sOrderNo = sOrderNo.Substring(0, 9) + iNum.ToString("00")
                         Else
                             ''存在する場合は、設定されている受注Noを設定
                             OIT0002EXLUProw("ORDERNO") = OIT0002GETtbl.Rows(0)("ORDERNO")
@@ -6469,6 +6473,57 @@ Public Class OIT0002LinkList
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 新規受注NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0002NEWORDERNOtbl) Then
+            OIT0002NEWORDERNOtbl = New DataTable
+        End If
+
+        If OIT0002NEWORDERNOtbl.Columns.Count <> 0 Then
+            OIT0002NEWORDERNOtbl.Columns.Clear()
+        End If
+
+        OIT0002NEWORDERNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002NEWORDERNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0002NEWORDERNOtbl.Rows(0)("ORDERNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L GET_NEWORDERNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L GET_NEWORDERNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
             Exit Sub
         End Try
     End Sub

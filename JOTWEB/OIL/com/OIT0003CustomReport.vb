@@ -104,7 +104,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
-                OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" Then
+                OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" _
+                OrElse excelFileName = "OIT0003L_KINOENE_SHIPPLAN.xlsx" _
+                OrElse excelFileName = "OIT0003L_SODEGAURA_SHIPPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入出力画面"), Excel.Worksheet)
                 'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_GOI_FILLINGPOINT.xlsx" Then
@@ -345,7 +347,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "(端切)" + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
 
                 '### 20201105 START 指摘票対応(No210)全体 ##################
@@ -536,7 +539,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
                 '### 20201209 START OT積込指示書(翌月発送対応) #########################
                 '★翌月発送
@@ -839,9 +843,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
 #End Region
 
-#Region "ダウンロード(積込予定表(甲子))"
+#Region "ダウンロード(出荷予定、積込予定表(甲子))"
     ''' <summary>
-    ''' テンプレートを元に帳票を作成しダウンロード(積込予定表(甲子))URLを生成する
+    ''' テンプレートを元に帳票を作成しダウンロード(出荷予定、積込予定表(甲子))URLを生成する
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
@@ -852,13 +856,27 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditKinoeneLineHeaderArea(lodDate)
-            '◯明細の設定
-            EditKinoeneLineDetailArea()
-            '***** TODO処理 ここまで *****
-            'ExcelTempSheet.Delete() '雛形シート削除
+            Select Case repPtn
+                '出荷予定(甲子)
+                Case "SHIPPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditKinoeneShipHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditkinoeneShipDetailArea()
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+
+                '積込予定(甲子)
+                Case "KINOENE_LOADPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditKinoeneLineHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditKinoeneLineDetailArea()
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+            End Select
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -883,6 +901,151 @@ Public Class OIT0003CustomReport : Implements IDisposable
         End Try
 
     End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(出荷予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneShipHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 出荷日（積込日）
+                Dim value As String = lodDate
+
+                '◯ 作成日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("AG1")
+                rngHeaderArea.Value = Date.Now.ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+                ExcelMemoryRelease(rngHeaderArea)
+
+                '　月月日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("D5")
+                rngHeaderArea.Value = Date.Parse(value).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+                ExcelMemoryRelease(rngHeaderArea)
+
+                '　ADO3TCH出荷期間（FROM）
+                rngHeaderArea = Me.ExcelWorkSheet.Range("B20")
+                rngHeaderArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
+                ExcelMemoryRelease(rngHeaderArea)
+
+                '　ADO3TCH出荷期間（TO）
+                rngHeaderArea = Me.ExcelWorkSheet.Range("B21")
+                rngHeaderArea.Value = PrintDatarow("ORDERTODATE").ToString()
+                ExcelMemoryRelease(rngHeaderArea)
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(出荷予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneShipDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+        Dim svTrainNo As String = ""
+        Dim svShippersCode As String = ""
+        Dim strYoko As String() = {"E", "H", "K", "N", "Q", "T", "Z", "AC"}
+        Dim iOilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0}
+        Dim iTate As Integer() = {8, 9, 10, 11, 12, 13}
+        Dim iYoko As Integer = 0
+
+        Try
+            Dim i As Integer = 8
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '★列車(着駅)、荷主が変更となった場合
+                If svTrainNo <> "" AndAlso
+                   (svTrainNo <> PrintDatarow("OTTRAINNO").ToString() OrElse
+                    svShippersCode <> PrintDatarow("SHIPPERSCODE").ToString()) Then
+                    '行を１つ下に移動
+                    i += 1
+                    '油種数を初期化
+                    iOilCnt = {0, 0, 0, 0, 0, 0, 0, 0}
+                End If
+
+                '油種が未設定の場合は次のデータへ
+                If PrintDatarow("OILCODE").ToString() = "" Then
+                    '★列車番号を退避
+                    svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                    svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
+                    Continue For
+                End If
+
+                '荷主の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                '荷受人の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+
+                Select Case PrintDatarow("OILCODE").ToString()
+                    '◯白油 
+                    '　GPRE(ハイオク)
+                    Case BaseDllConst.CONST_HTank
+                        iYoko = 0
+                    '　GREG(レギュラー)
+                    Case BaseDllConst.CONST_RTank
+                        iYoko = 1
+                    '　KER(灯油)
+                    Case BaseDllConst.CONST_TTank
+                        iYoko = 2
+                    '　ADO(軽油)
+                    Case BaseDllConst.CONST_KTank1
+                        iYoko = 3
+                    '　ADO3(３号軽油)
+                    Case BaseDllConst.CONST_K3Tank1
+                        iYoko = 4
+                    '　ADO3TCH(３号軽油＋灯油)
+                    Case BaseDllConst.CONST_K3Tank2
+                        iYoko = 5
+
+                    '◯黒油
+                    '　FOA10(Ａ重油)
+                    Case BaseDllConst.CONST_ATank
+                        iYoko = 6
+                    '　FOA01(ＬＳＡ)
+                    Case BaseDllConst.CONST_LTank1
+                        iYoko = 7
+
+                    Case Else
+                        Continue For
+                End Select
+
+                '★帳票に値を設定
+                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
+                iOilCnt(iYoko) += Integer.Parse(Convert.ToString(PrintDatarow("CNT")))
+                rngDetailArea.Value = iOilCnt(iYoko)
+                ExcelMemoryRelease(rngDetailArea)
+                '★列車番号、荷主を退避
+                svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
+            Next
+
+            '空白行の削除（合計が0（ゼロ）の行を削除する）
+            For rowCnt As Integer = iTate(iTate.Count - 1) To iTate(0) Step -1
+                rngDetailArea = Me.ExcelWorkSheet.Range("AI" & rowCnt)
+                If rngDetailArea.Value.ToString = "0" Then
+                    rngDetailArea.EntireRow.Delete()
+                End If
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' 帳票のヘッダー設定(積込予定表(甲子))
@@ -1016,6 +1179,16 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Try
             '○帳票の種類
             Select Case repPtn
+                '出荷予定(袖ケ浦)
+                Case "SHIPPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditSodegauraShipHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditSodegauraShipDetailArea()
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+
                 '★入線方(袖ヶ浦)
                 Case "LINEPLAN"
                     '***** TODO処理 ここから *****
@@ -1052,6 +1225,175 @@ Public Class OIT0003CustomReport : Implements IDisposable
         End Try
 
     End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(出荷予定表(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraShipHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 出荷日（積込日）
+                Dim value As String = lodDate
+
+                '◯ 作成日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("AG1")
+                rngHeaderArea.Value = Date.Now.ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+                ExcelMemoryRelease(rngHeaderArea)
+
+                '　月月日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("D5")
+                rngHeaderArea.Value = Date.Parse(value).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+                ExcelMemoryRelease(rngHeaderArea)
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(出荷予定表(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraShipDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+        Dim svTrainNo As String = ""
+        Dim svShippersCode As String = ""
+        Dim svConsigneeCode As String = ""
+        Dim strYoko As String() = {"E", "H", "K", "N", "Q", "W", "Z", "AC"}
+        Dim iOilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0}
+        Dim iTate As Integer() = {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22}
+        Dim iYoko As Integer = 0
+
+        Try
+            Dim i As Integer = 8
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '★列車(着駅)、荷主が変更となった場合
+                If svTrainNo <> "" AndAlso
+                   (svTrainNo <> PrintDatarow("OTTRAINNO").ToString() OrElse
+                    svConsigneeCode <> PrintDatarow("CONSIGNEECODE").ToString() OrElse
+                    svShippersCode <> PrintDatarow("SHIPPERSCODE").ToString()) Then
+
+                    If PrintDatarow("CONSIGNEECODE").ToString() = "30" Then
+                        'LTA出荷期間コウショウ高崎（FROM）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B29")
+                        rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
+                        'LTA出荷期間コウショウ高崎（TO）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B30")
+                        rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
+                    End If
+
+                    If PrintDatarow("CONSIGNEECODE").ToString() = "40" Then
+                        'LTA出荷期間JONET松本（FROM）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B32")
+                        rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
+                        'LTA出荷期間JONET松本（TO）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B33")
+                        rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
+                    End If
+
+                    If PrintDatarow("CONSIGNEECODE").ToString() = "54" Then
+                        'LTA出荷期間OT高崎（FROM）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B35")
+                        rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
+                        'LTA出荷期間OT高崎（TO）
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B36")
+                        rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
+                    End If
+
+                    '行を１つ下に移動
+                    i += 1
+                    '油種数を初期化
+                    iOilCnt = {0, 0, 0, 0, 0, 0, 0, 0}
+                End If
+
+                '油種が未設定の場合は次のデータへ
+                If PrintDatarow("OILCODE").ToString() = "" Then
+                    '★列車番号を退避
+                    svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                    svConsigneeCode = PrintDatarow("CONSIGNEECODE").ToString()
+                    svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
+                    Continue For
+                End If
+
+                '荷主の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                '荷受人の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+
+                Select Case PrintDatarow("OILCODE").ToString()
+                    '◯白油 
+                    '　プレミアム(ハイオク)
+                    Case BaseDllConst.CONST_HTank
+                        iYoko = 0
+                    '　レギュラー
+                    Case BaseDllConst.CONST_RTank
+                        iYoko = 1
+                    '　灯油
+                    Case BaseDllConst.CONST_TTank
+                        iYoko = 2
+                    '　軽油
+                    Case BaseDllConst.CONST_KTank1
+                        iYoko = 3
+                    '　３号軽油
+                    Case BaseDllConst.CONST_K3Tank1
+                        iYoko = 4
+
+                    '◯黒油
+                    Case BaseDllConst.CONST_ATank
+                        If PrintDatarow("ORDERINGTYPE").ToString() = "C" Then
+                            '　LTA
+                            iYoko = 5
+                        Else
+                            '　0.5A重油
+                            iYoko = 6
+                        End If
+                    '　0.1A重油
+                    Case BaseDllConst.CONST_LTank1
+                        iYoko = 7
+
+                    Case Else
+                        Continue For
+                End Select
+
+                '★帳票に値を設定
+                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
+                iOilCnt(iYoko) += Integer.Parse(Convert.ToString(PrintDatarow("CNT")))
+                rngDetailArea.Value = iOilCnt(iYoko)
+                ExcelMemoryRelease(rngDetailArea)
+                '★列車番号、荷主を退避
+                svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                svConsigneeCode = PrintDatarow("CONSIGNEECODE").ToString()
+                svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
+            Next
+
+            '空白行の削除（合計が0（ゼロ）の行を削除する）
+            For rowCnt As Integer = iTate(iTate.Count - 1) To iTate(0) Step -1
+                rngDetailArea = Me.ExcelWorkSheet.Range("AI" & rowCnt)
+                If rngDetailArea.Value.ToString = "0" Then
+                    rngDetailArea.EntireRow.Delete()
+                End If
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' 帳票のヘッダー設定(入線方(袖ヶ浦))

@@ -2008,6 +2008,8 @@ Public Class OIT0002LinkList
                     '★受注No、受注明細Noの引継ぎ処理
                     OIT0002EXLUPtbl.Columns.Add("ORDERNO", Type.GetType("System.String"))
                     OIT0002EXLUPtbl.Columns.Add("DETAILNO", Type.GetType("System.String"))
+                    OIT0002EXLUPtbl.Columns.Add("ORDERSTATUS", Type.GetType("System.String"))
+                    OIT0002EXLUPtbl.Columns.Add("CREATEFLAG", Type.GetType("System.String"))
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") _
@@ -2021,11 +2023,15 @@ Public Class OIT0002LinkList
                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") <> C_DELETE_FLG.DELETE Then
                                     OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
+                                    OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
                                 ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
 
                                     '★前回登録した受注明細の内容が今回とで変更されている場合
                                     '　前回登録した受注明細のデータの中身を消去する。
                                     WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
+
+                                    '★"1"変更あり(デフォルトは"0"(変更なし))
+                                    OIT0002ExlUProw("CREATEFLAG") = "1"
 
                                 End If
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
@@ -3777,6 +3783,7 @@ Public Class OIT0002LinkList
               " SELECT" _
             & "   OIT0002.ORDERNO            AS ORDERNO" _
             & " , OIT0003.DETAILNO           AS DETAILNO" _
+            & " , OIT0002.ORDERSTATUS        AS ORDERSTATUS" _
             & " , OIT0003.TANKNO             AS TANKNO" _
             & " , OIT0003.OILCODE            AS OILCODE" _
             & " , OIT0003.OILNAME            AS OILNAME" _
@@ -3821,7 +3828,7 @@ Public Class OIT0002LinkList
                 'Dim sOrderNo As String = WW_GetValue(0)
 
                 '退避用
-                Dim sOrderContent() As String = {"", "", "", "", "", ""}
+                Dim sOrderContent() As String = {"", "", "", "", "", "", ""}
                 Dim iNum As Integer
                 Dim i As Integer = 0
                 Dim tankNoFlg As String = "0"
@@ -3841,6 +3848,7 @@ Public Class OIT0002LinkList
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
                         OIT0002EXLUProw("ORDERNO") = sOrderContent(0)
+                        OIT0002EXLUProw("ORDERSTATUS") = sOrderContent(6)
                         '★タンク車Noと一致した明細Noを設定
                         For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
                             If Convert.ToString(OIT0002GETrow("TANKNO")) = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
@@ -3904,6 +3912,7 @@ Public Class OIT0002LinkList
                             WW_GetNewOrderNo(SQLcon, sOrderNo)
                             OIT0002EXLUProw("ORDERNO") = sOrderNo
                             OIT0002EXLUProw("DETAILNO") = "001"
+                            OIT0002EXLUProw("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100
 
                             ''次回用に受注Noをカウント
                             'iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
@@ -3911,6 +3920,7 @@ Public Class OIT0002LinkList
                         Else
                             ''存在する場合は、設定されている受注Noを設定
                             OIT0002EXLUProw("ORDERNO") = OIT0002GETtbl.Rows(0)("ORDERNO")
+                            OIT0002EXLUProw("ORDERSTATUS") = OIT0002GETtbl.Rows(0)("ORDERSTATUS")
                             'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO")) + 1
                             'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                             '★タンク車Noと一致した明細Noを設定
@@ -3959,6 +3969,7 @@ Public Class OIT0002LinkList
                     sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO")
                     sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE")
                     sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE")
+                    sOrderContent(6) = OIT0002EXLUProw("ORDERSTATUS")
                 Next
 
                 '設定した受注№、受注明細№を【貨車連結表(臨海)TBL】に反映
@@ -4195,6 +4206,8 @@ Public Class OIT0002LinkList
                     '★受注№が未設定の場合は次レコード
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
+                    If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                       AndAlso OIT0002row("CREATEFLAG").ToString() = "" Then Continue For
 
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
@@ -4650,6 +4663,7 @@ Public Class OIT0002LinkList
                     '★受注№が未設定の場合は次レコード
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
+                    If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
 
                     'DB更新
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                       '受注№

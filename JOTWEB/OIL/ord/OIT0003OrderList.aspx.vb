@@ -4042,6 +4042,8 @@ Public Class OIT0003OrderList
               " , OIT0003.REMARK                                 AS REMARK" _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , SUBSTRING(OIT0002.TRAINNAME,1,CHARINDEX('-',OIT0002.TRAINNAME)-1) AS OTTRAINNO" _
+            & " , OIT0003.OTTRANSPORTFLG                         AS OTTRANSPORTFLG" _
             & " , OIT0002.TOTALTANKCH                            AS TOTALTANK"
 
         '★積置フラグ無し用SQL
@@ -4242,6 +4244,16 @@ Public Class OIT0003OrderList
                     & "  , OIM0024.PRIORITYNO" _
                     & "  , OIT0002.TRAINNO" _
                     & "  , STACKING"
+
+            Case BaseDllConst.CONST_OFFICECODE_011201
+                '★五井営業所の場合
+                SQLStrAri &=
+                      " ORDER BY" _
+                    & "    OIT0002.TRAINNO" _
+                    & "  , OIT0003.OTTRANSPORTFLG" _
+                    & "  , STACKING" _
+                    & "  , OIT0003.SHIPPERSCODE" _
+                    & "  , OIM0024.PRIORITYNO"
 
             Case Else
                 '★上記以外の営業所

@@ -666,7 +666,8 @@ Public Class OIT0003OTLinkageList
         '******************************
         'CSV作成処理の実行
         '******************************
-        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH)
+        Dim OTFileName As String = SetCSVFileName()
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName)
             Dim url As String
             Try
                 url = repCbj.ConvertDataTableToCsv(False)
@@ -2392,6 +2393,31 @@ Public Class OIT0003OTLinkageList
         Return dt
     End Function
     ''' <summary>
+    ''' CSVファイル名取得
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function SetCSVFileName() As String
+        Dim fileName As String = ""
+
+        Select Case work.WF_SEL_OTS_SALESOFFICECODE.Text
+            '★仙台新港営業所, 四日市営業所
+            Case BaseDllConst.CONST_OFFICECODE_010402,
+                 BaseDllConst.CONST_OFFICECODE_012401
+                fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_OTRCV.FTP"
+
+            '★五井営業所, 甲子営業所, 袖ヶ浦営業所, 根岸営業所
+            Case BaseDllConst.CONST_OFFICECODE_011201,
+                 BaseDllConst.CONST_OFFICECODE_011202,
+                 BaseDllConst.CONST_OFFICECODE_011203,
+                 BaseDllConst.CONST_OFFICECODE_011402
+                fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_OTRCV7.FTP"
+
+        End Select
+
+        Return fileName
+    End Function
+
+    ''' <summary>
     ''' ファイル社外連携の各種出力ファイルの出力可否判定
     ''' </summary>
     Public Class FileLinkagePattern
@@ -2591,7 +2617,7 @@ Public Class OIT0003OTLinkageList
                 '三重塩浜営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012402", True, False, True
+                    "012402", False, False, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
             End With

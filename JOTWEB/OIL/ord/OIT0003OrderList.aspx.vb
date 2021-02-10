@@ -5525,13 +5525,17 @@ Public Class OIT0003OrderList
             & "                              OIM0007.ZAIKOSORT, " _
             & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS NYUSENNO" _
             & " , ''                                             AS OTRANK" _
-            & " , OIT0003.LOADINGIRILINEORDER                    AS LOADINGIRILINEORDER" _
+            & " , CASE" _
+            & "   WHEN OIT0003.LOADINGIRILINEORDER = '' THEN OIT0003.LINEORDER" _
+            & "   ELSE OIT0003.LOADINGIRILINEORDER" _
+            & "   END                                            AS LOADINGIRILINEORDER" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0003.LOADINGIRILINETRAINNAME                AS LOADINGIRILINETRAINNAME" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+        '& " , OIT0003.LOADINGIRILINEORDER                    AS LOADINGIRILINEORDER" _
 
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
@@ -5636,6 +5640,15 @@ Public Class OIT0003OrderList
                 End Using
 
                 Dim tblCnt As Integer = OIT0003ReportSodegauratbl.Rows.Count
+                For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Select("LOADINGOUTLETORDER=''")
+                    Try
+                        '積込出線順を自動設定(積込入線順の値の逆値を設定する)
+                        OIT0003Reprow("LOADINGOUTLETORDER") = (tblCnt - Integer.Parse(OIT0003Reprow("LOADINGIRILINEORDER")) + 1)
+                    Catch ex As Exception
+                        OIT0003Reprow("LOADINGOUTLETORDER") = ""
+                    End Try
+                Next
+
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
                     'OT順位を降順で設定
                     OIT0003Reprow("OTRANK") = tblCnt

@@ -11,7 +11,7 @@
     Private CsvSW As IO.StreamWriter
     Private xlProcId As Integer
 
-    Public Sub New(csvDataClass As DataTable, Optional ByVal I_FolderPath As String = Nothing)
+    Public Sub New(csvDataClass As DataTable, Optional ByVal I_FolderPath As String = Nothing, Optional ByVal I_FileName As String = Nothing)
         Dim CS0050SESSION As New CS0050SESSION
         'CSVファイルに書き込むときに使うEncoding
         Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
@@ -21,6 +21,9 @@
                                                    CS0050SESSION.USERID)
         Me.CsvData = csvDataClass
         Me.UploadTmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".csv"
+        If Not String.IsNullOrEmpty(I_FileName) Then
+            Me.UploadTmpFileName = I_FileName
+        End If
         Me.UploadTmpFilePath = IO.Path.Combine(Me.UploadRootPath, Me.UploadTmpFileName)
         If Not String.IsNullOrEmpty(I_FolderPath) Then
             Me.UploadFilePath = IO.Path.Combine(I_FolderPath, Me.UploadTmpFileName)

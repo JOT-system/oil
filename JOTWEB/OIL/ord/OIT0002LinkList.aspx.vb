@@ -2030,7 +2030,7 @@ Public Class OIT0002LinkList
                                     '　前回登録した受注明細のデータの中身を消去する。
                                     WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
 
-                                    '★"1"変更あり(デフォルトは"0"(変更なし))
+                                    '★"1"変更あり(デフォルトは""(変更なし))
                                     OIT0002ExlUProw("CREATEFLAG") = "1"
 
                                 End If
@@ -2043,9 +2043,13 @@ Public Class OIT0002LinkList
                     '★受注No、受注明細Noの引継ぎ処理
                     OIT0002EXLUPtbl.Columns.Add("ORDERNO", Type.GetType("System.String")).DefaultValue = ""
                     OIT0002EXLUPtbl.Columns.Add("DETAILNO", Type.GetType("System.String")).DefaultValue = ""
+                    OIT0002EXLUPtbl.Columns.Add("ORDERSTATUS", Type.GetType("System.String")).DefaultValue = ""
+                    OIT0002EXLUPtbl.Columns.Add("CREATEFLAG", Type.GetType("System.String")).DefaultValue = ""
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         OIT0002ExlUProw("ORDERNO") = ""
                         OIT0002ExlUProw("DETAILNO") = ""
+                        OIT0002ExlUProw("ORDERSTATUS") = ""
+                        OIT0002ExlUProw("CREATEFLAG") = ""
                     Next
                 End If
 
@@ -3871,16 +3875,22 @@ Public Class OIT0002LinkList
                             Next
                         End If
                         If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
+                            '★受注TBLに存在しない場合
                             If OIT0002GETtbl.Rows.Count = 0 Then
-                                iNum = Integer.Parse(sOrderContent(1)) + 1
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'iNum = Integer.Parse(sOrderContent(1)) + 1
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
                             Else
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                'OIT0002EXLUProw("DETAILNO") = ""
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 END   同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
@@ -3909,10 +3919,14 @@ Public Class OIT0002LinkList
 
                         '★受注TBLに存在しない場合
                         If OIT0002GETtbl.Rows.Count = 0 Then
-                            WW_GetNewOrderNo(SQLcon, sOrderNo)
-                            OIT0002EXLUProw("ORDERNO") = sOrderNo
-                            OIT0002EXLUProw("DETAILNO") = "001"
-                            OIT0002EXLUProw("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100
+                            '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
+                            OIT0002EXLUProw("ORDERNO") = ""
+                            OIT0002EXLUProw("DETAILNO") = ""
+                            'WW_GetNewOrderNo(SQLcon, sOrderNo)
+                            'OIT0002EXLUProw("ORDERNO") = sOrderNo
+                            'OIT0002EXLUProw("DETAILNO") = "001"
+                            'OIT0002EXLUProw("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100
+                            '### 20210210 END   同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
 
                             ''次回用に受注Noをカウント
                             'iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
@@ -3946,11 +3960,13 @@ Public Class OIT0002LinkList
                             End If
                             If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                'OIT0002EXLUProw("DETAILNO") = ""
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 END   同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
@@ -3974,7 +3990,7 @@ Public Class OIT0002LinkList
 
                 '設定した受注№、受注明細№を【貨車連結表(臨海)TBL】に反映
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
-                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" Then
+                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" AndAlso OIT0002EXLUProw("DETAILNO") <> "" Then
                         WW_UpdateRLinkOrderNo(SQLcon, OIT0002EXLUProw)
                     End If
                 Next

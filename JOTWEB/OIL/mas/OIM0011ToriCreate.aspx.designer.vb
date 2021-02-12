@@ -221,6 +221,33 @@ Partial Public Class OIM0011TORICreate
     Protected WithEvents WF_TORINAMEKANA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_DEPTNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DEPTNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_DEPTNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DEPTNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_DEPTNAME_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DEPTNAME_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_POSTNUM1_L コントロール。
     '''</summary>
     '''<remarks>
@@ -489,6 +516,141 @@ Partial Public Class OIM0011TORICreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_OILUSEFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_BANKCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_BANKCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_BANKCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_BANKBRANCHCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKBRANCHCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_BANKBRANCHCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKBRANCHCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_BANKBRANCHCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BANKBRANCHCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTTYPE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTTYPE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTTYPE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ACCOUNTTYPE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTTYPE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTNUMBER_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNUMBER_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTNUMBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNUMBER As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ACCOUNTNUMBER_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNUMBER_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNTNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ACCOUNTNAME_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。

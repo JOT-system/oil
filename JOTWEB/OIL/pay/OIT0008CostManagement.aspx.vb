@@ -15,14 +15,6 @@ Public Class OIT0008CostManagement
 
     Private OIM0002tbl As DataTable
 
-    Private Const CONST_DISPROWCOUNT As Integer = 45                ' 1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 20                 ' マウススクロール時稼働行数
-
-    '○ データOPERATION用
-    Private Const CONST_INSERT As String = "Insert"                 ' データ追加
-    Private Const CONST_UPDATE As String = "Update"                 ' データ更新
-    Private Const CONST_PATTERNERR As String = "PATTEN ERR"         ' 関連チェックエラー
-
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    ' ログ出力
     Private CS0013ProfView As New CS0013ProfView                    ' Tableオブジェクト展開
@@ -39,11 +31,14 @@ Public Class OIT0008CostManagement
     Private WW_ERRCODE As String                                    ' サブ用リターンコード
     Private WW_FOCUS_CONTROL As String = ""
     Private WW_FOCUS_ROW As Integer = 0
+    Private WW_OFFICECODE As String = ""
+    Private WW_KEIJYO_YM As String = ""
+    Private WW_EDITABLEFLG As Boolean = True
 
     '〇　請求/支払合計計算用
-    Private WK_INV_AMMOUNT_ALL As Integer = 0
+    Private WK_INV_AMOUNT_ALL As Integer = 0
     Private WK_INV_TAX_ALL As Integer = 0
-    Private WK_PAY_AMMOUNT_ALL As Integer = 0
+    Private WK_PAY_AMOUNT_ALL As Integer = 0
     Private WK_PAY_TAX_ALL As Integer = 0
 
     ''' <summary>
@@ -58,42 +53,56 @@ Public Class OIT0008CostManagement
             If IsPostBack Then
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
-                    ''○ 画面表示データ復元
-                    'Master.RecoverTable(OIT0008tbl)
 
+                    '項目の内容変更、又は「戻る」以外のポストバックでは、GridViewの表示内容をワークテーブルへ反映する
+                    If Not WF_ButtonClick.Value = "WF_ButtonEND" OrElse
+                       Not WF_ButtonClick.Value = "WF_ListboxDBclick" OrElse
+                       Not WF_ButtonClick.Value = "WF_LeftBoxSelectClick" Then
+                        SetGridViewToTempTable()
+                    End If
+
+                    Dim DisplayGridViewFlg As Boolean = True
                     Select Case WF_ButtonClick.Value
-                        'Case "WF_ButtonCSV"             ' ダウンロードボタン押下
-                        '    WF_ButtonDownload_Click()
-                        'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
-                        '    WF_ButtonPrint_Click()
                         Case "WF_ButtonEND"             '「戻る」ボタンクリック
                             WF_ButtonEND_Click()
+                            DisplayGridViewFlg = False
+                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                            WF_FIELD_Change()
+                            DisplayGridViewFlg = False
+                        Case "WF_ListboxDBclick", "WF_ButtonSel" '（左ボックス）項目選択
+                            WF_ButtonSel_Click()
+                            DisplayGridViewFlg = False
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        'Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
-                        '    WF_FIELD_Change()
-                        Case "WF_ButtonSel"             '（左ボックス）選択ボタン押下
-                            WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '（左ボックス）キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '（左ボックス）ダブルクリック
-                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '（右ボックス）ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '（右ボックス）メモ欄更新
                             WF_RIGHTBOX_Change()
-                        Case "WF_ButtonRELOAD"          '「表示する」ボタンクリック
-                            WF_Grid_RELOAD()
+                        Case "WF_Button_OfficeCode"     '「営業所」「表示する」ボタンクリック
+                            WF_OfficeButton_Click()
+                            DisplayGridViewFlg = False
                         Case "WF_ButtonDELETEROW"       '「行削除」ボタンクリック
                             WF_Grid_DeleteRow()
                         Case "WF_ButtonADDROW"          '「行追加」ボタンクリック
                             WF_Grid_AddRow()
                         Case "WF_ButtonUPDATE"          '「保存する」ボタンクリック
                             WF_ButtonUPDATE_Click()
+                            'Case "WF_ButtonCSV"             ' ダウンロードボタン押下
+                            '    WF_ButtonDownload_Click()
+                            'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
+                            '    WF_ButtonPrint_Click()
+                        Case Else
+                            If WF_ButtonClick.Value.Contains("WF_ButtonShowDetail") Then
+                                WF_ButtonShowDetail()   '「詳細を見る」ボタンクリック
+                            End If
                     End Select
 
                     '○ 一覧再表示処理
-                    DisplayGrid()
+                    If DisplayGridViewFlg Then
+                        WF_Grid_RELOAD(False)
+                    End If
                 End If
             Else
                 '○ 初期化処理
@@ -130,22 +139,121 @@ Public Class OIT0008CostManagement
 
     End Sub
 
-    Protected Sub WF_Grid_RELOAD()
-        ''【暫定】初期化処理
-        'Initialize()
+    ''' <summary>
+    ''' 「詳細を見る」ボタンクリック処理
+    ''' </summary>
+    Protected Sub WF_ButtonShowDetail()
+        Dim rowIdx As Integer = 0
+        'ボタンの行番号を取得する
+        Integer.TryParse(WF_ButtonClick.Value.Substring(WF_ButtonClick.Value.Length - 3), rowIdx)
+
+        '明細画面の検索条件を設定
+        '#
+        work.WF_SEL_LINE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_LINE"), Label).Text
+        '勘定科目コード
+        work.WF_SEL_ACCOUNTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
+        'セグメント
+        work.WF_SEL_SEGMENTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
+        'セグメント枝番
+        work.WF_SEL_SEGMENTBRANCHCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
+        '荷主コード
+        work.WF_SEL_SHIPPERSCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
+        '荷主名
+        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), HiddenField).Value
+        '請求先コード
+        work.WF_SEL_INVOICECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
+        '支払先コード
+        work.WF_SEL_PAYEECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox).Text
+        '摘要
+        work.WF_SEL_TEKIYOU.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_TEKIYOU"), TextBox).Text
+
+        '明細画面に遷移
+        Master.CheckParmissionCode(Master.USERCAMP)
+        If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
+            Master.TransitionPage()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 営業所ボタンクリック処理
+    ''' </summary>
+    Private Sub WF_OfficeButton_Click()
+        '選択中の営業所から営業所コードを取得
+        Dim contents1 = Me.Controls(0).FindControl("contents1")
+        Dim selectedHiddenId = DirectCast(contents1.FindControl("WF_OFFICEHDN_ID"), HiddenField).Value
+        Dim selectedHiddenControl = DirectCast(contents1.FindControl(selectedHiddenId), HiddenField)
+        WW_OFFICECODE = selectedHiddenControl.Value
+
+        '前回リロード時の営業所コードと異なる場合
+        If WW_OFFICECODE = work.WF_SEL_LAST_OFFICECODE.Text Then
+            'リロード
+            WF_Grid_RELOAD(False)
+        Else
+            '初期化リロード
+            WF_Grid_RELOAD(True)
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面リロード処理
+    ''' </summary>
+    ''' <param name="InitFlg">初期化フラグ</param>
+    Protected Sub WF_Grid_RELOAD(Optional ByRef InitFlg As Boolean = False)
 
         '選択中の営業所から営業所コードを取得
-        Dim selectedHiddenId = DirectCast(Me.Controls(0).FindControl("contents1").FindControl("WF_OFFICEHDN_ID"), HiddenField).Value
-        Dim selectedHiddenControl = DirectCast(Me.Controls(0).FindControl("contents1").FindControl(selectedHiddenId), HiddenField)
-        Dim WK_OFFICECODE = selectedHiddenControl.Value
+        Dim contents1 = Me.Controls(0).FindControl("contents1")
+        Dim selectedHiddenId = DirectCast(contents1.FindControl("WF_OFFICEHDN_ID"), HiddenField).Value
+        Dim selectedHiddenControl = DirectCast(contents1.FindControl(selectedHiddenId), HiddenField)
+        WW_OFFICECODE = selectedHiddenControl.Value
 
-        '計上月を取得
-        Dim WK_KEIJOYM = DateTime.Parse(WF_KEIJOYM.Text + "/01")
+        '今回表示する営業コードを保持
+        work.WF_SEL_LAST_OFFICECODE.Text = WW_OFFICECODE
+
+        '計上年月を取得
+        WW_KEIJYO_YM = WF_KEIJYO_YM.Text
+
+        '今回表示する計上年月を保持
+        work.WF_SEL_LAST_KEIJYO_YM.Text = WW_KEIJYO_YM
+
+        '初期表示計上年月よりも表示計上年月が小さい場合、編集不可とする
+        If CDate(work.WF_SEL_INIT_KEIJYO_YM.Text).CompareTo(CDate(work.WF_SEL_LAST_KEIJYO_YM.Text)) > 0 Then
+            WW_EDITABLEFLG = False
+        Else
+            WW_EDITABLEFLG = True
+        End If
+
+        'ボタン
+        WF_ALLSELECT.Enabled = WW_EDITABLEFLG
+        WF_ALLRELEACE.Enabled = WW_EDITABLEFLG
+        WF_ADDROW.Enabled = WW_EDITABLEFLG
+        WF_DELETEROW.Enabled = WW_EDITABLEFLG
+        WF_UPDATE.Enabled = WW_EDITABLEFLG
 
         'データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
 
-        'GridViewの初期化
-        GridViewInitialize()
+            'データベース接続
+            SQLcon.Open()
+
+            '初期化フラグが立っている場合は初期化
+            If InitFlg Then
+                '費用管理ワークテーブル群の初期化
+                InitTempTable(SQLcon)
+
+                '費用管理ワークテーブル群の初期データ設定
+                SetTempTable(SQLcon)
+
+                '入力可能の計上年月の場合、入力行を1行追加
+                If WW_EDITABLEFLG Then
+                    WF_Grid_AddRow()
+                End If
+            End If
+
+            'GridView設定
+            GridViewSetup(SQLcon)
+        End Using
 
         '営業所ボタンのスタイル変更
         Dim endIndex = selectedHiddenId.Split("_")
@@ -153,6 +261,10 @@ Public Class OIT0008CostManagement
 
     End Sub
 
+    ''' <summary>
+    ''' 営業所ボタンのスタイル設定
+    ''' </summary>
+    ''' <param name="endIndex">選択中ボタンの番号</param>
     Protected Sub SetOfficeStyle(ByRef endIndex As String)
 
         'いったん初期化
@@ -165,7 +277,8 @@ Public Class OIT0008CostManagement
         WF_OFFICEBTN_7.CssClass = "btn-office"
         WF_OFFICEBTN_8.CssClass = "btn-office"
         WF_OFFICEBTN_9.CssClass = "btn-office"
-        WF_OFFICEBTN_10.CssClass = "btn-office last"
+        WF_OFFICEBTN_10.CssClass = "btn-office"
+        WF_OFFICEBTN_11.CssClass = "btn-office last"
 
         '選択されているボタンのコントロールを得る
         Dim btnControl = DirectCast(Me.Controls(0).FindControl("contents1").FindControl("WF_OFFICEBTN_" + endIndex), Button)
@@ -173,149 +286,466 @@ Public Class OIT0008CostManagement
 
     End Sub
 
+    ''' <summary>
+    ''' 行削除
+    ''' </summary>
     Protected Sub WF_Grid_DeleteRow()
-        'グリッドビューから入力データテーブルに格納
-        ConvertGridViewToTable()
 
-        '入力データテーブルをコピー
-        OIT0008tbl = OIT0008INPtbl.Clone()
-        '選択行を除いて行をコピーし、#をカウントし直す
-        Dim lineCnt As Integer = 1
-        For Each INProw As DataRow In OIT0008INPtbl.Rows
-            If INProw("CHECK") = 0 Then
+        '選択行を削除
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" DELETE FROM [oil].TMP0008_COST")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     OFFICECODE = @P01")
+        SQLStrBldr.AppendLine(" AND KEIJYOYM = @P02")
+        SQLStrBldr.AppendLine(" AND CHECKFLG = 1")
 
-                Dim aRow As DataRow = OIT0008tbl.NewRow()
-                aRow.ItemArray = INProw.ItemArray
+        '行番号の振り直し
+        Dim MergeSQLStrBldr As New StringBuilder
+        MergeSQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS OLD_T")
+        MergeSQLStrBldr.AppendLine(" USING (")
+        MergeSQLStrBldr.AppendLine("     SELECT")
+        MergeSQLStrBldr.AppendLine("         OFFICECODE")
+        MergeSQLStrBldr.AppendLine("         , KEIJYOYM")
+        MergeSQLStrBldr.AppendLine("         , LINE")
+        MergeSQLStrBldr.AppendLine("         , ROW_NUMBER() OVER(ORDER BY LINE) AS NEW_LINE")
+        MergeSQLStrBldr.AppendLine("     FROM")
+        MergeSQLStrBldr.AppendLine("         [oil].TMP0008_COST")
+        MergeSQLStrBldr.AppendLine("     WHERE")
+        MergeSQLStrBldr.AppendLine("         OFFICECODE = @P01")
+        MergeSQLStrBldr.AppendLine("     AND KEIJYOYM = @P02")
+        MergeSQLStrBldr.AppendLine(" ) AS NEW_T")
+        MergeSQLStrBldr.AppendLine("     ON  OLD_T.OFFICECODE = NEW_T.OFFICECODE")
+        MergeSQLStrBldr.AppendLine("     AND OLD_T.KEIJYOYM = NEW_T.KEIJYOYM")
+        MergeSQLStrBldr.AppendLine("     AND OLD_T.LINE = NEW_T.LINE")
+        MergeSQLStrBldr.AppendLine(" WHEN MATCHED THEN UPDATE SET OLD_T.LINE = NEW_T.NEW_LINE;")
 
-                aRow("LINECNT") = lineCnt
-                OIT0008tbl.Rows.Add(aRow)
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()
 
-                lineCnt = lineCnt + 1
-            End If
-        Next
+                Using DelRowCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon), MergeCmd As New SqlCommand(MergeSQLStrBldr.ToString(), SQLcon)
+                    Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                    Dim PARA1 As SqlParameter = DelRowCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim PARA2 As SqlParameter = DelRowCmd.Parameters.Add("@P02", SqlDbType.Date)
+                    Dim MPARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim MPARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
 
-        '小計テーブル生成
-        CreateSubTotalTable()
+                    '行削除
+                    PARA1.Value = WW_OFFICECODE
+                    PARA2.Value = WK_DATE
+                    DelRowCmd.CommandTimeout = 300
+                    DelRowCmd.ExecuteNonQuery()
 
-        'データバインド
-        WF_COSTLISTTBL.DataSource = OIT0008tbl
-        WF_COSTLISTTBL.DataBind()
+                    '行番号振り直し
+                    MPARA1.Value = WW_OFFICECODE
+                    MPARA2.Value = WK_DATE
+                    MergeCmd.CommandTimeout = 300
+                    MergeCmd.ExecuteNonQuery()
+
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST DELETE_ROW")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST DELETE_ROW"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
+
     End Sub
 
+    ''' <summary>
+    ''' 行追加
+    ''' </summary>
     Protected Sub WF_Grid_AddRow()
-        'グリッドビューから入力データテーブルに格納
-        ConvertGridViewToTable()
 
-        '入力データテーブルをコピー
-        OIT0008tbl = OIT0008INPtbl.Clone()
-        '行数を取得
-        Dim lineCnt As Integer = 0
-        Dim aRow As DataRow = Nothing
-        For Each INProw As DataRow In OIT0008INPtbl.Rows
-            lineCnt = INProw("LINECNT")
-            aRow = OIT0008tbl.NewRow()
-            aRow.ItemArray = INProw.ItemArray
-            OIT0008tbl.Rows.Add(aRow)
-        Next
-        '行を追加
-        aRow = OIT0008tbl.NewRow()
-        aRow("LINECNT") = lineCnt + 1
-        aRow("CHECK") = 0
-        aRow("DETAIL") = 0
-        OIT0008tbl.Rows.Add(aRow)
+        '空行を追加
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" INSERT INTO [oil].TMP0008_COST")
+        SQLStrBldr.AppendLine(" SELECT")
+        SQLStrBldr.AppendLine("     @P01 AS OFFICECODE")
+        SQLStrBldr.AppendLine("     , @P02 AS KEIJYOYM")
+        SQLStrBldr.AppendLine("     , ISNULL((SELECT MAX(LINE) FROM [oil].TMP0008_COST WHERE OFFICECODE = @P01 AND KEIJYOYM = @P02), 0) + 1 AS LINE")
+        SQLStrBldr.AppendLine("     , 0 AS CHEKFLG")
+        SQLStrBldr.AppendLine("     , '2' AS CALCACCOUNT")
+        SQLStrBldr.AppendLine("     , '' AS ACCOUNTCODE")
+        SQLStrBldr.AppendLine("     , '' AS SEGMENTCODE")
+        SQLStrBldr.AppendLine("     , '' AS SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("     , '' AS SHIPPERSCODE")
+        SQLStrBldr.AppendLine("     , '' AS SHIPPERSNAME")
+        SQLStrBldr.AppendLine("     , 0.0 AS QUANTITY")
+        SQLStrBldr.AppendLine("     , 0.0 AS UNITPRICE")
+        SQLStrBldr.AppendLine("     , 0 AS AMOUNT")
+        SQLStrBldr.AppendLine("     , 0 AS TAX")
+        SQLStrBldr.AppendLine("     , '' AS INVOICECODE")
+        SQLStrBldr.AppendLine("     , '' AS INVOICENAME")
+        SQLStrBldr.AppendLine("     , '' AS INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("     , '' AS PAYEECODE")
+        SQLStrBldr.AppendLine("     , '' AS PAYEENAME")
+        SQLStrBldr.AppendLine("     , '' AS PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("     , '' AS TEKIYOU")
 
-        '小計テーブル生成
-        CreateSubTotalTable()
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()
 
-        'データバインド
-        WF_COSTLISTTBL.DataSource = OIT0008tbl
-        WF_COSTLISTTBL.DataBind()
+                Using InsBlankCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA1 As SqlParameter = InsBlankCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim PARA2 As SqlParameter = InsBlankCmd.Parameters.Add("@P02", SqlDbType.Date)
+
+                    '費用管理ワークテーブルへ空行を追加
+                    PARA1.Value = WW_OFFICECODE
+                    Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                    PARA2.Value = WK_DATE
+
+
+                    InsBlankCmd.CommandTimeout = 300
+                    InsBlankCmd.ExecuteNonQuery()
+
+                End Using
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST INSERT_BLANK_ROW")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST INSERT_BLANK_ROW"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
     End Sub
 
-    Protected Sub ConvertGridViewToTable()
-        'テーブル作成
-        OIT0008INPtbl = InitTableCreate()
+    ''' <summary>
+    ''' 費用管理ワークテーブルの更新(GridViewから入力テーブルへの変換)
+    ''' </summary>
+    Protected Sub SetGridViewToTempTable()
+
+        '前回表示時の営業所コードを設定
+        WW_OFFICECODE = work.WF_SEL_LAST_OFFICECODE.Text
+
+        '前回表示時の計上年月を設定
+        WW_KEIJYO_YM = work.WF_SEL_LAST_KEIJYO_YM.Text
+
+        '入力テーブル作成
+        OIT0008INPtbl = New DataTable
+        OIT0008INPtbl.Columns.Add("LINE", Type.GetType("System.Int32"))
+        OIT0008INPtbl.Columns.Add("CHECKFLG", Type.GetType("System.Int32"))
+        OIT0008INPtbl.Columns.Add("CALCACCOUNT", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("ACCOUNTCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SEGMENTBRANCHCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SHIPPERSCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SHIPPERSNAME", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("QUANTITY", Type.GetType("System.Decimal"))
+        OIT0008INPtbl.Columns.Add("AMOUNT", Type.GetType("System.Decimal"))
+        OIT0008INPtbl.Columns.Add("TAX", Type.GetType("System.Decimal"))
+        OIT0008INPtbl.Columns.Add("INVOICECODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("INVOICENAME", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("INVOICEDEPTNAME", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("PAYEECODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("PAYEENAME", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("PAYEEDEPTNAME", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("TEKIYOU", Type.GetType("System.String"))
 
         'GridViewの行を検索
         For Each gRow As GridViewRow In WF_COSTLISTTBL.Rows
-            Dim tRow As DataRow = OIT0008INPtbl.NewRow()
-            '#(LINECNT)
-            If gRow.FindControl("WF_COSTLISTTBL_LINECNT") IsNot Nothing Then
-                tRow("LINECNT") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_LINECNT"), Label).Text
+
+            Dim addRow = OIT0008INPtbl.NewRow
+
+            'データ行でなければ処理を行わない
+            If Not gRow.RowType = DataControlRowType.DataRow Then
+                Continue For
             End If
-            '選択(CHECK)
-            If gRow.FindControl("WF_COSTLISTTBL_CHECK") IsNot Nothing Then
-                Dim tmpCheckBox = DirectCast(gRow.FindControl("WF_COSTLISTTBL_CHECK"), CheckBox)
-                If tmpCheckBox IsNot Nothing AndAlso tmpCheckBox.Checked Then
-                    tRow("CHECK") = 1
-                Else
-                    tRow("CHECK") = 0
-                End If
+
+            '確認ボタンが使用可ならば自動計算科目なので、処理をスキップする
+            If DirectCast(gRow.FindControl("WF_COSTLISTTBL_CALCACCOUNT"), Button).Enabled = True Then
+                addRow("CALCACCOUNT") = "1"
+            Else
+                addRow("CALCACCOUNT") = "2"
             End If
-            '確認(DETAIL)
-            If gRow.FindControl("WF_COSTLISTTBL_DETAIL") IsNot Nothing Then
-                Dim tmpButton = DirectCast(gRow.FindControl("WF_COSTLISTTBL_DETAIL"), Button)
-                If tmpButton IsNot Nothing AndAlso tmpButton.Enabled Then
-                    tRow("DETAIL") = 1
-                Else
-                    tRow("DETAIL") = 0
-                End If
+
+            '#(LINE)
+            addRow("LINE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_LINE"), Label).Text
+
+            '選択(CHECKFLG)
+            If DirectCast(gRow.FindControl("WF_COSTLISTTBL_CHECKFLG"), CheckBox).Checked Then
+                addRow("CHECKFLG") = 1
+            Else
+                addRow("CHECKFLG") = 0
             End If
+
             '勘定科目コード(ACCOUNTCODE)
-            If gRow.FindControl("WF_COSTLISTTBL_ACCOUNTCODE") IsNot Nothing Then
-                tRow("ACCOUNTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
-            End If
+            addRow("ACCOUNTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
+
             'セグメント(SEGMENTCODE)
-            If gRow.FindControl("WF_COSTLISTTBL_SEGMENTCODE") IsNot Nothing Then
-                tRow("SEGMENTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
-            End If
+            addRow("SEGMENTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
+
             'セグメント枝番(SEGMENTCODE)
-            If gRow.FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE") IsNot Nothing Then
-                tRow("SEGMENTBRANCHCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
-            End If
-            '金額(AMMOUNT)
-            If gRow.FindControl("WF_COSTLISTTBL_AMMOUNT") IsNot Nothing Then
-                Dim ammount As Integer = 0
-                Integer.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_AMMOUNT"), TextBox).Text, ammount)
-                tRow("AMMOUNT") = ammount
-            End If
-            '税額(TAX)
-            If gRow.FindControl("WF_COSTLISTTBL_TAX") IsNot Nothing Then
-                Dim tax As Integer = 0
-                Integer.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_TAX"), Label).Text, tax)
-                tRow("TAX") = tax
-            End If
+            addRow("SEGMENTBRANCHCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
+
+            '荷主コード(SHIPPERSCODE)
+            addRow("SHIPPERSCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
+
+            '荷主名(SHIPPERSNAME)
+            addRow("SHIPPERSNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), HiddenField).Value
+
+            '数量(QUANTITY)
+            Dim quantity As Decimal = 0
+            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_QUANTITY"), HiddenField).Value, quantity)
+            addRow("QUANTITY") = quantity
+
+            '金額(AMOUNT)
+            Dim amount As Decimal = 0
+            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_AMOUNT"), TextBox).Text, amount)
+            addRow("AMOUNT") = amount
+
+            '税金(TAX)
+            Dim tax As Decimal = 0
+            addRow("TAX") = Math.Floor(amount * 0.1)
+
             '請求先コード(INVOICECODE)
-            If gRow.FindControl("WF_COSTLISTTBL_INVOICECODE") IsNot Nothing Then
-                tRow("INVOICECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
-            End If
+            addRow("INVOICECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
+
             '請求先名(INVOICENAME)
-            If gRow.FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
-                tRow("INVOICENAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICENAME"), Label).Text
-            End If
-            '請求先部門(INVOICEDEPT)
-            If gRow.FindControl("WF_COSTLISTTBL_INVOICEDEPT") IsNot Nothing Then
-                tRow("INVOICEDEPT") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICEDEPT"), Label).Text
-            End If
+            addRow("INVOICENAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICENAME"), Label).Text
+
+            '請求先部門(INVOICEDEPTNAME)
+            addRow("INVOICEDEPTNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label).Text
+
             '支払先コード(PAYEECODE)
-            If gRow.FindControl("WF_COSTLISTTBL_PAYEECODE") IsNot Nothing Then
-                tRow("PAYEECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox).Text
-            End If
+            addRow("PAYEECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox).Text
+
             '支払先名(PAYEENAME)
-            If gRow.FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
-                tRow("PAYEENAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEENAME"), Label).Text
-            End If
-            '支払先部門(PAYEEDEPT)
-            If gRow.FindControl("WF_COSTLISTTBL_PAYEEDEPT") IsNot Nothing Then
-                tRow("PAYEEDEPT") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEEDEPT"), Label).Text
-            End If
-            '摘要(ABSTRACT)
-            If gRow.FindControl("WF_COSTLISTTBL_ABSTRACT") IsNot Nothing Then
-                tRow("ABSTRACT") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ABSTRACT"), TextBox).Text
-            End If
+            addRow("PAYEENAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEENAME"), Label).Text
+
+            '支払先部門(PAYEEDEPTNAME)
+            addRow("PAYEEDEPTNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label).Text
+
+            '摘要(TEKIYOU)
+            addRow("TEKIYOU") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_TEKIYOU"), TextBox).Text
+
             'テーブルに行追加
-            OIT0008INPtbl.Rows.Add(tRow)
+            OIT0008INPtbl.Rows.Add(addRow)
         Next
+
+        '更新対象がなければ処理終了
+        If OIT0008INPtbl.Rows.Count = 0 Then Exit Sub
+
+        '画面表示データをワークテーブルへ反映
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()
+
+            UpdateTempTable(SQLcon)
+        End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' 費用管理ワークテーブルの更新(DB処理)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    Protected Sub UpdateTempTable(ByVal SQLcon As SqlConnection)
+
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS T0007")
+        SQLStrBldr.AppendLine(" USING (")
+        SQLStrBldr.AppendLine("     SELECT")
+        SQLStrBldr.AppendLine("         @P01 AS OFFICECODE")
+        SQLStrBldr.AppendLine("         , @P02 AS KEIJYOYM")
+        SQLStrBldr.AppendLine("         , @P03 AS LINE")
+        SQLStrBldr.AppendLine("         , @P04 AS CHECKFLG")
+        SQLStrBldr.AppendLine("         , @P05 AS CALCACCOUNT")
+        SQLStrBldr.AppendLine("         , @P06 AS ACCOUNTCODE")
+        SQLStrBldr.AppendLine("         , @P07 AS SEGMENTCODE")
+        SQLStrBldr.AppendLine("         , @P08 AS SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("         , @P09 AS SHIPPERSCODE")
+        SQLStrBldr.AppendLine("         , @P10 AS SHIPPERSNAME")
+        SQLStrBldr.AppendLine("         , @P11 AS QUANTITY")
+        SQLStrBldr.AppendLine("         , @P12 AS UNITPRICE")
+        SQLStrBldr.AppendLine("         , @P13 AS AMOUNT")
+        SQLStrBldr.AppendLine("         , @P14 AS TAX")
+        SQLStrBldr.AppendLine("         , @P15 AS INVOICECODE")
+        SQLStrBldr.AppendLine("         , @P16 AS INVOICENAME")
+        SQLStrBldr.AppendLine("         , @P17 AS INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("         , @P18 AS PAYEECODE")
+        SQLStrBldr.AppendLine("         , @P19 AS PAYEENAME")
+        SQLStrBldr.AppendLine("         , @P20 AS PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("         , @P21 AS TEKIYOU")
+        SQLStrBldr.AppendLine(" ) AS GVROW")
+        SQLStrBldr.AppendLine("     ON  T0007.OFFICECODE = GVROW.OFFICECODE")
+        SQLStrBldr.AppendLine("     AND T0007.KEIJYOYM = GVROW.KEIJYOYM")
+        SQLStrBldr.AppendLine("     AND T0007.LINE = GVROW.LINE")
+        SQLStrBldr.AppendLine("     AND GVROW.CALCACCOUNT = '2'")
+        SQLStrBldr.AppendLine(" WHEN MATCHED")
+        SQLStrBldr.AppendLine("         THEN UPDATE")
+        SQLStrBldr.AppendLine("             SET")
+        SQLStrBldr.AppendLine("                 T0007.CHECKFLG = GVROW.CHECKFLG")
+        SQLStrBldr.AppendLine("                 , T0007.CALCACCOUNT = GVROW.CALCACCOUNT")
+        SQLStrBldr.AppendLine("                 , T0007.ACCOUNTCODE = GVROW.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                 , T0007.SEGMENTCODE = GVROW.SEGMENTCODE")
+        SQLStrBldr.AppendLine("                 , T0007.SEGMENTBRANCHCODE = GVROW.SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                 , T0007.SHIPPERSCODE = GVROW.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("                 , T0007.SHIPPERSNAME = GVROW.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("                 , T0007.QUANTITY = GVROW.QUANTITY")
+        SQLStrBldr.AppendLine("                 , T0007.UNITPRICE = GVROW.UNITPRICE")
+        SQLStrBldr.AppendLine("                 , T0007.AMOUNT = GVROW.AMOUNT")
+        SQLStrBldr.AppendLine("                 , T0007.TAX = GVROW.TAX")
+        SQLStrBldr.AppendLine("                 , T0007.INVOICECODE = GVROW.INVOICECODE")
+        SQLStrBldr.AppendLine("                 , T0007.INVOICENAME = GVROW.INVOICENAME")
+        SQLStrBldr.AppendLine("                 , T0007.INVOICEDEPTNAME = GVROW.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0007.PAYEECODE = GVROW.PAYEECODE")
+        SQLStrBldr.AppendLine("                 , T0007.PAYEENAME = GVROW.PAYEENAME")
+        SQLStrBldr.AppendLine("                 , T0007.PAYEEDEPTNAME = GVROW.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0007.TEKIYOU = GVROW.TEKIYOU")
+        SQLStrBldr.AppendLine(" WHEN NOT MATCHED BY TARGET")
+        SQLStrBldr.AppendLine("         THEN INSERT (")
+        SQLStrBldr.AppendLine("                  OFFICECODE")
+        SQLStrBldr.AppendLine("                  , KEIJYOYM")
+        SQLStrBldr.AppendLine("                  , LINE")
+        SQLStrBldr.AppendLine("                  , CHECKFLG")
+        SQLStrBldr.AppendLine("                  , CALCACCOUNT")
+        SQLStrBldr.AppendLine("                  , ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                  , SEGMENTCODE")
+        SQLStrBldr.AppendLine("                  , SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                  , SHIPPERSCODE")
+        SQLStrBldr.AppendLine("                  , SHIPPERSNAME")
+        SQLStrBldr.AppendLine("                  , QUANTITY")
+        SQLStrBldr.AppendLine("                  , UNITPRICE")
+        SQLStrBldr.AppendLine("                  , AMOUNT")
+        SQLStrBldr.AppendLine("                  , TAX")
+        SQLStrBldr.AppendLine("                  , INVOICECODE")
+        SQLStrBldr.AppendLine("                  , INVOICENAME")
+        SQLStrBldr.AppendLine("                  , INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("                  , PAYEECODE")
+        SQLStrBldr.AppendLine("                  , PAYEENAME")
+        SQLStrBldr.AppendLine("                  , PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("                  , TEKIYOU")
+        SQLStrBldr.AppendLine("              ) VALUES (")
+        SQLStrBldr.AppendLine("                  GVROW.OFFICECODE")
+        SQLStrBldr.AppendLine("                  , GVROW.KEIJYOYM")
+        SQLStrBldr.AppendLine("                  , GVROW.LINE")
+        SQLStrBldr.AppendLine("                  , GVROW.CHECKFLG")
+        SQLStrBldr.AppendLine("                  , GVROW.CALCACCOUNT")
+        SQLStrBldr.AppendLine("                  , GVROW.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SEGMENTCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("                  , GVROW.QUANTITY")
+        SQLStrBldr.AppendLine("                  , GVROW.UNITPRICE")
+        SQLStrBldr.AppendLine("                  , GVROW.AMOUNT")
+        SQLStrBldr.AppendLine("                  , GVROW.TAX")
+        SQLStrBldr.AppendLine("                  , GVROW.INVOICECODE")
+        SQLStrBldr.AppendLine("                  , GVROW.INVOICENAME")
+        SQLStrBldr.AppendLine("                  , GVROW.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("                  , GVROW.PAYEECODE")
+        SQLStrBldr.AppendLine("                  , GVROW.PAYEENAME")
+        SQLStrBldr.AppendLine("                  , GVROW.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("                  , GVROW.TEKIYOU")
+        SQLStrBldr.AppendLine("              );")
+
+        Dim UpdateBldr As New StringBuilder
+        UpdateBldr.AppendLine(" UPDATE [oil].TMP0008_COST")
+        UpdateBldr.AppendLine(" SET")
+        UpdateBldr.AppendLine("     TEKIYOU = @P04")
+        UpdateBldr.AppendLine(" WHERE")
+        UpdateBldr.AppendLine("     OFFICECODE = @P01")
+        UpdateBldr.AppendLine(" AND KEIJYOYM = @P02")
+        UpdateBldr.AppendLine(" AND LINE = @P03")
+
+        Try
+            Using MergeCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon), UpdateCmd As New SqlCommand(UpdateBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim PARA3 As SqlParameter = MergeCmd.Parameters.Add("@P03", SqlDbType.Int)
+                Dim PARA4 As SqlParameter = MergeCmd.Parameters.Add("@P04", SqlDbType.Int)
+                Dim PARA5 As SqlParameter = MergeCmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)
+                Dim PARA6 As SqlParameter = MergeCmd.Parameters.Add("@P06", SqlDbType.NVarChar, 8)
+                Dim PARA7 As SqlParameter = MergeCmd.Parameters.Add("@P07", SqlDbType.NVarChar, 5)
+                Dim PARA8 As SqlParameter = MergeCmd.Parameters.Add("@P08", SqlDbType.NVarChar, 2)
+                Dim PARA9 As SqlParameter = MergeCmd.Parameters.Add("@P09", SqlDbType.NVarChar, 10)
+                Dim PARA10 As SqlParameter = MergeCmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40)
+                Dim PARA11 As SqlParameter = MergeCmd.Parameters.Add("@P11", SqlDbType.Float)
+                Dim PARA12 As SqlParameter = MergeCmd.Parameters.Add("@P12", SqlDbType.Money)
+                Dim PARA13 As SqlParameter = MergeCmd.Parameters.Add("@P13", SqlDbType.Money)
+                Dim PARA14 As SqlParameter = MergeCmd.Parameters.Add("@P14", SqlDbType.Money)
+                Dim PARA15 As SqlParameter = MergeCmd.Parameters.Add("@P15", SqlDbType.NVarChar, 10)
+                Dim PARA16 As SqlParameter = MergeCmd.Parameters.Add("@P16", SqlDbType.NVarChar, 40)
+                Dim PARA17 As SqlParameter = MergeCmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40)
+                Dim PARA18 As SqlParameter = MergeCmd.Parameters.Add("@P18", SqlDbType.NVarChar, 10)
+                Dim PARA19 As SqlParameter = MergeCmd.Parameters.Add("@P19", SqlDbType.NVarChar, 40)
+                Dim PARA20 As SqlParameter = MergeCmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40)
+                Dim PARA21 As SqlParameter = MergeCmd.Parameters.Add("@P21", SqlDbType.NVarChar, 200)
+
+                Dim UPARA1 As SqlParameter = UpdateCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim UPARA2 As SqlParameter = UpdateCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim UPARA3 As SqlParameter = UpdateCmd.Parameters.Add("@P03", SqlDbType.Int)
+                Dim UPARA4 As SqlParameter = UpdateCmd.Parameters.Add("@P04", SqlDbType.NVarChar, 200)
+
+                '費用管理ワークテーブルのデータ更新
+                PARA1.Value = WW_OFFICECODE
+                UPARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                UPARA2.Value = WK_DATE
+
+                '入力テーブルに格納された行数分、更新処理を行う
+                For Each row As DataRow In OIT0008INPtbl.Rows
+
+                    '自動計算科目以外はスキップ
+                    If row("CALCACCOUNT") = "1" Then
+                        UPARA3.Value = row("LINE")
+                        UPARA4.Value = row("TEKIYOU")
+
+                        UpdateCmd.CommandTimeout = 300
+                        UpdateCmd.ExecuteNonQuery()
+                    Else
+                        PARA3.Value = row("LINE")
+                        PARA4.Value = row("CHECKFLG")
+                        PARA5.Value = row("CALCACCOUNT")
+                        PARA6.Value = row("ACCOUNTCODE")
+                        PARA7.Value = row("SEGMENTCODE")
+                        PARA8.Value = row("SEGMENTBRANCHCODE")
+                        PARA9.Value = row("SHIPPERSCODE")
+                        PARA10.Value = row("SHIPPERSNAME")
+                        PARA11.Value = row("QUANTITY")
+                        PARA12.Value = 0.0  '単価(0固定)
+                        PARA13.Value = row("AMOUNT")
+                        PARA15.Value = row("INVOICECODE")
+                        PARA14.Value = Math.Floor(row("AMOUNT") * 0.1) '税額(10%切り捨て)
+                        PARA16.Value = row("INVOICENAME")
+                        PARA17.Value = row("INVOICEDEPTNAME")
+                        PARA18.Value = row("PAYEECODE")
+                        PARA19.Value = row("PAYEENAME")
+                        PARA20.Value = row("PAYEEDEPTNAME")
+                        PARA21.Value = row("TEKIYOU")
+
+                        MergeCmd.CommandTimeout = 300
+                        MergeCmd.ExecuteNonQuery()
+                    End If
+
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST MERGE")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST MERGE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
+
     End Sub
 
     ''' <summary>
@@ -329,7 +759,7 @@ Public Class OIT0008CostManagement
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
-        Master.eventDrop = True
+        Master.eventDrop = False
         '○Grid情報保存先のファイル名
         Master.CreateXMLSaveFile()
 
@@ -342,7 +772,7 @@ Public Class OIT0008CostManagement
         leftview.ActiveListBox()
 
         ' 右Boxへの値設定
-        rightview.MAPID = Master.MAPID
+        rightview.MAPID = OIT0008WRKINC.MAPIDM
         rightview.MAPVARI = Master.MAPvariant
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
@@ -350,9 +780,6 @@ Public Class OIT0008CostManagement
 
         '○ 画面の値設定
         WW_MAPValueInitSet()
-
-        ''○ GridView初期設定
-        'GridViewInitialize()
 
     End Sub
 
@@ -362,8 +789,10 @@ Public Class OIT0008CostManagement
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueInitSet()
 
+        '対象全営業所取得
+        GetAllOffice()
+
         '営業所ボタンの設定
-        GetOffice()
         WF_OFFICEBTN_1.Text = OIM0002tbl.Rows(0)("OFFICENAME")
         WF_OFFICEHDN_1.Value = OIM0002tbl.Rows(0)("OFFICECODE")
         WF_OFFICEBTN_1.OnClientClick = "OfficeButtonClick('WF_OFFICEHDN_1')"
@@ -404,59 +833,130 @@ Public Class OIT0008CostManagement
         WF_OFFICEHDN_10.Value = OIM0002tbl.Rows(9)("OFFICECODE")
         WF_OFFICEBTN_10.OnClientClick = "OfficeButtonClick('WF_OFFICEHDN_10')"
 
-        '計上月の初期化(当月の月初)
-        WF_KEIJOYM.Text = DateTime.Now.ToString("yyyy/MM")
+        WF_OFFICEBTN_11.Text = OIM0002tbl.Rows(10)("OFFICENAME")
+        WF_OFFICEHDN_11.Value = OIM0002tbl.Rows(10)("OFFICECODE")
+        WF_OFFICEBTN_11.OnClientClick = "OfficeButtonClick('WF_OFFICEHDN_11')"
 
         '所属営業所によるボタンの制御
         SetOfficeAuth()
 
-        '画面表示データの取得
-        WF_Grid_RELOAD()
+        'メニュー画面からの遷移の場合
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
+            '計上月の初期化
+            InitKEIJYO_YM()
+
+            '画面表示データの取得(初期化)
+            WF_Grid_RELOAD(True)
+        Else
+            Select Case work.WF_SEL_LAST_OFFICECODE.Text
+                Case WF_OFFICEHDN_1.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_1.ID
+                Case WF_OFFICEHDN_2.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_2.ID
+                Case WF_OFFICEHDN_3.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_3.ID
+                Case WF_OFFICEHDN_4.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_4.ID
+                Case WF_OFFICEHDN_5.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_5.ID
+                Case WF_OFFICEHDN_6.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_6.ID
+                Case WF_OFFICEHDN_7.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_7.ID
+                Case WF_OFFICEHDN_8.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_8.ID
+                Case WF_OFFICEHDN_9.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_9.ID
+                Case WF_OFFICEHDN_10.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_10.ID
+                Case WF_OFFICEHDN_11.Value
+                    WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_11.ID
+            End Select
+
+            '計上年月を最終表示計上年月に設定
+            WF_KEIJYO_YM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
+
+            '画面表示データの取得(初期化なし)
+            WF_Grid_RELOAD(False)
+        End If
+
+        '詳細画面検索条件を初期化
+        work.WF_SEL_LINE.Text = ""
+        work.WF_SEL_ACCOUNTCODE.Text = ""
+        work.WF_SEL_SEGMENTCODE.Text = ""
+        work.WF_SEL_SEGMENTBRANCHCODE.Text = ""
+        work.WF_SEL_SHIPPERSCODE.Text = ""
+        work.WF_SEL_SHIPPERSNAME.Text = ""
+        work.WF_SEL_INVOICECODE.Text = ""
+        work.WF_SEL_PAYEECODE.Text = ""
+        work.WF_SEL_TEKIYOU.Text = ""
 
     End Sub
 
-    Protected Sub GetOffice()
+    ''' <summary>
+    ''' 計上年月初期化
+    ''' </summary>
+    Protected Sub InitKEIJYO_YM()
 
         Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     ORGCODE AS OFFICECODE")
-        SQLStrBldr.AppendLine("     , NAMES AS OFFICENAME")
+        SQLStrBldr.AppendLine("     FORMAT(KEIJYOYM, 'yyyy/MM') AS KEIJYOYM")
         SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0002_ORG")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE IN ('010007')")
-        SQLStrBldr.AppendLine(" UNION ALL")
+        SQLStrBldr.AppendLine("     [oil].OIT0019_KEIJYOYM")
+
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    'SQL実行
+                    Dim WK_TBL As DataTable = New DataTable()
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            WK_TBL.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        WK_TBL.Load(SQLdr)
+                    End Using
+
+                    '計上年月を設定
+                    WF_KEIJYO_YM.Text = WK_TBL.Rows(0)("KEIJYOYM")
+                    '初期計上年月を保持
+                    work.WF_SEL_INIT_KEIJYO_YM.Text = WF_KEIJYO_YM.Text
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008 SELECT OIT0019_KEIJYOYM")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008 SELECT OIT0019_KEIJYOYM"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 営業所ボタン設定(対象全営業所コード取得)
+    ''' </summary>
+    Protected Sub GetAllOffice()
+
+        Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     ORGCODE AS OFFICECODE")
-        SQLStrBldr.AppendLine("     , NAMES AS OFFICENAME")
+        SQLStrBldr.AppendLine("     OFFICECODE")
+        SQLStrBldr.AppendLine("     , OFFICENAME")
         SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0002_ORG")
+        SQLStrBldr.AppendLine("     oil.VIW0015_COSTMANAGE_OFFICE")
         SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE IN ('010401','010402')")
-        SQLStrBldr.AppendLine(" UNION ALL")
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     ORGCODE AS OFFICECODE")
-        SQLStrBldr.AppendLine("     , NAMES AS OFFICENAME")
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0002_ORG")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE IN ('011401')")
-        SQLStrBldr.AppendLine(" UNION ALL")
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     ORGCODE AS OFFICECODE")
-        SQLStrBldr.AppendLine("     , NAMES AS OFFICENAME")
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0002_ORG")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE IN ('011201','011202','011203','011402')")
-        SQLStrBldr.AppendLine(" UNION ALL")
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     ORGCODE AS OFFICECODE")
-        SQLStrBldr.AppendLine("     , NAMES AS OFFICENAME")
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0002_ORG")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE IN ('012301','012401','012402')")
+        SQLStrBldr.AppendLine("     ORGCODE = 'ALL'")
+        SQLStrBldr.AppendLine(" ORDER BY")
+        SQLStrBldr.AppendLine("     SORTORDER")
 
         Try
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -491,111 +991,234 @@ Public Class OIT0008CostManagement
 
     End Sub
 
+    ''' <summary>
+    ''' 営業所ボタン設定(各営業所ボタンの押下可・不可設定)
+    ''' </summary>
     Protected Sub SetOfficeAuth()
 
-        '暫定(全営業所選択可)
-        WF_OFFICEBTN_1.Enabled = True
-        WF_OFFICEBTN_2.Enabled = True
-        WF_OFFICEBTN_3.Enabled = True
-        WF_OFFICEBTN_4.Enabled = True
-        WF_OFFICEBTN_5.Enabled = True
-        WF_OFFICEBTN_6.Enabled = True
-        WF_OFFICEBTN_7.Enabled = True
-        WF_OFFICEBTN_8.Enabled = True
-        WF_OFFICEBTN_9.Enabled = True
-        WF_OFFICEBTN_10.Enabled = True
-        '暫定(石油部を初期選択)
-        WF_OFFICEHDN_ID.Value = WF_OFFICEHDN_1.ID
+        'ユーザーの所属組織で選択可能な営業所を取得する
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT")
+        SQLStrBldr.AppendLine("     OFFICECODE")
+        SQLStrBldr.AppendLine("     , OFFICENAME")
+        SQLStrBldr.AppendLine(" FROM")
+        SQLStrBldr.AppendLine("     oil.VIW0015_COSTMANAGE_OFFICE")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     ORGCODE = @P01")
+        SQLStrBldr.AppendLine(" ORDER BY")
+        SQLStrBldr.AppendLine("     SORTORDER")
+
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    PARA1.Value = Master.USER_ORG
+
+                    'SQL実行
+                    OIM0002tbl = New DataTable()
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0002tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIM0002tbl.Load(SQLdr)
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008 SetOfficeAuth")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008 SetOfficeAuth"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+            Exit Sub
+        End Try
+
+        '営業所ボタンをすべて利用不可に初期化する
+        WF_OFFICEBTN_1.Enabled = False
+        WF_OFFICEBTN_2.Enabled = False
+        WF_OFFICEBTN_3.Enabled = False
+        WF_OFFICEBTN_4.Enabled = False
+        WF_OFFICEBTN_5.Enabled = False
+        WF_OFFICEBTN_6.Enabled = False
+        WF_OFFICEBTN_7.Enabled = False
+        WF_OFFICEBTN_8.Enabled = False
+        WF_OFFICEBTN_9.Enabled = False
+        WF_OFFICEBTN_10.Enabled = False
+        WF_OFFICEBTN_11.Enabled = False
+
+        '選択可能な営業所に対応するボタンのみ利用可とする
+        Dim InitSelectHdnId As String = ""
+        For Each row As DataRow In OIM0002tbl.Rows
+            If WF_OFFICEHDN_1.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_1.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_1.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_2.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_2.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_2.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_3.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_3.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_3.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_4.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_4.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_4.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_5.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_5.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_5.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_6.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_6.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_6.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_7.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_7.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_7.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_8.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_8.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_8.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_9.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_9.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_9.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_10.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_10.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_10.ID
+                End If
+                Continue For
+            End If
+            If WF_OFFICEHDN_11.Value = row("OFFICECODE") Then
+                WF_OFFICEBTN_11.Enabled = True
+                If String.IsNullOrEmpty(InitSelectHdnId) Then
+                    InitSelectHdnId = WF_OFFICEHDN_11.ID
+                End If
+                Continue For
+            End If
+        Next
+
+        '最初に利用可となった営業所を初期選択とする
+        WF_OFFICEHDN_ID.Value = InitSelectHdnId
 
     End Sub
 
-    Protected Function InitTableCreate() As DataTable
+    ''' <summary>
+    ''' 費用管理ワークテーブルデータ取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続設定</param>
+    ''' <returns></returns>
+    Protected Function GetTempTable(ByVal SQLcon As SqlConnection) As DataTable
 
-        Dim retTbl As DataTable = New DataTable()
+        Dim retDt As DataTable = Nothing
+        Dim SelSQLBldr As New StringBuilder()
+        SelSQLBldr.AppendLine(" SELECT")
+        SelSQLBldr.AppendLine("     OFFICECODE")
+        SelSQLBldr.AppendLine("     , KEIJYOYM")
+        SelSQLBldr.AppendLine("     , LINE")
+        SelSQLBldr.AppendLine("     , CHECKFLG")
+        SelSQLBldr.AppendLine("     , CALCACCOUNT")
+        SelSQLBldr.AppendLine("     , ACCOUNTCODE")
+        SelSQLBldr.AppendLine("     , SEGMENTCODE")
+        SelSQLBldr.AppendLine("     , SEGMENTBRANCHCODE")
+        SelSQLBldr.AppendLine("     , SHIPPERSCODE")
+        SelSQLBldr.AppendLine("     , SHIPPERSNAME")
+        SelSQLBldr.AppendLine("     , QUANTITY")
+        SelSQLBldr.AppendLine("     , AMOUNT")
+        SelSQLBldr.AppendLine("     , TAX")
+        SelSQLBldr.AppendLine("     , INVOICECODE")
+        SelSQLBldr.AppendLine("     , INVOICENAME")
+        SelSQLBldr.AppendLine("     , INVOICEDEPTNAME")
+        SelSQLBldr.AppendLine("     , PAYEECODE")
+        SelSQLBldr.AppendLine("     , PAYEENAME")
+        SelSQLBldr.AppendLine("     , PAYEEDEPTNAME")
+        SelSQLBldr.AppendLine("     , TEKIYOU")
+        SelSQLBldr.AppendLine(" FROM")
+        SelSQLBldr.AppendLine("     [oil].TMP0008_COST")
+        SelSQLBldr.AppendLine(" WHERE")
+        SelSQLBldr.AppendLine("     OFFICECODE = @P01")
+        SelSQLBldr.AppendLine(" AND KEIJYOYM = @P02")
+        SelSQLBldr.AppendLine(" ORDER BY")
+        SelSQLBldr.AppendLine("     LINE")
 
-        retTbl.Columns.Add("LINECNT", Type.GetType("System.Int32"))             '#
-        retTbl.Columns.Add("CHECK", Type.GetType("System.Int32"))               '選択
-        retTbl.Columns.Add("DETAIL", Type.GetType("System.Int32"))              '確認
-        retTbl.Columns.Add("ACCOUNTCODE", Type.GetType("System.String"))        '勘定科目コード(検索？)
-        retTbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))        'セグメント(表示のみ？)
-        retTbl.Columns.Add("SEGMENTBRANCHCODE", Type.GetType("System.String"))  'セグメント枝番(非表示)
-        retTbl.Columns.Add("AMMOUNT", Type.GetType("System.Int32"))             '金額(入力有)
-        retTbl.Columns.Add("TAX", Type.GetType("System.Int32"))                 '税額(入力 or 表示のみ(自動計算)？)
-        retTbl.Columns.Add("INVOICECODE", Type.GetType("System.String"))        '請求先コード(表示のみ？)
-        retTbl.Columns.Add("INVOICENAME", Type.GetType("System.String"))        '請求先名(表示のみ？)
-        retTbl.Columns.Add("INVOICEDEPT", Type.GetType("System.String"))        '請求先部門(表示のみ？)
-        retTbl.Columns.Add("PAYEECODE", Type.GetType("System.String"))          '支払先コード(表示のみ？)
-        retTbl.Columns.Add("PAYEENAME", Type.GetType("System.String"))          '支払先名(表示のみ？)
-        retTbl.Columns.Add("PAYEEDEPT", Type.GetType("System.String"))          '支払先部門(表示のみ?)
-        retTbl.Columns.Add("ABSTRACT", Type.GetType("System.String"))           '摘要(入力有)
+        Try
+            '費用管理明細ワークテーブルからローカルテーブルへインポート
+            Using SelCmd As New SqlCommand(SelSQLBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = SelCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = SelCmd.Parameters.Add("@P02", SqlDbType.DateTime)
 
-        Return retTbl
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+
+                Using SQLdr As SqlDataReader = SelCmd.ExecuteReader()
+                    retDt = New DataTable
+
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        retDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    retDt.Clear()
+                    retDt.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+        End Try
+
+        Return retDt
 
     End Function
 
-    Protected Sub InitTableDataSet()
-
-        OIT0008tbl = InitTableCreate()
-
-        Dim OIT0008row As DataRow = OIT0008tbl.NewRow()
-        OIT0008row("LINECNT") = 1
-        OIT0008row("CHECK") = 0
-        OIT0008row("DETAIL") = 1
-        OIT0008row("ACCOUNTCODE") = "4199999999"
-        OIT0008row("SEGMENTCODE") = "10101"
-        OIT0008row("SEGMENTBRANCHCODE") = "1"
-        OIT0008row("AMMOUNT") = 99999999
-        OIT0008row("TAX") = 9999999
-        OIT0008row("INVOICECODE") = "ABCDEFGHIJ"
-        OIT0008row("INVOICENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("INVOICEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEECODE") = "ABCDEFGHIJ"
-        OIT0008row("PAYEENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("ABSTRACT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008tbl.Rows.Add(OIT0008row)
-
-        OIT0008row = OIT0008tbl.NewRow()
-        OIT0008row("LINECNT") = 2
-        OIT0008row("CHECK") = 0
-        OIT0008row("DETAIL") = 0
-        OIT0008row("ACCOUNTCODE") = "5199999999"
-        OIT0008row("SEGMENTCODE") = "10101"
-        OIT0008row("SEGMENTBRANCHCODE") = "1"
-        OIT0008row("AMMOUNT") = 9999999
-        OIT0008row("TAX") = 9999999
-        OIT0008row("INVOICECODE") = "ABCDEFGHIJ"
-        OIT0008row("INVOICENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("INVOICEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEECODE") = "ABCDEFGHIJ"
-        OIT0008row("PAYEENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("ABSTRACT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008tbl.Rows.Add(OIT0008row)
-
-        OIT0008row = OIT0008tbl.NewRow()
-        OIT0008row("LINECNT") = 3
-        OIT0008row("CHECK") = 0
-        OIT0008row("DETAIL") = 1
-        OIT0008row("ACCOUNTCODE") = "5199999999"
-        OIT0008row("SEGMENTCODE") = "10101"
-        OIT0008row("SEGMENTBRANCHCODE") = "1"
-        OIT0008row("AMMOUNT") = 1
-        OIT0008row("TAX") = 1
-        OIT0008row("INVOICECODE") = "ABCDEFGHIJ"
-        OIT0008row("INVOICENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("INVOICEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEECODE") = "ABCDEFGHIJ"
-        OIT0008row("PAYEENAME") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("PAYEEDEPT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008row("ABSTRACT") = "あいうえおかきくけこさしすせそたちつてと"
-        OIT0008tbl.Rows.Add(OIT0008row)
-
-        '小計テーブル生成
-        CreateSubTotalTable()
-
-    End Sub
-
+    ''' <summary>
+    ''' 小計テーブル生成
+    ''' </summary>
     Protected Sub CreateSubTotalTable()
 
         '小計行テーブル生成
@@ -605,14 +1228,13 @@ Public Class OIT0008CostManagement
         OIT0008SubTotaltbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("SEGMENTBRANCHCODE", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("INVOICECODE", Type.GetType("System.String"))
-        OIT0008SubTotaltbl.Columns.Add("PAYEECODE", Type.GetType("System.String"))
-        '表示項目
         OIT0008SubTotaltbl.Columns.Add("INVOICENAME", Type.GetType("System.String"))
-        OIT0008SubTotaltbl.Columns.Add("INVOICEDEPT", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("INVOICEDEPTNAME", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("PAYEECODE", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("PAYEENAME", Type.GetType("System.String"))
-        OIT0008SubTotaltbl.Columns.Add("PAYEEDEPT", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("PAYEEDEPTNAME", Type.GetType("System.String"))
         '集計対象：金額/税額
-        OIT0008SubTotaltbl.Columns.Add("AMMOUNT", Type.GetType("System.Int32"))
+        OIT0008SubTotaltbl.Columns.Add("AMOUNT", Type.GetType("System.Int32"))
         OIT0008SubTotaltbl.Columns.Add("TAX", Type.GetType("System.Int32"))
 
         '小計行テーブルデータ生成
@@ -621,11 +1243,15 @@ Public Class OIT0008CostManagement
             Dim dataFound As Boolean = False
 
             '勘定科目コードまたはセグメントが未設定の場合は無視
-            If row("ACCOUNTCODE") Is DBNull.Value OrElse
-                row("SEGMENTCODE") Is DBNull.Value OrElse
-                row("SEGMENTBRANCHCODE") Is DBNull.Value OrElse
-                row("INVOICECODE") Is DBNull.Value OrElse
-                row("PAYEECODE") Is DBNull.Value Then
+            If String.IsNullOrEmpty(row("ACCOUNTCODE")) OrElse
+                String.IsNullOrEmpty(row("SEGMENTCODE")) OrElse
+                String.IsNullOrEmpty(row("SEGMENTBRANCHCODE")) OrElse
+                String.IsNullOrEmpty(row("INVOICECODE")) OrElse
+                String.IsNullOrEmpty(row("INVOICENAME")) OrElse
+                String.IsNullOrEmpty(row("INVOICEDEPTNAME")) OrElse
+                String.IsNullOrEmpty(row("PAYEECODE")) OrElse
+                String.IsNullOrEmpty(row("PAYEENAME")) OrElse
+                String.IsNullOrEmpty(row("PAYEEDEPTNAME")) Then
                 Continue For
             End If
 
@@ -635,9 +1261,14 @@ Public Class OIT0008CostManagement
                     row("SEGMENTCODE") = strow("SEGMENTCODE") AndAlso
                     row("SEGMENTBRANCHCODE") = strow("SEGMENTBRANCHCODE") AndAlso
                     row("INVOICECODE") = strow("INVOICECODE") AndAlso
-                    row("PAYEECODE") = strow("PAYEECODE") Then
-                    If Not row("AMMOUNT") Is DBNull.Value Then
-                        strow("AMMOUNT") += row("AMMOUNT")
+                    row("INVOICENAME") = strow("INVOICENAME") AndAlso
+                    row("INVOICEDEPTNAME") = strow("INVOICEDEPTNAME") AndAlso
+                    row("PAYEECODE") = strow("PAYEECODE") AndAlso
+                    row("PAYEENAME") = strow("PAYEENAME") AndAlso
+                    row("PAYEEDEPTNAME") = strow("PAYEEDEPTNAME") Then
+
+                    If Not row("AMOUNT") Is DBNull.Value Then
+                        strow("AMOUNT") += row("AMOUNT")
                     End If
                     If Not row("TAX") Is DBNull.Value Then
                         strow("TAX") += row("TAX")
@@ -656,13 +1287,13 @@ Public Class OIT0008CostManagement
                 strow("SEGMENTBRANCHCODE") = row("SEGMENTBRANCHCODE")
                 strow("INVOICECODE") = row("INVOICECODE")
                 strow("INVOICENAME") = row("INVOICENAME")
-                strow("INVOICEDEPT") = row("INVOICEDEPT")
+                strow("INVOICEDEPTNAME") = row("INVOICEDEPTNAME")
                 strow("PAYEECODE") = row("PAYEECODE")
                 strow("PAYEENAME") = row("PAYEENAME")
-                strow("PAYEEDEPT") = row("PAYEEDEPT")
+                strow("PAYEEDEPTNAME") = row("PAYEEDEPTNAME")
 
-                strow("AMMOUNT") = row("AMMOUNT")
-                If strow("AMMOUNT") Is DBNull.Value Then strow("AMMOUNT") = 0
+                strow("AMOUNT") = row("AMOUNT")
+                If strow("AMOUNT") Is DBNull.Value Then strow("AMOUNT") = 0
                 strow("TAX") = row("TAX")
                 If strow("TAX") Is DBNull.Value Then strow("TAX") = 0
 
@@ -676,9 +1307,15 @@ Public Class OIT0008CostManagement
     ''' GridViewデータ設定
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub GridViewInitialize()
+    Protected Sub GridViewSetup(ByVal SQLcon As SqlConnection)
 
-        InitTableDataSet()
+        '費用管理ワークテーブルからのデータ取得
+        OIT0008tbl = GetTempTable(SQLcon)
+
+        '小計テーブルの作成
+        CreateSubTotalTable()
+
+        'GridViewへのデータバインド
         WF_COSTLISTTBL.DataSource = OIT0008tbl
         WF_COSTLISTTBL.DataBind()
 
@@ -693,167 +1330,259 @@ Public Class OIT0008CostManagement
         Return False
     End Function
 
+    Protected Function GetCalcAccountVal(ByRef val As String) As Boolean
+
+        If val = "1" Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Protected Function GetCalcAccountValAndEditable(ByRef val As String) As Boolean
+
+        If val = "1" OrElse Not WW_EDITABLEFLG Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Protected Function GetEnabled(ByRef val As String) As Boolean
+
+        If val = "2" AndAlso WW_EDITABLEFLG Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Protected Function GetEditable() As Boolean
+
+        If Not WW_EDITABLEFLG Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Protected Function GetAccountCodeStyle(ByRef val As String) As String
+
+        Dim cssStyle As String = "WF_TEXTBOX_CSS boxIcon"
+
+        If val = "2" AndAlso WW_EDITABLEFLG Then
+            cssStyle += " iconOnly"
+        End If
+
+        Return cssStyle
+    End Function
+
     ''' <summary>
-    ''' 画面表示データ取得
+    ''' 費用管理ワークテーブルへのデータ設定
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
+    Protected Sub SetTempTable(ByVal SQLcon As SqlConnection)
 
-        'If IsNothing(OIT0008tbl) Then
-        '    OIT0008tbl = New DataTable
-        'End If
+        '費用管理ワークテーブルへの格納①
+        '受注費用明細テーブルの集計レコード
+        '(集計キー:営業所コード、計上年月、勘定科目コード、セグメント、セグメント枝番、荷主コード、請求先コード、支払先コード)
+        'と、同一キーで費用管理テーブルにレコードがあれば摘要を取得して格納する
+        Dim InsBldr As New StringBuilder
+        InsBldr.AppendLine(" INSERT INTO [oil].TMP0008_COST")
+        InsBldr.AppendLine(" SELECT")
+        InsBldr.AppendLine("     TMP.OFFICECODE")
+        InsBldr.AppendLine("     , TMP.KEIJYOYM")
+        InsBldr.AppendLine("     , ROW_NUMBER() OVER(")
+        InsBldr.AppendLine("           ORDER BY")
+        InsBldr.AppendLine("               TMP.OFFICECODE")
+        InsBldr.AppendLine("               , TMP.ACCOUNTCODE")
+        InsBldr.AppendLine("               , TMP.SEGMENTCODE")
+        InsBldr.AppendLine("               , TMP.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("               , TMP.SHIPPERSCODE")
+        InsBldr.AppendLine("               , TMP.INVOICECODE")
+        InsBldr.AppendLine("               , TMP.PAYEECODE")
+        InsBldr.AppendLine("       ) AS LINE")
+        InsBldr.AppendLine("     , 0 AS CHECKFLG")
+        InsBldr.AppendLine("     , TMP.CALCACCOUNT")
+        InsBldr.AppendLine("     , TMP.ACCOUNTCODE")
+        InsBldr.AppendLine("     , TMP.SEGMENTCODE")
+        InsBldr.AppendLine("     , TMP.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , TMP.SHIPPERSCODE")
+        InsBldr.AppendLine("     , TMP.SHIPPERSNAME")
+        InsBldr.AppendLine("     , TMP.QUANTITY")
+        InsBldr.AppendLine("     , 0.0 AS UNITPRICE")
+        InsBldr.AppendLine("     , TMP.AMOUNT")
+        InsBldr.AppendLine("     , TMP.TAX")
+        InsBldr.AppendLine("     , TMP.INVOICECODE")
+        InsBldr.AppendLine("     , TMP.INVOICENAME")
+        InsBldr.AppendLine("     , TMP.INVOICEDEPTNAME")
+        InsBldr.AppendLine("     , TMP.PAYEECODE")
+        InsBldr.AppendLine("     , TMP.PAYEENAME")
+        InsBldr.AppendLine("     , TMP.PAYEEDEPTNAME")
+        InsBldr.AppendLine("     , ISNULL(RTRIM(OIT0018.TEKIYOU), '') AS TEKIYOU")
+        InsBldr.AppendLine(" FROM (")
+        InsBldr.AppendLine("     SELECT")
+        InsBldr.AppendLine("         OFFICECODE")
+        InsBldr.AppendLine("         , @P02 AS KEIJYOYM")
+        InsBldr.AppendLine("         , '1' AS CALCACCOUNT")
+        InsBldr.AppendLine("         , ACCOUNTCODE")
+        InsBldr.AppendLine("         , SEGMENTCODE")
+        InsBldr.AppendLine("         , BREAKDOWNCODE AS SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("         , SHIPPERSCODE")
+        InsBldr.AppendLine("         , SHIPPERSNAME")
+        InsBldr.AppendLine("         , SUM(CARSAMOUNT) AS QUANTITY")
+        InsBldr.AppendLine("         , SUM(APPLYCHARGE) AS AMOUNT")
+        InsBldr.AppendLine("         , SUM(FLOOR(APPLYCHARGE * 0.10)) AS TAX")
+        InsBldr.AppendLine("         , INVOICECODE")
+        InsBldr.AppendLine("         , INVOICENAME")
+        InsBldr.AppendLine("         , INVOICEDEPTNAME")
+        InsBldr.AppendLine("         , PAYEECODE")
+        InsBldr.AppendLine("         , PAYEENAME")
+        InsBldr.AppendLine("         , PAYEEDEPTNAME")
+        InsBldr.AppendLine("     FROM")
+        InsBldr.AppendLine("         [oil].OIT0013_ORDERDETAILBILLING")
+        InsBldr.AppendLine("     WHERE")
+        InsBldr.AppendLine("         DELFLG <> '1'")
+        InsBldr.AppendLine("     AND OFFICECODE = @P01")
+        InsBldr.AppendLine("     AND KEIJYOYMD BETWEEN @P02 AND @P03")
+        InsBldr.AppendLine("     GROUP BY")
+        InsBldr.AppendLine("         OFFICECODE")
+        InsBldr.AppendLine("         , ACCOUNTCODE")
+        InsBldr.AppendLine("         , SEGMENTCODE")
+        InsBldr.AppendLine("         , BREAKDOWNCODE")
+        InsBldr.AppendLine("         , SHIPPERSCODE")
+        InsBldr.AppendLine("         , SHIPPERSNAME")
+        InsBldr.AppendLine("         , INVOICECODE")
+        InsBldr.AppendLine("         , INVOICENAME")
+        InsBldr.AppendLine("         , INVOICEDEPTNAME")
+        InsBldr.AppendLine("         , PAYEECODE")
+        InsBldr.AppendLine("         , PAYEENAME")
+        InsBldr.AppendLine("         , PAYEEDEPTNAME")
+        InsBldr.AppendLine(" ) TMP")
+        InsBldr.AppendLine(" LEFT OUTER JOIN [oil].OIT0018_COST OIT0018")
+        InsBldr.AppendLine("     ON  TMP.OFFICECODE = OIT0018.OFFICECODE")
+        InsBldr.AppendLine("     AND TMP.KEIJYOYM = OIT0018.KEIJYOYM")
+        InsBldr.AppendLine("     AND TMP.CALCACCOUNT = OIT0018.CALCACCOUNT")
+        InsBldr.AppendLine("     AND TMP.SEGMENTCODE = OIT0018.SEGMENTCODE")
+        InsBldr.AppendLine("     AND TMP.ACCOUNTCODE = OIT0018.ACCOUNTCODE")
+        InsBldr.AppendLine("     AND TMP.SEGMENTBRANCHCODE = OIT0018.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     AND TMP.SHIPPERSCODE = OIT0018.SHIPPERSCODE")
+        InsBldr.AppendLine("     AND TMP.INVOICECODE = OIT0018.INVOICECODE")
+        InsBldr.AppendLine("     AND TMP.PAYEECODE = OIT0018.PAYEECODE")
+        InsBldr.AppendLine(" ORDER BY")
+        InsBldr.AppendLine("     LINE")
 
-        'If OIT0008tbl.Columns.Count <> 0 Then
-        '    OIT0008tbl.Columns.Clear()
-        'End If
+        '費用管理ワークテーブルへの格納②
+        '費用管理テーブルに、営業コード、計上年月で計算科目＝2:手動入力のレコードがあれば抽出し
+        'SEQ番号順に、①で追加したレコード群の後のLINE番号を振り直して格納する
+        Dim InsBldr2 As StringBuilder = New StringBuilder
+        InsBldr2.AppendLine(" INSERT INTO [oil].TMP0008_COST")
+        InsBldr2.AppendLine(" SELECT")
+        InsBldr2.AppendLine("     OFFICECODE")
+        InsBldr2.AppendLine("     , KEIJYOYM")
+        InsBldr2.AppendLine("     , (SELECT MAX(LINE) FROM [oil].TMP0008_COST WHERE OFFICECODE = @P01 AND KEIJYOYM = @P02) + ROW_NUMBER() OVER(ORDER BY SEQ) AS LINE")
+        InsBldr2.AppendLine("     , 0 AS CHECKFLG")
+        InsBldr2.AppendLine("     , CALCACCOUNT")
+        InsBldr2.AppendLine("     , ACCOUNTCODE")
+        InsBldr2.AppendLine("     , SEGMENTCODE")
+        InsBldr2.AppendLine("     , SEGMENTBRANCHCODE")
+        InsBldr2.AppendLine("     , SHIPPERSCODE")
+        InsBldr2.AppendLine("     , SHIPPERSNAME")
+        InsBldr2.AppendLine("     , QUANTITY")
+        InsBldr2.AppendLine("     , UNITPRICE")
+        InsBldr2.AppendLine("     , AMOUNT")
+        InsBldr2.AppendLine("     , TAX")
+        InsBldr2.AppendLine("     , INVOICECODE")
+        InsBldr2.AppendLine("     , INVOICENAME")
+        InsBldr2.AppendLine("     , INVOICEDEPTNAME")
+        InsBldr2.AppendLine("     , PAYEECODE")
+        InsBldr2.AppendLine("     , PAYEENAME")
+        InsBldr2.AppendLine("     , PAYEEDEPTNAME")
+        InsBldr2.AppendLine("     , TEKIYOU")
+        InsBldr2.AppendLine(" FROM")
+        InsBldr2.AppendLine("     [oil].OIT0018_COST")
+        InsBldr2.AppendLine(" WHERE")
+        InsBldr2.AppendLine("     CALCACCOUNT = '2'")
+        InsBldr2.AppendLine(" AND OFFICECODE = @P01")
+        InsBldr2.AppendLine(" AND KEIJYOYM = @P02")
+        InsBldr2.AppendLine(" ORDER BY")
+        InsBldr2.AppendLine("     SEQ")
 
-        'OIT0008tbl.Clear()
+        Try
+            Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon), InsCmd2 As New SqlCommand(InsBldr2.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.DateTime)
+                Dim PARA3 As SqlParameter = InsCmd.Parameters.Add("@P03", SqlDbType.DateTime)
 
-        ''○ 検索SQL
-        ''　検索説明
-        ''     条件指定に従い該当データを列車マスタ（臨海）から取得する
-        'Dim SQLStrBldr As New StringBuilder
-        'SQLStrBldr.AppendLine(" SELECT ")
-        'SQLStrBldr.AppendLine("       0                                               AS LINECNT ")          ' 行番号
-        'SQLStrBldr.AppendLine("     , ''                                              AS OPERATION ")        ' 編集
-        'SQLStrBldr.AppendLine("     , CAST(OIT0008.UPDTIMSTP AS bigint)               AS UPDTIMSTP ")        ' タイムスタンプ
-        'SQLStrBldr.AppendLine("     , 1                                               AS 'SELECT' ")         ' 選択
-        'SQLStrBldr.AppendLine("     , 0                                               AS HIDDEN ")           ' 非表示
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.OFFICECODE), '')           AS OFFICECODE ")       ' 管轄受注営業所
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.IOKBN), '')                AS IOKBN ")            ' 入線出線区分
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.TRAINNO), '')              AS TRAINNO" )          ' 入線出線列車番号
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.TRAINNAME), '')            AS TRAINNAME" )        ' 入線出線列車名
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.DEPSTATION), '')           AS DEPSTATION" )       ' 発駅コード
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.ARRSTATION), '')           AS ARRSTATION" )       ' 着駅コード
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.PLANTCODE), '')            AS PLANTCODE" )        ' プラントコード
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.LINECNT), '')              AS LINE" )             ' 回線
-        'SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIT0008.DELFLG), '')               AS DELFLG ")           ' 削除フラグ
-        'SQLStrBldr.AppendLine(" FROM ")
-        'SQLStrBldr.AppendLine("     [oil].OIT0008_RTRAIN OIT0008 ")
+                Dim PARA2_1 As SqlParameter = InsCmd2.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2_2 As SqlParameter = InsCmd2.Parameters.Add("@P02", SqlDbType.DateTime)
 
-        ''○ 条件指定
-        'Dim andFlg As Boolean = False
+                '費用管理ワークテーブルのデータ生成
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_STYMD = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                Dim WK_ENDYMD = New DateTime(WK_STYMD.Year, WK_STYMD.Month, DateTime.DaysInMonth(WK_STYMD.Year, WK_STYMD.Month))
+                PARA2.Value = WK_STYMD
+                PARA3.Value = WK_ENDYMD
+                InsCmd.CommandTimeout = 300
+                InsCmd.ExecuteNonQuery()
 
-        '' 管轄受注営業所
-        'If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
-        '    SQLStrBldr.AppendLine(" WHERE ")
-        '    SQLStrBldr.AppendLine("     OIT0008.OFFICECODE = @P1 ")
-        '    andFlg = True
-        'End If
+                PARA2_1.Value = WW_OFFICECODE
+                PARA2_2.Value = WK_STYMD
+                InsCmd2.CommandTimeout = 300
+                InsCmd2.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST INSERT")
 
-        '' 入線出線区分
-        'If Not String.IsNullOrEmpty(work.WF_SEL_IOKBN.Text) Then
-        '    If andFlg Then
-        '        SQLStrBldr.AppendLine("     AND ")
-        '    Else
-        '        SQLStrBldr.AppendLine(" WHERE ")
-        '    End If
-        '    SQLStrBldr.AppendLine("     OIT0008.IOKBN = @P2 ")
-        '    andFlg = True
-        'End If
-
-        '' 回線
-        'If Not String.IsNullOrEmpty(work.WF_SEL_LINE.Text) Then
-        '    If andFlg Then
-        '        SQLStrBldr.AppendLine("     AND ")
-        '    Else
-        '        SQLStrBldr.AppendLine(" WHERE ")
-        '    End If
-        '    SQLStrBldr.AppendLine("     OIT0008.LINECNT = @P3 ")
-        '    andFlg = True
-        'End If
-
-        ''○ ソート
-        'SQLStrBldr.AppendLine(" ORDER BY ")
-        'SQLStrBldr.AppendLine("     OIT0008.OFFICECODE ")
-        'SQLStrBldr.AppendLine("     , OIT0008.IOKBN ")
-        'SQLStrBldr.AppendLine("     , OIT0008.LINECNT ")
-
-        'Try
-        '    Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
-        '        Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 管轄受注営業所
-        '        Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)     ' 入線出線区分
-        '        Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Int, 4)          ' 回線
-
-        '        PARA1.Value = work.WF_SEL_OFFICECODE.Text
-        '        PARA2.Value = work.WF_SEL_IOKBN.Text
-        '        If String.IsNullOrEmpty(work.WF_SEL_LINE.Text) Then
-        '            PARA3.Value = 0
-        '        Else
-        '            PARA3.Value = Int32.Parse(work.WF_SEL_LINE.Text)
-        '        End If
-
-
-        '        Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-        '            '○ フィールド名とフィールドの型を取得
-        '            For index As Integer = 0 To SQLdr.FieldCount - 1
-        '                OIT0008tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-        '            Next
-
-        '            '○ テーブル検索結果をテーブル格納
-        '            OIT0008tbl.Load(SQLdr)
-        '        End Using
-
-        '        Dim i As Integer = 0
-        '        For Each OIT0008row As DataRow In OIT0008tbl.Rows
-        '            i += 1
-        '            OIT0008row("LINECNT") = i        ' LINECNT
-        '        Next
-        '    End Using
-        'Catch ex As Exception
-        '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008L SELECT")
-
-        '    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
-        '    CS0011LOGWrite.INFPOSI = "DB:OIT0008L Select"
-        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-        '    CS0011LOGWrite.TEXT = ex.ToString()
-        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-        '    CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
-        '    Exit Sub
-        'End Try
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
     ''' <summary>
-    ''' 一覧再表示処理
+    ''' ワークテーブルの初期化
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub DisplayGrid()
+    Protected Sub InitTempTable(ByVal SQLcon As SqlConnection)
 
-        'グリッドビューから入力データテーブルに格納
-        ConvertGridViewToTable()
+        Dim DelBldr As New StringBuilder
+        DelBldr.AppendLine(" DELETE FROM [oil].TMP0008_COST")
+        DelBldr.AppendLine(" WHERE")
+        DelBldr.AppendLine("     OFFICECODE = @P1")
+        DelBldr.AppendLine(" AND KEIJYOYM = @P2")
 
-        '入力データテーブルをコピー
-        OIT0008tbl = OIT0008INPtbl.Clone()
-        '行数を取得
-        Dim lineCnt As Integer = 0
-        Dim aRow As DataRow = Nothing
-        For Each INProw As DataRow In OIT0008INPtbl.Rows
-            lineCnt = INProw("LINECNT")
-            aRow = OIT0008tbl.NewRow()
-            aRow.ItemArray = INProw.ItemArray
-            OIT0008tbl.Rows.Add(aRow)
-        Next
+        Try
+            Using DelCmd As New SqlCommand(DelBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
 
-        '小計テーブル生成
-        CreateSubTotalTable()
+                '費用管理ワークテーブルの初期化
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                DelCmd.CommandTimeout = 300
+                DelCmd.ExecuteNonQuery()
 
-        'データバインド
-        WF_COSTLISTTBL.DataSource = OIT0008tbl
-        WF_COSTLISTTBL.DataBind()
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M InitTempTable")
 
-        'フォーカスコントロール
-        Dim WK_TextBox As TextBox = Nothing
-        Select Case WW_FOCUS_CONTROL
-            Case WF_KEIJOYM.ID
-                WF_KEIJOYM.Focus()
-            Case Else
-                If WW_FOCUS_CONTROL.Contains("WF_COSTLISTTBL") Then
-                    WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(WW_FOCUS_ROW).FindControl(WW_FOCUS_CONTROL), TextBox)
-                    WK_TextBox.Focus()
-                End If
-        End Select
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M InitTempTable"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -863,47 +1592,207 @@ Public Class OIT0008CostManagement
     ''' <remarks></remarks>
     Protected Sub WF_ButtonUPDATE_Click()
 
-        ''○ エラーレポート準備
-        'rightview.SetErrorReport("")
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
 
-        'Dim WW_RESULT As String = ""
+        Dim WW_RESULT As String = ""
 
-        ''○ 関連チェック
-        'RelatedCheck(WW_ERRCODE)
+        '○項目チェック
+        INPTableCheck(WW_ERR_SW)
 
-        ''○ 同一レコードチェック
-        'If isNormal(WW_ERRCODE) Then
-        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '        SQLcon.Open()       ' DataBase接続
+        '○メッセージ表示
+        If Not isNormal(WW_ERR_SW) Then
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Exit Sub
+        End If
 
-        '        'マスタ更新
-        '        UpdateMaster(SQLcon)
-        '    End Using
-        'End If
+        '費用管理テーブル更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()
 
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0008tbl)
+            '費用管理テーブルから同一営業所、計上年月のレコードをいったん削除する
+            InitCostTable(SQLcon)
 
-        ''○ GridView初期設定
-        ''○ 画面表示データ再取得
-        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '    SQLcon.Open()       ' DataBase接続
+            '削除エラーの場合は処理を中断
+            If Not isNormal(WW_ERR_SW) Then
+                Exit Sub
+            End If
 
-        '    MAPDataGet(SQLcon)
-        'End Using
+            'ワークテーブルから費用管理テーブルへデータを移送する
+            SetCostTable(SQLcon)
+        End Using
 
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0008tbl)
+        '正常終了の場合はメッセージを表示
+        If isNormal(WW_ERR_SW) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
+    End Sub
 
-        ''○ 詳細画面クリア
-        'If isNormal(WW_ERRCODE) Then
-        '    DetailBoxClear()
-        'End If
+    ''' <summary>
+    ''' 費用管理テーブルの初期化
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub InitCostTable(ByVal SQLcon As SqlConnection)
 
-        ''○ メッセージ表示
-        'If Not isNormal(WW_ERRCODE) Then
-        '    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-        'End If
+        Dim DelBldr As New StringBuilder
+        DelBldr.AppendLine(" DELETE FROM [oil].OIT0018_COST")
+        DelBldr.AppendLine(" WHERE")
+        DelBldr.AppendLine("     OFFICECODE = @P1")
+        DelBldr.AppendLine(" AND KEIJYOYM = @P2")
+
+        Try
+            Using DelCmd As New SqlCommand(DelBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
+
+                '費用管理テーブルの初期化
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                DelCmd.CommandTimeout = 300
+                DelCmd.ExecuteNonQuery()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M DELETE OIT0018_COST")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M DELETE OIT0018_COST"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+
+            WW_ERR_SW = C_MESSAGE_NO.DB_ERROR
+
+            Exit Sub
+        End Try
+
+        WW_ERR_SW = C_MESSAGE_NO.NORMAL
+
+    End Sub
+
+    ''' <summary>
+    ''' 費用管理テーブルへのデータ保存
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub SetCostTable(ByVal SQLcon As SqlConnection)
+
+        'ワークテーブルから費用管理明細テーブルへの移送
+        Dim InsBldr As New StringBuilder
+        InsBldr.AppendLine(" INSERT INTO [oil].OIT0018_COST(")
+        InsBldr.AppendLine("     OFFICECODE")
+        InsBldr.AppendLine("     , KEIJYOYM")
+        InsBldr.AppendLine("     , SEQ")
+        InsBldr.AppendLine("     , CALCACCOUNT")
+        InsBldr.AppendLine("     , ACCOUNTCODE")
+        InsBldr.AppendLine("     , SEGMENTCODE")
+        InsBldr.AppendLine("     , SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , SHIPPERSCODE")
+        InsBldr.AppendLine("     , SHIPPERSNAME")
+        InsBldr.AppendLine("     , QUANTITY")
+        InsBldr.AppendLine("     , UNITPRICE")
+        InsBldr.AppendLine("     , AMOUNT")
+        InsBldr.AppendLine("     , TAX")
+        InsBldr.AppendLine("     , INVOICECODE")
+        InsBldr.AppendLine("     , INVOICENAME")
+        InsBldr.AppendLine("     , INVOICEDEPTNAME")
+        InsBldr.AppendLine("     , PAYEECODE")
+        InsBldr.AppendLine("     , PAYEENAME")
+        InsBldr.AppendLine("     , PAYEEDEPTNAME")
+        InsBldr.AppendLine("     , TEKIYOU")
+        InsBldr.AppendLine("     , INITYMD")
+        InsBldr.AppendLine("     , INITUSER")
+        InsBldr.AppendLine("     , INITTERMID")
+        InsBldr.AppendLine("     , UPDYMD")
+        InsBldr.AppendLine("     , UPDUSER")
+        InsBldr.AppendLine("     , UPDTERMID")
+        InsBldr.AppendLine("     , RECEIVEYMD")
+        InsBldr.AppendLine(" )")
+        InsBldr.AppendLine(" SELECT")
+        InsBldr.AppendLine("     TMP0008.OFFICECODE")
+        InsBldr.AppendLine("     , TMP0008.KEIJYOYM")
+        InsBldr.AppendLine("     , ROW_NUMBER() OVER(ORDER BY LINE) AS SEQ")
+        InsBldr.AppendLine("     , TMP0008.CALCACCOUNT")
+        InsBldr.AppendLine("     , TMP0008.ACCOUNTCODE")
+        InsBldr.AppendLine("     , TMP0008.SEGMENTCODE")
+        InsBldr.AppendLine("     , TMP0008.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , TMP0008.SHIPPERSCODE")
+        InsBldr.AppendLine("     , TMP0008.SHIPPERSNAME")
+        InsBldr.AppendLine("     , TMP0008.QUANTITY")
+        InsBldr.AppendLine("     , TMP0008.UNITPRICE")
+        InsBldr.AppendLine("     , TMP0008.AMOUNT")
+        InsBldr.AppendLine("     , TMP0008.TAX")
+        InsBldr.AppendLine("     , TMP0008.INVOICECODE")
+        InsBldr.AppendLine("     , TMP0008.INVOICENAME")
+        InsBldr.AppendLine("     , TMP0008.INVOICEDEPTNAME")
+        InsBldr.AppendLine("     , TMP0008.PAYEECODE")
+        InsBldr.AppendLine("     , TMP0008.PAYEENAME")
+        InsBldr.AppendLine("     , TMP0008.PAYEEDEPTNAME")
+        InsBldr.AppendLine("     , TMP0008.TEKIYOU")
+        InsBldr.AppendLine("     , @P03 AS INITYMD")
+        InsBldr.AppendLine("     , @P04 AS INITUSER")
+        InsBldr.AppendLine("     , @P05 AS INITTERMID")
+        InsBldr.AppendLine("     , @P03 AS UPDYMD")
+        InsBldr.AppendLine("     , @P04 AS UPDTUSER")
+        InsBldr.AppendLine("     , @P05 AS UPDTERMID")
+        InsBldr.AppendLine("     , @P06 AS RECEIVEYMD")
+        InsBldr.AppendLine(" FROM")
+        InsBldr.AppendLine("     [oil].TMP0008_COST TMP0008")
+        InsBldr.AppendLine(" WHERE")
+        InsBldr.AppendLine("     TMP0008.OFFICECODE = @P01")
+        InsBldr.AppendLine(" AND TMP0008.KEIJYOYM = @P02")
+        InsBldr.AppendLine(" AND (TMP0008.ACCOUNTCODE       IS NOT NULL AND TMP0008.ACCOUNTCODE <> '')")
+        InsBldr.AppendLine(" AND (TMP0008.SEGMENTCODE       IS NOT NULL AND TMP0008.SEGMENTCODE <> '')")
+        InsBldr.AppendLine(" AND (TMP0008.SEGMENTBRANCHCODE IS NOT NULL AND TMP0008.SEGMENTBRANCHCODE <> '')")
+        InsBldr.AppendLine(" AND TMP0008.INVOICECODE        IS NOT NULL")
+        InsBldr.AppendLine(" AND TMP0008.PAYEECODE          IS NOT NULL")
+        InsBldr.AppendLine(" AND (TMP0008.INVOICECODE <> '' OR TMP0008.PAYEECODE <> '')")
+        InsBldr.AppendLine(" AND (TMP0008.SHIPPERSCODE      IS NOT NULL AND")
+        InsBldr.AppendLine("         (TMP0008.CALCACCOUNT = '1' AND TMP0008.SHIPPERSCODE <> '') OR")
+        InsBldr.AppendLine("         (TMP0008.CALCACCOUNT = '2' AND TMP0008.SHIPPERSCODE =  '')")
+        InsBldr.AppendLine(" )")
+        InsBldr.AppendLine(" ORDER BY")
+        InsBldr.AppendLine("     TMP0008.LINE")
+
+        Try
+            Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim PARA3 As SqlParameter = InsCmd.Parameters.Add("@P03", SqlDbType.DateTime)
+                Dim PARA4 As SqlParameter = InsCmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)
+                Dim PARA5 As SqlParameter = InsCmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)
+                Dim PARA6 As SqlParameter = InsCmd.Parameters.Add("@P06", SqlDbType.DateTime)
+
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = Date.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                PARA3.Value = DateTime.Now
+                PARA4.Value = Master.USERID
+                PARA5.Value = Master.USERTERMID
+                PARA6.Value = C_DEFAULT_YMD
+
+                InsCmd.CommandTimeout = 300
+                InsCmd.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M OIT0018_COST INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M OIT0018_COST INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+
+            WW_ERR_SW = C_MESSAGE_NO.DB_ERROR
+
+            Exit Sub
+        End Try
+
+        WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
     End Sub
 
@@ -987,15 +1876,15 @@ Public Class OIT0008CostManagement
                 End If
 
                 If row("ACCOUNTCODE").ToString().Substring(0, 1) = "4" Then
-                    If Not row("AMMOUNT") Is DBNull.Value Then
-                        WK_INV_AMMOUNT_ALL += row("AMMOUNT")
+                    If Not row("AMOUNT") Is DBNull.Value Then
+                        WK_INV_AMOUNT_ALL += row("AMOUNT")
                     End If
                     If Not row("TAX") Is DBNull.Value Then
                         WK_INV_TAX_ALL += row("TAX")
                     End If
                 ElseIf row("ACCOUNTCODE").ToString().Substring(0, 1) = "5" Then
-                    If Not row("AMMOUNT") Is DBNull.Value Then
-                        WK_PAY_AMMOUNT_ALL += row("AMMOUNT")
+                    If Not row("AMOUNT") Is DBNull.Value Then
+                        WK_PAY_AMOUNT_ALL += row("AMOUNT")
                     End If
                     If Not row("TAX") Is DBNull.Value Then
                         WK_PAY_TAX_ALL += row("TAX")
@@ -1031,7 +1920,14 @@ Public Class OIT0008CostManagement
 
         i = 0
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
-            If Not gvrow.RowType = DataControlRowType.Footer Then
+
+            If gvrow.RowType = DataControlRowType.DataRow Then
+                Dim button As Button = DirectCast(gvrow.FindControl("WF_COSTLISTTBL_CALCACCOUNT"), Button)
+                If button.Enabled Then
+                    button.OnClientClick = "ButtonClick('WF_ButtonShowDetail" & String.Format("{0:000}", gvrow.RowIndex + 1) & "');"
+                End If
+                Continue For
+            ElseIf Not gvrow.RowType = DataControlRowType.Footer Then
                 Continue For
             End If
             If i < subTotalRowCnt Then  '小計行
@@ -1047,10 +1943,10 @@ Public Class OIT0008CostManagement
                 gvrow.Cells(2).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTCODE")
 
                 gvrow.Cells(3).CssClass = "footerCells money"
-                gvrow.Cells(3).Text = OIT0008SubTotaltbl.Rows(i)("AMMOUNT")
+                gvrow.Cells(3).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("AMOUNT"))
 
                 gvrow.Cells(4).CssClass = "footerCells money"
-                gvrow.Cells(4).Text = OIT0008SubTotaltbl.Rows(i)("TAX")
+                gvrow.Cells(4).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("TAX"))
 
                 Dim cellindex As Integer = 4
 
@@ -1063,7 +1959,7 @@ Public Class OIT0008CostManagement
 
                 gvrow.Cells(cellindex + 3).CssClass = "footerCells noicon inv_pay"
                 gvrow.Cells(cellindex + 3).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("INVOICEDEPT") + "</span>"
+                    OIT0008SubTotaltbl.Rows(i)("INVOICEDEPTNAME") + "</span>"
 
                 gvrow.Cells(cellindex + 4).CssClass = "footerCells withicon"
                 gvrow.Cells(cellindex + 4).Text = OIT0008SubTotaltbl.Rows(i)("PAYEECODE")
@@ -1074,7 +1970,7 @@ Public Class OIT0008CostManagement
 
                 gvrow.Cells(cellindex + 6).CssClass = "footerCells noicon inv_pay"
                 gvrow.Cells(cellindex + 6).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("PAYEEDEPT") + "</span>"
+                    OIT0008SubTotaltbl.Rows(i)("PAYEEDEPTNAME") + "</span>"
 
                 For j = cellindex + 7 To gvrow.Cells.Count - 1
                     gvrow.Cells(j).Visible = False
@@ -1088,19 +1984,19 @@ Public Class OIT0008CostManagement
                 gvrow.Cells(0).Text = "請求合計"
 
                 gvrow.Cells(1).CssClass = "footerCells money"
-                gvrow.Cells(1).Text = WK_INV_AMMOUNT_ALL
+                gvrow.Cells(1).Text = String.Format("{0:#,##0}", WK_INV_AMOUNT_ALL)
 
                 gvrow.Cells(2).CssClass = "footerCells money"
-                gvrow.Cells(2).Text = WK_INV_TAX_ALL
+                gvrow.Cells(2).Text = String.Format("{0:#,##0}", WK_INV_TAX_ALL)
 
                 gvrow.Cells(3).CssClass = "footerCells text"
                 gvrow.Cells(3).Text = "支払合計"
 
                 gvrow.Cells(4).CssClass = "footerCells money"
-                gvrow.Cells(4).Text = WK_PAY_AMMOUNT_ALL
+                gvrow.Cells(4).Text = String.Format("{0:#,##0}", WK_PAY_AMOUNT_ALL)
 
                 gvrow.Cells(5).CssClass = "footerCells money"
-                gvrow.Cells(5).Text = WK_PAY_TAX_ALL
+                gvrow.Cells(5).Text = String.Format("{0:#,##0}", WK_PAY_TAX_ALL)
 
                 For j = 6 To gvrow.Cells.Count - 1
                     gvrow.Cells(j).Visible = False
@@ -1133,7 +2029,7 @@ Public Class OIT0008CostManagement
                 Select Case WF_LeftMViewChange.Value
 
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                        .WF_Calendar.Text = WF_KEIJOYM.Text + "/01"
+                        .WF_Calendar.Text = WF_KEIJYO_YM.Text + "/01"
                         .ActiveCalendar()
                     Case Else
                         Dim prmData As New Hashtable
@@ -1145,7 +2041,7 @@ Public Class OIT0008CostManagement
                         If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") OrElse
                             WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
                             '取引マスタ検索
-                            prmData = work.CreateFIXParam(Master.USERCAMP, "TORIMASTER")
+                            prmData = work.CreateFIXParam(Master.USERCAMP, "TORI_DEPT")
                         End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -1166,31 +2062,97 @@ Public Class OIT0008CostManagement
     Protected Sub WF_FIELD_Change()
 
         WW_RTN_SW = C_MESSAGE_NO.NORMAL
+        Dim WK_RELOAD_FLG As Boolean = False
 
-        ''○ 変更した項目の名称をセット
-        'Select Case WF_FIELD.Value
-        '    Case WF_OFFICECODE.ID
-        '        '関連項目
-        '        CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)
-        '        CODENAME_get("SEGMENTOILCODE", WF_SEGMENTOILCODE.Text, WF_SEGMENTOILCODE_TEXT.Text, WW_RTN_SW)
-        '        '管轄営業所
-        '        CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '計上年月
+            Case WF_KEIJYO_YM.ID
+                '入力チェック
+                Try
+                    Dim WW_DATE As Date = Date.Parse(WF_KEIJYO_YM.Text + "/01")
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        WF_KEIJYO_YM.Text = "1950/01"
+                    Else
+                        WF_KEIJYO_YM.Text = WW_DATE.ToString("yyyy/MM")
+                    End If
+                Catch ex As Exception
+                    '型変換エラー
+                    WW_RTN_SW = C_MESSAGE_NO.CAST_FORMAT_ERROR
+                    '入力値変換エラーの場合は前回表示年月に戻す
+                    WF_KEIJYO_YM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
+                End Try
+                '前回までの年月と異なる場合は、初期化リロード
+                If Not WF_KEIJYO_YM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text Then
+                    WK_RELOAD_FLG = True
+                End If
+                'フォーカスセット
+                WF_KEIJYO_YM.Focus()
 
-        '    Case WF_OILCODE.ID
-        '        '関連項目
-        '        CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
-        '        CODENAME_get("SEGMENTOILCODE", WF_SEGMENTOILCODE.Text, WF_SEGMENTOILCODE_TEXT.Text, WW_RTN_SW)
-        '        '油種コード
-        '        CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)
+            Case Else
 
-        '    Case WF_SEGMENTOILCODE.ID
-        '        '関連項目
-        '        CODENAME_get("OFFICECODE", WF_OFFICECODE.Text, WF_OFFICECODE_TEXT.Text, WW_RTN_SW)
-        '        CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)
-        '        '油種細分コード
-        '        CODENAME_get("SEGMENTOILCODE", WF_SEGMENTOILCODE.Text, WF_SEGMENTOILCODE_TEXT.Text, WW_RTN_SW)
+                Dim rowIdx As Integer = 0
+                Dim WK_TextBox As TextBox = Nothing
+                Dim WK_Label As Label = Nothing
+                Dim WK_CODE As String = ""
+                Dim WK_NAME As String = ""
+                '請求先コード
+                If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") Then
+                    Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
 
-        'End Select
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE") IsNot Nothing Then
+                        WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
+                        WK_CODE = WK_TextBox.Text
+                    End If
+                    '取引先部門名称を取得
+                    CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
+                    '取得できた場合、取引先名、部門名をそれぞれ請求先名、請求先部門に設定
+                    If Not String.IsNullOrEmpty(WK_NAME) Then
+                        Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                        '請求先名
+                        If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
+                            WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
+                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                        End If
+                        '請求先名
+                        If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
+                            WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
+                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                        End If
+                    End If
+                End If
+                '支払先コード
+                If WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
+                    Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE") IsNot Nothing Then
+                        WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
+                        WK_CODE = WK_TextBox.Text
+                    End If
+                    '取引先部門名称を取得
+                    CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
+                    '取得できた場合、取引先名、部門名をそれぞれ支払先名、支払先部門に設定
+                    If Not String.IsNullOrEmpty(WK_NAME) Then
+                        Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                        '支払先名
+                        If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
+                            WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
+                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                        End If
+                        '支払先名
+                        If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
+                            WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
+                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                        End If
+                    End If
+                End If
+
+                'ワークテーブルへのデータ反映
+                SetGridViewToTempTable()
+        End Select
+
+        'GridViewリロード
+        WF_Grid_RELOAD(WK_RELOAD_FLG)
 
         '○ メッセージ表示
         If isNormal(WW_RTN_SW) Then
@@ -1209,6 +2171,7 @@ Public Class OIT0008CostManagement
 
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
+        Dim WK_RELOAD_FLG As Boolean = False
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -1217,22 +2180,31 @@ Public Class OIT0008CostManagement
             WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
         End If
 
-        ''○ 選択内容を画面項目へセット
+        '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
 
-            Case WF_KEIJOYM.ID
+            Case WF_KEIJYO_YM.ID
                 '計上年月
                 Dim WW_DATE As Date
                 Try
-                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    WW_DATE = Date.Parse(leftview.WF_Calendar.Text)
                     If WW_DATE < C_DEFAULT_YMD Then
-                        WF_KEIJOYM.Text = "1950/01"
+                        WF_KEIJYO_YM.Text = "1950/01"
                     Else
-                        WF_KEIJOYM.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        WF_KEIJYO_YM.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
+                    '型変換エラー
+                    WW_RTN_SW = C_MESSAGE_NO.CAST_FORMAT_ERROR
+                    '入力値変換エラーの場合は前回表示年月に戻す
+                    WF_KEIJYO_YM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
                 End Try
-                WW_FOCUS_CONTROL = WF_KEIJOYM.ID
+                '前回までの年月と異なる場合は、初期化リロード
+                If Not WF_KEIJYO_YM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text Then
+                    WK_RELOAD_FLG = True
+                End If
+                'フォーカスセット
+                WF_KEIJYO_YM.Focus()
 
             Case Else
                 Dim rowIdx As Integer
@@ -1271,7 +2243,17 @@ Public Class OIT0008CostManagement
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
                         WK_TextBox.Text = WW_SelectValue
                     End If
-                    '請求先名/請求先部門取得
+                    '請求先名
+                    Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
+                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                    End If
+                    '請求先部門
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
+                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                    End If
                 End If
                 '支払先コード
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
@@ -1284,10 +2266,26 @@ Public Class OIT0008CostManagement
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
                         WK_TextBox.Text = WW_SelectValue
                     End If
-                    '支払先名/支払先部門取得
+                    '支払先名
+                    Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
+                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                    End If
+                    '支払先部門
+                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
+                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                    End If
                 End If
 
+                'ワークテーブルへのデータ反映
+                SetGridViewToTempTable()
+
         End Select
+
+        'GridViewリロード
+        WF_Grid_RELOAD(WK_RELOAD_FLG)
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
@@ -1303,19 +2301,8 @@ Public Class OIT0008CostManagement
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            'Case WF_OFFICECODE.ID
-            '    '管轄営業所
-            '    WF_OFFICECODE.Focus()
-
-            'Case WF_OILCODE.ID
-            '    '油種コード
-            '    WF_OILCODE.Focus()
-
-            'Case WF_SEGMENTOILCODE.ID
-            '    '油種細分コード
-            '    WF_SEGMENTOILCODE.Focus()
-            Case WF_KEIJOYM.ID
-                WF_KEIJOYM.Focus()
+            Case WF_KEIJYO_YM.ID
+                WF_KEIJYO_YM.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -1399,214 +2386,169 @@ Public Class OIT0008CostManagement
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
     Protected Sub INPTableCheck(ByRef O_RTN As String)
-        'O_RTN = C_MESSAGE_NO.NORMAL
+        O_RTN = C_MESSAGE_NO.NORMAL
 
-        'Dim WW_LINE_ERR As String = ""
-        'Dim WW_TEXT As String = ""
-        'Dim WW_CheckMES1 As String = ""
-        'Dim WW_CheckMES2 As String = ""
-        'Dim WW_CS0024FCHECKERR As String = ""
-        'Dim WW_CS0024FCHECKREPORT As String = ""
-        'Dim dateErrFlag As String = ""
+        Dim WW_LINE_ERR As String = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
 
-        ''○ 画面操作権限チェック
-        '' 権限チェック(操作者がデータ内USERの更新権限があるかチェック
-        '' 　※権限判定時点：現在
-        'CS0025AUTHORget.USERID = CS0050SESSION.USERID
-        'CS0025AUTHORget.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
-        'CS0025AUTHORget.CODE = Master.MAPID
-        'CS0025AUTHORget.STYMD = Date.Now
-        'CS0025AUTHORget.ENDYMD = Date.Now
-        'CS0025AUTHORget.CS0025AUTHORget()
-        'If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
-        'Else
-        '    WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
-        '    WW_CheckMES2 = ""
-        '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-        '    WW_LINE_ERR = "ERR"
-        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    Exit Sub
-        'End If
+        '○ 画面操作権限チェック
+        ' 権限チェック(操作者がデータ内USERの更新権限があるかチェック
+        ' 　※権限判定時点：現在
+        CS0025AUTHORget.USERID = CS0050SESSION.USERID
+        CS0025AUTHORget.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
+        CS0025AUTHORget.CODE = Master.MAPID
+        CS0025AUTHORget.STYMD = Date.Now
+        CS0025AUTHORget.ENDYMD = Date.Now
+        CS0025AUTHORget.CS0025AUTHORget()
+        If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
+        Else
+            WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
+            WW_CheckMES2 = ""
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            WW_LINE_ERR = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Exit Sub
+        End If
 
-        ''○ 単項目チェック
-        'For Each OIT0008INProw As DataRow In OIT0008INPtbl.Rows
+        '○ 単項目チェック
+        For Each OIT0008INProw As DataRow In OIT0008INPtbl.Rows
 
-        '    WW_LINE_ERR = ""
+            WW_LINE_ERR = ""
 
-        '    ' 管轄受注営業所（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("OFFICECODE")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("OFFICECODE", OIT0008INProw("OFFICECODE"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(管轄受注営業所エラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(管轄受注営業所エラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '摘要（バリデーションチェック）
+            WW_TEXT = OIT0008INProw("TEKIYOU")
+            Master.CheckField(Master.USERCAMP, "TEKIYOU", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(摘要エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    ' 入線出線区分（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("IOKBN")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "IOKBN", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("IOKBN", OIT0008INProw("IOKBN"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(入線出線区分エラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(入線出線区分エラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '計算科目=1:自動計算は摘要以外スキップ
+            If OIT0008INProw("CALCACCOUNT") = "1" Then
+                Continue For
+            End If
 
-        '    ' 入線出線列車番号（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("TRAINNO")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If Not isNormal(WW_CS0024FCHECKERR) Then
-        '        WW_CheckMES1 = "・更新できないレコード(入線出線列車番号エラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '勘定科目コード
+            WW_TEXT = OIT0008INProw("ACCOUNTCODE")
+            Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(勘定科目コード)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    ' 入線出線列車名（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("TRAINNAME")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If Not isNormal(WW_CS0024FCHECKERR) Then
-        '        WW_CheckMES1 = "・更新できないレコード(入線出線列車名エラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            'セグメント
+            WW_TEXT = OIT0008INProw("SEGMENTCODE")
+            Master.CheckField(Master.USERCAMP, "SEGMENTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(セグメント)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    ' 発駅コード（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("DEPSTATION")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("STATION", OIT0008INProw("DEPSTATION"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(発駅コードエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(発駅コードエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            'セグメント枝番
+            WW_TEXT = OIT0008INProw("SEGMENTBRANCHCODE")
+            Master.CheckField(Master.USERCAMP, "SEGMENTBRANCHCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(セグメント)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    ' 着駅コード（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("ARRSTATION")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ARRSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("STATION", OIT0008INProw("ARRSTATION"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(着駅コードエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(着駅コードエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '存在チェック(勘定科目マスタ)
+            If String.IsNullOrEmpty(WW_LINE_ERR) AndAlso
+                Not String.IsNullOrEmpty(OIT0008INProw("ACCOUNTCODE")) AndAlso
+                Not String.IsNullOrEmpty(OIT0008INProw("SEGMENTCODE")) AndAlso
+                Not String.IsNullOrEmpty(OIT0008INProw("SEGMENTBRANCHCODE")) Then
 
-        '    ' プラントコード（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("PLANTCODE")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PLANTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("PLANTCODE", OIT0008INProw("PLANTCODE"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(プラントコードエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(プラントコードエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+                Dim WW_CODE As String = OIT0008INProw("ACCOUNTCODE") & " " &
+                                        OIT0008INProw("SEGMENTCODE") & " " &
+                                        OIT0008INProw("SEGMENTBRANCHCODE")
+                CODENAME_get("ACCOUNTPATTERN", WW_CODE, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(勘定科目コード/セグメント/セグメント枝番エラー)です。"
+                    WW_CheckMES2 = "勘定科目マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
 
-        '    ' 回線（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("LINE")
-        '    Master.CheckField(work.WF_SEL_LINE.Text, "LINE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If Not isNormal(WW_CS0024FCHECKERR) Then
-        '        WW_CheckMES1 = "・更新できないレコード(回線エラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '金額（バリデーションチェック）
+            WW_TEXT = OIT0008INProw("AMOUNT")
+            Master.CheckField(Master.USERCAMP, "AMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(金額エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    ' 削除フラグ（バリデーションチェック）
-        '    WW_TEXT = OIT0008INProw("DELFLG")
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        ' 値存在チェックT
-        '        CODENAME_get("DELFLG", OIT0008INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(削除フラグエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(削除フラグエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
+            '請求先コード（バリデーションチェック）
+            WW_TEXT = OIT0008INProw("INVOICECODE")
+            Master.CheckField(Master.USERCAMP, "INVOICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                CODENAME_get("TORI_DEPT", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(請求先コード)です。"
+                    WW_CheckMES2 = "該当する取引先コードが取引マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(請求先コードエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
+            '支払先コード（バリデーションチェック）
+            WW_TEXT = OIT0008INProw("PAYEECODE")
+            Master.CheckField(Master.USERCAMP, "PAYEECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                CODENAME_get("TORI_DEPT", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(支払先コード)です。"
+                    WW_CheckMES2 = "該当する取引先コードが取引マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(支払先コードエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
-        '    If WW_LINE_ERR = "" Then
-        '        If OIT0008INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-        '            OIT0008INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        End If
-        '    Else
-        '        If WW_LINE_ERR = CONST_PATTERNERR Then
-        '            ' 関連チェックエラーをセット
-        '            OIT0008INProw.Item("OPERATION") = CONST_PATTERNERR
-        '        Else
-        '            ' 単項目チェックエラーをセット
-        '            OIT0008INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '        End If
-        '    End If
-        'Next
+            '請求先コード/支払先コード共にNull又は空の場合、エラーとする
+            If String.IsNullOrEmpty(OIT0008INProw("INVOICECODE")) AndAlso
+                String.IsNullOrEmpty(OIT0008INProw("PAYEECODE")) Then
+                WW_CheckMES1 = "・更新できないレコード(請求先コード/支払先コード)です。"
+                WW_CheckMES2 = "請求先、支払先のどちらかを入力してください。"
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0008INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+        Next
 
     End Sub
 
@@ -1663,184 +2605,22 @@ Public Class OIT0008CostManagement
         End If
 
         If Not IsNothing(OIT0008row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 管轄受注営業所 =" & OIT0008row("OFFICECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 入線出線区分 =" & OIT0008row("IOKBN") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 入線出線列車番号 =" & OIT0008row("TRAINNO") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 入線出線列車名 =" & OIT0008row("TRAINNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 発駅コード =" & OIT0008row("DEPSTATION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 着駅コード =" & OIT0008row("ARRSTATION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> プラントコード =" & OIT0008row("PLANTCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 回線 =" & OIT0008row("LINE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0008row("DELFLG")
+            WW_ERR_MES &= ControlChars.NewLine & "  --> # =" & OIT0008row("LINE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 勘定科目コード =" & OIT0008row("ACCOUNTCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント =" & OIT0008row("SEGMENTCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント枝番 =" & OIT0008row("SEGMENTBRANCHCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 金額 =" & OIT0008row("AMOUNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 税額 =" & OIT0008row("TAX") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先コード =" & OIT0008row("INVOICECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先名 =" & OIT0008row("INVOICENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先部門 =" & OIT0008row("INVOICEDEPTNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先コード =" & OIT0008row("PAYEECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先名 =" & OIT0008row("PAYEENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先部門 =" & OIT0008row("PAYEEDEPTNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 摘要 =" & OIT0008row("TEKIYOU")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
-
-    End Sub
-
-    ''' <summary>
-    ''' 遷移先(登録画面)退避データ保存先の作成
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Sub WW_CreateXMLSaveFile()
-        'work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
-        '    Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
-
-    End Sub
-
-    ''' <summary>
-    ''' OIT0008tbl更新
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub OIT0008tbl_UPD()
-
-        ''○ 画面状態設定
-        'For Each OIT0008row As DataRow In OIT0008tbl.Rows
-        '    Select Case OIT0008row("OPERATION")
-        '        Case C_LIST_OPERATION_CODE.NODATA
-        '            OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.NODISP
-        '            OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.SELECTED
-        '            OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-        '            OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-        '            OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '    End Select
-        'Next
-
-        ''○ 追加変更判定
-        'For Each OIT0008INProw As DataRow In OIT0008INPtbl.Rows
-
-        '    ' エラーレコード読み飛ばし
-        '    If OIT0008INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
-        '        Continue For
-        '    End If
-
-        '    OIT0008INProw.Item("OPERATION") = CONST_INSERT
-
-        '    ' KEY項目が等しい時
-        '    For Each OIT0008row As DataRow In OIT0008tbl.Rows
-        '        If OIT0008row("OFFICECODE") = OIT0008INProw("OFFICECODE") AndAlso
-        '            OIT0008row("IOKBN") = OIT0008INProw("IOKBN") AndAlso
-        '            OIT0008row("PLANTCODE") = OIT0008INProw("PLANTCODE") Then
-        '            ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-        '            If OIT0008row("TRAINNO") = OIT0008INProw("TRAINNO") AndAlso
-        '                OIT0008row("TRAINNAME") = OIT0008INProw("TRAINNAME") AndAlso
-        '                OIT0008row("DEPSTATION") = OIT0008INProw("DEPSTATION") AndAlso
-        '                OIT0008row("ARRSTATION") = OIT0008INProw("ARRSTATION") AndAlso
-        '                OIT0008row("LINE") = OIT0008INProw("LINE") AndAlso
-        '                OIT0008row("DELFLG") = OIT0008INProw("DELFLG") AndAlso
-        '                OIT0008INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
-        '            Else
-        '                ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
-        '                OIT0008INProw("OPERATION") = CONST_UPDATE
-        '                Exit For
-        '            End If
-
-        '            Exit For
-
-        '        End If
-        '    Next
-        'Next
-
-        ''○ 変更有無判定　&　入力値反映
-        'For Each OIT0008INProw As DataRow In OIT0008INPtbl.Rows
-        '    Select Case OIT0008INProw("OPERATION")
-        '        Case CONST_UPDATE
-        '            TBL_UPDATE_SUB(OIT0008INProw)
-        '        Case CONST_INSERT
-        '            TBL_INSERT_SUB(OIT0008INProw)
-        '        Case CONST_PATTERNERR
-        '            ' 関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-        '            TBL_INSERT_SUB(OIT0008INProw)
-        '        Case C_LIST_OPERATION_CODE.ERRORED
-        '            TBL_ERR_SUB(OIT0008INProw)
-        '    End Select
-        'Next
-
-    End Sub
-
-    ''' <summary>
-    ''' 更新予定データの一覧更新時処理
-    ''' </summary>
-    ''' <param name="OIT0008INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_UPDATE_SUB(ByRef OIT0008INProw As DataRow)
-
-        'For Each OIT0008row As DataRow In OIT0008tbl.Rows
-
-        '    ' 同一レコードか判定
-        '    If OIT0008INProw("OFFICECODE") = OIT0008row("OFFICECODE") AndAlso
-        '        OIT0008INProw("IOKBN") = OIT0008row("IOKBN") AndAlso
-        '        OIT0008INProw("PLANTCODE") = OIT0008row("PLANTCODE") Then
-        '        ' 画面入力テーブル項目設定
-        '        OIT0008INProw("LINECNT") = OIT0008row("LINECNT")
-        '        OIT0008INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        OIT0008INProw("UPDTIMSTP") = OIT0008row("UPDTIMSTP")
-        '        OIT0008INProw("SELECT") = 1
-        '        OIT0008INProw("HIDDEN") = 0
-
-        '        ' 項目テーブル項目設定
-        '        OIT0008row.ItemArray = OIT0008INProw.ItemArray
-        '        Exit For
-        '    End If
-        'Next
-
-    End Sub
-
-    ''' <summary>
-    ''' 追加予定データの一覧登録時処理
-    ''' </summary>
-    ''' <param name="OIT0008INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_INSERT_SUB(ByRef OIT0008INProw As DataRow)
-
-        ''○ 項目テーブル項目設定
-        'Dim OIT0008row As DataRow = OIT0008tbl.NewRow
-        'OIT0008row.ItemArray = OIT0008INProw.ItemArray
-
-        'OIT0008row("LINECNT") = OIT0008tbl.Rows.Count + 1
-        'If OIT0008INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
-        '    OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        'Else
-        '    OIT0008row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
-        'End If
-
-        'OIT0008row("UPDTIMSTP") = "0"
-        'OIT0008row("SELECT") = 1
-        'OIT0008row("HIDDEN") = 0
-
-        'OIT0008tbl.Rows.Add(OIT0008row)
-
-    End Sub
-
-    ''' <summary>
-    ''' エラーデータの一覧登録時処理
-    ''' </summary>
-    ''' <param name="OIT0008INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_ERR_SUB(ByRef OIT0008INProw As DataRow)
-
-        'For Each OIT0008row As DataRow In OIT0008tbl.Rows
-
-        '    ' 同一レコードか判定
-        '    If OIT0008INProw("OFFICECODE") = OIT0008row("OFFICECODE") AndAlso
-        '        OIT0008INProw("IOKBN") = OIT0008row("IOKBN") AndAlso
-        '        OIT0008INProw("PLANTCODE") = OIT0008row("PLANTCODE") Then
-        '        ' 画面入力テーブル項目設定
-        '        OIT0008INProw("LINECNT") = OIT0008row("LINECNT")
-        '        OIT0008INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '        OIT0008INProw("UPDTIMSTP") = OIT0008row("UPDTIMSTP")
-        '        OIT0008INProw("SELECT") = 1
-        '        OIT0008INProw("HIDDEN") = 0
-
-        '        ' 項目テーブル項目設定
-        '        OIT0008row.ItemArray = OIT0008INProw.ItemArray
-        '        Exit For
-        '    End If
-        'Next
 
     End Sub
 
@@ -1865,30 +2645,13 @@ Public Class OIT0008CostManagement
 
         Try
             Select Case I_FIELD
-                Case "OFFICECODE"
-                    ' 管轄受注営業所
-                    prmData = work.CreateOfficeCodeParam(Master.USER_ORG)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "IOKBN"
-                    ' 入線出線区分
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "IOKBN")
+                Case "ACCOUNTPATTERN"
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-'                Case "TRAINNO"
-'                    ' 入線出線列車番号
-'                    prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
-'                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "STATION"
-                    ' 駅
-                    prmData = work.CreateFIXParam(Master.USERCAMP)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "PLANTCODE"
-                    ' プラントコード
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "PLANTCODE")
+                Case "TORI_DEPT"
+                    ' 請求先コード/支払先コード
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "TORI_DEPT")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "DELFLG"
-                    ' 削除
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

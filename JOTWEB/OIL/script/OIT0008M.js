@@ -33,7 +33,7 @@ window.addEventListener('load', function () {
 });
 
 function selectAll(val) {
-    let queryString = "table#WF_COSTLISTTBL > tbody > tr > td > input[type=checkbox]"
+    let queryString = "table#WF_COSTLISTTBL > tbody > tr > td > span > input[type=checkbox]"
     var targetCheckBoxList = document.querySelectorAll(queryString);
     if (targetCheckBoxList != null) {
         for (let i = 0; i < targetCheckBoxList.length; i++) {
@@ -50,7 +50,7 @@ function OfficeButtonClick(hiddnId) {
         // 要素のID、営業所コードを設定
         if (hiddnId != null) {
             // 押下されたボタンを設定
-            document.getElementById("WF_ButtonClick").value = "WF_ButtonRELOAD";
+            document.getElementById("WF_ButtonClick").value = "WF_Button_OfficeCode";
             document.getElementById("WF_OFFICEHDN_ID").value = hiddnId
             document.getElementById("MF_SUBMIT").value = "TRUE";
             document.body.style.cursor = "wait";

@@ -11,10 +11,34 @@
     Private CsvSW As IO.StreamWriter
     Private xlProcId As Integer
 
-    Public Sub New(csvDataClass As DataTable, Optional ByVal I_FolderPath As String = Nothing, Optional ByVal I_FileName As String = Nothing)
+    ''' <param name="I_FolderPath">格納先フォルダ</param>
+    ''' <param name="I_FileName">ファイル名</param>
+    ''' <param name="I_Enc">文字コード("UTF8", "EUC")※指定なしの場合は"SJIS"</param>
+    Public Sub New(csvDataClass As DataTable,
+                   Optional ByVal I_FolderPath As String = Nothing,
+                   Optional ByVal I_FileName As String = Nothing,
+                   Optional ByVal I_Enc As String = Nothing)
+
         Dim CS0050SESSION As New CS0050SESSION
         'CSVファイルに書き込むときに使うEncoding
-        Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        'Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
+        Dim enc As System.Text.Encoding
+        Select Case I_Enc
+            '○UTF8(世界標準)BOM無し
+            Case "UTF8N"
+                enc = New System.Text.UTF8Encoding(False)
+            '○UTF8(windows)BOM有り
+            Case "UTF8Y"
+                enc = System.Text.Encoding.UTF8
+                'enc = New System.Text.UTF8Encoding(True)
+            '○EUC(日本語独自)
+            Case "EUC"
+                enc = System.Text.Encoding.GetEncoding("EUC-JP")
+                '○シフトJIS(日本語独自)
+            Case Else
+                enc = System.Text.Encoding.GetEncoding("Shift_JIS")
+        End Select
+        'Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("IBM290")
 
         Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                    "PRINTWORK",

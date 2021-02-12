@@ -5774,7 +5774,7 @@ Public Class OIT0002LinkList
 
                             '★★五井営業所で積込後の着駅が「南松本」の場合
                             If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
-                                AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本	" Then
+                                AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本" Then
                                 OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
                             Else
                                 OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")

@@ -667,7 +667,7 @@ Public Class OIT0003OTLinkageList
         'CSV作成処理の実行
         '******************************
         Dim OTFileName As String = SetCSVFileName()
-        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName)
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName, I_Enc:="UTF8N")
             Dim url As String
             Try
                 url = repCbj.ConvertDataTableToCsv(False)

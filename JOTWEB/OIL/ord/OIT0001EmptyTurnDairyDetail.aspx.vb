@@ -5293,7 +5293,10 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         '### 20201120 START 指摘票対応(No224)全体 #########################################################################
         'WW_FixvalueMasterSearch("01" + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
-        WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        '### 20210212 START 荷受人毎の油種期間で油種の入力制限 ############################################################
+        WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
+        'WW_FixvalueMasterSearch(work.WF_SEL_CONSIGNEECODE.Text + work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        '### 20210212 END   荷受人毎の油種期間で油種の入力制限 ############################################################
         '### 20201120 END   指摘票対応(No224)全体 #########################################################################
 
         For i As Integer = 0 To WW_GetValue.Length - 1

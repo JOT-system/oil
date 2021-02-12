@@ -15009,7 +15009,10 @@ Public Class OIT0003OrderDetail
             WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
         Else
             '### 20201120 START 指摘票対応(No224)全体 #########################################################################
-            WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20210212 START 荷受人毎の油種期間で油種の入力制限 ############################################################
+            WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
+            'WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20210212 END   荷受人毎の油種期間で油種の入力制限 ############################################################
             'WW_FixvalueMasterSearch("01" + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
             '### 20201120 END   指摘票対応(No224)全体 #########################################################################
             'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")

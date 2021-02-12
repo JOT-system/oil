@@ -5772,13 +5772,16 @@ Public Class OIT0002LinkList
                         If OIT0002EXLUProw("ARRSTATIONCODE") = OIT0002EXLOILCVTrow("DEPSTATION") _
                             AndAlso OIT0002EXLUProw("DAILYREPORTCODE") = OIT0002EXLOILCVTrow("DAILYREPORTCODE") Then
 
-                            '★★五井営業所で積込後の着駅が「南松本」の場合
-                            If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
-                                AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本" Then
-                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
-                            Else
-                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
-                            End If
+                            '### 20210212 START 他の着駅と同じ油種を設定 ######################################
+                            OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
+                            ''★★五井営業所で積込後の着駅が「南松本」の場合
+                            'If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
+                            '    AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本" Then
+                            '    OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
+                            'Else
+                            '    OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
+                            'End If
+                            '### 20210212 END   他の着駅と同じ油種を設定 ######################################
                             Exit For
                         End If
                     Next

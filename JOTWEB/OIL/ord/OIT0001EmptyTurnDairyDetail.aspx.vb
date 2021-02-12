@@ -23,6 +23,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
+    Private OIT0001NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
@@ -457,7 +458,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '新規登録ボタン押下
         If work.WF_SEL_CREATEFLG.Text = "1" Then
-
             SQLStr =
               " SELECT TOP (@P0)" _
             & "   0                                              AS LINECNT" _
@@ -514,15 +514,19 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG"
 
-            '### 20200609 START #######################################################
-            If work.WF_SEL_ORDERNUMBER.Text = "" Then
-                SQLStr &=
-                  " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO"
-            Else
-                SQLStr &=
+            '### 20210208 START 受注NO対応(設定は更新時にするためここでは未設定)#######
+            SQLStr &=
                   " , @P1                                            AS ORDERNO"
-            End If
-            '### 20200609 END   #######################################################
+            ''### 20200609 START #######################################################
+            'If work.WF_SEL_ORDERNUMBER.Text = "" Then
+            '    SQLStr &=
+            '      " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO"
+            'Else
+            '    SQLStr &=
+            '      " , @P1                                            AS ORDERNO"
+            'End If
+            ''### 20200609 END   #######################################################
+            '### 20210208 END   受注NO対応(設定は更新時にするためここでは未設定)#######
 
             SQLStr &=
               " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
@@ -745,7 +749,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If work.WF_SEL_CREATEFLG.Text = "1" Then
                     For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
                         If work.WF_SEL_ORDERNUMBER.Text = "" Then
-                            PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                            '### 20210208 START 受注NO対応(設定は更新時にするためここでは未設定)#######
+                            PARA1.Value = ""
+                            'PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                            '### 20210208 START 受注NO対応(設定は更新時にするためここでは未設定)#######
                         Else
                             PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                         End If
@@ -5678,6 +5685,11 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
 
+                '★新規受注NO取得処理(登録する直前に取得)
+                If work.WF_SEL_ORDERNUMBER.Text = "" Then
+                    WW_GetNewOrderNo(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                End If
+
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                     '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
@@ -8207,6 +8219,57 @@ Public Class OIT0001EmptyTurnDairyDetail
             Next
         End If
         '### 20200812 END   指摘票対応(No120)全体 ############################################
+    End Sub
+
+    ''' <summary>
+    ''' 新規受注NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0001NEWORDERNOtbl) Then
+            OIT0001NEWORDERNOtbl = New DataTable
+        End If
+
+        If OIT0001NEWORDERNOtbl.Columns.Count <> 0 Then
+            OIT0001NEWORDERNOtbl.Columns.Clear()
+        End If
+
+        OIT0001NEWORDERNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001NEWORDERNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0001NEWORDERNOtbl.Rows(0)("ORDERNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D GET_NEWORDERNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D GET_NEWORDERNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
 End Class

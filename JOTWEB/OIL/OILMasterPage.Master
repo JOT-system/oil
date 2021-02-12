@@ -58,7 +58,7 @@
                         <div class="popUpTitle"><asp:ContentPlaceHolder ID="contentsPopUpTitle" runat="server"></asp:ContentPlaceHolder></div>
                         <div class="popUpButtons">
                             <input type="button" id="WF_ButtonOkCommonPopUp"     class="btn-sticky" value="OK"  onclick="ButtonClick('WF_ButtonOkCommonPopUp');" />
-                            <input type="button" id="WF_ButtonCancelCommonPopUp" class="btn-sticky" value="ｷｬﾝｾﾙ" onclick="commonHideCustomPopup();" />
+                            <input type="button" id="WF_ButtonCancelCommonPopUp" class="btn-sticky" value="閉じる" onclick="commonHideCustomPopup();" />
                         </div>
                         <div class="popUpContents">
                             <asp:ContentPlaceHolder ID="contentsPopUpInside" runat="server"></asp:ContentPlaceHolder>

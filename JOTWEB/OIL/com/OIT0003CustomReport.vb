@@ -243,31 +243,54 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
         Dim rngTmp As Excel.Range = Nothing
         Dim rngSummary As Excel.Range = Nothing
+        Dim strTrainNoSave As String = ""
         Dim strTrainNameSave As String = ""
         Dim strTotalTankSave As String = ""
+        Dim strOTTransportSave As String = ""
+        Dim blnNewLine As Boolean = False
 
         Try
             Dim i As Integer = 5
+            Dim iTotalCnt As Integer = 0
             For Each PrintDatarow As DataRow In PrintData.Rows
 
                 '★ 五井営業所の場合のみ合計車数を表示
-                '　 かつ前回の列車名と今回の列車名が不一致
-                If officeCode = BaseDllConst.CONST_OFFICECODE_011201 _
-                    AndAlso strTrainNameSave <> "" _
-                    AndAlso strTrainNameSave <> PrintDatarow("TRAINNAME").ToString() Then
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011201 AndAlso strTrainNameSave <> "" Then
+                    '○前回の列車名と今回の列車名が不一致
+                    If strTrainNameSave <> PrintDatarow("TRAINNAME").ToString() Then
+                        blnNewLine = True
 
-                    '★tmpシートより合計行をコピーして値を設定
-                    rngSummary = Me.ExcelTempSheet.Range("B1:P1")
-                    rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "P" + i.ToString())
-                    'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-                    rngSummary.Copy(rngTmp)
-                    ExcelMemoryRelease(rngSummary)
-                    ExcelMemoryRelease(rngTmp)
-                    '◯ 合計車数
-                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                    rngDetailArea.Value = strTotalTankSave + "両"
-                    ExcelMemoryRelease(rngDetailArea)
-                    i += 1
+                        '○8883列車でOT⇒請負になった時点で合計を表示
+                    ElseIf strTrainNoSave = "8883" AndAlso PrintDatarow("TRAINNO").ToString() = "8883" _
+                           AndAlso strOTTransportSave <> PrintDatarow("OTTRANSPORTFLG").ToString() Then
+                        blnNewLine = True
+
+                        '○8877列車でOT⇒請負になった時点で合計を表示
+                    ElseIf strTrainNoSave = "8877" AndAlso PrintDatarow("TRAINNO").ToString() = "8877" _
+                           AndAlso strOTTransportSave <> PrintDatarow("OTTRANSPORTFLG").ToString() Then
+                        blnNewLine = True
+
+                    End If
+
+                    '★合計表示対象の場合
+                    If blnNewLine = True Then
+                        '★tmpシートより合計行をコピーして値を設定
+                        rngSummary = Me.ExcelTempSheet.Range("B1:P1")
+                        rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "P" + i.ToString())
+                        'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
+                        rngSummary.Copy(rngTmp)
+                        ExcelMemoryRelease(rngSummary)
+                        ExcelMemoryRelease(rngTmp)
+                        '◯ 合計車数
+                        rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                        rngDetailArea.Value = Convert.ToString(iTotalCnt) + "両"
+                        'rngDetailArea.Value = strTotalTankSave + "両"
+                        ExcelMemoryRelease(rngDetailArea)
+                        i += 1
+                        iTotalCnt = 0
+                        blnNewLine = False
+                    End If
+
                 End If
 
                 '◯ No
@@ -314,7 +337,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 列車№
                 rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("TRAINNO")
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011201 Then
+                    rngDetailArea.Value = PrintDatarow("OTTRAINNO")
+                Else
+                    rngDetailArea.Value = PrintDatarow("TRAINNO")
+                End If
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 積込回数
                 '### 出力項目（空白） #####################################
@@ -347,7 +374,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "(端切)" + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
 
                 '### 20201105 START 指摘票対応(No210)全体 ##################
@@ -362,6 +390,29 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '### 20201105 END   指摘票対応(No210)全体 ##################
 
+                '★五井営業所
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011201 Then
+                    '★「請負」倉賀野向け列車(8883, 8877列車)対応※請負のみ
+                    If (Convert.ToString(PrintDatarow("TRAINNO")) = "8883" _
+                             OrElse Convert.ToString(PrintDatarow("TRAINNO")) = "8877") _
+                        AndAlso PrintDatarow("OTTRANSPORTFLG").ToString() = "2" Then
+                        If Remark = "" Then
+                            Remark &= "「請負」"
+                        Else
+                            Remark &= vbCrLf + "「請負」"
+                        End If
+                        '★「請負」南松本向け列車(2081, 5972, 9672列車)対応
+                    ElseIf Convert.ToString(PrintDatarow("TRAINNO")) = "2081" _
+                             OrElse Convert.ToString(PrintDatarow("TRAINNO")) = "5972" _
+                             OrElse Convert.ToString(PrintDatarow("TRAINNO")) = "9672" Then
+                        If Remark = "" Then
+                            Remark &= "「請負」"
+                        Else
+                            Remark &= vbCrLf + "「請負」"
+                        End If
+                    End If
+                End If
+
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then
@@ -375,16 +426,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '### 20201014 END   備考欄への表示対応 #####################
 
                 '★ 列車名・合計車数を退避
+                strTrainNoSave = PrintDatarow("TRAINNO").ToString()
                 strTrainNameSave = PrintDatarow("TRAINNAME").ToString()
                 strTotalTankSave = PrintDatarow("TOTALTANK").ToString()
+                strOTTransportSave = PrintDatarow("OTTRANSPORTFLG").ToString()
 
                 i += 1
+                iTotalCnt += 1
             Next
 
             '★ 五井営業所の場合のみ合計車数を表示
             If officeCode = BaseDllConst.CONST_OFFICECODE_011201 Then
                 '★tmpシートより合計行をコピーして値を設定
-                rngSummary = Me.ExcelTempSheet.Range("B1:O1")
+                rngSummary = Me.ExcelTempSheet.Range("B1:P1")
                 rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "O" + i.ToString())
                 'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
                 rngSummary.Copy(rngTmp)
@@ -392,7 +446,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngTmp)
                 '◯ 合計車数
                 rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                rngDetailArea.Value = strTotalTankSave + "両"
+                rngDetailArea.Value = Convert.ToString(iTotalCnt) + "両"
+                'rngDetailArea.Value = strTotalTankSave + "両"
                 ExcelMemoryRelease(rngDetailArea)
             End If
 
@@ -538,7 +593,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
+                    Remark &= "『" + PrintDatarow("UPGRADE").ToString + "』"
+                    'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
                 '### 20201209 START OT積込指示書(翌月発送対応) #########################
                 '★翌月発送
@@ -922,12 +978,12 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngHeaderArea)
 
                 '　ADO3TCH出荷期間（FROM）
-                rngHeaderArea = Me.ExcelWorkSheet.Range("B18")
+                rngHeaderArea = Me.ExcelWorkSheet.Range("B20")
                 rngHeaderArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
                 ExcelMemoryRelease(rngHeaderArea)
 
                 '　ADO3TCH出荷期間（TO）
-                rngHeaderArea = Me.ExcelWorkSheet.Range("B19")
+                rngHeaderArea = Me.ExcelWorkSheet.Range("B21")
                 rngHeaderArea.Value = PrintDatarow("ORDERTODATE").ToString()
                 ExcelMemoryRelease(rngHeaderArea)
                 Exit For
@@ -973,6 +1029,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
                     Continue For
                 End If
+
+                '荷主の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                '荷受人の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
 
                 Select Case PrintDatarow("OILCODE").ToString()
                     '◯白油 
@@ -1266,28 +1335,28 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
                     If PrintDatarow("CONSIGNEECODE").ToString() = "30" Then
                         'LTA出荷期間コウショウ高崎（FROM）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B27")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B29")
                         rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
                         'LTA出荷期間コウショウ高崎（TO）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B28")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B30")
                         rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
                     End If
 
                     If PrintDatarow("CONSIGNEECODE").ToString() = "40" Then
                         'LTA出荷期間JONET松本（FROM）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B30")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B32")
                         rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
                         'LTA出荷期間JONET松本（TO）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B31")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B33")
                         rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
                     End If
 
                     If PrintDatarow("CONSIGNEECODE").ToString() = "54" Then
                         'LTA出荷期間OT高崎（FROM）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B33")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B35")
                         rngDetailArea.Value = PrintDatarow("ORDERFROMDATE").ToString()
                         'LTA出荷期間OT高崎（TO）
-                        rngDetailArea = Me.ExcelWorkSheet.Range("B34")
+                        rngDetailArea = Me.ExcelWorkSheet.Range("B36")
                         rngDetailArea.Value = PrintDatarow("ORDERTODATE").ToString()
                     End If
 
@@ -1305,6 +1374,19 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     svShippersCode = PrintDatarow("SHIPPERSCODE").ToString()
                     Continue For
                 End If
+
+                '荷主の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                'OT列車番号の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OTTRAINNO").ToString()
+                ExcelMemoryRelease(rngDetailArea)
+                '荷受人の出力
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME").ToString()
+                ExcelMemoryRelease(rngDetailArea)
 
                 Select Case PrintDatarow("OILCODE").ToString()
                     '◯白油 

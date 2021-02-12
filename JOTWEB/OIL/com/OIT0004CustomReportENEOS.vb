@@ -217,6 +217,7 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                 Dim rngTargetRow As Excel.Range = Nothing
                 Dim rngOffset As Excel.Range = Nothing
                 Dim rngResize As Excel.Range = Nothing
+                Dim rngKeiOffset As Excel.Range = Nothing
                 Dim targetRowName As String
                 Dim pasteColHeader(0, 4) As Object
                 Dim pasteColUkeire(0, 2) As Object
@@ -256,6 +257,20 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                         rngOffset = rngTargetRow.Offset(ColumnOffset:=11 + (7 * loopcnt))
                         rngOffset.Value = CDec(daysItm.Send)
                         ExcelMemoryRelease(rngOffset)
+                        '軽油の場合は計算範囲情報を付与
+                        If {"1404"}.Contains(oilItm.OilInfo.OilCode) Then
+                            rngOffset = rngTargetRow.Offset(RowOffset:=2, ColumnOffset:=6 + (7 * loopcnt))
+                            rngResize = rngOffset
+                            If oilItm.OilInfo.OrderFromDate <= daysItm.DaysItem.ItemDate.ToString("yyyy/MM/dd") AndAlso
+                               oilItm.OilInfo.OrderToDate >= daysItm.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                                rngResize.Value = "1"
+                            Else
+                                rngResize.Value = "0"
+                            End If
+
+                            ExcelMemoryRelease(rngResize)
+                            ExcelMemoryRelease(rngOffset)
+                        End If
                         loopcnt = loopcnt + 1
                     Next
                     ExcelMemoryRelease(rngTargetRow)

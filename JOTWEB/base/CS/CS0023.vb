@@ -1461,6 +1461,20 @@ Public Structure CS0023XLSUPLOAD
                 'rng = oSheet.Range("Q" + jStart.ToString())
                 dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
+                Select Case Convert.ToString(dt.Rows(i)("LOADARRSTATION"))
+                    Case "倉賀野"
+                        dt.Rows(i)("LOADARRSTATIONCODE") = "4113"
+                    Case "八王子"
+                        dt.Rows(i)("LOADARRSTATIONCODE") = "4610"
+                    Case "南松本"
+                        dt.Rows(i)("LOADARRSTATIONCODE") = "5141"
+                    Case "宇都宮(タ)"
+                        dt.Rows(i)("LOADARRSTATIONCODE") = "4425"
+                    Case "郡山"
+                        dt.Rows(i)("LOADARRSTATIONCODE") = "2407"
+                    Case Else
+                        dt.Rows(i)("LOADARRSTATIONCODE") = ""
+                End Select
                 '### 20210121 START 向き先複数駅ある列車対応 ####################
                 rng = oSheet.Range("T" + jStart.ToString())
                 dt.Rows(i)("LOADINGKTRAINNO") = rng.Text.ToString()
@@ -1980,6 +1994,7 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("OTTRANSPORTFLG", Type.GetType("System.String"))
         '### 20201204 END   指摘票対応(No231)全体 #######################
         dt.Columns.Add("LOADARRSTATION", Type.GetType("System.String"))
+        dt.Columns.Add("LOADARRSTATIONCODE", Type.GetType("System.String"))
         '### 20210121 START 向き先複数駅ある列車対応 ####################
         dt.Columns.Add("LOADINGKTRAINNO", Type.GetType("System.String"))
         '### 20210121 END   向き先複数駅ある列車対応 ####################

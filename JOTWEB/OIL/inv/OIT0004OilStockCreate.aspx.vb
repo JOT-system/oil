@@ -6565,7 +6565,7 @@ Public Class OIT0004OilStockCreate
                     '前日日付データ取得
                     Dim prevDayKey As String = itm.DaysItem.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
                     '前日データを元に実行する処理(前日データあり=一覧初日以外)
-                    If stockListItm.StockItemList.ContainsKey(prevDayKey) AndAlso firstDispDay <> itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                    If stockListItm.StockItemList.ContainsKey(prevDayKey) AndAlso firstDispDay <> itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") AndAlso Now.ToString("yyyy/MM/dd") > itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
                         '前日のデータ
                         Dim prevItm = stockListItm.StockItemList(prevDayKey)
                         '◆1行目 前日夕在庫(前日データの夕在庫フィールドを格納)

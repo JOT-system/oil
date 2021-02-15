@@ -2099,52 +2099,94 @@ Public Class OIT0008CostManagement
                 '請求先コード
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
+                    '請求先コードを取得する
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE") IsNot Nothing Then
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
                         WK_CODE = WK_TextBox.Text
                     End If
-                    '取引先部門名称を取得
-                    CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
-                    '取得できた場合、取引先名、部門名をそれぞれ請求先名、請求先部門に設定
-                    If Not String.IsNullOrEmpty(WK_NAME) Then
-                        Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                    '請求先コードが空の場合、請求先名、請求先部門もクリアする
+                    If String.IsNullOrEmpty(WK_CODE) Then
                         '請求先名
                         If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
                             WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
-                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                            WK_Label.Text = ""
                         End If
-                        '請求先名
+                        '請求先部門
                         If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
                             WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
-                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                            WK_Label.Text = ""
+                        End If
+                    Else
+                        '取引先部門名称を取得
+                        CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
+                        '取得できた場合、取引先名、部門名をそれぞれ請求先名、請求先部門に設定
+                        If Not String.IsNullOrEmpty(WK_NAME) Then
+                            Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                            '請求先名
+                            If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
+                                WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
+                                If WK_TORI_DEPT_NAMES.Length > 0 Then
+                                    WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                                Else
+                                    WK_Label.Text = WK_NAME
+                                End If
+                            End If
+                            '請求先部門
+                            If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
+                                WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
+                                If WK_TORI_DEPT_NAMES.Length > 1 Then
+                                    WK_Label.Text = WK_TORI_DEPT_NAMES(1)
+                                End If
+                            End If
                         End If
                     End If
+
                 End If
                 '支払先コード
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
+                    '支払先コードを取得する
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE") IsNot Nothing Then
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
                         WK_CODE = WK_TextBox.Text
                     End If
-                    '取引先部門名称を取得
-                    CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
-                    '取得できた場合、取引先名、部門名をそれぞれ支払先名、支払先部門に設定
-                    If Not String.IsNullOrEmpty(WK_NAME) Then
-                        Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                    '支払先コードが空の場合、支払先名、支払先部門もクリアする
+                    If String.IsNullOrEmpty(WK_CODE) Then
                         '支払先名
                         If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
                             WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
-                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                            WK_Label.Text = ""
                         End If
-                        '支払先名
+                        '支払先部門
                         If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
                             WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
-                            WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                            WK_Label.Text = ""
+                        End If
+                    Else
+                        '取引先部門名称を取得
+                        CODENAME_get("TORI_DEPT", WK_CODE, WK_NAME, WW_RTN_SW)
+                        '取得できた場合、取引先名、部門名をそれぞれ支払先名、支払先部門に設定
+                        If Not String.IsNullOrEmpty(WK_NAME) Then
+                            Dim WK_TORI_DEPT_NAMES = WK_NAME.Split(" ")
+                            '支払先名
+                            If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
+                                WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
+                                If WK_TORI_DEPT_NAMES.Length > 0 Then
+                                    WK_Label.Text = WK_TORI_DEPT_NAMES(0)
+                                Else
+                                    WK_Label.Text = WK_NAME
+                                End If
+                            End If
+                            '支払先部門
+                            If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
+                                WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
+                                If WK_TORI_DEPT_NAMES.Length > 1 Then
+                                    WK_Label.Text = WK_TORI_DEPT_NAMES(1)
+                                End If
+                            End If
                         End If
                     End If
+
                 End If
 
                 'ワークテーブルへのデータ反映
@@ -2215,29 +2257,29 @@ Public Class OIT0008CostManagement
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_ACCOUNTCODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
 
-                    WW_FOCUS_CONTROL = "WF_COSTLISTTBL_ACCOUNTCODE"
-                    WW_FOCUS_ROW = rowIdx - 1
-
                     Dim accountCodes = WW_SelectValue.Split(" ")
                     '勘定科目コード
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE") IsNot Nothing Then
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox)
-                        WK_TextBox.Text = accountCodes(0)
+                        If accountCodes.Length > 0 Then
+                            WK_TextBox.Text = accountCodes(0)
+                        End If
                     End If
                     'セグメント/セグメント枝番
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE") IsNot Nothing Then
                         WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label)
-                        WK_Label.Text = accountCodes(1)
+                        If accountCodes.Length > 1 Then
+                            WK_Label.Text = accountCodes(1)
+                        End If
                         WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField)
-                        WK_Hidden.Value = accountCodes(2)
+                        If accountCodes.Length > 2 Then
+                            WK_Hidden.Value = accountCodes(2)
+                        End If
                     End If
                 End If
                 '請求先コード
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
-                    WW_FOCUS_CONTROL = "WF_COSTLISTTBL_INVOICECODE"
-                    WW_FOCUS_ROW = rowIdx - 1
 
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE") IsNot Nothing Then
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
@@ -2247,20 +2289,24 @@ Public Class OIT0008CostManagement
                     Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
                         WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
-                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                        If WK_TORI_DEPAT_TEXT.Length > 0 Then
+                            WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                        Else
+                            WK_Label.Text = WW_SelectText
+                        End If
+
                     End If
                     '請求先部門
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
                         WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
-                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                        If WK_TORI_DEPAT_TEXT.Length > 1 Then
+                            WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                        End If
                     End If
                 End If
                 '支払先コード
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
-                    WW_FOCUS_CONTROL = "WF_COSTLISTTBL_PAYEECODE"
-                    WW_FOCUS_ROW = rowIdx - 1
 
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE") IsNot Nothing Then
                         WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
@@ -2270,12 +2316,18 @@ Public Class OIT0008CostManagement
                     Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
                         WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
-                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                        If WK_TORI_DEPAT_TEXT.Length > 0 Then
+                            WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                        Else
+                            WK_Label.Text = WW_SelectText
+                        End If
                     End If
                     '支払先部門
                     If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
                         WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
-                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                        If WK_TORI_DEPAT_TEXT.Length > 1 Then
+                            WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
+                        End If
                     End If
                 End If
 

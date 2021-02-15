@@ -37,6 +37,15 @@
     min-height: 1.0em;
 }
 
+div.headerbox, div.detailbox {
+    min-width: 1220px;
+}
+
+div.detailbox {
+    height: calc(100% - 40px);
+    overflow-y: scroll;
+}
+
 div.detail_keijoym {
     width: 100%;
     box-sizing: border-box;
@@ -89,7 +98,7 @@ div.detail_costlist {
     margin-bottom: 8px;
     margin-left: 20px;
     font-size: 0.9em;
-    overflow-x:scroll;
+    overflow-x: scroll;
 }
 
 table#WF_COSTLISTTBL, table#WF_COSTLISTTBL th, table#WF_COSTLISTTBL td {

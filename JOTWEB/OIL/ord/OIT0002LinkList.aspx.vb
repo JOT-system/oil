@@ -2025,16 +2025,17 @@ Public Class OIT0002LinkList
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
                                     OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
                                 ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
-
+                                    OIT0002ExlUProw("ORDERSTATUS") = ""
                                     '★前回登録した受注明細の内容が今回とで変更されている場合
                                     '　前回登録した受注明細のデータの中身を消去する。
                                     WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
 
                                     '★"1"変更あり(デフォルトは""(変更なし))
                                     OIT0002ExlUProw("CREATEFLAG") = "1"
-
                                 End If
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
+                            Else
+                                OIT0002ExlUProw("ORDERSTATUS") = ""
                             End If
                         Next
                     Next
@@ -5575,8 +5576,8 @@ Public Class OIT0002LinkList
 
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Select(Nothing, "TSUMI")
                         '★発駅・着駅が異なる場合はSKIP
-                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") _
-                            AndAlso OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
+                        If OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("LOADARRSTATIONCODE") Then Continue For
 
                         ''★甲子営業所の場合は、チェック不要と判断し一旦SKIP
                         'If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For

@@ -17,76 +17,40 @@ Public Class OIT0003CustomMultiReport
         Return ""
     End Function
 
-    Public Shared Function CreateActualShip(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As List(Of String)
-        Dim urlList As New List(Of String)
+    Public Shared Function CreateActualShip(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As String
+        Dim url As String
         Using repCbj = New ActualShip(mapId, officeCode, printDataClass)
-            Dim url As String
             Try
                 url = repCbj.CreatePrintData(lodDate, trainNo)
             Catch ex As Exception
                 Throw
             End Try
-            If Not String.IsNullOrWhiteSpace(url) Then
-                urlList.Add(url)
-            End If
         End Using
-        Return urlList
+        Return url
     End Function
 
-    Public Shared Function CreateTankDispatch(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As List(Of String)
-        Dim urlList As New List(Of String)
-
-
-        If printDataClass IsNot Nothing AndAlso printDataClass.Rows.Count > 0 Then
-            'グループ化（油層所毎）
-            Dim group = printDataClass.AsEnumerable.
-                    GroupBy(Function(g As DataRow) Tuple.Create(g.Item("CONSIGNEECODE").ToString())).
-                    Select(Function(g) New With {.consigneeCode = g.Key.Item1, .dataTable = g.CopyToDataTable}).ToList()
-            'グループ毎に作成
+    Public Shared Function CreateTankDispatch(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal consigneeCode As String, ByVal trainNo As String) As String
+        Dim url As String
+        Using repCbj = New TankDispatch(mapId, officeCode, printDataClass)
             Try
-                For Each item In group
-                    Using repCbj = New TankDispatch(mapId, officeCode, item.dataTable)
-                        Dim url As String
-                        url = repCbj.CreatePrintData(lodDate, trainNo, item.consigneeCode)
-                        If Not String.IsNullOrWhiteSpace(url) Then
-                            urlList.Add(url)
-                        End If
-                    End Using
-                Next
+                url = repCbj.CreatePrintData(lodDate, trainNo, consigneeCode)
             Catch ex As Exception
                 Throw
             End Try
-        Else
-            Using repCbj = New TankDispatch(mapId, officeCode, printDataClass)
-                Dim url As String
-                Try
-                    url = repCbj.CreatePrintData(lodDate, trainNo, Nothing)
-                Catch ex As Exception
-                    Throw
-                End Try
-                If Not String.IsNullOrWhiteSpace(url) Then
-                    urlList.Add(url)
-                End If
-            End Using
-        End If
-
-        Return urlList
+        End Using
+        Return url
     End Function
 
-    Public Shared Function CreateContactOrder(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As List(Of String)
-        Dim urlList As New List(Of String)
+    Public Shared Function CreateContactOrder(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As String
+        Dim url As String
         Using repCbj = New ContactOrder(mapId, officeCode, printDataClass)
-            Dim url As String
             Try
                 url = repCbj.CreatePrintData(lodDate, trainNo)
             Catch ex As Exception
                 Throw
             End Try
-            If Not String.IsNullOrWhiteSpace(url) Then
-                urlList.Add(url)
-            End If
         End Using
-        Return urlList
+        Return url
     End Function
 
 End Class
@@ -581,6 +545,15 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
     Protected OfficeCode As String
     Protected PrintData As DataTable
+
+
+    Public Class CONSIGNEECODE
+        Public Const KOUSYOUTAKASAKI As String = "30"
+        Public Const JONETMATSUMOTO As String = "40"
+        Public Const OTMORIOKA As String = "51"
+        Public Const OTTAKASAKI As String = "54"
+    End Class
+
 
     Public Sub New(mapId As String, ByVal officeCode As String, printDataClass As DataTable)
         MyBase.New(mapId, TEMP_XLS_FILE_NAME)

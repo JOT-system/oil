@@ -4,7 +4,7 @@
 .btn-office {
     text-decoration: none;
     height: 35px;
-    width: 9.8%;
+    width: 8.9%;
     line-height: 23px;
     text-align: center;
     color: #2bb6c1;
@@ -92,6 +92,11 @@ div.detail_costlist {
     overflow-x:scroll;
 }
 
+table#WF_COSTLISTTBL, table#WF_COSTLISTTBL th, table#WF_COSTLISTTBL td {
+    border: solid 1px #2bb6c1;
+}
+
+
 th[class^="WF_COSTLISTTBL_TH"] {
     height: 18px;
     background-color: #2bb6c1;
@@ -144,19 +149,21 @@ div#RowOperationBox {
         color: #2bb6c1;
     }
 
-span#WF_COSTLISTTBL_LINECNT {
-    padding-right:2px;
+span#WF_COSTLISTTBL_LINE {
+    padding-right:3px;
     text-align: right;
     display: inline-block;
     width: 20px;
 }
 
-td.WF_COSTLISTTBL_TD2 {
+span.WF_COSTLISTTBL_CHECKFLG {
     width: 40px;
+    display: inline-block;
 }
 
-td.WF_COSTLISTTBL_TD3 {
+span.WF_COSTLISTTBL_CALCACCOUNT {
     width: 85px;
+    display: inline-block;
 }
 
 input#WF_COSTLISTTBL_ACCOUNTCODE, input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
@@ -167,8 +174,9 @@ input#WF_COSTLISTTBL_ACCOUNTCODE, input#WF_COSTLISTTBL_INVOICECODE, input#WF_COS
 span#WF_COSTLISTTBL_SEGMENTCODE {
     width: 85px;
     padding-left: 2px;
+    letter-spacing: 1px;
     text-align: left;
-    vertical-align:middle;
+    vertical-align: middle;
     display: inline-block;
 }
 
@@ -179,12 +187,13 @@ input#WF_COSTLISTTBL_AMMOUNT {
 span#WF_COSTLISTTBL_TAX {
     width: 94px;
     padding-left: 3px;
+    letter-spacing: 1px;
     text-align: left;
     vertical-align: middle;
     display: inline-block;
 }
 
-span#WF_COSTLISTTBL_INVOICENAME, span#WF_COSTLISTTBL_PAYEENAME, span#WF_COSTLISTTBL_INVOICEDEPT, span#WF_COSTLISTTBL_PAYEEDEPT {
+span#WF_COSTLISTTBL_INVOICENAME, span#WF_COSTLISTTBL_PAYEENAME, span#WF_COSTLISTTBL_INVOICEDEPTNAME, span#WF_COSTLISTTBL_PAYEEDEPTNAME {
     padding-left: 2px;
     text-align: left;
     vertical-align: middle;
@@ -203,7 +212,8 @@ input#WF_COSTLISTTBL_ABSTRACT {
 td.footerCells {
     height: 22px;
     vertical-align: middle;
-    font-size: 0.9em
+    font-size: 0.9em;
+    letter-spacing: 1px;
 }
 
 td.text {

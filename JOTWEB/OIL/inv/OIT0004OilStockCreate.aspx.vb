@@ -4421,15 +4421,16 @@ Public Class OIT0004OilStockCreate
         Dim retVal As String = ""
         Try
             Dim sqlStr As New StringBuilder
-            sqlStr.AppendLine("SELECT FX.KEYCODE  AS ORDERNO")
-            sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
-            sqlStr.AppendLine(" WHERE FX.CLASS    = @CLASS")
-            sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+            sqlStr.AppendLine("SELECT 'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO")
+            'sqlStr.AppendLine("SELECT FX.KEYCODE  AS ORDERNO")
+            'sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+            'sqlStr.AppendLine(" WHERE FX.CLASS    = @CLASS")
+            'sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
             Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
-                With sqlCmd.Parameters
-                    .Add("@CLASS", SqlDbType.NVarChar).Value = "NEWORDERNOGET"
-                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                End With
+                'With sqlCmd.Parameters
+                '    .Add("@CLASS", SqlDbType.NVarChar).Value = "NEWORDERNOGET"
+                '    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                'End With
 
                 Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows Then

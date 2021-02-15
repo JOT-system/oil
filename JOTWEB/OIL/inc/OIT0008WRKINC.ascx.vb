@@ -4,6 +4,7 @@ Public Class OIT0008WRKINC
     Inherits UserControl
 
     Public Const MAPIDM As String = "OIT0008M"       'MAPID(費用管理)
+    Public Const MAPIDD As String = "OIT0008D"       'MAPID(費用管理詳細)
 
     '' <summary>
     '' ワークデータ初期化処理
@@ -11,24 +12,6 @@ Public Class OIT0008WRKINC
     '' <remarks></remarks>
     Public Sub Initialize()
     End Sub
-
-    ''' <summary>
-    ''' 管轄受注営業所パラメーター
-    ''' </summary>
-    ''' <param name="I_OFFICECODE"></param>
-    ''' <returns></returns>
-    ''' <remarks>全て</remarks>
-    Function CreateOfficeCodeParam(ByVal I_COMPCODE As String, Optional ByVal I_OFFICECODE As String = Nothing) As Hashtable
-
-        Dim prmData As New Hashtable
-
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_OFFICECODE
-        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
-
-        Return prmData
-
-    End Function
 
     ''' <summary>
     ''' 固定値マスタから一覧の取得

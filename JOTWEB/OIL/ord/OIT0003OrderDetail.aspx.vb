@@ -37,6 +37,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003FIDtbl_tab3 As DataTable                         '検索用1テーブル(タブ３用)
     Private OIT0003FID2tbl_tab3 As DataTable                        '検索用2テーブル(タブ３用)(受注TBLから情報を取得)
     'Private OIT0003FIDtbl_tab4 As DataTable                         '検索用テーブル(タブ４用)
+    Private OIT0003NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -839,10 +840,11 @@ Public Class OIT0003OrderDetail
 
         'オーダー№
         If work.WF_SEL_ORDERNUMBER.Text = "" Then
-            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
-            WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
-            work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
-            Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+            '★新規受注NO取得(登録する直前に取得)
+            'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+            'WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
+            'work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
+            'Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         Else
             Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         End If
@@ -1925,8 +1927,11 @@ Public Class OIT0003OrderDetail
 
                     '★貨車連結順序アップロードから作成された新規受注データの場合
                     '　※追記　受注明細画面以外から作成された新規受注データ
-                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                        AndAlso OIT0003row("EMPTYTURNFLG") <> "0" Then
+                    If (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                            AndAlso OIT0003row("EMPTYTURNFLG") <> "0") _
+                        OrElse (work.WF_SEL_ORDERSTATUS.Text <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                            AndAlso OIT0003row("SHIPORDER") = "" _
+                            AndAlso OIT0003row("EMPTYTURNFLG") <> "0") Then
 
                         '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
                         '　※上記以外の営業所については、入力しないため値は未入力。
@@ -1938,6 +1943,17 @@ Public Class OIT0003OrderDetail
                             Catch ex As Exception
                                 OIT0003row("SHIPORDER") = ""
                             End Try
+
+                            '★受注進行ステータスが100(受注受付)以外
+                            If work.WF_SEL_ORDERSTATUS.Text <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                                '★★割当は確定しているため、発送順をDBに自動更新する。
+                                WW_UpdateDetailRelatedFlg(OIT0003row("SHIPORDER"), OIT0003row, "SHIPORDER")
+                                '★★割当は確定しているため、積込出線順をDBに自動更新する。
+                                WW_UpdateDetailRelatedFlg(OIT0003row("SHIPORDER"), OIT0003row, "LOADINGOUTLETORDER")
+                                '★★割当は確定しているため、積込入線順をDBに自動更新する。
+                                WW_UpdateDetailRelatedFlg(OIT0003row("LINEORDER"), OIT0003row, "LOADINGIRILINEORDER")
+                            End If
+
                         End If
 
                         'OIT0003row("LINEORDER") = i    '貨物駅入線順
@@ -2453,6 +2469,14 @@ Public Class OIT0003OrderDetail
                                                         "DELIVERYMASTER",
                                                         OIT0003tab2row("LOADINGIRILINETRAINNAME") + OIT0003tab2row("LOADINGIRILINEORDER"),
                                                         WW_GetValue)
+
+                        '★受注進行ステータスが100(受注受付)以外で充填ポイントが異なる場合
+                        If work.WF_SEL_ORDERSTATUS.Text <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                            AndAlso OIT0003tab2row("FILLINGPOINT") <> WW_GetValue(0) Then
+                            '★★割当は確定しているため、充填ポイントをDBに自動更新する。
+                            WW_UpdateDetailRelatedFlg(WW_GetValue(0), OIT0003tab2row, "FILLINGPOINT")
+                        End If
+
                         '託送コード設定(充填ポイント)
                         OIT0003tab2row("FILLINGPOINT") = WW_GetValue(0)
                     End If
@@ -3526,7 +3550,7 @@ Public Class OIT0003OrderDetail
         work.WF_SEL_CONTACTFLG.Text = "1"
 
         '受注TBL更新
-        WW_UpdateRelatedFlg("1", "CONTACTFLG")
+        WW_UpdateOrderRelatedFlg("1", "CONTACTFLG")
 
         '〇 受注進行ステータスの状態を取得
         WW_ScreenOrderStatusSet(strOrderStatus)
@@ -3548,7 +3572,7 @@ Public Class OIT0003OrderDetail
         work.WF_SEL_RESULTFLG.Text = "1"
 
         '受注TBL更新
-        WW_UpdateRelatedFlg("1", "RESULTFLG")
+        WW_UpdateOrderRelatedFlg("1", "RESULTFLG")
 
         '〇 受注進行ステータスの状態を取得
         WW_ScreenOrderStatusSet(strOrderStatus)
@@ -3570,7 +3594,7 @@ Public Class OIT0003OrderDetail
         work.WF_SEL_DELIVERYFLG.Text = "1"
 
         '受注TBL更新
-        WW_UpdateRelatedFlg("1", "DELIVERYFLG")
+        WW_UpdateOrderRelatedFlg("1", "DELIVERYFLG")
 
         '〇 受注進行ステータスの状態を取得
         WW_ScreenOrderStatusSet(strOrderStatus)
@@ -8796,6 +8820,12 @@ Public Class OIT0003OrderDetail
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
 
+                '★新規受注NO取得処理(登録する直前に取得)
+                If work.WF_SEL_ORDERNUMBER.Text = "" Then
+                    WW_GetNewOrderNo(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+                End If
+
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                     '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
@@ -12411,7 +12441,7 @@ Public Class OIT0003OrderDetail
     ''' (受注TBL)フラグ関連更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_UpdateRelatedFlg(ByVal I_Value As String, Optional ByVal I_PARA01 As String = Nothing)
+    Protected Sub WW_UpdateOrderRelatedFlg(ByVal I_Value As String, Optional ByVal I_PARA01 As String = Nothing)
 
         Try
             'DataBase接続文字
@@ -12447,6 +12477,79 @@ Public Class OIT0003OrderDetail
             PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
             PARA02.Value = C_DELETE_FLG.DELETE
             PARA03.Value = I_Value
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_" + I_PARA01 + "UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_" + I_PARA01 + "UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注明細TBL)フラグ関連更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateDetailRelatedFlg(ByVal I_Value As String, ByVal dtrow As DataRow,
+                                            Optional ByVal I_PARA01 As String = Nothing)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注明細TBLの各フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0003_DETAIL " _
+                    & "    SET UPDYMD      = @P11, " _
+                    & "        UPDUSER     = @P12, " _
+                    & "        UPDTERMID   = @P13, " _
+                    & "        RECEIVEYMD  = @P14, "
+
+            SQLStr &= String.Format("        {0}   = @P04 ", I_PARA01)
+
+            SQLStr &=
+                    "  WHERE ORDERNO     = @P01 " _
+                    & "    AND DETAILNO  = @P02 " _
+                    & "    AND DELFLG   <> @P03; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = dtrow("ORDERNO")
+            PARA02.Value = dtrow("DETAILNO")
+            PARA03.Value = C_DELETE_FLG.DELETE
+            PARA04.Value = I_Value
 
             PARA11.Value = Date.Now
             PARA12.Value = Master.USERID
@@ -14906,7 +15009,10 @@ Public Class OIT0003OrderDetail
             WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
         Else
             '### 20201120 START 指摘票対応(No224)全体 #########################################################################
-            WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20210212 START 荷受人毎の油種期間で油種の入力制限 ############################################################
+            WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
+            'WW_FixvalueMasterSearch(Me.TxtConsigneeCode.Text + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+            '### 20210212 END   荷受人毎の油種期間で油種の入力制限 ############################################################
             'WW_FixvalueMasterSearch("01" + Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
             '### 20201120 END   指摘票対応(No224)全体 #########################################################################
             'WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN_FT_SEG", "", WW_GetValue, I_PARA01:="1")
@@ -22165,6 +22271,57 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' 新規受注NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0003NEWORDERNOtbl) Then
+            OIT0003NEWORDERNOtbl = New DataTable
+        End If
+
+        If OIT0003NEWORDERNOtbl.Columns.Count <> 0 Then
+            OIT0003NEWORDERNOtbl.Columns.Clear()
+        End If
+
+        OIT0003NEWORDERNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003NEWORDERNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0003NEWORDERNOtbl.Rows(0)("ORDERNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D GET_NEWORDERNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D GET_NEWORDERNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

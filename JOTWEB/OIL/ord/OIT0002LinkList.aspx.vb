@@ -34,6 +34,7 @@ Public Class OIT0002LinkList
     Private OIT0002His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
+    Private OIT0002NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -439,7 +440,8 @@ Public Class OIT0002LinkList
 
         SQLStr &=
               " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
-            & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
+            & " AND ISNULL(OIT0011.LINKNO,'') <> '' " _
+            & " AND OIT0011.DELFLG <> @P02 "
 
         '### 20201203 START 指摘票対応(No234)全体 ####################################### 
         SQLStr &=
@@ -1946,15 +1948,17 @@ Public Class OIT0002LinkList
             & "    , ISNULL(RTRIM(OIT0011.DETAILNO), '') AS DETAILNO " _
             & "    , ISNULL(RTRIM(OIT0011.TRUCKNO), '')  AS TRUCKNO " _
             & "    , OIT0002.TRAINNO                     AS TRAINNO " _
+            & "    , OIT0002.LODDATE                     AS LODDATE " _
+            & "    , OIT0002.DEPDATE                     AS DEPDATE " _
             & "    , OIT0002.SHIPPERSCODE                AS SHIPPERSCODE " _
             & "    , OIT0002.SHIPPERSNAME                AS SHIPPERSNAME " _
             & "    , OIT0002.ORDERSTATUS                 AS ORDERSTATUS " _
             & "    , OIT0002.DELFLG                      AS ORDER_DELFLG " _
             & "    , OIT0003.DELFLG                      AS DETAIL_DELFLG " _
             & " FROM oil.OIT0011_RLINK OIT0011 " _
-            & " INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & " LEFT JOIN oil.OIT0002_ORDER OIT0002 ON " _
             & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
-            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & " LEFT JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
             & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
             & " WHERE " _
@@ -2004,23 +2008,30 @@ Public Class OIT0002LinkList
                     '★受注No、受注明細Noの引継ぎ処理
                     OIT0002EXLUPtbl.Columns.Add("ORDERNO", Type.GetType("System.String"))
                     OIT0002EXLUPtbl.Columns.Add("DETAILNO", Type.GetType("System.String"))
+                    OIT0002EXLUPtbl.Columns.Add("ORDERSTATUS", Type.GetType("System.String"))
+                    OIT0002EXLUPtbl.Columns.Add("CREATEFLAG", Type.GetType("System.String"))
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") _
                             AndAlso OIT0002Exlrow("ORDERNO") <> "" Then
                                 '### 20210204 START 指摘票対応(No340)全体 ############################################
                                 If OIT0002ExlUProw("LOADINGTRAINNO") = OIT0002Exlrow("TRAINNO") _
+                                    AndAlso OIT0002ExlUProw("LOADINGLODDATE") = OIT0002Exlrow("LODDATE") _
+                                    AndAlso OIT0002ExlUProw("LOADINGDEPDATE") = OIT0002Exlrow("DEPDATE") _
                                     AndAlso OIT0002Exlrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 _
                                     AndAlso OIT0002Exlrow("ORDER_DELFLG") <> C_DELETE_FLG.DELETE _
                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") <> C_DELETE_FLG.DELETE Then
                                     OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
-                                ElseIf OIT0002ExlUProw("LOADINGTRAINNO") <> OIT0002Exlrow("TRAINNO") _
-                                     AndAlso OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
+                                    OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
+                                ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
 
                                     '★前回登録した受注明細の内容が今回とで変更されている場合
                                     '　前回登録した受注明細のデータの中身を消去する。
                                     WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
+
+                                    '★"1"変更あり(デフォルトは""(変更なし))
+                                    OIT0002ExlUProw("CREATEFLAG") = "1"
 
                                 End If
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
@@ -2032,9 +2043,13 @@ Public Class OIT0002LinkList
                     '★受注No、受注明細Noの引継ぎ処理
                     OIT0002EXLUPtbl.Columns.Add("ORDERNO", Type.GetType("System.String")).DefaultValue = ""
                     OIT0002EXLUPtbl.Columns.Add("DETAILNO", Type.GetType("System.String")).DefaultValue = ""
+                    OIT0002EXLUPtbl.Columns.Add("ORDERSTATUS", Type.GetType("System.String")).DefaultValue = ""
+                    OIT0002EXLUPtbl.Columns.Add("CREATEFLAG", Type.GetType("System.String")).DefaultValue = ""
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         OIT0002ExlUProw("ORDERNO") = ""
                         OIT0002ExlUProw("DETAILNO") = ""
+                        OIT0002ExlUProw("ORDERSTATUS") = ""
+                        OIT0002ExlUProw("CREATEFLAG") = ""
                     Next
                 End If
 
@@ -3772,6 +3787,7 @@ Public Class OIT0002LinkList
               " SELECT" _
             & "   OIT0002.ORDERNO            AS ORDERNO" _
             & " , OIT0003.DETAILNO           AS DETAILNO" _
+            & " , OIT0002.ORDERSTATUS        AS ORDERSTATUS" _
             & " , OIT0003.TANKNO             AS TANKNO" _
             & " , OIT0003.OILCODE            AS OILCODE" _
             & " , OIT0003.OILNAME            AS OILNAME" _
@@ -3808,13 +3824,15 @@ Public Class OIT0002LinkList
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
+                '★新規受注NO取得処理(登録する直前に取得)
+                Dim sOrderNo As String = ""
                 '受注№取得
-                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-                WW_FixvalueMasterSearch("ZZ", "NEWORDERNOGET", "", WW_GetValue)
-                Dim sOrderNo As String = WW_GetValue(0)
+                'Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch("ZZ", "NEWORDERNOGET", "", WW_GetValue)
+                'Dim sOrderNo As String = WW_GetValue(0)
 
                 '退避用
-                Dim sOrderContent() As String = {"", "", "", "", "", ""}
+                Dim sOrderContent() As String = {"", "", "", "", "", "", ""}
                 Dim iNum As Integer
                 Dim i As Integer = 0
                 Dim tankNoFlg As String = "0"
@@ -3834,6 +3852,7 @@ Public Class OIT0002LinkList
                        AndAlso sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE").ToString() Then
 
                         OIT0002EXLUProw("ORDERNO") = sOrderContent(0)
+                        OIT0002EXLUProw("ORDERSTATUS") = sOrderContent(6)
                         '★タンク車Noと一致した明細Noを設定
                         For Each OIT0002GETrow As DataRow In OIT0002GETtbl.Select("USEFLG = '0'")
                             If Convert.ToString(OIT0002GETrow("TANKNO")) = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
@@ -3856,16 +3875,22 @@ Public Class OIT0002LinkList
                             Next
                         End If
                         If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
+                            '★受注TBLに存在しない場合
                             If OIT0002GETtbl.Rows.Count = 0 Then
-                                iNum = Integer.Parse(sOrderContent(1)) + 1
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'iNum = Integer.Parse(sOrderContent(1)) + 1
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
                             Else
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                'OIT0002EXLUProw("DETAILNO") = ""
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 END   同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
@@ -3894,15 +3919,22 @@ Public Class OIT0002LinkList
 
                         '★受注TBLに存在しない場合
                         If OIT0002GETtbl.Rows.Count = 0 Then
-                            OIT0002EXLUProw("ORDERNO") = sOrderNo
-                            OIT0002EXLUProw("DETAILNO") = "001"
+                            '### 20210210 START 同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
+                            OIT0002EXLUProw("ORDERNO") = ""
+                            OIT0002EXLUProw("DETAILNO") = ""
+                            'WW_GetNewOrderNo(SQLcon, sOrderNo)
+                            'OIT0002EXLUProw("ORDERNO") = sOrderNo
+                            'OIT0002EXLUProw("DETAILNO") = "001"
+                            'OIT0002EXLUProw("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100
+                            '### 20210210 END   同一KEY(本線列車・積込日・発日)が未存在の場合は追加しない #######
 
-                            '次回用に受注Noをカウント
-                            iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
-                            sOrderNo = sOrderNo.Substring(0, 9) + iNum.ToString("00")
+                            ''次回用に受注Noをカウント
+                            'iNum = Integer.Parse(sOrderNo.Substring(9, 2)) + 1
+                            'sOrderNo = sOrderNo.Substring(0, 9) + iNum.ToString("00")
                         Else
                             ''存在する場合は、設定されている受注Noを設定
                             OIT0002EXLUProw("ORDERNO") = OIT0002GETtbl.Rows(0)("ORDERNO")
+                            OIT0002EXLUProw("ORDERSTATUS") = OIT0002GETtbl.Rows(0)("ORDERSTATUS")
                             'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO")) + 1
                             'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
                             '★タンク車Noと一致した明細Noを設定
@@ -3928,11 +3960,13 @@ Public Class OIT0002LinkList
                             End If
                             If Convert.ToString(OIT0002EXLUProw("DETAILNO")) = "" Then
                                 '### 20201119 START 同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
-                                ''★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
-                                'OIT0002EXLUProw("DETAILNO") = ""
-                                i += 1
-                                iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
-                                OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 START 同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
+                                '★受注No(明細No)は振らず、後続処理にてエラーとするため""(空白)を設定
+                                OIT0002EXLUProw("DETAILNO") = ""
+                                'i += 1
+                                'iNum = Integer.Parse(OIT0002GETtbl.Rows(0)("DETAILNO_MAX")) + i
+                                'OIT0002EXLUProw("DETAILNO") = iNum.ToString("000")
+                                '### 20210210 END   同一KEY(本線列車・積込日・発日)は存在しても、タンク車No及び油種が未存在の場合は追加しない #######
                                 '### 20201119 END   同一KEY(本線列車・積込日・発日)は存在するが、タンク車No及び油種が未存在の場合 #######
                             End If
                         End If
@@ -3951,11 +3985,12 @@ Public Class OIT0002LinkList
                     sOrderContent(3) = OIT0002EXLUProw("LOADINGTRAINNO")
                     sOrderContent(4) = OIT0002EXLUProw("LOADINGLODDATE")
                     sOrderContent(5) = OIT0002EXLUProw("LOADINGDEPDATE")
+                    sOrderContent(6) = OIT0002EXLUProw("ORDERSTATUS")
                 Next
 
                 '設定した受注№、受注明細№を【貨車連結表(臨海)TBL】に反映
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
-                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" Then
+                    If OIT0002EXLUProw("ORDERNO").ToString() <> "" AndAlso OIT0002EXLUProw("DETAILNO") <> "" Then
                         WW_UpdateRLinkOrderNo(SQLcon, OIT0002EXLUProw)
                     End If
                 Next
@@ -4187,6 +4222,8 @@ Public Class OIT0002LinkList
                     '★受注№が未設定の場合は次レコード
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
+                    If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                       AndAlso OIT0002row("CREATEFLAG").ToString() = "" Then Continue For
 
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
@@ -4642,6 +4679,7 @@ Public Class OIT0002LinkList
                     '★受注№が未設定の場合は次レコード
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
+                    If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
 
                     'DB更新
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                       '受注№
@@ -5734,13 +5772,16 @@ Public Class OIT0002LinkList
                         If OIT0002EXLUProw("ARRSTATIONCODE") = OIT0002EXLOILCVTrow("DEPSTATION") _
                             AndAlso OIT0002EXLUProw("DAILYREPORTCODE") = OIT0002EXLOILCVTrow("DAILYREPORTCODE") Then
 
-                            '★★五井営業所で積込後の着駅が「南松本」の場合
-                            If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
-                                AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本	" Then
-                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
-                            Else
-                                OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
-                            End If
+                            '### 20210212 START 他の着駅と同じ油種を設定 ######################################
+                            OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
+                            ''★★五井営業所で積込後の着駅が「南松本」の場合
+                            'If OIT0002EXLUProw("ARRSTATIONCODE") = BaseDllConst.CONST_STATION_434103 _
+                            '    AndAlso OIT0002EXLUProw("LOADARRSTATION") = "南松本" Then
+                            '    OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME_GOI")
+                            'Else
+                            '    OIT0002EXLUProw("OILNAME") = OIT0002EXLOILCVTrow("ORDERINGOILNAME")
+                            'End If
+                            '### 20210212 END   他の着駅と同じ油種を設定 ######################################
                             Exit For
                         End If
                     Next
@@ -6465,6 +6506,57 @@ Public Class OIT0002LinkList
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 新規受注NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0002NEWORDERNOtbl) Then
+            OIT0002NEWORDERNOtbl = New DataTable
+        End If
+
+        If OIT0002NEWORDERNOtbl.Columns.Count <> 0 Then
+            OIT0002NEWORDERNOtbl.Columns.Clear()
+        End If
+
+        OIT0002NEWORDERNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.order_sequence,'00') AS ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002NEWORDERNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0002NEWORDERNOtbl.Rows(0)("ORDERNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L GET_NEWORDERNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L GET_NEWORDERNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
             Exit Sub
         End Try
     End Sub

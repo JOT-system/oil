@@ -5945,12 +5945,18 @@ Public Class OIT0003OrderList
             & " , OIM0003.SEGMENTOILNAME                         AS SEGMENTOILNAME" _
             & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
             & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , OIM0024.PRIORITYNO                             AS PRIORITYNO" _
             & " , '0'                                            AS DELFLG" _
             & " FROM oil.OIM0013_LOAD OIM0013 " _
             & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
             & "     OIM0003.OFFICECODE = @P01 " _
             & " AND OIM0003.PLANTCODE = OIM0013.PLANTCODE " _
-            & " AND OIM0003.OILCODE = OIM0013.OILCODE "
+            & " AND OIM0003.OILCODE = OIM0013.OILCODE " _
+            & " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+            & "     OIM0024.OFFICECODE = OIM0003.OFFICECODE " _
+            & " AND OIM0024.OILCODE = OIM0013.OILCODE " _
+            & " AND OIM0024.SEGMENTOILCODE = OIM0013.SEGMENTOILCODE " _
+            & " AND OIM0024.DELFLG <> @P02 "
 
         SQLLDP &=
                 " ORDER BY" _
@@ -5996,7 +6002,8 @@ Public Class OIT0003OrderList
             & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_K3Tank1 + "' THEN OIT0002.K3TANKCH " _
             & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_ATank + "' THEN OIT0002.ATANKCH " _
             & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN OIT0002.LTANKCH " _
-            & "   END, 0)                                        AS TOTALTANK"
+            & "   END, 0)                                        AS TOTALTANK" _
+            & " , OIM0024.PRIORITYNO                             AS PRIORITYNO"
 
         '★予備枠用SQLセット
         Dim SQLStrYobi As String = SQLStr & " , ISNULL(OIT0002.RNUM, 2) AS RNUM"
@@ -6190,7 +6197,9 @@ Public Class OIT0003OrderList
                   SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon),
                   SQLGetcmd As New SqlCommand(SQLGetStr, SQLcon)
                 Dim PARALDP01 As SqlParameter = SQLLDPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARALDP02 As SqlParameter = SQLLDPcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARALDP01.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARALDP02.Value = C_DELETE_FLG.DELETE
 
                 Using SQLLDPdr As SqlDataReader = SQLLDPcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -6267,44 +6276,84 @@ Public Class OIT0003OrderList
 
                 Dim i As Integer = 0
                 Dim strTrainNo As String = ""
+                Dim strOilCode As String = ""
+
+                OIT0003ReportNegishitbl.AsEnumerable().
+                        Where(Function(r) r.Item("OILCODE") IsNot DBNull.Value).
+                        GroupBy(Function(r) Tuple.Create(r.Item("TRAINNO"), r.Item("OILCODE"), r.Item("PRIORITYNO"))).
+                        Select(Function(g) New With {
+                            .trainNo = g.Key.Item1,
+                            .oilCode = g.Key.Item2,
+                            .priorityNo = g.Key.Item3,
+                            .rows = g.Select(Function(r) r)
+                                   }).
+                        ToList().ForEach(
+                        Sub(g)
+
+                            '★列車Noが変更になったら、充填ポイントの内容を初期化
+                            If strTrainNo <> "" AndAlso strTrainNo <> g.trainNo Then
+                                For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                                    OIT0003Wkrow("DELFLG") = "0"
+                                Next
+                            End If
+
+                            g.rows.ToList.ForEach(
+                            Sub(r)
+
+                                '現油種の空きレコード
+                                Dim thisFreePoints = OIT0003WKtbl.AsEnumerable().
+                                Where(Function(wr) wr("DELFLG") <> "1" AndAlso wr("OILCODE") = g.oilCode).
+                                Select(Function(wr) CInt(wr("LOADINGPOINT"))).Distinct().ToList()
+
+                                '優先する空きレコード
+                                Dim priorityPoints = OIT0003WKtbl.AsEnumerable().
+                                Where(Function(wr)
+                                          Return wr("DELFLG") <> "1" _
+                                          AndAlso wr("PRIORITYNO") < g.priorityNo _
+                                          AndAlso thisFreePoints.Exists(Function(x) x = CInt(wr("LOADINGPOINT")))
+                                      End Function).
+                                Select(Function(wr) CInt(wr("LOADINGPOINT"))).Distinct().ToList()
+
+                                '★表示用の油種コードと充填ポイントで設定している油種コードを比較
+                                For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                                    If OIT0003Wkrow("DELFLG") = "1" Then Continue For
+                                    If OIT0003Wkrow("OILCODE") <> r("OILCODE") Then Continue For
+
+                                    If thisFreePoints.Any() AndAlso
+                                    Not thisFreePoints.Exists(Function(x) x = OIT0003Wkrow("LOADINGPOINT")) Then
+                                        Continue For
+                                    End If
+
+                                    If priorityPoints.Any() AndAlso
+                                    Not priorityPoints.Exists(Function(x) x = OIT0003Wkrow("LOADINGPOINT")) Then
+                                        Continue For
+                                    End If
+
+                                    '★充填ポイントの設定
+                                    r("FILLINGPOINT") = OIT0003Wkrow("LOADINGPOINT")
+                                    OIT0003Wkrow("DELFLG") = "1"
+
+                                    '★設定した充填ポイントはすべて使用済みにする
+                                    For Each OIT0003Wk2row As DataRow In OIT0003WKtbl.Rows
+                                        If OIT0003Wk2row("LOADINGPOINT") = OIT0003Wkrow("LOADINGPOINT") Then
+                                            OIT0003Wk2row("DELFLG") = "1"
+                                        End If
+                                    Next
+                                    Exit For
+                                Next
+                            End Sub)
+
+                            '★列車No退避
+                            strTrainNo = g.trainNo
+                            strOilCode = g.oilCode
+
+                        End Sub)
+
                 For Each OIT0003Reprow As DataRow In OIT0003ReportNegishitbl.Rows
                     i += 1
                     OIT0003Reprow("LINECNT") = i        'LINECNT
-
-                    '★油種コードが未設定（NULL）の場合は次のデータへ遷移
-                    If OIT0003Reprow("OILCODE") Is DBNull.Value Then
-                        '★列車No退避
-                        strTrainNo = OIT0003Reprow("TRAINNO")
-                        Continue For
-                    End If
-
-                    '★列車Noが変更になったら、充填ポイントの内容を初期化
-                    If strTrainNo <> "" AndAlso strTrainNo <> OIT0003Reprow("TRAINNO") Then
-                        For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
-                            OIT0003Wkrow("DELFLG") = "0"
-                        Next
-                    End If
-
-                    '★表示用の油種コードと充填ポイントで設定している油種コードを比較
-                    For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
-                        If OIT0003Wkrow("DELFLG") <> "1" _
-                            AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
-                            OIT0003Reprow("FILLINGPOINT") = OIT0003Wkrow("LOADINGPOINT")
-                            OIT0003Wkrow("DELFLG") = "1"
-
-                            '★設定した充填ポイントはすべて使用済みにする
-                            For Each OIT0003Wk2row As DataRow In OIT0003WKtbl.Rows
-                                If OIT0003Wk2row("LOADINGPOINT") = OIT0003Wkrow("LOADINGPOINT") Then
-                                    OIT0003Wk2row("DELFLG") = "1"
-                                End If
-                            Next
-                            Exit For
-                        End If
-                    Next
-
-                    '★列車No退避
-                    strTrainNo = OIT0003Reprow("TRAINNO")
                 Next
+
             End Using
 
         Catch ex As Exception

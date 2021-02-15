@@ -212,22 +212,40 @@ Partial Public Class OIT0008CostManagement
     Protected WithEvents WF_OFFICEHDN_10 As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
-    '''WF_KEIJOYM_L コントロール。
+    '''WF_OFFICEBTN_11 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_KEIJOYM_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OFFICEBTN_11 As Global.System.Web.UI.WebControls.Button
     
     '''<summary>
-    '''WF_KEIJOYM コントロール。
+    '''WF_OFFICEHDN_11 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_KEIJOYM As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OFFICEHDN_11 As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_KEIJYO_YM_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_KEIJYO_YM_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_KEIJYO_YM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_KEIJYO_YM As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_RELOAD_BTN コントロール。
@@ -255,6 +273,24 @@ Partial Public Class OIT0008CostManagement
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MEMO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ALLSELECT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLSELECT As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ALLRELEACE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLRELEACE As Global.System.Web.UI.WebControls.Button
     
     '''<summary>
     '''WF_DELETEROW コントロール。

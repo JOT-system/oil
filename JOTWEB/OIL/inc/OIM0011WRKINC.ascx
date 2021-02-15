@@ -20,6 +20,7 @@
     <asp:TextBox ID="WF_SEL_TORINAME" runat="server"></asp:TextBox>                 <!-- 取引先名称 -->
     <asp:TextBox ID="WF_SEL_TORINAMES" runat="server"></asp:TextBox>                <!-- 取引先略称 -->
     <asp:TextBox ID="WF_SEL_TORINAMEKANA" runat="server"></asp:TextBox>             <!-- 取引先カナ名称 -->
+    <asp:TextBox ID="WF_SEL_DEPTNAME" runat="server"></asp:TextBox>                 <!-- 部門名称 -->
     <asp:TextBox ID="WF_SEL_POSTNUM1" runat="server"></asp:TextBox>                 <!-- 郵便番号（上） -->
     <asp:TextBox ID="WF_SEL_POSTNUM2" runat="server"></asp:TextBox>                 <!-- 郵便番号（下） -->
     <asp:TextBox ID="WF_SEL_ADDR1" runat="server"></asp:TextBox>                    <!-- 住所１ -->
@@ -30,6 +31,12 @@
     <asp:TextBox ID="WF_SEL_FAX" runat="server"></asp:TextBox>                      <!-- ＦＡＸ番号 -->
     <asp:TextBox ID="WF_SEL_MAIL" runat="server"></asp:TextBox>                     <!-- メールアドレス -->
     <asp:TextBox ID="WF_SEL_OILUSEFLG" runat="server"></asp:TextBox>                <!-- 石油利用フラグ -->
+    <asp:TextBox ID="WF_SEL_BANKCODE" runat="server"></asp:TextBox>                 <!-- 銀行コード -->
+    <asp:TextBox ID="WF_SEL_BANKBRANCHCODE" runat="server"></asp:TextBox>           <!-- 支店コード -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTTYPE" runat="server"></asp:TextBox>              <!-- 口座種別 -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTNUMBER" runat="server"></asp:TextBox>            <!-- 口座番号 -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTNAME" runat="server"></asp:TextBox>              <!-- 口座名義 -->
+
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_INITYMD" runat="server"></asp:TextBox>                  <!-- 登録年月日 -->
     <asp:TextBox ID="WF_SEL_INITUSER" runat="server"></asp:TextBox>                 <!-- 登録ユーザーＩＤ -->

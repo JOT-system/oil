@@ -666,7 +666,8 @@ Public Class OIT0003OTLinkageList
         '******************************
         'CSV作成処理の実行
         '******************************
-        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH)
+        Dim OTFileName As String = SetCSVFileName()
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName, I_Enc:="UTF8N")
             Dim url As String
             Try
                 url = repCbj.ConvertDataTableToCsv(False)
@@ -1235,22 +1236,27 @@ Public Class OIT0003OTLinkageList
             & " AND OIM0010.BRANCH = '1' " _
             & " AND OIM0010.KBN = 'O' " _
             & " AND OIM0010.DEFAULTKBN = 'def' " _
-            & " AND OIM0010.DELFLG <> @P02 " _
-            & " LEFT JOIN (SELECT  " _
+            & " AND OIM0010.DELFLG <> @P02 "
+
+        SQLStrCmn &=
+              " LEFT JOIN (SELECT  " _
             & "              OIM0005.TANKNUMBER " _
             & "            , CASE  " _
             & "              WHEN OIM0005.MODEL = 'タキ1000' THEN 100000 + CONVERT(INT, OIM0005.TANKNUMBER) " _
             & "              ELSE OIM0005.TANKNUMBER " _
             & "              END AS MODELTANKNO " _
-            & "            , CASE  " _
-            & "              WHEN CONVERT(VARCHAR, OIM0005.LOAD) <> '44.0' THEN '' " _
-            & "              ELSE CONVERT(VARCHAR, CONVERT(INT, OIM0005.LOAD)) " _
-            & "              END AS LOAD " _
+            & "            , CONVERT(INT, OIM0005.LOAD) AS LOAD " _
             & "            , OIM0005.DELFLG " _
             & "            FROM oil.OIM0005_TANK OIM0005) OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
-            & " AND OIM0005.DELFLG <> @P02 " _
-            & " LEFT JOIN OIL.OIM0025_OTLINKAGE OIM0025 ON " _
+            & " AND OIM0005.DELFLG <> @P02 "
+        '& "            , CASE  " _
+        '& "              WHEN CONVERT(VARCHAR, OIM0005.LOAD) <> '44.0' THEN '' " _
+        '& "              ELSE CONVERT(VARCHAR, CONVERT(INT, OIM0005.LOAD)) " _
+        '& "              END AS LOAD " _
+
+        SQLStrCmn &=
+              " LEFT JOIN OIL.OIM0025_OTLINKAGE OIM0025 ON " _
             & "     OIM0025.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0025.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
             & " AND OIM0025.PLANTCODE = OIT0002.BASECODE " _
@@ -1351,6 +1357,11 @@ Public Class OIT0003OTLinkageList
                     'i += 1
                     'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
+                Next
+
+                '★積込日を[yyyymmdd]⇒[yymmdd]に変換
+                For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                    OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
                 Next
 
             End Using
@@ -2382,6 +2393,31 @@ Public Class OIT0003OTLinkageList
         Return dt
     End Function
     ''' <summary>
+    ''' CSVファイル名取得
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function SetCSVFileName() As String
+        Dim fileName As String = ""
+
+        Select Case work.WF_SEL_OTS_SALESOFFICECODE.Text
+            '★仙台新港営業所, 四日市営業所
+            Case BaseDllConst.CONST_OFFICECODE_010402,
+                 BaseDllConst.CONST_OFFICECODE_012401
+                fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_OTRCV.FTP"
+
+            '★五井営業所, 甲子営業所, 袖ヶ浦営業所, 根岸営業所
+            Case BaseDllConst.CONST_OFFICECODE_011201,
+                 BaseDllConst.CONST_OFFICECODE_011202,
+                 BaseDllConst.CONST_OFFICECODE_011203,
+                 BaseDllConst.CONST_OFFICECODE_011402
+                fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_OTRCV7.FTP"
+
+        End Select
+
+        Return fileName
+    End Function
+
+    ''' <summary>
     ''' ファイル社外連携の各種出力ファイルの出力可否判定
     ''' </summary>
     Public Class FileLinkagePattern
@@ -2581,7 +2617,7 @@ Public Class OIT0003OTLinkageList
                 '三重塩浜営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012402", True, False, True
+                    "012402", False, False, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
             End With

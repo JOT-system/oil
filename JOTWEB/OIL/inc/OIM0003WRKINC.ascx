@@ -40,7 +40,63 @@
     <asp:TextBox ID="WF_SEL_ORDERFROMDATE" runat="server"></asp:TextBox>        <!-- 受注登録可能期間FROM -->
     <asp:TextBox ID="WF_SEL_ORDERTODATE" runat="server"></asp:TextBox>          <!-- 受注登録可能期間TO -->
     <asp:TextBox ID="WF_SEL_DELFLG2" runat="server"></asp:TextBox>              <!-- 削除フラグ -->
-    <asp:TextBox ID="WF_SEL_OILTERMTBL" runat="server"></asp:TextBox>           <!-- 品種出荷期間TBL -->
+    <!-- 品種出荷期間マスタ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_01" runat="server"></asp:TextBox> <!-- 品種出荷期間01.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_01" runat="server"></asp:TextBox> <!-- 品種出荷期間01.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_01" runat="server"></asp:TextBox> <!-- 品種出荷期間01.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_01" runat="server"></asp:TextBox>   <!-- 品種出荷期間01.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_01" runat="server"></asp:TextBox>        <!-- 品種出荷期間01.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_02" runat="server"></asp:TextBox> <!-- 品種出荷期間02.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_02" runat="server"></asp:TextBox> <!-- 品種出荷期間02.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_02" runat="server"></asp:TextBox> <!-- 品種出荷期間02.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_02" runat="server"></asp:TextBox>   <!-- 品種出荷期間02.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_02" runat="server"></asp:TextBox>        <!-- 品種出荷期間02.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_03" runat="server"></asp:TextBox> <!-- 品種出荷期間03.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_03" runat="server"></asp:TextBox> <!-- 品種出荷期間03.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_03" runat="server"></asp:TextBox> <!-- 品種出荷期間03.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_03" runat="server"></asp:TextBox>   <!-- 品種出荷期間03.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_03" runat="server"></asp:TextBox>        <!-- 品種出荷期間03.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_04" runat="server"></asp:TextBox> <!-- 品種出荷期間04.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_04" runat="server"></asp:TextBox> <!-- 品種出荷期間04.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_04" runat="server"></asp:TextBox> <!-- 品種出荷期間04.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_04" runat="server"></asp:TextBox>   <!-- 品種出荷期間04.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_04" runat="server"></asp:TextBox>        <!-- 品種出荷期間04.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_05" runat="server"></asp:TextBox> <!-- 品種出荷期間05.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_05" runat="server"></asp:TextBox> <!-- 品種出荷期間05.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_05" runat="server"></asp:TextBox> <!-- 品種出荷期間05.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_05" runat="server"></asp:TextBox>   <!-- 品種出荷期間05.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_05" runat="server"></asp:TextBox>        <!-- 品種出荷期間05.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_06" runat="server"></asp:TextBox> <!-- 品種出荷期間06.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_06" runat="server"></asp:TextBox> <!-- 品種出荷期間06.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_06" runat="server"></asp:TextBox> <!-- 品種出荷期間06.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_06" runat="server"></asp:TextBox>   <!-- 品種出荷期間06.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_06" runat="server"></asp:TextBox>        <!-- 品種出荷期間06.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_07" runat="server"></asp:TextBox> <!-- 品種出荷期間07.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_07" runat="server"></asp:TextBox> <!-- 品種出荷期間07.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_07" runat="server"></asp:TextBox> <!-- 品種出荷期間07.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_07" runat="server"></asp:TextBox>   <!-- 品種出荷期間07.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_07" runat="server"></asp:TextBox>        <!-- 品種出荷期間07.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_08" runat="server"></asp:TextBox> <!-- 品種出荷期間08.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_08" runat="server"></asp:TextBox> <!-- 品種出荷期間08.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_08" runat="server"></asp:TextBox> <!-- 品種出荷期間08.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_08" runat="server"></asp:TextBox>   <!-- 品種出荷期間08.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_08" runat="server"></asp:TextBox>        <!-- 品種出荷期間08.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_09" runat="server"></asp:TextBox> <!-- 品種出荷期間09.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_09" runat="server"></asp:TextBox> <!-- 品種出荷期間09.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_09" runat="server"></asp:TextBox> <!-- 品種出荷期間09.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_09" runat="server"></asp:TextBox>   <!-- 品種出荷期間09.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_09" runat="server"></asp:TextBox>        <!-- 品種出荷期間09.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_10" runat="server"></asp:TextBox> <!-- 品種出荷期間10.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_10" runat="server"></asp:TextBox> <!-- 品種出荷期間10.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_10" runat="server"></asp:TextBox> <!-- 品種出荷期間10.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_10" runat="server"></asp:TextBox>   <!-- 品種出荷期間10.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_10" runat="server"></asp:TextBox>        <!-- 品種出荷期間10.削除フラグ -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_11" runat="server"></asp:TextBox> <!-- 品種出荷期間11.荷受人コード -->
+    <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEENAME_11" runat="server"></asp:TextBox> <!-- 品種出荷期間11.荷受人名 -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERFROMDATE_11" runat="server"></asp:TextBox> <!-- 品種出荷期間11.受注登録可能期間FROM -->
+    <asp:TextBox ID="WF_SEL_OILTERM_ORDERTODATE_11" runat="server"></asp:TextBox>   <!-- 品種出荷期間11.受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_OILTERM_DELFLG_11" runat="server"></asp:TextBox>        <!-- 品種出荷期間11.削除フラグ -->
+
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>               <!-- 更新データ(退避用) -->
 
     <!-- DB更新メッセージ表示用 -->

@@ -100,6 +100,13 @@
                         <asp:TextBox ID="WF_TORINAMEKANA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="100"></asp:TextBox>
                         <asp:Label ID="WF_TORINAMEKANA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+
+                    <!-- 部門名称 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_DEPTNAME_L" runat="server" Text="部門名称" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_DEPTNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_DEPTNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
                 </p>
 
                 <p id="KEY_LINE_6">
@@ -181,6 +188,49 @@
                             <asp:TextBox ID="WF_OILUSEFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_OILUSEFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_11">
+                    <!-- 銀行コード -->
+                    <span class="ef">
+                        <asp:Label ID="WF_BANKCODE_L" runat="server" Text="銀行コード" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_BANKCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
+                        <asp:Label ID="WF_BANKCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+
+                    <!-- 支店コード -->
+                    <span class="ef">
+                        <asp:Label ID="WF_BANKBRANCHCODE_L" runat="server" Text="支店コード" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_BANKBRANCHCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
+                        <asp:Label ID="WF_BANKBRANCHCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_12">
+                    <!-- 口座種別 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_ACCOUNTTYPE_L" runat="server" Text="口座種別" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_ACCOUNTTYPE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_ACCOUNTTYPE');">
+                            <asp:TextBox ID="WF_ACCOUNTTYPE" runat="server" readOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_ACCOUNTTYPE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+
+                    <!-- 口座番号 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_ACCOUNTNUMBER_L" runat="server" Text="口座番号" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_ACCOUNTNUMBER" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="7"></asp:TextBox>
+                        <asp:Label ID="WF_ACCOUNTNUMBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_13">
+                    <!-- 口座名義 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_ACCOUNTNAME_L" runat="server" Text="口座名義" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_ACCOUNTNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="30"></asp:TextBox>
+                        <asp:Label ID="WF_ACCOUNTNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
             </div>

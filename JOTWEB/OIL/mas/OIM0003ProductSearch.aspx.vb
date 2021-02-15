@@ -477,7 +477,7 @@ Public Class OIM0003ProductSearch
             Case WF_SHIPPERCODE.ID
                 '荷主コード
                 WF_SHIPPERCODE.Text = WW_SelectValue
-                WF_PLANTCODE_TEXT.Text = WW_SelectText
+                WF_SHIPPERCODE_TEXT.Text = WW_SelectText
                 WF_SHIPPERCODE.Focus()
             Case WF_PLANTCODE.ID
                 '基地コード

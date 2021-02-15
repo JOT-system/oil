@@ -1,0 +1,181 @@
+﻿body {
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 1.6em;
+    font-size: 13.5px;
+    box-sizing: border-box;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+#divContensbox {
+    height: calc(100% - 2.4em - 1.4em);
+}
+/* コンテンツの最小横幅 */
+.headerbox, .detailbox {
+    min-width: 1220px;
+}
+
+.detailbox a {
+    font-size: 12.8px;
+}
+
+.headerbox a {
+    font-size: 0.8em;
+}
+
+.actionButtonBox {
+    padding: 5px;
+}
+
+#headerDispArea {
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+
+.headerDetail {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1190px;
+    box-sizing: border-box;
+}
+
+/* 1項目のサイズ */
+.headerDetail > span {
+    display: inline-block;
+    width: 220px;
+    white-space: nowrap;
+    margin: 1px;
+}
+
+.headerDetail > span.left {
+    width: 250px;
+}
+.headerDetail > span.doubleItem {
+    width: 460px;
+}
+
+.headerDetail > span > a {
+    display: inline-block;
+    text-align:right;
+    vertical-align: middle;
+    padding: 1px;
+}
+/* ヘッダー入力欄の項目名 */
+.headerDetail > span > a:nth-child(1) {
+    width: 65px;
+}
+/* 最も左に来る列の項目名サイズ */
+.headerDetail > span.left > a:nth-child(1),
+.headerDetail > span.doubleItem > a:nth-child(1) {
+    width: 105px;
+}
+
+/* 入力ボックス */
+.headerDetail > span > a:nth-child(2) {
+    width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+/* 【受注パターン】のテキストボックスの長さ */
+.headerDetail > span.doubleItem > a:nth-child(2) {
+    width: 365px;
+}
+
+.headerDetail > span > a:nth-child(2) input[type=text] {
+    width: 100% !important;
+}
+
+/* 明細 */
+#detailbox {
+    height: calc(100% - 249px);
+    width: calc(100% - 20px);
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+
+/*table#WF_CONSIGNEELIST > tbody > tr > td {
+    min-width:170px;
+}*/
+
+table#WF_CONSIGNEELIST td.CONSIGNEECODE {
+    min-width: 128px;
+}
+table#WF_CONSIGNEELIST td.CONSIGNEENAME {
+    min-width: 256px;
+}
+table#WF_CONSIGNEELIST td.AMOUNT {
+    min-width: 143px;
+}
+table#WF_CONSIGNEELIST td.TAX {
+    min-width: 101px;
+}
+table#WF_CONSIGNEELIST td.TOTAL {
+    min-width: 182px;
+}
+
+table#WF_CONSIGNEELIST td.codeText {
+    text-align: left;
+    padding-left: 5px;
+}
+
+table#WF_CONSIGNEELIST td.moneyText {
+    text-align: right;
+    padding-right: 10px;
+}
+
+table#WF_CONSIGNEELIST td.footerText {
+    text-align: right;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+table#WF_CONSIGNEELIST th.AllBorder, table#WF_CONSIGNEELIST td.AllBorder {
+    border: solid 1px #2bb6c1;
+}
+
+table#WF_CONSIGNEELIST th.NoneRightBorder, table#WF_CONSIGNEELIST td.NoneRightBorder {
+    border-style: solid;
+    border-color: #2bb6c1;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 0px;
+}
+
+table#WF_CONSIGNEELIST th.NoneLeftBorder, table#WF_CONSIGNEELIST td.NoneLeftBorder {
+    border-style: solid;
+    border-color: #2bb6c1;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-right-width: 1px;
+}
+
+table#WF_CONSIGNEELIST th {
+    background-color: #163a5a;
+    color: white;
+    font-size: 0.9em;
+}
+
+table#WF_CONSIGNEELIST td {
+    background-color: white;
+    font-size: 0.9em;
+}
+

@@ -29,6 +29,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK10tbl As DataTable                             '作業用10テーブル(同一列車(同一積込日)タンク車チェック用)
     Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0003Oiltermtbl As DataTable                          '作業用テーブル(油種出荷期間マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル(受注履歴)
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル(受注明細履歴)
     Private OIT0003ReportDeliverytbl As DataTable                   '帳票用(託送指示)テーブル
@@ -3926,6 +3927,18 @@ Public Class OIT0003OrderDetail
 
             End If
         Next
+
+        '○五井営業所の場合
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
+            '★油種の出荷期間に合致した「ＬＴＡ」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_LTank1 + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
+        End If
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -13933,6 +13946,104 @@ Public Class OIT0003OrderDetail
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
+    End Sub
+
+    ''' <summary>
+    ''' 品種出荷期間検索処理
+    ''' </summary>
+    Protected Sub WW_OilTermSearch(ByVal OIT0003row As DataRow)
+        If IsNothing(OIT0003Oiltermtbl) Then
+            OIT0003Oiltermtbl = New DataTable
+        End If
+
+        If OIT0003Oiltermtbl.Columns.Count <> 0 Then
+            OIT0003Oiltermtbl.Columns.Clear()
+        End If
+
+        OIT0003Oiltermtbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   OIM0030.OFFICECODE      AS OFFICECODE" _
+                & " , OIM0030.SHIPPERCODE     AS SHIPPERCODE" _
+                & " , OIM0030.PLANTCODE       AS PLANTCODE" _
+                & " , OIM0030.CONSIGNEECODE   AS CONSIGNEECODE" _
+                & " , OIM0030.ORDERFROMDATE   AS ORDERFROMDATE" _
+                & " , OIM0030.ORDERTODATE     AS ORDERTODATE" _
+                & " , OIM0003.OILCODE         AS OILCODE" _
+                & " , OIM0003.OILNAME         AS OILNAME" _
+                & " , OIM0003.SEGMENTOILCODE  AS SEGMENTOILCODE" _
+                & " , OIM0003.SEGMENTOILNAME  AS SEGMENTOILNAME" _
+                & " FROM OIL.OIM0030_OILTERM OIM0030 " _
+                & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+                & "     OIM0003.OFFICECODE = OIM0030.OFFICECODE " _
+                & " AND OIM0003.SHIPPERCODE = OIM0030.SHIPPERCODE " _
+                & " AND OIM0003.PLANTCODE = OIM0030.PLANTCODE " _
+                & " AND OIM0003.OILCODE = OIM0030.OILCODE " _
+                & " AND OIM0003.SEGMENTOILCODE = OIM0030.SEGMENTOILCODE " _
+                & " AND OIM0003.DELFLG <> @DELFLG " _
+                & " WHERE OIM0030.OFFICECODE = @OFFICECODE " _
+                & " AND OIM0030.CONSIGNEECODE = @CONSIGNEECODE " _
+                & " AND OIM0030.OILCODE = @OILCODE " _
+                & " AND OIM0030.ORDERFROMDATE <= @ORDERFROMDATE " _
+                & " AND OIM0030.ORDERTODATE >= @ORDERTODATE " _
+                & " AND OIM0030.DELFLG <> @DELFLG "
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_CONSIGNEECODE As SqlParameter = SQLcmd.Parameters.Add("@CONSIGNEECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_OILCODE As SqlParameter = SQLcmd.Parameters.Add("@OILCODE", System.Data.SqlDbType.NVarChar)
+                Dim P_ORDERFROMDATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERFROMDATE", System.Data.SqlDbType.Date)
+                Dim P_ORDERTODATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERTODATE", System.Data.SqlDbType.Date)
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                P_CONSIGNEECODE.Value = OIT0003row("CONSIGNEECODE")
+                P_OILCODE.Value = OIT0003row("OILCODE")
+                P_ORDERFROMDATE.Value = Me.TxtLoadingDate.Text
+                P_ORDERTODATE.Value = Me.TxtLoadingDate.Text
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Oiltermtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Oiltermtbl.Load(SQLdr)
+                End Using
+
+                '★出荷期間内の油種があった場合
+                If OIT0003Oiltermtbl.Rows.Count <> 0 Then
+                    OIT0003row("OILCODE") = OIT0003Oiltermtbl.Rows(0)("OILCODE")
+                    OIT0003row("OILNAME") = OIT0003Oiltermtbl.Rows(0)("OILNAME")
+                    OIT0003row("ORDERINGTYPE") = OIT0003Oiltermtbl.Rows(0)("SEGMENTOILCODE")
+                    OIT0003row("ORDERINGOILNAME") = OIT0003Oiltermtbl.Rows(0)("SEGMENTOILNAME")
+                End If
+
+            End Using
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003tbl)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D OILTERM_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D OILTERM_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

@@ -20,10 +20,11 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001WK7tbl As DataTable                              '作業用テーブル(他オーダー情報取得(同オーダーの同一発日取得用))
     Private OIT0001WK8tbl As DataTable                              '作業用テーブル(同一列車(同一積込日)タンク車チェック用)
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0001Oiltermtbl As DataTable                          '作業用テーブル(油種出荷期間マスタ取得用)
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
-    Private OIT0001NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
+    Private OIT0001NewOrderNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
@@ -1054,6 +1055,18 @@ Public Class OIT0001EmptyTurnDairyDetail
             OIT0001row("ORDERINGOILNAME") = arrTankOrderName(z)
             z += 1
         Next
+
+        '○五井営業所の場合
+        If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+            For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                WW_OilTermSearch(OIT0001row)
+            Next
+            '★油種の出荷期間に合致した「ＬＴＡ」の種類へ変換
+            For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_LTank1 + "'")
+                WW_OilTermSearch(OIT0001row)
+            Next
+        End If
 
         ''〇 1件以上の登録があった場合
         'If intTankCnt <> 0 Then
@@ -5084,6 +5097,104 @@ Public Class OIT0001EmptyTurnDairyDetail
     End Sub
 
     ''' <summary>
+    ''' 品種出荷期間検索処理
+    ''' </summary>
+    Protected Sub WW_OilTermSearch(ByVal OIT0001row As DataRow)
+        If IsNothing(OIT0001Oiltermtbl) Then
+            OIT0001Oiltermtbl = New DataTable
+        End If
+
+        If OIT0001Oiltermtbl.Columns.Count <> 0 Then
+            OIT0001Oiltermtbl.Columns.Clear()
+        End If
+
+        OIT0001Oiltermtbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   OIM0030.OFFICECODE      AS OFFICECODE" _
+                & " , OIM0030.SHIPPERCODE     AS SHIPPERCODE" _
+                & " , OIM0030.PLANTCODE       AS PLANTCODE" _
+                & " , OIM0030.CONSIGNEECODE   AS CONSIGNEECODE" _
+                & " , OIM0030.ORDERFROMDATE   AS ORDERFROMDATE" _
+                & " , OIM0030.ORDERTODATE     AS ORDERTODATE" _
+                & " , OIM0003.OILCODE         AS OILCODE" _
+                & " , OIM0003.OILNAME         AS OILNAME" _
+                & " , OIM0003.SEGMENTOILCODE  AS SEGMENTOILCODE" _
+                & " , OIM0003.SEGMENTOILNAME  AS SEGMENTOILNAME" _
+                & " FROM OIL.OIM0030_OILTERM OIM0030 " _
+                & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+                & "     OIM0003.OFFICECODE = OIM0030.OFFICECODE " _
+                & " AND OIM0003.SHIPPERCODE = OIM0030.SHIPPERCODE " _
+                & " AND OIM0003.PLANTCODE = OIM0030.PLANTCODE " _
+                & " AND OIM0003.OILCODE = OIM0030.OILCODE " _
+                & " AND OIM0003.SEGMENTOILCODE = OIM0030.SEGMENTOILCODE " _
+                & " AND OIM0003.DELFLG <> @DELFLG " _
+                & " WHERE OIM0030.OFFICECODE = @OFFICECODE " _
+                & " AND OIM0030.CONSIGNEECODE = @CONSIGNEECODE " _
+                & " AND OIM0030.OILCODE = @OILCODE " _
+                & " AND OIM0030.ORDERFROMDATE <= @ORDERFROMDATE " _
+                & " AND OIM0030.ORDERTODATE >= @ORDERTODATE " _
+                & " AND OIM0030.DELFLG <> @DELFLG "
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_CONSIGNEECODE As SqlParameter = SQLcmd.Parameters.Add("@CONSIGNEECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_OILCODE As SqlParameter = SQLcmd.Parameters.Add("@OILCODE", System.Data.SqlDbType.NVarChar)
+                Dim P_ORDERFROMDATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERFROMDATE", System.Data.SqlDbType.Date)
+                Dim P_ORDERTODATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERTODATE", System.Data.SqlDbType.Date)
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                P_CONSIGNEECODE.Value = OIT0001row("CONSIGNEECODE")
+                P_OILCODE.Value = OIT0001row("OILCODE")
+                P_ORDERFROMDATE.Value = Me.TxtLoadingDate.Text
+                P_ORDERTODATE.Value = Me.TxtLoadingDate.Text
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001Oiltermtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001Oiltermtbl.Load(SQLdr)
+                End Using
+
+                '★出荷期間内の油種があった場合
+                If OIT0001Oiltermtbl.Rows.Count <> 0 Then
+                    OIT0001row("OILCODE") = OIT0001Oiltermtbl.Rows(0)("OILCODE")
+                    OIT0001row("OILNAME") = OIT0001Oiltermtbl.Rows(0)("OILNAME")
+                    OIT0001row("ORDERINGTYPE") = OIT0001Oiltermtbl.Rows(0)("SEGMENTOILCODE")
+                    OIT0001row("ORDERINGOILNAME") = OIT0001Oiltermtbl.Rows(0)("SEGMENTOILNAME")
+                End If
+
+            End Using
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0001tbl)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D OILTERM_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D OILTERM_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' マスタ検索処理
     ''' </summary>
     ''' <param name="I_CODE"></param>
@@ -8231,15 +8342,15 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' <remarks></remarks>
     Protected Sub WW_GetNewOrderNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
 
-        If IsNothing(OIT0001NEWORDERNOtbl) Then
-            OIT0001NEWORDERNOtbl = New DataTable
+        If IsNothing(OIT0001NewOrderNOtbl) Then
+            OIT0001NewOrderNOtbl = New DataTable
         End If
 
-        If OIT0001NEWORDERNOtbl.Columns.Count <> 0 Then
-            OIT0001NEWORDERNOtbl.Columns.Clear()
+        If OIT0001NewOrderNOtbl.Columns.Count <> 0 Then
+            OIT0001NewOrderNOtbl.Columns.Clear()
         End If
 
-        OIT0001NEWORDERNOtbl.Clear()
+        OIT0001NewOrderNOtbl.Clear()
 
         '○ 検索SQL
         '     条件指定に従い該当データを受注テーブルから取得する
@@ -8252,14 +8363,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0001NEWORDERNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0001NewOrderNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0001NEWORDERNOtbl.Load(SQLdr)
+                    OIT0001NewOrderNOtbl.Load(SQLdr)
                 End Using
 
-                O_ORDERNO = OIT0001NEWORDERNOtbl.Rows(0)("ORDERNO")
+                O_ORDERNO = OIT0001NewOrderNOtbl.Rows(0)("ORDERNO")
 
             End Using
         Catch ex As Exception

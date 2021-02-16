@@ -6820,12 +6820,12 @@ Public Class OIT0003OrderDetail
                     Exit Sub
                 End If
 
-                ''● 受注DB更新(訂正)
-                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()       'DataBase接続
+                '● 受注DB更新(訂正)
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
 
-                '    WW_UpdateOrder_Correction(SQLcon)
-                'End Using
+                    WW_UpdateOrder_Correction(SQLcon)
+                End Using
 
                 '● 受注明細DB更新(訂正)
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -6860,64 +6860,40 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
-                    & "    SET ARRDATE        = @ARRDATE, " _
-                    & "        ACCDATE        = @ACCDATE, " _
-                    & "        EMPARRDATE     = @EMPARRDATE, " _
-                    & "        UPDYMD         = @UPDYMD, " _
-                    & "        UPDUSER        = @UPDUSER, " _
-                    & "        UPDTERMID      = @UPDTERMID, " _
-                    & "        RECEIVEYMD     = @RECEIVEYMD  " _
-                    & "  WHERE ORDERNO        = @ORDERNO  " _
-                    & "    AND DELFLG        <> @DELFLG; "
+                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
+                    & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
+                    & "        UPDYMD               = @UPDYMD, " _
+                    & "        UPDUSER              = @UPDUSER, " _
+                    & "        UPDTERMID            = @UPDTERMID, " _
+                    & "        RECEIVEYMD           = @RECEIVEYMD  " _
+                    & "  WHERE ORDERNO              = @ORDERNO  " _
+                    & "    AND DELFLG              <> @DELFLG; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
 
             Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)                   '受注№
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)                     '削除フラグ
+            P_ORDERNO.Value = Me.TxtOrderNo.Text
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-            Dim P_ARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
-            Dim P_ACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
-            Dim P_EMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@EMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)                   '更新ユーザーＩＤ
             Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)               '更新端末
             Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)             '集信日時
+            P_ACTUALARRDATE.Value = Me.TxtActualArrDate.Text
+            P_ACTUALACCDATE.Value = Me.TxtActualAccDate.Text
+            P_ACTUALEMPARRDATE.Value = Me.TxtActualEmparrDate.Text
             P_UPDYMD.Value = Date.Now
             P_UPDUSER.Value = Master.USERID
             P_UPDTERMID.Value = Master.USERTERMID
             P_RECEIVEYMD.Value = C_DEFAULT_YMD
 
-            For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select("OPERATION='on'")
-                'OIT0003tab3row("OPERATION") = ""
-
-                '○受注№
-                P_ORDERNO.Value = OIT0003tab3row("ORDERNO")
-
-                '○積車着日
-                If OIT0003tab3row("ARRDATE") = "" Then
-                    P_ARRDATE.Value = DBNull.Value
-                Else
-                    P_ARRDATE.Value = OIT0003tab3row("ARRDATE")
-                End If
-
-                '○受入日
-                If OIT0003tab3row("ACCDATE") = "" Then
-                    P_ACCDATE.Value = DBNull.Value
-                Else
-                    P_ACCDATE.Value = OIT0003tab3row("ACCDATE")
-                End If
-
-                '○空車着日
-                If OIT0003tab3row("EMPARRDATE") = "" Then
-                    P_EMPARRDATE.Value = DBNull.Value
-                Else
-                    P_EMPARRDATE.Value = OIT0003tab3row("EMPARRDATE")
-                End If
-
-                SQLcmd.ExecuteNonQuery()
-            Next
+            SQLcmd.ExecuteNonQuery()
 
             'CLOSE
             SQLcmd.Dispose()
@@ -6927,9 +6903,9 @@ Public Class OIT0003OrderDetail
             Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDERDETAIL_CORRECTION UPDATE")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDER_CORRECTION UPDATE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDERDETAIL_CORRECTION UPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDER_CORRECTION UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

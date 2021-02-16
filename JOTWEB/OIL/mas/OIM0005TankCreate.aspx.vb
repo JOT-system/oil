@@ -908,6 +908,9 @@ Public Class OIM0005TankCreate
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
+                            'リース先C
+                            Case "WF_LEASECODE"
+                                prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
 
                             '自動延長
                             Case "WF_AUTOEXTENTION"
@@ -1812,7 +1815,7 @@ Public Class OIM0005TankCreate
             If isNormal(WW_CS0024FCHECKERR) Then
                 If WW_TEXT <> "" Then
                     '値存在チェック
-                    CODENAME_get("LEASECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    CODENAME_get("CAMPCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
                     If Not isNormal(WW_RTN_SW) Then
                         WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
                         WW_CheckMES2 = "マスタに存在しません。"
@@ -3643,6 +3646,7 @@ Public Class OIM0005TankCreate
 
             Select Case I_FIELD
                 Case "CAMPCODE"                     '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"                          '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)

@@ -13315,7 +13315,6 @@ Public Class OIT0003OrderDetail
                     '実績日訂正フラグが"1"(有効)の場合
                     If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
                         OIT0003tab3row("OPERATION") = "on"
-                        Continue For
                     End If
                     '### 20201210 END   指摘票対応(No246) #######################################
                     OIT0003tab3row("ACTUALARRDATE") = Me.TxtActualArrDate.Text

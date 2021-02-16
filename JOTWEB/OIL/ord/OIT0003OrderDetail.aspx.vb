@@ -29,6 +29,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK10tbl As DataTable                             '作業用10テーブル(同一列車(同一積込日)タンク車チェック用)
     Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0003Oiltermtbl As DataTable                          '作業用テーブル(油種出荷期間マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル(受注履歴)
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル(受注明細履歴)
     Private OIT0003ReportDeliverytbl As DataTable                   '帳票用(託送指示)テーブル
@@ -3927,6 +3928,18 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
+        '○五井営業所の場合
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
+            '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
+            '★油種の出荷期間に合致した「ＬＴＡ」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_LTank1 + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
+        End If
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
@@ -6807,6 +6820,13 @@ Public Class OIT0003OrderDetail
                     Exit Sub
                 End If
 
+                '● 受注DB更新(訂正)
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    WW_UpdateOrder_Correction(SQLcon)
+                End Using
+
                 '● 受注明細DB更新(訂正)
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
@@ -6831,6 +6851,74 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 受注TBL更新(訂正)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrder_Correction(ByVal SQLcon As SqlConnection)
+        Try
+            '更新SQL文･･･受注明細TBLの各項目をを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER " _
+                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
+                    & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
+                    & "        UPDYMD               = @UPDYMD, " _
+                    & "        UPDUSER              = @UPDUSER, " _
+                    & "        UPDTERMID            = @UPDTERMID, " _
+                    & "        RECEIVEYMD           = @RECEIVEYMD  " _
+                    & "  WHERE ORDERNO              = @ORDERNO  " _
+                    & "    AND DELFLG              <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)                   '受注№
+            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)                     '削除フラグ
+            P_ORDERNO.Value = Me.TxtOrderNo.Text
+            P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)                   '更新ユーザーＩＤ
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)               '更新端末
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)             '集信日時
+            P_ACTUALARRDATE.Value = Me.TxtActualArrDate.Text
+            P_ACTUALACCDATE.Value = Me.TxtActualAccDate.Text
+            P_ACTUALEMPARRDATE.Value = Me.TxtActualEmparrDate.Text
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDER_CORRECTION UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDER_CORRECTION UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    End Sub
+
+    ''' <summary>
     ''' 受注明細TBL更新(訂正)
     ''' </summary>
     ''' <param name="SQLcon">SQL接続</param>
@@ -6841,7 +6929,8 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0003_DETAIL " _
-                    & "    SET ACTUALACCDATE        = @ACTUALACCDATE, " _
+                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
                     & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
                     & "        UPDYMD               = @UPDYMD, " _
                     & "        UPDUSER              = @UPDUSER, " _
@@ -6859,6 +6948,7 @@ Public Class OIT0003OrderDetail
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)                     '削除フラグ
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
@@ -6877,6 +6967,13 @@ Public Class OIT0003OrderDetail
                 P_ORDERNO.Value = OIT0003tab3row("ORDERNO")
                 '○受注明細№
                 P_DETAILNO.Value = OIT0003tab3row("DETAILNO")
+
+                '○積車着日
+                If OIT0003tab3row("ACTUALARRDATE") = "" Then
+                    P_ACTUALARRDATE.Value = DBNull.Value
+                Else
+                    P_ACTUALARRDATE.Value = OIT0003tab3row("ACTUALARRDATE")
+                End If
 
                 '○受入日
                 If OIT0003tab3row("ACTUALACCDATE") = "" Then
@@ -6925,8 +7022,18 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_TankShozaiSet_Correction(ByVal OIT0003row As DataRow)
 
         Dim dtNow As String = Now.ToString("yyyy/MM/dd")
-        '    ◯受入日(実績)、空車着日(実績)が未設定(空白)の場合
-        If OIT0003row("ACTUALACCDATE").ToString() = "" _
+
+        '    ◯積車着日(実績)、受入日(実績)、空車着日(実績)が未設定(空白)の場合
+        If OIT0003row("ACTUALARRDATE").ToString() = "" _
+           AndAlso OIT0003row("ACTUALACCDATE").ToString() = "" _
+           AndAlso OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
+            '★タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
+            WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_350,
+                                   BaseDllConst.CONST_TANKSITUATION_02,
+                                   OI_TANKNO:=OIT0003row("TANKNO"))
+
+            '◯受入日(実績)、空車着日(実績)が未設定(空白)の場合
+        ElseIf OIT0003row("ACTUALACCDATE").ToString() = "" _
             AndAlso OIT0003row("ACTUALEMPARRDATE").ToString() = "" Then
             '★タンク車所在の更新(※タンク車所在の更新はバッチにて実施する。)
             WW_TankShozaiSetSelect(BaseDllConst.CONST_ORDERSTATUS_400,
@@ -13068,7 +13175,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtLoadingDate.Text = ""
                     Else
-                        Me.TxtLoadingDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtLoadingDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtLoadingDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13125,7 +13233,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtDepDate.Text = ""
                     Else
-                        Me.TxtDepDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtDepDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtDepDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13157,7 +13266,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtArrDate.Text = ""
                     Else
-                        Me.TxtArrDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtArrDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtArrDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13187,7 +13297,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtAccDate.Text = ""
                     Else
-                        Me.TxtAccDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtAccDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtAccDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13215,7 +13326,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtEmparrDate.Text = ""
                     Else
-                        Me.TxtEmparrDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtEmparrDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtEmparrDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13229,7 +13341,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtActualLoadingDate.Text = ""
                     Else
-                        Me.TxtActualLoadingDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtActualLoadingDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtActualLoadingDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13251,7 +13364,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtActualDepDate.Text = ""
                     Else
-                        Me.TxtActualDepDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtActualDepDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtActualDepDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13272,7 +13386,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtActualArrDate.Text = ""
                     Else
-                        Me.TxtActualArrDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtActualArrDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtActualArrDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13280,6 +13395,12 @@ Public Class OIT0003OrderDetail
 
                 '(実績)積込着日に入力された日付を、(一覧)積込着日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '### 20201210 START 指摘票対応(No246) #######################################
+                    '実績日訂正フラグが"1"(有効)の場合
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                        OIT0003tab3row("OPERATION") = "on"
+                    End If
+                    '### 20201210 END   指摘票対応(No246) #######################################
                     OIT0003tab3row("ACTUALARRDATE") = Me.TxtActualArrDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -13293,7 +13414,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtActualAccDate.Text = ""
                     Else
-                        Me.TxtActualAccDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtActualAccDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtActualAccDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13301,6 +13423,14 @@ Public Class OIT0003OrderDetail
 
                 '(実績)受入日に入力された日付を、(一覧)受入日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '### 20201210 START 指摘票対応(No246) #######################################
+                    '実績日訂正フラグが"1"(有効)の場合
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                        OIT0003tab3row("OPERATION") = "on"
+                        OIT0003tab3row("ACTUALACCDATE") = Me.TxtActualAccDate.Text
+                        Continue For
+                    End If
+                    '### 20201210 END   指摘票対応(No246) #######################################
                     '★未卸可否フラグがチェックされている場合は、(一覧)受入日には設定しない。
                     If OIT0003tab3row("WHOLESALEFLG") = "on" Then Continue For
                     OIT0003tab3row("ACTUALACCDATE") = Me.TxtActualAccDate.Text
@@ -13316,7 +13446,8 @@ Public Class OIT0003OrderDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         Me.TxtActualEmparrDate.Text = ""
                     Else
-                        Me.TxtActualEmparrDate.Text = leftview.WF_Calendar.Text
+                        Me.TxtActualEmparrDate.Text = WW_DATE.ToString("yyyy/MM/dd")
+                        'Me.TxtActualEmparrDate.Text = leftview.WF_Calendar.Text
                     End If
                 Catch ex As Exception
                 End Try
@@ -13324,6 +13455,14 @@ Public Class OIT0003OrderDetail
 
                 '(実績)空車着日に入力された日付を、(一覧)空車着日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '### 20201210 START 指摘票対応(No246) #######################################
+                    '実績日訂正フラグが"1"(有効)の場合
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                        OIT0003tab3row("OPERATION") = "on"
+                        OIT0003tab3row("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
+                        Continue For
+                    End If
+                    '### 20201210 END   指摘票対応(No246) #######################################
                     '★未卸可否フラグがチェックされている場合,
                     '　または交検可否フラグがチェックされている場合、
                     '　または留置可否フラグがチェックされている場合は、(一覧)空車着日には設定しない。
@@ -13718,7 +13857,8 @@ Public Class OIT0003OrderDetail
                                 If WW_DATE < C_DEFAULT_YMD Then
                                     updHeader.Item(WF_FIELD.Value) = ""
                                 Else
-                                    updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+                                    updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM/dd")
+                                    'updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
                                 End If
 
                                 '(一覧)(実績)積込日の場合
@@ -13933,6 +14073,104 @@ Public Class OIT0003OrderDetail
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
+    End Sub
+
+    ''' <summary>
+    ''' 品種出荷期間検索処理
+    ''' </summary>
+    Protected Sub WW_OilTermSearch(ByVal OIT0003row As DataRow)
+        If IsNothing(OIT0003Oiltermtbl) Then
+            OIT0003Oiltermtbl = New DataTable
+        End If
+
+        If OIT0003Oiltermtbl.Columns.Count <> 0 Then
+            OIT0003Oiltermtbl.Columns.Clear()
+        End If
+
+        OIT0003Oiltermtbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   OIM0030.OFFICECODE      AS OFFICECODE" _
+                & " , OIM0030.SHIPPERCODE     AS SHIPPERCODE" _
+                & " , OIM0030.PLANTCODE       AS PLANTCODE" _
+                & " , OIM0030.CONSIGNEECODE   AS CONSIGNEECODE" _
+                & " , OIM0030.ORDERFROMDATE   AS ORDERFROMDATE" _
+                & " , OIM0030.ORDERTODATE     AS ORDERTODATE" _
+                & " , OIM0003.OILCODE         AS OILCODE" _
+                & " , OIM0003.OILNAME         AS OILNAME" _
+                & " , OIM0003.SEGMENTOILCODE  AS SEGMENTOILCODE" _
+                & " , OIM0003.SEGMENTOILNAME  AS SEGMENTOILNAME" _
+                & " FROM OIL.OIM0030_OILTERM OIM0030 " _
+                & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+                & "     OIM0003.OFFICECODE = OIM0030.OFFICECODE " _
+                & " AND OIM0003.SHIPPERCODE = OIM0030.SHIPPERCODE " _
+                & " AND OIM0003.PLANTCODE = OIM0030.PLANTCODE " _
+                & " AND OIM0003.OILCODE = OIM0030.OILCODE " _
+                & " AND OIM0003.SEGMENTOILCODE = OIM0030.SEGMENTOILCODE " _
+                & " AND OIM0003.DELFLG <> @DELFLG " _
+                & " WHERE OIM0030.OFFICECODE = @OFFICECODE " _
+                & " AND OIM0030.CONSIGNEECODE = @CONSIGNEECODE " _
+                & " AND OIM0030.OILCODE = @OILCODE " _
+                & " AND OIM0030.ORDERFROMDATE <= @ORDERFROMDATE " _
+                & " AND OIM0030.ORDERTODATE >= @ORDERTODATE " _
+                & " AND OIM0030.DELFLG <> @DELFLG "
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_CONSIGNEECODE As SqlParameter = SQLcmd.Parameters.Add("@CONSIGNEECODE", System.Data.SqlDbType.NVarChar)
+                Dim P_OILCODE As SqlParameter = SQLcmd.Parameters.Add("@OILCODE", System.Data.SqlDbType.NVarChar)
+                Dim P_ORDERFROMDATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERFROMDATE", System.Data.SqlDbType.Date)
+                Dim P_ORDERTODATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERTODATE", System.Data.SqlDbType.Date)
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                P_CONSIGNEECODE.Value = OIT0003row("CONSIGNEECODE")
+                P_OILCODE.Value = OIT0003row("OILCODE")
+                P_ORDERFROMDATE.Value = Me.TxtLoadingDate.Text
+                P_ORDERTODATE.Value = Me.TxtLoadingDate.Text
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Oiltermtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Oiltermtbl.Load(SQLdr)
+                End Using
+
+                '★出荷期間内の油種があった場合
+                If OIT0003Oiltermtbl.Rows.Count <> 0 Then
+                    OIT0003row("OILCODE") = OIT0003Oiltermtbl.Rows(0)("OILCODE")
+                    OIT0003row("OILNAME") = OIT0003Oiltermtbl.Rows(0)("OILNAME")
+                    OIT0003row("ORDERINGTYPE") = OIT0003Oiltermtbl.Rows(0)("SEGMENTOILCODE")
+                    OIT0003row("ORDERINGOILNAME") = OIT0003Oiltermtbl.Rows(0)("SEGMENTOILNAME")
+                End If
+
+            End Using
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003tbl)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D OILTERM_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D OILTERM_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>
@@ -14996,6 +15234,16 @@ Public Class OIT0003OrderDetail
             Me.TxtActualEmparrDate.Enabled = True
         End If
 
+        '★実績日訂正フラグが"1"(有効)の場合、一部(実績)日を開放する。
+        If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+            '(実績)積車着日
+            Me.TxtActualArrDate.Enabled = True
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = True
+            '(実績)空車着日
+            Me.TxtActualEmparrDate.Enabled = True
+        End If
+
     End Sub
 
     ''' <summary>
@@ -15413,6 +15661,34 @@ Public Class OIT0003OrderDetail
 
         '◯受注進行ステータス
         Select Case I_FLG
+            '350:受注確定
+            Case BaseDllConst.CONST_ORDERSTATUS_350
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+
+                If Not String.IsNullOrEmpty(OI_TANKNO) Then
+                    '◯タンク車Noが指定されている場合は、指定されたタンク車Noを使用
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_02,
+                                        "F",
+                                        I_TANKNO:=OI_TANKNO,
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                Else
+                    '◯タンク車Noが指定されていない場合
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text,
+                                        BaseDllConst.CONST_TANKSTATUS_02,
+                                        "F",
+                                        I_SITUATION:=I_TANKSITUATION,'BaseDllConst.CONST_TANKSITUATION_02,
+                                        upLastOilCode:=True)
+                End If
+
             '400:受入日確認中
             Case BaseDllConst.CONST_ORDERSTATUS_400
                 '★タンク車所在の更新
@@ -22080,14 +22356,14 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
-                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
 
                             '### 20201210 START 指摘票対応(No246) #######################################

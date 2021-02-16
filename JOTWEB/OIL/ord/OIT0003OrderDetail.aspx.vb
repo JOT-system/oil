@@ -6820,12 +6820,12 @@ Public Class OIT0003OrderDetail
                     Exit Sub
                 End If
 
-                '● 受注DB更新(訂正)
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                ''● 受注DB更新(訂正)
+                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()       'DataBase接続
 
-                    WW_UpdateOrder_Correction(SQLcon)
-                End Using
+                '    WW_UpdateOrder_Correction(SQLcon)
+                'End Using
 
                 '● 受注明細DB更新(訂正)
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection

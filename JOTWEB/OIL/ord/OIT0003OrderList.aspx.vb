@@ -3982,13 +3982,7 @@ Public Class OIT0003OrderList
                 '******************************
                 'CSV作成処理の実行
                 '******************************
-                Dim OTFileName As String = ""
-                Select Case tyohyoType
-                    Case CONST_CSV_LOADDISPATCH_10
-                        OTFileName = "【北信】油槽所B.CSV"
-                    Case CONST_CSV_LOADDISPATCH_20
-                        OTFileName = "【甲府】油槽所B.CSV"
-                End Select
+                Dim OTFileName As String = "油槽所B.CSV"
                 Using repCbj = New CsvCreate(OIT0003CsvLoadDispatchtbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
                     Dim url As String
                     Try

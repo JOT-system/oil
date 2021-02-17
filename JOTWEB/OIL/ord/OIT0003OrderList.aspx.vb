@@ -36,6 +36,7 @@ Public Class OIT0003OrderList
     Private OIT0003ReportPlanFrame As DataTable                     '帳票用(計画枠用)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
     Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
+    Private OIT0003CsvLoadDispatchtbl As DataTable                  'CSV用(積込実績)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -69,6 +70,8 @@ Public Class OIT0003OrderList
     Private Const CONST_RPT_TANKDISPATCH_54 As String = "TANKDISPATCH_54"       'タンク車発送実績(OT高崎/構内取り)
     Private Const CONST_RPT_ACTUALSHIP As String = "ACTUALSHIP"                 '発送実績
     Private Const CONST_RPT_CONCATORDER As String = "CONCATORDER"               '連結順序表
+    Private Const CONST_CSV_LOADDISPATCH_10 As String = "LOADDISPATH_10"         '積込実績(北信)
+    Private Const CONST_CSV_LOADDISPATCH_20 As String = "LOADDISPATH_20"         '積込実績(甲府)
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -281,6 +284,8 @@ Public Class OIT0003OrderList
         Me.rbLineBtn.Visible = False
         Me.rbKinoeneLoadBtn.Visible = False
         Me.rbNegishiLoadBtn.Visible = False
+        Me.rbLoadDispatch10Btn.Visible = False
+        Me.rbLoadDispatch20Btn.Visible = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
         Me.rbKuukaiBtn.Visible = False
         '### 20201106 END   指摘票No195(空回日報対応) #################################################
@@ -2797,6 +2802,10 @@ Public Class OIT0003OrderList
         Me.rbLineBtn.Checked = False
         '積込予定(根岸)(ラジオボタン)
         Me.rbNegishiLoadBtn.Checked = False
+        '積込実績(北信)(ラジオボタン)
+        Me.rbLoadDispatch10Btn.Checked = False
+        '積込実績(甲府)(ラジオボタン)
+        Me.rbLoadDispatch20Btn.Checked = False
         '積込予定(甲子)(ラジオボタン)
         Me.rbKinoeneLoadBtn.Checked = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
@@ -2832,6 +2841,10 @@ Public Class OIT0003OrderList
         Me.rbLineBtn.Visible = False
         '積込予定(根岸)(ラジオボタン)を非表示
         Me.rbNegishiLoadBtn.Visible = False
+        '積込実績(北信)(ラジオボタン)
+        Me.rbLoadDispatch10Btn.Visible = False
+        '積込実績(甲府)(ラジオボタン)
+        Me.rbLoadDispatch20Btn.Visible = False
         '積込予定(甲子)(ラジオボタン)を非表示
         Me.rbKinoeneLoadBtn.Visible = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
@@ -2941,6 +2954,10 @@ Public Class OIT0003OrderList
                 Me.rbShipBtn.Visible = True
                 '積込予定(根岸)(ラジオボタン)を表示
                 Me.rbNegishiLoadBtn.Visible = True
+                '積込実績(北信)(ラジオボタン)を表示
+                Me.rbLoadDispatch10Btn.Visible = True
+                '積込実績(甲府)(ラジオボタン)を表示
+                Me.rbLoadDispatch20Btn.Visible = True
 
             '◯四日市営業所
             Case BaseDllConst.CONST_OFFICECODE_012401
@@ -3001,6 +3018,8 @@ Public Class OIT0003OrderList
             AndAlso Me.rbShipBtn.Checked = False _
             AndAlso Me.rbLineBtn.Checked = False _
             AndAlso Me.rbNegishiLoadBtn.Checked = False _
+            AndAlso Me.rbLoadDispatch10Btn.Checked = False _
+            AndAlso Me.rbLoadDispatch20Btn.Checked = False _
             AndAlso Me.rbKinoeneLoadBtn.Checked = False _
             AndAlso Me.rbKuukaiBtn.Checked = False _
             AndAlso Me.rbFillingPointBtn.Checked = False _
@@ -3175,6 +3194,14 @@ Public Class OIT0003OrderList
                 ElseIf Me.rbNegishiLoadBtn.Checked = True Then  '■積込予定(根岸)を選択
                     '☆ 固定帳票(積込予定(根岸))作成処理
                     WW_TyohyoNegishiCreate(CONST_RPT_LOADPLAN_NEGISHI, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbLoadDispatch10Btn.Checked = True Then  '■積込実績(北信)を選択
+                    '☆ CSV(積込実績(北信))作成処理
+                    WW_TyohyoNegishiCreate(CONST_CSV_LOADDISPATCH_10, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbLoadDispatch20Btn.Checked = True Then  '■積込実績(甲府)を選択
+                    '☆ CSV(積込実績(甲府))作成処理
+                    WW_TyohyoNegishiCreate(CONST_CSV_LOADDISPATCH_20, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -3937,6 +3964,33 @@ Public Class OIT0003OrderList
                         Return
                     End Try
                     '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+
+            'ダウンロードボタン(積込実績(北信、甲府))押下
+            Case CONST_CSV_LOADDISPATCH_10,
+                 CONST_CSV_LOADDISPATCH_20
+                '******************************
+                '積込実績データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    CsvLoadDispatchDataGet(SQLcon, tyohyoType, officeCode, Me.txtReportLodDate.Text)
+                End Using
+                '******************************
+                'CSV作成処理の実行
+                '******************************
+                Dim OTFileName As String = "油槽所B.CSV"
+                Using repCbj = New CsvCreate(OIT0003CsvLoadDispatchtbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
+                    Dim url As String
+                    Try
+                        url = repCbj.ConvertDataTableToCsv(False, False, True)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ CSVをダウンロード
                     WF_PrintURL.Value = url
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
@@ -5905,6 +5959,127 @@ Public Class OIT0003OrderList
 
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003ReportPlanFrame)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' CSV出力(積込実績(北信、甲府))データ取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub CsvLoadDispatchDataGet(ByVal SQLcon As SqlConnection,
+                                         ByVal tyohyoType As String,
+                                         ByVal officeCode As String,
+                                         ByVal lodDate As String)
+
+        If IsNothing(OIT0003CsvLoadDispatchtbl) Then
+            OIT0003CsvLoadDispatchtbl = New DataTable
+        End If
+
+        If OIT0003CsvLoadDispatchtbl.Columns.Count <> 0 Then
+            OIT0003CsvLoadDispatchtbl.Columns.Clear()
+        End If
+
+        OIT0003CsvLoadDispatchtbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　CSV用SQL
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   MONTH(OIT0002.LODDATE)                         AS LODDATE_MM" _
+            & " , DAY(OIT0002.LODDATE)                           AS LODDATE_DD" _
+            & " , OIT0002.TRAINNO                                AS TRAINNO" _
+            & " , OIT0003.SHIPORDER                              AS SHIPORDER" _
+            & " , CASE  " _
+            & "        WHEN OIM0005.MODEL = 'タキ1000' THEN 1000000 + CONVERT(INT, OIM0005.TANKNUMBER) " _
+            & "        ELSE OIM0005.TANKNUMBER " _
+            & "   END AS TANKNO " _
+            & " , OIM0029.VALUE01                                AS OILKANA" _
+            & " , OIM0029.VALUE02                                AS OILOUTCODE" _
+            & " , CONVERT(INT, OIT0003.CARSAMOUNT * 1000)        AS CARSAMOUNT" _
+            & " , CASE OIT0002.CONSIGNEECODE " _
+            & "        WHEN '10' THEN '北信（油）'" _
+            & "        WHEN '20' THEN '甲府（油）'" _
+            & "        ELSE '' " _
+            & "   END AS CONSIGNEENAME" _
+            & " FROM oil.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "         OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "     And OIT0003.DELFLG <> @P02 " _
+
+        '★タンク車マスタより車番を取得
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " And OIM0005.DELFLG    <> @P02 "
+
+        '★変換マスタより油種変換を取得
+        SQLStr &=
+              " LEFT JOIN oil.OIM0029_CONVERT OIM0029 " _
+            & " ON  OIM0029.CLASS     = @P05 " _
+            & " And OIM0029.KEYCODE01 =  @P01 " _
+            & " And OIM0029.KEYCODE02 =  OIT0003.OILCODE " _
+            & " And OIM0029.KEYCODE04 =  ORDERINGTYPE " _
+            & " AND OIM0029.DELFLG   <>  @P02 "
+
+        SQLStr &=
+              " WHERE OIT0002.OFFICECODE    = @P01 " _
+            & " AND   OIT0002.CONSIGNEECODE = @P06 " _
+            & " AND   OIT0002.ACTUALLODDATE = @P03 " _
+            & " AND   OIT0002.ORDERSTATUS  <> @P04 " _
+            & " AND   OIT0002.DELFLG       <> @P02 " _
+            & " ORDER BY" _
+            & "    OIT0002.TRAINNO " _
+            & "  , CONVERT(INT, OIT0003.SHIPORDER) "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '分類
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
+                PARA01.Value = officeCode
+                PARA02.Value = C_DELETE_FLG.DELETE
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    PARA03.Value = lodDate
+                Else
+                    PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA05.Value = "LOADDISPATCH_OILCODE"
+                Select Case tyohyoType
+                    Case CONST_CSV_LOADDISPATCH_10
+                        PARA06.Value = "10"
+                    Case CONST_CSV_LOADDISPATCH_20
+                        PARA06.Value = "20"
+                End Select
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003CsvLoadDispatchtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003CsvLoadDispatchtbl.Load(SQLdr)
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LNEGISHI CSV_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LNEGISHI CSV_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)

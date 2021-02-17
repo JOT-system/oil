@@ -5644,6 +5644,17 @@ Public Class OIT0002LinkList
 
                 WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, C_MESSAGE_NO.OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE)
                 O_RTN = "ERR"
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    '★貨車連結表(臨海)TBLに登録している、受注Noと明細Noを初期化
+                    For Each OIT0002ExlUPInirow As DataRow In OIT0002EXLUPtbl.Select("ORDERNO<>''")
+                        OIT0002ExlUPInirow("ORDERNO") = ""
+                        OIT0002ExlUPInirow("DETAILNO") = ""
+                        WW_UpdateRLinkOrderNo(SQLcon, OIT0002ExlUPInirow)
+                    Next
+                End Using
+
                 Exit Sub
             End If
         Next

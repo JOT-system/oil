@@ -1939,6 +1939,10 @@ Public Class OIT0003OrderDetail
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                             Try
                                 intListCnt = OIT0003WKtbl.Rows(0)("CNT")
+                            Catch ex As Exception
+                                intListCnt = OIT0003tbl.Rows.Count
+                            End Try
+                            Try
                                 '発送順を自動設定(貨物駅入線順の値の逆値を設定する)
                                 OIT0003row("SHIPORDER") = (intListCnt - Integer.Parse(OIT0003row("LINEORDER")) + 1)
                             Catch ex As Exception
@@ -19036,16 +19040,23 @@ Public Class OIT0003OrderDetail
             & " , SUM(VIW0006_JR2.CNT)                      AS TRAINCARS" _
             & " , ISNULL(RTRIM(VIW0006_JR2.MAXTANK2), '')   AS MAXTANK" _
             & " FROM ( " _
-            & "       SELECT VIW0006.* " _
-            & "       FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
-            & "       WHERE VIW0006.ORDERNO = @P01 " _
-            & "      ) VIW0006_BASE " _
-            & " INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR2 ON" _
-            & "        VIW0006_BASE.JRTRAINNO2  = VIW0006_JR2.JRTRAINNO2 " _
-            & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR2.MERGEDAY" _
-            & "    AND VIW0006_BASE.JRTRAINNO2 <> ''" _
-            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR2.LODDATE" _
-            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR2.DEPDATE" _
+            & "     SELECT DISTINCT " _
+            & "           VIW0006_JR2.ORDERNO " _
+            & "         , VIW0006_JR2.JRTRAINNO2 " _
+            & "         , VIW0006_JR2.CNT " _
+            & "         , VIW0006_JR2.MAXTANK2 " _
+            & "     FROM ( " _
+            & "           SELECT VIW0006.* " _
+            & "           FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
+            & "           WHERE VIW0006.ORDERNO = @P01 " _
+            & "          ) VIW0006_BASE " _
+            & "     INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR2 ON" _
+            & "            VIW0006_BASE.JRTRAINNO2  = VIW0006_JR2.JRTRAINNO2 " _
+            & "        AND VIW0006_BASE.MERGEDAY    = VIW0006_JR2.MERGEDAY" _
+            & "        AND VIW0006_BASE.JRTRAINNO2 <> ''" _
+            & "        AND VIW0006_BASE.LODDATE = VIW0006_JR2.LODDATE" _
+            & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR2.DEPDATE" _
+            & " ) VIW0006_JR2 " _
             & " GROUP BY " _
             & "   VIW0006_JR2.JRTRAINNO2" _
             & " , VIW0006_JR2.MAXTANK2"
@@ -19060,16 +19071,23 @@ Public Class OIT0003OrderDetail
             & " , SUM(VIW0006_JR1.CNT)                      AS TRAINCARS" _
             & " , ISNULL(RTRIM(VIW0006_JR1.MAXTANK1), '')   AS MAXTANK" _
             & " FROM ( " _
-            & "       SELECT VIW0006.* " _
-            & "       FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
-            & "       WHERE VIW0006.ORDERNO = @P01 " _
-            & "      ) VIW0006_BASE " _
-            & " INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR1 ON" _
-            & "        VIW0006_BASE.JRTRAINNO1  = VIW0006_JR1.JRTRAINNO1 " _
-            & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR1.MERGEDAY" _
-            & "    AND VIW0006_BASE.JRTRAINNO1 <> ''" _
-            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR1.LODDATE" _
-            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR1.DEPDATE" _
+            & "     SELECT DISTINCT " _
+            & "           VIW0006_JR1.ORDERNO " _
+            & "         , VIW0006_JR1.JRTRAINNO1 " _
+            & "         , VIW0006_JR1.CNT " _
+            & "         , VIW0006_JR1.MAXTANK1 " _
+            & "     FROM ( " _
+            & "           SELECT VIW0006.* " _
+            & "           FROM oil.VIW0006_TRAINCARSCHECK VIW0006 " _
+            & "           WHERE VIW0006.ORDERNO = @P01 " _
+            & "          ) VIW0006_BASE " _
+            & "     INNER JOIN OIL.VIW0006_TRAINCARSCHECK VIW0006_JR1 ON" _
+            & "            VIW0006_BASE.JRTRAINNO1  = VIW0006_JR1.JRTRAINNO1 " _
+            & "        AND VIW0006_BASE.MERGEDAY    = VIW0006_JR1.MERGEDAY" _
+            & "        AND VIW0006_BASE.JRTRAINNO1 <> ''" _
+            & "        AND VIW0006_BASE.LODDATE = VIW0006_JR1.LODDATE" _
+            & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR1.DEPDATE" _
+            & " ) VIW0006_JR1 " _
             & " GROUP BY " _
             & "   VIW0006_JR1.JRTRAINNO1" _
             & " , VIW0006_JR1.MAXTANK1"

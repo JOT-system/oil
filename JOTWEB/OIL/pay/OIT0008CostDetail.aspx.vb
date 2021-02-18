@@ -143,69 +143,32 @@ Public Class OIT0008CostDetail
 
         '勘定科目コード
         TxtAccountCode.Text = work.WF_SEL_ACCOUNTCODE.Text
+        '勘定科目名
+        TxtAccountName.Text = work.WF_SEL_ACCOUNTNAME.Text
         'セグメント
         TxtSegmentCode.Text = work.WF_SEL_SEGMENTCODE.Text
+        'セグメント名
+        TxtSegmentName.Text = work.WF_SEL_SEGMENTNAME.Text
         'セグメント枝番
         TxtSegmentBranchCode.Text = work.WF_SEL_SEGMENTBRANCHCODE.Text
-
-        '勘定科目コード/セグメント/セグメント枝番の名称取得
-        seachCode = TxtAccountCode.Text & " " & TxtSegmentCode.Text & " " & TxtSegmentBranchCode.Text
-        CODENAME_get("ACCOUNTPATTERN", seachCode, seachedName, WW_DUMMY)
-        If Not String.IsNullOrEmpty(seachedName) Then
-            'セグメント枝番名の境界の「(」を半角空白に変換し、末尾の「)」は除去
-            seachedName = seachedName.Replace("(", " ")
-            seachedName = seachedName.Replace(")", "")
-            '名称を半角空白で分割
-            Dim names = seachedName.Split(" ")
-            If names.Length > 0 Then
-                TxtAccountName.Text = names(0)
-            End If
-            If names.Length > 1 Then
-                TxtSegmentName.Text = names(1)
-            End If
-            If names.Length > 2 Then
-                TxtSegmentBranchName.Text = names(2)
-            End If
-        End If
-
+        'セグメント枝番名
+        TxtSegmentBranchName.Text = work.WF_SEL_SEGMENTBRANCHNAME.Text
         '荷主コード
         TxtShippersCode.Text = work.WF_SEL_SHIPPERSCODE.Text
         '荷主名
         TxtShippersName.Text = work.WF_SEL_SHIPPERSNAME.Text
-
         '請求先コード
         TxtInvoiceCode.Text = work.WF_SEL_INVOICECODE.Text
-        '請求先コードの名称・部門名取得
-        seachCode = TxtInvoiceCode.Text
-        seachedName = ""
-        CODENAME_get("TORI_DEPT", seachCode, seachedName, WW_DUMMY)
-        If Not String.IsNullOrEmpty(seachedName) Then
-            '名称を半角空白で分割
-            Dim names = seachedName.Split(" ")
-            If names.Length > 0 Then
-                TxtInvoiceName.Text = names(0)
-            End If
-            If names.Length > 1 Then
-                TxtInvoiceDeptName.Text = names(1)
-            End If
-        End If
-
+        '請求先名
+        TxtInvoiceName.Text = work.WF_SEL_INVOICENAME.Text
+        '請求先部門
+        TxtInvoiceDeptName.Text = work.WF_SEL_INVOICEDEPTNAME.Text
         '支払先コード
         TxtPayeeCode.Text = work.WF_SEL_PAYEECODE.Text
-        '請求先コードの名称・部門名取得
-        seachCode = TxtPayeeCode.Text
-        seachedName = ""
-        CODENAME_get("TORI_DEPT", seachCode, seachedName, WW_DUMMY)
-        If Not String.IsNullOrEmpty(seachedName) Then
-            '名称を半角空白で分割
-            Dim names = seachedName.Split(" ")
-            If names.Length > 0 Then
-                TxtPayeeName.Text = names(0)
-            End If
-            If names.Length > 1 Then
-                TxtPayeeDeptName.Text = names(1)
-            End If
-        End If
+        '支払先名
+        TxtPayeeName.Text = work.WF_SEL_PAYEENAME.Text
+        '支払先部門
+        TxtPayeeDeptName.Text = work.WF_SEL_PAYEEDEPTNAME.Text
 
     End Sub
 
@@ -238,6 +201,8 @@ Public Class OIT0008CostDetail
             Case DataControlRowType.DataRow
                 Dim row = DirectCast(e.Row.DataItem, DataRowView)
 
+                If Not row("OILCODE") = "9999" Then Exit Sub
+
                 If Not row("AMOUNT") Is DBNull.Value Then
                     WW_AMOUNT_SUM += row("AMOUNT")
                 End If
@@ -260,16 +225,38 @@ Public Class OIT0008CostDetail
         'GridView本体を取得
         Dim grid As GridView = CType(sender, GridView)
 
+        Dim lastCONSIGNEENAME As String = ""
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
             If gvrow.RowType = DataControlRowType.Header Then
+                'ヘッダー
                 gvrow.Cells(2).ColumnSpan = 2
                 gvrow.Cells(3).Visible = False
                 gvrow.Cells(4).ColumnSpan = 2
                 gvrow.Cells(5).Visible = False
             ElseIf gvrow.RowType = DataControlRowType.Footer Then
+                'フッター
                 gvrow.Cells(2).Text = String.Format("{0:#,##0}", WW_AMOUNT_SUM)
                 gvrow.Cells(4).Text = String.Format("{0:#,##0}", WW_TAX_SUM)
                 gvrow.Cells(6).Text = String.Format("{0:#,##0}", WW_TOTAL_SUM)
+            ElseIf gvrow.RowType = DataControlRowType.DataRow Then
+                'データ行
+                If Not String.IsNullOrEmpty(lastCONSIGNEENAME) Then
+                    If lastCONSIGNEENAME = DirectCast(gvrow.Cells(0).Controls(3), Label).Text Then
+                        '前回出現した荷受人名と現在行の荷受人名が一致する場合
+                        '荷受人名をクリアする
+                        DirectCast(gvrow.Cells(0).Controls(3), Label).Text = ""
+                    Else
+                        lastCONSIGNEENAME = DirectCast(gvrow.Cells(0).Controls(3), Label).Text
+                    End If
+                Else
+                    lastCONSIGNEENAME = DirectCast(gvrow.Cells(0).Controls(3), Label).Text
+                End If
+
+                If DirectCast(gvrow.Cells(1).Controls(1), HiddenField).Value = "9999" Then
+                    gvrow.Cells(0).CssClass = "CONSIGNEENAME centerText AllBorder"
+                    gvrow.Cells(0).ColumnSpan = "2"
+                    gvrow.Cells(1).Visible = False
+                End If
             End If
         Next
 
@@ -297,42 +284,118 @@ Public Class OIT0008CostDetail
         '     条件指定に従い該当データを列車マスタから取得する
         Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("      0 AS LINECNT ")                                                ' 行番号
-        SQLStrBldr.AppendLine("     , CONSIGNEECODE")                                               ' 荷受人コード
-        SQLStrBldr.AppendLine("     , CONSIGNEENAME")                                               ' 荷受人名
-        SQLStrBldr.AppendLine("     , SUM(CARSAMOUNT) AS QUANTITY")                                 ' 数量
-        SQLStrBldr.AppendLine("     , SUM(APPLYCHARGE) AS AMOUNT")                                  ' 請求金額
-        SQLStrBldr.AppendLine("     , SUM(FLOOR(APPLYCHARGE * 0.10)) AS TAX")                       ' 請求税額
-        SQLStrBldr.AppendLine("     , SUM(APPLYCHARGE) + SUM(FLOOR(APPLYCHARGE * 0.10)) AS TOTAL")  ' 請求額合計
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     [oil].OIT0013_ORDERDETAILBILLING")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     DELFLG       <> @P00")
-        SQLStrBldr.AppendLine(" AND OFFICECODE    = @P01")
-        SQLStrBldr.AppendLine(" AND KEIJYOYMD BETWEEN @P02 AND @P03")
-        SQLStrBldr.AppendLine(" AND ACCOUNTCODE   = @P04")
-        SQLStrBldr.AppendLine(" AND SEGMENTCODE   = @P05")
-        SQLStrBldr.AppendLine(" AND BREAKDOWNCODE = @P06")
-        SQLStrBldr.AppendLine(" AND SHIPPERSCODE  = @P07")
-        SQLStrBldr.AppendLine(" AND INVOICECODE   = @P08")
-        SQLStrBldr.AppendLine(" AND PAYEECODE     = @P09")
-        SQLStrBldr.AppendLine(" GROUP BY")
-        SQLStrBldr.AppendLine("     CONSIGNEECODE")
-        SQLStrBldr.AppendLine("     , CONSIGNEENAME")
+        SQLStrBldr.AppendLine("     UNIQ.CONSIGNEECODE")    '荷受人コード
+        SQLStrBldr.AppendLine("     , UNIQ.CONSIGNEENAME")  '荷受人名
+        SQLStrBldr.AppendLine("     , UNIQ.OILCODE")        '油種コード
+        SQLStrBldr.AppendLine("     , UNIQ.OILNAME")        '油種名
+        SQLStrBldr.AppendLine("     , UNIQ.CARSNUMBER")     '車数
+        SQLStrBldr.AppendLine("     , UNIQ.QUANTITY")       '数量
+        SQLStrBldr.AppendLine("     , UNIQ.AMOUNT")         '金額
+        SQLStrBldr.AppendLine("     , UNIQ.TAX")            '税額
+        SQLStrBldr.AppendLine("     , UNIQ.TOTAL")          '総額
+        SQLStrBldr.AppendLine(" FROM (")
+        '荷受人・油種単位での集計値
+        SQLStrBldr.AppendLine("     SELECT")
+        SQLStrBldr.AppendLine("         OIT0013.CONSIGNEECODE")
+        SQLStrBldr.AppendLine("         , OIT0013.CONSIGNEENAME")
+        SQLStrBldr.AppendLine("         , OIT0013.OILCODE")
+        SQLStrBldr.AppendLine("         , OIT0013.OILNAME")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.CARSNUMBER) AS CARSNUMBER")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.CARSAMOUNT) AS QUANTITY")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.APPLYCHARGE) AS AMOUNT")
+        SQLStrBldr.AppendLine("         , SUM(FLOOR(OIT0013.APPLYCHARGE * 0.10)) AS TAX")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.APPLYCHARGE) + SUM(FLOOR(OIT0013.APPLYCHARGE * 0.10)) AS TOTAL")
+        SQLStrBldr.AppendLine("     FROM")
+        SQLStrBldr.AppendLine("         [oil].OIT0013_ORDERDETAILBILLING OIT0013")
+        SQLStrBldr.AppendLine("         INNER JOIN (")
+        SQLStrBldr.AppendLine("             SELECT")
+        SQLStrBldr.AppendLine("                 *")
+        SQLStrBldr.AppendLine("             FROM")
+        SQLStrBldr.AppendLine("                 oil.TMP0008_COST")
+        SQLStrBldr.AppendLine("             WHERE")
+        SQLStrBldr.AppendLine("                 LINE = @P04")
+        SQLStrBldr.AppendLine("             AND OFFICECODE = @P01")
+        SQLStrBldr.AppendLine("             AND KEIJYOYM = @P02")
+        SQLStrBldr.AppendLine("         ) SEL_TMP")
+        SQLStrBldr.AppendLine("         ON  SEL_TMP.ACCOUNTCODE = OIT0013.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.ACCOUNTNAME = OIT0013.ACCOUNTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTCODE = OIT0013.SEGMENTCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTNAME = OIT0013.SEGMENTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTBRANCHCODE = OIT0013.BREAKDOWNCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTBRANCHNAME = OIT0013.BREAKDOWN")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SHIPPERSCODE = OIT0013.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SHIPPERSNAME = OIT0013.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICECODE = OIT0013.INVOICECODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICENAME = OIT0013.INVOICENAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICEDEPTNAME = OIT0013.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEECODE = OIT0013.PAYEECODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEENAME = OIT0013.PAYEENAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEEDEPTNAME = OIT0013.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.OFFICECODE = OIT0013.OFFICECODE")
+        SQLStrBldr.AppendLine("         AND OIT0013.KEIJYOYMD BETWEEN @P02 AND @P03")
+        SQLStrBldr.AppendLine("         AND OIT0013.DELFLG <> @P00")
+        SQLStrBldr.AppendLine("     GROUP BY")
+        SQLStrBldr.AppendLine("         OIT0013.CONSIGNEECODE")
+        SQLStrBldr.AppendLine("         , OIT0013.CONSIGNEENAME")
+        SQLStrBldr.AppendLine("         , OIT0013.OILCODE")
+        SQLStrBldr.AppendLine("         , OIT0013.OILNAME")
+        SQLStrBldr.AppendLine(" ")
+        SQLStrBldr.AppendLine("     UNION ALL")
+        SQLStrBldr.AppendLine(" ")
+        '荷受人単位での集計値
+        SQLStrBldr.AppendLine("     SELECT")
+        SQLStrBldr.AppendLine("         CONSIGNEECODE")
+        SQLStrBldr.AppendLine("         , CONSIGNEENAME + '計' AS CONSIGNEENAME")
+        SQLStrBldr.AppendLine("         , '9999' AS OILCODE")
+        SQLStrBldr.AppendLine("         , '' AS OILNAME")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.CARSNUMBER) AS CARSNUMBER")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.CARSAMOUNT) AS QUANTITY")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.APPLYCHARGE) AS AMOUNT")
+        SQLStrBldr.AppendLine("         , SUM(FLOOR(OIT0013.APPLYCHARGE * 0.10)) AS TAX")
+        SQLStrBldr.AppendLine("         , SUM(OIT0013.APPLYCHARGE) + SUM(FLOOR(OIT0013.APPLYCHARGE * 0.10)) AS TOTAL")
+        SQLStrBldr.AppendLine("     FROM")
+        SQLStrBldr.AppendLine("         [oil].OIT0013_ORDERDETAILBILLING OIT0013")
+        SQLStrBldr.AppendLine("         INNER JOIN (")
+        SQLStrBldr.AppendLine("             SELECT")
+        SQLStrBldr.AppendLine("                 *")
+        SQLStrBldr.AppendLine("             FROM")
+        SQLStrBldr.AppendLine("                 oil.TMP0008_COST")
+        SQLStrBldr.AppendLine("             WHERE")
+        SQLStrBldr.AppendLine("                 LINE = @P04")
+        SQLStrBldr.AppendLine("             AND OFFICECODE = @P01")
+        SQLStrBldr.AppendLine("             AND KEIJYOYM = @P02")
+        SQLStrBldr.AppendLine("         ) SEL_TMP")
+        SQLStrBldr.AppendLine("         ON  SEL_TMP.ACCOUNTCODE = OIT0013.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.ACCOUNTNAME = OIT0013.ACCOUNTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTCODE = OIT0013.SEGMENTCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTNAME = OIT0013.SEGMENTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTBRANCHCODE = OIT0013.BREAKDOWNCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SEGMENTBRANCHNAME = OIT0013.BREAKDOWN")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SHIPPERSCODE = OIT0013.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.SHIPPERSNAME = OIT0013.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICECODE = OIT0013.INVOICECODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICENAME = OIT0013.INVOICENAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.INVOICEDEPTNAME = OIT0013.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEECODE = OIT0013.PAYEECODE")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEENAME = OIT0013.PAYEENAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.PAYEEDEPTNAME = OIT0013.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("         AND SEL_TMP.OFFICECODE = OIT0013.OFFICECODE")
+        SQLStrBldr.AppendLine("         AND OIT0013.KEIJYOYMD BETWEEN @P02 AND @P03")
+        SQLStrBldr.AppendLine("         AND OIT0013.DELFLG <> @P00")
+        SQLStrBldr.AppendLine("     GROUP BY")
+        SQLStrBldr.AppendLine("         OIT0013.CONSIGNEECODE")
+        SQLStrBldr.AppendLine("         , OIT0013.CONSIGNEENAME")
+        SQLStrBldr.AppendLine(" ) UNIQ")
         SQLStrBldr.AppendLine(" ORDER BY")
-        SQLStrBldr.AppendLine("     CONSIGNEECODE")
+        SQLStrBldr.AppendLine("     UNIQ.CONSIGNEECODE")
+        SQLStrBldr.AppendLine("     , UNIQ.OILCODE")
 
         Try
             Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   ' 営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)          ' 計上年月(月初日)
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)          ' 計上年月(月末日)
-                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 8)   ' 勘定科目コード
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 5)   ' セグメント
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 2)   ' セグメント枝番
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 10)  ' 荷主コード
-                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 10)  ' 請求先コード
-                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 10)  ' 支払先コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.Int)           ' 勘定科目コード
                 Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   ' 削除フラグ
 
                 PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
@@ -340,12 +403,7 @@ Public Class OIT0008CostDetail
                 Dim WK_ENDYMD = New Date(WK_STYMD.Year, WK_STYMD.Month, DateTime.DaysInMonth(WK_STYMD.Year, WK_STYMD.Month))
                 PARA02.Value = WK_STYMD
                 PARA03.Value = WK_ENDYMD
-                PARA04.Value = work.WF_SEL_ACCOUNTCODE.Text
-                PARA05.Value = work.WF_SEL_SEGMENTCODE.Text
-                PARA06.Value = work.WF_SEL_SEGMENTBRANCHCODE.Text
-                PARA07.Value = work.WF_SEL_SHIPPERSCODE.Text
-                PARA08.Value = work.WF_SEL_INVOICECODE.Text
-                PARA09.Value = work.WF_SEL_PAYEECODE.Text
+                PARA04.Value = Int32.Parse(work.WF_SEL_LINE.Text)
                 PARA00.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -358,11 +416,6 @@ Public Class OIT0008CostDetail
                     OIT0008tbl.Load(SQLdr)
                 End Using
 
-                Dim i As Integer = 0
-                For Each OIT0008row As DataRow In OIT0008tbl.Rows
-                    i += 1
-                    OIT0008row("LINECNT") = i        ' LINECNT
-                Next
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008L SELECT")

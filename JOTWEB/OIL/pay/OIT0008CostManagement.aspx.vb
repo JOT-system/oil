@@ -152,18 +152,32 @@ Public Class OIT0008CostManagement
         work.WF_SEL_LINE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_LINE"), Label).Text
         '勘定科目コード
         work.WF_SEL_ACCOUNTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
+        '勘定科目名
+        work.WF_SEL_ACCOUNTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTNAME"), HiddenField).Value
         'セグメント
         work.WF_SEL_SEGMENTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
+        'セグメント名
+        work.WF_SEL_SEGMENTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTNAME"), HiddenField).Value
         'セグメント枝番
         work.WF_SEL_SEGMENTBRANCHCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
+        'セグメント枝番名
+        work.WF_SEL_SEGMENTBRANCHNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHNAME"), Label).Text
         '荷主コード
         work.WF_SEL_SHIPPERSCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
         '荷主名
         work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), HiddenField).Value
         '請求先コード
         work.WF_SEL_INVOICECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
+        '請求先名
+        work.WF_SEL_INVOICENAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label).Text
+        '請求先部門
+        work.WF_SEL_INVOICEDEPTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label).Text
         '支払先コード
         work.WF_SEL_PAYEECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox).Text
+        '支払先名
+        work.WF_SEL_PAYEENAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label).Text
+        '支払先部門
+        work.WF_SEL_PAYEEDEPTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label).Text
         '摘要
         work.WF_SEL_TEKIYOU.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_TEKIYOU"), TextBox).Text
 
@@ -373,8 +387,11 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("     , 0 AS CHEKFLG")
         SQLStrBldr.AppendLine("     , '2' AS CALCACCOUNT")
         SQLStrBldr.AppendLine("     , '' AS ACCOUNTCODE")
+        SQLStrBldr.AppendLine("     , '' AS ACCOUNTNAME")
         SQLStrBldr.AppendLine("     , '' AS SEGMENTCODE")
+        SQLStrBldr.AppendLine("     , '' AS SEGMENTNAME")
         SQLStrBldr.AppendLine("     , '' AS SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("     , '' AS SEGMENTBRANCHNAME")
         SQLStrBldr.AppendLine("     , '' AS SHIPPERSCODE")
         SQLStrBldr.AppendLine("     , '' AS SHIPPERSNAME")
         SQLStrBldr.AppendLine("     , 0.0 AS QUANTITY")
@@ -439,8 +456,11 @@ Public Class OIT0008CostManagement
         OIT0008INPtbl.Columns.Add("CHECKFLG", Type.GetType("System.Int32"))
         OIT0008INPtbl.Columns.Add("CALCACCOUNT", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("ACCOUNTCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("ACCOUNTNAME", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SEGMENTNAME", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("SEGMENTBRANCHCODE", Type.GetType("System.String"))
+        OIT0008INPtbl.Columns.Add("SEGMENTBRANCHNAME", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("SHIPPERSCODE", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("SHIPPERSNAME", Type.GetType("System.String"))
         OIT0008INPtbl.Columns.Add("QUANTITY", Type.GetType("System.Decimal"))
@@ -484,11 +504,20 @@ Public Class OIT0008CostManagement
             '勘定科目コード(ACCOUNTCODE)
             addRow("ACCOUNTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
 
+            '勘定科目名(ACCOUNTNAME)
+            addRow("ACCOUNTNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ACCOUNTNAME"), HiddenField).Value
+
             'セグメント(SEGMENTCODE)
             addRow("SEGMENTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
 
-            'セグメント枝番(SEGMENTCODE)
+            'セグメント名(SEGMENTNAME)
+            addRow("SEGMENTNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTNAME"), HiddenField).Value
+
+            'セグメント枝番(SEGMENTBRANCHCODE)
             addRow("SEGMENTBRANCHCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
+
+            'セグメント枝番名(SEGMENTBRANCHNAME)
+            addRow("SEGMENTBRANCHNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SEGMENTBRANCHNAME"), Label).Text
 
             '荷主コード(SHIPPERSCODE)
             addRow("SHIPPERSCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
@@ -554,7 +583,7 @@ Public Class OIT0008CostManagement
     Protected Sub UpdateTempTable(ByVal SQLcon As SqlConnection)
 
         Dim SQLStrBldr As New StringBuilder
-        SQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS T0007")
+        SQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS T0008")
         SQLStrBldr.AppendLine(" USING (")
         SQLStrBldr.AppendLine("     SELECT")
         SQLStrBldr.AppendLine("         @P01 AS OFFICECODE")
@@ -563,8 +592,11 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("         , @P04 AS CHECKFLG")
         SQLStrBldr.AppendLine("         , @P05 AS CALCACCOUNT")
         SQLStrBldr.AppendLine("         , @P06 AS ACCOUNTCODE")
+        SQLStrBldr.AppendLine("         , @P22 AS ACCOUNTNAME")
         SQLStrBldr.AppendLine("         , @P07 AS SEGMENTCODE")
+        SQLStrBldr.AppendLine("         , @P23 AS SEGMENTNAME")
         SQLStrBldr.AppendLine("         , @P08 AS SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("         , @P24 AS SEGMENTBRANCHNAME")
         SQLStrBldr.AppendLine("         , @P09 AS SHIPPERSCODE")
         SQLStrBldr.AppendLine("         , @P10 AS SHIPPERSNAME")
         SQLStrBldr.AppendLine("         , @P11 AS QUANTITY")
@@ -579,31 +611,34 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("         , @P20 AS PAYEEDEPTNAME")
         SQLStrBldr.AppendLine("         , @P21 AS TEKIYOU")
         SQLStrBldr.AppendLine(" ) AS GVROW")
-        SQLStrBldr.AppendLine("     ON  T0007.OFFICECODE = GVROW.OFFICECODE")
-        SQLStrBldr.AppendLine("     AND T0007.KEIJYOYM = GVROW.KEIJYOYM")
-        SQLStrBldr.AppendLine("     AND T0007.LINE = GVROW.LINE")
+        SQLStrBldr.AppendLine("     ON  T0008.OFFICECODE = GVROW.OFFICECODE")
+        SQLStrBldr.AppendLine("     AND T0008.KEIJYOYM = GVROW.KEIJYOYM")
+        SQLStrBldr.AppendLine("     AND T0008.LINE = GVROW.LINE")
         SQLStrBldr.AppendLine("     AND GVROW.CALCACCOUNT = '2'")
         SQLStrBldr.AppendLine(" WHEN MATCHED")
         SQLStrBldr.AppendLine("         THEN UPDATE")
         SQLStrBldr.AppendLine("             SET")
-        SQLStrBldr.AppendLine("                 T0007.CHECKFLG = GVROW.CHECKFLG")
-        SQLStrBldr.AppendLine("                 , T0007.CALCACCOUNT = GVROW.CALCACCOUNT")
-        SQLStrBldr.AppendLine("                 , T0007.ACCOUNTCODE = GVROW.ACCOUNTCODE")
-        SQLStrBldr.AppendLine("                 , T0007.SEGMENTCODE = GVROW.SEGMENTCODE")
-        SQLStrBldr.AppendLine("                 , T0007.SEGMENTBRANCHCODE = GVROW.SEGMENTBRANCHCODE")
-        SQLStrBldr.AppendLine("                 , T0007.SHIPPERSCODE = GVROW.SHIPPERSCODE")
-        SQLStrBldr.AppendLine("                 , T0007.SHIPPERSNAME = GVROW.SHIPPERSNAME")
-        SQLStrBldr.AppendLine("                 , T0007.QUANTITY = GVROW.QUANTITY")
-        SQLStrBldr.AppendLine("                 , T0007.UNITPRICE = GVROW.UNITPRICE")
-        SQLStrBldr.AppendLine("                 , T0007.AMOUNT = GVROW.AMOUNT")
-        SQLStrBldr.AppendLine("                 , T0007.TAX = GVROW.TAX")
-        SQLStrBldr.AppendLine("                 , T0007.INVOICECODE = GVROW.INVOICECODE")
-        SQLStrBldr.AppendLine("                 , T0007.INVOICENAME = GVROW.INVOICENAME")
-        SQLStrBldr.AppendLine("                 , T0007.INVOICEDEPTNAME = GVROW.INVOICEDEPTNAME")
-        SQLStrBldr.AppendLine("                 , T0007.PAYEECODE = GVROW.PAYEECODE")
-        SQLStrBldr.AppendLine("                 , T0007.PAYEENAME = GVROW.PAYEENAME")
-        SQLStrBldr.AppendLine("                 , T0007.PAYEEDEPTNAME = GVROW.PAYEEDEPTNAME")
-        SQLStrBldr.AppendLine("                 , T0007.TEKIYOU = GVROW.TEKIYOU")
+        SQLStrBldr.AppendLine("                 T0008.CHECKFLG = GVROW.CHECKFLG")
+        SQLStrBldr.AppendLine("                 , T0008.CALCACCOUNT = GVROW.CALCACCOUNT")
+        SQLStrBldr.AppendLine("                 , T0008.ACCOUNTCODE = GVROW.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                 , T0008.ACCOUNTNAME = GVROW.ACCOUNTNAME")
+        SQLStrBldr.AppendLine("                 , T0008.SEGMENTCODE = GVROW.SEGMENTCODE")
+        SQLStrBldr.AppendLine("                 , T0008.SEGMENTNAME = GVROW.SEGMENTNAME")
+        SQLStrBldr.AppendLine("                 , T0008.SEGMENTBRANCHCODE = GVROW.SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                 , T0008.SEGMENTBRANCHNAME = GVROW.SEGMENTBRANCHNAME")
+        SQLStrBldr.AppendLine("                 , T0008.SHIPPERSCODE = GVROW.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("                 , T0008.SHIPPERSNAME = GVROW.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("                 , T0008.QUANTITY = GVROW.QUANTITY")
+        SQLStrBldr.AppendLine("                 , T0008.UNITPRICE = GVROW.UNITPRICE")
+        SQLStrBldr.AppendLine("                 , T0008.AMOUNT = GVROW.AMOUNT")
+        SQLStrBldr.AppendLine("                 , T0008.TAX = GVROW.TAX")
+        SQLStrBldr.AppendLine("                 , T0008.INVOICECODE = GVROW.INVOICECODE")
+        SQLStrBldr.AppendLine("                 , T0008.INVOICENAME = GVROW.INVOICENAME")
+        SQLStrBldr.AppendLine("                 , T0008.INVOICEDEPTNAME = GVROW.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0008.PAYEECODE = GVROW.PAYEECODE")
+        SQLStrBldr.AppendLine("                 , T0008.PAYEENAME = GVROW.PAYEENAME")
+        SQLStrBldr.AppendLine("                 , T0008.PAYEEDEPTNAME = GVROW.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0008.TEKIYOU = GVROW.TEKIYOU")
         SQLStrBldr.AppendLine(" WHEN NOT MATCHED BY TARGET")
         SQLStrBldr.AppendLine("         THEN INSERT (")
         SQLStrBldr.AppendLine("                  OFFICECODE")
@@ -612,8 +647,11 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("                  , CHECKFLG")
         SQLStrBldr.AppendLine("                  , CALCACCOUNT")
         SQLStrBldr.AppendLine("                  , ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                  , ACCOUNTNAME")
         SQLStrBldr.AppendLine("                  , SEGMENTCODE")
+        SQLStrBldr.AppendLine("                  , SEGMENTNAME")
         SQLStrBldr.AppendLine("                  , SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                  , SEGMENTBRANCHNAME")
         SQLStrBldr.AppendLine("                  , SHIPPERSCODE")
         SQLStrBldr.AppendLine("                  , SHIPPERSNAME")
         SQLStrBldr.AppendLine("                  , QUANTITY")
@@ -634,8 +672,11 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("                  , GVROW.CHECKFLG")
         SQLStrBldr.AppendLine("                  , GVROW.CALCACCOUNT")
         SQLStrBldr.AppendLine("                  , GVROW.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.ACCOUNTNAME")
         SQLStrBldr.AppendLine("                  , GVROW.SEGMENTCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SEGMENTNAME")
         SQLStrBldr.AppendLine("                  , GVROW.SEGMENTBRANCHCODE")
+        SQLStrBldr.AppendLine("                  , GVROW.SEGMENTBRANCHNAME")
         SQLStrBldr.AppendLine("                  , GVROW.SHIPPERSCODE")
         SQLStrBldr.AppendLine("                  , GVROW.SHIPPERSNAME")
         SQLStrBldr.AppendLine("                  , GVROW.QUANTITY")
@@ -683,6 +724,9 @@ Public Class OIT0008CostManagement
                 Dim PARA19 As SqlParameter = MergeCmd.Parameters.Add("@P19", SqlDbType.NVarChar, 40)
                 Dim PARA20 As SqlParameter = MergeCmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40)
                 Dim PARA21 As SqlParameter = MergeCmd.Parameters.Add("@P21", SqlDbType.NVarChar, 200)
+                Dim PARA22 As SqlParameter = MergeCmd.Parameters.Add("@P22", SqlDbType.NVarChar, 40)
+                Dim PARA23 As SqlParameter = MergeCmd.Parameters.Add("@P23", SqlDbType.NVarChar, 40)
+                Dim PARA24 As SqlParameter = MergeCmd.Parameters.Add("@P24", SqlDbType.NVarChar, 40)
 
                 Dim UPARA1 As SqlParameter = UpdateCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
                 Dim UPARA2 As SqlParameter = UpdateCmd.Parameters.Add("@P02", SqlDbType.Date)
@@ -711,8 +755,11 @@ Public Class OIT0008CostManagement
                         PARA4.Value = row("CHECKFLG")
                         PARA5.Value = row("CALCACCOUNT")
                         PARA6.Value = row("ACCOUNTCODE")
+                        PARA22.Value = row("ACCOUNTNAME")
                         PARA7.Value = row("SEGMENTCODE")
+                        PARA23.Value = row("SEGMENTNAME")
                         PARA8.Value = row("SEGMENTBRANCHCODE")
+                        PARA24.Value = row("SEGMENTBRANCHNAME")
                         PARA9.Value = row("SHIPPERSCODE")
                         PARA10.Value = row("SHIPPERSNAME")
                         PARA11.Value = row("QUANTITY")
@@ -1158,8 +1205,11 @@ Public Class OIT0008CostManagement
         SelSQLBldr.AppendLine("     , CHECKFLG")
         SelSQLBldr.AppendLine("     , CALCACCOUNT")
         SelSQLBldr.AppendLine("     , ACCOUNTCODE")
+        SelSQLBldr.AppendLine("     , ACCOUNTNAME")
         SelSQLBldr.AppendLine("     , SEGMENTCODE")
+        SelSQLBldr.AppendLine("     , SEGMENTNAME")
         SelSQLBldr.AppendLine("     , SEGMENTBRANCHCODE")
+        SelSQLBldr.AppendLine("     , SEGMENTBRANCHNAME")
         SelSQLBldr.AppendLine("     , SHIPPERSCODE")
         SelSQLBldr.AppendLine("     , SHIPPERSNAME")
         SelSQLBldr.AppendLine("     , QUANTITY")
@@ -1217,6 +1267,26 @@ Public Class OIT0008CostManagement
     End Function
 
     ''' <summary>
+    ''' 勘定科目パターン名称を勘定科目名/セグメント名/セグメント枝番名に分割する
+    ''' </summary>
+    ''' <param name="source"></param>
+    ''' <returns></returns>
+    Private Function ConvertAccountPatternName(ByVal source As String) As String()
+
+        Dim retStrs As String() = Nothing
+
+        '元文字列の最初の「(」を半角空白に変換
+        Dim repSource = Replace(source, "(", " ", 1, 1)
+        '元文字列の最後の「)」を除去
+        repSource = repSource.Substring(0, repSource.LastIndexOf(")"))
+        '変換した文字列を半角空白で分割
+        retStrs = repSource.Split(" ")
+
+        Return retStrs
+
+    End Function
+
+    ''' <summary>
     ''' 小計テーブル生成
     ''' </summary>
     Protected Sub CreateSubTotalTable()
@@ -1225,8 +1295,11 @@ Public Class OIT0008CostManagement
         OIT0008SubTotaltbl = New DataTable()
         '小計の集計キー：勘定科目コード/セグメント/セグメント枝番/請求先コード/支払先コード
         OIT0008SubTotaltbl.Columns.Add("ACCOUNTCODE", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("ACCOUNTNAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("SEGMENTNAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("SEGMENTBRANCHCODE", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("SEGMENTBRANCHNAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("INVOICECODE", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("INVOICENAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("INVOICEDEPTNAME", Type.GetType("System.String"))
@@ -1242,30 +1315,23 @@ Public Class OIT0008CostManagement
 
             Dim dataFound As Boolean = False
 
-            '勘定科目コードまたはセグメントが未設定の場合は無視
+            '勘定科目コード/セグメント/セグメント枝番のいずれか
+            '又は請求先/ 支払先コードの両方が未設定の場合は無視
             If String.IsNullOrEmpty(row("ACCOUNTCODE")) OrElse
                 String.IsNullOrEmpty(row("SEGMENTCODE")) OrElse
                 String.IsNullOrEmpty(row("SEGMENTBRANCHCODE")) OrElse
-                String.IsNullOrEmpty(row("INVOICECODE")) OrElse
-                String.IsNullOrEmpty(row("INVOICENAME")) OrElse
-                String.IsNullOrEmpty(row("INVOICEDEPTNAME")) OrElse
-                String.IsNullOrEmpty(row("PAYEECODE")) OrElse
-                String.IsNullOrEmpty(row("PAYEENAME")) OrElse
-                String.IsNullOrEmpty(row("PAYEEDEPTNAME")) Then
+                (String.IsNullOrEmpty(row("INVOICECODE")) AndAlso String.IsNullOrEmpty(row("PAYEECODE"))) Then
                 Continue For
             End If
 
             For Each strow As DataRow In OIT0008SubTotaltbl.Rows
-                '勘定科目コード、セグメントが一致する行が存在する場合、金額、税額をそれぞれ加算
+                '勘定科目コード/セグメント/請求先コード/支払先コードが一致する行が存在する場合
+                '金額、税額をそれぞれ加算
                 If row("ACCOUNTCODE") = strow("ACCOUNTCODE") AndAlso
                     row("SEGMENTCODE") = strow("SEGMENTCODE") AndAlso
                     row("SEGMENTBRANCHCODE") = strow("SEGMENTBRANCHCODE") AndAlso
                     row("INVOICECODE") = strow("INVOICECODE") AndAlso
-                    row("INVOICENAME") = strow("INVOICENAME") AndAlso
-                    row("INVOICEDEPTNAME") = strow("INVOICEDEPTNAME") AndAlso
-                    row("PAYEECODE") = strow("PAYEECODE") AndAlso
-                    row("PAYEENAME") = strow("PAYEENAME") AndAlso
-                    row("PAYEEDEPTNAME") = strow("PAYEEDEPTNAME") Then
+                    row("PAYEECODE") = strow("PAYEECODE") Then
 
                     If Not row("AMOUNT") Is DBNull.Value Then
                         strow("AMOUNT") += row("AMOUNT")
@@ -1283,8 +1349,23 @@ Public Class OIT0008CostManagement
                 Dim strow As DataRow = OIT0008SubTotaltbl.NewRow()
 
                 strow("ACCOUNTCODE") = row("ACCOUNTCODE")
+                strow("ACCOUNTNAME") = row("ACCOUNTNAME")
                 strow("SEGMENTCODE") = row("SEGMENTCODE")
+                strow("SEGMENTNAME") = row("SEGMENTNAME")
                 strow("SEGMENTBRANCHCODE") = row("SEGMENTBRANCHCODE")
+                strow("SEGMENTBRANCHNAME") = row("SEGMENTBRANCHNAME")
+
+                '勘定科目/セグメント/セグメント枝番名称取得
+                Dim WK_CODE As String = strow("ACCOUNTCODE") & " " & strow("SEGMENTCODE") & " " & strow("SEGMENTBRANCHCODE")
+                Dim WK_NAME As String = ""
+                CODENAME_get("ACCOUNTPATTERN", WK_CODE, WK_NAME, WW_RTN_SW)
+                If Not String.IsNullOrEmpty(WK_NAME) Then
+                    Dim names = ConvertAccountPatternName(WK_NAME)
+                    If names.Length > 0 Then strow("ACCOUNTNAME") = names(0)
+                    If names.Length > 1 Then strow("SEGMENTNAME") = names(1)
+                    If names.Length > 2 Then strow("SEGMENTBRANCHNAME") = names(2)
+                End If
+
                 strow("INVOICECODE") = row("INVOICECODE")
                 strow("INVOICENAME") = row("INVOICENAME")
                 strow("INVOICEDEPTNAME") = row("INVOICEDEPTNAME")
@@ -1406,8 +1487,11 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     , 0 AS CHECKFLG")
         InsBldr.AppendLine("     , TMP.CALCACCOUNT")
         InsBldr.AppendLine("     , TMP.ACCOUNTCODE")
+        InsBldr.AppendLine("     , TMP.ACCOUNTNAME")
         InsBldr.AppendLine("     , TMP.SEGMENTCODE")
+        InsBldr.AppendLine("     , TMP.SEGMENTNAME")
         InsBldr.AppendLine("     , TMP.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , TMP.SEGMENTBRANCHNAME")
         InsBldr.AppendLine("     , TMP.SHIPPERSCODE")
         InsBldr.AppendLine("     , TMP.SHIPPERSNAME")
         InsBldr.AppendLine("     , TMP.QUANTITY")
@@ -1427,8 +1511,11 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("         , @P02 AS KEIJYOYM")
         InsBldr.AppendLine("         , '1' AS CALCACCOUNT")
         InsBldr.AppendLine("         , ACCOUNTCODE")
+        InsBldr.AppendLine("         , ACCOUNTNAME")
         InsBldr.AppendLine("         , SEGMENTCODE")
+        InsBldr.AppendLine("         , SEGMENTNAME")
         InsBldr.AppendLine("         , BREAKDOWNCODE AS SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("         , BREAKDOWN AS SEGMENTBRANCHNAME")
         InsBldr.AppendLine("         , SHIPPERSCODE")
         InsBldr.AppendLine("         , SHIPPERSNAME")
         InsBldr.AppendLine("         , SUM(CARSAMOUNT) AS QUANTITY")
@@ -1449,8 +1536,11 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     GROUP BY")
         InsBldr.AppendLine("         OFFICECODE")
         InsBldr.AppendLine("         , ACCOUNTCODE")
+        InsBldr.AppendLine("         , ACCOUNTNAME")
         InsBldr.AppendLine("         , SEGMENTCODE")
+        InsBldr.AppendLine("         , SEGMENTNAME")
         InsBldr.AppendLine("         , BREAKDOWNCODE")
+        InsBldr.AppendLine("         , BREAKDOWN")
         InsBldr.AppendLine("         , SHIPPERSCODE")
         InsBldr.AppendLine("         , SHIPPERSNAME")
         InsBldr.AppendLine("         , INVOICECODE")
@@ -1464,12 +1554,19 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     ON  TMP.OFFICECODE = OIT0018.OFFICECODE")
         InsBldr.AppendLine("     AND TMP.KEIJYOYM = OIT0018.KEIJYOYM")
         InsBldr.AppendLine("     AND TMP.CALCACCOUNT = OIT0018.CALCACCOUNT")
-        InsBldr.AppendLine("     AND TMP.SEGMENTCODE = OIT0018.SEGMENTCODE")
         InsBldr.AppendLine("     AND TMP.ACCOUNTCODE = OIT0018.ACCOUNTCODE")
+        InsBldr.AppendLine("     AND TMP.ACCOUNTNAME = OIT0018.ACCOUNTNAME")
+        InsBldr.AppendLine("     AND TMP.SEGMENTCODE = OIT0018.SEGMENTCODE")
+        InsBldr.AppendLine("     AND TMP.SEGMENTNAME = OIT0018.SEGMENTNAME")
         InsBldr.AppendLine("     AND TMP.SEGMENTBRANCHCODE = OIT0018.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     AND TMP.SEGMENTBRANCHNAME = OIT0018.SEGMENTBRANCHNAME")
         InsBldr.AppendLine("     AND TMP.SHIPPERSCODE = OIT0018.SHIPPERSCODE")
         InsBldr.AppendLine("     AND TMP.INVOICECODE = OIT0018.INVOICECODE")
+        InsBldr.AppendLine("     AND TMP.INVOICENAME = OIT0018.INVOICENAME")
+        InsBldr.AppendLine("     AND TMP.INVOICEDEPTNAME = OIT0018.INVOICEDEPTNAME")
         InsBldr.AppendLine("     AND TMP.PAYEECODE = OIT0018.PAYEECODE")
+        InsBldr.AppendLine("     AND TMP.PAYEENAME = OIT0018.PAYEENAME")
+        InsBldr.AppendLine("     AND TMP.PAYEEDEPTNAME = OIT0018.PAYEEDEPTNAME")
         InsBldr.AppendLine(" ORDER BY")
         InsBldr.AppendLine("     LINE")
 
@@ -1479,35 +1576,38 @@ Public Class OIT0008CostManagement
         Dim InsBldr2 As StringBuilder = New StringBuilder
         InsBldr2.AppendLine(" INSERT INTO [oil].TMP0008_COST")
         InsBldr2.AppendLine(" SELECT")
-        InsBldr2.AppendLine("     OFFICECODE")
-        InsBldr2.AppendLine("     , KEIJYOYM")
-        InsBldr2.AppendLine("     , (SELECT MAX(LINE) FROM [oil].TMP0008_COST WHERE OFFICECODE = @P01 AND KEIJYOYM = @P02) + ROW_NUMBER() OVER(ORDER BY SEQ) AS LINE")
+        InsBldr2.AppendLine("     OIT0018.OFFICECODE")
+        InsBldr2.AppendLine("     , OIT0018.KEIJYOYM")
+        InsBldr2.AppendLine("     , ISNULL((SELECT MAX(LINE) FROM [oil].TMP0008_COST WHERE OFFICECODE = @P01 AND KEIJYOYM = @P02), 0) + ROW_NUMBER() OVER(ORDER BY OIT0018.SEQ) AS LINE")
         InsBldr2.AppendLine("     , 0 AS CHECKFLG")
-        InsBldr2.AppendLine("     , CALCACCOUNT")
-        InsBldr2.AppendLine("     , ACCOUNTCODE")
-        InsBldr2.AppendLine("     , SEGMENTCODE")
-        InsBldr2.AppendLine("     , SEGMENTBRANCHCODE")
-        InsBldr2.AppendLine("     , SHIPPERSCODE")
-        InsBldr2.AppendLine("     , SHIPPERSNAME")
-        InsBldr2.AppendLine("     , QUANTITY")
-        InsBldr2.AppendLine("     , UNITPRICE")
-        InsBldr2.AppendLine("     , AMOUNT")
-        InsBldr2.AppendLine("     , TAX")
-        InsBldr2.AppendLine("     , INVOICECODE")
-        InsBldr2.AppendLine("     , INVOICENAME")
-        InsBldr2.AppendLine("     , INVOICEDEPTNAME")
-        InsBldr2.AppendLine("     , PAYEECODE")
-        InsBldr2.AppendLine("     , PAYEENAME")
-        InsBldr2.AppendLine("     , PAYEEDEPTNAME")
-        InsBldr2.AppendLine("     , TEKIYOU")
+        InsBldr2.AppendLine("     , OIT0018.CALCACCOUNT")
+        InsBldr2.AppendLine("     , OIT0018.ACCOUNTCODE")
+        InsBldr2.AppendLine("     , OIT0018.ACCOUNTNAME")
+        InsBldr2.AppendLine("     , OIT0018.SEGMENTCODE")
+        InsBldr2.AppendLine("     , OIT0018.SEGMENTNAME")
+        InsBldr2.AppendLine("     , OIT0018.SEGMENTBRANCHCODE")
+        InsBldr2.AppendLine("     , OIT0018.SEGMENTBRANCHNAME")
+        InsBldr2.AppendLine("     , OIT0018.SHIPPERSCODE")
+        InsBldr2.AppendLine("     , OIT0018.SHIPPERSNAME")
+        InsBldr2.AppendLine("     , OIT0018.QUANTITY")
+        InsBldr2.AppendLine("     , OIT0018.UNITPRICE")
+        InsBldr2.AppendLine("     , OIT0018.AMOUNT")
+        InsBldr2.AppendLine("     , OIT0018.TAX")
+        InsBldr2.AppendLine("     , OIT0018.INVOICECODE")
+        InsBldr2.AppendLine("     , OIT0018.INVOICENAME")
+        InsBldr2.AppendLine("     , OIT0018.INVOICEDEPTNAME")
+        InsBldr2.AppendLine("     , OIT0018.PAYEECODE")
+        InsBldr2.AppendLine("     , OIT0018.PAYEENAME")
+        InsBldr2.AppendLine("     , OIT0018.PAYEEDEPTNAME")
+        InsBldr2.AppendLine("     , OIT0018.TEKIYOU")
         InsBldr2.AppendLine(" FROM")
-        InsBldr2.AppendLine("     [oil].OIT0018_COST")
+        InsBldr2.AppendLine("     [oil].OIT0018_COST AS OIT0018")
         InsBldr2.AppendLine(" WHERE")
-        InsBldr2.AppendLine("     CALCACCOUNT = '2'")
-        InsBldr2.AppendLine(" AND OFFICECODE = @P01")
-        InsBldr2.AppendLine(" AND KEIJYOYM = @P02")
+        InsBldr2.AppendLine("     OIT0018.CALCACCOUNT = '2'")
+        InsBldr2.AppendLine(" AND OIT0018.OFFICECODE = @P01")
+        InsBldr2.AppendLine(" AND OIT0018.KEIJYOYM = @P02")
         InsBldr2.AppendLine(" ORDER BY")
-        InsBldr2.AppendLine("     SEQ")
+        InsBldr2.AppendLine("     OIT0018.SEQ")
 
         Try
             Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon), InsCmd2 As New SqlCommand(InsBldr2.ToString(), SQLcon)
@@ -1688,8 +1788,11 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     , SEQ")
         InsBldr.AppendLine("     , CALCACCOUNT")
         InsBldr.AppendLine("     , ACCOUNTCODE")
+        InsBldr.AppendLine("     , ACCOUNTNAME")
         InsBldr.AppendLine("     , SEGMENTCODE")
+        InsBldr.AppendLine("     , SEGMENTNAME")
         InsBldr.AppendLine("     , SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , SEGMENTBRANCHNAME")
         InsBldr.AppendLine("     , SHIPPERSCODE")
         InsBldr.AppendLine("     , SHIPPERSNAME")
         InsBldr.AppendLine("     , QUANTITY")
@@ -1717,8 +1820,11 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     , ROW_NUMBER() OVER(ORDER BY LINE) AS SEQ")
         InsBldr.AppendLine("     , TMP0008.CALCACCOUNT")
         InsBldr.AppendLine("     , TMP0008.ACCOUNTCODE")
+        InsBldr.AppendLine("     , TMP0008.ACCOUNTNAME")
         InsBldr.AppendLine("     , TMP0008.SEGMENTCODE")
+        InsBldr.AppendLine("     , TMP0008.SEGMENTNAME")
         InsBldr.AppendLine("     , TMP0008.SEGMENTBRANCHCODE")
+        InsBldr.AppendLine("     , TMP0008.SEGMENTBRANCHNAME")
         InsBldr.AppendLine("     , TMP0008.SHIPPERSCODE")
         InsBldr.AppendLine("     , TMP0008.SHIPPERSNAME")
         InsBldr.AppendLine("     , TMP0008.QUANTITY")
@@ -1942,37 +2048,34 @@ Public Class OIT0008CostManagement
                 gvrow.Cells(2).CssClass = "footerCells noicon"
                 gvrow.Cells(2).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTCODE")
 
-                gvrow.Cells(3).CssClass = "footerCells money"
-                gvrow.Cells(3).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("AMOUNT"))
+                gvrow.Cells(3).CssClass = "footerCells noicon"
+                gvrow.Cells(3).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTBRANCHNAME")
 
                 gvrow.Cells(4).CssClass = "footerCells money"
-                gvrow.Cells(4).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("TAX"))
+                gvrow.Cells(4).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("AMOUNT"))
 
-                Dim cellindex As Integer = 4
+                gvrow.Cells(5).CssClass = "footerCells money"
+                gvrow.Cells(5).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("TAX"))
 
-                gvrow.Cells(cellindex + 1).CssClass = "footerCells withicon"
-                gvrow.Cells(cellindex + 1).Text = OIT0008SubTotaltbl.Rows(i)("invoicecode")
+                gvrow.Cells(6).CssClass = "footerCells withicon"
+                gvrow.Cells(6).Text = OIT0008SubTotaltbl.Rows(i)("invoicecode")
 
-                gvrow.Cells(cellindex + 2).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(cellindex + 2).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("INVOICENAME") + "</span>"
+                gvrow.Cells(7).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(7).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICENAME") + "</span>"
 
-                gvrow.Cells(cellindex + 3).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(cellindex + 3).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("INVOICEDEPTNAME") + "</span>"
+                gvrow.Cells(8).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(8).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICEDEPTNAME") + "</span>"
 
-                gvrow.Cells(cellindex + 4).CssClass = "footerCells withicon"
-                gvrow.Cells(cellindex + 4).Text = OIT0008SubTotaltbl.Rows(i)("PAYEECODE")
+                gvrow.Cells(9).CssClass = "footerCells withicon"
+                gvrow.Cells(9).Text = OIT0008SubTotaltbl.Rows(i)("PAYEECODE")
 
-                gvrow.Cells(cellindex + 5).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(cellindex + 5).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("PAYEENAME") + "</span>"
+                gvrow.Cells(10).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(10).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEENAME") + "</span>"
 
-                gvrow.Cells(cellindex + 6).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(cellindex + 6).Text = "<span class='inv_pay'>" +
-                    OIT0008SubTotaltbl.Rows(i)("PAYEEDEPTNAME") + "</span>"
+                gvrow.Cells(11).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(11).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEEDEPTNAME") + "</span>"
 
-                For j = cellindex + 7 To gvrow.Cells.Count - 1
+                For j = 12 To gvrow.Cells.Count - 1
                     gvrow.Cells(j).Visible = False
                 Next
 
@@ -1980,7 +2083,7 @@ Public Class OIT0008CostManagement
             Else                        '請求合計
                 '「請求合計」のスタイル設定
                 gvrow.Cells(0).CssClass = "footerCells text"
-                gvrow.Cells(0).ColumnSpan = 5
+                gvrow.Cells(0).ColumnSpan = 6
                 gvrow.Cells(0).Text = "請求合計"
 
                 gvrow.Cells(1).CssClass = "footerCells money"
@@ -2253,81 +2356,96 @@ Public Class OIT0008CostManagement
                 Dim WK_TextBox As TextBox = Nothing
                 Dim WK_Label As Label = Nothing
                 Dim WK_Hidden As HiddenField = Nothing
+
                 '勘定科目コード/セグメント/セグメント枝番
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_ACCOUNTCODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
 
-                    Dim accountCodes = WW_SelectValue.Split(" ")
+                    Dim patternCodes = WW_SelectValue.Split(" ")
+                    Dim patternNames = ConvertAccountPatternName(WW_SelectText)
+
                     '勘定科目コード
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE") IsNot Nothing Then
-                        WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox)
-                        If accountCodes.Length > 0 Then
-                            WK_TextBox.Text = accountCodes(0)
-                        End If
+                    WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox)
+                    If patternCodes.Length > 0 Then
+                        WK_TextBox.Text = patternCodes(0)
                     End If
-                    'セグメント/セグメント枝番
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE") IsNot Nothing Then
-                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label)
-                        If accountCodes.Length > 1 Then
-                            WK_Label.Text = accountCodes(1)
-                        End If
-                        WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField)
-                        If accountCodes.Length > 2 Then
-                            WK_Hidden.Value = accountCodes(2)
-                        End If
+
+                    '勘定科目名
+                    WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTNAME"), HiddenField)
+                    If patternNames.Length > 0 Then
+                        WK_Hidden.Value = patternNames(0)
+                    End If
+
+                    'セグメント
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label)
+                    If patternCodes.Length > 1 Then
+                        WK_Label.Text = patternCodes(1)
+                    End If
+
+                    'セグメント名
+                    WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTNAME"), HiddenField)
+                    If patternNames.Length > 1 Then
+                        WK_Hidden.Value = patternNames(1)
+                    End If
+
+                    'セグメント枝番
+                    WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField)
+                    If patternCodes.Length > 2 Then
+                        WK_Hidden.Value = patternCodes(2)
+                    End If
+
+                    'セグメント枝番名
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHNAME"), Label)
+                    If patternNames.Length > 2 Then
+                        WK_Label.Text = patternNames(2)
                     End If
                 End If
-                '請求先コード
+
+                '請求先
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE") IsNot Nothing Then
-                        WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
-                        WK_TextBox.Text = WW_SelectValue
-                    End If
-                    '請求先名
                     Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME") IsNot Nothing Then
-                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
-                        If WK_TORI_DEPAT_TEXT.Length > 0 Then
-                            WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
-                        Else
-                            WK_Label.Text = WW_SelectText
-                        End If
 
+                    '請求先コード
+                    WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox)
+                    WK_TextBox.Text = WW_SelectValue
+
+                    '請求先名
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label)
+                    If WK_TORI_DEPAT_TEXT.Length > 0 Then
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                    Else
+                        WK_Label.Text = WW_SelectText
                     End If
+
                     '請求先部門
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME") IsNot Nothing Then
-                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
-                        If WK_TORI_DEPAT_TEXT.Length > 1 Then
-                            WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
-                        End If
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label)
+                    If WK_TORI_DEPAT_TEXT.Length > 1 Then
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
                     End If
                 End If
-                '支払先コード
+
+                '支払先
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_PAYEECODE") Then
                     Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
-
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE") IsNot Nothing Then
-                        WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
-                        WK_TextBox.Text = WW_SelectValue
-                    End If
-                    '支払先名
                     Dim WK_TORI_DEPAT_TEXT = WW_SelectText.Split(" ")
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME") IsNot Nothing Then
-                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
-                        If WK_TORI_DEPAT_TEXT.Length > 0 Then
-                            WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
-                        Else
-                            WK_Label.Text = WW_SelectText
-                        End If
+
+                    '支払先コード
+                    WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox)
+                    WK_TextBox.Text = WW_SelectValue
+
+                    '支払先名
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label)
+                    If WK_TORI_DEPAT_TEXT.Length > 0 Then
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(0)
+                    Else
+                        WK_Label.Text = WW_SelectText
                     End If
+
                     '支払先部門
-                    If WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME") IsNot Nothing Then
-                        WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
-                        If WK_TORI_DEPAT_TEXT.Length > 1 Then
-                            WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
-                        End If
+                    WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label)
+                    If WK_TORI_DEPAT_TEXT.Length > 1 Then
+                        WK_Label.Text = WK_TORI_DEPAT_TEXT(1)
                     End If
                 End If
 
@@ -2660,7 +2778,7 @@ Public Class OIT0008CostManagement
             WW_ERR_MES &= ControlChars.NewLine & "  --> # =" & OIT0008row("LINE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 勘定科目コード =" & OIT0008row("ACCOUNTCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント =" & OIT0008row("SEGMENTCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント枝番 =" & OIT0008row("SEGMENTBRANCHCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント枝番 =" & OIT0008row("SEGMENTBRANCHNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 金額 =" & OIT0008row("AMOUNT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 税額 =" & OIT0008row("TAX") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先コード =" & OIT0008row("INVOICECODE") & " , "

@@ -43,16 +43,14 @@ div.headerbox, div.detailbox {
 
 div.detailbox {
     height: calc(100% - 40px);
-    overflow-y: scroll;
 }
 
 div.detail_keijoym {
     width: 100%;
     box-sizing: border-box;
-    /*padding: 0.5em;*/
     display: inline-block;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
 div.detail_keijoym > :nth-child(5n+1) {
@@ -94,10 +92,12 @@ div.detail_keijoym > :nth-child(5n+5) {
 
 div.detail_costlist {
     box-sizing: border-box;
+    height: calc(100% - 149px);
     margin-top: 8px;
-    margin-bottom: 8px;
+    /*margin-bottom: 8px;*/
     margin-left: 20px;
     font-size: 0.9em;
+    overflow-y: scroll;
     overflow-x: scroll;
 }
 
@@ -146,17 +146,17 @@ div#RowOperationBox {
     margin-left: 2px;
 }
 
-    .btn-detail:hover {
-        background: #2bb6c1;
-        color: #fff;
-    }
+.btn-detail:hover {
+    background: #2bb6c1;
+    color: #fff;
+}
 
-    .btn-detail:disabled {
-        background-image: none;
-        background-color: #ccc;
-        border-color: #ccc;
-        color: #2bb6c1;
-    }
+.btn-detail:disabled {
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
 
 span#WF_COSTLISTTBL_LINE {
     padding-right:3px;
@@ -175,9 +175,14 @@ span.WF_COSTLISTTBL_CALCACCOUNT {
     display: inline-block;
 }
 
-input#WF_COSTLISTTBL_ACCOUNTCODE, input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
-    width: 130px;
+input#WF_COSTLISTTBL_ACCOUNTCODE {
+    width: 98px;
     padding-left:25px;
+}
+
+input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
+    width: 116px;
+    padding-left: 25px;
 }
 
 span#WF_COSTLISTTBL_SEGMENTCODE {
@@ -189,15 +194,29 @@ span#WF_COSTLISTTBL_SEGMENTCODE {
     display: inline-block;
 }
 
-input#WF_COSTLISTTBL_AMMOUNT {
+span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
+    padding-left: 2px;
+    text-align: left;
+    vertical-align: middle;
+    display: inline-block;
+    letter-spacing: 1px;
+    width: 208px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+input#WF_COSTLISTTBL_AMOUNT {
     width: 102px;
+    padding-right: 3px;
+    text-align: right;
 }
 
 span#WF_COSTLISTTBL_TAX {
     width: 94px;
-    padding-left: 3px;
+    padding-right: 3px;
     letter-spacing: 1px;
-    text-align: left;
+    text-align: right;
     vertical-align: middle;
     display: inline-block;
 }
@@ -250,6 +269,6 @@ span.inv_pay {
 }
 
 td.money {
-    padding-left: 3px;
-    text-align: left;
+    padding-right: 3px;
+    text-align: right;
 }

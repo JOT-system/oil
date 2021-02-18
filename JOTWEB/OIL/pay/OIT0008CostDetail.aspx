@@ -31,8 +31,6 @@
                         <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                         <input type="button" id="WF_ButtonPrint"  class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPrint');" />
                         <input type="button" id="WF_ButtonEND"    class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
-<%--                        <div                 id="WF_ButtonFIRST"  class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>--%>
-<%--                        <div                 id="WF_ButtonLAST"   class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
                     </div>
                 </div> <!-- End class=actionButtonBox -->
             </div> <!-- End class="Operation" -->
@@ -152,16 +150,18 @@
         <div class="detailbox" id="detailbox">
             <asp:GridView ID="WF_CONSIGNEELIST" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" ShowHeaderWhenEmpty="true" Visible="true" ShowFooter="true" CssClass="" GridLines="None" BorderWidth="0">
                 <Columns>
-                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="CONSIGNEECODE codeText AllBorder" FooterStyle-CssClass="NoneRightBorder">
-                        <HeaderTemplate>荷受人コード</HeaderTemplate>
+                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="CONSIGNEENAME codeText NoneTopAndBottomBorder" FooterStyle-CssClass="NoneRightBorder">
+                        <HeaderTemplate>荷受人</HeaderTemplate>
                         <ItemTemplate>
-                            <asp:Label ID="WF_NINUKELIST_CONSIGNEECODE" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEECODE")%>' />
+                            <asp:HiddenField ID="WF_NINUKELIST_CONSIGNEECODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEECODE")%>' />
+                            <asp:Label ID="WF_NINUKELIST_CONSIGNEENAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEENAME")%>' />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="CONSIGNEENAME codeText AllBorder" FooterStyle-CssClass="footerText NoneLeftBorder">
-                        <HeaderTemplate>荷受人名</HeaderTemplate>
+                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="OILNAME codeText AllBorder" FooterStyle-CssClass="footerText NoneLeftBorder">
+                        <HeaderTemplate>油種</HeaderTemplate>
                         <ItemTemplate>
-                            <asp:Label ID="WF_NINUKELIST_CONSIGNEENAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEENAME")%>' />
+                            <asp:HiddenField ID="WF_NINUKELIST_OILCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "OILCODE")%>' />
+                            <asp:Label ID="WF_NINUKELIST_OILNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "OILNAME")%>' />
                         </ItemTemplate>
                         <FooterTemplate>
                             <span class="footerColName">請求額</span>

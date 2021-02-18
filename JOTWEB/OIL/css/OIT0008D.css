@@ -108,31 +108,40 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     padding-top: 10px;
     padding-left: 20px;
     padding-bottom: 10px;
+    overflow-y: scroll
 }
 
 /*table#WF_CONSIGNEELIST > tbody > tr > td {
     min-width:170px;
 }*/
 
-table#WF_CONSIGNEELIST td.CONSIGNEECODE {
-    min-width: 128px;
+table#WF_CONSIGNEELIST > tbody > tr {
+    min-height: 22px;
 }
+
 table#WF_CONSIGNEELIST td.CONSIGNEENAME {
-    min-width: 256px;
+    min-width: 144px;
+}
+table#WF_CONSIGNEELIST td.OILNAME {
+    min-width: 96px;
 }
 table#WF_CONSIGNEELIST td.AMOUNT {
-    min-width: 143px;
+    min-width: 112px;
 }
 table#WF_CONSIGNEELIST td.TAX {
-    min-width: 101px;
+    min-width: 80px;
 }
 table#WF_CONSIGNEELIST td.TOTAL {
-    min-width: 182px;
+    min-width: 144px;
 }
 
 table#WF_CONSIGNEELIST td.codeText {
     text-align: left;
     padding-left: 5px;
+}
+
+table#WF_CONSIGNEELIST td.centerText {
+    text-align: center;
 }
 
 table#WF_CONSIGNEELIST td.moneyText {
@@ -148,6 +157,15 @@ table#WF_CONSIGNEELIST td.footerText {
 
 table#WF_CONSIGNEELIST th.AllBorder, table#WF_CONSIGNEELIST td.AllBorder {
     border: solid 1px #2bb6c1;
+}
+
+table#WF_CONSIGNEELIST th.NoneRightBorder, table#WF_CONSIGNEELIST td.NoneTopAndBottomBorder {
+    border-style: solid;
+    border-color: #2bb6c1;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 1px;
+    border-right-width: 1px;
 }
 
 table#WF_CONSIGNEELIST th.NoneRightBorder, table#WF_CONSIGNEELIST td.NoneRightBorder {

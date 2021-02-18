@@ -1338,6 +1338,7 @@ Public Structure CS0023XLSUPLOAD
 
         '★セルの内容を取得
         'Dim sCellAgoBehind() As String = {"", ""}
+        Dim sCellOffice() As String = {"", "", ""}
         Dim sCellTitle() As String = {"", ""}
         Dim sCellFooter() As String = {"", "", ""}
 
@@ -1349,6 +1350,21 @@ Public Structure CS0023XLSUPLOAD
             ''　前から
             'rng = oSheet.Range("H2")
             'sCellAgoBehind(1) = rng.Text.ToString()
+            '　営業所
+            rng = oSheet.Range("A2")
+            sCellOffice(1) = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
+            Select Case sCellOffice(1)
+                Case "五井営業所"
+                    sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011201
+                    sCellOffice(2) = "浜五井"
+                Case "甲子営業所"
+                    sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011202
+                    sCellOffice(2) = "甲子"
+                Case "袖ヶ浦営業所"
+                    sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011203
+                    sCellOffice(2) = "北袖"
+            End Select
             '　日付
             rng = oSheet.Range("D4")
             sCellTitle(0) = rng.Text.ToString()
@@ -1384,6 +1400,9 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("FILENAME") = excelFileName
                 dt.Rows(i)("AGOBEHINDFLG") = ""
                 dt.Rows(i)("REGISTRATIONDATE") = sCellTitle(0)
+                dt.Rows(i)("TARGETOFFICECODE") = sCellOffice(0)
+                dt.Rows(i)("TARGETOFFICENAME") = sCellOffice(1)
+                dt.Rows(i)("TARGETSTATIONNAME") = sCellOffice(2)
                 dt.Rows(i)("TRAINNO") = sCellTitle(1)
                 dt.Rows(i)("CONVENTIONAL") = ""
                 dt.Rows(i)("CONVENTIONALTIME") = ""
@@ -1963,6 +1982,9 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("FILENAME", Type.GetType("System.String"))
         dt.Columns.Add("AGOBEHINDFLG", Type.GetType("System.String"))
         dt.Columns.Add("REGISTRATIONDATE", Type.GetType("System.String"))
+        dt.Columns.Add("TARGETOFFICECODE", Type.GetType("System.String"))
+        dt.Columns.Add("TARGETOFFICENAME", Type.GetType("System.String"))
+        dt.Columns.Add("TARGETSTATIONNAME", Type.GetType("System.String"))
         dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("CONVENTIONAL", Type.GetType("System.String"))
         dt.Columns.Add("CONVENTIONALTIME", Type.GetType("System.String"))

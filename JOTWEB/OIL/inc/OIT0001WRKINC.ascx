@@ -80,6 +80,8 @@
 
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
+    <!-- 空回日報取込データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_OTRECEIVETBL" runat="server"></asp:TextBox>
     <!-- 荷主コード -->
     <asp:TextBox ID="WF_SEL_SHIPPERSCODE" runat="server"></asp:TextBox>
     <!-- 荷主名 -->

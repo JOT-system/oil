@@ -1166,7 +1166,7 @@ Public Class OIT0003OTLinkageList
 
         '★共通SQL
         Dim SQLStrCmn As String =
-              " , OIT0002.ORDERNO                                AS ORDERNO" _
+              " , OIT0003.ORDERNO                                AS ORDERNO" _
             & " , OIT0003.DETAILNO                               AS DETAILNO" _
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
@@ -1214,11 +1214,18 @@ Public Class OIT0003OTLinkageList
         SQLStrAri &=
               SQLStrCmn _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
-            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & " AND OIT0003.DELFLG <> @P02 " _
             & " AND OIT0003.STACKINGFLG = '1' " _
-            & " AND OIT0003.ACTUALLODDATE >= @P03 "
+            & " AND FORMAT(OIT0003.ACTUALLODDATE,'yyyy/MM') = @P05 "
+        'SQLStrAri &=
+        '      SQLStrCmn _
+        '    & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        '    & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+        '    & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+        '    & " AND OIT0003.DELFLG <> @P02 " _
+        '    & " AND OIT0003.STACKINGFLG = '1' " _
+        '    & " AND OIT0003.ACTUALLODDATE >= @P03 "
 
         '★共通SQL
         SQLStrCmn =
@@ -1288,7 +1295,8 @@ Public Class OIT0003OTLinkageList
         SQLStrNashi &=
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
-            & "         OR OIT0002.DEPDATE     >= @TODAY) "
+            & "         OR OIT0002.DEPDATE     >= @TODAY) " _
+            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _
@@ -1315,12 +1323,14 @@ Public Class OIT0003OTLinkageList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '積込日(年月)
                 Dim PARATODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '積込日
                 'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+                PARA05.Value = Format(Now.AddDays(1), "yyyy/MM")
                 PARATODAY.Value = Format(Now, "yyyy/MM/dd")
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
@@ -1342,8 +1352,8 @@ Public Class OIT0003OTLinkageList
                 Dim i As Integer = 0
                 Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
                 For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
-                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) AndAlso
-                                                                       Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
+                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) 'AndAlso
+                    'Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
                     If qHasSelectedRow.Any Then
                         Dim newDr As DataRow = OIT0003CsvOTLinkagetbl.NewRow
                         For Each col As DataColumn In wrkDt.Columns

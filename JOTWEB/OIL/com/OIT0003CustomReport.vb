@@ -309,22 +309,24 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("CONSIGNEENAME")
                 ExcelMemoryRelease(rngDetailArea)
+                '◯ 積込回数
+                '### 出力項目（空白） #####################################
                 '◯ 積込ポイント
                 '### 出力項目（空白） #####################################
                 '◯ 油種
-                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 型式
-                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("MODEL")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 車番
-                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("TANKNUMBER")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 予約数量
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("RESERVEAMOUNT")
                 ExcelMemoryRelease(rngDetailArea)
                 ''◯ 交検
@@ -332,19 +334,17 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 'rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
                 'ExcelMemoryRelease(rngDetailArea)
                 '◯ 積置
-                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("STACKING").ToString().Replace("　", "")
                 ExcelMemoryRelease(rngDetailArea)
                 '◯ 列車№
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
                 If officeCode = BaseDllConst.CONST_OFFICECODE_011201 Then
                     rngDetailArea.Value = PrintDatarow("OTTRAINNO")
                 Else
                     rngDetailArea.Value = PrintDatarow("TRAINNO")
                 End If
                 ExcelMemoryRelease(rngDetailArea)
-                '◯ 積込回数
-                '### 出力項目（空白） #####################################
                 '◯ 発日(予定)
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("DEPDATE")

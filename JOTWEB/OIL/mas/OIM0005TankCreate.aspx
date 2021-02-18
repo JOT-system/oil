@@ -322,7 +322,7 @@
 
                     <!-- 運用基地C -->
                     <span class="ef">
-                        <asp:Label ID="WF_OPERATIONBASECODE_L" runat="server" Text="運用基地C"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <asp:Label ID="WF_OPERATIONBASECODE_L" runat="server" Text="運用基地C"  CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_OPERATIONBASECODE', <%=LIST_BOX_CLASSIFICATION.LC_BASE%>);" onchange="TextBox_change('WF_OPERATIONBASECODE');">
                             <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
@@ -501,7 +501,7 @@
                 <p id="KEY_LINE_24">
                     <!-- 車籍編入年月日 -->
                     <span class="ef">
-                        <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日"  CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_TRANSFERDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                             <asp:TextBox ID="WF_TRANSFERDATE" runat="server"  CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
                         </span>

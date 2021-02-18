@@ -3133,8 +3133,9 @@ Public Class OIS0001UserCreate
                         OIS0001row("SORTNO24") = OIS0001INProw("SORTNO24") AndAlso
                         OIS0001row("OUTPUTID25") = OIS0001INProw("OUTPUTID25") AndAlso
                         OIS0001row("ONOFF25") = OIS0001INProw("ONOFF25") AndAlso
-                        OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") AndAlso
-                        OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") Then
+
+                        OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
                         OIS0001INProw("OPERATION") = CONST_UPDATE
@@ -3287,23 +3288,23 @@ Public Class OIS0001UserCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール
-                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    prmData = work.CreateRoleList(WF_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MAP"         '画面参照更新制御ロール
-                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    prmData = work.CreateRoleList(WF_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "VIEW"         '画面表示項目制御ロール
-                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    prmData = work.CreateRoleList(WF_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "XML"         'エクセル出力制御ロール
-                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    prmData = work.CreateRoleList(WF_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "APPROVAL"         '承認権限ロール
-                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    prmData = work.CreateRoleList(WF_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "OUTPUTID"         '情報出力ID

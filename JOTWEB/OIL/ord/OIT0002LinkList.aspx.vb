@@ -1947,6 +1947,21 @@ Public Class OIT0002LinkList
             & "    , ISNULL(RTRIM(OIT0011.ORDERNO), '')  AS ORDERNO " _
             & "    , ISNULL(RTRIM(OIT0011.DETAILNO), '') AS DETAILNO " _
             & "    , ISNULL(RTRIM(OIT0011.TRUCKNO), '')  AS TRUCKNO " _
+            & "    , OIT0011.SERIALNUMBER                AS SERIALNUMBER " _
+            & "    , OIT0011.OBJECTIVENAME               AS OBJECTIVENAME " _
+            & "    , OIT0011.DAILYREPORTCODE             AS DAILYREPORTCODE " _
+            & "    , OIT0011.DAILYREPORTOILNAME          AS DAILYREPORTOILNAME " _
+            & "    , OIT0011.OILNAME                     AS OILNAME " _
+            & "    , OIT0011.LINE                        AS LINE " _
+            & "    , OIT0011.POSITION                    AS POSITION " _
+            & "    , OIT0011.INLINETRAIN                 AS INLINETRAIN " _
+            & "    , OIT0011.LOADARRSTATION              AS LOADARRSTATION " _
+            & "    , OIT0011.LOADINGKTRAINNO             AS LOADINGKTRAINNO " _
+            & "    , OIT0011.LOADINGTRAINNO              AS LOADINGTRAINNO " _
+            & "    , OIT0011.LOADINGLODDATE              AS LOADINGLODDATE " _
+            & "    , OIT0011.LOADINGDEPDATE              AS LOADINGDEPDATE " _
+            & "    , OIT0011.FORWARDINGARRSTATION        AS FORWARDINGARRSTATION " _
+            & "    , OIT0011.FORWARDINGCONFIGURE         AS FORWARDINGCONFIGURE " _
             & "    , OIT0002.TRAINNO                     AS TRAINNO " _
             & "    , OIT0002.LODDATE                     AS LODDATE " _
             & "    , OIT0002.DEPDATE                     AS DEPDATE " _
@@ -2005,6 +2020,31 @@ Public Class OIT0002LinkList
                     Next
                     SQLDel2cmd.Dispose()
 
+                    '★貨車連結表(臨海)TBLに保持している内容を引き継ぐ
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("TRUCKNO<>''")
+                        '★アップロード対象の営業所(対象の駅)の場合は引き継ぐ必要ないのでSKIP
+                        If OIT0002ExlUProw("TARGETSTATIONNAME") = OIT0002ExlUProw("ARRSTATIONNAME") Then Continue For
+                        For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
+                            If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") Then
+                                OIT0002ExlUProw("OBJECTIVENAME") = OIT0002Exlrow("OBJECTIVENAME")
+                                OIT0002ExlUProw("DAILYREPORTCODE") = OIT0002Exlrow("DAILYREPORTCODE")
+                                OIT0002ExlUProw("DAILYREPORTOILNAME") = OIT0002Exlrow("DAILYREPORTOILNAME")
+                                OIT0002ExlUProw("OILNAME") = OIT0002Exlrow("OILNAME")
+                                OIT0002ExlUProw("LINE") = OIT0002Exlrow("LINE")
+                                OIT0002ExlUProw("POSITION") = OIT0002Exlrow("POSITION")
+                                OIT0002ExlUProw("INLINETRAIN") = OIT0002Exlrow("INLINETRAIN")
+                                OIT0002ExlUProw("LOADARRSTATION") = OIT0002Exlrow("LOADARRSTATION")
+                                OIT0002ExlUProw("LOADINGKTRAINNO") = OIT0002Exlrow("LOADINGKTRAINNO")
+                                OIT0002ExlUProw("LOADINGTRAINNO") = OIT0002Exlrow("LOADINGTRAINNO")
+                                OIT0002ExlUProw("LOADINGLODDATE") = OIT0002Exlrow("LOADINGLODDATE")
+                                OIT0002ExlUProw("LOADINGDEPDATE") = OIT0002Exlrow("LOADINGDEPDATE")
+                                OIT0002ExlUProw("FORWARDINGARRSTATION") = OIT0002Exlrow("FORWARDINGARRSTATION")
+                                OIT0002ExlUProw("FORWARDINGCONFIGURE") = OIT0002Exlrow("FORWARDINGCONFIGURE")
+                                Exit For
+                            End If
+                        Next
+                    Next
+
                     '★受注No、受注明細Noの引継ぎ処理
                     OIT0002EXLUPtbl.Columns.Add("ORDERNO", Type.GetType("System.String"))
                     OIT0002EXLUPtbl.Columns.Add("DETAILNO", Type.GetType("System.String"))
@@ -2025,16 +2065,17 @@ Public Class OIT0002LinkList
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
                                     OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
                                 ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
-
+                                    OIT0002ExlUProw("ORDERSTATUS") = ""
                                     '★前回登録した受注明細の内容が今回とで変更されている場合
                                     '　前回登録した受注明細のデータの中身を消去する。
                                     WW_UpdateOrderInfoStatus(SQLcon, I_TYPE:="ERASURE", OIT0002row:=OIT0002Exlrow)
 
                                     '★"1"変更あり(デフォルトは""(変更なし))
                                     OIT0002ExlUProw("CREATEFLAG") = "1"
-
                                 End If
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
+                            Else
+                                OIT0002ExlUProw("ORDERSTATUS") = ""
                             End If
                         Next
                     Next
@@ -5575,8 +5616,8 @@ Public Class OIT0002LinkList
 
                     For Each OIT0002EXLCHKrow As DataRow In OIT0002EXLCHKtbl.Select(Nothing, "TSUMI")
                         '★発駅・着駅が異なる場合はSKIP
-                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") _
-                            AndAlso OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("DEPSTATIONCODE") Then Continue For
+                        If OIT0002EXLCHKrow("DEPSTATIONNAME") <> OIT0002EXLUProw("ARRSTATIONNAME") Then Continue For
+                        If OIT0002EXLCHKrow("ARRSTATIONCODE") <> OIT0002EXLUProw("LOADARRSTATIONCODE") Then Continue For
 
                         ''★甲子営業所の場合は、チェック不要と判断し一旦SKIP
                         'If OIT0002EXLUProw("ARRSTATIONCODE") = "434105" Then Continue For
@@ -5643,6 +5684,17 @@ Public Class OIT0002LinkList
 
                 WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, C_MESSAGE_NO.OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE)
                 O_RTN = "ERR"
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    '★貨車連結表(臨海)TBLに登録している、受注Noと明細Noを初期化
+                    For Each OIT0002ExlUPInirow As DataRow In OIT0002EXLUPtbl.Select("ORDERNO<>''")
+                        OIT0002ExlUPInirow("ORDERNO") = ""
+                        OIT0002ExlUPInirow("DETAILNO") = ""
+                        WW_UpdateRLinkOrderNo(SQLcon, OIT0002ExlUPInirow)
+                    Next
+                End Using
+
                 Exit Sub
             End If
         Next
@@ -5676,16 +5728,16 @@ Public Class OIT0002LinkList
             '　または、(運用指示)積込後の着駅が設定されている
             '　または、(ポラリス必須)積込日が設定されている
             '　または、(ポラリス必須)発日が設定されている
-            If OIT0002ExlUProw("LOADINGTRAINNO") = "" AndAlso
-                    (OIT0002ExlUProw("OILNAME") <> "" _
-                     OrElse OIT0002ExlUProw("LINE") <> "" _
-                     OrElse OIT0002ExlUProw("POSITION") <> "" _
-                     OrElse OIT0002ExlUProw("INLINETRAIN") <> "" _
-                     OrElse OIT0002ExlUProw("LOADARRSTATION") <> "" _
-                     OrElse OIT0002ExlUProw("LOADINGLODDATE") <> "" _
-                     OrElse OIT0002ExlUProw("LOADINGDEPDATE") <> "") Then
+            If Convert.ToString(OIT0002ExlUProw("LOADINGTRAINNO")) = "" AndAlso
+                    (Convert.ToString(OIT0002ExlUProw("OILNAME")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("LINE")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("POSITION")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("INLINETRAIN")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("LOADINGLODDATE")) <> "" _
+                     OrElse Convert.ToString(OIT0002ExlUProw("LOADINGDEPDATE")) <> "") Then
 
-                If OIT0002ExlUProw("ARTICLENAME") = WW_Kensa Then
+                If Convert.ToString(OIT0002ExlUProw("ARTICLENAME")) = WW_Kensa Then
                     WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(2))
                     Continue For
                 Else
@@ -5699,7 +5751,7 @@ Public Class OIT0002LinkList
             '★(運用指示)油種と(受注登録用)油種が不一致
             If OIT0002ExlUProw("OILNAME").ToString() <> OIT0002ExlUProw("ORDERINGOILNAME").ToString() Then
 
-                If OIT0002ExlUProw("ARTICLENAME") = WW_Kensa Then
+                If Convert.ToString(OIT0002ExlUProw("ARTICLENAME")) = WW_Kensa Then
                     WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(2))
                     Continue For
                 Else

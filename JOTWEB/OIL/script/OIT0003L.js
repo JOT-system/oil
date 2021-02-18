@@ -221,10 +221,14 @@ function reportRadioButton() {
     // ### 20201106 END   OT積込指示(月末)対応 ##################################
 
     let chkObj3 = document.getElementById('rbTankDispatchBtn');
-    let chkObj3_2 = document.getElementById('rbActualShipBtn');
-    let chkObj3_3 = document.getElementById('rbConcatOederBtn');
+    let chkObj3_2 = document.getElementById('rbTankDispatch30Btn');
+    let chkObj3_3 = document.getElementById('rbTankDispatch40Btn');
+    let chkObj3_4 = document.getElementById('rbTankDispatch54Btn');
+    let chkObj3_5 = document.getElementById('rbActualShipBtn');
+    let chkObj3_6 = document.getElementById('rbConcatOederBtn');
     let txtObj3 = document.getElementById('divTrainNo'); //←表示非表示切替用
 
+    document.getElementById('txtReportTrainNo').value = ''
     let isVisitTxtObj3 = false
     if (chkObj3 !== null) {
         isVisitTxtObj3 = chkObj3.checked | isVisitTxtObj3
@@ -234,6 +238,16 @@ function reportRadioButton() {
     }
     if (chkObj3_3 !== null) {
         isVisitTxtObj3 = chkObj3_3.checked | isVisitTxtObj3
+    }
+    if (chkObj3_4 !== null) {
+        isVisitTxtObj3 = chkObj3_4.checked | isVisitTxtObj3
+    }
+    if (chkObj3_5 !== null) {
+        isVisitTxtObj3 = chkObj3_5.checked | isVisitTxtObj3
+    }
+    if (chkObj3_6 !== null) {
+        isVisitTxtObj3 = chkObj3_6.checked | isVisitTxtObj3
+        document.getElementById('txtReportTrainNo').value = '5461'
     }
     
     if (isVisitTxtObj3) {

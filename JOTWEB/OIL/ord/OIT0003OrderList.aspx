@@ -183,7 +183,7 @@
                 <asp:RadioButton ID="rbKuukaiBtn" runat="server" GroupName="WF_SW" Text="空回日報" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示書" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbOTLoadBtn" runat="server" GroupName="WF_SW" Text="OT積込指示" onclick="reportRadioButton();" />

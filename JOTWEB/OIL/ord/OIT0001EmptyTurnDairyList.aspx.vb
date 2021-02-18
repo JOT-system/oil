@@ -20,7 +20,8 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
-    Private OIT0001OTOrdertbl As DataTable                        'OT空回日報取込用テーブル
+    Private OIT0001OTOrdertbl As DataTable                          'OT空回日報(OT受注TBL)取込用テーブル
+    Private OIT0001OTDetailtbl As DataTable                         'OT空回日報(OT受注明細TBL)取込用テーブル
     Private OIT0001CHKOrdertbl As DataTable                         '受注TBLチェック用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
@@ -776,6 +777,16 @@ Public Class OIT0001EmptyTurnDairyList
             WW_GetOTOrderData(SQLcon)
         End Using
 
+        '○ OT受注データ⇒受注データに追加
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '★OT受注TBL⇒受注TBLへ追加(すでに登録済みの場合は追加しない)
+            WW_InsertOrder(SQLcon)
+            '★OT受注明細TBL⇒受注明細TBLへ追加(すでに登録済みの場合は追加しない)
+            WW_InsertOrderDetail(SQLcon)
+        End Using
+
     End Sub
 
     ''' <summary>
@@ -1290,7 +1301,7 @@ Public Class OIT0001EmptyTurnDairyList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_GetOTOrderData(ByVal SQLcon As SqlConnection)
-        '○OT空回日報取込用
+        '○OT空回日報取込用(OT受注TBL)
         If IsNothing(OIT0001OTOrdertbl) Then
             OIT0001OTOrdertbl = New DataTable
         End If
@@ -1485,16 +1496,121 @@ Public Class OIT0001EmptyTurnDairyList
 
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L ChkOTReceiveData")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L GetOTOrderData")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0001L ChkOTReceiveData"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L GetOTOrderData"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' OT受注TBL⇒受注TBLへ追加
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_InsertOrder(ByVal SQLcon As SqlConnection)
+        Try
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L_InsertOrder")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L_InsertOrder"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' OT受注明細TBL⇒受注明細TBLへ追加
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_InsertOrderDetail(ByVal SQLcon As SqlConnection)
+        Try
+            '追加SQL文･･･受注TBL追加
+            Dim SQLStr As String =
+                  " INSERT INTO OIL.OIT0002_ORDER " _
+                & " ( ORDERNO         , TRAINNO             , TRAINNAME      , ORDERYMD      , OFFICECODE      , OFFICENAME" _
+                & " , ORDERTYPE       , SHIPPERSCODE        , SHIPPERSNAME   , BASECODE      , BASENAME" _
+                & " , CONSIGNEECODE   , CONSIGNEENAME       , DEPSTATION     , DEPSTATIONNAME" _
+                & " , ARRSTATION      , ARRSTATIONNAME      , RETSTATION     , RETSTATIONNAME" _
+                & " , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS    , ORDERINFO" _
+                & " , EMPTYTURNFLG    , STACKINGFLG         , USEPROPRIETYFLG, CONTACTFLG    , RESULTFLG" _
+                & " , DELIVERYFLG     , DELIVERYCOUNT" _
+                & " , LODDATE         , DEPDATE             , ARRDATE        , ACCDATE       , EMPARRDATE" _
+                & " , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE  , ACTUALACCDATE , ACTUALEMPARRDATE" _
+                & " , RTANK           , HTANK               , TTANK          , MTTANK        , KTANK" _
+                & " , K3TANK          , K5TANK              , K10TANK        , LTANK         , ATANK" _
+                & " , OTHER1OTANK     , OTHER2OTANK         , OTHER3OTANK    , OTHER4OTANK   , OTHER5OTANK" _
+                & " , OTHER6OTANK     , OTHER7OTANK         , OTHER8OTANK    , OTHER9OTANK   , OTHER10OTANK    , TOTALTANK" _
+                & " , RTANKCH,HTANKCH , TTANKCH             , MTTANKCH       , KTANKCH       , K3TANKCH" _
+                & " , K5TANKCH        , K10TANKCH           , LTANKCH        , ATANKCH" _
+                & " , OTHER1OTANKCH   , OTHER2OTANKCH       , OTHER3OTANKCH  , OTHER4OTANKCH , OTHER5OTANKCH" _
+                & " , OTHER6OTANKCH   , OTHER7OTANKCH       , OTHER8OTANKCH  , OTHER9OTANKCH , OTHER10OTANKCH  , TOTALTANKCH" _
+                & " , TANKLINKNO      , TANKLINKNOMADE      , BILLINGNO      , KEIJYOYMD" _
+                & " , SALSE           , SALSETAX            , TOTALSALSE" _
+                & " , PAYMENT         , PAYMENTTAX          , TOTALPAYMENT" _
+                & " , OTFILENAME      , RECEIVECOUNT        , OTSENDSTATUS   , RESERVEDSTATUS" _
+                & " , TAKUSOUSTATUS   , BTRAINNO            , BTRAINNAME     , ANASYORIFLG   , DELFLG" _
+                & " , INITYMD         , INITUSER            , INITTERMID" _
+                & " , UPDYMD          , UPDUSER             , UPDTERMID      , RECEIVEYMD    , UPDTIMSTP)"
+
+            SQLStr &=
+                  " VALUES" _
+                & " ( @ORDERNO         , @TRAINNO             , @TRAINNAME      , @ORDERYMD      , @OFFICECODE      , @OFFICENAME" _
+                & " , @ORDERTYPE       , @SHIPPERSCODE        , @SHIPPERSNAME   , @BASECODE      , @BASENAME" _
+                & " , @CONSIGNEECODE   , @CONSIGNEENAME       , @DEPSTATION     , @DEPSTATIONNAME" _
+                & " , @ARRSTATION      , @ARRSTATIONNAME      , @RETSTATION     , @RETSTATIONNAME" _
+                & " , @CHANGERETSTATION, @CHANGERETSTATIONNAME, @ORDERSTATUS    , @ORDERINFO" _
+                & " , @EMPTYTURNFLG    , @STACKINGFLG         , @USEPROPRIETYFLG, @CONTACTFLG    , @RESULTFLG" _
+                & " , @DELIVERYFLG     , @DELIVERYCOUNT" _
+                & " , @LODDATE         , @DEPDATE             , @ARRDATE        , @ACCDATE       , @EMPARRDATE" _
+                & " , @ACTUALLODDATE   , @ACTUALDEPDATE       , @ACTUALARRDATE  , @ACTUALACCDATE , @ACTUALEMPARRDATE" _
+                & " , @RTANK           , @HTANK               , @TTANK          , @MTTANK        , @KTANK" _
+                & " , @K3TANK          , @K5TANK              , @K10TANK        , @LTANK         , @ATANK" _
+                & " , @OTHER1OTANK     , @OTHER2OTANK         , @OTHER3OTANK    , @OTHER4OTANK   , @OTHER5OTANK" _
+                & " , @OTHER6OTANK     , @OTHER7OTANK         , @OTHER8OTANK    , @OTHER9OTANK   , @OTHER10OTANK    , @TOTALTANK" _
+                & " , @RTANKCH,HTANKCH , @TTANKCH             , @MTTANKCH       , @KTANKCH       , @K3TANKCH" _
+                & " , @K5TANKCH        , @K10TANKCH           , @LTANKCH        , @ATANKCH" _
+                & " , @OTHER1OTANKCH   , @OTHER2OTANKCH       , @OTHER3OTANKCH  , @OTHER4OTANKCH , @OTHER5OTANKCH" _
+                & " , @OTHER6OTANKCH   , @OTHER7OTANKCH       , @OTHER8OTANKCH  , @OTHER9OTANKCH , @OTHER10OTANKCH  , @TOTALTANKCH" _
+                & " , @TANKLINKNO      , @TANKLINKNOMADE      , @BILLINGNO      , @KEIJYOYMD" _
+                & " , @SALSE           , @SALSETAX            , @TOTALSALSE" _
+                & " , @PAYMENT         , @PAYMENTTAX          , @TOTALPAYMENT" _
+                & " , @OTFILENAME      , @RECEIVECOUNT        , @OTSENDSTATUS   , @RESERVEDSTATUS" _
+                & " , @TAKUSOUSTATUS   , @BTRAINNO            , @BTRAINNAME     , @ANASYORIFLG   , @DELFLG" _
+                & " , @INITYMD         , @INITUSER            , @INITTERMID" _
+                & " , @UPDYMD          , @UPDUSER             , @UPDTERMID      , @RECEIVEYMD    , @UPDTIMSTP)"
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L_InsertOrderDetail")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L_InsertOrderDetail"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
     End Sub
 
     ' ******************************************************************************

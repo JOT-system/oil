@@ -1523,7 +1523,7 @@ Public Class OIT0007FileInputList
         sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
         sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキタキ243000'")
+        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ243000'")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
         sqlStat.AppendLine("            ELSE '000000'")
         sqlStat.AppendLine("             END")

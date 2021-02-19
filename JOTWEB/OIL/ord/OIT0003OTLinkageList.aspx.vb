@@ -1616,7 +1616,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '1'          AS KINO_DATAKBN")
         sqlStat.AppendLine("     , ''           AS OUTPUTRESERVENO") '出力用予約番号(後続処理で番号を組み立てる）
         sqlStat.AppendLine("     , '2'          AS KINO_TOKUISAKICODE") '得意先コード（甲子）
-        sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社□□□□□'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
+        sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社　　　　　'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
         sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_KAI")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_POINT")
@@ -1646,7 +1646,11 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
         sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
         sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '0011'  ELSE '0012' END AS SEQ_UKEHARAI_CODE") 'シーケンスファイル受払い基地コード
-        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        'sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000'")
+        sqlStat.AppendLine("            ELSE format(ISNULL(LRV.RESERVEDQUANTITY,0) * 1000,'00000') ")
+        sqlStat.AppendLine("        END AS SEQ_ORDERAMOUNT")        'シーケンスファイルオーダー数量
+
         sqlStat.AppendLine("     , '1'           AS SEQ_TRANSWAY") 'シーケンスファイル輸送方法
         sqlStat.AppendLine("     , CASE WHEN TRA.TRAINCLASS = 'O'")
         sqlStat.AppendLine("                 THEN '023'")
@@ -1687,9 +1691,12 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
         sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
         sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
-        sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
+        sqlStat.AppendLine("     , TNK.LOAD") '甲子ソート用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
+        sqlStat.AppendLine("     , DET.STACKINGFLG") '甲子ソート用
+        sqlStat.AppendLine("     , PRI.PRIORITYNO") '甲子ソート用
+        sqlStat.AppendLine("     , ISNULL(TNK.TANKNUMBER,'0') AS TANKNUMBER_SORT") '甲子ソート用
         sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         '明細結合ここから↓
         sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
@@ -1749,6 +1756,13 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND CMICNV.KEYCODE02      = DET.SECONDCONSIGNEECODE")
         sqlStat.AppendLine("   AND CMICNV.DELFLG         = @DELFLG")
         '変換マスタ（荷受人（構内取））結合ここまで↑
+        '優先油種マスタ結合(ソート用PRIORITYNO取得用)のここから ↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0024_PRIORITY PRI")
+        sqlStat.AppendLine("    ON PRI.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND PRI.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND PRI.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND PRI.DELFLG         = @DELFLG")
+        '優先油種マスタ結合(ソート用PRIORITYNO取得用)ここまで ↑
         sqlStat.AppendLine(" WHERE ODR.ORDERSTATUS <= @ORDERSTATUS")
         sqlStat.AppendLine("   AND ODR.DELFLG       = @DELFLG")
         sqlStat.AppendFormat("   AND ODR.ORDERNO     IN({0})", selectedOrderNoInStat).AppendLine()
@@ -1791,11 +1805,19 @@ Public Class OIT0003OTLinkageList
                     maxReservedNo = "000"
                 End If
 
-                Dim sortedDt = From dr As DataRow In wrkDt 'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
                 Dim officeCode As String = ""
-                If sortedDt.Any Then
-                    officeCode = Convert.ToString(sortedDt.First.Item("OFFICECODE"))
+                If wrkDt IsNot Nothing AndAlso wrkDt.Rows.Count > 0 Then
+                    officeCode = Convert.ToString(wrkDt.Rows(0).Item("OFFICECODE"))
                 End If
+
+                Dim sortedDt = From dr As DataRow In wrkDt  'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 Then
+                    '甲子の場合ソート変更
+                    sortedDt = From dr As DataRow In wrkDt Order By Convert.ToString(dr("TRAINNO"))
+                   , Convert.ToString(dr("STACKINGFLG")) Descending, Convert.ToString(dr("SHIPPERSCODE"))
+                   , Convert.ToString(dr("PRIORITYNO")), Convert.ToString(dr("LOAD")), CDec(Convert.ToString(dr("TANKNUMBER_SORT")))
+                End If
+
                 For Each sortedDr As DataRow In sortedDt
                     Dim newDr As DataRow = OIT0003Reserved.NewRow
 

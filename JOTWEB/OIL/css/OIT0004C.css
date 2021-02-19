@@ -833,7 +833,7 @@ div.popUpContents > div {
     margin-top:calc(100% - 14px) !important;
 }
 /* 変更された情報を押えるテキストボックススタイル */
-input[type=text].modified {
+input[type=text].modified:not(:disabled) {
     background-color:blue;
     color:white;
 }

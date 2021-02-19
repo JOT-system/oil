@@ -1178,7 +1178,7 @@ Public Class OIT0003OTLinkageList
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
-            & " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
+            & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
             & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
@@ -1201,6 +1201,7 @@ Public Class OIT0003OTLinkageList
             & " , REPLACE (CONVERT(NCHAR (5), REPLACE(OIT0003.CARSAMOUNT,'.','')), SPACE (1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 "
+        '& " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
         '& " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
         '& " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
         '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN), SPACE (8))  AS OTDAILYDEPSTATIONN" _
@@ -1379,7 +1380,7 @@ Public Class OIT0003OTLinkageList
                 Next
 
                 '○項目の再設定
-                Dim OTSHIPPERC() As String = {"1", "4", "9"}
+                Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
@@ -1391,11 +1392,11 @@ Public Class OIT0003OTLinkageList
                         Select Case Convert.ToString(OIT0003row("SHIPPERSCODE"))
                             '★コスモの場合
                             Case BaseDllConst.CONST_SHIPPERCODE_0094000010
-                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(1).PadRight(2) '"4 "
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(1).PadRight(2) '"04"
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(1).PadRight(6) '"コス    "
                             '★出光興産の場合
                             Case BaseDllConst.CONST_SHIPPERCODE_0122700010
-                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"9 "
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"09"
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
                     End If

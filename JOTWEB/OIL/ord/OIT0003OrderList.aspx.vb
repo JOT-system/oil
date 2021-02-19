@@ -4190,7 +4190,8 @@ Public Class OIT0003OrderList
             & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
             & " , OIM0005.MODEL                                  AS MODEL" _
-            & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
+            & " , OIM0005.LOAD                                   AS LOAD" _
+            & " , CONVERT(int, OIM0005.TANKNUMBER)               AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
             & " , OIT0003.JOINT                                  AS JOINT" _
@@ -4425,6 +4426,17 @@ Public Class OIT0003OrderList
 
         '営業所における順序の設定
         Select Case OFFICECDE
+            Case BaseDllConst.CONST_OFFICECODE_011202
+                '★甲子営業所の場合
+                SQLStrAri &=
+                      " ORDER BY" _
+                    & "    OIT0002.TRAINNO" _
+                    & "  , STACKING" _
+                    & "  , OIT0003.SHIPPERSCODE" _
+                    & "  , OIM0024.PRIORITYNO" _
+                    & "  , OIM0005.LOAD" _
+                    & "  , CONVERT(int, OIM0005.TANKNUMBER)"
+
             Case BaseDllConst.CONST_OFFICECODE_011203
                 '★袖ヶ浦営業所の場合
                 SQLStrAri &=

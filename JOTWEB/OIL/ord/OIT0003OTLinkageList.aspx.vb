@@ -1168,6 +1168,8 @@ Public Class OIT0003OTLinkageList
         Dim SQLStrCmn As String =
               " , OIT0003.ORDERNO                                AS ORDERNO" _
             & " , OIT0003.DETAILNO                               AS DETAILNO" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
@@ -1370,9 +1372,28 @@ Public Class OIT0003OTLinkageList
 
                 Next
 
-                '★積込日を[yyyymmdd]⇒[yymmdd]に変換
+                '○項目の再設定
+                Dim OTSHIPPERC() As String = {"1", "4", "9"}
+                Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                    '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
+
+                    '★仙台新港営業所の場合(荷主チェック)
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
+                        '荷受人が"ENEOS"以外が設定されている場合再設定する。
+                        Select Case Convert.ToString(OIT0003row("SHIPPERSCODE"))
+                            '★コスモの場合
+                            Case BaseDllConst.CONST_SHIPPERCODE_0094000010
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(1).PadRight(2) '"4 "
+                                OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(1).PadRight(6) '"コス    "
+                            '★出光興産の場合
+                            Case BaseDllConst.CONST_SHIPPERCODE_0122700010
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"9 "
+                                OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
+                        End Select
+                    End If
+
                 Next
 
             End Using

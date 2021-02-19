@@ -97,8 +97,16 @@ div.detail_costlist {
     /*margin-bottom: 8px;*/
     margin-left: 20px;
     font-size: 0.9em;
-    overflow-y: scroll;
-    overflow-x: scroll;
+    overflow: auto;
+}
+
+/*
+  Chromeだと横スクロールバーが表示されない為、上書き
+*/
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    div.detail_costlist {
+        height: calc(100% - 166px);
+    }
 }
 
 table#WF_COSTLISTTBL, table#WF_COSTLISTTBL th, table#WF_COSTLISTTBL td {
@@ -176,12 +184,12 @@ span.WF_COSTLISTTBL_CALCACCOUNT {
 }
 
 input#WF_COSTLISTTBL_ACCOUNTCODE {
-    width: 98px;
+    width: 112px;
     padding-left:25px;
 }
 
 input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
-    width: 116px;
+    width: 128px;
     padding-left: 25px;
 }
 
@@ -207,7 +215,7 @@ span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
 }
 
 input#WF_COSTLISTTBL_AMOUNT {
-    width: 102px;
+    width: 112px;
     padding-right: 3px;
     text-align: right;
 }

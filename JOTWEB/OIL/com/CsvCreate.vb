@@ -34,6 +34,9 @@
             '○EUC(日本語独自)
             Case "EUC"
                 enc = System.Text.Encoding.GetEncoding("EUC-JP")
+            '○EBCDIC(IBM独自)
+            Case "EBCDIC"
+                enc = System.Text.Encoding.GetEncoding("IBM290")
                 '○シフトJIS(日本語独自)
             Case Else
                 enc = System.Text.Encoding.GetEncoding("Shift_JIS")
@@ -88,7 +91,8 @@
     ''' <param name="blnSeparate">,(カンマ)で区切る時はtrue。</param>
     Public Function ConvertDataTableToCsv(writeHeader As Boolean,
                                           Optional ByVal blnFrame As Boolean = False,
-                                          Optional ByVal blnSeparate As Boolean = False) As String
+                                          Optional ByVal blnSeparate As Boolean = False,
+                                          Optional ByVal blnNewline As Boolean = True) As String
         Dim retByte() As Byte
         Dim colCount As Integer = Me.CsvData.Columns.Count
         Dim lastColIndex As Integer = colCount - 1
@@ -114,7 +118,9 @@
                     End If
                 Next
                 '改行する
-                Me.CsvSW.Write(vbCrLf)
+                If blnNewline = True Then
+                    Me.CsvSW.Write(vbCrLf)
+                End If
             End If
 
             'レコードを書き込む
@@ -137,7 +143,9 @@
                     End If
                 Next
                 '改行する
-                Me.CsvSW.Write(vbCrLf)
+                If blnNewline = True Then
+                    Me.CsvSW.Write(vbCrLf)
+                End If
             Next
             '閉じる
             Me.CsvSW.Close()

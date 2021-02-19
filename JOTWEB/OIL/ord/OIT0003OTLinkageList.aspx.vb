@@ -670,7 +670,7 @@ Public Class OIT0003OTLinkageList
         Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName, I_Enc:="UTF8N")
             Dim url As String
             Try
-                url = repCbj.ConvertDataTableToCsv(False)
+                url = repCbj.ConvertDataTableToCsv(False, blnNewline:=False)
             Catch ex As Exception
                 Return
             End Try
@@ -1393,7 +1393,9 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
                     End If
-
+                    '★CSV出力に不必要なので削除
+                    OIT0003row("OFFICECODE") = ""
+                    OIT0003row("SHIPPERSCODE") = ""
                 Next
 
             End Using

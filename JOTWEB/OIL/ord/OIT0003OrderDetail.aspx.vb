@@ -15392,6 +15392,18 @@ Public Class OIT0003OrderDetail
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
                 WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
+
+                '### 20210219 START 仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    For Each OIT0003row As DataRow In OIT0003tbl.Select("STACKINGFLG='on'")
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        WW_UpdateTankShozai("", "", "", upLastOilCode:=True, I_TANKNO:=OIT0003row("TANKNO"))
+                    Next
+                End If
+                '### 20210219 END   仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
             End If
 
             '受注進行ステータスが以下の場合

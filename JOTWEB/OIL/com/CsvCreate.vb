@@ -36,7 +36,9 @@
                 enc = System.Text.Encoding.GetEncoding("EUC-JP")
             '○EBCDIC(IBM独自)
             Case "EBCDIC"
-                enc = System.Text.Encoding.GetEncoding("IBM290")
+                'enc = System.Text.Encoding.GetEncoding("IBM037")
+                enc = System.Text.Encoding.GetEncoding(20290)
+                'enc = System.Text.Encoding.GetEncoding("IBM290")
                 '○シフトJIS(日本語独自)
             Case Else
                 enc = System.Text.Encoding.GetEncoding("Shift_JIS")

@@ -1326,7 +1326,7 @@ Public Class OIT0001EmptyTurnDairyList
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データをOT受注データを取得する
-        Dim SQLStr As String =
+        Dim SQLOrderStr As String =
               " SELECT" _
             & "   '0' AS ORDERFLAG" _
             & " , OIT0016.ORDERNO" _
@@ -1443,22 +1443,109 @@ Public Class OIT0001EmptyTurnDairyList
             & " AND OIT0016.ORDERYMD   = @ORDERYMD" _
             & " AND OIT0016.DELFLG    <> @DELFLG"
 
+        '　検索説明
+        '     条件指定に従い該当データをOT受注明細データを取得する
+        Dim SQLDetailStr As String =
+              " SELECT" _
+            & "   '0' AS ORDERFLAG" _
+            & " , ORDERNO" _
+            & " , DETAILNO" _
+            & " , SHIPORDER" _
+            & " , LINEORDER" _
+            & " , TANKNO" _
+            & " , KAMOKU" _
+            & " , STACKINGORDERNO" _
+            & " , STACKINGFLG" _
+            & " , WHOLESALEFLG" _
+            & " , INSPECTIONFLG" _
+            & " , DETENTIONFLG" _
+            & " , FIRSTRETURNFLG" _
+            & " , AFTERRETURNFLG" _
+            & " , OTTRANSPORTFLG" _
+            & " , UPGRADEFLG" _
+            & " , ORDERINFO" _
+            & " , SHIPPERSCODE" _
+            & " , SHIPPERSNAME" _
+            & " , OILCODE" _
+            & " , OILNAME" _
+            & " , ORDERINGTYPE" _
+            & " , ORDERINGOILNAME" _
+            & " , CARSNUMBER" _
+            & " , CARSAMOUNT" _
+            & " , RETURNDATETRAIN" _
+            & " , JOINTCODE" _
+            & " , JOINT" _
+            & " , REMARK" _
+            & " , CHANGETRAINNO" _
+            & " , CHANGETRAINNAME" _
+            & " , SECONDCONSIGNEECODE" _
+            & " , SECONDCONSIGNEENAME" _
+            & " , SECONDARRSTATION" _
+            & " , SECONDARRSTATIONNAME" _
+            & " , CHANGERETSTATION" _
+            & " , CHANGERETSTATIONNAME" _
+            & " , LINE" _
+            & " , FILLINGPOINT" _
+            & " , LOADINGIRILINETRAINNO" _
+            & " , LOADINGIRILINETRAINNAME" _
+            & " , LOADINGIRILINEORDER" _
+            & " , LOADINGOUTLETTRAINNO" _
+            & " , LOADINGOUTLETTRAINNAME" _
+            & " , LOADINGOUTLETORDER" _
+            & " , ACTUALLODDATE" _
+            & " , ACTUALDEPDATE" _
+            & " , ACTUALARRDATE" _
+            & " , ACTUALACCDATE" _
+            & " , ACTUALEMPARRDATE" _
+            & " , RESERVEDNO" _
+            & " , GYONO" _
+            & " , OTSENDCOUNT" _
+            & " , DLRESERVEDCOUNT" _
+            & " , DLTAKUSOUCOUNT" _
+            & " , SALSE" _
+            & " , SALSETAX" _
+            & " , TOTALSALSE" _
+            & " , PAYMENT" _
+            & " , PAYMENTTAX" _
+            & " , TOTALPAYMENT" _
+            & " , ANASYORIFLG" _
+            & " , VOLSYORIFLG" _
+            & " , DELFLG" _
+            & " , INITYMD" _
+            & " , INITUSER" _
+            & " , INITTERMID" _
+            & " , UPDYMD" _
+            & " , UPDUSER" _
+            & " , UPDTERMID" _
+            & " , RECEIVEYMD" _
+            & " FROM OIL.OIT0017_OTDETAIL OIT0017" _
+            & " INNER JOIN OIL.OIT0016_OTORDER OIT0016 ON" _
+            & "     OIT0016.OFFICECODE = @OFFICECODE" _
+            & " AND OIT0016.ORDERYMD   = @ORDERYMD" _
+            & " AND OIT0016.ORDERNO    = OIT0017.ORDERNO" _
+            & " AND OIT0016.DELFLG    <> @DELFLG" _
+            & " WHERE " _
+            & "     OIT0017.DELFLG    <> @DELFLG"
+
         '★受注TBL存在チェック用
-        Dim SQLOrderStr As String =
+        Dim SQLChkOrderStr As String =
               " SELECT" _
             & "   OIT0002.ORDERNO" _
             & " FROM OIL.OIT0002_ORDER OIT0002" _
             & " WHERE OIT0002.ORDERNO = @ORDERNO"
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLOrdercmd As New SqlCommand(SQLOrderStr, SQLcon)
-                With SQLcmd.Parameters
+            Using SQLOrdercmd As New SqlCommand(SQLOrderStr, SQLcon),
+                  SQLDetailcmd As New SqlCommand(SQLDetailStr, SQLcon),
+                  SQLChkOrdercmd As New SqlCommand(SQLChkOrderStr, SQLcon)
+                '★OT受注TBLからデータを取得
+                With SQLOrdercmd.Parameters
                     .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text    '営業所コード
                     .Add("@ORDERYMD", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")                '登録日
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.DELETE                     '削除フラグ
                 End With
 
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                Using SQLdr As SqlDataReader = SQLOrdercmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0001OTOrdertbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -1468,12 +1555,12 @@ Public Class OIT0001EmptyTurnDairyList
                     OIT0001OTOrdertbl.Load(SQLdr)
                 End Using
 
-                Dim P_ORDERNO As SqlParameter = SQLOrdercmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar) '受注№
+                Dim P_ORDERNO As SqlParameter = SQLChkOrdercmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar) '受注№
                 '受信した空回日報が受注TBLに登録済みかチェック
                 For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
                     P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
 
-                    Using SQLdr As SqlDataReader = SQLOrdercmd.ExecuteReader()
+                    Using SQLdr As SqlDataReader = SQLChkOrdercmd.ExecuteReader()
                         If OIT0001CHKOrdertbl.Columns.Count = 0 Then
                             '○ フィールド名とフィールドの型を取得
                             For index As Integer = 0 To SQLdr.FieldCount - 1
@@ -1492,6 +1579,32 @@ Public Class OIT0001EmptyTurnDairyList
                         OIT0001OTrow("ORDERFLAG") = "1"
                     End If
 
+                Next
+
+                '★OT受注明細TBLからデータを取得
+                With SQLDetailcmd.Parameters
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text    '営業所コード
+                    .Add("@ORDERYMD", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")                '登録日
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.DELETE                     '削除フラグ
+                End With
+
+                Using SQLdr As SqlDataReader = SQLOrdercmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001OTDetailtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001OTDetailtbl.Load(SQLdr)
+                End Using
+
+                '★受注TBLに存在した受注NoをOT受注明細の受注にも設定する。
+                For Each OIT0001OTOrderrow As DataRow In OIT0001OTOrdertbl.Select("ORDERFLAG='1'")
+                    For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Rows
+                        If OIT0001OTOrderrow("ORDERNO") = OIT0001OTOrderrow("ORDERNO") Then
+                            OIT0001OTOrderrow("ORDERFLAG") = "1"
+                        End If
+                    Next
                 Next
 
             End Using
@@ -1570,117 +1683,119 @@ Public Class OIT0001EmptyTurnDairyList
                 & " , @UPDYMD          , @UPDUSER             , @UPDTERMID      , @RECEIVEYMD)"
 
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Select("ORDERFLAG='0'")
                     With SQLcmd.Parameters
-                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("")           '
-                        .Add("@TRAINNO", SqlDbType.NVarChar).Value = OIT0001OTrow("")           '
-                        .Add("@TRAINNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")         '
-                        .Add("@ORDERYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("")          '
-                        .Add("@OFFICECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("")        '
-                        .Add("@OFFICENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")        '
-                        .Add("@ORDERTYPE", SqlDbType.NVarChar).Value = OIT0001OTrow("")         '
-                        .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = OIT0001OTrow("")      '
-                        .Add("@SHIPPERSNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")      '
-                        .Add("@BASECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("")          '
-                        .Add("@BASENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")          '
-                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@CONSIGNEENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DEPSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DEPSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ARRSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ARRSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RETSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RETSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@CHANGERETSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ORDERINFO", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@EMPTYTURNFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@STACKINGFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@USEPROPRIETYFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@CONTACTFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RESULTFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DELIVERYFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DELIVERYCOUNT", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@LODDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DEPDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACCDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@EMPARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACTUALLODDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACTUALDEPDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACTUALARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACTUALACCDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@HTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@MTTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@KTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K3TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K5TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K10TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@LTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ATANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER1OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER2OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER3OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER4OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER5OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER6OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER7OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER8OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER9OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER10OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TOTALTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@HTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@MTTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@KTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K3TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K5TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@K10TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@LTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ATANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER1OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER2OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER3OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER4OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER5OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER6OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER7OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER8OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER9OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTHER10OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TOTALTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TANKLINKNO", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TANKLINKNOMADE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@BILLINGNO", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@KEIJYOYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@SALSE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@SALSETAX", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TOTALSALSE", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@PAYMENT", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@PAYMENTTAX", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TOTALPAYMENT", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTFILENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RECEIVECOUNT", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@OTSENDSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RESERVEDSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@TAKUSOUSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@BTRAINNO", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@BTRAINNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@ANASYORIFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@DELFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@INITYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@INITUSER", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@INITTERMID", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@UPDYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
-                        .Add("@RECEIVEYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("")               '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '-- 受注№
+                        .Add("@TRAINNO", SqlDbType.NVarChar).Value = OIT0001OTrow("TRAINNO")                            '-- 本線列車
+                        .Add("@TRAINNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("TRAINNAME")                        '-- 本線列車名
+                        .Add("@ORDERYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERYMD")                          '-- 受注登録日
+                        .Add("@OFFICECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("OFFICECODE")                      '-- 受注営業所コード
+                        .Add("@OFFICENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("OFFICENAME")                      '-- 受注営業所名
+                        .Add("@ORDERTYPE", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERTYPE")                        '-- 受注パターン
+                        .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = OIT0001OTrow("SHIPPERSCODE")                  '-- 荷主コード
+                        .Add("@SHIPPERSNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("SHIPPERSNAME")                  '-- 荷主名
+                        .Add("@BASECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("BASECODE")                          '-- 基地コード
+                        .Add("@BASENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("BASENAME")                          '-- 基地名
+                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = OIT0001OTrow("CONSIGNEECODE")                '-- 荷受人コード
+                        .Add("@CONSIGNEENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("CONSIGNEENAME")                '-- 荷受人名
+                        .Add("@DEPSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("DEPSTATION")                      '-- 発駅コード
+                        .Add("@DEPSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("DEPSTATIONNAME")              '-- 発駅名
+                        .Add("@ARRSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("ARRSTATION")                      '-- 着駅コード
+                        .Add("@ARRSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("ARRSTATIONNAME")              '-- 着駅名
+                        .Add("@RETSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("RETSTATION")                      '-- 空車着駅コード
+                        .Add("@RETSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("RETSTATIONNAME")              '-- 空車着駅名
+                        .Add("@CHANGERETSTATION", SqlDbType.NVarChar).Value = OIT0001OTrow("CHANGERETSTATION")          '-- 空車着駅コード（変更後）
+                        .Add("@CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("CHANGERETSTATIONNAME")  '-- 空車着駅名（変更後）
+                        .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERSTATUS")                    '-- 受注進行ステータス
+                        .Add("@ORDERINFO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERINFO")                        '-- 受注情報
+                        .Add("@EMPTYTURNFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("EMPTYTURNFLG")                  '-- 空回日報可否フラグ
+                        .Add("@STACKINGFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("STACKINGFLG")                    '-- 積置可否フラグ
+                        .Add("@USEPROPRIETYFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("USEPROPRIETYFLG")            '-- 利用可否フラグ
+                        .Add("@CONTACTFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("CONTACTFLG")                      '-- 手配連絡フラグ
+                        .Add("@RESULTFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("RESULTFLG")                        '-- 結果受理フラグ
+                        .Add("@DELIVERYFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("DELIVERYFLG")                    '-- 託送指示フラグ
+                        .Add("@DELIVERYCOUNT", SqlDbType.NVarChar).Value = OIT0001OTrow("DELIVERYCOUNT")                '-- 託送指示送信回数
+                        .Add("@LODDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("LODDATE")                            '-- 積込日（予定）
+                        .Add("@DEPDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("DEPDATE")                            '-- 発日（予定）
+                        .Add("@ARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ARRDATE")                            '-- 積車着日（予定）
+                        .Add("@ACCDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACCDATE")                            '-- 受入日（予定）
+                        .Add("@EMPARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("EMPARRDATE")                      '-- 空車着日（予定）
+                        .Add("@ACTUALLODDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACTUALLODDATE")                '-- 積込日（実績）
+                        .Add("@ACTUALDEPDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACTUALDEPDATE")                '-- 発日（実績）
+                        .Add("@ACTUALARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACTUALARRDATE")                '-- 積車着日（実績）
+                        .Add("@ACTUALACCDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACTUALACCDATE")                '-- 受入日（実績）
+                        .Add("@ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = OIT0001OTrow("ACTUALEMPARRDATE")          '-- 空車着日（実績）
+                        .Add("@RTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("RTANK")                                '-- 車数（レギュラー）
+                        .Add("@HTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("HTANK")                                '-- 車数（ハイオク）
+                        .Add("@TTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("TTANK")                                '-- 車数（灯油）
+                        .Add("@MTTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("MTTANK")                              '-- 車数（未添加灯油）
+                        .Add("@KTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("KTANK")                                '-- 車数（軽油）
+                        .Add("@K3TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("K3TANK")                              '-- 車数（３号軽油）
+                        .Add("@K5TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("K5TANK")                              '-- 車数（５号軽油）
+                        .Add("@K10TANK", SqlDbType.NVarChar).Value = OIT0001OTrow("K10TANK")                            '-- 車数（１０号軽油）
+                        .Add("@LTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("LTANK")                                '-- 車数（LSA）
+                        .Add("@ATANK", SqlDbType.NVarChar).Value = OIT0001OTrow("ATANK")                                '-- 車数（A重油）
+                        .Add("@OTHER1OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER1OTANK")                    '-- 車数（その他１）
+                        .Add("@OTHER2OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER2OTANK")                    '-- 車数（その他２）
+                        .Add("@OTHER3OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER3OTANK")                    '-- 車数（その他３）
+                        .Add("@OTHER4OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER4OTANK")                    '-- 車数（その他４）
+                        .Add("@OTHER5OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER5OTANK")                    '-- 車数（その他５）
+                        .Add("@OTHER6OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER6OTANK")                    '-- 車数（その他６）
+                        .Add("@OTHER7OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER7OTANK")                    '-- 車数（その他７）
+                        .Add("@OTHER8OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER8OTANK")                    '-- 車数（その他８）
+                        .Add("@OTHER9OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER9OTANK")                    '-- 車数（その他９）
+                        .Add("@OTHER10OTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER10OTANK")                  '-- 車数（その他１０）
+                        .Add("@TOTALTANK", SqlDbType.NVarChar).Value = OIT0001OTrow("TOTALTANK")                        '-- 合計車数
+                        .Add("@RTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("RTANKCH")                            '-- 変更後_車数（レギュラー）
+                        .Add("@HTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("HTANKCH")                            '-- 変更後_車数（ハイオク）
+                        .Add("@TTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("TTANKCH")                            '-- 変更後_車数（灯油）
+                        .Add("@MTTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("MTTANKCH")                          '-- 変更後_車数（未添加灯油）
+                        .Add("@KTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("KTANKCH")                            '-- 変更後_車数（軽油）
+                        .Add("@K3TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("K3TANKCH")                          '-- 変更後_車数（３号軽油）
+                        .Add("@K5TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("K5TANKCH")                          '-- 変更後_車数（５号軽油）
+                        .Add("@K10TANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("K10TANKCH")                        '-- 変更後_車数（１０号軽油）
+                        .Add("@LTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("LTANKCH")                            '-- 変更後_車数（LSA）
+                        .Add("@ATANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("ATANKCH")                            '-- 変更後_車数（A重油）
+                        .Add("@OTHER1OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER1OTANKCH")                '-- 変更後_車数（その他１）
+                        .Add("@OTHER2OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER2OTANKCH")                '-- 変更後_車数（その他２）
+                        .Add("@OTHER3OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER3OTANKCH")                '-- 変更後_車数（その他３）
+                        .Add("@OTHER4OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER4OTANKCH")                '-- 変更後_車数（その他４）
+                        .Add("@OTHER5OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER5OTANKCH")                '-- 変更後_車数（その他５）
+                        .Add("@OTHER6OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER6OTANKCH")                '-- 変更後_車数（その他６）
+                        .Add("@OTHER7OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER7OTANKCH")                '-- 変更後_車数（その他７）
+                        .Add("@OTHER8OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER8OTANKCH")                '-- 変更後_車数（その他８）
+                        .Add("@OTHER9OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER9OTANKCH")                '-- 変更後_車数（その他９）
+                        .Add("@OTHER10OTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("OTHER10OTANKCH")              '-- 変更後_車数（その他１０）
+                        .Add("@TOTALTANKCH", SqlDbType.NVarChar).Value = OIT0001OTrow("TOTALTANKCH")                    '-- 変更後_合計車数
+                        .Add("@TANKLINKNO", SqlDbType.NVarChar).Value = OIT0001OTrow("TANKLINKNO")                      '-- 貨車連結順序表№
+                        .Add("@TANKLINKNOMADE", SqlDbType.NVarChar).Value = OIT0001OTrow("TANKLINKNOMADE")              '-- 作成_貨車連結順序表№
+                        .Add("@BILLINGNO", SqlDbType.NVarChar).Value = OIT0001OTrow("BILLINGNO")                        '-- 支払請求№
+                        .Add("@KEIJYOYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("KEIJYOYMD")                        '-- 計上日
+                        .Add("@SALSE", SqlDbType.NVarChar).Value = OIT0001OTrow("SALSE")                                '-- 売上金額
+                        .Add("@SALSETAX", SqlDbType.NVarChar).Value = OIT0001OTrow("SALSETAX")                          '-- 売上消費税額
+                        .Add("@TOTALSALSE", SqlDbType.NVarChar).Value = OIT0001OTrow("TOTALSALSE")                      '-- 売上合計金額
+                        .Add("@PAYMENT", SqlDbType.NVarChar).Value = OIT0001OTrow("PAYMENT")                            '-- 支払金額
+                        .Add("@PAYMENTTAX", SqlDbType.NVarChar).Value = OIT0001OTrow("PAYMENTTAX")                      '-- 支払消費税額
+                        .Add("@TOTALPAYMENT", SqlDbType.NVarChar).Value = OIT0001OTrow("TOTALPAYMENT")                  '-- 支払合計金額
+                        .Add("@OTFILENAME", SqlDbType.NVarChar).Value = OIT0001OTrow("OTFILENAME")                      '-- OTファイル名
+                        .Add("@RECEIVECOUNT", SqlDbType.NVarChar).Value = OIT0001OTrow("RECEIVECOUNT")                  '-- OT空回日報受信回数
+                        .Add("@OTSENDSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("OTSENDSTATUS")                  '-- OT発送日報送信状況
+                        .Add("@RESERVEDSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("RESERVEDSTATUS")              '-- 出荷予約ダウンロード状況
+                        .Add("@TAKUSOUSTATUS", SqlDbType.NVarChar).Value = OIT0001OTrow("TAKUSOUSTATUS")                '-- 託送状ダウンロード状況
+                        .Add("@BTRAINNO", SqlDbType.NVarChar).Value = OIT0001OTrow("BTRAINNO")                          '-- 返送列車
+                        .Add("@BTRAINNAME", SqlDbType.NVarChar).Value = OIT0001OTrow("BTRAINNAME")                      '-- 返送列車名
+                        .Add("@ANASYORIFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("ANASYORIFLG")                    '-- 分析テーブル処理フラグ
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = OIT0001OTrow("DELFLG")                              '-- 削除フラグ
+                        .Add("@INITYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("INITYMD")                            '-- 登録年月日
+                        .Add("@INITUSER", SqlDbType.NVarChar).Value = OIT0001OTrow("INITUSER")                          '-- 登録ユーザーＩＤ
+                        .Add("@INITTERMID", SqlDbType.NVarChar).Value = OIT0001OTrow("INITTERMID")                      '-- 登録端末
+                        .Add("@UPDYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("UPDYMD")                              '-- 更新年月日
+                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = OIT0001OTrow("UPDUSER")                            '-- 更新ユーザーＩＤ
+                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = OIT0001OTrow("UPDTERMID")                        '-- 更新端末
+                        .Add("@RECEIVEYMD", SqlDbType.NVarChar).Value = OIT0001OTrow("RECEIVEYMD")                      '-- 集信日時
                     End With
+                    SQLcmd.CommandTimeout = 300
+                    SQLcmd.ExecuteNonQuery()
                 Next
             End Using
 
@@ -1707,7 +1822,84 @@ Public Class OIT0001EmptyTurnDairyList
     ''' <remarks></remarks>
     Protected Sub WW_InsertOrderDetail(ByVal SQLcon As SqlConnection)
         Try
+            '追加SQL文･･･受注明細TBL追加
+            Dim SQLStr As String =
+                  " INSERT INTO OIL.OIT0003_DETAIL " _
+                & " ( ORDERNO              , DETAILNO               , SHIPORDER       , LINEORDER" _
+                & " , TANKNO               , KAMOKU                 , STACKINGORDERNO , STACKINGFLG" _
+                & " , WHOLESALEFLG         , INSPECTIONFLG          , DETENTIONFLG" _
+                & " , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG  , UPGRADEFLG" _
+                & " , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
+                & " , OILCODE              , OILNAME                , ORDERINGTYPE    , ORDERINGOILNAME" _
+                & " , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN" _
+                & " , JOINTCODE            , JOINT                  , REMARK          , CHANGETRAINNO      , CHANGETRAINNAME" _
+                & " , SECONDCONSIGNEECODE  , SECONDCONSIGNEENAME    , SECONDARRSTATION, SECONDARRSTATIONNAME" _
+                & " , CHANGERETSTATION     , CHANGERETSTATIONNAME   , LINE,FILLINGPOINT" _
+                & " , LOADINGIRILINETRAINNO, LOADINGIRILINETRAINNAME, LOADINGIRILINEORDER" _
+                & " , LOADINGOUTLETTRAINNO , LOADINGOUTLETTRAINNAME , LOADINGOUTLETORDER" _
+                & " , ACTUALLODDATE        , ACTUALDEPDATE          , ACTUALARRDATE   , ACTUALACCDATE      , ACTUALEMPARRDATE" _
+                & " , RESERVEDNO,GYONO     , OTSENDCOUNT            , DLRESERVEDCOUNT , DLTAKUSOUCOUNT" _
+                & " , SALSE,SALSETAX       , TOTALSALSE             , PAYMENT         , PAYMENTTAX         , TOTALPAYMENT" _
+                & " , ANASYORIFLG          , VOLSYORIFLG            , DELFLG" _
+                & " , INITYMD              , INITUSER               , INITTERMID" _
+                & " , UPDYMD               , UPDUSER                , UPDTERMID       , RECEIVEYMD)"
 
+            SQLStr &=
+                  " VALUES" _
+                & " ( @ORDERNO              , @DETAILNO               , @SHIPORDER       , @LINEORDER" _
+                & " , @TANKNO               , @KAMOKU                 , @STACKINGORDERNO , @STACKINGFLG" _
+                & " , @WHOLESALEFLG         , @INSPECTIONFLG          , @DETENTIONFLG" _
+                & " , @FIRSTRETURNFLG       , @AFTERRETURNFLG         , @OTTRANSPORTFLG  , @UPGRADEFLG" _
+                & " , @ORDERINFO            , @SHIPPERSCODE           , @SHIPPERSNAME" _
+                & " , @OILCODE              , @OILNAME                , @ORDERINGTYPE    , @ORDERINGOILNAME" _
+                & " , @CARSNUMBER           , @CARSAMOUNT             , @RETURNDATETRAIN" _
+                & " , @JOINTCODE            , @JOINT                  , @REMARK          , @CHANGETRAINNO      , @CHANGETRAINNAME" _
+                & " , @SECONDCONSIGNEECODE  , @SECONDCONSIGNEENAME    , @SECONDARRSTATION, @SECONDARRSTATIONNAME" _
+                & " , @CHANGERETSTATION     , @CHANGERETSTATIONNAME   , @LINE,FILLINGPOINT" _
+                & " , @LOADINGIRILINETRAINNO, @LOADINGIRILINETRAINNAME, @LOADINGIRILINEORDER" _
+                & " , @LOADINGOUTLETTRAINNO , @LOADINGOUTLETTRAINNAME , @LOADINGOUTLETORDER" _
+                & " , @ACTUALLODDATE        , @ACTUALDEPDATE          , @ACTUALARRDATE   , @ACTUALACCDATE      , @ACTUALEMPARRDATE" _
+                & " , @RESERVEDNO,GYONO     , @OTSENDCOUNT            , @DLRESERVEDCOUNT , @DLTAKUSOUCOUNT" _
+                & " , @SALSE,SALSETAX       , @TOTALSALSE             , @PAYMENT         , @PAYMENTTAX         , @TOTALPAYMENT" _
+                & " , @ANASYORIFLG          , @VOLSYORIFLG            , @DELFLG" _
+                & " , @INITYMD              , @INITUSER               , @INITTERMID" _
+                & " , @UPDYMD               , @UPDUSER                , @UPDTERMID       , @RECEIVEYMD)"
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("ORDERFLAG='0'")
+                    With SQLcmd.Parameters
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@DETAILNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@SHIPORDER", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@TANKNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = OIT0001OTrow("ORDERNO")                            '
+                    End With
+
+
+
+
+                Next
+            End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L_InsertOrderDetail")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名

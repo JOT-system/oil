@@ -320,22 +320,22 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbNegishiLoadBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
-    '''rbLoadDispatch10Btn コントロール。
+    '''rbActualLoad10Btn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rbLoadDispatch10Btn As Global.System.Web.UI.WebControls.RadioButton
+    Protected WithEvents rbActualLoad10Btn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
-    '''rbLoadDispatch20Btn コントロール。
+    '''rbActualLoad20Btn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rbLoadDispatch20Btn As Global.System.Web.UI.WebControls.RadioButton
+    Protected WithEvents rbActualLoad20Btn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rbLineBtn コントロール。

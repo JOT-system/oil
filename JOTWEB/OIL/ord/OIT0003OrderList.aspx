@@ -171,10 +171,10 @@
                 <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadDispatch10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbActualLoad10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadDispatch20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbActualLoad20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />

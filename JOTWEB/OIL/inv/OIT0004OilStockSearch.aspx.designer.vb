@@ -113,6 +113,24 @@ Partial Public Class OIT0004OilStockSearch
     Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_UpdateUser コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_UpdateUser As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_UpdateDtm コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_UpdateDtm As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

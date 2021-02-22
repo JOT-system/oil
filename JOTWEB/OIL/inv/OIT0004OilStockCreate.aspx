@@ -440,6 +440,9 @@
                         </ItemTemplate>
                     </asp:Repeater>
                 </div> <!-- End id="divStockList" -->
+                <div class="footer" style="display:none;">
+                    
+                </div>
             </asp:Panel> <!-- End 在庫表 -->
         </div> <!-- end class="headerboxOnly" id="headerbox" -->
         <!-- rightbox レイアウト -->

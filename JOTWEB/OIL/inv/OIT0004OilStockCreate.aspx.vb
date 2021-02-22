@@ -341,6 +341,7 @@ Public Class OIT0004OilStockCreate
         '3.在庫表
         repStockDate.DataSource = dispDataObj.StockDateDisplay
         repStockDate.DataBind()
+        dispDataObj.CalcStockSummary()
         repStockOilTypeItem.DataSource = dispDataObj.StockList
         repStockOilTypeItem.DataBind()
         SaveThisScreenValue(dispDataObj)
@@ -3390,8 +3391,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,ARRLORRYVOL = @ARRLORRYVOL")
         sqlStat.AppendLine("               ,EVESTOCK    = @EVESTOCK")
 
-        sqlStat.AppendLine("               ,MFLG_MORSTOCK    = CASE WHEN MFLG_MORSTOCK    = '0' AND @MORSTOCK    <> MORSTOCK    AND STOCKYMD <= CONVERT(datetime, CONVERT(char(8), GETDATE(), 112)) THEN '1' ELSE MFLG_MORSTOCK END")
-        sqlStat.AppendLine("               ,MFLG_SHIPPINGVOL = CASE WHEN MFLG_SHIPPINGVOL = '0' AND @SHIPPINGVOL <> SHIPPINGVOL THEN '1' ELSE MFLG_SHIPPINGVOL END")
+        sqlStat.AppendLine("               ,MFLG_MORSTOCK    = CASE WHEN MFLG_MORSTOCK    = '0' AND @MORSTOCK    <> MORSTOCK    AND MORSTOCK    <> 0 AND STOCKYMD <= CONVERT(datetime, CONVERT(char(8), GETDATE(), 112)) THEN '1' ELSE MFLG_MORSTOCK END")
+        sqlStat.AppendLine("               ,MFLG_SHIPPINGVOL = CASE WHEN MFLG_SHIPPINGVOL = '0' AND @SHIPPINGVOL <> SHIPPINGVOL AND SHIPPINGVOL <> 0 THEN '1' ELSE MFLG_SHIPPINGVOL END")
 
         sqlStat.AppendLine("               ,DELFLG      = @DELFLG")
         sqlStat.AppendLine("               ,UPDYMD      = @UPDYMD")
@@ -3846,22 +3847,22 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,LTANK2     = @LTANK2")
         sqlStat.AppendLine("               ,ATANK2     = @ATANK2")
 
-        sqlStat.AppendLine("               ,MFLG_RTANK1     = CASE WHEN MFLG_RTANK1  = '0' AND @RTANK1  <> RTANK1  THEN '1' ELSE MFLG_RTANK1  END")
-        sqlStat.AppendLine("               ,MFLG_HTANK1     = CASE WHEN MFLG_HTANK1  = '0' AND @HTANK1  <> HTANK1  THEN '1' ELSE MFLG_HTANK1  END")
-        sqlStat.AppendLine("               ,MFLG_TTANK1     = CASE WHEN MFLG_TTANK1  = '0' AND @TTANK1  <> TTANK1  THEN '1' ELSE MFLG_TTANK1  END")
-        sqlStat.AppendLine("               ,MFLG_MTTANK1    = CASE WHEN MFLG_MTTANK1 = '0' AND @MTTANK1 <> MTTANK1 THEN '1' ELSE MFLG_MTTANK1 END")
-        sqlStat.AppendLine("               ,MFLG_KTANK1     = CASE WHEN MFLG_KTANK1  = '0' AND @KTANK1  <> KTANK1  THEN '1' ELSE MFLG_KTANK1  END")
-        sqlStat.AppendLine("               ,MFLG_K3TANK1    = CASE WHEN MFLG_K3TANK1 = '0' AND @K3TANK1 <> K3TANK1 THEN '1' ELSE MFLG_K3TANK1 END")
-        sqlStat.AppendLine("               ,MFLG_LTANK1     = CASE WHEN MFLG_LTANK1  = '0' AND @LTANK1  <> LTANK1  THEN '1' ELSE MFLG_LTANK1  END")
-        sqlStat.AppendLine("               ,MFLG_ATANK1     = CASE WHEN MFLG_ATANK1  = '0' AND @ATANK1  <> ATANK1  THEN '1' ELSE MFLG_ATANK1  END")
-        sqlStat.AppendLine("               ,MFLG_RTANK2     = CASE WHEN MFLG_RTANK2  = '0' AND @RTANK2  <> RTANK2  THEN '1' ELSE MFLG_RTANK2  END")
-        sqlStat.AppendLine("               ,MFLG_HTANK2     = CASE WHEN MFLG_HTANK2  = '0' AND @HTANK2  <> HTANK2  THEN '1' ELSE MFLG_HTANK2  END")
-        sqlStat.AppendLine("               ,MFLG_TTANK2     = CASE WHEN MFLG_TTANK2  = '0' AND @TTANK2  <> TTANK2  THEN '1' ELSE MFLG_TTANK2  END")
-        sqlStat.AppendLine("               ,MFLG_MTTANK2    = CASE WHEN MFLG_MTTANK2 = '0' AND @MTTANK2 <> MTTANK2 THEN '1' ELSE MFLG_MTTANK2 END")
-        sqlStat.AppendLine("               ,MFLG_KTANK2     = CASE WHEN MFLG_KTANK2  = '0' AND @KTANK2  <> KTANK2  THEN '1' ELSE MFLG_KTANK2  END")
-        sqlStat.AppendLine("               ,MFLG_K3TANK2    = CASE WHEN MFLG_K3TANK2 = '0' AND @K3TANK2 <> K3TANK2 THEN '1' ELSE MFLG_K3TANK2 END")
-        sqlStat.AppendLine("               ,MFLG_LTANK2     = CASE WHEN MFLG_LTANK2  = '0' AND @LTANK2  <> LTANK2  THEN '1' ELSE MFLG_LTANK2  END")
-        sqlStat.AppendLine("               ,MFLG_ATANK2     = CASE WHEN MFLG_ATANK2  = '0' AND @ATANK2  <> ATANK2  THEN '1' ELSE MFLG_ATANK2  END")
+        sqlStat.AppendLine("               ,MFLG_RTANK1     = CASE WHEN MFLG_RTANK1  = '0' AND @RTANK1  <> RTANK1  AND RTANK1  <> 0 THEN '1' ELSE MFLG_RTANK1  END")
+        sqlStat.AppendLine("               ,MFLG_HTANK1     = CASE WHEN MFLG_HTANK1  = '0' AND @HTANK1  <> HTANK1  AND HTANK1  <> 0 THEN '1' ELSE MFLG_HTANK1  END")
+        sqlStat.AppendLine("               ,MFLG_TTANK1     = CASE WHEN MFLG_TTANK1  = '0' AND @TTANK1  <> TTANK1  AND TTANK1  <> 0 THEN '1' ELSE MFLG_TTANK1  END")
+        sqlStat.AppendLine("               ,MFLG_MTTANK1    = CASE WHEN MFLG_MTTANK1 = '0' AND @MTTANK1 <> MTTANK1 AND MTTANK1 <> 0 THEN '1' ELSE MFLG_MTTANK1 END")
+        sqlStat.AppendLine("               ,MFLG_KTANK1     = CASE WHEN MFLG_KTANK1  = '0' AND @KTANK1  <> KTANK1  AND KTANK1  <> 0 THEN '1' ELSE MFLG_KTANK1  END")
+        sqlStat.AppendLine("               ,MFLG_K3TANK1    = CASE WHEN MFLG_K3TANK1 = '0' AND @K3TANK1 <> K3TANK1 AND K3TANK1 <> 0 THEN '1' ELSE MFLG_K3TANK1 END")
+        sqlStat.AppendLine("               ,MFLG_LTANK1     = CASE WHEN MFLG_LTANK1  = '0' AND @LTANK1  <> LTANK1  AND LTANK1  <> 0 THEN '1' ELSE MFLG_LTANK1  END")
+        sqlStat.AppendLine("               ,MFLG_ATANK1     = CASE WHEN MFLG_ATANK1  = '0' AND @ATANK1  <> ATANK1  AND ATANK1  <> 0 THEN '1' ELSE MFLG_ATANK1  END")
+        sqlStat.AppendLine("               ,MFLG_RTANK2     = CASE WHEN MFLG_RTANK2  = '0' AND @RTANK2  <> RTANK2  AND RTANK2  <> 0 THEN '1' ELSE MFLG_RTANK2  END")
+        sqlStat.AppendLine("               ,MFLG_HTANK2     = CASE WHEN MFLG_HTANK2  = '0' AND @HTANK2  <> HTANK2  AND HTANK2  <> 0 THEN '1' ELSE MFLG_HTANK2  END")
+        sqlStat.AppendLine("               ,MFLG_TTANK2     = CASE WHEN MFLG_TTANK2  = '0' AND @TTANK2  <> TTANK2  AND TTANK2  <> 0 THEN '1' ELSE MFLG_TTANK2  END")
+        sqlStat.AppendLine("               ,MFLG_MTTANK2    = CASE WHEN MFLG_MTTANK2 = '0' AND @MTTANK2 <> MTTANK2 AND MTTANK2 <> 0 THEN '1' ELSE MFLG_MTTANK2 END")
+        sqlStat.AppendLine("               ,MFLG_KTANK2     = CASE WHEN MFLG_KTANK2  = '0' AND @KTANK2  <> KTANK2  AND KTANK2  <> 0 THEN '1' ELSE MFLG_KTANK2  END")
+        sqlStat.AppendLine("               ,MFLG_K3TANK2    = CASE WHEN MFLG_K3TANK2 = '0' AND @K3TANK2 <> K3TANK2 AND K3TANK2 <> 0 THEN '1' ELSE MFLG_K3TANK2 END")
+        sqlStat.AppendLine("               ,MFLG_LTANK2     = CASE WHEN MFLG_LTANK2  = '0' AND @LTANK2  <> LTANK2  AND LTANK2  <> 0 THEN '1' ELSE MFLG_LTANK2  END")
+        sqlStat.AppendLine("               ,MFLG_ATANK2     = CASE WHEN MFLG_ATANK2  = '0' AND @ATANK2  <> ATANK2  AND ATANK2  <> 0 THEN '1' ELSE MFLG_ATANK2  END")
 
         sqlStat.AppendLine("               ,DELFLG     = @DELFLG")
         sqlStat.AppendLine("               ,UPDYMD     = @UPDYMD")
@@ -3948,22 +3949,22 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,@LTANK2")
         sqlStat.AppendLine("            ,@ATANK2")
 
-        sqlStat.AppendLine("            ,CASE WHEN @RTANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @HTANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @TTANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @MTTANK1 = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @KTANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @K3TANK1 = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @LTANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @ATANK1  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @RTANK2  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @HTANK2  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @TTANK2  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @MTTANK2 = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @KTANK2  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @K3TANK2 = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @LTANK2  = 0 THEN '0' ELSE '1' END")
-        sqlStat.AppendLine("            ,CASE WHEN @ATANK2  = 0 THEN '0' ELSE '1' END")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
+        sqlStat.AppendLine("            ,'0'")
 
         sqlStat.AppendLine("            ,@DELFLG")
         sqlStat.AppendLine("            ,@INITYMD")
@@ -6360,6 +6361,12 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property StockList As Dictionary(Of String, StockListCollection)
         ''' <summary>
+        ''' 合計一覧
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property SummaryStockList As StockListCollection
+
+        ''' <summary>
         ''' 提案書表示可否(True:表示,False:非表示)
         ''' </summary>
         ''' <returns></returns>
@@ -6510,6 +6517,47 @@ Public Class OIT0004OilStockCreate
             Me.Shipper = shipper
             Me.Consignee = consigneeCode
         End Sub
+        ''' <summary>
+        ''' 在庫一覧の合計を計算
+        ''' </summary>
+        Public Sub CalcStockSummary()
+
+            Me.SummaryStockList = New StockListCollection(New OilItem("summary", "summary"), Me.StockDate)
+            For Each oilTypeItem In Me.StockList.Values
+                For Each daysItem In oilTypeItem.StockItemListDisplay
+                    '格納先に対象の日付が無ければスキップ（直前にNewしてるのでありえないが念のため)
+                    If Not Me.SummaryStockList.StockItemList.ContainsKey(daysItem.Key) Then
+                        Continue For
+                    End If
+                    '画面表示対象外の日付は合計を出す必要が無いのでスキップ
+                    If daysItem.Value.DaysItem.IsDispArea = False Then
+                        Continue For
+                    End If
+                    '軽油の場合は受注対象期間外は合計に含めない
+                    If {"1404"}.Contains(oilTypeItem.OilInfo.OilCode) Then
+                        If oilTypeItem.OilInfo.OrderFromDate <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                            Continue For
+                        End If
+                        If oilTypeItem.OilInfo.OrderToDate >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                            Continue For
+                        End If
+                    End If
+
+                    With Me.SummaryStockList.StockItemList(daysItem.Key)
+                        If IsNumeric(daysItem.Value.MorningStock) Then
+                            .MorningStock = (CDec(.MorningStock) + CDec(daysItem.Value.MorningStock)).ToString("#,##0")
+                        End If
+                        If IsNumeric(daysItem.Value.Send) Then
+                            .Send = (CDec(.Send) + CDec(daysItem.Value.Send)).ToString("#,##0")
+                        End If
+                        If IsNumeric(daysItem.Value.SummaryReceive) Then
+                            .Receive = (CDec(.Receive) + daysItem.Value.SummaryReceive).ToString("#,##0")
+                        End If
+                    End With
+                Next
+            Next
+        End Sub
+
         ''' <summary>
         ''' 入力項目を0クリア・チェックボックスを未チェックにするメソッド
         ''' </summary>

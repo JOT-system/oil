@@ -36,7 +36,7 @@ Public Class OIT0003OrderList
     Private OIT0003ReportPlanFrame As DataTable                     '帳票用(計画枠用)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
     Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
-    Private OIT0003CsvLoadDispatchtbl As DataTable                  'CSV用(積込実績)テーブル
+    Private OIT0003CsvActualLoadtbl As DataTable                  'CSV用(積込実績)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -70,8 +70,8 @@ Public Class OIT0003OrderList
     Private Const CONST_RPT_TANKDISPATCH_54 As String = "TANKDISPATCH_54"       'タンク車発送実績(OT高崎/構内取り)
     Private Const CONST_RPT_ACTUALSHIP As String = "ACTUALSHIP"                 '発送実績
     Private Const CONST_RPT_CONCATORDER As String = "CONCATORDER"               '連結順序表
-    Private Const CONST_CSV_LOADDISPATCH_10 As String = "LOADDISPATH_10"         '積込実績(北信)
-    Private Const CONST_CSV_LOADDISPATCH_20 As String = "LOADDISPATH_20"         '積込実績(甲府)
+    Private Const CONST_CSV_ACTUALLOAD_10 As String = "ACTUALLOAD_10"           '積込実績(北信)
+    Private Const CONST_CSV_ACTUALLOAD_20 As String = "ACTUALLOAD_20"           '積込実績(甲府)
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -284,8 +284,8 @@ Public Class OIT0003OrderList
         Me.rbLineBtn.Visible = False
         Me.rbKinoeneLoadBtn.Visible = False
         Me.rbNegishiLoadBtn.Visible = False
-        Me.rbLoadDispatch10Btn.Visible = False
-        Me.rbLoadDispatch20Btn.Visible = False
+        Me.rbActualLoad10Btn.Visible = False
+        Me.rbActualLoad20Btn.Visible = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
         Me.rbKuukaiBtn.Visible = False
         '### 20201106 END   指摘票No195(空回日報対応) #################################################
@@ -2803,9 +2803,9 @@ Public Class OIT0003OrderList
         '積込予定(根岸)(ラジオボタン)
         Me.rbNegishiLoadBtn.Checked = False
         '積込実績(北信)(ラジオボタン)
-        Me.rbLoadDispatch10Btn.Checked = False
+        Me.rbActualLoad10Btn.Checked = False
         '積込実績(甲府)(ラジオボタン)
-        Me.rbLoadDispatch20Btn.Checked = False
+        Me.rbActualLoad20Btn.Checked = False
         '積込予定(甲子)(ラジオボタン)
         Me.rbKinoeneLoadBtn.Checked = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
@@ -2842,9 +2842,9 @@ Public Class OIT0003OrderList
         '積込予定(根岸)(ラジオボタン)を非表示
         Me.rbNegishiLoadBtn.Visible = False
         '積込実績(北信)(ラジオボタン)
-        Me.rbLoadDispatch10Btn.Visible = False
+        Me.rbActualLoad10Btn.Visible = False
         '積込実績(甲府)(ラジオボタン)
-        Me.rbLoadDispatch20Btn.Visible = False
+        Me.rbActualLoad20Btn.Visible = False
         '積込予定(甲子)(ラジオボタン)を非表示
         Me.rbKinoeneLoadBtn.Visible = False
         '### 20201106 START 指摘票No195(空回日報対応) #################################################
@@ -2955,9 +2955,9 @@ Public Class OIT0003OrderList
                 '積込予定(根岸)(ラジオボタン)を表示
                 Me.rbNegishiLoadBtn.Visible = True
                 '積込実績(北信)(ラジオボタン)を表示
-                Me.rbLoadDispatch10Btn.Visible = True
+                Me.rbActualLoad10Btn.Visible = True
                 '積込実績(甲府)(ラジオボタン)を表示
-                Me.rbLoadDispatch20Btn.Visible = True
+                Me.rbActualLoad20Btn.Visible = True
 
             '◯四日市営業所
             Case BaseDllConst.CONST_OFFICECODE_012401
@@ -3018,8 +3018,8 @@ Public Class OIT0003OrderList
             AndAlso Me.rbShipBtn.Checked = False _
             AndAlso Me.rbLineBtn.Checked = False _
             AndAlso Me.rbNegishiLoadBtn.Checked = False _
-            AndAlso Me.rbLoadDispatch10Btn.Checked = False _
-            AndAlso Me.rbLoadDispatch20Btn.Checked = False _
+            AndAlso Me.rbActualLoad10Btn.Checked = False _
+            AndAlso Me.rbActualLoad20Btn.Checked = False _
             AndAlso Me.rbKinoeneLoadBtn.Checked = False _
             AndAlso Me.rbKuukaiBtn.Checked = False _
             AndAlso Me.rbFillingPointBtn.Checked = False _
@@ -3195,13 +3195,13 @@ Public Class OIT0003OrderList
                     '☆ 固定帳票(積込予定(根岸))作成処理
                     WW_TyohyoNegishiCreate(CONST_RPT_LOADPLAN_NEGISHI, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
-                ElseIf Me.rbLoadDispatch10Btn.Checked = True Then  '■積込実績(北信)を選択
+                ElseIf Me.rbActualLoad10Btn.Checked = True Then  '■積込実績(北信)を選択
                     '☆ CSV(積込実績(北信))作成処理
-                    WW_TyohyoNegishiCreate(CONST_CSV_LOADDISPATCH_10, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoNegishiCreate(CONST_CSV_ACTUALLOAD_10, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
-                ElseIf Me.rbLoadDispatch20Btn.Checked = True Then  '■積込実績(甲府)を選択
+                ElseIf Me.rbActualLoad20Btn.Checked = True Then  '■積込実績(甲府)を選択
                     '☆ CSV(積込実績(甲府))作成処理
-                    WW_TyohyoNegishiCreate(CONST_CSV_LOADDISPATCH_20, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    WW_TyohyoNegishiCreate(CONST_CSV_ACTUALLOAD_20, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -3969,21 +3969,21 @@ Public Class OIT0003OrderList
                 End Using
 
             'ダウンロードボタン(積込実績(北信、甲府))押下
-            Case CONST_CSV_LOADDISPATCH_10,
-                 CONST_CSV_LOADDISPATCH_20
+            Case CONST_CSV_ACTUALLOAD_10,
+                 CONST_CSV_ACTUALLOAD_20
                 '******************************
                 '積込実績データ取得処理
                 '******************************
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    CsvLoadDispatchDataGet(SQLcon, tyohyoType, officeCode, Me.txtReportLodDate.Text)
+                    CsvActualLoadDataGet(SQLcon, tyohyoType, officeCode, Me.txtReportLodDate.Text)
                 End Using
                 '******************************
                 'CSV作成処理の実行
                 '******************************
                 Dim OTFileName As String = "油槽所B.CSV"
-                Using repCbj = New CsvCreate(OIT0003CsvLoadDispatchtbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
+                Using repCbj = New CsvCreate(OIT0003CsvActualLoadtbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
                     Dim url As String
                     Try
                         url = repCbj.ConvertDataTableToCsv(False, False, True)
@@ -5981,20 +5981,20 @@ Public Class OIT0003OrderList
     ''' CSV出力(積込実績(北信、甲府))データ取得
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub CsvLoadDispatchDataGet(ByVal SQLcon As SqlConnection,
+    Protected Sub CsvActualLoadDataGet(ByVal SQLcon As SqlConnection,
                                          ByVal tyohyoType As String,
                                          ByVal officeCode As String,
                                          ByVal lodDate As String)
 
-        If IsNothing(OIT0003CsvLoadDispatchtbl) Then
-            OIT0003CsvLoadDispatchtbl = New DataTable
+        If IsNothing(OIT0003CsvActualLoadtbl) Then
+            OIT0003CsvActualLoadtbl = New DataTable
         End If
 
-        If OIT0003CsvLoadDispatchtbl.Columns.Count <> 0 Then
-            OIT0003CsvLoadDispatchtbl.Columns.Clear()
+        If OIT0003CsvActualLoadtbl.Columns.Count <> 0 Then
+            OIT0003CsvActualLoadtbl.Columns.Clear()
         End If
 
-        OIT0003CsvLoadDispatchtbl.Clear()
+        OIT0003CsvActualLoadtbl.Clear()
 
         '○ 取得SQL
         '　 説明　：　CSV用SQL
@@ -6062,22 +6062,22 @@ Public Class OIT0003OrderList
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
-                PARA05.Value = "LOADDISPATCH_OILCODE"
+                PARA05.Value = "ACTUALLOAD_OILCODE"
                 Select Case tyohyoType
-                    Case CONST_CSV_LOADDISPATCH_10
+                    Case CONST_CSV_ACTUALLOAD_10
                         PARA06.Value = "10"
-                    Case CONST_CSV_LOADDISPATCH_20
+                    Case CONST_CSV_ACTUALLOAD_20
                         PARA06.Value = "20"
                 End Select
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003CsvLoadDispatchtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0003CsvActualLoadtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0003CsvLoadDispatchtbl.Load(SQLdr)
+                    OIT0003CsvActualLoadtbl.Load(SQLdr)
                 End Using
             End Using
 

@@ -926,14 +926,28 @@ Public Class OIT0003OTLinkageList
         End Try
 
     End Sub
+
     ''' <summary>
     ''' 託送指示ボタン押下時処理
     ''' </summary>
     Protected Sub WF_ButtonTakusou_Click()
         Try
-            '一旦三重塩浜、四日市ではない場合、素通り
+
+            '出力可能リスト(Excel)
+            Dim outputExcelList As String() = {
+                BaseDllConst.CONST_OFFICECODE_012401,
+                BaseDllConst.CONST_OFFICECODE_012402}
+
+            '出力可能リスト(CSV)
+            Dim outputCsvList As String() = {
+                BaseDllConst.CONST_OFFICECODE_011201,
+                BaseDllConst.CONST_OFFICECODE_011202,
+                BaseDllConst.CONST_OFFICECODE_011203}
+
+            '対象以外は素通り
             Dim targetOffice As String = work.WF_SEL_OTS_SALESOFFICECODE.Text
-            If Not {"012401", "012402"}.Contains(targetOffice) Then
+            If Not outputExcelList.Contains(targetOffice) AndAlso
+                Not outputCsvList.Contains(targetOffice) Then
                 Return
             End If
             '
@@ -961,6 +975,30 @@ Public Class OIT0003OTLinkageList
                 Exit Sub
             End If
 
+            If outputExcelList.Contains(targetOffice) Then
+                OutputTakusouExcel()
+            End If
+
+            If outputCsvList.Contains(targetOffice) Then
+                OutputTakusouCSV()
+            End If
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLTakusou"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()
+        End Try
+
+    End Sub
+
+    Private Sub OutputTakusouExcel()
+        Try
+
             '処理対象のデータ明細を取得
             Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -974,6 +1012,7 @@ Public Class OIT0003OTLinkageList
             If selectedOrderInfo.Count = 0 Then
                 Return '出力対象無し
             End If
+
             '******************************
             ' 出力データ生成
             '******************************
@@ -997,6 +1036,7 @@ Public Class OIT0003OTLinkageList
                 WF_PrintURL.Value = url
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
             End Using
+
             '******************************
             '託送指示データの（本体）ダウンロードフラグ更新
             '                  （明細）ダウンロード数インクリメント
@@ -1062,8 +1102,161 @@ Public Class OIT0003OTLinkageList
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()
         End Try
-
     End Sub
+
+    Private Sub OutputTakusouCSV()
+        Try
+
+            '処理対象のデータ明細を取得
+            Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                selectedOrderInfo = KeiyouTakusouDataGet(SQLcon)
+                If selectedOrderInfo Is Nothing OrElse selectedOrderInfo.Count = 0 Then
+                    Return
+                End If
+            End Using
+            If selectedOrderInfo.Count = 0 Then
+                Return '出力対象無し
+            End If
+
+            '******************************
+            '出力データ生成
+            '******************************
+            Using repCbj = New OIT0003CustomReportTakusouCsv(OIT0003Takusoutbl)
+                Dim url As String
+                Try
+                    url = repCbj.CreatePrintData()
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
+
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLTakusou"
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = ex.ToString()
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()
+                    Return
+                End Try
+                '○ 別画面でExcelを表示
+                WF_PrintURL.Value = url
+                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+            End Using
+
+            '******************************
+            '託送指示データの（本体）ダウンロードフラグ更新
+            '                  （明細）ダウンロード数インクリメント
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                Dim procDate As Date = Now
+                Dim resProc As Boolean = False
+                Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+                Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                    'オーダー明細のダウンロードカウントのインクリメント
+                    resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate, updateGyoNo:=True)
+                    If resProc = False Then
+                        Return
+                    End If
+                    'オーダー明細よりダウンロードフラグを取得
+                    orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                    If orderDlFlags Is Nothing Then
+                        Return
+                    End If
+                    'オーダーを更新
+                    resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                    If resProc = False Then
+                        Return
+                    End If
+                    '履歴登録用直近データ取得
+                    '直近履歴番号取得
+                    Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                    If historyNo = "" Then
+                        Return
+                    End If
+                    Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                    Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                    If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                        Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
+                        For Each dr As DataRow In hisDetailTbl.Rows
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                        Next
+                        'ジャーナル登録
+                        OutputJournal(orderTbl, "OIT0002_ORDER")
+                        OutputJournal(detailTbl, "OIT0003_DETAIL")
+                    End If
+
+                    'ここまで来たらコミット
+                    sqlTran.Commit()
+                End Using
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLTakusou"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()
+        End Try
+    End Sub
+
+    Private Sub CreateRinkaiTakusouDataTable()
+        Try
+
+            OIT0003Takusoutbl = Nothing
+            OIT0003Takusoutbl = New DataTable
+
+            OIT0003Takusoutbl.Columns.Add("処理年月日", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("積込年月日", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("運送状年月日", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("発車年月日", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("発駅コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("発専用線コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("着駅コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("着専用線コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備１", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("荷主コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("荷受人コード（外部コード）", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("荷受人コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("着荷主コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("着受託人コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("品目コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("車種コード", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("車番", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("本線列車番号", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備2", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備3", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備4", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備5", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備6", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備7", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備8", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備9", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("積込回線", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("積込番線", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("積込ポイント", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備10", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備11", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("予備12", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("絶対行番号", GetType(String))
+            OIT0003Takusoutbl.Columns.Add("備考", GetType(String))
+
+        Catch ex As Exception
+            Throw ex
+        End Try
+    End Sub
+
     ''' <summary>
     ''' 受注履歴テーブル用の履歴番号取得
     ''' </summary>
@@ -1525,6 +1718,243 @@ Public Class OIT0003OTLinkageList
         End Try
 
     End Function
+
+    ''' <summary>
+    ''' 京葉臨海鉄道託送データを取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <returns>処理対象の受注Noと明細No</returns>
+    Private Function KeiyouTakusouDataGet(ByVal SQLcon As SqlConnection) As List(Of OutputOrdedrInfo)
+        Dim retVal As New List(Of OutputOrdedrInfo)
+        If IsNothing(Me.OIT0003Takusoutbl) Then
+            Me.OIT0003Takusoutbl = New DataTable
+        End If
+
+        If Me.OIT0003Takusoutbl.Columns.Count <> 0 Then
+            Me.OIT0003Takusoutbl.Columns.Clear()
+        End If
+
+        Me.OIT0003Takusoutbl.Clear()
+        '画面上選択されたORDERNO一覧を生成
+        Dim qcheckedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "" Select Convert.ToString(dr("ORDERNO")))
+        'ここまで来て未選択はありえないが念のため
+        If qcheckedRow.Any = False Then
+            Return Nothing
+        End If
+        Dim selectedOrderNo As List(Of String) = qcheckedRow.ToList
+        Dim selectedOrderNoInStat As String = String.Join(",", (From odrNo In selectedOrderNo Select "'" & odrNo & "'"))
+        Dim sqlStat As New StringBuilder
+        With sqlStat
+            .AppendLine(" SELECT ")
+            .AppendLine("     ODR.ORDERNO                     AS ORDERNO ")
+            .AppendLine("   , DET.DETAILNO                    AS DETAILNO ")
+            .AppendLine("   , FORMAT(ODR.LODDATE, 'yyyyMMdd') AS LODDATE ")
+            .AppendLine("   , FORMAT(ODR.ACCDATE, 'yyyyMMdd') AS ACCDATE ")
+            .AppendLine("   , ODR.DEPSTATION                  AS DEPSTATION ")
+            .AppendLine("   , ODR.ARRSTATION                  AS ARRSTATION ")
+            .AppendLine("   , CNV_SHIP.VALUE01                AS SHIPPERCODE ")
+            .AppendLine("   , TRA.TRAINCLASS                  AS TRAINCLASS ")
+            .AppendLine("   , ODR.CONSIGNEECODE               AS CONSIGNEECODE ")
+            .AppendLine("   , CNV_OIL.VALUE01                 AS OILCODE ")
+            .AppendLine("   , TNK.MODEL                       AS TANKMODEL ")
+            .AppendLine("   , DET.TANKNO                      AS TANKNO ")
+            .AppendLine("   , ODR.TRAINNO                     AS TRAINNO ")
+            .AppendLine("   , ODR.OFFICECODE                  AS OFFICECODE ")
+            .AppendLine("   , DET.LINE                        AS LINE ")
+            .AppendLine("   , DET.FILLINGPOINT                AS FILLINGPOINT ")
+            .AppendLine("   , DET.GYONO                       AS GYONO ")
+            .AppendLine(" FROM ")
+            .AppendLine("   OIL.OIT0002_ORDER ODR ")
+            .AppendLine("   INNER JOIN OIL.OIT0003_DETAIL DET ")
+            .AppendLine("     ON ODR.ORDERNO = DET.ORDERNO ")
+            .AppendLine("     AND DET.DELFLG = @DELFLG ")
+            .AppendLine("   LEFT JOIN OIL.OIM0007_TRAIN TRA ")
+            .AppendLine("     ON TRA.OFFICECODE = ODR.OFFICECODE ")
+            .AppendLine("     AND TRA.TRAINNO = ODR.TRAINNO ")
+            .AppendLine("     AND TRA.TSUMI = CASE ")
+            .AppendLine("       WHEN ODR.STACKINGFLG = '1' ")
+            .AppendLine("         THEN 'T' ")
+            .AppendLine("       ELSE 'N' ")
+            .AppendLine("       END ")
+            .AppendLine("     AND TRA.DEPSTATION = ODR.DEPSTATION ")
+            .AppendLine("     AND TRA.ARRSTATION = ODR.ARRSTATION ")
+            .AppendLine("     AND TRA.DELFLG = @DELFLG ")
+            .AppendLine("   LEFT JOIN OIL.OIM0005_TANK TNK ")
+            .AppendLine("     ON TNK.TANKNUMBER = DET.TANKNO ")
+            .AppendLine("     AND TNK.DELFLG = @DELFLG ")
+            .AppendLine("   LEFT JOIN OIL.OIM0029_CONVERT CNV_SHIP ")
+            .AppendLine("     ON CNV_SHIP.CLASS = 'RINKAI_TAKUSOU_SHIP' ")
+            .AppendLine("     AND CNV_SHIP.KEYCODE01 = ODR.SHIPPERSCODE ")
+            .AppendLine("     AND CNV_SHIP.DELFLG = @DELFLG ")
+            .AppendLine("   LEFT JOIN OIL.OIM0029_CONVERT CNV_OIL ")
+            .AppendLine("     ON CNV_OIL.CLASS = 'RINKAI_TAKUSOU_OIL' ")
+            .AppendLine("     AND CNV_OIL.KEYCODE01 = ODR.OFFICECODE ")
+            .AppendLine("     AND CNV_OIL.KEYCODE03 = DET.OILCODE ")
+            .AppendLine("     AND CNV_OIL.KEYCODE05 = DET.ORDERINGTYPE ")
+            .AppendLine("     AND CNV_OIL.DELFLG = @DELFLG ")
+            .AppendLine(" WHERE ")
+            .AppendLine("   ODR.ORDERSTATUS <= @ORDERSTATUS ")
+            .AppendLine("   AND ODR.DELFLG = @DELFLG ")
+            .AppendFormat("   AND ODR.ORDERNO IN({0}) ", selectedOrderNoInStat).AppendLine()
+            .AppendLine(" ORDER BY ")
+            .AppendLine("   ODR.ORDERNO ")
+            .AppendLine("   , DET.DETAILNO ")
+        End With
+
+        Try
+            '並び順は抽出後
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
+                'SQLパラメータ設定
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
+                End With
+                'SQL実行
+                Dim wrkDt As New DataTable
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        wrkDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    wrkDt.Load(sqlDr)
+                End Using
+
+                '○ テーブル定義作成
+                CreateRinkaiTakusouDataTable()
+
+                '処理年月日取得
+                Dim processDate As String = Now.ToString("yyyyMMddHHmm")
+                Dim gyoNo As Integer = 0
+                If wrkDt IsNot Nothing AndAlso wrkDt.Rows.Count > 0 Then
+                    '行番号の最大値取得
+                    gyoNo = wrkDt.AsEnumerable().
+                        Select(Function(r)
+                                   Dim tmp As Integer = 0
+                                   If Integer.TryParse(r("GYONO").ToString(), tmp) Then
+                                       Return tmp
+                                   Else
+                                       Return 0
+                                   End If
+                               End Function).Max()
+                End If
+                For Each wrkDr As DataRow In wrkDt.Rows
+                    Dim newDr As DataRow = OIT0003Takusoutbl.NewRow
+
+                    '○ フィールド設定
+                    newDr("処理年月日") = processDate
+                    newDr("積込年月日") = wrkDr("LODDATE").ToString()
+                    newDr("運送状年月日") = wrkDr("LODDATE").ToString()
+                    newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString()
+                    newDr("発専用線コード") = "00"
+                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString()
+                    newDr("着専用線コード") = ""
+                    newDr("予備１") = ""
+                    newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString()
+                    Dim shipperCode As String = ""
+                    Select Case wrkDr("TRAINCLASS").ToString()
+                        Case "J"
+                            shipperCode = "1"
+                        Case "O"
+                            shipperCode = "2"
+                    End Select
+                    newDr("荷受人コード（外部コード）") = shipperCode
+                    newDr("荷受人コード") = shipperCode
+                    Dim arrShipperCode As String = ""
+                    Select Case wrkDr("TRAINCLASS").ToString()
+                        Case "51", "52", "53", "54", "55", "56"
+                            arrShipperCode = "2"
+                        Case Else
+                            arrShipperCode = "1"
+                    End Select
+                    newDr("着荷主コード") = arrShipperCode
+                    newDr("着受託人コード") = arrShipperCode
+                    newDr("品目コード") = wrkDr("OILCODE").ToString()
+                    Dim tankType As String = ""
+                    If wrkDr("TANKMODEL").ToString() = "タキ1000" Then
+                        tankType = "5"
+                    Else
+                        tankType = "4"
+                    End If
+                    newDr("車種コード") = tankType
+                    newDr("車番") = wrkDr("TANKNO").ToString()
+                    newDr("本線列車番号") = wrkDr("TRAINNO").ToString()
+                    newDr("予備2") = ""
+                    newDr("予備3") = ""
+                    newDr("予備4") = ""
+                    newDr("予備5") = ""
+                    newDr("予備6") = ""
+                    newDr("予備7") = ""
+                    newDr("予備8") = ""
+                    newDr("予備9") = ""
+                    Dim tsumiKaisen As String = ""
+                    Dim tsumiBansen As String = ""
+                    Dim tsumiPoint As String = ""
+                    Select Case wrkDr("OFFICECODE").ToString()
+                        Case BaseDllConst.CONST_OFFICECODE_011201
+                            '五井
+                            tsumiKaisen = wrkDr("LINE").ToString()
+                            If wrkDr("LINE").ToString() <> "" Then
+                                tsumiKaisen = Strings.Left(wrkDr("LINE").ToString(), 1)
+                            End If
+                            If wrkDr("FILLINGPOINT").ToString() <> "" Then
+                                tsumiBansen = Strings.Left(wrkDr("FILLINGPOINT").ToString(), 1)
+                                tsumiPoint = Strings.Right(wrkDr("FILLINGPOINT").ToString(), 1)
+                            End If
+                        Case BaseDllConst.CONST_OFFICECODE_011202
+                            '甲子
+                            If wrkDr("LINE").ToString() <> "" Then
+                                tsumiKaisen = Strings.Left(wrkDr("LINE").ToString(), 1)
+                                tsumiBansen = Strings.Right(wrkDr("LINE").ToString(), 1)
+                            End If
+                            tsumiPoint = wrkDr("FILLINGPOINT").ToString()
+                        Case BaseDllConst.CONST_OFFICECODE_011203
+                            '袖ヶ浦
+                            If wrkDr("FILLINGPOINT").ToString() <> "" Then
+                                tsumiKaisen = Strings.Left(wrkDr("FILLINGPOINT").ToString(), 1)
+                                tsumiBansen = Strings.Mid(wrkDr("FILLINGPOINT").ToString(), 2, 1)
+                                tsumiPoint = Strings.Right(wrkDr("FILLINGPOINT").ToString(), 1)
+                            End If
+                    End Select
+                    newDr("積込回線") = tsumiKaisen
+                    newDr("積込番線") = tsumiBansen
+                    newDr("積込ポイント") = tsumiPoint
+                    newDr("予備10") = ""
+                    newDr("予備11") = ""
+                    newDr("予備12") = ""
+                    Dim strGyoNo As String = ""
+                    If wrkDr("GYONO").ToString() = "" Then
+                        gyoNo += 1
+                        strGyoNo = gyoNo.ToString("00#")
+                    Else
+                        strGyoNo = wrkDr("GYONO").ToString()
+                    End If
+                    newDr("絶対行番号") = wrkDr("LODDATE").ToString() & strGyoNo
+                    newDr("備考") = ""
+
+                    OIT0003Takusoutbl.Rows.Add(newDr)
+                    Dim orderInf As OutputOrdedrInfo = New OutputOrdedrInfo(Convert.ToString(wrkDr("ORDERNO")), Convert.ToString(wrkDr("DETAILNO")))
+                    orderInf.GyoNo = strGyoNo
+                    retVal.Add(orderInf)
+                Next
+            End Using
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL RINKAI_TAKUSOU_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL RINKAI_TAKUSOU_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+
+    End Function
+
     ''' <summary>
     ''' 出荷予約データを取得
     ''' </summary>
@@ -1807,7 +2237,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="callerButton">呼出し元ボタン</param>
     ''' <param name="sqlCon">SQL接続</param>
     ''' <param name="sqlTran">トランザクション</param>
-    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False) As Boolean
+    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False, Optional updateGyoNo As Boolean = False) As Boolean
         Try
 
             Dim sqlStat As StringBuilder
@@ -1837,6 +2267,9 @@ Public Class OIT0003OTLinkageList
             If updateReservedNo Then
                 sqlStat.AppendLine("       ,RESERVEDNO         = @RESERVEDNO")
             End If
+            If updateGyoNo Then
+                sqlStat.AppendLine("       ,GYONO         = @GYONO")
+            End If
             sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
             sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
             sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
@@ -1851,6 +2284,9 @@ Public Class OIT0003OTLinkageList
                         '値
                         If updateReservedNo Then
                             .Add("@RESERVEDNO", SqlDbType.NVarChar).Value = orderKey.ReservedNo
+                        End If
+                        If updateGyoNo Then
+                            .Add("@GYONO", SqlDbType.NVarChar).Value = orderKey.GyoNo
                         End If
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
                         .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
@@ -2751,6 +3187,12 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property ReservedNo As String
+        ''' <summary>
+        ''' 絶対行番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property GyoNo As String
+
     End Class
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***

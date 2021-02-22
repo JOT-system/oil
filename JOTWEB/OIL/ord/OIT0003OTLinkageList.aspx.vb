@@ -1598,6 +1598,11 @@ Public Class OIT0003OTLinkageList
                     OIT0003row("OFFICECODE") = ""
                     OIT0003row("SHIPPERSCODE") = ""
 
+                    ''★シフトアウト(14)・シフトイン(15)設定
+                    'OIT0003row("OTDAILYDEPSTATIONN") = Chr(14) + Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN")) + Chr(15)
+                    'OIT0003row("OTDAILYSHIPPERN") = Chr(14) + Convert.ToString(OIT0003row("OTDAILYSHIPPERN")) + Chr(15)
+                    'OIT0003row("OTOILNAME") = Chr(14) + Convert.ToString(OIT0003row("OTOILNAME")) + Chr(15)
+
                     '★スペース対応(暫定的に「発駅名」「荷主名」「油種名」をスペース埋めする)
                     '○半角スペース
                     OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8)

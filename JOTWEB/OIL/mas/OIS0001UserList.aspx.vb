@@ -2309,6 +2309,9 @@ Public Class OIS0001UserList
             Exit Sub
         End Try
 
+        'ユーザー会社コード
+        work.WF_SEL_USER_CAMPCODE.Text = Master.USERCAMP
+
         '選択行
         work.WF_SEL_LINECNT.Text = OIS0001tbl.Rows(WW_LINECNT)("LINECNT")
 
@@ -2639,7 +2642,7 @@ Public Class OIS0001UserList
         Master.SaveTable(OIS0001tbl, work.WF_SEL_INPTBL.Text)
 
         '登録画面ページへ遷移
-        Master.TransitionPage()
+        Master.TransitionPage(Master.USERCAMP)
 
     End Sub
 

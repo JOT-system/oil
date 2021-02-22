@@ -47,6 +47,9 @@
                     </div>
 
                     <div class="rightSide">
+                        <div style="display:none;">
+                        <input type="button" id="WF_ButtonOTINSERT" class="btn-sticky" value="空回日報取込"  onclick ="ButtonClick('WF_ButtonOTINSERT');" />
+                        </div>
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="新規登録"        onclick ="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"           onclick="ButtonClick('WF_ButtonCSV');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"               onclick="ButtonClick('WF_ButtonEND');" />
@@ -140,6 +143,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- 権限 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- 空回日報取込ボタン押下フラグ(True:有効, False：無効) -->
+            <input id="WF_OTReceiveFLG" runat="server" value="FALSE" type="text" />
         </div>
  
 </asp:Content>

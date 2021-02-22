@@ -171,13 +171,19 @@
                 <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
             <li>
+                <asp:RadioButton ID="rbActualLoad10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbActualLoad20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
+            </li>
+            <li>
                 <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbKuukaiBtn" runat="server" GroupName="WF_SW" Text="空回日報" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示書" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbOTLoadBtn" runat="server" GroupName="WF_SW" Text="OT積込指示" onclick="reportRadioButton();" />

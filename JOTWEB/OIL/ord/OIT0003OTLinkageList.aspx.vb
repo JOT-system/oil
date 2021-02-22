@@ -667,10 +667,15 @@ Public Class OIT0003OTLinkageList
         'CSV作成処理の実行
         '******************************
         Dim OTFileName As String = SetCSVFileName()
-        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH, I_FileName:=OTFileName, I_Enc:="UTF8N")
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl,
+                                     I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
+                                     I_FileName:=OTFileName,
+                                     I_Enc:="EBCDIC")
+            'I_Enc:="UTF8N")
+            'I_Enc:="EBCDIC")
             Dim url As String
             Try
-                url = repCbj.ConvertDataTableToCsv(False)
+                url = repCbj.ConvertDataTableToCsv(False, blnNewline:=False)
             Catch ex As Exception
                 Return
             End Try
@@ -1359,12 +1364,14 @@ Public Class OIT0003OTLinkageList
 
         '★共通SQL
         Dim SQLStrCmn As String =
-              " , OIT0002.ORDERNO                                AS ORDERNO" _
+              " , OIT0003.ORDERNO                                AS ORDERNO" _
             & " , OIT0003.DETAILNO                               AS DETAILNO" _
-            & " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
-            & " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
+            & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
             & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
@@ -1373,7 +1380,7 @@ Public Class OIT0003OTLinkageList
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
             & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))" _
             & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))))    AS OTDAILYSHIPPERN" _
-            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , CONVERT(CHAR (4), OIM0003.OTOILCODE)           AS OTOILCODE" _
             & " , CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))" _
             & "   +  REPLICATE(SPACE (1), 12 - DATALENGTH(CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))))        AS OTOILNAME" _
             & " , CASE" _
@@ -1384,9 +1391,12 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
             & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
             & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
-            & " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
+            & " , REPLACE (CONVERT(NCHAR (5), REPLACE(OIT0003.CARSAMOUNT,'.','')), SPACE (1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 "
+        '& " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
+        '& " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
+        '& " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
         '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN), SPACE (8))  AS OTDAILYDEPSTATIONN" _
         '& " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
         '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN), SPACE (8))     AS OTDAILYSHIPPERN" _
@@ -1406,11 +1416,18 @@ Public Class OIT0003OTLinkageList
         SQLStrAri &=
               SQLStrCmn _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
-            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & " AND OIT0003.DELFLG <> @P02 " _
             & " AND OIT0003.STACKINGFLG = '1' " _
-            & " AND OIT0003.ACTUALLODDATE >= @P03 "
+            & " AND FORMAT(OIT0003.ACTUALLODDATE,'yyyy/MM') = @P05 "
+        'SQLStrAri &=
+        '      SQLStrCmn _
+        '    & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        '    & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+        '    & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+        '    & " AND OIT0003.DELFLG <> @P02 " _
+        '    & " AND OIT0003.STACKINGFLG = '1' " _
+        '    & " AND OIT0003.ACTUALLODDATE >= @P03 "
 
         '★共通SQL
         SQLStrCmn =
@@ -1480,7 +1497,8 @@ Public Class OIT0003OTLinkageList
         SQLStrNashi &=
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
-            & "         OR OIT0002.DEPDATE     >= @TODAY) "
+            & "         OR OIT0002.DEPDATE     >= @TODAY) " _
+            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _
@@ -1507,12 +1525,14 @@ Public Class OIT0003OTLinkageList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '積込日(年月)
                 Dim PARATODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '積込日
                 'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+                PARA05.Value = Format(Now.AddDays(1), "yyyy/MM")
                 PARATODAY.Value = Format(Now, "yyyy/MM/dd")
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
@@ -1534,8 +1554,8 @@ Public Class OIT0003OTLinkageList
                 Dim i As Integer = 0
                 Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
                 For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
-                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) AndAlso
-                                                                       Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
+                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) 'AndAlso
+                    'Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
                     If qHasSelectedRow.Any Then
                         Dim newDr As DataRow = OIT0003CsvOTLinkagetbl.NewRow
                         For Each col As DataColumn In wrkDt.Columns
@@ -1552,9 +1572,42 @@ Public Class OIT0003OTLinkageList
 
                 Next
 
-                '★積込日を[yyyymmdd]⇒[yymmdd]に変換
+                '○項目の再設定
+                Dim OTSHIPPERC() As String = {"01", "04", "09"}
+                Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
+                Dim setSPACE As String = ""
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                    '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
+
+                    '★仙台新港営業所の場合(荷主チェック)
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
+                        '荷受人が"ENEOS"以外が設定されている場合再設定する。
+                        Select Case Convert.ToString(OIT0003row("SHIPPERSCODE"))
+                            '★コスモの場合
+                            Case BaseDllConst.CONST_SHIPPERCODE_0094000010
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(1).PadRight(2) '"04"
+                                OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(1).PadRight(6) '"コス    "
+                            '★出光興産の場合
+                            Case BaseDllConst.CONST_SHIPPERCODE_0122700010
+                                OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"09"
+                                OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
+                        End Select
+                    End If
+                    '★CSV出力に不必要なので削除
+                    OIT0003row("OFFICECODE") = ""
+                    OIT0003row("SHIPPERSCODE") = ""
+
+                    '★スペース対応(暫定的に「発駅名」「荷主名」「油種名」をスペース埋めする)
+                    '○半角スペース
+                    OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8)
+                    OIT0003row("OTDAILYSHIPPERN") = setSPACE.PadLeft(8)
+                    OIT0003row("OTOILNAME") = setSPACE.PadLeft(12)
+                    ''○全角スペース
+                    'OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8).Replace("  ", "　")
+                    'OIT0003row("OTDAILYSHIPPERN") = setSPACE.PadLeft(8).Replace("  ", "　")
+                    'OIT0003row("OTOILNAME") = setSPACE.PadLeft(12).Replace("  ", "　")
+
                 Next
 
             End Using
@@ -2014,7 +2067,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '1'          AS KINO_DATAKBN")
         sqlStat.AppendLine("     , ''           AS OUTPUTRESERVENO") '出力用予約番号(後続処理で番号を組み立てる）
         sqlStat.AppendLine("     , '2'          AS KINO_TOKUISAKICODE") '得意先コード（甲子）
-        sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社□□□□□'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
+        sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社　　　　　'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
         sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_KAI")
         sqlStat.AppendLine("     , '0'          AS NEG_TUMIKOMI_POINT")
@@ -2044,7 +2097,11 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
         sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
         sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '0011'  ELSE '0012' END AS SEQ_UKEHARAI_CODE") 'シーケンスファイル受払い基地コード
-        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        'sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000'")
+        sqlStat.AppendLine("            ELSE format(ISNULL(LRV.RESERVEDQUANTITY,0) * 1000,'00000') ")
+        sqlStat.AppendLine("        END AS SEQ_ORDERAMOUNT")        'シーケンスファイルオーダー数量
+
         sqlStat.AppendLine("     , '1'           AS SEQ_TRANSWAY") 'シーケンスファイル輸送方法
         sqlStat.AppendLine("     , CASE WHEN TRA.TRAINCLASS = 'O'")
         sqlStat.AppendLine("                 THEN '023'")
@@ -2056,13 +2113,19 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("                 THEN '017'")
         sqlStat.AppendLine("             END")
         sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
-        sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
-        sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキタキ243000'")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
+        'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ243000'")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        'sqlStat.AppendLine("            ELSE '000000'")
+        'sqlStat.AppendLine("             END")
+        'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
-        sqlStat.AppendLine("            ELSE '000000'")
+        sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
         sqlStat.AppendLine("             END")
         sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+
         sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
         sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
         sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
@@ -2079,9 +2142,12 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
         sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
         sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
-        sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
+        sqlStat.AppendLine("     , TNK.LOAD") '甲子ソート用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
+        sqlStat.AppendLine("     , DET.STACKINGFLG") '甲子ソート用
+        sqlStat.AppendLine("     , PRI.PRIORITYNO") '甲子ソート用
+        sqlStat.AppendLine("     , ISNULL(TNK.TANKNUMBER,'0') AS TANKNUMBER_SORT") '甲子ソート用
         sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         '明細結合ここから↓
         sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
@@ -2141,6 +2207,13 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND CMICNV.KEYCODE02      = DET.SECONDCONSIGNEECODE")
         sqlStat.AppendLine("   AND CMICNV.DELFLG         = @DELFLG")
         '変換マスタ（荷受人（構内取））結合ここまで↑
+        '優先油種マスタ結合(ソート用PRIORITYNO取得用)のここから ↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0024_PRIORITY PRI")
+        sqlStat.AppendLine("    ON PRI.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND PRI.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND PRI.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND PRI.DELFLG         = @DELFLG")
+        '優先油種マスタ結合(ソート用PRIORITYNO取得用)ここまで ↑
         sqlStat.AppendLine(" WHERE ODR.ORDERSTATUS <= @ORDERSTATUS")
         sqlStat.AppendLine("   AND ODR.DELFLG       = @DELFLG")
         sqlStat.AppendFormat("   AND ODR.ORDERNO     IN({0})", selectedOrderNoInStat).AppendLine()
@@ -2183,11 +2256,19 @@ Public Class OIT0003OTLinkageList
                     maxReservedNo = "000"
                 End If
 
-                Dim sortedDt = From dr As DataRow In wrkDt 'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
                 Dim officeCode As String = ""
-                If sortedDt.Any Then
-                    officeCode = Convert.ToString(sortedDt.First.Item("OFFICECODE"))
+                If wrkDt IsNot Nothing AndAlso wrkDt.Rows.Count > 0 Then
+                    officeCode = Convert.ToString(wrkDt.Rows(0).Item("OFFICECODE"))
                 End If
+
+                Dim sortedDt = From dr As DataRow In wrkDt  'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011202 Then
+                    '甲子の場合ソート変更
+                    sortedDt = From dr As DataRow In wrkDt Order By Convert.ToString(dr("TRAINNO"))
+                   , Convert.ToString(dr("STACKINGFLG")) Descending, Convert.ToString(dr("SHIPPERSCODE"))
+                   , Convert.ToString(dr("PRIORITYNO")), Convert.ToString(dr("LOAD")), CDec(Convert.ToString(dr("TANKNUMBER_SORT")))
+                End If
+
                 For Each sortedDr As DataRow In sortedDt
                     Dim newDr As DataRow = OIT0003Reserved.NewRow
 

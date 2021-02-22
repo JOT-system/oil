@@ -2597,187 +2597,9 @@ Public Class OIM0005TankList
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MODEL") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MODELKANA") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LOAD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LOADUNIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("VOLUME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("VOLUMEUNIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MYWEIGHT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LENGTH") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TANKLENGTH") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MAXCALIBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MINCALIBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LENGTHFLG") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORIGINOWNERNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OWNERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OWNERNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASECLASS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASECLASSNEMAE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("AUTOEXTENTION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("AUTOEXTENTIONNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASESTYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASEENDYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USERNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CURRENTSTATIONCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CURRENTSTATIONNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYSTATIONCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYSTATIONNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USERLIMIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LIMITTEXTRADIARYSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DEDICATETYPECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DEDICATETYPENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYTYPECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYTYPENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYLIMIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("BIGOILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("BIGOILNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OPERATIONBASECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OPERATIONBASENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COLORCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COLORNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MARKCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MARKNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGCODE1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGNAME1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGCODE2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGNAME2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGCODE3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGNAME3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGCODE4") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTAGNAME4") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("IDSSTAGCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("IDSSTAGNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COSMOTAGCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COSMOTAGNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RESERVE1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RESERVE2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("INSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRSPECIFIEDDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SPECIFIEDDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ALLINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PREINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("GETDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRANSFERDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OBTAINEDCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OBTAINEDNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PROGRESSYEAR") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("NEXTPROGRESSYEAR") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXCLUDEDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RETIRMENTDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRTANKTYPE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OLDTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OTTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTANKNUMBER1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTANKNUMBER2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTANKNUMBER3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JXTGTANKNUMBER4") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COSMOTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("FUJITANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SHELLTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SAPSHELLTANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RESERVE3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USEDFLG") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
                 For Each OIM0005row As DataRow In OIM0005tbl.Rows
-                    If XLSTBLrow("TANKNUMBER") = OIM0005row("TANKNUMBER") AndAlso
-                        XLSTBLrow("MODEL") = OIM0005row("MODEL") AndAlso
-                        XLSTBLrow("MODELKANA") = OIM0005row("MODELKANA") AndAlso
-                        XLSTBLrow("LOAD") = OIM0005row("LOAD") AndAlso
-                        XLSTBLrow("LOADUNIT") = OIM0005row("LOADUNIT") AndAlso
-                        XLSTBLrow("VOLUME") = OIM0005row("VOLUME") AndAlso
-                        XLSTBLrow("VOLUMEUNIT") = OIM0005row("VOLUMEUNIT") AndAlso
-                        XLSTBLrow("MYWEIGHT") = OIM0005row("MYWEIGHT") AndAlso
-                        XLSTBLrow("LENGTH") = OIM0005row("LENGTH") AndAlso
-                        XLSTBLrow("TANKLENGTH") = OIM0005row("TANKLENGTH") AndAlso
-                        XLSTBLrow("MAXCALIBER") = OIM0005row("MAXCALIBER") AndAlso
-                        XLSTBLrow("MINCALIBER") = OIM0005row("MINCALIBER") AndAlso
-                        XLSTBLrow("LENGTHFLG") = OIM0005row("LENGTHFLG") AndAlso
-                        XLSTBLrow("ORIGINOWNERCODE") = OIM0005row("ORIGINOWNERCODE") AndAlso
-                        XLSTBLrow("ORIGINOWNERNAME") = OIM0005row("ORIGINOWNERNAME") AndAlso
-                        XLSTBLrow("OWNERCODE") = OIM0005row("OWNERCODE") AndAlso
-                        XLSTBLrow("OWNERNAME") = OIM0005row("OWNERNAME") AndAlso
-                        XLSTBLrow("LEASECODE") = OIM0005row("LEASECODE") AndAlso
-                        XLSTBLrow("LEASENAME") = OIM0005row("LEASENAME") AndAlso
-                        XLSTBLrow("LEASECLASS") = OIM0005row("LEASECLASS") AndAlso
-                        XLSTBLrow("LEASECLASSNEMAE") = OIM0005row("LEASECLASSNEMAE") AndAlso
-                        XLSTBLrow("AUTOEXTENTION") = OIM0005row("AUTOEXTENTION") AndAlso
-                        XLSTBLrow("AUTOEXTENTIONNAME") = OIM0005row("AUTOEXTENTIONNAME") AndAlso
-                        XLSTBLrow("LEASESTYMD") = OIM0005row("LEASESTYMD") AndAlso
-                        XLSTBLrow("LEASEENDYMD") = OIM0005row("LEASEENDYMD") AndAlso
-                        XLSTBLrow("USERCODE") = OIM0005row("USERCODE") AndAlso
-                        XLSTBLrow("USERNAME") = OIM0005row("USERNAME") AndAlso
-                        XLSTBLrow("CURRENTSTATIONCODE") = OIM0005row("CURRENTSTATIONCODE") AndAlso
-                        XLSTBLrow("CURRENTSTATIONNAME") = OIM0005row("CURRENTSTATIONNAME") AndAlso
-                        XLSTBLrow("EXTRADINARYSTATIONCODE") = OIM0005row("EXTRADINARYSTATIONCODE") AndAlso
-                        XLSTBLrow("EXTRADINARYSTATIONNAME") = OIM0005row("EXTRADINARYSTATIONNAME") AndAlso
-                        XLSTBLrow("USERLIMIT") = OIM0005row("USERLIMIT") AndAlso
-                        XLSTBLrow("LIMITTEXTRADIARYSTATION") = OIM0005row("LIMITTEXTRADIARYSTATION") AndAlso
-                        XLSTBLrow("DEDICATETYPECODE") = OIM0005row("DEDICATETYPECODE") AndAlso
-                        XLSTBLrow("DEDICATETYPENAME") = OIM0005row("DEDICATETYPENAME") AndAlso
-                        XLSTBLrow("EXTRADINARYTYPECODE") = OIM0005row("EXTRADINARYTYPECODE") AndAlso
-                        XLSTBLrow("EXTRADINARYTYPENAME") = OIM0005row("EXTRADINARYTYPENAME") AndAlso
-                        XLSTBLrow("EXTRADINARYLIMIT") = OIM0005row("EXTRADINARYLIMIT") AndAlso
-                        XLSTBLrow("BIGOILCODE") = OIM0005row("BIGOILCODE") AndAlso
-                        XLSTBLrow("BIGOILNAME") = OIM0005row("BIGOILNAME") AndAlso
-                        XLSTBLrow("OPERATIONBASECODE") = OIM0005row("OPERATIONBASECODE") AndAlso
-                        XLSTBLrow("OPERATIONBASENAME") = OIM0005row("OPERATIONBASENAME") AndAlso
-                        XLSTBLrow("COLORCODE") = OIM0005row("COLORCODE") AndAlso
-                        XLSTBLrow("COLORNAME") = OIM0005row("COLORNAME") AndAlso
-                        XLSTBLrow("MARKCODE") = OIM0005row("MARKCODE") AndAlso
-                        XLSTBLrow("MARKNAME") = OIM0005row("MARKNAME") AndAlso
-                        XLSTBLrow("JXTGTAGCODE1") = OIM0005row("JXTGTAGCODE1") AndAlso
-                        XLSTBLrow("JXTGTAGNAME1") = OIM0005row("JXTGTAGNAME1") AndAlso
-                        XLSTBLrow("JXTGTAGCODE2") = OIM0005row("JXTGTAGCODE2") AndAlso
-                        XLSTBLrow("JXTGTAGNAME2") = OIM0005row("JXTGTAGNAME2") AndAlso
-                        XLSTBLrow("JXTGTAGCODE3") = OIM0005row("JXTGTAGCODE3") AndAlso
-                        XLSTBLrow("JXTGTAGNAME3") = OIM0005row("JXTGTAGNAME3") AndAlso
-                        XLSTBLrow("JXTGTAGCODE4") = OIM0005row("JXTGTAGCODE4") AndAlso
-                        XLSTBLrow("JXTGTAGNAME4") = OIM0005row("JXTGTAGNAME4") AndAlso
-                        XLSTBLrow("IDSSTAGCODE") = OIM0005row("IDSSTAGCODE") AndAlso
-                        XLSTBLrow("IDSSTAGNAME") = OIM0005row("IDSSTAGNAME") AndAlso
-                        XLSTBLrow("COSMOTAGCODE") = OIM0005row("COSMOTAGCODE") AndAlso
-                        XLSTBLrow("COSMOTAGNAME") = OIM0005row("COSMOTAGNAME") AndAlso
-                        XLSTBLrow("RESERVE1") = OIM0005row("RESERVE1") AndAlso
-                        XLSTBLrow("RESERVE2") = OIM0005row("RESERVE2") AndAlso
-                        XLSTBLrow("JRINSPECTIONDATE") = OIM0005row("JRINSPECTIONDATE") AndAlso
-                        XLSTBLrow("INSPECTIONDATE") = OIM0005row("INSPECTIONDATE") AndAlso
-                        XLSTBLrow("JRSPECIFIEDDATE") = OIM0005row("JRSPECIFIEDDATE") AndAlso
-                        XLSTBLrow("SPECIFIEDDATE") = OIM0005row("SPECIFIEDDATE") AndAlso
-                        XLSTBLrow("JRALLINSPECTIONDATE") = OIM0005row("JRALLINSPECTIONDATE") AndAlso
-                        XLSTBLrow("ALLINSPECTIONDATE") = OIM0005row("ALLINSPECTIONDATE") AndAlso
-                        XLSTBLrow("PREINSPECTIONDATE") = OIM0005row("PREINSPECTIONDATE") AndAlso
-                        XLSTBLrow("GETDATE") = OIM0005row("GETDATE") AndAlso
-                        XLSTBLrow("TRANSFERDATE") = OIM0005row("TRANSFERDATE") AndAlso
-                        XLSTBLrow("OBTAINEDCODE") = OIM0005row("OBTAINEDCODE") AndAlso
-                        XLSTBLrow("OBTAINEDNAME") = OIM0005row("OBTAINEDNAME") AndAlso
-                        XLSTBLrow("PROGRESSYEAR") = OIM0005row("PROGRESSYEAR") AndAlso
-                        XLSTBLrow("NEXTPROGRESSYEAR") = OIM0005row("NEXTPROGRESSYEAR") AndAlso
-                        XLSTBLrow("EXCLUDEDATE") = OIM0005row("EXCLUDEDATE") AndAlso
-                        XLSTBLrow("RETIRMENTDATE") = OIM0005row("RETIRMENTDATE") AndAlso
-                        XLSTBLrow("JRTANKNUMBER") = OIM0005row("JRTANKNUMBER") AndAlso
-                        XLSTBLrow("JRTANKTYPE") = OIM0005row("JRTANKTYPE") AndAlso
-                        XLSTBLrow("OLDTANKNUMBER") = OIM0005row("OLDTANKNUMBER") AndAlso
-                        XLSTBLrow("OTTANKNUMBER") = OIM0005row("OTTANKNUMBER") AndAlso
-                        XLSTBLrow("JXTGTANKNUMBER1") = OIM0005row("JXTGTANKNUMBER1") AndAlso
-                        XLSTBLrow("JXTGTANKNUMBER2") = OIM0005row("JXTGTANKNUMBER2") AndAlso
-                        XLSTBLrow("JXTGTANKNUMBER3") = OIM0005row("JXTGTANKNUMBER3") AndAlso
-                        XLSTBLrow("JXTGTANKNUMBER4") = OIM0005row("JXTGTANKNUMBER4") AndAlso
-                        XLSTBLrow("COSMOTANKNUMBER") = OIM0005row("COSMOTANKNUMBER") AndAlso
-                        XLSTBLrow("FUJITANKNUMBER") = OIM0005row("FUJITANKNUMBER") AndAlso
-                        XLSTBLrow("SHELLTANKNUMBER") = OIM0005row("SHELLTANKNUMBER") AndAlso
-                        XLSTBLrow("SAPSHELLTANKNUMBER") = OIM0005row("SAPSHELLTANKNUMBER") AndAlso
-                        XLSTBLrow("RESERVE3") = OIM0005row("RESERVE3") AndAlso
-                        XLSTBLrow("USEDFLG") = OIM0005row("USEDFLG") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0005row("DELFLG") Then
+                    If XLSTBLrow("TANKNUMBER") = OIM0005row("TANKNUMBER") Then
                         OIM0005INProw.ItemArray = OIM0005row.ItemArray
                         Exit For
                     End If
@@ -3456,7 +3278,7 @@ Public Class OIM0005TankList
             If isNormal(WW_CS0024FCHECKERR) Then
                 If WW_TEXT <> "" Then
                     '値存在チェック
-                    CODENAME_get("LEASECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    CODENAME_get("CAMPCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
                     If Not isNormal(WW_RTN_SW) Then
                         WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
                         WW_CheckMES2 = "マスタに存在しません。"
@@ -4169,7 +3991,7 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            ' 原専用種別（バリデーションチェック）
+            ' 原専用種別名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("DEDICATETYPENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
@@ -4180,7 +4002,7 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            ' 臨時専用種別（バリデーションチェック）
+            ' 臨時専用種別名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("EXTRADINARYTYPENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
@@ -4236,7 +4058,7 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            ' 塗色（バリデーションチェック）
+            ' 塗色名（バリデーションチェック）
             WW_TEXT = OIM0005INProw("COLORNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
@@ -4941,16 +4763,16 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用期限 =" & OIM0005row("USERLIMIT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅期限 =" & OIM0005row("LIMITTEXTRADIARYSTATION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別C =" & OIM0005row("DEDICATETYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別 =" & OIM0005row("DEDICATETYPENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別名 =" & OIM0005row("DEDICATETYPENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別C =" & OIM0005row("EXTRADINARYTYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別 =" & OIM0005row("EXTRADINARYTYPENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別名 =" & OIM0005row("EXTRADINARYTYPENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIM0005row("EXTRADINARYLIMIT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類コード =" & OIM0005row("BIGOILCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類名 =" & OIM0005row("BIGOILNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIM0005row("OPERATIONBASENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色 =" & OIM0005row("COLORNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色名 =" & OIM0005row("COLORNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> マークコード =" & OIM0005row("MARKCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> マーク名 =" & OIM0005row("MARKNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG仙台タグコード =" & OIM0005row("JXTGTAGCODE1") & " , "
@@ -5048,10 +4870,10 @@ Public Class OIM0005TankList
 
             'KEY項目が等しい時
             For Each OIM0005row As DataRow In OIM0005tbl.Rows
-                If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
-                    OIM0005row("MODEL") = OIM0005INProw("MODEL") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
+                If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
+                    'KEY項目以外の変更チェック
+                    If OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
+                        OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
                         OIM0005row("LOAD") = OIM0005INProw("LOAD") AndAlso
                         OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
                         OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
@@ -5138,8 +4960,9 @@ Public Class OIM0005TankList
                         OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                         OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                        'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
                         OIM0005INProw("OPERATION") = CONST_UPDATE
@@ -5271,6 +5094,7 @@ Public Class OIM0005TankList
 
             Select Case I_FIELD
                 Case "CAMPCODE"                     '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"                          '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)

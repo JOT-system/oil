@@ -9,6 +9,7 @@
 ' 修正履歴:
 '         :
 ''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -59,10 +60,14 @@ Public Class OIT0004OilStockSearch
                     Case "HELP"                         'ヘルプ表示
                         WF_HELP_Click()
                 End Select
+                If Not {"WF_ButtonDO", "WF_ButtonEND"}.Contains(WF_ButtonClick.Value) Then
+                    GetLastUpdate()
+                End If
             End If
         Else
             '○ 初期化処理
             Initialize()
+            GetLastUpdate()
         End If
 
     End Sub
@@ -653,6 +658,7 @@ Public Class OIT0004OilStockSearch
             Using sqlCon = CS0050SESSION.getConnection,
                   sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
                 sqlCon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@CAMPCODE", SqlDbType.NVarChar).Value = "01"
                     .Add("@CLASS", SqlDbType.NVarChar).Value = "STOCKSELECTDEFOFFICE"
@@ -677,6 +683,91 @@ Public Class OIT0004OilStockSearch
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
+        End Try
+    End Sub
+    ''' <summary>
+    ''' 最終更新者取得
+    ''' </summary>
+    Public Sub GetLastUpdate()
+        Try
+            '一旦初期化
+            Me.WF_UpdateUser.Text = "&nbsp;"
+            Me.WF_UpdateDtm.Text = "&nbsp;"
+
+            Dim officeCode As String = ""
+            '取得出来ない条件の場合はスキップ
+            If Me.TxtSalesOffice.Text.Trim = "" OrElse
+               Me.LblSalesOfficeName.Text = "" OrElse
+               Me.TxtShipper.Text.Trim = "" OrElse
+               Me.LblShipperName.Text = "" OrElse
+               Me.WF_CONSIGNEE_CODE.Text.Trim = "" OrElse
+               Me.WF_CONSIGNEE_NAME.Text = "" OrElse
+               Me.WF_STYMD_CODE.Text.Trim = "" OrElse
+               IsDate(Me.WF_STYMD_CODE.Text) = False Then
+                Return
+            End If
+
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("Select format(SQ.UPDYMD,'yyyy/MM/dd HH:mm') AS UPDYMD")
+            sqlStat.AppendLine("      ,isnull(UM.STAFFNAMEL, SQ.UPDUSER)    AS UPDUSER")
+            sqlStat.AppendLine("FROM (")
+            sqlStat.AppendLine("SELECT UPDYMD")
+            sqlStat.AppendLine("      ,UPDUSER")
+            sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
+            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+            'sqlStat.AppendLine(" WHERE 1=1")
+            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
+            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+            sqlStat.AppendLine(" UNION ALL")
+            sqlStat.AppendLine("SELECT UPDYMD")
+            sqlStat.AppendLine("      ,UPDUSER")
+            sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
+            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+            'sqlStat.AppendLine(" WHERE 1=1")
+            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
+            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+            sqlStat.AppendLine(" ) SQ")
+            sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
+            sqlStat.AppendLine("   ON UM.USERID = SQ.UPDUSER")
+            sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
+            sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
+            sqlStat.AppendLine(" ORDER BY SQ.UPDYMD DESC")
+            'DataBase接続文字
+            Using sqlCon = CS0050SESSION.getConnection,
+              sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
+                    .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows Then
+                        sqlDr.Read()
+                        Me.WF_UpdateUser.Text = Convert.ToString(sqlDr("UPDUSER"))
+                        Me.WF_UpdateDtm.Text = Convert.ToString(sqlDr("UPDYMD"))
+                    End If
+                End Using 'sqlDr
+            End Using 'sqlCon, sqlCmd
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004S LASTUPDATE_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004S LASTUPDATE_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return
         End Try
     End Sub
 End Class

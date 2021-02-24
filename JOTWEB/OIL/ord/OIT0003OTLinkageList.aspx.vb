@@ -2299,19 +2299,20 @@ Public Class OIT0003OTLinkageList
                     newDr("KINO_RESERVEDQUANTITY") = newDr("RESERVEDQUANTITY")
                     If IsNumeric(newDr("RESERVEDQUANTITY")) Then
                         Dim reservQ As Decimal = CDec(newDr("RESERVEDQUANTITY"))
-                        If reservQ <> 0 Then
-                            Dim reservQALL = reservQ
-                            Dim top As String = Math.Truncate(reservQ).ToString()
-                            Dim rightReserv = reservQALL.ToString("0.0##")
-                            Dim right0trim = rightReserv.Split("."c)(1)
-                            If right0trim <> "0" Then
-                                newDr("KINO_RESERVEDQUANTITY") = top & "." & right0trim
-                            Else
-                                newDr("KINO_RESERVEDQUANTITY") = top
-                            End If
-                        Else
-                            newDr("KINO_RESERVEDQUANTITY") = "0"
-                        End If
+                        newDr("KINO_RESERVEDQUANTITY") = reservQ.ToString("00.000")
+                        'If reservQ <> 0 Then
+                        '    Dim reservQALL = reservQ
+                        '    Dim top As String = Math.Truncate(reservQ).ToString()
+                        '    Dim rightReserv = reservQALL.ToString("0.0##")
+                        '    Dim right0trim = rightReserv.Split("."c)(1)
+                        '    If right0trim <> "0" Then
+                        '        newDr("KINO_RESERVEDQUANTITY") = top & "." & right0trim
+                        '    Else
+                        '        newDr("KINO_RESERVEDQUANTITY") = top
+                        '    End If
+                        'Else
+                        '    newDr("KINO_RESERVEDQUANTITY") = "0"
+                        'End If
                     End If
                     OIT0003Reserved.Rows.Add(newDr)
 

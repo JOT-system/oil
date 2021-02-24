@@ -342,6 +342,8 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataSource = dispDataObj.StockDateDisplay
         repStockDate.DataBind()
         dispDataObj.CalcStockSummary()
+        repStockSummary.DataSource = dispDataObj.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
         repStockOilTypeItem.DataSource = dispDataObj.StockList
         repStockOilTypeItem.DataBind()
         SaveThisScreenValue(dispDataObj)
@@ -415,6 +417,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispClass.StockList
         repStockOilTypeItem.DataBind()
+        dispClass.CalcStockSummary()
+        repStockSummary.DataSource = dispClass.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 受注作成ボタン押下時処理
@@ -538,6 +543,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 入力値クリアボタン押下時処理
@@ -568,6 +576,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 再計算ボタン押下時処理
@@ -590,6 +601,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 更新ボタン押下時処理
@@ -647,6 +661,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
     End Sub
     ''' <summary>

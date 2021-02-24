@@ -557,6 +557,9 @@
                 <li>
                     <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
                 </li>
+                <li>
+                    <asp:CheckBox ID="chkPrintConsigneeRep" runat="server" Text="油槽所在庫" /> 
+                </li>
             </ul>
         </div>
     </div>
@@ -572,6 +575,7 @@
             <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
             <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                <asp:CheckBox ID="chkConsigneeRepDoubleSpan" runat="server" text="12日分" />
             </a>
         </span>
     </div>

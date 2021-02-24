@@ -673,21 +673,48 @@ function bindEneosCheckBox() {
     }
     chkObj.addEventListener('click', (function () {
         return function () {
-            eneosCheckChange();
+            eneosCheckChange('chkPrintENEOS');
         };
     })(), true);
-
+    chkObj = null;
+    chkObj = document.getElementById('chkPrintConsigneeRep');
+    if (chkObj === null) {
+        return;
+    }
+    chkObj.addEventListener('click', (function () {
+        return function () {
+            eneosCheckChange('chkPrintConsigneeRep');
+        };
+    })(), true);
 }
-function eneosCheckChange() {
-    let chkObj = document.getElementById('chkPrintENEOS');
+function eneosCheckChange(chkId) {
+    let chkObj = document.getElementById(chkId);
+    let otherSideId = 'chkPrintENEOS';
+    if (chkId === otherSideId) {
+        otherSideId = 'chkPrintConsigneeRep';
+    }
+    let otherSideChk = document.getElementById(otherSideId);
     let hdnShowPnlToDateObj = document.getElementById('hdnShowPnlToDate');
     let hdnPnlMonthPickerObj = document.getElementById('spnDownloadMonth');
     let hdnPnlFromDateObj = document.getElementById('spnFromDate');
     //let pnlObj = document.getElementById('pnlToDate');
+    if (otherSideChk !== null) {
+        otherSideChk.checked = false;
+    }
     if (chkObj.checked) {
         hdnShowPnlToDateObj.value = '0';
         hdnPnlMonthPickerObj.style.display = 'none';
         hdnPnlFromDateObj.style.display = '';
+        let visibleDoubleSpan = 'none';
+        if (chkId === 'chkPrintConsigneeRep') {
+            visibleDoubleSpan = 'inline-block';
+        } 
+        let cDSpanObj = document.getElementById('chkConsigneeRepDoubleSpan');
+        if (cDSpanObj !== null) {
+            cDSpanObj.style.display = visibleDoubleSpan;
+            cDSpanObj.nextElementSibling.style.display = visibleDoubleSpan;
+        } 
+
     } else {
         hdnShowPnlToDateObj.value = '1';
         hdnPnlMonthPickerObj.style.display = '';

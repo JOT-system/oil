@@ -364,12 +364,25 @@ Public Class OIT0004OilStockCreate
                 lastMonthDay = firstDay.AddMonths(1).AddDays(1)
             End With
             'ENEOS以外の荷主の場合、ENEOS帳票チェックを非表示
+            Me.chkPrintConsigneeRep.Visible = False
             If Not (shipper = "0005700010" AndAlso salesOffice = "011402") Then
                 Me.divChkEneos.Visible = False
+            Else
+                If {"10", "20"}.Contains(consignee) Then
+                    Me.chkPrintConsigneeRep.Visible = True
+                End If
             End If
             Me.txtDownloadMonth.Text = Now.ToString("yyyy/MM")
             Me.txtReportFromDate.Text = Now.ToString("yyyy/MM/dd") 'firstDay.ToString("yyyy/MM/dd")
             'Me.txtReportToDate.Text = lastMonthDay.ToString("yyyy/MM/dd")
+        Else
+
+            Me.chkPrintConsigneeRep.Visible = False
+            If shipper = "0005700010" AndAlso salesOffice = "011402" AndAlso {"10", "20"}.Contains(consignee) Then
+                Me.chkPrintConsigneeRep.Visible = True
+            Else
+                Me.chkPrintConsigneeRep.Checked = False
+            End If
         End If
         If mesNo <> C_MESSAGE_NO.NORMAL Then
             Master.Output(mesNo, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

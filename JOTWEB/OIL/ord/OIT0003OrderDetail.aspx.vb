@@ -19552,7 +19552,6 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(MERGE_TBL.NO), '')           AS NO" _
             & " , ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.PLANTNAME), '')    AS PLANTNAME" _
-            & " , ISNULL(RTRIM(MERGE_TBL.LOADINGIRILINETRAINNO), '') AS LOADINGIRILINETRAINNO" _
             & " , ISNULL(RTRIM(MERGE_TBL.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(MERGE_TBL.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(MERGE_TBL.CHECKOILCODE), '') AS CHECKOILCODE" _
@@ -19573,7 +19572,6 @@ Public Class OIT0003OrderDetail
             & "   '1'                                     AS NO" _
             & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '') AS LOADINGIRILINETRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '') AS CHECKOILCODE" _
@@ -19583,8 +19581,8 @@ Public Class OIT0003OrderDetail
         '### 20201202 START 指摘票対応(No243)全体 ################################################################
         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
             SQLStr &=
-                  " , SUM(1) OVER(PARTITION BY OIT0003.LOADINGIRILINETRAINNO, OIM0003.CHECKOILCODE) AS TANKCOUNT" _
-                & " , ROW_NUMBER() OVER(PARTITION BY OIT0003.LOADINGIRILINETRAINNO, OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
+                  " , SUM(1) OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE) AS TANKCOUNT" _
+                & " , ROW_NUMBER() OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
         Else
             SQLStr &=
                   " , COUNT(1)                                AS TANKCOUNT"
@@ -19616,7 +19614,6 @@ Public Class OIT0003OrderDetail
               " GROUP BY " _
             & "   OIM0003.PLANTCODE" _
             & " , OIM0009.PLANTNAME" _
-            & " , OIT0003.LOADINGIRILINETRAINNO" _
             & " , OIT0003.LINE" _
             & " , OIM0003.BIGOILCODE" _
             & " , OIM0003.CHECKOILCODE" _
@@ -19632,7 +19629,6 @@ Public Class OIT0003OrderDetail
             & "   '2'                                     AS NO" _
             & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '') AS LOADINGIRILINETRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , 'ZZZZ'                                  AS CHECKOILCODE" _
@@ -19667,7 +19663,6 @@ Public Class OIT0003OrderDetail
             & " GROUP BY " _
             & "   OIM0003.PLANTCODE" _
             & " , OIM0009.PLANTNAME" _
-            & " , OIT0003.LOADINGIRILINETRAINNO" _
             & " , OIT0003.LINE" _
             & " , OIM0003.BIGOILCODE" _
             & " , OIM0003.BIGOILNAME"
@@ -19679,7 +19674,6 @@ Public Class OIT0003OrderDetail
             & "   '3'                                     AS NO" _
             & " , ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '') AS LOADINGIRILINETRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ''                                      AS BIGOILCODE" _
             & " , ''                                      AS CHECKOILCODE" _
@@ -19714,7 +19708,6 @@ Public Class OIT0003OrderDetail
             & " GROUP BY " _
             & "   OIM0003.PLANTCODE" _
             & " , OIM0009.PLANTNAME" _
-            & " , OIT0003.LOADINGIRILINETRAINNO" _
             & " , OIT0003.LINE"
 
         SQLStr &=

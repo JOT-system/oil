@@ -1618,6 +1618,9 @@ Public Class OIT0001EmptyTurnDairyList
                     If OIT0001CHKOrdertbl.Rows.Count <> 0 Then
                         '受注TBL"1"(存在)に設定
                         OIT0001OTrow("ORDERFLAG") = "1"
+                        'OT受注TBLの取込フラグを"1"(取込済み)に更新
+                        WW_UpdateOTOrderStatus(SQLcon, OIT0001row:=OIT0001OTrow, I_ITEM:="IMPORTFLG", I_VALUE:="1")
+
                     End If
 
                 Next
@@ -2249,6 +2252,7 @@ Public Class OIT0001EmptyTurnDairyList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOTOrderStatus(ByVal SQLcon As SqlConnection,
+                                         Optional OIT0001row As DataRow = Nothing,
                                          Optional I_ITEM As String = Nothing,
                                          Optional I_VALUE As String = Nothing)
         Try
@@ -2282,11 +2286,16 @@ Public Class OIT0001EmptyTurnDairyList
             P_UPDTERMID.Value = Master.USERTERMID
             P_RECEIVEYMD.Value = C_DEFAULT_YMD
 
-            For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
-                P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
+            If IsNothing(OIT0001row) Then
+                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                    P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
+                    SQLcmd.ExecuteNonQuery()
+                Next
 
+            Else
+                P_ORDERNO.Value = OIT0001row("ORDERNO")
                 SQLcmd.ExecuteNonQuery()
-            Next
+            End If
 
             'CLOSE
             SQLcmd.Dispose()

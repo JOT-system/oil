@@ -208,7 +208,7 @@
             </li>
         </ul>
     </div>
-    <div id="divRTrainNo">
+    <div id="divRTrainNo" runat="server">
         <span id="spnRTrainNo">
             <asp:Label ID="lblReportRTrainNo" runat="server" Text="列車番号(臨海)"></asp:Label>
             <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
@@ -216,7 +216,7 @@
             </a>
         </span>
     </div>
-    <div id="divTrainNo">
+    <div id="divTrainNo" runat="server">
         <span id="spnTrainNo">
             <asp:Label ID="lblReportTrainNo" runat="server" Text="列車番号"></asp:Label>
             <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
@@ -224,7 +224,7 @@
             </a>
         </span>
     </div>
-    <div id="divEndMonthChk">
+    <div id="divEndMonthChk" runat="server">
         <span id="spnEndMonthChk">
             <asp:Label ID="lblEndMonthChkDmy" runat="server" Text="　　　　　　　　　"></asp:Label>
             <a id="aEndMonthChk">

@@ -33,6 +33,18 @@ Public Class OIT0003CustomMultiReport
         Dim url As String
         Using repCbj = New TankDispatch(mapId, officeCode, printDataClass)
             Try
+                url = repCbj.CreatePrintData(lodDate, {trainNo}, consigneeCode)
+            Catch ex As Exception
+                Throw
+            End Try
+        End Using
+        Return url
+    End Function
+
+    Public Shared Function CreateTankDispatch(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal consigneeCode As String, ByVal trainNo As String()) As String
+        Dim url As String
+        Using repCbj = New TankDispatch(mapId, officeCode, printDataClass)
+            Try
                 url = repCbj.CreatePrintData(lodDate, trainNo, consigneeCode)
             Catch ex As Exception
                 Throw
@@ -564,7 +576,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
         TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
     End Sub
 
-    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String, ByVal consigneeCode As String) As String
+    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String(), ByVal consigneeCode As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
@@ -632,7 +644,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea(ByVal lodDate As String, ByVal trainNo As String, ByVal consigneeCode As String)
+    Private Sub EditHeaderArea(ByVal lodDate As String, ByVal trainNo() As String, ByVal consigneeCode As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
 
@@ -640,7 +652,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
             'タイトル(列車番号)
             rngHeaderArea = ExcelWorkSheet.Range("B1")
-            rngHeaderArea.Value = String.Format("出荷実績表({0}列車)", trainNo)
+            rngHeaderArea.Value = String.Format("出荷実績表({0}列車)", String.Join(",", trainNo))
             ExcelMemoryRelease(rngHeaderArea)
 
             '出荷日(積込日)

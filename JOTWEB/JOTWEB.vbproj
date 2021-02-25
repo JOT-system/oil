@@ -506,6 +506,7 @@
     <Compile Include="OIL\com\OIT0003CustomReportReservedCsv.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportTakusouCsv.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportTakusouExcel.vb" />
+    <Compile Include="OIL\com\OIT0004CustomReportConsignee.vb" />
     <Compile Include="OIL\com\OIT0004CustomReportENEOS.vb" />
     <Compile Include="OIL\com\OIT0004CustomReport.vb" />
     <Compile Include="OIL\com\OIT0004CustomReportOLD.vb" />

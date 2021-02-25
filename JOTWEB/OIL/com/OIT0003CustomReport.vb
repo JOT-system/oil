@@ -103,6 +103,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" OrElse excelFileName = "OIT0003L_OTLOADPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+            ElseIf excelFileName = "OIT0003L_MIESHIOHAMA_LOADPLAN.xlsx" Then
+                Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_KINOENE_SHIPPLAN.xlsx" _
@@ -2191,7 +2193,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Function
 #End Region
 
-#Region "ダウンロード(託送指示(三重塩浜))"
+#Region "ダウンロード(託送指示、積込指示(三重塩浜))"
     ''' <summary>
     ''' テンプレートを元に帳票を作成しダウンロード(託送指示(三重塩浜))URLを生成する
     ''' </summary>
@@ -2204,14 +2206,26 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim retByte() As Byte
 
         Try
-            '***** TODO処理 ここから *****
-            '◯ヘッダーの設定
-            EditDeliveryHeaderArea(lodDate)
-            '◯明細の設定
-            EditDeliveryDetailArea()
-            '***** TODO処理 ここまで *****
-            ExcelTempSheet.Delete() '雛形シート削除
-            ExcelMemoryRelease(ExcelTempSheet)
+            Select Case repPtn
+                '託送指示
+                Case "DELIVERYPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditDeliveryHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditDeliveryDetailArea()
+                    '***** TODO処理 ここまで *****
+                    ExcelTempSheet.Delete() '雛形シート削除
+                    ExcelMemoryRelease(ExcelTempSheet)
+                '積込指示
+                Case "LOADPLAN"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditLoadPlanHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditLoadPlanDetailArea()
+                    '***** TODO処理 ここまで *****
+            End Select
             '保存処理実行
             Dim saveExcelLock As New Object
             SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
@@ -2322,6 +2336,67 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '受領印
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 'rngDetailArea.Value = PrintDatarow("")
+                ExcelMemoryRelease(rngDetailArea)
+                i += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(積込指示)
+    ''' </summary>
+    Private Sub EditLoadPlanHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            '積込日
+            rngHeaderArea = Me.ExcelWorkSheet.Range("H1")
+            rngHeaderArea.Value = lodDate
+            ExcelMemoryRelease(rngHeaderArea)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(積込指示)
+    ''' </summary>
+    Private Sub EditLoadPlanDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 4
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '固定NO
+                rngDetailArea = Me.ExcelWorkSheet.Range("A" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("LINECNT")
+                ExcelMemoryRelease(rngDetailArea)
+                '荷主名
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME")
+                ExcelMemoryRelease(rngDetailArea)
+                '着駅名
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ARRSTATIONNAME")
+                ExcelMemoryRelease(rngDetailArea)
+                '荷受人名
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME")
+                ExcelMemoryRelease(rngDetailArea)
+                '油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OILNAME")
+                ExcelMemoryRelease(rngDetailArea)
+                '貨車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TANKNO")
                 ExcelMemoryRelease(rngDetailArea)
                 i += 1
             Next

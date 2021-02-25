@@ -342,6 +342,8 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataSource = dispDataObj.StockDateDisplay
         repStockDate.DataBind()
         dispDataObj.CalcStockSummary()
+        repStockSummary.DataSource = dispDataObj.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
         repStockOilTypeItem.DataSource = dispDataObj.StockList
         repStockOilTypeItem.DataBind()
         SaveThisScreenValue(dispDataObj)
@@ -362,12 +364,25 @@ Public Class OIT0004OilStockCreate
                 lastMonthDay = firstDay.AddMonths(1).AddDays(1)
             End With
             'ENEOS以外の荷主の場合、ENEOS帳票チェックを非表示
+            Me.chkPrintConsigneeRep.Visible = False
             If Not (shipper = "0005700010" AndAlso salesOffice = "011402") Then
                 Me.divChkEneos.Visible = False
+            Else
+                If {"10", "20"}.Contains(consignee) Then
+                    Me.chkPrintConsigneeRep.Visible = True
+                End If
             End If
             Me.txtDownloadMonth.Text = Now.ToString("yyyy/MM")
             Me.txtReportFromDate.Text = Now.ToString("yyyy/MM/dd") 'firstDay.ToString("yyyy/MM/dd")
             'Me.txtReportToDate.Text = lastMonthDay.ToString("yyyy/MM/dd")
+        Else
+
+            Me.chkPrintConsigneeRep.Visible = False
+            If shipper = "0005700010" AndAlso salesOffice = "011402" AndAlso {"10", "20"}.Contains(consignee) Then
+                Me.chkPrintConsigneeRep.Visible = True
+            Else
+                Me.chkPrintConsigneeRep.Checked = False
+            End If
         End If
         If mesNo <> C_MESSAGE_NO.NORMAL Then
             Master.Output(mesNo, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -415,6 +430,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispClass.StockList
         repStockOilTypeItem.DataBind()
+        dispClass.CalcStockSummary()
+        repStockSummary.DataSource = dispClass.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 受注作成ボタン押下時処理
@@ -538,6 +556,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 入力値クリアボタン押下時処理
@@ -568,6 +589,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 再計算ボタン押下時処理
@@ -590,6 +614,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
     End Sub
     ''' <summary>
     ''' 更新ボタン押下時処理
@@ -647,6 +674,9 @@ Public Class OIT0004OilStockCreate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispValues.StockList
         repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
     End Sub
     ''' <summary>
@@ -6523,6 +6553,15 @@ Public Class OIT0004OilStockCreate
         Public Sub CalcStockSummary()
 
             Me.SummaryStockList = New StockListCollection(New OilItem("summary", "summary"), Me.StockDate)
+
+            Dim ordDate3goFrom As String = ""
+            Dim ordDate3goTo As String = ""
+            Dim isControl3go As Boolean = False
+            If {"010402", "011402"}.Contains(Me.SalesOffice) AndAlso Me.OilTypeList.ContainsKey("1404") AndAlso Me.Shipper = "0005700010" Then
+                isControl3go = True
+                ordDate3goFrom = Me.OilTypeList("1404").OrderFromDate
+                ordDate3goTo = Me.OilTypeList("1404").OrderToDate
+            End If
             For Each oilTypeItem In Me.StockList.Values
                 For Each daysItem In oilTypeItem.StockItemListDisplay
                     '格納先に対象の日付が無ければスキップ（直前にNewしてるのでありえないが念のため)
@@ -6534,15 +6573,24 @@ Public Class OIT0004OilStockCreate
                         Continue For
                     End If
                     '軽油の場合は受注対象期間外は合計に含めない
-                    If {"1404"}.Contains(oilTypeItem.OilInfo.OilCode) Then
-                        If oilTypeItem.OilInfo.OrderFromDate <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                    '　３号期間内なら３号を含める
+                    If isControl3go AndAlso {"1404"}.Contains(oilTypeItem.OilInfo.OilCode) Then
+                        If Not ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
                             Continue For
                         End If
-                        If oilTypeItem.OilInfo.OrderToDate >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                        If Not ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
                             Continue For
                         End If
                     End If
-
+                    '　３号の期間内で在れば軽油は含めない
+                    If isControl3go AndAlso {"1401"}.Contains(oilTypeItem.OilInfo.OilCode) Then
+                        If ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                            Continue For
+                        End If
+                        If ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                            Continue For
+                        End If
+                    End If
                     With Me.SummaryStockList.StockItemList(daysItem.Key)
                         If IsNumeric(daysItem.Value.MorningStock) Then
                             .MorningStock = (CDec(.MorningStock) + CDec(daysItem.Value.MorningStock)).ToString("#,##0")

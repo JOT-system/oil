@@ -19581,8 +19581,8 @@ Public Class OIT0003OrderDetail
         '### 20201202 START 指摘票対応(No243)全体 ################################################################
         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
             SQLStr &=
-                  " , SUM(1) OVER(PARTITION BY OIM0003.CHECKOILCODE) AS TANKCOUNT" _
-                & " , ROW_NUMBER() OVER(PARTITION BY OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
+                  " , SUM(1) OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE) AS TANKCOUNT" _
+                & " , ROW_NUMBER() OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
         Else
             SQLStr &=
                   " , COUNT(1)                                AS TANKCOUNT"

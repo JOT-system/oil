@@ -4124,8 +4124,29 @@ Public Class OIT0003OrderList
 
             'ダウンロードボタン(積込指示)押下
             Case CONST_RPT_LOADPLAN
-                '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                '### 20210224 START 共通帳票から個別帳票へ対応 ###############################################
+                ''★ 固定帳票(積込予定(共通))作成処理  止める！！
+                ''WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                '★ 固定帳票(積込予定（三重塩浜))作成処理
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelLoadPlanDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_012402, lodDate:=Me.txtReportLodDate.Text)
+                End Using
+
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_MIESHIOHAMA_LOADPLAN.xlsx", OIT0003Reporttbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintMieShiohamaData(CONST_RPT_LOADPLAN, Me.txtReportLodDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+                '### 20210224 END 共通帳票から個別帳票へ対応 ###############################################
 
             'ダウンロードボタン(OT積込指示)押下
             Case CONST_RPT_OTLOADPLAN
@@ -6711,6 +6732,122 @@ Public Class OIT0003OrderList
 
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003ReportYokkaichitbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(積込指示（三重塩浜）)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelLoadPlanDataGet(ByVal SQLcon As SqlConnection,
+                                       ByVal officeCode As String,
+                                       Optional ByVal lodDate As String = Nothing)
+
+        If IsNothing(OIT0003Reporttbl) Then
+            OIT0003Reporttbl = New DataTable
+        End If
+
+        If OIT0003Reporttbl.Columns.Count <> 0 Then
+            OIT0003Reporttbl.Columns.Clear()
+        End If
+
+        OIT0003Reporttbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+        " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , ''                                             AS No" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
+            & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
+            & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
+            & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
+            & " , OIT0002.TRAINNO                                AS TRAINNO" _
+            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+            & " , OIT0003.TANKNO                                 AS TANKNO" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , ISNULL(OIM0029.VALUE01,OIT0003.OILNAME)        AS OILNAME" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0029_CONVERT OIM0029 ON " _
+            & "     OIM0029.CLASS = @P05 " _
+            & " AND OIM0029.KEYCODE01 = @P01 " _
+            & " AND OIM0029.KEYCODE02 = OIT0003.OILCODE " _
+            & " AND OIM0029.KEYCODE04 = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0029.DELFLG <> @P02 " _
+            & " WHERE OIT0002.LODDATE = @P03 " _
+            & " AND OIT0002.OFFICECODE = @P01 " _
+            & " AND OIT0002.ORDERSTATUS <= @P04 " _
+            & " AND OIT0002.DELFLG <> @P02 "
+
+        SQLStr &=
+                " ORDER BY" _
+            & "    OIT0002.TRAINNO" _
+            & "   ,OIT0003.OILCODE" _
+            & "   ,OIT0003.ORDERINGTYPE"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '分類
+                PARA01.Value = officeCode
+                PARA02.Value = C_DELETE_FLG.DELETE
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    PARA03.Value = lodDate
+                Else
+                    PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+                'PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+                PARA05.Value = "LOADPLAN_OILCODE"
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Reporttbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003Reprow As DataRow In OIT0003Reporttbl.Rows
+                    i += 1
+                    OIT0003Reprow("LINECNT") = i        'LINECNT
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LLOADPLAN EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LLOADPLAN EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)

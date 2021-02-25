@@ -1598,6 +1598,11 @@ Public Class OIT0003OTLinkageList
                     OIT0003row("OFFICECODE") = ""
                     OIT0003row("SHIPPERSCODE") = ""
 
+                    ''★シフトアウト(14)・シフトイン(15)設定
+                    'OIT0003row("OTDAILYDEPSTATIONN") = Chr(14) + Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN")) + Chr(15)
+                    'OIT0003row("OTDAILYSHIPPERN") = Chr(14) + Convert.ToString(OIT0003row("OTDAILYSHIPPERN")) + Chr(15)
+                    'OIT0003row("OTOILNAME") = Chr(14) + Convert.ToString(OIT0003row("OTOILNAME")) + Chr(15)
+
                     '★スペース対応(暫定的に「発駅名」「荷主名」「油種名」をスペース埋めする)
                     '○半角スペース
                     OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8)
@@ -2048,6 +2053,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , ISNULL(DET.RESERVEDNO,'')        AS RESERVEDNO")  '予約番号
         sqlStat.AppendLine("     , PRD.REPORTOILNAME")            '油種コード(甲子用？）
         sqlStat.AppendLine("     , LRV.RESERVEDQUANTITY")         '予約数量
+        sqlStat.AppendLine("     , '' AS KINO_RESERVEDQUANTITY")         '予約数量
         sqlStat.AppendLine("     , ODR.TRAINNO")
         sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4) AS TRAINNO_PAD_ZERO")
         sqlStat.AppendLine("     , DET.TANKNO")
@@ -2290,7 +2296,24 @@ Public Class OIT0003OTLinkageList
                         Case Else 'その他は積込日+3桁0埋め予約番号
                             newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & reservedNo
                     End Select
-
+                    newDr("KINO_RESERVEDQUANTITY") = newDr("RESERVEDQUANTITY")
+                    If IsNumeric(newDr("RESERVEDQUANTITY")) Then
+                        Dim reservQ As Decimal = CDec(newDr("RESERVEDQUANTITY"))
+                        newDr("KINO_RESERVEDQUANTITY") = reservQ.ToString("00.000")
+                        'If reservQ <> 0 Then
+                        '    Dim reservQALL = reservQ
+                        '    Dim top As String = Math.Truncate(reservQ).ToString()
+                        '    Dim rightReserv = reservQALL.ToString("0.0##")
+                        '    Dim right0trim = rightReserv.Split("."c)(1)
+                        '    If right0trim <> "0" Then
+                        '        newDr("KINO_RESERVEDQUANTITY") = top & "." & right0trim
+                        '    Else
+                        '        newDr("KINO_RESERVEDQUANTITY") = top
+                        '    End If
+                        'Else
+                        '    newDr("KINO_RESERVEDQUANTITY") = "0"
+                        'End If
+                    End If
                     OIT0003Reserved.Rows.Add(newDr)
 
                     Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
@@ -3015,7 +3038,7 @@ Public Class OIT0003OTLinkageList
                 outFieldList.Add("OUTPUTRESERVENO", 0)
                 outFieldList.Add("KINO_TRAINNO", 0)
                 outFieldList.Add("REPORTOILNAME", 0)
-                outFieldList.Add("RESERVEDQUANTITY", 0)
+                outFieldList.Add("KINO_RESERVEDQUANTITY", 0)
                 outFieldList.Add("KINO_TOKUISAKICODE", 0)
                 outFieldList.Add("KINO_TOKUISAKINAME", 0)
                 outFieldList.Add("CONSIGNEECONVCODE", 0)

@@ -439,10 +439,52 @@
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
+                    <div class="footer">
+                        <asp:Repeater ID="repStockSummary" runat="server">
+                            <HeaderTemplate>
+                                <%--<div class="footerColHeader">--%>
+                                    <div class="col1To3s">
+                                        <div><span>合計</span></div>
+                                    </div>
+                                    <div class="col4s">
+                                        <div class="colStockInfoBottomRow"><span>朝在庫</span></div>
+                                        <div class="colStockInfoBottomRow"><span>受入</span></div>
+                                        <div class="colStockInfoBottomRow"><span>払出</span></div>
+                                    </div>
+                                    <%--<div class="summaryItem">--%>
+                            </HeaderTemplate>
+                            <ItemTemplate>
+                                <div class='colStockInfo date week<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.WeekNum  %>  holiday<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsHoliday, "1", "0") %>'>
+                                    <!-- 朝在庫 -->
+                                    <div>
+                                        <span class='<%# If(CDec(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock) < 0, "minus", "") %>'>
+                                            <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>
+                                        </span>
+                                    </div>
+                                    <!-- 受入 -->
+                                    <div>
+                                        <span class='<%# If(CDec(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) < 0, "minus", "") %>'>
+                                            <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive  %>
+                                        </span>
+                                    </div>
+                                    <!-- 払出 -->
+                                    <div>
+                                        <span class='<%# If(CDec(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send) < 0, "minus", "") %>'>
+                                            <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Send  %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                            <FooterTemplate>
+                                <%--</div>--%> <!-- End summaryItem -->
+                                <%--</div>--%>
+                            </FooterTemplate>
+                        
+                        </asp:Repeater> 
+                        <div class="lastMargin"></div>
+                    </div>
                 </div> <!-- End id="divStockList" -->
-                <div class="footer" style="display:none;">
-                    
-                </div>
+
             </asp:Panel> <!-- End 在庫表 -->
         </div> <!-- end class="headerboxOnly" id="headerbox" -->
         <!-- rightbox レイアウト -->
@@ -515,6 +557,9 @@
                 <li>
                     <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
                 </li>
+                <li>
+                    <asp:CheckBox ID="chkPrintConsigneeRep" runat="server" Text="油槽所在庫" /> 
+                </li>
             </ul>
         </div>
     </div>
@@ -530,6 +575,7 @@
             <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
             <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                <asp:CheckBox ID="chkConsigneeRepDoubleSpan" runat="server" text="12日分" />
             </a>
         </span>
     </div>

@@ -149,6 +149,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents repStockOilTypeItem As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''repStockSummary コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repStockSummary As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>
@@ -374,6 +383,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents chkPrintENEOS As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
+    '''chkPrintConsigneeRep コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkPrintConsigneeRep As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''hdnShowPnlToDate コントロール。
     '''</summary>
     '''<remarks>
@@ -417,6 +435,15 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''chkConsigneeRepDoubleSpan コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkConsigneeRepDoubleSpan As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''Master プロパティ。

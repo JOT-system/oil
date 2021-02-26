@@ -1379,7 +1379,9 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
         '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
@@ -1392,7 +1394,9 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
         '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
@@ -1636,40 +1640,40 @@ Public Class OIT0003OTLinkageList
 
                 Next
 
-                'Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy
-                'Dim WW_DATENOW As DateTime = Date.Now
-                ''★履歴IDなどの項目を追加
-                'hisDt.Columns.Add("HISTORYNO", Type.GetType("System.String"))
-                'hisDt.Columns.Add("MAPID", Type.GetType("System.String"))
-                'hisDt.Columns.Add("DATESENDYMD", Type.GetType("System.String"))
-                'hisDt.Columns.Add("DELFLG", Type.GetType("System.String"))
-                'hisDt.Columns.Add("INITYMD", Type.GetType("System.String"))
-                'hisDt.Columns.Add("INITUSER", Type.GetType("System.String"))
-                'hisDt.Columns.Add("INITTERMID", Type.GetType("System.String"))
-                'hisDt.Columns.Add("UPDYMD", Type.GetType("System.String"))
-                'hisDt.Columns.Add("UPDUSER", Type.GetType("System.String"))
-                'hisDt.Columns.Add("UPDTERMID", Type.GetType("System.String"))
-                'hisDt.Columns.Add("RECEIVEYMD", Type.GetType("System.String"))
-                'Dim WW_GetHistoryNo() As String = {""}
-                'WW_FixvalueMasterSearch("", "NEWOTSHIPHISNOGET", "", WW_GetHistoryNo)
-                'Using tran = SQLcon.BeginTransaction
-                '    For Each hisDtrow As DataRow In hisDt.Rows
-                '        hisDtrow("HISTORYNO") = WW_GetHistoryNo(0)
-                '        hisDtrow("MAPID") = Master.MAPID
-                '        hisDtrow("DATESENDYMD") = WW_DATENOW
-                '        hisDtrow("DELFLG") = C_DELETE_FLG.ALIVE
-                '        hisDtrow("INITYMD") = WW_DATENOW
-                '        hisDtrow("INITUSER") = Master.USERID
-                '        hisDtrow("INITTERMID") = Master.USERTERMID
-                '        hisDtrow("UPDYMD") = WW_DATENOW
-                '        hisDtrow("UPDUSER") = Master.USERID
-                '        hisDtrow("UPDTERMID") = Master.USERTERMID
-                '        hisDtrow("RECEIVEYMD") = C_DEFAULT_YMD
-                '        EntryHistory.InsertOTShipSendHistory(SQLcon, tran, hisDtrow)
-                '    Next
-                '    'トランザクションコミット
-                '    tran.Commit()
-                'End Using
+                Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy
+                Dim WW_DATENOW As DateTime = Date.Now
+                '★履歴IDなどの項目を追加
+                hisDt.Columns.Add("HISTORYNO", Type.GetType("System.String"))
+                hisDt.Columns.Add("MAPID", Type.GetType("System.String"))
+                hisDt.Columns.Add("DATESENDYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("DELFLG", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITUSER", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITTERMID", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDUSER", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDTERMID", Type.GetType("System.String"))
+                hisDt.Columns.Add("RECEIVEYMD", Type.GetType("System.String"))
+                Dim WW_GetHistoryNo() As String = {""}
+                WW_FixvalueMasterSearch("", "NEWOTSHIPHISNOGET", "", WW_GetHistoryNo)
+                Using tran = SQLcon.BeginTransaction
+                    For Each hisDtrow As DataRow In hisDt.Rows
+                        hisDtrow("HISTORYNO") = WW_GetHistoryNo(0)
+                        hisDtrow("MAPID") = Master.MAPID
+                        hisDtrow("DATESENDYMD") = WW_DATENOW
+                        hisDtrow("DELFLG") = C_DELETE_FLG.ALIVE
+                        hisDtrow("INITYMD") = WW_DATENOW
+                        hisDtrow("INITUSER") = Master.USERID
+                        hisDtrow("INITTERMID") = Master.USERTERMID
+                        hisDtrow("UPDYMD") = WW_DATENOW
+                        hisDtrow("UPDUSER") = Master.USERID
+                        hisDtrow("UPDTERMID") = Master.USERTERMID
+                        hisDtrow("RECEIVEYMD") = C_DEFAULT_YMD
+                        EntryHistory.InsertOTShipSendHistory(SQLcon, tran, hisDtrow)
+                    Next
+                    'トランザクションコミット
+                    tran.Commit()
+                End Using
 
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★CSV出力に不必要なので削除

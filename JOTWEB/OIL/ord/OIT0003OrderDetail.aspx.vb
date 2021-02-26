@@ -4312,6 +4312,10 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If
+
+                        'タンク車№に紐づく情報を取得・設定
+                        WW_TANKNUMBER_FIND(OIT0003tbl.Rows(i), I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
                         Exit For
                     End If
                 Next
@@ -7360,7 +7364,11 @@ Public Class OIT0003OrderDetail
         Dim WW_JRINSPECTIONCNT As String
         OIT0003row("JRINSPECTIONDATE") = WW_GetValue(2)
         If WW_GetValue(2) <> "" Then
-            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(2)))
+            'WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            If OIT0003row("STACKINGFLG") = "on" Then
+                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0003row("ACTUALLODDATE")), Date.Parse(WW_GetValue(2)))
+            End If
 
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
@@ -7408,7 +7416,11 @@ Public Class OIT0003OrderDetail
         Dim WW_JRALLINSPECTIONCNT As String
         OIT0003row("JRALLINSPECTIONDATE") = WW_GetValue(3)
         If WW_GetValue(3) <> "" Then
-            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(3)))
+            'WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            If OIT0003row("STACKINGFLG") = "on" Then
+                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0003row("ACTUALLODDATE")), Date.Parse(WW_GetValue(3)))
+            End If
 
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
@@ -15392,6 +15404,18 @@ Public Class OIT0003OrderDetail
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
                 WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
+
+                '### 20210219 START 仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    For Each OIT0003row As DataRow In OIT0003tbl.Select("STACKINGFLG='on'")
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        WW_UpdateTankShozai("", "", "", upLastOilCode:=True, I_TANKNO:=OIT0003row("TANKNO"))
+                    Next
+                End If
+                '### 20210219 END   仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
             End If
 
             '受注進行ステータスが以下の場合
@@ -19569,8 +19593,8 @@ Public Class OIT0003OrderDetail
         '### 20201202 START 指摘票対応(No243)全体 ################################################################
         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 Then
             SQLStr &=
-                  " , SUM(1) OVER(PARTITION BY OIM0003.CHECKOILCODE) AS TANKCOUNT" _
-                & " , ROW_NUMBER() OVER(PARTITION BY OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
+                  " , SUM(1) OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE) AS TANKCOUNT" _
+                & " , ROW_NUMBER() OVER(PARTITION BY OIT0003.LINE, OIM0003.CHECKOILCODE ORDER BY OIM0003.SEGMENTOILCODE) AS RNUM"
         Else
             SQLStr &=
                   " , COUNT(1)                                AS TANKCOUNT"

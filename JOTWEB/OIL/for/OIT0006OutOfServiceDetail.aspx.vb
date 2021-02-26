@@ -4056,7 +4056,9 @@ Public Class OIT0006OutOfServiceDetail
         End If
 
         '★新規登録時は、回送営業所のみチェックし処理を抜ける
-        If work.WF_SEL_CREATEFLG.Text = "1" AndAlso Me.WW_UPBUTTONFLG = "0" Then Exit Sub
+        '　※割当更新(一時更新)の場合も後続チェック不要
+        If work.WF_SEL_CREATEFLG.Text = "1" _
+            AndAlso (Me.WW_UPBUTTONFLG = "0" OrElse Me.WW_UPBUTTONFLG = "1") Then Exit Sub
 
 #Region "### 20200106 新画面に整理後、不要と判断(廃止) #########################################################"
         ''本線列車

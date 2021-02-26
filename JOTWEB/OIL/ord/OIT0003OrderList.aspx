@@ -171,10 +171,10 @@
                 <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadDispatch10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbActualLoad10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadDispatch20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbActualLoad20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
@@ -208,7 +208,7 @@
             </li>
         </ul>
     </div>
-    <div id="divRTrainNo">
+    <div id="divRTrainNo" runat="server">
         <span id="spnRTrainNo">
             <asp:Label ID="lblReportRTrainNo" runat="server" Text="列車番号(臨海)"></asp:Label>
             <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
@@ -216,7 +216,7 @@
             </a>
         </span>
     </div>
-    <div id="divTrainNo">
+    <div id="divTrainNo" runat="server">
         <span id="spnTrainNo">
             <asp:Label ID="lblReportTrainNo" runat="server" Text="列車番号"></asp:Label>
             <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
@@ -224,7 +224,7 @@
             </a>
         </span>
     </div>
-    <div id="divEndMonthChk">
+    <div id="divEndMonthChk" runat="server">
         <span id="spnEndMonthChk">
             <asp:Label ID="lblEndMonthChkDmy" runat="server" Text="　　　　　　　　　"></asp:Label>
             <a id="aEndMonthChk">

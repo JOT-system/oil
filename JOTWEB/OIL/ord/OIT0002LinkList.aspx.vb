@@ -1619,6 +1619,19 @@ Public Class OIT0002LinkList
                         WW_ERRCODE = "ERR"
                         Exit For
                     End Try
+
+                    '### 20210224 START 積込日と発日チェック ########################################################
+                    '★ポラリス(タンク車指示(指示内容))が未設定の場合
+                    If Convert.ToString(OIT0002EXLUProw("OBJECTIVENAME")) = "" Then
+                        If dtLodDate > dtDepDate Then
+                            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した積込日と発日が逆転しています。再度確認をおねがいします。", needsPopUp:=True)
+                            WW_ERRCODE = "ERR"
+                            Exit For
+                        End If
+                    End If
+                    '### 20210224 END   積込日と発日チェック ########################################################
+
                     '# 位置(桁数)チェック
                     If Convert.ToString(OIT0002EXLUProw("POSITION")).Length >= 3 Then
                         '★3桁以上で設定されている場合はエラー
@@ -2073,6 +2086,7 @@ Public Class OIT0002LinkList
                                     '★"1"変更あり(デフォルトは""(変更なし))
                                     OIT0002ExlUProw("CREATEFLAG") = "1"
                                 End If
+                                Exit For
                                 '### 20210204 END   指摘票対応(No340)全体 ############################################
                             Else
                                 OIT0002ExlUProw("ORDERSTATUS") = ""
@@ -5677,7 +5691,8 @@ Public Class OIT0002LinkList
 
         For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
             '貨車アップロードにて指定した本線列車が登録されているかチェック
-            If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" Then
+            If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" _
+                AndAlso Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")) <> "" Then
                 WW_ErrorMES = Convert.ToString(OIT0002ExlUProw("LOADINGTRAINNAME"))
                 WW_ErrorMES &= "　" + Convert.ToString(OIT0002ExlUProw("OILNAME"))
                 Master.Output(C_MESSAGE_NO.OIL_UPLOAD_ERR_LINK_OILOVER_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=WW_ErrorMES, needsPopUp:=True)
@@ -5697,6 +5712,20 @@ Public Class OIT0002LinkList
 
                 Exit Sub
             End If
+
+            '### 20210224 START 積込日と発日チェック ########################################################
+            '★ポラリス(タンク車指示(指示内容))が未設定の場合
+            If Convert.ToString(OIT0002ExlUProw("ORDERSTATUS")) <> "" _
+                AndAlso Convert.ToString(OIT0002ExlUProw("ORDERSTATUS")) >= BaseDllConst.CONST_ORDERSTATUS_310 Then
+
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                                  "ポラリスで設定した対象の受注が手配完了済みのためアップロードできません。再度確認をおねがいします。", needsPopUp:=True)
+                WW_ERRCODE = "ERR"
+                Exit For
+
+            End If
+            '### 20210224 END   積込日と発日チェック ########################################################
+
         Next
     End Sub
 

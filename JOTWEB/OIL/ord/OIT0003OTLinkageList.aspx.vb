@@ -1631,6 +1631,9 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
                     End If
+
+                    OIT0003row("TOTALTANK") = OIT0003CsvOTLinkagetbl.Rows.Count.ToString("00")
+
                 Next
 
                 'Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy

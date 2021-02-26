@@ -4312,6 +4312,10 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If
+
+                        'タンク車№に紐づく情報を取得・設定
+                        WW_TANKNUMBER_FIND(OIT0003tbl.Rows(i), I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
                         Exit For
                     End If
                 Next
@@ -7360,7 +7364,11 @@ Public Class OIT0003OrderDetail
         Dim WW_JRINSPECTIONCNT As String
         OIT0003row("JRINSPECTIONDATE") = WW_GetValue(2)
         If WW_GetValue(2) <> "" Then
-            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(2)))
+            'WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            If OIT0003row("STACKINGFLG") = "on" Then
+                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0003row("ACTUALLODDATE")), Date.Parse(WW_GetValue(2)))
+            End If
 
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
@@ -7408,7 +7416,11 @@ Public Class OIT0003OrderDetail
         Dim WW_JRALLINSPECTIONCNT As String
         OIT0003row("JRALLINSPECTIONDATE") = WW_GetValue(3)
         If WW_GetValue(3) <> "" Then
-            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(3)))
+            'WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            If OIT0003row("STACKINGFLG") = "on" Then
+                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0003row("ACTUALLODDATE")), Date.Parse(WW_GetValue(3)))
+            End If
 
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################

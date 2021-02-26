@@ -1264,6 +1264,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001tbl.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If
 
+                        'タンク車№に紐づく情報を取得・設定
+                        WW_TANKNUMBER_FIND(OIT0001tbl.Rows(i), I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
+                        Exit For
                     End If
                 Next
             '### 20201009 START 指摘票No165対応 ############################################################
@@ -1276,6 +1280,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Else
                             OIT0001tbl.Rows(i)("WHOLESALEFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -1293,6 +1298,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Else
                             OIT0001tbl.Rows(i)("INSPECTIONFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -1310,6 +1316,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Else
                             OIT0001tbl.Rows(i)("DETENTIONFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20201009 END   指摘票No165対応 ############################################################
@@ -1324,6 +1331,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Else
                             OIT0001tbl.Rows(i)("OTTRANSPORTFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20201110 END   指摘票No198対応 ############################################################
@@ -1339,7 +1347,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001Drow("UPGRADEFLG") = "on"
                             OIT0001Drow("DOWNGRADEFLG") = ""
                         End If
-
                         Exit For
                     End If
                 Next
@@ -1356,7 +1363,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001Drow("DOWNGRADEFLG") = "on"
                             OIT0001Drow("UPGRADEFLG") = ""
                         End If
-
                         Exit For
                     End If
                 Next
@@ -1371,6 +1377,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Else
                             OIT0001tbl.Rows(i)("OPERATION") = "on"
                         End If
+                        Exit For
                     End If
                 Next
         End Select
@@ -7864,7 +7871,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_JRINSPECTIONCNT As String
         OIT0001row("JRINSPECTIONDATE") = WW_GetValue(2)
         If WW_GetValue(2) <> "" Then
-            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(2)))
+            'WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+            If OIT0001row("STACKINGFLG") = "on" Then
+                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0001row("ACTUALLODDATE")), Date.Parse(WW_GetValue(2)))
+            End If
 
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
@@ -7913,7 +7924,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_JRALLINSPECTIONCNT As String
         OIT0001row("JRALLINSPECTIONDATE") = WW_GetValue(3)
         If WW_GetValue(3) <> "" Then
-            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(Me.TxtLoadingDate.Text), Date.Parse(WW_GetValue(3)))
+            'WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+            If OIT0001row("STACKINGFLG") = "on" Then
+                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(OIT0001row("ACTUALLODDATE")), Date.Parse(WW_GetValue(3)))
+            End If
 
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################

@@ -106,7 +106,7 @@
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH4" ItemStyle-CssClass="WF_COSTLISTTBL_TD4">
-                            <HeaderTemplate>荷受人</HeaderTemplate>
+                            <HeaderTemplate>荷主</HeaderTemplate>
                             <ItemTemplate>
                                 <!-- 荷受人名 -->
                                 <asp:Label ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSNAME") %>' />

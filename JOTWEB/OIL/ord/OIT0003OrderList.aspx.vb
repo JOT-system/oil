@@ -3037,13 +3037,13 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbTankDispatch30Btn.Checked     'タンク車発送実績<br>(コウショウ高崎)
                 Me.divTrainNo.Visible = True
-                Me.txtReportTrainNo.Text = "8877"
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877
             Case Me.rbTankDispatch40Btn.Checked     'タンク車発送実績<br>(ＪＯＮＥＴ松本)
                 Me.divTrainNo.Visible = True
-                Me.txtReportTrainNo.Text = "5461"
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
             Case Me.rbTankDispatch54Btn.Checked     'タンク車発送実績<br>(構内取り)
                 Me.divTrainNo.Visible = True
-                Me.txtReportTrainNo.Text = "8877"
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877
             Case Me.rbActualShipBtn.Checked         '出荷実績
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
@@ -3815,12 +3815,19 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(タンク車発送実績(袖ヶ浦))押下
             Case CONST_RPT_TANKDISPATCH,
                  CONST_RPT_TANKDISPATCH_30,    'コウショウ高崎
-                 CONST_RPT_TANKDISPATCH_40,    'ＪＯＮＥＴ松本
                  CONST_RPT_TANKDISPATCH_54     'OT高崎（構内取り）
 
                 '列車設定
                 Dim trainNoList As New List(Of String)
                 trainNoList.Add(Me.txtReportTrainNo.Text)
+                If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
+                    '8877及び8883は集計して出力する
+                    Dim secondTrainNo As String = CONST_SODE_TRAIN_8883
+                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
+                        secondTrainNo = CONST_SODE_TRAIN_8877
+                    End If
+                    trainNoList.Add(secondTrainNo)
+                End If
 
                 '油層所毎設定
                 Dim consigneeCode As String = Nothing
@@ -3829,30 +3836,9 @@ Public Class OIT0003OrderList
                     Case CONST_RPT_TANKDISPATCH_30
                         'コウショウ高崎
                         consigneeCode = BaseDllConst.CONST_CONSIGNEECODE_30
-
-                        If txtReportTrainNo.Text = "8877" OrElse txtReportTrainNo.Text = "8883" Then
-                            Dim secondTrainNo As String = "8883"
-                            If lblReportTrainNo.Text = "8883" Then
-                                secondTrainNo = "8877"
-                            End If
-                            trainNoList.Add(secondTrainNo)
-                        End If
-
-                    Case CONST_RPT_TANKDISPATCH_40
-                        'ＪＯＮＥＴ松本
-                        consigneeCode = BaseDllConst.CONST_CONSIGNEECODE_40
                     Case CONST_RPT_TANKDISPATCH_54
                         'OT高崎(構内取り)
                         secondConsigneeCode = BaseDllConst.CONST_CONSIGNEECODE_54
-
-                        If txtReportTrainNo.Text = "8877" OrElse txtReportTrainNo.Text = "8883" Then
-                            Dim secondTrainNo As String = "8883"
-                            If lblReportTrainNo.Text = "8883" Then
-                                secondTrainNo = "8877"
-                            End If
-                            trainNoList.Add(secondTrainNo)
-                        End If
-
                 End Select
 
                 '******************************
@@ -3860,37 +3846,41 @@ Public Class OIT0003OrderList
                 '******************************
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
-
-                    If consigneeCode = BaseDllConst.CONST_CONSIGNEECODE_40 Then
-                        ExcelActualShipDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
-                    Else
-                        ExcelTankDispatchDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, trainNoList.ToArray(), consigneeCode, secondConsigneeCode)
-                    End If
-
+                    ExcelTankDispatchDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, trainNoList.ToArray(), consigneeCode, secondConsigneeCode)
                 End Using
 
-                '帳票作成
-                Dim urlList As New List(Of String)
-                Dim url As String
-
-                '松本のみ出荷実績と同じレイアウトを使用
-                If consigneeCode = BaseDllConst.CONST_CONSIGNEECODE_40 Then
-                    url = OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, txtReportLodDate.Text, txtReportTrainNo.Text)
-                    urlList.Add(url)
-                Else
-                    If Not String.IsNullOrWhiteSpace(secondConsigneeCode) Then
-                        consigneeCode = secondConsigneeCode
+                '出力時の表示油層所を設定
+                If Not String.IsNullOrEmpty(secondConsigneeCode) Then
+                    consigneeCode = secondConsigneeCode
+                End If
+                '出力時の列車番号を設定
+                Dim outputTrainNo As String = Me.txtReportTrainNo.Text
+                If OIT0003Reporttbl IsNot Nothing AndAlso OIT0003Reporttbl.Rows.Count > 0 Then
+                    Dim query = OIT0003Reporttbl.AsEnumerable()
+                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
+                        If query.Where(Function(r) r("TRAINNO").ToString() = CONST_SODE_TRAIN_8877).Any() Then
+                            outputTrainNo = CONST_SODE_TRAIN_8877
+                        ElseIf query.Where(Function(r) r("TRAINNO").ToString() = CONST_SODE_TRAIN_8883).Any() Then
+                            outputTrainNo = CONST_SODE_TRAIN_8883
+                        End If
                     End If
-                    url = OIT0003CustomMultiReport.CreateTankDispatch(Master.MAPID, officeCode, OIT0003Reporttbl, txtReportLodDate.Text, consigneeCode, trainNoList.ToArray())
-                    urlList.Add(url)
+                Else
+                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
+                        outputTrainNo = CONST_SODE_TRAIN_8877
+                    End If
                 End If
 
+                '帳票作成
+                Dim url As String =
+                    OIT0003CustomMultiReport.CreateTankDispatch(Master.MAPID, officeCode, OIT0003Reporttbl, txtReportLodDate.Text, consigneeCode, outputTrainNo)
+
                 '○ 別画面でExcelを表示
-                WF_PrintURL.Value = OIT0003CustomMultiReport.CreateUrlJson(urlList)
+                WF_PrintURL.Value = url
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
 
-            'ダウンロードボタン(出荷実績(袖ヶ浦))押下
-            Case CONST_RPT_ACTUALSHIP
+            'ダウンロードボタン(出荷実績(袖ヶ浦)、タンク車発送実績(袖ヶ浦))押下
+            Case CONST_RPT_ACTUALSHIP,
+                 CONST_RPT_TANKDISPATCH_40    'ＪＯＮＥＴ松本
                 '******************************
                 '帳票表示データ取得処理
                 '******************************

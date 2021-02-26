@@ -174,12 +174,13 @@ Public Class OIT0003OTLinkageList
         '製油所出荷予約
         WF_ButtonReserved.Visible = settings.CanReserved
         '託送指示
-        WF_ButtonTakusou.Visible = settings.CanTakusou
+        WF_ButtonTakusou.Visible = settings.CanTakusou Or settings.CanKeiyouTakusou
         '幅調整の為ボタンの数量で
         Dim cssVal = Me.Form.Attributes("class")
         Dim btnCnt As Integer = If(settings.CanOtSend, 1, 0) +
                                 If(settings.CanReserved, 1, 0) +
-                                If(settings.CanTakusou, 1, 0)
+                                If(settings.CanTakusou, 1, 0) +
+                                If(settings.CanKeiyouTakusou, 1, 0)
         cssVal = cssVal & " btnCnt" & btnCnt
         Me.Form.Attributes("class") = cssVal
         '表示するデータが無ければ各種ボタンは非活性
@@ -487,6 +488,8 @@ Public Class OIT0003OTLinkageList
                 dtWrk.Columns.Add("CAN_RESERVED", GetType(String)).DefaultValue = "0"
                 '託送指示出力可否
                 dtWrk.Columns.Add("CAN_TAKUSOU", GetType(String)).DefaultValue = "0"
+                '京葉臨海託送指示出力可否
+                dtWrk.Columns.Add("CAN_KEIYOUTAKUSOU", GetType(String)).DefaultValue = "0"
                 If dtWrk.Rows.Count <> 0 Then
                     OIT0003tbl = (From dr As DataRow In dtWrk Order By dr("LODDATE")).CopyToDataTable
                 Else
@@ -514,6 +517,12 @@ Public Class OIT0003OTLinkageList
                         OIT0003row("CAN_TAKUSOU") = "1"
                     Else
                         OIT0003row("CAN_TAKUSOU") = "0"
+                    End If
+                    '京葉臨海託送指示出力可否(発日 >= 当日)
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= today Then
+                        OIT0003row("CAN_KEIYOUTAKUSOU") = "1"
+                    Else
+                        OIT0003row("CAN_KEIYOUTAKUSOU") = "0"
                     End If
                     ''受注進行ステータス
                     'CODENAME_get("ORDERSTATUS", OIT0003row("STATUS"), OIT0003row("STATUS"), WW_DUMMY)
@@ -955,30 +964,6 @@ Public Class OIT0003OTLinkageList
                 Not outputCsvList.Contains(targetOffice) Then
                 Return
             End If
-            '
-            '一覧のチェックボックスが選択されているか確認
-            If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
-                '選択されていない場合は、エラーメッセージを表示し終了
-                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                Exit Sub
-            End If
-            '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
-            Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
-                                                             AndAlso dr("CAN_TAKUSOU").Equals("0")
-
-            If qCannotProc.Any Then
-                '選択されていない場合は、エラーメッセージを表示し終了
-                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                Exit Sub
-            End If
-            '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
-            '対象の発日が統一されていない場合（同一発日以外は不許可）
-            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
-            If qSameProcDateCnt > 1 Then
-                '選択されていない場合は、エラーメッセージを表示し終了
-                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                Exit Sub
-            End If
 
             If outputExcelList.Contains(targetOffice) Then
                 OutputTakusouExcel()
@@ -1003,6 +988,30 @@ Public Class OIT0003OTLinkageList
 
     Private Sub OutputTakusouExcel()
         Try
+
+            '一覧のチェックボックスが選択されているか確認
+            If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
+            Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                             AndAlso dr("CAN_TAKUSOU").Equals("0")
+
+            If qCannotProc.Any Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+            '対象の発日が統一されていない場合（同一発日以外は不許可）
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            If qSameProcDateCnt > 1 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
 
             '処理対象のデータ明細を取得
             Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
@@ -1111,6 +1120,30 @@ Public Class OIT0003OTLinkageList
 
     Private Sub OutputTakusouCSV()
         Try
+
+            '一覧のチェックボックスが選択されているか確認
+            If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
+            Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                             AndAlso dr("CAN_KEIYOUTAKUSOU").Equals("0")
+
+            If qCannotProc.Any Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+            '対象の発日が統一されていない場合（同一発日以外は不許可）
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            If qSameProcDateCnt > 1 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
 
             '処理対象のデータ明細を取得
             Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
@@ -2974,14 +3007,14 @@ Public Class OIT0003OTLinkageList
                 '仙台新港営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "010402", True, False, False
+                    "010402", True, False, False, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '五井営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011201", True, True, True
+                    "011201", True, True, True, True
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 With outFieldList
@@ -3029,7 +3062,7 @@ Public Class OIT0003OTLinkageList
                 '甲子営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011202", True, True, True
+                    "011202", True, True, True, True
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 outFieldList.Add("KINO_DATAKBN", 0)
@@ -3051,7 +3084,7 @@ Public Class OIT0003OTLinkageList
                 '袖ヶ浦営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011203", True, True, True
+                    "011203", True, True, True, True
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 outFieldList.Add("SOD_STATUS", 0)
@@ -3084,7 +3117,7 @@ Public Class OIT0003OTLinkageList
                 '根岸営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011402", True, True, False
+                    "011402", True, True, False, False
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
@@ -3108,7 +3141,7 @@ Public Class OIT0003OTLinkageList
                 '四日市営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012401", True, True, True
+                    "012401", True, True, True, False
                     )
                 outFieldList = New Dictionary(Of String, Integer)
                 With outFieldList
@@ -3156,7 +3189,7 @@ Public Class OIT0003OTLinkageList
                 '三重塩浜営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012402", False, False, True
+                    "012402", False, False, True, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
             End With
@@ -3172,7 +3205,7 @@ Public Class OIT0003OTLinkageList
                     Return Me._Item(officeCode)
                 Else
                     '設定が存在しない場合は全てボタン非表示
-                    Return New FileLinkagePatternItem(officeCode, False, False, False)
+                    Return New FileLinkagePatternItem(officeCode, False, False, False, False)
                 End If
 
             End Get
@@ -3202,7 +3235,7 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <param name="officeCode"></param>
         Public Sub New(officeCode As String)
-            Me.New(officeCode, False, False, False)
+            Me.New(officeCode, False, False, False, False)
         End Sub
         ''' <summary>
         ''' コンストラクタ
@@ -3211,11 +3244,13 @@ Public Class OIT0003OTLinkageList
         ''' <param name="canOtSend">OT発送日報出力可否(True:可,False:不可)</param>
         ''' <param name="canReserved">製油所出荷予約出力可否(True:可,False:不可)</param>
         ''' <param name="canTakusou">託送指示出力可否(True:可,False:不可)</param>
-        Public Sub New(officeCode As String, canOtSend As Boolean, canReserved As Boolean, canTakusou As Boolean)
+        ''' <param name="canKeiyouTakusou"> 京葉臨海託送指示出力可否(True:可,False:不可)</param>
+        Public Sub New(officeCode As String, canOtSend As Boolean, canReserved As Boolean, canTakusou As Boolean, canKeiyouTakusou As Boolean)
             Me.OfficeCode = officeCode
             Me.CanOtSend = canOtSend
             Me.CanReserved = canReserved
             Me.CanTakusou = canTakusou
+            Me.CanKeiyouTakusou = canKeiyouTakusou
         End Sub
 
         ''' <summary>
@@ -3238,7 +3273,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property CanTakusou As Boolean = False
-
+        ''' <summary>
+        ''' 京葉臨海託送指示出力可否(True:可,False:不可)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CanKeiyouTakusou As Boolean = false
         ''' <summary>
         ''' 出荷予約出力フォーマット
         ''' </summary>

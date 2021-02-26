@@ -401,7 +401,7 @@ Public Class OIT0003OTLinkageList
             & "      VIW0003.ORGCODE    = @P05 " _
             & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " WHERE OIT0002.DELFLG      <> @P04" _
-            & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
+        '& "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         'SQLStrNashi &=
@@ -410,11 +410,13 @@ Public Class OIT0003OTLinkageList
         '    & "         OR OIT0002.DEPDATE     >= @TODAY) "
         SQLStrNashi &=
               SQLStrCmn _
+            & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
         '★積置フラグ有り用SQL
         SQLStrAri &=
-              SQLStrCmn
+              SQLStrCmn _
+            & "   AND OIT0002.ORDERSTATUS BETWEEN @P07 AND @P06 "
 
         SQLStrCmn =
               " GROUP BY" _
@@ -463,11 +465,13 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータスTO
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 3)  '受注進行ステータスFROM(積置)
                 Dim PARA_TODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '当日
                 'PARA01.Value = OFFICECDE
                 PARA02.Value = targetDate
                 PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
+                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE

@@ -1384,10 +1384,9 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))" _
             & "   +  REPLICATE(SPACE (1), 12 - DATALENGTH(CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))))        AS OTOILNAME" _
             & " , CASE" _
-            & "   WHEN OIM0005.MODELTANKNO IS NULL THEN SPACE(1)" _
-            & "   ELSE CONVERT(VARCHAR (6), OIM0005.MODELTANKNO)" _
-            & "   END" _
-            & "   +  REPLICATE(SPACE (1), 6 - DATALENGTH(CONVERT(VARCHAR (6), ISNULL(OIM0005.MODELTANKNO,''))))        AS TANKNO" _
+            & "   WHEN OIM0005.MODELTANKNO IS NULL THEN '000000'" _
+            & "   ELSE FORMAT(OIM0005.MODELTANKNO , '000000')" _
+            & "   END                                            AS TANKNO" _
             & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
             & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
             & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _

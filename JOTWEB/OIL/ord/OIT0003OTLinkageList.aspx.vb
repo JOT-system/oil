@@ -3277,7 +3277,7 @@ Public Class OIT0003OTLinkageList
         ''' 京葉臨海託送指示出力可否(True:可,False:不可)
         ''' </summary>
         ''' <returns></returns>
-        Public Property CanKeiyouTakusou As Boolean = false
+        Public Property CanKeiyouTakusou As Boolean = False
         ''' <summary>
         ''' 出荷予約出力フォーマット
         ''' </summary>

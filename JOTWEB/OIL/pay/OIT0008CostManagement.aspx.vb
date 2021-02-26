@@ -165,7 +165,7 @@ Public Class OIT0008CostManagement
         '荷主コード
         work.WF_SEL_SHIPPERSCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
         '荷主名
-        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), HiddenField).Value
+        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), Label).Text
         '請求先コード
         work.WF_SEL_INVOICECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
         '請求先名
@@ -523,7 +523,7 @@ Public Class OIT0008CostManagement
             addRow("SHIPPERSCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
 
             '荷主名(SHIPPERSNAME)
-            addRow("SHIPPERSNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), HiddenField).Value
+            addRow("SHIPPERSNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), Label).Text
 
             '数量(QUANTITY)
             Dim quantity As Decimal = 0
@@ -930,12 +930,19 @@ Public Class OIT0008CostManagement
         '詳細画面検索条件を初期化
         work.WF_SEL_LINE.Text = ""
         work.WF_SEL_ACCOUNTCODE.Text = ""
+        work.WF_SEL_ACCOUNTNAME.Text = ""
         work.WF_SEL_SEGMENTCODE.Text = ""
+        work.WF_SEL_SEGMENTNAME.Text = ""
         work.WF_SEL_SEGMENTBRANCHCODE.Text = ""
+        work.WF_SEL_SEGMENTBRANCHNAME.Text = ""
         work.WF_SEL_SHIPPERSCODE.Text = ""
         work.WF_SEL_SHIPPERSNAME.Text = ""
         work.WF_SEL_INVOICECODE.Text = ""
+        work.WF_SEL_INVOICENAME.Text = ""
+        work.WF_SEL_INVOICEDEPTNAME.Text = ""
         work.WF_SEL_PAYEECODE.Text = ""
+        work.WF_SEL_PAYEENAME.Text = ""
+        work.WF_SEL_PAYEEDEPTNAME.Text = ""
         work.WF_SEL_TEKIYOU.Text = ""
 
     End Sub
@@ -1294,6 +1301,8 @@ Public Class OIT0008CostManagement
         '小計行テーブル生成
         OIT0008SubTotaltbl = New DataTable()
         '小計の集計キー：勘定科目コード/セグメント/セグメント枝番/請求先コード/支払先コード
+        OIT0008SubTotaltbl.Columns.Add("SHIPPERSCODE", Type.GetType("System.String"))
+        OIT0008SubTotaltbl.Columns.Add("SHIPPERSNAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("ACCOUNTCODE", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("ACCOUNTNAME", Type.GetType("System.String"))
         OIT0008SubTotaltbl.Columns.Add("SEGMENTCODE", Type.GetType("System.String"))
@@ -1327,7 +1336,8 @@ Public Class OIT0008CostManagement
             For Each strow As DataRow In OIT0008SubTotaltbl.Rows
                 '勘定科目コード/セグメント/請求先コード/支払先コードが一致する行が存在する場合
                 '金額、税額をそれぞれ加算
-                If row("ACCOUNTCODE") = strow("ACCOUNTCODE") AndAlso
+                If row("SHIPPERSCODE") = strow("SHIPPERSCODE") AndAlso
+                    row("ACCOUNTCODE") = strow("ACCOUNTCODE") AndAlso
                     row("SEGMENTCODE") = strow("SEGMENTCODE") AndAlso
                     row("SEGMENTBRANCHCODE") = strow("SEGMENTBRANCHCODE") AndAlso
                     row("INVOICECODE") = strow("INVOICECODE") AndAlso
@@ -1348,6 +1358,8 @@ Public Class OIT0008CostManagement
 
                 Dim strow As DataRow = OIT0008SubTotaltbl.NewRow()
 
+                strow("SHIPPERSCODE") = row("SHIPPERSCODE")
+                strow("SHIPPERSNAME") = row("SHIPPERSNAME")
                 strow("ACCOUNTCODE") = row("ACCOUNTCODE")
                 strow("ACCOUNTNAME") = row("ACCOUNTNAME")
                 strow("SEGMENTCODE") = row("SEGMENTCODE")
@@ -1477,10 +1489,10 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("     , ROW_NUMBER() OVER(")
         InsBldr.AppendLine("           ORDER BY")
         InsBldr.AppendLine("               TMP.OFFICECODE")
+        InsBldr.AppendLine("               , TMP.SHIPPERSCODE")
         InsBldr.AppendLine("               , TMP.ACCOUNTCODE")
         InsBldr.AppendLine("               , TMP.SEGMENTCODE")
         InsBldr.AppendLine("               , TMP.SEGMENTBRANCHCODE")
-        InsBldr.AppendLine("               , TMP.SHIPPERSCODE")
         InsBldr.AppendLine("               , TMP.INVOICECODE")
         InsBldr.AppendLine("               , TMP.PAYEECODE")
         InsBldr.AppendLine("       ) AS LINE")
@@ -2042,40 +2054,43 @@ Public Class OIT0008CostManagement
                 gvrow.Cells(0).ColumnSpan = 3
                 gvrow.Cells(0).Text = "小計"
 
-                gvrow.Cells(1).CssClass = "footerCells withicon"
-                gvrow.Cells(1).Text = OIT0008SubTotaltbl.Rows(i)("ACCOUNTCODE")
+                gvrow.Cells(1).CssClass = "footerCells noicon"
+                gvrow.Cells(1).Text = OIT0008SubTotaltbl.Rows(i)("SHIPPERSNAME")
 
-                gvrow.Cells(2).CssClass = "footerCells noicon"
-                gvrow.Cells(2).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTCODE")
+                gvrow.Cells(2).CssClass = "footerCells withicon"
+                gvrow.Cells(2).Text = OIT0008SubTotaltbl.Rows(i)("ACCOUNTCODE")
 
                 gvrow.Cells(3).CssClass = "footerCells noicon"
-                gvrow.Cells(3).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTBRANCHNAME")
+                gvrow.Cells(3).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTCODE")
 
-                gvrow.Cells(4).CssClass = "footerCells money"
-                gvrow.Cells(4).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("AMOUNT"))
+                gvrow.Cells(4).CssClass = "footerCells noicon"
+                gvrow.Cells(4).Text = OIT0008SubTotaltbl.Rows(i)("SEGMENTBRANCHNAME")
 
                 gvrow.Cells(5).CssClass = "footerCells money"
-                gvrow.Cells(5).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("TAX"))
+                gvrow.Cells(5).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("AMOUNT"))
 
-                gvrow.Cells(6).CssClass = "footerCells withicon"
-                gvrow.Cells(6).Text = OIT0008SubTotaltbl.Rows(i)("invoicecode")
+                gvrow.Cells(6).CssClass = "footerCells money"
+                gvrow.Cells(6).Text = String.Format("{0:#,##0}", OIT0008SubTotaltbl.Rows(i)("TAX"))
 
-                gvrow.Cells(7).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(7).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICENAME") + "</span>"
+                gvrow.Cells(7).CssClass = "footerCells withicon"
+                gvrow.Cells(7).Text = OIT0008SubTotaltbl.Rows(i)("invoicecode")
 
                 gvrow.Cells(8).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(8).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICEDEPTNAME") + "</span>"
+                gvrow.Cells(8).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICENAME") + "</span>"
 
-                gvrow.Cells(9).CssClass = "footerCells withicon"
-                gvrow.Cells(9).Text = OIT0008SubTotaltbl.Rows(i)("PAYEECODE")
+                gvrow.Cells(9).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(9).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("INVOICEDEPTNAME") + "</span>"
 
-                gvrow.Cells(10).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(10).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEENAME") + "</span>"
+                gvrow.Cells(10).CssClass = "footerCells withicon"
+                gvrow.Cells(10).Text = OIT0008SubTotaltbl.Rows(i)("PAYEECODE")
 
                 gvrow.Cells(11).CssClass = "footerCells noicon inv_pay"
-                gvrow.Cells(11).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEEDEPTNAME") + "</span>"
+                gvrow.Cells(11).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEENAME") + "</span>"
 
-                For j = 12 To gvrow.Cells.Count - 1
+                gvrow.Cells(12).CssClass = "footerCells noicon inv_pay"
+                gvrow.Cells(12).Text = "<span class='inv_pay'>" + OIT0008SubTotaltbl.Rows(i)("PAYEEDEPTNAME") + "</span>"
+
+                For j = 13 To gvrow.Cells.Count - 1
                     gvrow.Cells(j).Visible = False
                 Next
 
@@ -2083,7 +2098,7 @@ Public Class OIT0008CostManagement
             Else                        '請求合計
                 '「請求合計」のスタイル設定
                 gvrow.Cells(0).CssClass = "footerCells text"
-                gvrow.Cells(0).ColumnSpan = 6
+                gvrow.Cells(0).ColumnSpan = 7
                 gvrow.Cells(0).Text = "請求合計"
 
                 gvrow.Cells(1).CssClass = "footerCells money"

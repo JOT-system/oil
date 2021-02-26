@@ -106,6 +106,15 @@
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH4" ItemStyle-CssClass="WF_COSTLISTTBL_TD4">
+                            <HeaderTemplate>荷受人</HeaderTemplate>
+                            <ItemTemplate>
+                                <!-- 荷受人名 -->
+                                <asp:Label ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSNAME") %>' />
+                                <!-- 荷受人コード -->
+                                <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSCODE") %>' />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH5" ItemStyle-CssClass="WF_COSTLISTTBL_TD5">
                             <HeaderTemplate>勘定科目</HeaderTemplate>
                             <ItemTemplate>
                                 <span ondblclick="Field_DBclick('WF_COSTLISTTBL_ACCOUNTCODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST%>)">
@@ -115,7 +124,7 @@
                                 <asp:HiddenField ID="WF_COSTLISTTBL_ACCOUNTNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "ACCOUNTNAME") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH5" ItemStyle-CssClass="WF_COSTLISTTBL_TD5" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH6" ItemStyle-CssClass="WF_COSTLISTTBL_TD6" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>セグメント</HeaderTemplate>
                             <ItemTemplate>
                                 <!-- セグメント -->
@@ -124,20 +133,16 @@
                                 <asp:HiddenField ID="WF_COSTLISTTBL_SEGMENTNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SEGMENTNAME") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH6" ItemStyle-CssClass="WF_COSTLISTTBL_TD6" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH7" ItemStyle-CssClass="WF_COSTLISTTBL_TD7" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>セグメント枝番</HeaderTemplate>
                             <ItemTemplate>
                                 <!-- セグメント枝番名 -->
                                 <asp:Label ID="WF_COSTLISTTBL_SEGMENTBRANCHNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "SEGMENTBRANCHNAME") %>' />
                                 <!-- セグメント枝番 -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_SEGMENTBRANCHCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SEGMENTBRANCHCODE") %>' />
-                                <!-- 荷受人コード -->
-                                <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSCODE") %>' />
-                                <!-- 荷受人名 -->
-                                <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSNAME") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH7" ItemStyle-CssClass="WF_COSTLISTTBL_TD7" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH8" ItemStyle-CssClass="WF_COSTLISTTBL_TD8" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>金額</HeaderTemplate>
                             <ItemTemplate>
                                 <span onchange="TextBox_change('WF_COSTLISTTBL_AMOUNT<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
@@ -147,13 +152,13 @@
                                 <asp:HiddenField ID="WF_COSTLISTTBL_QUANTITY" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "QUANTITY") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH8" ItemStyle-CssClass="WF_COSTLISTTBL_TD8" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH9" ItemStyle-CssClass="WF_COSTLISTTBL_TD9" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>税額</HeaderTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="WF_COSTLISTTBL_TAX" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "TAX")) %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH9" ItemStyle-CssClass="WF_COSTLISTTBL_TD9" ControlStyle-CssClass="WF_TEXTBOX_CSS boxIcon">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH10" ItemStyle-CssClass="WF_COSTLISTTBL_TD10" ControlStyle-CssClass="WF_TEXTBOX_CSS boxIcon">
                             <HeaderTemplate>請求先コード</HeaderTemplate>
                             <ItemTemplate>
                                 <span ondblclick="Field_DBclick('WF_COSTLISTTBL_INVOICECODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>)" onchange="TextBox_change('WF_COSTLISTTBL_INVOICECODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
@@ -161,19 +166,19 @@
                                 </span>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH10" ItemStyle-CssClass="WF_COSTLISTTBL_TD10" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH11" ItemStyle-CssClass="WF_COSTLISTTBL_TD11" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>請求先名</HeaderTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="WF_COSTLISTTBL_INVOICENAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "INVOICENAME")%>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH11" ItemStyle-CssClass="WF_COSTLISTTBL_TD11" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH12" ItemStyle-CssClass="WF_COSTLISTTBL_TD12" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>請求先部門</HeaderTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="WF_COSTLISTTBL_INVOICEDEPTNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "INVOICEDEPTNAME")%>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH12" ItemStyle-CssClass="WF_COSTLISTTBL_TD12" ControlStyle-CssClass="WF_TEXTBOX_CSS boxIcon">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH13" ItemStyle-CssClass="WF_COSTLISTTBL_TD13" ControlStyle-CssClass="WF_TEXTBOX_CSS boxIcon">
                             <HeaderTemplate>支払先コード</HeaderTemplate>
                             <ItemTemplate>
                                 <span ondblclick="Field_DBclick('WF_COSTLISTTBL_PAYEECODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>)" onchange="TextBox_change('WF_COSTLISTTBL_PAYEECODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
@@ -181,19 +186,19 @@
                                 </span>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH13" ItemStyle-CssClass="WF_COSTLISTTBL_TD13" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH14" ItemStyle-CssClass="WF_COSTLISTTBL_TD14" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>支払先名</HeaderTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="WF_COSTLISTTBL_PAYEENAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "PAYEENAME")%>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH14" ItemStyle-CssClass="WF_COSTLISTTBL_TD14" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH15" ItemStyle-CssClass="WF_COSTLISTTBL_TD15" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>支払先部門</HeaderTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="WF_COSTLISTTBL_PAYEEDEPTNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "PAYEEDEPTNAME")%>' />
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH15" ItemStyle-CssClass="WF_COSTLISTTBL_TD15" ControlStyle-CssClass="WF_TEXTBOX_CSS">
+                        <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH16" ItemStyle-CssClass="WF_COSTLISTTBL_TD16" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>摘要</HeaderTemplate>
                             <ItemTemplate>
                                 <span onchange="TextBox_change('WF_COSTLISTTBL_TEKIYOU<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">

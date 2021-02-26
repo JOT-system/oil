@@ -194,12 +194,24 @@ input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
 }
 
 span#WF_COSTLISTTBL_SEGMENTCODE {
-    width: 85px;
+    width: 80px;
     padding-left: 2px;
     letter-spacing: 1px;
     text-align: left;
     vertical-align: middle;
     display: inline-block;
+}
+
+span#WF_COSTLISTTBL_SHIPPERSNAME {
+    padding-left: 2px;
+    text-align: left;
+    vertical-align: middle;
+    display: inline-block;
+    letter-spacing: 1px;
+    width: 128px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
@@ -208,7 +220,7 @@ span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
     vertical-align: middle;
     display: inline-block;
     letter-spacing: 1px;
-    width: 208px;
+    width: 160px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

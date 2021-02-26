@@ -27,6 +27,8 @@ Public Class OIT0008CostDetail
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    ' サブ用リターンコード
+    Private WW_CARSNUMBER_SUM As Long = 0
+    Private WW_QUANTITY_SUM As Double = 0.0
     Private WW_AMOUNT_SUM As Long = 0
     Private WW_TAX_SUM As Long = 0
     Private WW_TOTAL_SUM As Long = 0
@@ -203,6 +205,12 @@ Public Class OIT0008CostDetail
 
                 If Not row("OILCODE") = "9999" Then Exit Sub
 
+                If Not row("CARSNUMBER") Is DBNull.Value Then
+                    WW_CARSNUMBER_SUM += row("CARSNUMBER")
+                End If
+                If Not row("QUANTITY") Is DBNull.Value Then
+                    WW_QUANTITY_SUM += row("QUANTITY")
+                End If
                 If Not row("AMOUNT") Is DBNull.Value Then
                     WW_AMOUNT_SUM += row("AMOUNT")
                 End If
@@ -227,16 +235,12 @@ Public Class OIT0008CostDetail
 
         Dim lastCONSIGNEENAME As String = ""
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
-            If gvrow.RowType = DataControlRowType.Header Then
-                'ヘッダー
-                gvrow.Cells(2).ColumnSpan = 2
-                gvrow.Cells(3).Visible = False
-                gvrow.Cells(4).ColumnSpan = 2
-                gvrow.Cells(5).Visible = False
-            ElseIf gvrow.RowType = DataControlRowType.Footer Then
+            If gvrow.RowType = DataControlRowType.Footer Then
                 'フッター
-                gvrow.Cells(2).Text = String.Format("{0:#,##0}", WW_AMOUNT_SUM)
-                gvrow.Cells(4).Text = String.Format("{0:#,##0}", WW_TAX_SUM)
+                gvrow.Cells(2).Text = String.Format("{0:#,##0.000}", WW_QUANTITY_SUM)
+                gvrow.Cells(3).Text = String.Format("{0:#,##0}", WW_CARSNUMBER_SUM)
+                gvrow.Cells(4).Text = String.Format("{0:#,##0}", WW_AMOUNT_SUM)
+                gvrow.Cells(5).Text = String.Format("{0:#,##0}", WW_TAX_SUM)
                 gvrow.Cells(6).Text = String.Format("{0:#,##0}", WW_TOTAL_SUM)
             ElseIf gvrow.RowType = DataControlRowType.DataRow Then
                 'データ行

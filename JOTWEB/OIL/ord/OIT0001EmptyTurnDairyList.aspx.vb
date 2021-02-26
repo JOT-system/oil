@@ -23,6 +23,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001OTOrdertbl As DataTable                          'OT空回日報(OT受注TBL)取込用テーブル
     Private OIT0001OTDetailtbl As DataTable                         'OT空回日報(OT受注明細TBL)取込用テーブル
     Private OIT0001CHKOrdertbl As DataTable                         '受注TBLチェック用テーブル
+    Private OIT0001CMPOrdertbl As DataTable                         '受注TBL, OT受注TBL比較用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -42,6 +43,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -807,6 +809,14 @@ Public Class OIT0001EmptyTurnDairyList
 
         End Using
 
+        '○ 受注TBLとOT受注TBLデータの比較
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '★受注TBLとOT受注TBL比較
+            WW_CompareOrderToOTOrder(SQLcon)
+        End Using
+
         '○ 画面表示データ取得(一覧再取得)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -1370,6 +1380,8 @@ Public Class OIT0001EmptyTurnDairyList
         Dim SQLOrderStr As String =
               " SELECT" _
             & "   '0' AS ORDERFLAG" _
+            & " , OIT0016.CMPRESULTSCODE" _
+            & " , OIT0016.CMPRESULTSNAME" _
             & " , OIT0016.ORDERNO" _
             & " , OIT0016.TRAINNO" _
             & " , OIT0016.TRAINNAME" _
@@ -2305,6 +2317,93 @@ Public Class OIT0001EmptyTurnDairyList
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L_OTORDERSTATUS UPDATE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0001L_OTORDERSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注TBLとOT受注TBL比較
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CompareOrderToOTOrder(ByVal SQLcon As SqlConnection)
+
+        Dim inOrder As String = ""
+
+        If IsNothing(OIT0001CMPOrdertbl) Then
+            OIT0001CMPOrdertbl = New DataTable
+        End If
+
+        If OIT0001CMPOrdertbl.Columns.Count <> 0 Then
+            OIT0001CMPOrdertbl.Columns.Clear()
+        End If
+
+        OIT0001CMPOrdertbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTCompare(OIT0001OTOrdertbl, inOrder)
+
+        '削除・追加用
+        Dim SQLTempTblStr As String =
+          " DELETE FROM OIL.TMP0009_OTRECEIVECOMPARE " _
+        & " WHERE KEYCODE2 = @OFFICECODE " _
+        & String.Format("   AND KEYCODE1 IN {0}; ", inOrder) _
+        & " INSERT INTO OIL.TMP0009_OTRECEIVECOMPARE "
+        'Dim SQLTempTblStr As String =
+        '  " DELETE FROM OIL.TMP0009_OTRECEIVECOMPARE " _
+        '& " WHERE (OFFICECODE = @OFFICECODE OR OT_OFFICECODE = @OFFICECODE) " _
+        '& String.Format("   AND (ORDERNO IN {0} OR OT_ORDERNO IN {1}); ", inOrder, inOrder) _
+        '& " INSERT INTO OIL.TMP0009_OTRECEIVECOMPARE "
+
+        '削除・追加用にSELECT分を追加
+        SQLTempTblStr &= SQLStr
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon)
+                'tmp作成用
+                Dim PT_OFFICECODE As SqlParameter = SQLTMPcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar) '営業所コード
+                Dim PT_ORDERYMD As SqlParameter = SQLTMPcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '登録日(当日)
+                PT_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                PT_ORDERYMD.Value = Now.ToString("yyyy/MM/dd")
+
+                SQLTMPcmd.ExecuteNonQuery()
+
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar) '営業所コード
+                Dim P_ORDERYMD As SqlParameter = SQLcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '登録日(当日)
+                'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)     '削除フラグ
+                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                P_ORDERYMD.Value = Now.ToString("yyyy/MM/dd")
+                'P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001CMPOrdertbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001CMPOrdertbl.Load(SQLdr)
+                End Using
+
+                'Dim i As Integer = 0
+                'For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Rows
+
+                'Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L_ORDERtoOTORDER COMPARE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L_ORDERtoOTORDER COMPARE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

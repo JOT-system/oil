@@ -833,8 +833,291 @@
     ''' 空回日報(OT連携)比較用SQL
     ''' </summary>
     ''' <remarks>OT連携されたデータと空回日報との比較を表示する際のSQLを設定</remarks>
-    Public Function EmptyTurnDairyOTCompare()
+    Public Function EmptyTurnDairyOTCompare(ByVal dt As DataTable, ByRef O_inOrder As String)
+        Dim inOrder As String = "("
+        Dim i As Integer = 0
+        For Each dtrow As DataRow In dt.Rows
+            If i = 0 Then
+                inOrder &= "'" + Convert.ToString(dtrow("ORDERNO")) + "'"
+            Else
+                inOrder &= ", '" + Convert.ToString(dtrow("ORDERNO")) + "'"
+            End If
+            i += 1
+        Next
+        inOrder &= ")"
+        O_inOrder = inOrder
+
+        '######################################################
+        '# 受注TBLに存在するデータと比較(OT受注TBL)
+        '######################################################
         Dim SQLStr As String = ""
+        Dim SQLORDERStr As String =
+              " SELECT " _
+            & "   OIT0002.ORDERNO AS KEYCODE1" _
+            & " , OIT0002.OFFICECODE AS KEYCODE2 " _
+            & " , CASE " _
+            & "   WHEN OT.IMPORTFLG = '0' THEN '0' " _
+            & "   WHEN OT.ORDERNO IS NULL THEN '4' " _
+            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '2' " _
+            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '3' " _
+            & "   ELSE '1' " _
+            & "   END AS COMPAREINFOCD " _
+            & " , CASE " _
+            & "   WHEN OT.IMPORTFLG = '0' THEN '新規作成' " _
+            & "   WHEN OT.ORDERNO IS NULL THEN 'データ削除' " _
+            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '油種不一致' " _
+            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN 'タンク車No不一致' " _
+            & "   ELSE '一致' " _
+            & "   END AS COMPAREINFONM " _
+            & " , OIT0002.ORDERNO " _
+            & " , OIT0003.DETAILNO " _
+            & " , OIT0002.ORDERSTATUS " _
+            & " , OIT0002.TRAINNO " _
+            & " , OIT0002.TRAINNAME " _
+            & " , OIT0002.ORDERYMD " _
+            & " , OIT0002.OFFICECODE " _
+            & " , OIT0002.OFFICENAME " _
+            & " , OIT0003.SHIPPERSCODE " _
+            & " , OIT0003.SHIPPERSNAME " _
+            & " , OIT0002.BASECODE " _
+            & " , OIT0002.BASENAME " _
+            & " , OIT0002.CONSIGNEECODE " _
+            & " , OIT0002.CONSIGNEENAME " _
+            & " , OIT0002.DEPSTATION " _
+            & " , OIT0002.DEPSTATIONNAME " _
+            & " , OIT0002.ARRSTATION " _
+            & " , OIT0002.ARRSTATIONNAME " _
+            & " , OIT0003.TANKNO " _
+            & " , OIT0003.OILCODE " _
+            & " , OIT0003.OILNAME " _
+            & " , OIT0003.ORDERINGTYPE " _
+            & " , OIT0003.ORDERINGOILNAME " _
+            & " , OIT0003.JOINTCODE " _
+            & " , OIT0003.JOINT " _
+            & " , OIT0002.LODDATE " _
+            & " , OIT0002.DEPDATE " _
+            & " , OIT0002.ARRDATE " _
+            & " , OIT0002.ACCDATE " _
+            & " , OIT0002.EMPARRDATE " _
+            & " , OT.IMPORTFLG AS IMPORTFLG " _
+            & " , OT.ORDERNO AS OT_ORDERNO " _
+            & " , OT.DETAILNO AS OT_DETAILNO " _
+            & " , OT.ORDERSTATUS AS OT_ORDERSTATUS " _
+            & " , OT.TRAINNO AS OT_TRAINNO " _
+            & " , OT.TRAINNAME AS OT_TRAINNAME " _
+            & " , OT.ORDERYMD AS OT_ORDERYMD " _
+            & " , OT.OFFICECODE AS OT_OFFICECODE " _
+            & " , OT.OFFICENAME AS OT_OFFICENAME " _
+            & " , OT.SHIPPERSCODE AS OT_SHIPPERSCODE " _
+            & " , OT.SHIPPERSNAME AS OT_SHIPPERSNAME " _
+            & " , OT.BASECODE AS OT_BASECODE " _
+            & " , OT.BASENAME AS OT_BASENAME " _
+            & " , OT.CONSIGNEECODE AS OT_CONSIGNEECODE " _
+            & " , OT.CONSIGNEENAME AS OT_CONSIGNEENAME " _
+            & " , OT.DEPSTATION AS OT_DEPSTATION " _
+            & " , OT.DEPSTATIONNAME AS OT_DEPSTATIONNAME " _
+            & " , OT.ARRSTATION AS OT_ARRSTATION " _
+            & " , OT.ARRSTATIONNAME AS OT_ARRSTATIONNAME " _
+            & " , OT.TANKNO AS OT_TANKNO " _
+            & " , OT.OILCODE AS OT_OILCODE " _
+            & " , OT.OILNAME AS OT_OILNAME " _
+            & " , OT.ORDERINGTYPE AS OT_ORDERINGTYPE " _
+            & " , OT.ORDERINGOILNAME AS OT_ORDERINGOILNAME " _
+            & " , OT.JOINTCODE AS OT_JOINTCODE " _
+            & " , OT.JOINT AS OT_JOINT " _
+            & " , OT.LODDATE AS OT_LODDATE " _
+            & " , OT.DEPDATE AS OT_DEPDATE " _
+            & " , OT.ARRDATE AS OT_ARRDATE " _
+            & " , OT.ACCDATE AS OT_ACCDATE " _
+            & " , OT.EMPARRDATE AS OT_EMPARRDATE "
+
+        SQLORDERStr &=
+              " FROM oil.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & " OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & " LEFT JOIN ( " _
+            & "     SELECT " _
+            & "       OIT0016.IMPORTFLG " _
+            & "     , OIT0016.ORDERNO " _
+            & "     , OIT0017.DETAILNO " _
+            & "     , OIT0016.ORDERSTATUS " _
+            & "     , OIT0016.TRAINNO " _
+            & "     , OIT0016.TRAINNAME " _
+            & "     , OIT0016.ORDERYMD " _
+            & "     , OIT0016.OFFICECODE " _
+            & "     , OIT0016.OFFICENAME " _
+            & "     , OIT0017.SHIPPERSCODE " _
+            & "     , OIT0017.SHIPPERSNAME " _
+            & "     , OIT0016.BASECODE " _
+            & "     , OIT0016.BASENAME " _
+            & "     , OIT0016.CONSIGNEECODE " _
+            & "     , OIT0016.CONSIGNEENAME " _
+            & "     , OIT0016.DEPSTATION " _
+            & "     , OIT0016.DEPSTATIONNAME " _
+            & "     , OIT0016.ARRSTATION " _
+            & "     , OIT0016.ARRSTATIONNAME " _
+            & "     , OIT0017.TANKNO " _
+            & "     , OIT0017.OILCODE " _
+            & "     , OIT0017.OILNAME " _
+            & "     , OIT0017.ORDERINGTYPE " _
+            & "     , OIT0017.ORDERINGOILNAME " _
+            & "     , OIT0017.JOINTCODE " _
+            & "     , OIT0017.JOINT " _
+            & "     , OIT0016.LODDATE " _
+            & "     , OIT0016.DEPDATE " _
+            & "     , OIT0016.ARRDATE " _
+            & "     , OIT0016.ACCDATE " _
+            & "     , OIT0016.EMPARRDATE " _
+            & "     FROM oil.OIT0016_OTORDER OIT0016 " _
+            & "     INNER JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
+            & "     OIT0017.ORDERNO = OIT0016.ORDERNO " _
+            & "     WHERE OIT0016.OFFICECODE = @OFFICECODE " _
+            & "     AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & "     ) OT ON " _
+            & " OT.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OT.DETAILNO = OIT0003.DETAILNO "
+
+        SQLORDERStr &=
+              String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
+            & " AND OIT0002.OFFICECODE = @OFFICECODE " _
+
+        '######################################################
+        '# OT受注TBLにのみ存在するデータを取得(比較は受注TBL)
+        '######################################################
+        Dim SQLOTORDERStr As String =
+              " SELECT " _
+            & "   OIT0016.ORDERNO AS KEYCODE1 " _
+            & " , OIT0016.OFFICECODE AS KEYCODE2 " _
+            & " , CASE " _
+            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '0' " _
+            & "   WHEN JOT.ORDERNO IS NULL THEN '5' " _
+            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '2' " _
+            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '3' " _
+            & "   ELSE '1' " _
+            & "   END AS COMPAREINFOCD " _
+            & " , CASE " _
+            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '新規作成' " _
+            & "   WHEN JOT.ORDERNO IS NULL THEN 'データ追加' " _
+            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '油種不一致' " _
+            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN 'タンク車No不一致' " _
+            & "   ELSE '一致' " _
+            & "   END AS COMPAREINFONM " _
+            & " , JOT.ORDERNO AS JOT_ORDERNO " _
+            & " , JOT.DETAILNO AS JOT_DETAILNO " _
+            & " , JOT.ORDERSTATUS AS JOT_ORDERSTATUS " _
+            & " , JOT.TRAINNO AS JOT_TRAINNO " _
+            & " , JOT.TRAINNAME AS JOT_TRAINNAME " _
+            & " , JOT.ORDERYMD AS JOT_ORDERYMD " _
+            & " , JOT.OFFICECODE AS JOT_OFFICECODE " _
+            & " , JOT.OFFICENAME AS JOT_OFFICENAME " _
+            & " , JOT.SHIPPERSCODE AS JOT_SHIPPERSCODE " _
+            & " , JOT.SHIPPERSNAME AS JOT_SHIPPERSNAME " _
+            & " , JOT.BASECODE AS JOT_BASECODE " _
+            & " , JOT.BASENAME AS JOT_BASENAME " _
+            & " , JOT.CONSIGNEECODE AS JOT_CONSIGNEECODE " _
+            & " , JOT.CONSIGNEENAME AS JOT_CONSIGNEENAME " _
+            & " , JOT.DEPSTATION AS JOT_DEPSTATION " _
+            & " , JOT.DEPSTATIONNAME AS JOT_DEPSTATIONNAME " _
+            & " , JOT.ARRSTATION AS JOT_ARRSTATION " _
+            & " , JOT.ARRSTATIONNAME AS JOT_ARRSTATIONNAME " _
+            & " , JOT.TANKNO AS JOT_TANKNO " _
+            & " , JOT.OILCODE AS JOT_OILCODE " _
+            & " , JOT.OILNAME AS JOT_OILNAME " _
+            & " , JOT.ORDERINGTYPE AS JOT_ORDERINGTYPE " _
+            & " , JOT.ORDERINGOILNAME AS JOT_ORDERINGOILNAME " _
+            & " , JOT.JOINTCODE AS JOT_JOINTCODE " _
+            & " , JOT.JOINT AS JOT_JOINT " _
+            & " , JOT.LODDATE AS JOT_LODDATE " _
+            & " , JOT.DEPDATE AS JOT_DEPDATE " _
+            & " , JOT.ARRDATE AS JOT_ARRDATE " _
+            & " , JOT.ACCDATE AS JOT_ACCDATE " _
+            & " , JOT.EMPARRDATE AS JOT_EMPARRDATE " _
+            & " , OIT0016.IMPORTFLG " _
+            & " , OIT0016.ORDERNO " _
+            & " , OIT0017.DETAILNO " _
+            & " , OIT0016.ORDERSTATUS " _
+            & " , OIT0016.TRAINNO " _
+            & " , OIT0016.TRAINNAME " _
+            & " , OIT0016.ORDERYMD " _
+            & " , OIT0016.OFFICECODE " _
+            & " , OIT0016.OFFICENAME " _
+            & " , OIT0017.SHIPPERSCODE " _
+            & " , OIT0017.SHIPPERSNAME " _
+            & " , OIT0016.BASECODE " _
+            & " , OIT0016.BASENAME " _
+            & " , OIT0016.CONSIGNEECODE " _
+            & " , OIT0016.CONSIGNEENAME " _
+            & " , OIT0016.DEPSTATION " _
+            & " , OIT0016.DEPSTATIONNAME " _
+            & " , OIT0016.ARRSTATION " _
+            & " , OIT0016.ARRSTATIONNAME " _
+            & " , OIT0017.TANKNO " _
+            & " , OIT0017.OILCODE " _
+            & " , OIT0017.OILNAME " _
+            & " , OIT0017.ORDERINGTYPE " _
+            & " , OIT0017.ORDERINGOILNAME " _
+            & " , OIT0017.JOINTCODE " _
+            & " , OIT0017.JOINT " _
+            & " , OIT0016.LODDATE " _
+            & " , OIT0016.DEPDATE " _
+            & " , OIT0016.ARRDATE " _
+            & " , OIT0016.ACCDATE " _
+            & " , OIT0016.EMPARRDATE "
+
+        SQLOTORDERStr &=
+              " FROM oil.OIT0016_OTORDER OIT0016 " _
+            & " INNER JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
+            & " OIT0016.ORDERNO = OIT0017.ORDERNO " _
+            & " LEFT JOIN ( " _
+            & "     SELECT " _
+            & "       OIT0002.ORDERNO " _
+            & "     , OIT0003.DETAILNO " _
+            & "     , OIT0002.ORDERSTATUS " _
+            & "     , OIT0002.TRAINNO " _
+            & "     , OIT0002.TRAINNAME " _
+            & "     , OIT0002.ORDERYMD " _
+            & "     , OIT0002.OFFICECODE " _
+            & "     , OIT0002.OFFICENAME " _
+            & "     , OIT0003.SHIPPERSCODE " _
+            & "     , OIT0003.SHIPPERSNAME " _
+            & "     , OIT0002.BASECODE " _
+            & "     , OIT0002.BASENAME " _
+            & "     , OIT0002.CONSIGNEECODE " _
+            & "     , OIT0002.CONSIGNEENAME " _
+            & "     , OIT0002.DEPSTATION " _
+            & "     , OIT0002.DEPSTATIONNAME " _
+            & "     , OIT0002.ARRSTATION " _
+            & "     , OIT0002.ARRSTATIONNAME " _
+            & "     , OIT0003.TANKNO " _
+            & "     , OIT0003.OILCODE " _
+            & "     , OIT0003.OILNAME " _
+            & "     , OIT0003.ORDERINGTYPE " _
+            & "     , OIT0003.ORDERINGOILNAME " _
+            & "     , OIT0003.JOINTCODE " _
+            & "     , OIT0003.JOINT " _
+            & "     , OIT0002.LODDATE " _
+            & "     , OIT0002.DEPDATE " _
+            & "     , OIT0002.ARRDATE " _
+            & "     , OIT0002.ACCDATE " _
+            & "     , OIT0002.EMPARRDATE " _
+            & "     FROM oil.OIT0002_ORDER OIT0002 " _
+            & "     INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
+            & "     AND OIT0002.OFFICECODE = @OFFICECODE " _
+            & "     ) JOT ON " _
+            & " JOT.ORDERNO = OIT0016.ORDERNO " _
+            & " AND JOT.DETAILNO = OIT0017.DETAILNO "
+
+        SQLOTORDERStr &=
+              " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
+            & " AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & " AND JOT.ORDERNO IS NULL "
+
+        '★SQL結合
+        SQLStr = SQLORDERStr
+        SQLStr &= " UNION ALL "
+        SQLStr &= SQLOTORDERStr
 
         Return SQLStr
     End Function

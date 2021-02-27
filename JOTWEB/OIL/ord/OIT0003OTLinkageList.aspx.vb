@@ -661,9 +661,12 @@ Public Class OIT0003OTLinkageList
         '対象の積日が統一されていない場合（同一積日以外は不許可）
         Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
         If qSameProcDateCnt > 1 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+            '★仙台新港営業所については、月跨りで異なる積込日が混在することもあるためSKIP
+            If work.WF_SEL_OTS_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
         '******************************
         'OT発送日報データ取得処理
@@ -1592,6 +1595,15 @@ Public Class OIT0003OTLinkageList
                     wrkDt.Load(SQLdr)
                 End Using
 
+                '○タンク車合計の設定
+                For Each wrkDtrow As DataRow In wrkDt.Rows
+                    '★仙台新港営業所の場合(タンク車合計の再取得)
+                    '　※仙台は月末月初で積込した車数を分けて提出する運用があるため
+                    If Convert.ToString(wrkDtrow("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
+                        wrkDtrow("TOTALTANK") = wrkDt.Select("ORDERNO = '" + Convert.ToString(wrkDtrow("ORDERNO")) + "'").Count.ToString("00")
+                    End If
+                Next
+
                 Dim i As Integer = 0
                 Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
                 For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
@@ -1635,9 +1647,6 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
                     End If
-
-                    OIT0003row("TOTALTANK") = OIT0003CsvOTLinkagetbl.Rows.Count.ToString("00")
-
                 Next
 
                 Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy

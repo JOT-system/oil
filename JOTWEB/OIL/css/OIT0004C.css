@@ -913,7 +913,7 @@ input[type=text].modified:not(:disabled) {
 }
 /* リリース前なので隠す */
 #chkPrintConsigneeRep, #chkConsigneeRepDoubleSpan, #chkPrintConsigneeRep + label, #chkConsigneeRepDoubleSpan + label{
-    display: none !important;
+    /*display: none !important;
     width: 0;
-    height: 0;
+    height: 0;*/
 }

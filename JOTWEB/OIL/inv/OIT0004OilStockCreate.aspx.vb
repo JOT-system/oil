@@ -1330,8 +1330,16 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND FV.CLASS     = @CLASS")
         sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
         sqlStr.AppendLine("   AND FV.VALUE12  != @STOCKFLG")
-        sqlStr.AppendLine(" ORDER BY KEYCODE")
-
+        'sqlStr.AppendLine(" ORDER BY KEYCODE")
+        sqlStr.AppendLine(" ORDER BY CASE WHEN @CAMPCODE = '010402'")
+        sqlStr.AppendLine("                AND KEYCODE   = '2201'")
+        sqlStr.AppendLine("               THEN '1'")
+        sqlStr.AppendLine("               WHEN @CAMPCODE = '010402'")
+        sqlStr.AppendLine("                AND KEYCODE   = '2101'")
+        sqlStr.AppendLine("               THEN '2'")
+        sqlStr.AppendLine("               ELSE '0'")
+        sqlStr.AppendLine("          END")
+        sqlStr.AppendLine("         ,KEYCODE")
         'タンク容量、目標在庫率、D/S、開始年月、終了年月取得用
         Dim sqlConsigneeOilType As New StringBuilder
         sqlConsigneeOilType.AppendLine("SELECT FV.VALUE1 AS OILCODE")

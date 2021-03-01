@@ -1173,7 +1173,7 @@ Public Class OIT0003OTLinkageList
             Using repCbj = New OIT0003CustomReportTakusouCsv(OIT0003Takusoutbl)
                 Dim url As String
                 Try
-                    url = repCbj.CreatePrintData()
+                    url = repCbj.CreatePrintData(writeHeader:=False)
                 Catch ex As Exception
                     Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
 
@@ -1996,9 +1996,9 @@ Public Class OIT0003OTLinkageList
                     newDr("積込年月日") = wrkDr("LODDATE").ToString()
                     newDr("運送状年月日") = wrkDr("LODDATE").ToString()
                     newDr("発車年月日") = wrkDr("ACCDATE").ToString()
-                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString()
+                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
-                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString()
+                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)
                     newDr("着専用線コード") = ""
                     newDr("予備１") = ""
                     newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString()
@@ -2012,7 +2012,9 @@ Public Class OIT0003OTLinkageList
                     newDr("荷受人コード（外部コード）") = shipperCode
                     newDr("荷受人コード") = shipperCode
                     Dim arrShipperCode As String = ""
-                    Select Case wrkDr("TRAINCLASS").ToString()
+                    Select Case wrkDr("CONSIGNEECODE").ToString()
+                        Case "40"
+                            arrShipperCode = "99"
                         Case "51", "52", "53", "54", "55", "56"
                             arrShipperCode = "2"
                         Case Else

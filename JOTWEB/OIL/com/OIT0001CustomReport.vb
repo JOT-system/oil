@@ -121,7 +121,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '★空回一覧(帳票)より(OT比較用)ダウンロード
                 Case "OTCOMPARE"
                     '***** TODO処理 ここから *****
-
+                    '◯ヘッダーと明細の設定
+                    EditOTCompareHeaderDetailArea(I_officeCode)
                     '***** TODO処理 ここまで *****
                     'ExcelTempSheet.Delete() '雛形シート削除
 
@@ -168,6 +169,329 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
     End Function
 
+    ''' <summary>
+    ''' 帳票のヘッダー設定((空回日報(一覧)画面)OT比較用)
+    ''' </summary>
+    Private Sub EditOTCompareHeaderDetailArea(ByVal I_officeCode As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim j As Integer = 0                            '次明細切り替え時用
+            Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
+            Dim i As Integer = iTate(j)
+            Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
+            Dim z As Integer = 0                            '明細の合計
+            Dim strOtOilNameSave As String = ""
+            Dim strTrainNoSave As String = ""
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                If strTrainNoSave = "" Then
+                    '○ 帳票のヘッダー(共通)設定(初回)
+                    EditOTCompareHeaderArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
+                End If
+                '★列車が変わった場合
+                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
+                    '◯ 合計
+                    rngDetailArea = Me.ExcelWorkSheet.Range("F" + Convert.ToString(iFooter(j)))
+                    rngDetailArea.Value = Convert.ToString(z) + "車"
+                    ExcelMemoryRelease(rngDetailArea)
+                    '★次明細用として合計,油種(保存)を初期化
+                    z = 0
+                    strOtOilNameSave = ""
+
+                    '★次明細の行設定
+                    j += 1
+                    i = iTate(j)
+
+                    '○ 帳票のヘッダー(共通)設定(２列車目以降)
+                    EditOTCompareHeaderArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
+                End If
+
+                '○帳票の明細(共通)設定
+                EditOTCompareDetailArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
+
+                '○列車Noの保存
+                strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
+
+                '○次の行へカウント
+                i += 1
+                z += 1
+            Next
+
+            '◯ 合計
+            rngDetailArea = Me.ExcelWorkSheet.Range("F" + Convert.ToString(iFooter(j)))
+            rngDetailArea.Value = Convert.ToString(z) + "車"
+            ExcelMemoryRelease(rngDetailArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のヘッダー((空回日報(一覧)画面)OT比較用)設定
+    ''' </summary>
+    Private Sub EditOTCompareHeaderArea(ByVal I_officeCode As String,
+                                        ByVal I_rngHeaderArea As Excel.Range,
+                                        ByVal PrintDatarow As DataRow,
+                                        ByVal I_column As Integer)
+        Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+        Dim strTrainNo() As String = {"5461", "5972"}
+        Dim i As Integer = 0
+
+        '◯ 営業所名
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i)))
+        I_rngHeaderArea.Value = Convert.ToString(PrintDatarow("OFFICENAME")) + " 作成"
+        ExcelMemoryRelease(I_rngHeaderArea)
+        '◯ 向い先(着駅)
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 1)))
+        I_rngHeaderArea.Value = PrintDatarow("ARRSTATIONNAME")
+        ExcelMemoryRelease(I_rngHeaderArea)
+
+        '★列車No(5461⇒5972へ変更)
+        If Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
+            '◯ 列車No
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
+            I_rngHeaderArea.Value = strTrainNo(1)
+            ExcelMemoryRelease(I_rngHeaderArea)
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 3)))
+            I_rngHeaderArea.Value = strTrainNo(1)
+            ExcelMemoryRelease(I_rngHeaderArea)
+        Else
+            '◯ 列車No
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
+            I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+            ExcelMemoryRelease(I_rngHeaderArea)
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 3)))
+            I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
+            ExcelMemoryRelease(I_rngHeaderArea)
+        End If
+
+        '◯ 積込日（予定）
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea.Value = PrintDatarow("LODDATE")
+        ExcelMemoryRelease(I_rngHeaderArea)
+        '◯ 発日（予定）
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("I" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
+        ExcelMemoryRelease(I_rngHeaderArea)
+        '◯ 積車着日（予定）
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
+        ExcelMemoryRelease(I_rngHeaderArea)
+        '◯ 受入日（予定）
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
+        ExcelMemoryRelease(I_rngHeaderArea)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細((空回日報(一覧)画面)OT比較用)設定
+    ''' </summary>
+    Private Sub EditOTCompareDetailArea(ByVal I_officeCode As String,
+                                        ByVal I_rngDetailArea As Excel.Range,
+                                        ByVal PrintDatarow As DataRow,
+                                        ByVal I_column As Integer,
+                                        ByRef O_OtOilName As String)
+
+        '◯ 車数
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("B" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("LINECNT")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ 荷主名
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("C" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("SHIPPERSNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ 在庫発駅(発駅)
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("D" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("DEPSTATIONNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ 油種(油種)
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("E" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("JOT_OTOILNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ 油種(OT油種)
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("F" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("OT_OTOILNAME")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ 車(OT油種毎の件数)
+        If O_OtOilName <> PrintDatarow("OTOILNAME").ToString() Then
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("OTOILCTCNT")
+            ExcelMemoryRelease(I_rngDetailArea)
+        End If
+        O_OtOilName = PrintDatarow("OTOILNAME").ToString()
+
+        '★袖ヶ浦営業所の場合
+        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
+                I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("TANKNO"))
+            Else
+                I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("OT_MODEL")) = BaseDllConst.CONST_MODEL_1000 Then
+                I_rngDetailArea.Value = "1-" + Convert.ToString(PrintDatarow("OT_TANKNO"))
+            Else
+                I_rngDetailArea.Value = PrintDatarow("OT_TANKNO")
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+        Else
+            '◯ タンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("TANKNO")
+            ExcelMemoryRelease(I_rngDetailArea)
+            '◯ OTタンク車番号
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
+            I_rngDetailArea.Value = PrintDatarow("OT_TANKNO")
+            ExcelMemoryRelease(I_rngDetailArea)
+        End If
+
+        '◯ 記事
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("O" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("COMPAREINFONM")
+        ExcelMemoryRelease(I_rngDetailArea)
+
+    End Sub
+
+
+#Region "空回日報登録画面"
+    ''' <summary>
+    ''' 帳票のヘッダー設定(空回日報画面)
+    ''' </summary>
+    Private Sub EditHeaderArea(ByVal I_officeCode As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            Dim j As Integer = 0                            '次明細切り替え時用
+
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '○ 帳票のヘッダー(共通)設定
+                EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
+
+                Exit For
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(空回日報画面)
+    ''' </summary>
+    Private Sub EditDetailArea(ByVal I_officeCode As String)
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 12
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then i = 15
+            Dim strOtOilNameSave As String = ""
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '○帳票の明細(共通)設定
+                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
+
+                i += 1
+            Next
+
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '◯ 合計
+                rngDetailArea = Me.ExcelWorkSheet.Range("G37")
+            Else
+                '◯ 合計
+                rngDetailArea = Me.ExcelWorkSheet.Range("G41")
+            End If
+            rngDetailArea.Value = PrintData.Rows.Count.ToString() + "車"
+            ExcelMemoryRelease(rngDetailArea)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+#End Region
+
+#Region "受注一覧画面(帳票)"
+    ''' <summary>
+    ''' 帳票のヘッダーと明細設定(受注一覧(帳票)画面)
+    ''' </summary>
+    Private Sub EditHeaderDetailArea(ByVal I_officeCode As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim j As Integer = 0                            '次明細切り替え時用
+            Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 53, 91, 129}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 54, 93, 132}
+            Dim i As Integer = iTate(j)
+            Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 75, 113, 151}
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 76, 115, 154}
+            Dim z As Integer = 0                            '明細の合計
+            Dim strOtOilNameSave As String = ""
+            Dim strTrainNoSave As String = ""
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                If strTrainNoSave = "" Then
+                    '○ 帳票のヘッダー(共通)設定(初回)
+                    EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
+                End If
+                '★列車が変わった場合
+                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
+                    '◯ 合計
+                    rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
+                    rngDetailArea.Value = Convert.ToString(z) + "車"
+                    ExcelMemoryRelease(rngDetailArea)
+                    '★次明細用として合計,油種(保存)を初期化
+                    z = 0
+                    strOtOilNameSave = ""
+
+                    '★次明細の行設定
+                    j += 1
+                    i = iTate(j)
+
+                    '○ 帳票のヘッダー(共通)設定(２列車目以降)
+                    EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
+                End If
+
+                '○帳票の明細(共通)設定
+                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
+
+                '○列車Noの保存
+                strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
+
+                '○次の行へカウント
+                i += 1
+                z += 1
+            Next
+
+            '◯ 合計
+            rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
+            rngDetailArea.Value = Convert.ToString(z) + "車"
+            ExcelMemoryRelease(rngDetailArea)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+#End Region
+
+#Region "空回日報(共通)出力"
     ''' <summary>
     ''' 帳票のヘッダー(共通)設定
     ''' </summary>
@@ -406,130 +730,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
         End If
 
     End Sub
-
-    ''' <summary>
-    ''' 帳票のヘッダー設定(空回日報画面)
-    ''' </summary>
-    Private Sub EditHeaderArea(ByVal I_officeCode As String)
-        Dim rngHeaderArea As Excel.Range = Nothing
-
-        Try
-            Dim j As Integer = 0                            '次明細切り替え時用
-
-            For Each PrintDatarow As DataRow In PrintData.Rows
-
-                '○ 帳票のヘッダー(共通)設定
-                EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
-
-                Exit For
-            Next
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngHeaderArea)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 帳票の明細設定(空回日報画面)
-    ''' </summary>
-    Private Sub EditDetailArea(ByVal I_officeCode As String)
-        Dim rngDetailArea As Excel.Range = Nothing
-
-        Try
-            Dim i As Integer = 12
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then i = 15
-            Dim strOtOilNameSave As String = ""
-            For Each PrintDatarow As DataRow In PrintData.Rows
-
-                '○帳票の明細(共通)設定
-                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
-
-                i += 1
-            Next
-
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-                '◯ 合計
-                rngDetailArea = Me.ExcelWorkSheet.Range("G37")
-            Else
-                '◯ 合計
-                rngDetailArea = Me.ExcelWorkSheet.Range("G41")
-            End If
-            rngDetailArea.Value = PrintData.Rows.Count.ToString() + "車"
-            ExcelMemoryRelease(rngDetailArea)
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngDetailArea)
-        End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' 帳票のヘッダーと明細設定(受注一覧(帳票)画面)
-    ''' </summary>
-    Private Sub EditHeaderDetailArea(ByVal I_officeCode As String)
-        Dim rngHeaderArea As Excel.Range = Nothing
-        Dim rngDetailArea As Excel.Range = Nothing
-
-        Try
-            Dim j As Integer = 0                            '次明細切り替え時用
-            Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 53, 91, 129}
-            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 54, 93, 132}
-            Dim i As Integer = iTate(j)
-            Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 75, 113, 151}
-            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 76, 115, 154}
-            Dim z As Integer = 0                            '明細の合計
-            Dim strOtOilNameSave As String = ""
-            Dim strTrainNoSave As String = ""
-            For Each PrintDatarow As DataRow In PrintData.Rows
-
-                If strTrainNoSave = "" Then
-                    '○ 帳票のヘッダー(共通)設定(初回)
-                    EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
-                End If
-                '★列車が変わった場合
-                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
-                    '◯ 合計
-                    rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
-                    rngDetailArea.Value = Convert.ToString(z) + "車"
-                    ExcelMemoryRelease(rngDetailArea)
-                    '★次明細用として合計,油種(保存)を初期化
-                    z = 0
-                    strOtOilNameSave = ""
-
-                    '★次明細の行設定
-                    j += 1
-                    i = iTate(j)
-
-                    '○ 帳票のヘッダー(共通)設定(２列車目以降)
-                    EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
-                End If
-
-                '○帳票の明細(共通)設定
-                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
-
-                '○列車Noの保存
-                strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
-
-                '○次の行へカウント
-                i += 1
-                z += 1
-            Next
-
-            '◯ 合計
-            rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
-            rngDetailArea.Value = Convert.ToString(z) + "車"
-            ExcelMemoryRelease(rngDetailArea)
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngDetailArea)
-        End Try
-
-    End Sub
+#End Region
 
     ''' <summary>
     ''' Excelオブジェクトの解放

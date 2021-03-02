@@ -1208,6 +1208,9 @@
             & " , 1                                                            AS 'SELECT'" _
             & " , 0                                                            AS HIDDEN" _
             & " , OIT0020.KEYCODE3                                             AS OFFICECODE" _
+            & " , OIM0002.NAME                                                 AS OFFICENAME" _
+            & " , OIT0020.COMPAREINFOCD                                        AS COMPAREINFOCD" _
+            & " , OIT0020.COMPAREINFONM                                        AS COMPAREINFONM" _
             & " , ISNULL(OIT0020.TRAINNO,OIT0020.OT_TRAINNO)                   AS TRAINNO" _
             & " , ISNULL(OIT0020.TRAINNAME,OIT0020.OT_TRAINNAME)               AS TRAINNAME" _
             & " , ISNULL(OIT0020.SHIPPERSCODE,OIT0020.OT_SHIPPERSCODE)         AS SHIPPERSCODE" _
@@ -1240,11 +1243,17 @@
             & " , OIT0020.OILNAME                                          AS OILNAME" _
             & " , OIT0020.ORDERINGTYPE                                     AS ORDERINGTYPE" _
             & " , OIT0020.ORDERINGOILNAME                                  AS ORDERINGOILNAME" _
+            & " , OIM0003_JOT.OTOILCODE                                    AS JOT_OTOILCODE" _
+            & " , OIM0003_JOT.OTOILNAME                                    AS JOT_OTOILNAME" _
             & " , OIT0020.OT_OILCODE                                       AS OT_OILCODE" _
             & " , OIT0020.OT_OILNAME                                       AS OT_OILNAME" _
             & " , OIT0020.OT_ORDERINGTYPE                                  AS OT_ORDERINGTYPE" _
             & " , OIT0020.OT_ORDERINGOILNAME                               AS OT_ORDERINGOILNAME" _
+            & " , OIM0003_OT.OTOILCODE                                     AS OT_OTOILCODE" _
+            & " , OIM0003_OT.OTOILNAME                                     AS OT_OTOILNAME" _
+            & " , OIM0005_JOT.MODEL                                        AS MODEL" _
             & " , OIT0020.TANKNO                                           AS TANKNO" _
+            & " , OIM0005_OT.MODEL                                         AS OT_MODEL" _
             & " , OIT0020.OT_TANKNO                                        AS OT_TANKNO" _
             & " FROM oil.OIT0020_OTCOMPARE OIT0020 " _
             & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003_JOT ON " _
@@ -1256,7 +1265,16 @@
             & "     OIM0003_OT.OFFICECODE = OIT0020.KEYCODE3 " _
             & " AND OIM0003_OT.OILCODE = OIT0020.OT_OILCODE " _
             & " AND OIM0003_OT.SEGMENTOILCODE = OIT0020.OT_ORDERINGTYPE " _
-            & " AND OIM0003_OT.DELFLG <> @DELFLG "
+            & " AND OIM0003_OT.DELFLG <> @DELFLG " _
+            & " LEFT JOIN oil.OIM0005_TANK OIM0005_JOT ON " _
+            & "     OIM0005_JOT.TANKNUMBER = OIT0020.TANKNO " _
+            & " AND OIM0005_JOT.DELFLG <> @DELFLG " _
+            & " LEFT JOIN oil.OIM0005_TANK OIM0005_OT ON " _
+            & "     OIM0005_OT.TANKNUMBER = OIT0020.OT_TANKNO " _
+            & " AND OIM0005_OT.DELFLG <> @DELFLG " _
+            & " LEFT JOIN oil.OIM0002_ORG OIM0002 ON " _
+            & "     OIM0002.ORGCODE = OIT0020.KEYCODE3 " _
+            & " AND OIM0002.DELFLG <> @DELFLG "
 
         SQLStr &=
               " LEFT JOIN ( " _

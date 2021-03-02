@@ -880,6 +880,20 @@ Public Class OIT0001EmptyTurnDairyList
                         OIT0001ReportOTComparetbl.Load(SQLdr)
                     End Using
                 Next
+
+                Dim i As Integer = 0
+                Dim strTrainNosave As String = ""
+                For Each OIT0001Reprow As DataRow In OIT0001ReportOTComparetbl.Rows
+                    If strTrainNosave <> "" _
+                        AndAlso strTrainNosave <> Convert.ToString(OIT0001Reprow("TRAINNO")) Then
+                        i = 1
+                        OIT0001Reprow("LINECNT") = i        'LINECNT
+                    Else
+                        i += 1
+                        OIT0001Reprow("LINECNT") = i        'LINECNT
+                    End If
+                    strTrainNosave = Convert.ToString(OIT0001Reprow("TRAINNO"))
+                Next
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L EXCEL_OTCOMPARE_DATAGET")

@@ -393,9 +393,19 @@
         & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')                  AS TRAINNAME" _
         & " , ISNULL(RTRIM(OIM0005.MODEL), '')                      AS MODEL" _
         & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                     AS TANKNO" _
+        & " , ISNULL(RTRIM(OIT0003.STACKINGFLG), '')                AS STACKINGFLG" _
+        & " , ISNULL(RTRIM(OIT0003.WHOLESALEFLG), '')               AS WHOLESALEFLG" _
+        & " , ISNULL(RTRIM(OIT0003.INSPECTIONFLG), '')              AS INSPECTIONFLG" _
+        & " , ISNULL(RTRIM(OIT0003.DETENTIONFLG), '')               AS DETENTIONFLG" _
+        & " , ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '')             AS FIRSTRETURNFLG" _
+        & " , ISNULL(RTRIM(OIT0003.AFTERRETURNFLG), '')             AS AFTERRETURNFLG" _
+        & " , ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')             AS OTTRANSPORTFLG" _
+        & " , ISNULL(RTRIM(OIT0003.UPGRADEFLG), '')                 AS UPGRADEFLG" _
         & " , ISNULL(RTRIM(OIT0003.CARSNUMBER), '')                 AS CARSNUMBER" _
         & " , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')                 AS CARSAMOUNT" _
         & " , ISNULL(RTRIM(OIM0005.LOAD), '')                       AS LOAD" _
+        & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                  AS JOINTCODE" _
+        & " , ISNULL(RTRIM(OIT0003.JOINT), '')                      AS JOINT" _
         & " , ISNULL(RTRIM(OIT0003.OILCODE), '')                    AS OILCODE" _
         & " , ISNULL(RTRIM(OIT0003.OILNAME), '')                    AS OILNAME" _
         & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')               AS ORDERINGTYPE" _

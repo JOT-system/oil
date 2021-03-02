@@ -568,4 +568,70 @@ Public Class EntryHistory
 
     End Sub
 
+    ''' <summary>
+    ''' OT発送日報履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト(トランザクションを利用しない場合はNothing指定)</param>
+    ''' <param name="drOrder">履歴用の受注テーブル行オブジェクト</param>
+    ''' <remarks>OT発送日報送信時に作成したファイルに「履歴番号」と「画面ID」(呼出し側のMe.Title）
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
+    Public Shared Sub InsertOTShipSendHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
+        '◯OT発送日報TBL
+        Dim sqlOTShipSendStat As New StringBuilder
+        sqlOTShipSendStat.AppendLine("INSERT INTO OIL.HIS0006_OTSHIPSEND")
+        sqlOTShipSendStat.AppendLine("   (HISTORYNO,MAPID,DATESENDYMD,OURDAILYBRANCHC,OTDAILYCONSIGNEEC,LODDATE,")
+        sqlOTShipSendStat.AppendLine("    OFFICECODE,SHIPPERSCODE,TRAINNO,TRAINTYPE,TOTALTANK,SHIPORDER,")
+        sqlOTShipSendStat.AppendLine("    OTDAILYFROMPLANT,LANDC,EMPTYFAREFLG,OTDAILYDEPSTATIONN,OTDAILYSHIPPERC,OTDAILYSHIPPERN,")
+        sqlOTShipSendStat.AppendLine("    OTOILCODE,OTOILNAME,TANKNO,OUTSIDEINFO,GENERALCARTYPE,RUNINFO,CARSAMOUNT,")
+        sqlOTShipSendStat.AppendLine("    REMARK,DELFLG,INITYMD,INITUSER,INITTERMID,UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
+        sqlOTShipSendStat.AppendLine("    VALUES")
+        sqlOTShipSendStat.AppendLine("   (@HISTORYNO,@MAPID,@DATESENDYMD,@OURDAILYBRANCHC,@OTDAILYCONSIGNEEC,@LODDATE,")
+        sqlOTShipSendStat.AppendLine("    @OFFICECODE,@SHIPPERSCODE,@TRAINNO,@TRAINTYPE,@TOTALTANK,@SHIPORDER,")
+        sqlOTShipSendStat.AppendLine("    @OTDAILYFROMPLANT,@LANDC,@EMPTYFAREFLG,@OTDAILYDEPSTATIONN,@OTDAILYSHIPPERC,@OTDAILYSHIPPERN,")
+        sqlOTShipSendStat.AppendLine("    @OTOILCODE,@OTOILNAME,@TANKNO,@OUTSIDEINFO,@GENERALCARTYPE,@RUNINFO,@CARSAMOUNT,")
+        sqlOTShipSendStat.AppendLine("    @REMARK,@DELFLG,@INITYMD,@INITUSER,@INITTERMID,@UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
+
+        Using sqlOTShipSendCmd As New SqlCommand(sqlOTShipSendStat.ToString, sqlCon, sqlTran)
+            With sqlOTShipSendCmd.Parameters
+                .Add("HISTORYNO", SqlDbType.NVarChar).Value = drOrder("HISTORYNO")
+                .Add("MAPID", SqlDbType.NVarChar).Value = drOrder("MAPID")
+                .Add("DATESENDYMD", SqlDbType.DateTime).Value = drOrder("DATESENDYMD")
+                .Add("OURDAILYBRANCHC", SqlDbType.NVarChar).Value = drOrder("OURDAILYBRANCHC")
+                .Add("OTDAILYCONSIGNEEC", SqlDbType.NVarChar).Value = drOrder("OTDAILYCONSIGNEEC")
+                .Add("LODDATE", SqlDbType.NVarChar).Value = drOrder("LODDATE")
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = drOrder("OFFICECODE")
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                .Add("TRAINNO", SqlDbType.NVarChar).Value = drOrder("TRAINNO")
+                .Add("TRAINTYPE", SqlDbType.NVarChar).Value = drOrder("TRAINTYPE")
+                .Add("TOTALTANK", SqlDbType.NVarChar).Value = drOrder("TOTALTANK")
+                .Add("SHIPORDER", SqlDbType.NVarChar).Value = drOrder("SHIPORDER")
+                .Add("OTDAILYFROMPLANT", SqlDbType.NVarChar).Value = drOrder("OTDAILYFROMPLANT")
+                .Add("LANDC", SqlDbType.NVarChar).Value = drOrder("LANDC")
+                .Add("EMPTYFAREFLG", SqlDbType.NVarChar).Value = drOrder("EMPTYFAREFLG")
+                .Add("OTDAILYDEPSTATIONN", SqlDbType.NVarChar).Value = drOrder("OTDAILYDEPSTATIONN")
+                .Add("OTDAILYSHIPPERC", SqlDbType.NVarChar).Value = drOrder("OTDAILYSHIPPERC")
+                .Add("OTDAILYSHIPPERN", SqlDbType.NVarChar).Value = drOrder("OTDAILYSHIPPERN")
+                .Add("OTOILCODE", SqlDbType.NVarChar).Value = drOrder("OTOILCODE")
+                .Add("OTOILNAME", SqlDbType.NVarChar).Value = drOrder("OTOILNAME")
+                .Add("TANKNO", SqlDbType.NVarChar).Value = drOrder("TANKNO")
+                .Add("OUTSIDEINFO", SqlDbType.NVarChar).Value = drOrder("OUTSIDEINFO")
+                .Add("GENERALCARTYPE", SqlDbType.NVarChar).Value = drOrder("GENERALCARTYPE")
+                .Add("RUNINFO", SqlDbType.NVarChar).Value = drOrder("RUNINFO")
+                .Add("CARSAMOUNT", SqlDbType.NVarChar).Value = drOrder("CARSAMOUNT")
+                .Add("REMARK", SqlDbType.NVarChar).Value = drOrder("REMARK")
+                .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
+                .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
+                .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("INITTERMID")
+                .Add("UPDYMD", SqlDbType.DateTime).Value = drOrder("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = drOrder("RECEIVEYMD")
+            End With
+            sqlOTShipSendCmd.CommandTimeout = 300
+            sqlOTShipSendCmd.ExecuteNonQuery()
+        End Using
+
+    End Sub
 End Class

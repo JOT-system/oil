@@ -707,7 +707,7 @@ Public Class OIT0004OilStockCreate
             Dim daySpan As Integer = 0
 
             Dim targetMonth As String = ""
-            If Me.chkPrintENEOS.Checked = False Then
+            If Me.chkPrintENEOS.Checked = False AndAlso Me.chkPrintConsigneeRep.Checked = False Then
                 '通常帳票のデータ取得（非ENEOS情報の取得）
                 '１週前の平均を取る為TO - 7日分を保持するためFrom - 7日をする
                 baseDate = CDate(Me.txtDownloadMonth.Text & "/01").AddDays(-7).ToString("yyyy/MM/dd")
@@ -715,8 +715,7 @@ Public Class OIT0004OilStockCreate
                 targetMonth = CDate(Me.txtDownloadMonth.Text & "/01").ToString("yyyy/MM")
                 daySpan = CInt((CDate(toDate) - CDate(baseDate)).TotalDays) + 1
                 printDataNormal = GetPrintData(baseDate, daySpan, targetMonth, dispClass)
-            Else
-                'ENEOS帳票のデータ取得
+            ElseIf Me.chkPrintENEOS.Checked Then                'ENEOS帳票のデータ取得
                 baseDate = CDate(txtReportFromDate.Text).ToString("yyyy/MM/dd")
                 toDate = CDate(txtReportFromDate.Text).AddDays(4).ToString("yyyy/MM/dd")
                 daySpan = CInt((CDate(toDate) - CDate(baseDate)).TotalDays) + 1
@@ -725,14 +724,27 @@ Public Class OIT0004OilStockCreate
                 printDataHokushin = GetPrintData(baseDate, daySpan, targetMonth, dispHokushin)
                 Dim dispKouhu As New DispDataClass(dispClass.SalesOffice, dispClass.Shipper, CONST_CONSIGNEECODE_20)
                 printDataKouhu = GetPrintData(baseDate, daySpan, targetMonth, dispKouhu)
-
+            Else '油槽所帳票
+                Dim base As Integer = 5
+                If Me.chkConsigneeRepDoubleSpan.Checked = True Then
+                    base = 11
+                End If
+                baseDate = CDate(txtReportFromDate.Text).ToString("yyyy/MM/dd")
+                toDate = CDate(txtReportFromDate.Text).AddDays(base).ToString("yyyy/MM/dd")
+                daySpan = CInt((CDate(toDate) - CDate(baseDate)).TotalDays) + 1
+                printDataNormal = GetPrintData(baseDate, daySpan, targetMonth, dispClass, True)
+                '北信と甲府の在庫データ取得
+                'Dim dispHokushin As New DispDataClass(dispClass.SalesOffice, dispClass.Shipper, CONST_CONSIGNEECODE_10)
+                'printDataHokushin = GetPrintData(baseDate, daySpan, targetMonth, dispHokushin)
+                'Dim dispKouhu As New DispDataClass(dispClass.SalesOffice, dispClass.Shipper, CONST_CONSIGNEECODE_20)
+                'printDataKouhu = GetPrintData(baseDate, daySpan, targetMonth, dispKouhu)
             End If
 
         End With
         '******************************
         '帳票作成処理の実行
         '******************************
-        If Me.chkPrintENEOS.Checked = False Then
+        If Me.chkPrintENEOS.Checked = False AndAlso Me.chkPrintConsigneeRep.Checked = False Then
             Using repCbj = New OIT0004CustomReport(Master.MAPID, Master.MAPID & ".xlsx", printDataNormal)
                 Dim url As String
                 Try
@@ -745,8 +757,22 @@ Public Class OIT0004OilStockCreate
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 Master.HideCustomPopUp()
             End Using
-        Else
+        ElseIf Me.chkPrintENEOS.Checked Then
             Using repCbj = New OIT0004CustomReportENEOS(Master.MAPID, Master.MAPID & "ENEOS.xlsx", printDataHokushin, printDataKouhu)
+                Dim url As String
+                Try
+                    url = repCbj.CreateExcelPrintData
+                Catch ex As Exception
+                    Return
+                End Try
+                '○ 別画面でExcelを表示
+                WF_PrintURL.Value = url
+                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                Master.HideCustomPopUp()
+            End Using
+        Else
+            Dim templateFile As String = String.Format("{0}{1}{2}.xlsx", Master.MAPID, "Consignee", printDataNormal.Consignee)
+            Using repCbj = New OIT0004CustomReportConsignee(Master.MAPID, templateFile, printDataNormal)
                 Dim url As String
                 Try
                     url = repCbj.CreateExcelPrintData
@@ -768,7 +794,7 @@ Public Class OIT0004OilStockCreate
     ''' <param name="daySpan"></param>
     ''' <param name="dispClass"></param>
     ''' <returns></returns>
-    Private Function GetPrintData(baseDate As String, daySpan As Integer, targetMonth As String, dispClass As DispDataClass) As DispDataClass
+    Private Function GetPrintData(baseDate As String, daySpan As Integer, targetMonth As String, dispClass As DispDataClass, Optional isConsigneePrint As Boolean = False) As DispDataClass
         Dim printData As DispDataClass = Nothing
         Dim showLorry As String = ""
 
@@ -781,7 +807,11 @@ Public Class OIT0004OilStockCreate
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             '日付情報取得（祝祭日含む）
-            daysList = GetTargetDateList(sqlCon, baseDate, daySpan:=daySpan, isPrint:=True)
+            If isConsigneePrint Then
+                daysList = GetTargetDateList(sqlCon, baseDate, daySpan:=daySpan)
+            Else
+                daysList = GetTargetDateList(sqlCon, baseDate, daySpan:=daySpan, isPrint:=True)
+            End If
             '対象油種取得
             oilTypeList = GetTargetOilType(sqlCon, dispClass.SalesOffice, dispClass.Consignee, dispClass.Shipper, targetMonth)
             '対象列車取得
@@ -1300,8 +1330,16 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND FV.CLASS     = @CLASS")
         sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
         sqlStr.AppendLine("   AND FV.VALUE12  != @STOCKFLG")
-        sqlStr.AppendLine(" ORDER BY KEYCODE")
-
+        'sqlStr.AppendLine(" ORDER BY KEYCODE")
+        sqlStr.AppendLine(" ORDER BY CASE WHEN @CAMPCODE = '010402'")
+        sqlStr.AppendLine("                AND KEYCODE   = '2201'")
+        sqlStr.AppendLine("               THEN '1'")
+        sqlStr.AppendLine("               WHEN @CAMPCODE = '010402'")
+        sqlStr.AppendLine("                AND KEYCODE   = '2101'")
+        sqlStr.AppendLine("               THEN '2'")
+        sqlStr.AppendLine("               ELSE '0'")
+        sqlStr.AppendLine("          END")
+        sqlStr.AppendLine("         ,KEYCODE")
         'タンク容量、目標在庫率、D/S、開始年月、終了年月取得用
         Dim sqlConsigneeOilType As New StringBuilder
         sqlConsigneeOilType.AppendLine("SELECT FV.VALUE1 AS OILCODE")

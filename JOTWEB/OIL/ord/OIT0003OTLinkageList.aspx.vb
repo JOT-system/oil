@@ -19,6 +19,7 @@ Public Class OIT0003OTLinkageList
     Private OIT0003CsvOTLinkagetbl As DataTable                     'CSV用(OT発送日報)テーブル
     Private OIT0003Takusoutbl As DataTable                     '帳票用(託送指示)テーブル
     Private OIT0003Reserved As DataTable
+    Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -400,7 +401,7 @@ Public Class OIT0003OTLinkageList
             & "      VIW0003.ORGCODE    = @P05 " _
             & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " WHERE OIT0002.DELFLG      <> @P04" _
-            & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
+        '& "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         'SQLStrNashi &=
@@ -409,11 +410,13 @@ Public Class OIT0003OTLinkageList
         '    & "         OR OIT0002.DEPDATE     >= @TODAY) "
         SQLStrNashi &=
               SQLStrCmn _
+            & "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
         '★積置フラグ有り用SQL
         SQLStrAri &=
-              SQLStrCmn
+              SQLStrCmn _
+            & "   AND OIT0002.ORDERSTATUS BETWEEN @P07 AND @P06 "
 
         SQLStrCmn =
               " GROUP BY" _
@@ -462,11 +465,13 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータスTO
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 3)  '受注進行ステータスFROM(積置)
                 Dim PARA_TODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '当日
                 'PARA01.Value = OFFICECDE
                 PARA02.Value = targetDate
                 PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
+                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
@@ -656,9 +661,12 @@ Public Class OIT0003OTLinkageList
         '対象の積日が統一されていない場合（同一積日以外は不許可）
         Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
         If qSameProcDateCnt > 1 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+            '★仙台新港営業所については、月跨りで異なる積込日が混在することもあるためSKIP
+            If work.WF_SEL_OTS_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
         '******************************
         'OT発送日報データ取得処理
@@ -1165,7 +1173,7 @@ Public Class OIT0003OTLinkageList
             Using repCbj = New OIT0003CustomReportTakusouCsv(OIT0003Takusoutbl)
                 Dim url As String
                 Try
-                    url = repCbj.CreatePrintData()
+                    url = repCbj.CreatePrintData(writeHeader:=False)
                 Catch ex As Exception
                     Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
 
@@ -1374,7 +1382,9 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
         '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
@@ -1387,7 +1397,9 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
         '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
@@ -1583,6 +1595,15 @@ Public Class OIT0003OTLinkageList
                     wrkDt.Load(SQLdr)
                 End Using
 
+                '○タンク車合計の設定
+                For Each wrkDtrow As DataRow In wrkDt.Rows
+                    '★仙台新港営業所の場合(タンク車合計の再取得)
+                    '　※仙台は月末月初で積込した車数を分けて提出する運用があるため
+                    If Convert.ToString(wrkDtrow("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
+                        wrkDtrow("TOTALTANK") = wrkDt.Select("ORDERNO = '" + Convert.ToString(wrkDtrow("ORDERNO")) + "'").Count.ToString("00")
+                    End If
+                Next
+
                 Dim i As Integer = 0
                 Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
                 For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
@@ -1626,6 +1647,44 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
                     End If
+                Next
+
+                Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy
+                Dim WW_DATENOW As DateTime = Date.Now
+                '★履歴IDなどの項目を追加
+                hisDt.Columns.Add("HISTORYNO", Type.GetType("System.String"))
+                hisDt.Columns.Add("MAPID", Type.GetType("System.String"))
+                hisDt.Columns.Add("DATESENDYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("DELFLG", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITUSER", Type.GetType("System.String"))
+                hisDt.Columns.Add("INITTERMID", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDYMD", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDUSER", Type.GetType("System.String"))
+                hisDt.Columns.Add("UPDTERMID", Type.GetType("System.String"))
+                hisDt.Columns.Add("RECEIVEYMD", Type.GetType("System.String"))
+                Dim WW_GetHistoryNo() As String = {""}
+                WW_FixvalueMasterSearch("", "NEWOTSHIPHISNOGET", "", WW_GetHistoryNo)
+                Using tran = SQLcon.BeginTransaction
+                    For Each hisDtrow As DataRow In hisDt.Rows
+                        hisDtrow("HISTORYNO") = WW_GetHistoryNo(0)
+                        hisDtrow("MAPID") = Master.MAPID
+                        hisDtrow("DATESENDYMD") = WW_DATENOW
+                        hisDtrow("DELFLG") = C_DELETE_FLG.ALIVE
+                        hisDtrow("INITYMD") = WW_DATENOW
+                        hisDtrow("INITUSER") = Master.USERID
+                        hisDtrow("INITTERMID") = Master.USERTERMID
+                        hisDtrow("UPDYMD") = WW_DATENOW
+                        hisDtrow("UPDUSER") = Master.USERID
+                        hisDtrow("UPDTERMID") = Master.USERTERMID
+                        hisDtrow("RECEIVEYMD") = C_DEFAULT_YMD
+                        EntryHistory.InsertOTShipSendHistory(SQLcon, tran, hisDtrow)
+                    Next
+                    'トランザクションコミット
+                    tran.Commit()
+                End Using
+
+                For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★CSV出力に不必要なので削除
                     OIT0003row("OFFICECODE") = ""
                     OIT0003row("SHIPPERSCODE") = ""
@@ -1937,9 +1996,9 @@ Public Class OIT0003OTLinkageList
                     newDr("積込年月日") = wrkDr("LODDATE").ToString()
                     newDr("運送状年月日") = wrkDr("LODDATE").ToString()
                     newDr("発車年月日") = wrkDr("ACCDATE").ToString()
-                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString()
+                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
-                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString()
+                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)
                     newDr("着専用線コード") = ""
                     newDr("予備１") = ""
                     newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString()
@@ -1953,7 +2012,9 @@ Public Class OIT0003OTLinkageList
                     newDr("荷受人コード（外部コード）") = shipperCode
                     newDr("荷受人コード") = shipperCode
                     Dim arrShipperCode As String = ""
-                    Select Case wrkDr("TRAINCLASS").ToString()
+                    Select Case wrkDr("CONSIGNEECODE").ToString()
+                        Case "40"
+                            arrShipperCode = "99"
                         Case "51", "52", "53", "54", "55", "56"
                             arrShipperCode = "2"
                         Case Else
@@ -3362,7 +3423,7 @@ Public Class OIT0003OTLinkageList
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                    If WW_DATE <CDate(C_DEFAULT_YMD) Then
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
                         WF_FILTERDATE_TEXT.Text = ""
                     Else
                         WF_FILTERDATE_TEXT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
@@ -3398,4 +3459,119 @@ Public Class OIT0003OTLinkageList
         'WF_LeftMViewChange.Value = ""
 
     End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="O_VALUE"></param>
+    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String,
+                                          ByVal I_CLASS As String,
+                                          ByVal I_KEYCODE As String,
+                                          ByRef O_VALUE() As String)
+
+        If IsNothing(OIT0003Fixvaltbl) Then
+            OIT0003Fixvaltbl = New DataTable
+        End If
+
+        If OIT0003Fixvaltbl.Columns.Count <> 0 Then
+            OIT0003Fixvaltbl.Columns.Clear()
+        End If
+
+        OIT0003Fixvaltbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '') AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '')    AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')  AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '')    AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')   AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')   AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')   AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')   AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')   AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')   AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')   AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')   AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')   AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')   AS VALUE9" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')  AS VALUE10" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')  AS VALUE11" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')  AS VALUE12" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')  AS VALUE13" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')  AS VALUE14" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')  AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE16), '')  AS VALUE16" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE17), '')  AS VALUE17" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE18), '')  AS VALUE18" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE19), '')  AS VALUE19" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE20), '')  AS VALUE20" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')   AS DELFLG" _
+                & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+                & " WHERE VIW0001.CLASS = @P01" _
+                & " AND VIW0001.DELFLG <> @P03"
+
+            '○ 条件指定で指定されたものでSQLで可能なものを追加する
+            '会社コード
+            If Not String.IsNullOrEmpty(I_CODE) Then
+                SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+            End If
+            'マスターキー
+            If Not String.IsNullOrEmpty(I_KEYCODE) Then
+                SQLStr &= String.Format("    AND VIW0001.KEYCODE = '{0}'", I_KEYCODE)
+            End If
+
+            SQLStr &=
+                  " ORDER BY" _
+                & "    VIW0001.KEYCODE"
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+                PARA01.Value = I_CLASS
+                'PARA02.Value = I_KEYCODE
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Fixvaltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Fixvaltbl.Load(SQLdr)
+                End Using
+
+                For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                    For i = 1 To O_VALUE.Length
+                        O_VALUE(i - 1) = Convert.ToString(OIT0003WKrow("VALUE" & i.ToString()))
+                    Next
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
 End Class

@@ -3549,7 +3549,7 @@ Public Class OIT0003OrderList
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelTankDispatchDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, {Me.txtReportTrainNo.Text}, BaseDllConst.CONST_CONSIGNEECODE_40, Nothing)
+                    ExcelTankDispatchDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, {Me.txtReportTrainNo.Text}, BaseDllConst.CONST_CONSIGNEECODE_51, Nothing)
                 End Using
 
                 '帳票作成
@@ -3819,14 +3819,11 @@ Public Class OIT0003OrderList
 
                 '列車設定
                 Dim trainNoList As New List(Of String)
-                trainNoList.Add(Me.txtReportTrainNo.Text)
                 If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
                     '8877及び8883は集計して出力する
-                    Dim secondTrainNo As String = CONST_SODE_TRAIN_8883
-                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
-                        secondTrainNo = CONST_SODE_TRAIN_8877
-                    End If
-                    trainNoList.Add(secondTrainNo)
+                    trainNoList.AddRange({CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883})
+                Else
+                    trainNoList.Add(Me.txtReportTrainNo.Text)
                 End If
 
                 '油層所毎設定
@@ -3853,21 +3850,48 @@ Public Class OIT0003OrderList
                 If Not String.IsNullOrEmpty(secondConsigneeCode) Then
                     consigneeCode = secondConsigneeCode
                 End If
+
                 '出力時の列車番号を設定
                 Dim outputTrainNo As String = Me.txtReportTrainNo.Text
-                If OIT0003Reporttbl IsNot Nothing AndAlso OIT0003Reporttbl.Rows.Count > 0 Then
+                If OIT0003Reporttbl IsNot Nothing AndAlso OIT0003Reporttbl.Rows.Count > 0 AndAlso trainNoList.Count = 2 Then
                     Dim query = OIT0003Reporttbl.AsEnumerable()
-                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
-                        If query.Where(Function(r) r("TRAINNO").ToString() = CONST_SODE_TRAIN_8877).Any() Then
-                            outputTrainNo = CONST_SODE_TRAIN_8877
-                        ElseIf query.Where(Function(r) r("TRAINNO").ToString() = CONST_SODE_TRAIN_8883).Any() Then
-                            outputTrainNo = CONST_SODE_TRAIN_8883
-                        End If
+
+                    '列車番号毎に入線番号を取得
+                    Dim dicIrisen As New Dictionary(Of String, String())
+                    For Each trainNo As String In trainNoList
+                        dicIrisen.Add(trainNo, query.Where(Function(r) r("TRAINNO").ToString() = trainNo).Select(Function(r) r("LOADINGIRILINETRAINNO").ToString()).Distinct().ToArray())
+                    Next
+
+                    '表示優先列車番号を取得
+                    Dim viewIrisen As New List(Of String)
+                    Dim anyTrain As Boolean = False
+                    For i As Integer = 0 To dicIrisen.Count - 1 Step 1
+                        If anyTrain Then Exit For
+                        For j As Integer = 0 To dicIrisen.Count - 1 Step 1
+                            If i = j Then Continue For
+                            '入線番号の積集合をとる
+                            Dim intersectIrisen = dicIrisen.ElementAtOrDefault(i).Value.Intersect(dicIrisen.ElementAtOrDefault(j).Value)
+                            If intersectIrisen.Any() Then
+                                If Not anyTrain Then
+                                    outputTrainNo = dicIrisen.ElementAtOrDefault(i).Key
+                                    anyTrain = True
+                                End If
+                                viewIrisen.AddRange(intersectIrisen)
+                            End If
+                        Next
+                    Next
+                    viewIrisen = viewIrisen.Distinct().ToList()
+                    If Not anyTrain Then
+                        outputTrainNo = dicIrisen.Where(Function(d) d.Value.Any()).FirstOrDefault().Key
+                        viewIrisen = dicIrisen.Item(outputTrainNo).ToList()
                     End If
-                Else
-                    If Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877 OrElse Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8883 Then
-                        outputTrainNo = CONST_SODE_TRAIN_8877
-                    End If
+
+                    '表示優先列車番号以外かつ同一の入線番号を持たないデータを出力対象外とする
+                    query.Where(Function(r)
+                                    Return outputTrainNo <> r("TRAINNO").ToString() AndAlso Not viewIrisen.Contains(r("LOADINGIRILINETRAINNO").ToString())
+                                End Function).
+                                ToList().ForEach(Sub(r) r.Delete())
+
                 End If
 
                 '帳票作成
@@ -6888,6 +6912,7 @@ Public Class OIT0003OrderList
             & "   , ISNULL(OIT0003.SECONDCONSIGNEECODE, '')    AS SECONDCONSIGNEECODE " _
             & "   , ISNULL(OIT0003.CARSAMOUNT, '0.000')        AS CARSAMOUNT " _
             & "   , ISNULL(OIM0005.SAPSHELLTANKNUMBER, '')     AS TANKNUMBER " _
+            & "   , ISNULL(OIT0003.LOADINGIRILINETRAINNO, '')  AS LOADINGIRILINETRAINNO " _
             & " FROM " _
             & "   OIL.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _

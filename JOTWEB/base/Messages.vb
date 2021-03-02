@@ -803,6 +803,14 @@ Public Module Messages
         ''' 前回油種での格下げに伴う整合性ワーニング(空回日報画面)
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_DOWNGRADE_WAR2 As String = "20100"
+        ''' <summary>
+        ''' OT比較データ未存在
+        ''' </summary>
+        Public Const OIL_OTCOMPAREDATA_NOTFOUND As String = "20101"
+        ''' <summary>
+        ''' OT比較行未存在
+        ''' </summary>
+        Public Const OIL_OTCOMPARELINE_NOTFOUND As String = "20102"
 
 
 #End Region

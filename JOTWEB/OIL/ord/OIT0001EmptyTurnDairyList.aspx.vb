@@ -24,6 +24,10 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001OTDetailtbl As DataTable                         'OT空回日報(OT受注明細TBL)取込用テーブル
     Private OIT0001CHKOrdertbl As DataTable                         '受注TBLチェック用テーブル
     Private OIT0001CMPOrdertbl As DataTable                         '受注TBL, OT受注TBL比較用テーブル
+    Private OIT0001ReportOTComparetbl As DataTable                  '帳票(受注TBL, OT受注TBL)比較結果テーブル
+
+    '帳票用
+    Private Const CONST_RPT_OTCOMPARE As String = "OTCOMPARE"       '空回日報(受注TBL, OT受注TBL)比較
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -69,6 +73,8 @@ Public Class OIT0001EmptyTurnDairyList
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
                             WF_ButtonLINE_LIFTED_Click()
+                        Case "WF_ButtonOTCOMPARE"       'OT比較結果ボタン押下
+                            WF_ButtonOTCOMPARE_Click()
                         Case "WF_ButtonOTINSERT"        '空回日報取込ボタン押下
                             WF_ButtonOTINSERT_Click()
                         Case "WF_ButtonINSERT"          '新規登録ボタン押下
@@ -285,6 +291,10 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ISNULL(RTRIM(OIT0016.CMPRESULTSCODE), '')          AS CMPRESULTSCODE" _
+            & " , CASE " _
+            & "   WHEN OIT0016.CMPRESULTSCODE = '1' THEN '不一致'" _
+            & "   ELSE '' END                                        AS CMPRESULTSNAME" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
@@ -324,6 +334,8 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " LEFT JOIN OIL.OIT0016_OTORDER OIT0016 ON " _
+            & " OIT0016.ORDERNO = OIT0002.ORDERNO " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
             & "   AND OIT0002.LODDATE      >= @P2" _
             & "   AND OIT0002.DELFLG       <> @P3" _
@@ -785,7 +797,106 @@ Public Class OIT0001EmptyTurnDairyList
     End Sub
 
     ''' <summary>
-    ''' 空回日報取込ボタン押下ボタン押下時処理
+    ''' OT比較結果ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOTCOMPARE_Click()
+
+        '    ★一覧の表示が0件の場合
+        If OIT0001tbl.Rows.Count = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_OTCOMPAREDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+
+            '★一覧件数が１件以上で未選択の場合
+        ElseIf OIT0001tbl.Select("OPERATION='on'").Count = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_OTCOMPARELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '******************************
+        '帳票表示データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            ExcelOTCompareDataGet(SQLcon)
+        End Using
+
+        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_OTCOMPARE.xlsx", OIT0001ReportOTComparetbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData(work.WF_SEL_SALESOFFICECODE.Text, repPtn:=CONST_RPT_OTCOMPARE)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(OT比較結果)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelOTCompareDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0001ReportOTComparetbl) Then
+            OIT0001ReportOTComparetbl = New DataTable
+        End If
+
+        If OIT0001ReportOTComparetbl.Columns.Count <> 0 Then
+            OIT0001ReportOTComparetbl.Columns.Clear()
+        End If
+
+        OIT0001ReportOTComparetbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTComparePrint("OIT0001")
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)       '受注№
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
+                Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 6)  '受注営業所コード
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+
+                '○一覧で選択された受注NoをKEYに取得
+                For Each OIT0001row As DataRow In OIT0001tbl.Select("OPERATION='on'")
+                    P_ORDERNO.Value = OIT0001row("ORDERNO")
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        If OIT0001ReportOTComparetbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0001ReportOTComparetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0001ReportOTComparetbl.Load(SQLdr)
+                    End Using
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L EXCEL_OTCOMPARE_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L EXCEL_OTCOMPARE_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' 空回日報取込ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOTINSERT_Click()
@@ -2279,20 +2390,20 @@ Public Class OIT0001EmptyTurnDairyList
                     & "        UPDUSER     = @UPDUSER, " _
                     & "        UPDTERMID   = @UPDTERMID, " _
                     & "        RECEIVEYMD  = @RECEIVEYMD  " _
-                    & "  WHERE ORDERNO     = @ORDERNO  " _
-                    & "    AND DELFLG     <> @DELFLG; "
+                    & "  WHERE ORDERNO     = @ORDERNO  "
+            '& "    AND DELFLG     <> @DELFLG; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
             Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
-            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+            'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
 
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
             Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
             Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
 
-            P_DELFLG.Value = C_DELETE_FLG.DELETE
+            'P_DELFLG.Value = C_DELETE_FLG.DELETE
             P_UPDYMD.Value = Date.Now
             P_UPDUSER.Value = Master.USERID
             P_UPDTERMID.Value = Master.USERTERMID
@@ -2354,14 +2465,30 @@ Public Class OIT0001EmptyTurnDairyList
 
         '削除・追加用
         Dim SQLTempTblStr As String =
-          " DELETE FROM OIL.TMP0009_OTRECEIVECOMPARE " _
-        & " WHERE KEYCODE2 = @OFFICECODE " _
+          " DELETE FROM OIL.OIT0020_OTCOMPARE " _
+        & " WHERE KEYCODE3 = @OFFICECODE " _
         & String.Format("   AND KEYCODE1 IN {0}; ", inOrder) _
-        & " INSERT INTO OIL.TMP0009_OTRECEIVECOMPARE "
+        & " INSERT INTO OIL.OIT0020_OTCOMPARE " _
+        & " (KEYCODE1, KEYCODE2, KEYCODE3, COMPAREINFOCD, COMPAREINFONM, " _
+        & "  ORDERNO, DETAILNO, ORDERSTATUS, TRAINNO, TRAINNAME, ORDERYMD, " _
+        & "  OFFICECODE, OFFICENAME, SHIPPERSCODE, SHIPPERSNAME, BASECODE, BASENAME, " _
+        & "  CONSIGNEECODE, CONSIGNEENAME, DEPSTATION, DEPSTATIONNAME, " _
+        & "  ARRSTATION, ARRSTATIONNAME, SHIPORDER, LINEORDER, TANKNO, " _
+        & "  OILCODE, OILNAME, ORDERINGTYPE, ORDERINGOILNAME, CARSNUMBER, CARSAMOUNT, RETURNDATETRAIN, " _
+        & "  JOINTCODE, JOINT, REMARK, SECONDCONSIGNEECODE, SECONDCONSIGNEENAME, " _
+        & "  LODDATE, DEPDATE, ARRDATE, ACCDATE, EMPARRDATE, BTRAINNO, IMPORTFLG, " _
+        & "  OT_ORDERNO, OT_DETAILNO, OT_ORDERSTATUS, OT_TRAINNO, OT_TRAINNAME, OT_ORDERYMD, " _
+        & "  OT_OFFICECODE, OT_OFFICENAME, OT_SHIPPERSCODE, OT_SHIPPERSNAME, OT_BASECODE, OT_BASENAME, " _
+        & "  OT_CONSIGNEECODE, OT_CONSIGNEENAME, OT_DEPSTATION, OT_DEPSTATIONNAME, " _
+        & "  OT_ARRSTATION, OT_ARRSTATIONNAME, OT_SHIPORDER, OT_LINEORDER, OT_TANKNO, " _
+        & "  OT_OILCODE, OT_OILNAME, OT_ORDERINGTYPE, OT_ORDERINGOILNAME, OT_CARSNUMBER, OT_CARSAMOUNT, OT_RETURNDATETRAIN, " _
+        & "  OT_JOINTCODE, OT_JOINT, OT_REMARK, OT_SECONDCONSIGNEECODE, OT_SECONDCONSIGNEENAME, " _
+        & "  OT_LODDATE, OT_DEPDATE, OT_ARRDATE, OT_ACCDATE, OT_EMPARRDATE, OT_BTRAINNO, " _
+        & "  DELFLG, INITYMD, INITUSER, INITTERMID, UPDYMD, UPDUSER, UPDTERMID, RECEIVEYMD) "
         'Dim SQLTempTblStr As String =
         '  " DELETE FROM OIL.TMP0009_OTRECEIVECOMPARE " _
-        '& " WHERE (OFFICECODE = @OFFICECODE OR OT_OFFICECODE = @OFFICECODE) " _
-        '& String.Format("   AND (ORDERNO IN {0} OR OT_ORDERNO IN {1}); ", inOrder, inOrder) _
+        '& " WHERE KEYCODE2 = @OFFICECODE " _
+        '& String.Format("   AND KEYCODE1 IN {0}; ", inOrder) _
         '& " INSERT INTO OIL.TMP0009_OTRECEIVECOMPARE "
 
         '削除・追加用にSELECT分を追加
@@ -2372,16 +2499,43 @@ Public Class OIT0001EmptyTurnDairyList
                 'tmp作成用
                 Dim PT_OFFICECODE As SqlParameter = SQLTMPcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar) '営業所コード
                 Dim PT_ORDERYMD As SqlParameter = SQLTMPcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '登録日(当日)
+                Dim PT_INITYMD As SqlParameter = SQLTMPcmd.Parameters.Add("@INITYMD", System.Data.SqlDbType.DateTime)
+                Dim PT_INITUSER As SqlParameter = SQLTMPcmd.Parameters.Add("@INITUSER", System.Data.SqlDbType.NVarChar)
+                Dim PT_INITTERMID As SqlParameter = SQLTMPcmd.Parameters.Add("@INITTERMID", System.Data.SqlDbType.NVarChar)
+                Dim PT_UPDYMD As SqlParameter = SQLTMPcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+                Dim PT_UPDUSER As SqlParameter = SQLTMPcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+                Dim PT_UPDTERMID As SqlParameter = SQLTMPcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+                Dim PT_RECEIVEYMD As SqlParameter = SQLTMPcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
                 PT_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PT_ORDERYMD.Value = Now.ToString("yyyy/MM/dd")
-
+                PT_INITYMD.Value = Date.Now
+                PT_INITUSER.Value = Master.USERID
+                PT_INITTERMID.Value = Master.USERTERMID
+                PT_UPDYMD.Value = Date.Now
+                PT_UPDUSER.Value = Master.USERID
+                PT_UPDTERMID.Value = Master.USERTERMID
+                PT_RECEIVEYMD.Value = C_DEFAULT_YMD
                 SQLTMPcmd.ExecuteNonQuery()
 
                 Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar) '営業所コード
                 Dim P_ORDERYMD As SqlParameter = SQLcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '登録日(当日)
+                Dim P_INITYMD As SqlParameter = SQLcmd.Parameters.Add("@INITYMD", System.Data.SqlDbType.DateTime)
+                Dim P_INITUSER As SqlParameter = SQLcmd.Parameters.Add("@INITUSER", System.Data.SqlDbType.NVarChar)
+                Dim P_INITTERMID As SqlParameter = SQLcmd.Parameters.Add("@INITTERMID", System.Data.SqlDbType.NVarChar)
+                Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+                Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+                Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+                Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
                 'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)     '削除フラグ
                 P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
                 P_ORDERYMD.Value = Now.ToString("yyyy/MM/dd")
+                P_INITYMD.Value = Date.Now
+                P_INITUSER.Value = Master.USERID
+                P_INITTERMID.Value = Master.USERTERMID
+                P_UPDYMD.Value = Date.Now
+                P_UPDUSER.Value = Master.USERID
+                P_UPDTERMID.Value = Master.USERTERMID
+                P_RECEIVEYMD.Value = C_DEFAULT_YMD
                 'P_DELFLG.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -2394,10 +2548,16 @@ Public Class OIT0001EmptyTurnDairyList
                     OIT0001CMPOrdertbl.Load(SQLdr)
                 End Using
 
-                'Dim i As Integer = 0
-                'For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Rows
-
-                'Next
+                Dim i As Integer = 0
+                Dim svOrderNo As String = ""
+                '★差異がある場合(受注TBLとOT受注TBLの比較)
+                For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD<>'1'")
+                    svOrderNo = Convert.ToString(OIT0001Cmprow("ORDERNO"))
+                    OIT0001Cmprow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
+                    '★OT受注TBLの比較結果を"不一致"とする。
+                    WW_UpdateOTOrderStatus(SQLcon, OIT0001Cmprow, I_ITEM:="CMPRESULTSCODE", I_VALUE:="1")
+                    OIT0001Cmprow("ORDERNO") = svOrderNo
+                Next
 
             End Using
         Catch ex As Exception

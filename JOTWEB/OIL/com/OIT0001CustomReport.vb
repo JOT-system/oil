@@ -118,6 +118,13 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Try
             Select Case repPtn
+                '★空回一覧(帳票)より(OT比較用)ダウンロード
+                Case "OTCOMPARE"
+                    '***** TODO処理 ここから *****
+
+                    '***** TODO処理 ここまで *****
+                    'ExcelTempSheet.Delete() '雛形シート削除
+
                 '★受注一覧(帳票)よりダウンロード
                 Case "KUUKAI_SODEGAURA"
                     '***** TODO処理 ここから *****

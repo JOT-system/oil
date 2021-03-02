@@ -1382,8 +1382,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
-        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
@@ -1397,8 +1397,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
-        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+        '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _

@@ -10799,7 +10799,7 @@ Public Class OIT0003OrderDetail
             & "        , OFFICECODE      , OFFICENAME          , DEPSTATION         , DEPSTATIONNAME" _
             & "        , ARRSTATION      , ARRSTATIONNAME      , CONSIGNEECODE      , CONSIGNEENAME" _
             & "        , KEIJYOYMD       , TRAINNO             , TRAINNAME          , MODEL" _
-            & "        , TANKNO          , CARSNUMBER          , CARSAMOUNT         , LOAD" _
+            & "        , TANKNO          , OTTRANSPORTFLG      , CARSNUMBER         , CARSAMOUNT         , LOAD" _
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CHANGETRAINNO   , CHANGETRAINNAME     , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CHANGERETSTATION   , CHANGERETSTATIONNAME" _
@@ -10820,7 +10820,7 @@ Public Class OIT0003OrderDetail
             & "        , @OFFICECODE      , @OFFICENAME          , @DEPSTATION         , @DEPSTATIONNAME" _
             & "        , @ARRSTATION      , @ARRSTATIONNAME      , @CONSIGNEECODE      , @CONSIGNEENAME" _
             & "        , @KEIJYOYMD       , @TRAINNO             , @TRAINNAME          , @MODEL" _
-            & "        , @TANKNO          , @CARSNUMBER          , @CARSAMOUNT         , @LOAD" _
+            & "        , @TANKNO          , @OTTRANSPORTFLG      , @CARSNUMBER         , @CARSAMOUNT         , @LOAD" _
             & "        , @OILCODE         , @OILNAME             , @ORDERINGTYPE       , @ORDERINGOILNAME" _
             & "        , @CHANGETRAINNO   , @CHANGETRAINNAME     , @SECONDCONSIGNEECODE, @SECONDCONSIGNEENAME" _
             & "        , @SECONDARRSTATION, @SECONDARRSTATIONNAME, @CHANGERETSTATION   , @CHANGERETSTATIONNAME" _
@@ -10867,6 +10867,7 @@ Public Class OIT0003OrderDetail
             & "    , TRAINNAME" _
             & "    , MODEL" _
             & "    , TANKNO" _
+            & "    , OTTRANSPORTFLG" _
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
             & "    , LOAD" _
@@ -10967,6 +10968,7 @@ Public Class OIT0003OrderDetail
                 Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar, 20)           '本線列車名
                 Dim P_MODEL As SqlParameter = SQLcmd.Parameters.Add("@MODEL", SqlDbType.NVarChar, 20)                   '型式
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)                  'タンク車№
+                Dim P_OTTRANSPORTFLG As SqlParameter = SQLcmd.Parameters.Add("@OTTRANSPORTFLG", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 Dim P_CARSNUMBER As SqlParameter = SQLcmd.Parameters.Add("@CARSNUMBER", SqlDbType.Int)                  '車数
                 Dim P_CARSAMOUNT As SqlParameter = SQLcmd.Parameters.Add("@CARSAMOUNT", SqlDbType.Decimal)              '数量
                 Dim P_LOAD As SqlParameter = SQLcmd.Parameters.Add("@LOAD", SqlDbType.Decimal)                          '車型
@@ -11057,6 +11059,7 @@ Public Class OIT0003OrderDetail
                     P_TRAINNAME.Value = OIT0003INPtab4row("TRAINNAME")
                     P_MODEL.Value = OIT0003INPtab4row("MODEL")
                     P_TANKNO.Value = OIT0003INPtab4row("TANKNO")
+                    P_OTTRANSPORTFLG.Value = OIT0003INPtab4row("OTTRANSPORTFLG")
                     P_CARSNUMBER.Value = OIT0003INPtab4row("CARSNUMBER")
                     P_CARSAMOUNT.Value = OIT0003INPtab4row("CARSAMOUNT")
                     P_LOAD.Value = OIT0003INPtab4row("LOAD")

@@ -9238,7 +9238,8 @@ Public Class OIT0003OrderDetail
             & "    SET" _
             & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO        = @P03" _
             & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, OTTRANSPORTFLG = @P46" _
-            & "        , UPGRADEFLG          = @P55, SHIPPERSCODE         = @P23, SHIPPERSNAME  = @P24" _
+            & "        , UPGRADEFLG          = @P55, TESTPRODUCTFLG       = @P56" _
+            & "        , SHIPPERSCODE        = @P23, SHIPPERSNAME         = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE  = @P35" _
             & "        , ORDERINGOILNAME     = @P36, JOINTCODE            = @P39, JOINT         = @P08" _
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
@@ -9257,7 +9258,7 @@ Public Class OIT0003OrderDetail
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , SHIPORDER          , LINEORDER           , TANKNO" _
             & "        , KAMOKU               , STACKINGFLG            , WHOLESALEFLG       , INSPECTIONFLG       , DETENTIONFLG" _
-            & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG     , UPGRADEFLG" _
+            & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG     , UPGRADEFLG          , TESTPRODUCTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER           , CARSAMOUNT             , JOINTCODE          , JOINT" _
@@ -9272,7 +9273,7 @@ Public Class OIT0003OrderDetail
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
             & "        , @P04, @P41, @P54, @P52, @P53" _
-            & "        , @P42, @P45, @P46, @P55" _
+            & "        , @P42, @P45, @P46, @P55, @P56" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P39, @P08" _
@@ -9304,6 +9305,7 @@ Public Class OIT0003OrderDetail
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
             & "    , UPGRADEFLG" _
+            & "    , TESTPRODUCTFLG" _
             & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
@@ -9376,6 +9378,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.NVarChar)      '後返し可否フラグ
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar)      'OT輸送可否フラグ
                 Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.NVarChar)      '格上可否フラグ
+                Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.NVarChar)      'テスト積み可否フラグ
                 Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
@@ -9465,6 +9468,9 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA55.Value = "2"
                     End If
+
+                    '# テスト積み可否フラグ(0:テスト積みあり 1:テスト積みなし)
+                    PARA56.Value = "2"
 
                     '# 積込日(実績)
                     If OIT0003row("ACTUALLODDATE") = "" Then

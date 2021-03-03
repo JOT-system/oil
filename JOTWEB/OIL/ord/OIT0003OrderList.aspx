@@ -144,6 +144,7 @@
                 <asp:TextBox ID="txtReportLodDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
+        <input type="button" id="WF_ButtonReportDateNow" class="btn-sticky" value="当日"  onclick="reportDatrNowButton();" />
     </div>
     <br/>
     <div>

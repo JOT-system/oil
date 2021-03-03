@@ -197,6 +197,12 @@ function reportRadioButton() {
     
 }
 
+// ○帳票(当日ボタンクリック)
+function reportDatrNowButton() {
+    var date = new Date();
+    document.getElementById("txtReportLodDate").value = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+}
+
 // ○ダウンロード処理
 function f_ExcelPrint() {
     

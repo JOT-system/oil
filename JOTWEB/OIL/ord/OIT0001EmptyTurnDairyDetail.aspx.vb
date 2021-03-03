@@ -7278,6 +7278,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ISNULL(RTRIM(OIT0016.CMPRESULTSCODE), '')          AS CMPRESULTSCODE" _
+            & " , CASE " _
+            & "   WHEN OIT0016.CMPRESULTSCODE = '1' THEN '不一致'" _
+            & "   ELSE '' END                                        AS CMPRESULTSNAME" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
@@ -7316,6 +7320,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " LEFT JOIN OIL.OIT0016_OTORDER OIT0016 ON " _
+            & " OIT0016.ORDERNO = OIT0002.ORDERNO " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
             & "   AND OIT0002.LODDATE      >= @P2" _
             & "   AND OIT0002.DELFLG       <> @P3" _

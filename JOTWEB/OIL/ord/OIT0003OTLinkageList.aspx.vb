@@ -1626,9 +1626,12 @@ Public Class OIT0003OTLinkageList
                 Next
 
                 '○項目の再設定
+                Dim setSPACE As String = ""
+                '★仙台新港営業所対応用
                 Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
-                Dim setSPACE As String = ""
+                '★四日市営業所対応用
+                Dim OTTrainNoChg() As String = {"6078", "6089"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
@@ -1646,6 +1649,13 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"09"
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
+                    End If
+
+                    '★四日市営業所の場合(列車チェック)
+                    '　稲沢経由で列車Noが変更(四日市⇒稲沢(6078)　稲沢⇒南松本(6089))
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_012401 _
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoChg(1)
                     End If
                 Next
 

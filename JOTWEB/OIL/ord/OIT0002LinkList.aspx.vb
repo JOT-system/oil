@@ -2036,7 +2036,7 @@ Public Class OIT0002LinkList
                     '★貨車連結表(臨海)TBLに保持している内容を引き継ぐ
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("TRUCKNO<>''")
                         '★アップロード対象の営業所(対象の駅)の場合は引き継ぐ必要ないのでSKIP
-                        If OIT0002ExlUProw("TARGETSTATIONNAME") = OIT0002ExlUProw("ARRSTATIONNAME") Then Continue For
+                        If Convert.ToString(OIT0002ExlUProw("TARGETSTATIONNAME")) = Convert.ToString(OIT0002ExlUProw("ARRSTATIONNAME")) Then Continue For
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
                             If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") Then
                                 OIT0002ExlUProw("OBJECTIVENAME") = OIT0002Exlrow("OBJECTIVENAME")
@@ -2461,10 +2461,18 @@ Public Class OIT0002LinkList
                     End If
 
                     '★受注№
-                    ORDERNO.Value = OIT0002EXLUProw("ORDERNO")
+                    Try
+                        ORDERNO.Value = OIT0002EXLUProw("ORDERNO")
+                    Catch ex As Exception
+                        ORDERNO.Value = ""
+                    End Try
 
                     '★受注明細№
-                    DETAILNO.Value = OIT0002EXLUProw("DETAILNO")
+                    Try
+                        DETAILNO.Value = OIT0002EXLUProw("DETAILNO")
+                    Catch ex As Exception
+                        DETAILNO.Value = ""
+                    End Try
 
                     '★着駅名を保存
                     strDepstationName = DEPSTATIONNAME.Value

@@ -1418,8 +1418,8 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
             & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
-            & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
-            & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
+            & " , CONVERT(NCHAR(1), '0')                         AS LANDC" _
+            & " , CONVERT(NCHAR(1), '0')                         AS EMPTYFAREFLG" _
             & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,''))" _
             & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,'')))) AS OTDAILYDEPSTATIONN" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
@@ -1432,9 +1432,19 @@ Public Class OIT0003OTLinkageList
             & "   WHEN OIM0005.MODELTANKNO IS NULL THEN '000000'" _
             & "   ELSE FORMAT(OIM0005.MODELTANKNO , '000000')" _
             & "   END                                            AS TANKNO" _
-            & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
-            & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
-            & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
+            & " , CONVERT(NCHAR(1), '')                          AS OUTSIDEINFO" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & "       CASE" _
+            & String.Format("       WHEN OIT0002.TRAINNO = '{0}' THEN '1'", "8877") _
+            & "       END" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & "       CASE" _
+            & String.Format("       WHEN OIT0002.TRAINNO IN ('{0}','{1}') THEN '1'", "6078", "8380") _
+            & "       END" _
+            & "   ELSE CONVERT(NCHAR(1), '')" _
+            & "   END                                            AS GENERALCARTYPE" _
+            & " , CONVERT(NCHAR(1), '')                          AS RUNINFO" _
             & " , REPLACE (CONVERT(NCHAR (5), REPLACE(OIT0003.CARSAMOUNT,'.','')), SPACE (1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 "
@@ -1446,6 +1456,7 @@ Public Class OIT0003OTLinkageList
         '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN), SPACE (8))     AS OTDAILYSHIPPERN" _
         '& " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
         '& " , ISNULL(CONVERT(NCHAR(6), OIM0005.MODELTANKNO), SPACE (6))         AS TANKNO" _
+        '& " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
 
         '★積置フラグ無し用SQL
         SQLStrNashi &=

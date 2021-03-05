@@ -175,9 +175,18 @@
                         <ItemTemplate>
                             <asp:Label ID="WF_NINUKELIST_CARSNUMBER" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "CARSNUMBER"))%>' />
                         </ItemTemplate>
-                        <FooterTemplate>
-                            <span class="footerColName">合計額</span>
-                        </FooterTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="AMOUNT moneyText NoneRightBorder" FooterStyle-CssClass="moneyText AllBorder">
+                        <HeaderTemplate>屯数</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:Label ID="WF_NINUKELIST_LOAD" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "LOAD"))%>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="AMOUNT moneyText NoneRightBorder" FooterStyle-CssClass="moneyText AllBorder">
+                        <HeaderTemplate>単価</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:Label ID="WF_NINUKELIST_UNIT_PRICE" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "UNIT_PRICE") %>' />
+                        </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderStyle-CssClass="AllBorder" ItemStyle-CssClass="AMOUNT moneyText NoneRightBorder" FooterStyle-CssClass="moneyText AllBorder">
                         <HeaderTemplate>請求額</HeaderTemplate>

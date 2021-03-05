@@ -186,9 +186,9 @@ Public Class EntryHistory
         '◯受注明細TBL
         Dim sqlDetailStat As New StringBuilder
         sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0002_DETAIL")
-        sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
+        sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,OTDETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
         sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,WHOLESALEFLG,INSPECTIONFLG,DETENTIONFLG,")
-        sqlDetailStat.AppendLine("    FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,UPGRADEFLG,")
+        sqlDetailStat.AppendLine("    FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,UPGRADEFLG,TESTPRODUCTFLG,")
         sqlDetailStat.AppendLine("    ORDERINFO,SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    JOINTCODE,JOINT,REMARK,")
@@ -206,9 +206,9 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
-        sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
+        sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@OTDETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
         sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@WHOLESALEFLG,@INSPECTIONFLG,@DETENTIONFLG,")
-        sqlDetailStat.AppendLine("    @FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@UPGRADEFLG,")
+        sqlDetailStat.AppendLine("    @FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@UPGRADEFLG,@TESTPRODUCTFLG,")
         sqlDetailStat.AppendLine("    @ORDERINFO,@SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    @JOINTCODE,@JOINT,@REMARK,")
@@ -232,6 +232,15 @@ Public Class EntryHistory
                 .Add("MAPID", SqlDbType.NVarChar).Value = drOrder("MAPID")
                 .Add("ORDERNO", SqlDbType.NVarChar).Value = drOrder("ORDERNO")
                 .Add("DETAILNO", SqlDbType.NVarChar).Value = drOrder("DETAILNO")
+                Try
+                    .Add("OTDETAILNO", SqlDbType.NVarChar).Value = drOrder("OTDETAILNO")
+                Catch ex As Exception
+                    If .Contains("OTDETAILNO") Then
+                        .Item("OTDETAILNO").Value = ""
+                    Else
+                        .Add("OTDETAILNO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("SHIPORDER", SqlDbType.NVarChar).Value = drOrder("SHIPORDER")
                 .Add("LINEORDER", SqlDbType.NVarChar).Value = drOrder("LINEORDER")
                 .Add("TANKNO", SqlDbType.NVarChar).Value = drOrder("TANKNO")
@@ -245,6 +254,15 @@ Public Class EntryHistory
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
                 .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = drOrder("UPGRADEFLG")
+                Try
+                    .Add("TESTPRODUCTFLG", SqlDbType.NVarChar).Value = drOrder("TESTPRODUCTFLG")
+                Catch ex As Exception
+                    If .Contains("TESTPRODUCTFLG") Then
+                        .Item("TESTPRODUCTFLG").Value = ""
+                    Else
+                        .Add("TESTPRODUCTFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")

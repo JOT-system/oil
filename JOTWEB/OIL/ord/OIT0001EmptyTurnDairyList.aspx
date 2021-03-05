@@ -48,6 +48,7 @@
 
                     <div class="rightSide">
                         <div style="display:none;">
+                        <input type="button" id="WF_ButtonOTCOMPARE" class="btn-sticky" value="OT比較結果"  onclick ="ButtonClick('WF_ButtonOTCOMPARE');" />
                         <input type="button" id="WF_ButtonOTINSERT" class="btn-sticky" value="空回日報取込"  onclick ="ButtonClick('WF_ButtonOTINSERT');" />
                         </div>
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="新規登録"        onclick ="ButtonClick('WF_ButtonINSERT');" />

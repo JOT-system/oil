@@ -2079,7 +2079,7 @@ Public Class OIT0003OTLinkageList
                         tankType = "4"
                     End If
                     newDr("車種コード") = tankType.PadLeft(2, "0"c).PadRight(3, " "c)
-                    newDr("車番") = wrkDr("TANKNO").ToString()
+                    newDr("車番") = wrkDr("TANKNO").ToString().PadLeft(6, "0"c)
                     newDr("本線列車番号") = wrkDr("TRAINNO").ToString()
                     newDr("予備2") = "".PadRight(5, " "c)
                     newDr("予備3") = "".PadRight(1, " "c)

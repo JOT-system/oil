@@ -2057,7 +2057,7 @@ Public Class OIT0003OTLinkageList
                     Dim arrShipperCode As String = ""
                     Select Case wrkDr("CONSIGNEECODE").ToString()
                         Case BaseDllConst.CONST_CONSIGNEECODE_40
-                            arrShipperCode = "99"
+                            arrShipperCode = "99".PadLeft(5, "0"c)
                         Case BaseDllConst.CONST_CONSIGNEECODE_30,
                              BaseDllConst.CONST_CONSIGNEECODE_51,
                              BaseDllConst.CONST_CONSIGNEECODE_52,

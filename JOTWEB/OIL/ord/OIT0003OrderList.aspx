@@ -40,7 +40,7 @@
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->
-                        <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ダウンロード" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
+                        <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ﾀﾞｳﾝﾛｰﾄﾞ" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="社外連携" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
                         <a style="display:none;">

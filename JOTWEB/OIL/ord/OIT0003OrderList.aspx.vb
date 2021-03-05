@@ -727,13 +727,6 @@ Public Class OIT0003OrderList
     ''' </summary>
     Protected Sub WF_ButtonDetailDownload_Click()
 
-        '出力データ存在チェック
-        If OIT0003tbl Is Nothing OrElse OIT0003tbl.Rows.Count = 0 Then
-            'データが存在しない場合、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-
         '******************************
         '帳票表示データ取得処理
         '******************************
@@ -858,6 +851,8 @@ Public Class OIT0003OrderList
 
         If Not String.IsNullOrEmpty(selectedOrderNoInStat) Then
             SQLStr &= String.Format("   AND OIT0002.ORDERNO IN ({0}) ", selectedOrderNoInStat)
+        Else
+            SQLStr &= " AND OIT0002.DELFLG <> @DELFLG "
         End If
 
         SQLStr &=

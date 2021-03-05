@@ -138,14 +138,19 @@
                 <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>--%>
-    <div>
+    <div class="grc0001Wrapper">
+        <span id="spnReportDateNowChk">
+            <asp:Label ID="lblReportDateNowChk" runat="server" Text=""></asp:Label>
+            <a id="aReportDateNowChk" onclick="reportDatrNowButton();" >
+                <asp:CheckBox ID="chkReportDateNowChk" runat="server" Text="当日" />
+            </a>
+        </span>
         <span id="spnLodDate">
             <asp:Label ID="lblReportLodDate" runat="server" Text="積込日"></asp:Label>
             <a class="ef" id="aReportLodDate" ondblclick="Field_DBclick('txtReportLodDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportLodDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
-        <input type="button" id="WF_ButtonReportDateNow" class="btn-sticky" value="当日"  onclick="reportDatrNowButton();" />
     </div>
     <br/>
     <div>

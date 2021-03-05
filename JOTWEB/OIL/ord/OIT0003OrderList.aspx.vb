@@ -3180,6 +3180,12 @@ Public Class OIT0003OrderList
 
     Protected Sub WF_ReportSelect()
 
+        '選択したチェックボックス(営業所)の名称を取得
+        work.WF_SEL_TH_ORDERSALESOFFICENAME.Text = tileSalesOffice.GetSelectedSingleText()
+        '選択したチェックボックス(営業所)のコードを取得
+        work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
+
+        '初期化
         Me.divRTrainNo.Visible = False
         Me.txtReportRTrainNo.Text = ""
         Me.divTrainNo.Visible = False
@@ -3227,6 +3233,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
+                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '袖ヶ浦のみ初期値を設定
+                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                End If
         End Select
 
     End Sub

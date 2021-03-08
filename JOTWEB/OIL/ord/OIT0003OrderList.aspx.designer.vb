@@ -239,6 +239,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents WF_BUTTONofficecode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''lblReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportDateNowChk As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''chkReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkReportDateNowChk As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''lblReportLodDate コントロール。
     '''</summary>
     '''<remarks>

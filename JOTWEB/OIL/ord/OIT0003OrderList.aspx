@@ -40,7 +40,7 @@
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->
-                        <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ダウンロード" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
+                        <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ﾀﾞｳﾝﾛｰﾄﾞ" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="社外連携" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
                         <a style="display:none;">
@@ -138,14 +138,19 @@
                 <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>--%>
-    <div>
+    <div class="grc0001Wrapper">
+        <span id="spnReportDateNowChk">
+            <asp:Label ID="lblReportDateNowChk" runat="server" Text=""></asp:Label>
+            <a id="aReportDateNowChk" onclick="reportDatrNowButton();" >
+                <asp:CheckBox ID="chkReportDateNowChk" runat="server" Text="当日" />
+            </a>
+        </span>
         <span id="spnLodDate">
             <asp:Label ID="lblReportLodDate" runat="server" Text="積込日"></asp:Label>
             <a class="ef" id="aReportLodDate" ondblclick="Field_DBclick('txtReportLodDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportLodDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
-        <input type="button" id="WF_ButtonReportDateNow" class="btn-sticky" value="当日"  onclick="reportDatrNowButton();" />
     </div>
     <br/>
     <div>

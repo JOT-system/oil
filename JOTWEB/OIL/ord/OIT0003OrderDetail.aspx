@@ -29,7 +29,7 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
-                <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ダウンロード" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
+                <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDetailDownload');" />
                 <%-- 20201210 START 指摘票対応(No246) --%>
                 <input type="button" id="WF_ButtonCORRECTIONDATE" class="btn-sticky" value="実績日訂正" onclick="ButtonClick('WF_ButtonCORRECTIONDATE');" />
                 <%-- 20201210 END   指摘票対応(No246) --%>

@@ -57,3 +57,6 @@ div[data-generated="1"] td:nth-child(4) {
 #divContentsPopUp .grc0001Wrapper ul {
     width:600px; /* 共通は450px で３列折り返しから４列折り返しに */
 }
+.grc0001Wrapper input[type=checkbox] + label {
+    display: inline-flex;
+}

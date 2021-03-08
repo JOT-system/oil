@@ -727,13 +727,6 @@ Public Class OIT0003OrderList
     ''' </summary>
     Protected Sub WF_ButtonDetailDownload_Click()
 
-        '出力データ存在チェック
-        If OIT0003tbl Is Nothing OrElse OIT0003tbl.Rows.Count = 0 Then
-            'データが存在しない場合、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-
         '******************************
         '帳票表示データ取得処理
         '******************************
@@ -858,6 +851,8 @@ Public Class OIT0003OrderList
 
         If Not String.IsNullOrEmpty(selectedOrderNoInStat) Then
             SQLStr &= String.Format("   AND OIT0002.ORDERNO IN ({0}) ", selectedOrderNoInStat)
+        Else
+            SQLStr &= " AND OIT0002.DELFLG <> @DELFLG "
         End If
 
         SQLStr &=
@@ -3185,6 +3180,12 @@ Public Class OIT0003OrderList
 
     Protected Sub WF_ReportSelect()
 
+        '選択したチェックボックス(営業所)の名称を取得
+        work.WF_SEL_TH_ORDERSALESOFFICENAME.Text = tileSalesOffice.GetSelectedSingleText()
+        '選択したチェックボックス(営業所)のコードを取得
+        work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
+
+        '初期化
         Me.divRTrainNo.Visible = False
         Me.txtReportRTrainNo.Text = ""
         Me.divTrainNo.Visible = False
@@ -3232,6 +3233,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
+                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '袖ヶ浦のみ初期値を設定
+                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                End If
         End Select
 
     End Sub

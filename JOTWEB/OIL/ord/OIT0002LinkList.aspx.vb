@@ -5697,7 +5697,7 @@ Public Class OIT0002LinkList
         Dim WW_CheckMES2 As String = ""
         Dim WW_ErrorMES As String = ""
 
-        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>'' AND TARGETOFFICECODE=OFFICECODE")
             '貨車アップロードにて指定した本線列車が登録されているかチェック
             If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" _
                 AndAlso Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")) <> "" Then

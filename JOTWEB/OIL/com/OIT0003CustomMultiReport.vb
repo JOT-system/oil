@@ -483,6 +483,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             End Select
             ExcelMemoryRelease(rngHeaderArea)
 
+            '受入基地
+            rngHeaderArea = ExcelWorkSheet.Range("G4")
+            rngHeaderArea.Value = "松本油槽所"
+            ExcelMemoryRelease(rngHeaderArea)
+
         Catch ex As Exception
             Throw
         Finally

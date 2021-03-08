@@ -12,4 +12,9 @@
     <!-- 一覧画面用で設定 -->
     <asp:TextBox ID="WF_LISTSEL_TANKNUMBER" runat="server"></asp:TextBox>
     <asp:TextBox ID="WF_LISTSEL_INPTBL" runat="server"></asp:TextBox> <!-- 一覧画面のデータファイルパス -->
+    <!-- メニュー画面より遷移した場合用で設定 -->
+    <asp:TextBox ID="WF_MAIN_OFFICECODE" runat="server"></asp:TextBox>  <!-- 対象の営業所コード -->
+    <asp:TextBox ID="WF_MAIN_VIEWTABLE" runat="server"></asp:TextBox>   <!-- 対象のVIEWテーブル -->
+    <asp:TextBox ID="WF_MAIN_VIEWSORT" runat="server"></asp:TextBox>    <!-- 対象のソートKEY -->
+
 </div>

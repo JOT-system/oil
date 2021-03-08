@@ -83,15 +83,16 @@ Public Class OILMasterPage
             '画面間情報取得処理
             SetMAPValue()
         End If
-        'オンラインサービス判定 
-        Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
-        CS0008ONLINEstat.COMPCODE = GetTargetComp()
-        CS0008ONLINEstat.CS0008ONLINEstat()
 
-        If Not isNormal(CS0008ONLINEstat.ERR) OrElse CS0008ONLINEstat.ONLINESW = 0 Then
-            Server.Transfer(C_URL.LOGIN)
-            Exit Sub
-        End If
+        'オンラインサービス判定 
+        '        Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
+        '        CS0008ONLINEstat.COMPCODE = GetTargetComp()
+        '        CS0008ONLINEstat.CS0008ONLINEstat()
+
+        '        If Not isNormal(CS0008ONLINEstat.ERR) OrElse CS0008ONLINEstat.ONLINESW = 0 Then
+        '        Server.Transfer(C_URL.LOGIN)
+        '        Exit Sub
+        '        End If
 
     End Sub
 
@@ -1230,6 +1231,29 @@ Public Class OILMasterPage
             MF_USERTERMID.Value = value
         End Set
     End Property
+    ''' <summary>
+    ''' POSIROW
+    ''' </summary>
+    Property POSIROW As String
+        Get
+            Return MF_POSIROW.Value
+        End Get
+        Set(value As String)
+            MF_POSIROW.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' POSICOL
+    ''' </summary>
+    Property POSICOL As String
+        Get
+            Return MF_POSICOL.Value
+        End Get
+        Set(value As String)
+            MF_POSICOL.Value = value
+        End Set
+    End Property
+
     ''' <summary>
     ''' ×ボタン情報保持
     ''' </summary>

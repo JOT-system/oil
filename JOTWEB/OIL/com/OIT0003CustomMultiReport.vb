@@ -483,6 +483,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             End Select
             ExcelMemoryRelease(rngHeaderArea)
 
+            '受入基地
+            rngHeaderArea = ExcelWorkSheet.Range("G4")
+            rngHeaderArea.Value = "松本油槽所"
+            ExcelMemoryRelease(rngHeaderArea)
+
         Catch ex As Exception
             Throw
         Finally
@@ -953,6 +958,7 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
                 'GO
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1401")).Count
+                tankCount += query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1404")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH16")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
                 ExcelMemoryRelease(rngHeaderArea)

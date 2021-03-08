@@ -5962,7 +5962,11 @@ Public Class OIT0006OutOfServiceDetail
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
-                        If Convert.ToString(loopdr("TANKNO")) = "" Then
+                        If Convert.ToString(loopdr("TANKNO")) = "" _
+                           OrElse Convert.ToString(loopdr("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_101 _
+                           OrElse Convert.ToString(loopdr("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_102 _
+                           OrElse Convert.ToString(loopdr("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_107 _
+                           OrElse Convert.ToString(loopdr("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_108 Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")

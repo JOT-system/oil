@@ -148,6 +148,8 @@ Public Class OIT0006OutOfServiceDetail
                             WF_RIGHTBOX_Change()
                         Case "WF_ListChange"                  'リスト変更
                             WF_ListChange()
+                        Case "WF_ComDeleteIconClick"          'リスト削除
+                            WF_ListDelete()
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
                         Case "btnChkIdoSpecifyOfficeConfirmYes" '確認メッセージはいボタン押下(目的(移動)でタンク車ステータスを更新確認)
@@ -2940,6 +2942,63 @@ Public Class OIT0006OutOfServiceDetail
         Master.SaveTable(OIT0006tbl)
 
     End Sub
+
+    ''' <summary>
+    ''' リスト削除時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListDelete()
+        '紐付けているリストのID
+        Dim ListId As String = Master.DELETE_FIELDINFO.ListId
+        'フィールド名
+        Dim FieldName As String = Master.DELETE_FIELDINFO.FieldName
+        '行番号
+        Dim LineCnt As String = Master.DELETE_FIELDINFO.LineCnt
+
+        Select Case WF_DetailMView.ActiveViewIndex
+                'タンク車割当
+            Case 0
+                WW_ListDelete_TAB1(FieldName, LineCnt)
+
+                '費用入力
+            Case 1
+                WW_ListDelete_TAB2(FieldName, LineCnt)
+
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0006tbl)
+    End Sub
+    ''' <summary>
+    ''' リスト削除時処理(タンク車割当)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB1(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0006tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = I_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        Select Case I_FIELDNAME
+            Case "ACTUALDEPDATE"
+                updHeader.Item("ACTUALDEPDATE") = ""
+            Case "ACTUALARRDATE"
+                updHeader.Item("ACTUALARRDATE") = ""
+            Case "ACTUALACCDATE"
+                updHeader.Item("ACTUALACCDATE") = ""
+            Case "ACTUALEMPARRDATE"
+                updHeader.Item("ACTUALEMPARRDATE") = ""
+        End Select
+
+    End Sub
+    ''' <summary>
+    ''' リスト削除時処理(費用入力)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListDelete_TAB2(ByVal I_FIELDNAME As String, ByVal I_LINECNT As String)
+
+    End Sub
+
 
     ''' <summary>
     ''' リスト変更時処理(タブ「タンク車割当」)
@@ -5897,11 +5956,17 @@ Public Class OIT0006OutOfServiceDetail
                     '(実績)発送日, (実績)着日, (実績)受入日, 着駅, 交検日を入力可能(読取専用)とする。
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
-                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
+                        If Convert.ToString(loopdr("TANKNO")) = "" Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
                     End If
                     '(実績)返送日
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
@@ -5910,7 +5975,7 @@ Public Class OIT0006OutOfServiceDetail
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
                             '(目的(移動)以外)入力可能(読取専用)とする。
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly  showDeleteIcon'>")
                         End If
                     End If
                 Next
@@ -5961,7 +6026,7 @@ Public Class OIT0006OutOfServiceDetail
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") Then
                                 If loopdr("OBJECTIVECODE") = BaseDllConst.CONST_OBJECTCODE_25 Then
                                     '(目的(移動))入力可能(読取専用)とする。
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly  showDeleteIcon'>")
                                 Else
                                     '(目的(移動)以外)入力不可とする。
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -6038,7 +6103,7 @@ Public Class OIT0006OutOfServiceDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
                                     '(目的(移動)以外)入力可能(読取専用)とする。
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly  showDeleteIcon'>")
                                 End If
                             End If
                             ''(実績)発駅戻り日を入力可能とする。

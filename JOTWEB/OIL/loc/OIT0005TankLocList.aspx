@@ -22,7 +22,9 @@
                     <input type="button" id="WF_ButtonSelectOff"           class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSelectOff');" />--%>
                 </div>
                 <div class="rightSide">
+                    <div style="display:none">
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                    </div>
                     <input type="button" id="WF_ButtonUpdateList"    class="btn-sticky" value="明細更新" onclick="ButtonClick('WF_ButtonUpdateList');" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>

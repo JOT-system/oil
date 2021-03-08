@@ -3896,7 +3896,7 @@ Public Class OIT0002LinkList
 
                 '退避用
                 Dim sOrderContent() As String = {"", "", "", "", "", "", ""}
-                Dim iNum As Integer
+                'Dim iNum As Integer
                 Dim i As Integer = 0
                 Dim tankNoFlg As String = "0"
 

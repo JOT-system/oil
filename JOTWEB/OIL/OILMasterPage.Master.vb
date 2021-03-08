@@ -1231,6 +1231,29 @@ Public Class OILMasterPage
         End Set
     End Property
     ''' <summary>
+    ''' POSIROW
+    ''' </summary>
+    Property POSIROW As String
+        Get
+            Return MF_POSIROW.Value
+        End Get
+        Set(value As String)
+            MF_POSIROW.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' POSICOL
+    ''' </summary>
+    Property POSICOL As String
+        Get
+            Return MF_POSICOL.Value
+        End Get
+        Set(value As String)
+            MF_POSICOL.Value = value
+        End Set
+    End Property
+
+    ''' <summary>
     ''' ×ボタン情報保持
     ''' </summary>
     Private mMasterDeleteFieldInfo As MasterDeleteFieldInfo

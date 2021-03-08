@@ -4028,7 +4028,7 @@ Public Class OIT0006OutOfServiceDetail
         Dim WW_TEXT As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
-        Dim WW_STYMD As Date
+        'Dim WW_STYMD As Date
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
 

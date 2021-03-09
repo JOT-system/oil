@@ -24,6 +24,7 @@ Public Class OIT0006OutOfServiceDetail
     Private OIT0006Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0006His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0006His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003NEWKAISOUNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 99                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -369,10 +370,10 @@ Public Class OIT0006OutOfServiceDetail
 
         '■オーダー№
         If work.WF_SEL_KAISOUNUMBER.Text = "" Then
-            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
-            WW_FixvalueMasterSearch("", "NEWKAISOUNOGET", "", WW_GetValue)
-            work.WF_SEL_KAISOUNUMBER.Text = WW_GetValue(0)
-            Me.TxtKaisouOrderNo.Text = work.WF_SEL_KAISOUNUMBER.Text
+            'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+            'WW_FixvalueMasterSearch("", "NEWKAISOUNOGET", "", WW_GetValue)
+            'work.WF_SEL_KAISOUNUMBER.Text = WW_GetValue(0)
+            'Me.TxtKaisouOrderNo.Text = work.WF_SEL_KAISOUNUMBER.Text
         Else
             Me.TxtKaisouOrderNo.Text = work.WF_SEL_KAISOUNUMBER.Text
         End If
@@ -3305,6 +3306,11 @@ Public Class OIT0006OutOfServiceDetail
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar) '回送№
 
                 Dim WW_DATENOW As DateTime = Date.Now
+                '★新規回送NO取得処理(登録する直前に取得)
+                If work.WF_SEL_KAISOUNUMBER.Text = "" Then
+                    WW_GetNewKaisouNo(SQLcon, work.WF_SEL_KAISOUNUMBER.Text)
+                    Me.TxtKaisouOrderNo.Text = work.WF_SEL_KAISOUNUMBER.Text
+                End If
 
                 'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
                 'WW_FixvalueMasterSearch("", "NEWKAISOUNOGET", "", WW_GetValue)
@@ -6955,7 +6961,7 @@ Public Class OIT0006OutOfServiceDetail
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", ActualEmparrDate)
             End If
 
-                SQLStr &=
+            SQLStr &=
                       "        UPDYMD       = @P11, " _
                     & "        UPDUSER      = @P12, " _
                     & "        UPDTERMID    = @P13, " _
@@ -7513,6 +7519,57 @@ Public Class OIT0006OutOfServiceDetail
         End If
         '### 20200831 END   タンク車の所在地コード確認 ###########################
 
+    End Sub
+
+    ''' <summary>
+    ''' 新規回送NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewKaisouNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0003NEWKAISOUNOtbl) Then
+            OIT0003NEWKAISOUNOtbl = New DataTable
+        End If
+
+        If OIT0003NEWKAISOUNOtbl.Columns.Count <> 0 Then
+            OIT0003NEWKAISOUNOtbl.Columns.Clear()
+        End If
+
+        OIT0003NEWKAISOUNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.kaisou_sequence,'00') AS KAISOUNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003NEWKAISOUNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003NEWKAISOUNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0003NEWKAISOUNOtbl.Rows(0)("KAISOUNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D GET_NEWKAISOUNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D GET_NEWKAISOUNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

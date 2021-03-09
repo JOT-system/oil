@@ -35,6 +35,7 @@ Public Class OIT0002LinkList
     Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0002NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
+    Private OIT0003NEWKAISOUNOtbl As DataTable                       '取得用(新規回送No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -2036,7 +2037,7 @@ Public Class OIT0002LinkList
                     '★貨車連結表(臨海)TBLに保持している内容を引き継ぐ
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("TRUCKNO<>''")
                         '★アップロード対象の営業所(対象の駅)の場合は引き継ぐ必要ないのでSKIP
-                        If OIT0002ExlUProw("TARGETSTATIONNAME") = OIT0002ExlUProw("ARRSTATIONNAME") Then Continue For
+                        If Convert.ToString(OIT0002ExlUProw("TARGETSTATIONNAME")) = Convert.ToString(OIT0002ExlUProw("ARRSTATIONNAME")) Then Continue For
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
                             If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") Then
                                 OIT0002ExlUProw("OBJECTIVENAME") = OIT0002Exlrow("OBJECTIVENAME")
@@ -2461,10 +2462,18 @@ Public Class OIT0002LinkList
                     End If
 
                     '★受注№
-                    ORDERNO.Value = OIT0002EXLUProw("ORDERNO")
+                    Try
+                        ORDERNO.Value = OIT0002EXLUProw("ORDERNO")
+                    Catch ex As Exception
+                        ORDERNO.Value = ""
+                    End Try
 
                     '★受注明細№
-                    DETAILNO.Value = OIT0002EXLUProw("DETAILNO")
+                    Try
+                        DETAILNO.Value = OIT0002EXLUProw("DETAILNO")
+                    Catch ex As Exception
+                        DETAILNO.Value = ""
+                    End Try
 
                     '★着駅名を保存
                     strDepstationName = DEPSTATIONNAME.Value
@@ -3026,9 +3035,10 @@ Public Class OIT0002LinkList
                 P_KAISOUSTATUS.Value = BaseDllConst.CONST_KAISOUSTATUS_900
 
                 '回送№取得
-                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-                WW_FixvalueMasterSearch("ZZ", "NEWKAISOUNOGET", "", WW_GetValue)
-                Dim sKaisouNo As String = WW_GetValue(0)
+                'Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch("ZZ", "NEWKAISOUNOGET", "", WW_GetValue)
+                'Dim sKaisouNo As String = WW_GetValue(0)
+                Dim sKaisouNo As String = ""
 
                 '退避用
                 Dim sKaisouContent() As String = {"", "", "", "", "", ""}
@@ -3092,12 +3102,14 @@ Public Class OIT0002LinkList
 
                         '★回送TBLに存在しない場合
                         If OIT0002GETtbl.Rows.Count = 0 Then
+                            '★新規回送NO取得処理(登録する直前に取得)
+                            WW_GetNewKaisouNo(SQLcon, sKaisouNo)
                             OIT0002EXLUProw("KAISOUNO") = sKaisouNo
                             OIT0002EXLUProw("KAISOUDETAILNO") = "001"
 
-                            '次回用に受注Noをカウント
-                            iNum = Integer.Parse(sKaisouNo.Substring(9, 2)) + 1
-                            sKaisouNo = sKaisouNo.Substring(0, 9) + iNum.ToString("00")
+                            ''次回用に回送Noをカウント
+                            'iNum = Integer.Parse(sKaisouNo.Substring(9, 2)) + 1
+                            'sKaisouNo = sKaisouNo.Substring(0, 9) + iNum.ToString("00")
                         Else
                             ''存在する場合は、設定されている受注Noを設定
                             OIT0002EXLUProw("KAISOUNO") = OIT0002GETtbl.Rows(0)("KAISOUNO")
@@ -3888,7 +3900,7 @@ Public Class OIT0002LinkList
 
                 '退避用
                 Dim sOrderContent() As String = {"", "", "", "", "", "", ""}
-                Dim iNum As Integer
+                'Dim iNum As Integer
                 Dim i As Integer = 0
                 Dim tankNoFlg As String = "0"
 
@@ -5689,7 +5701,7 @@ Public Class OIT0002LinkList
         Dim WW_CheckMES2 As String = ""
         Dim WW_ErrorMES As String = ""
 
-        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>''")
+        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("LOADINGTRAINNO<>'' AND TARGETOFFICECODE=OFFICECODE")
             '貨車アップロードにて指定した本線列車が登録されているかチェック
             If Convert.ToString(OIT0002ExlUProw("DETAILNO")) = "" _
                 AndAlso Convert.ToString(OIT0002ExlUProw("LOADARRSTATION")) <> "" Then
@@ -6783,4 +6795,54 @@ Public Class OIT0002LinkList
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 新規回送NO取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_GetNewKaisouNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
+
+        If IsNothing(OIT0003NEWKAISOUNOtbl) Then
+            OIT0003NEWKAISOUNOtbl = New DataTable
+        End If
+
+        If OIT0003NEWKAISOUNOtbl.Columns.Count <> 0 Then
+            OIT0003NEWKAISOUNOtbl.Columns.Clear()
+        End If
+
+        OIT0003NEWKAISOUNOtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.kaisou_sequence,'00') AS KAISOUNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003NEWKAISOUNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003NEWKAISOUNOtbl.Load(SQLdr)
+                End Using
+
+                O_ORDERNO = OIT0003NEWKAISOUNOtbl.Rows(0)("KAISOUNO")
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D GET_NEWKAISOUNO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D GET_NEWKAISOUNO"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+    End Sub
 End Class

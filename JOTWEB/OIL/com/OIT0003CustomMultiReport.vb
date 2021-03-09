@@ -65,6 +65,18 @@ Public Class OIT0003CustomMultiReport
         Return url
     End Function
 
+    Public Shared Function CreateOrderDetail(mapId As String, printDataClass As DataTable) As String
+        Dim url As String
+        Using repCbj = New OrderDetail(mapId, printDataClass)
+            Try
+                url = repCbj.CreatePrintData()
+            Catch ex As Exception
+                Throw
+            End Try
+        End Using
+        Return url
+    End Function
+
 End Class
 
 ''' <summary>
@@ -469,6 +481,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                 Case CONST_OFFICECODE_012402
                     rngHeaderArea.Value = "昭和四日市石油"
             End Select
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '受入基地
+            rngHeaderArea = ExcelWorkSheet.Range("G4")
+            rngHeaderArea.Value = "松本油槽所"
             ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
@@ -941,6 +958,7 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
                 'GO
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1401")).Count
+                tankCount += query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1404")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH16")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
                 ExcelMemoryRelease(rngHeaderArea)
@@ -1024,6 +1042,512 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
             ExcelMemoryRelease(rngDetailArea)
         End Try
 
+    End Sub
+
+End Class
+
+Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
+
+    Private Const TEMP_XLS_FILE_NAME As String = "ORDERDETAIL.xlsx"
+    Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 7
+    Private Const DETAIL_AREA_ROWS_COUNT As Integer = 22
+    Private Const DETAIL_AREA_PAGE_COUNT As Integer = 25
+
+    Protected PrintData As DataTable
+
+    Public Sub New(mapId As String, printDataClass As DataTable)
+        MyBase.New(mapId, TEMP_XLS_FILE_NAME)
+
+        Me.PrintData = printDataClass
+
+        '○作業シート設定
+        TrySetExcelWorkSheet("受注明細", "TEMPLATE")
+    End Sub
+
+    Public Function CreatePrintData(Optional ByVal trainNo As String = Nothing, Optional ByVal lodDate As String = Nothing, Optional ByVal depDate As String = Nothing) As String
+
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
+
+        Try
+
+            Dim query = Me.PrintData.AsEnumerable().
+                GroupBy(Function(r) New With {
+                    Key .officeCode = r("OFFICECODE").ToString(),
+                    Key .trainNo = r("TRAINNO").ToString(),
+                    Key .lodDate = r("LODDATE").ToString(),
+                    Key .depDate = r("DEPDATE").ToString()
+                }).
+                Select(Function(g) New With {
+                    g.Key.officeCode,
+                    g.Key.trainNo,
+                    g.Key.lodDate,
+                    g.Key.depDate,
+                    .rows = g.Select(Function(r) r).ToArray()
+                }).
+                Where(Function(p)
+                          Dim selectFlg As Boolean = True
+                          If selectFlg AndAlso Not String.IsNullOrEmpty(trainNo) Then
+                              selectFlg = (p.trainNo = trainNo)
+                          End If
+                          If selectFlg AndAlso Not String.IsNullOrEmpty(lodDate) Then
+                              selectFlg = (p.lodDate = lodDate)
+                          End If
+                          If selectFlg AndAlso Not String.IsNullOrEmpty(lodDate) Then
+                              selectFlg = (p.depDate = depDate)
+                          End If
+                          Return selectFlg
+                      End Function).ToList()
+
+            If query.Any() Then
+
+                Dim pageIndex As Integer = 0
+                Do
+                    '○NextPage
+                    If pageIndex > 0 Then
+                        '○作業シート設定
+                        TrySetExcelWorkSheet("受注明細", "TEMPLATE")
+                    End If
+
+                    '○出力シート設定
+                    If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                        OutputSheetNames.Add(ExcelWorkSheet.Name)
+                        HiddenColumn(query.Item(pageIndex).officeCode)
+                    End If
+
+                    '◯ヘッダーの設定
+                    EditHeaderArea(query.Item(pageIndex).trainNo, query.Item(pageIndex).lodDate, query.Item(pageIndex).depDate)
+
+                    '◯明細の設定
+                    EditDetailArea(query.Item(pageIndex).rows, query.Item(pageIndex).officeCode)
+
+                    pageIndex += 1
+                Loop While pageIndex < query.Count()
+            Else
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
+                    HiddenColumn(Nothing)
+                End If
+
+                '◯ヘッダーの設定
+                EditHeaderArea(trainNo, lodDate, depDate)
+            End If
+
+            '○出力シートのみ残す
+            If OutputSheetNames IsNot Nothing AndAlso OutputSheetNames.Any() Then
+                ExcelMemoryRelease(ExcelWorkSheet)
+                ExcelMemoryRelease(ExcelTempSheet)
+                Dim allSeetName As New Dictionary(Of String, Integer)
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    allSeetName.Add(sheet.Name, sheet.Index)
+                    ExcelMemoryRelease(sheet)
+                Next
+                For Each sheetName As String In allSeetName.
+                    Where(Function(x) Not OutputSheetNames.Contains(x.Key)).
+                    OrderByDescending(Function(x) x.Value).
+                    Select(Function(x) x.Key).ToList()
+
+                    If TrySetExcelWorkSheet(sheetName) Then
+                        ExcelWorkSheet.Delete()
+                    End If
+                Next
+            End If
+
+            '保存処理実行
+            ExcelSaveAs(tmpFilePath)
+            ExcelBookObj.Close(False)
+
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' ヘッダー部の設定
+    ''' </summary>
+    Private Sub EditHeaderArea(ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
+
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+
+            '列車番号
+            rngHeaderArea = Me.ExcelWorkSheet.Range("B3")
+            rngHeaderArea.Value = trainNo
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '積込予定日
+            rngHeaderArea = Me.ExcelWorkSheet.Range("D3")
+            rngHeaderArea.Value = lodDate
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '発予定日
+            rngHeaderArea = Me.ExcelWorkSheet.Range("F3")
+            rngHeaderArea.Value = depDate
+            ExcelMemoryRelease(rngHeaderArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 明細部分の編集
+    ''' </summary>
+    Private Sub EditDetailArea(ByVal printRows As DataRow(), ByVal officeCode As String)
+        Dim rngDetailArea As Excel.Range = Nothing
+        Try
+
+            Select Case officeCode
+                Case BaseDllConst.CONST_OFFICECODE_011402
+                    printRows = printRows.
+                        OrderBy(Function(r) r("ORDERNO").ToString()).
+                        ThenBy(Function(r) IIf(r("ACTUALLODDATE").ToString() <> "", r("ACTUALLODDATE").ToString(), r("LODDATE").ToString())).
+                        ThenBy(Function(r)
+                                   Dim result As Integer = 2
+                                   Select Case r("OILCODE").ToString()
+                                       Case BaseDllConst.CONST_HTank,
+                                            BaseDllConst.CONST_RTank,
+                                            BaseDllConst.CONST_TTank,
+                                            BaseDllConst.CONST_MTTank,
+                                            BaseDllConst.CONST_KTank1,
+                                            BaseDllConst.CONST_K3Tank1,
+                                            BaseDllConst.CONST_LTank1,
+                                            BaseDllConst.CONST_ATank
+                                           result = 1
+                                       Case Else
+                                           result = 2
+                                   End Select
+                                   Return result
+                               End Function
+                        ).
+                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
+                        ThenBy(Function(r) r("LINEORDER").ToString().PadLeft(2, "0"c)).
+                        ThenBy(Function(r) r("SHIPORDER").ToString().PadLeft(2, "0"c)).
+                        ToArray()
+                Case BaseDllConst.CONST_OFFICECODE_012402
+                    printRows = printRows.
+                        OrderBy(Function(r) r("ORDERNO").ToString()).
+                        ThenBy(Function(r) r("DETAILNO").ToString()).
+                        ToArray()
+                Case Else
+                    printRows = printRows.
+                        OrderBy(Function(r) r("ORDERNO").ToString()).
+                        ThenBy(Function(r) IIf(r("ACTUALLODDATE").ToString() <> "", r("ACTUALLODDATE").ToString(), r("LODDATE").ToString())).
+                        ThenBy(Function(r) r("PRIORITYNO").ToString()).
+                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
+                        ThenBy(Function(r) r("LINEORDER").ToString().PadLeft(2, "0"c)).
+                        ThenBy(Function(r) r("SHIPORDER").ToString().PadLeft(2, "0"c)).
+                        ToArray()
+            End Select
+
+            Dim orderNo As String = ""
+            Dim pageCount As Integer = 1
+            Dim startRowIndex As Integer = DETAIL_AREA_BEGIN_ROW_INDEX
+            Dim rowIndex As Integer = 0
+            For Each r In printRows.Select(Function(x, i) New With {.row = x, .index = i + DETAIL_AREA_BEGIN_ROW_INDEX}).ToList()
+
+                If orderNo <> "" AndAlso orderNo <> r.row("ORDERNO").ToString() Then
+                    pageCount += 1
+                    startRowIndex = pageCount * DETAIL_AREA_ROWS_COUNT + DETAIL_AREA_BEGIN_ROW_INDEX
+                    rowIndex = 0
+                End If
+
+                'Excel行No
+                Dim rIdx As String = (startRowIndex + rowIndex).ToString()
+
+                '発送順
+                rngDetailArea = Me.ExcelWorkSheet.Range("A" + rIdx)
+                rngDetailArea.Value = r.row("SHIPORDER")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '車番
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + rIdx)
+                rngDetailArea.Value = r.row("TANKNO")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '油種
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + rIdx)
+                rngDetailArea.Value = r.row("OILNAME")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '数量
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + rIdx)
+                rngDetailArea.Value = r.row("CARSAMOUNT")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '荷主
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + rIdx)
+                rngDetailArea.Value = r.row("SHIPPERSNAME")
+                ExcelMemoryRelease(rngDetailArea)
+
+                'ジョイント
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + rIdx)
+                rngDetailArea.Value = r.row("JOINT")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '構内取
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + rIdx)
+                rngDetailArea.Value = r.row("SECONDCONSIGNEENAME")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積置
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + rIdx)
+                rngDetailArea.Value = r.row("STACKINGFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '先返し
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + rIdx)
+                rngDetailArea.Value = r.row("FIRSTRETURNFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '後返し
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + rIdx)
+                rngDetailArea.Value = r.row("AFTERRETURNFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                'OT輸送
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + rIdx)
+                rngDetailArea.Value = r.row("OTTRANSPORTFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '格上げ
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + rIdx)
+                rngDetailArea.Value = r.row("UPGRADEFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '格下げ
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + rIdx)
+                rngDetailArea.Value = r.row("DOWNGRADEFLG")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積込日(実)
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + rIdx)
+                rngDetailArea.Value = r.row("ACTUALLODDATE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '発日(実)
+                rngDetailArea = Me.ExcelWorkSheet.Range("P" + rIdx)
+                rngDetailArea.Value = r.row("ACTUALDEPDATE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積車着日(実)
+                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + rIdx)
+                rngDetailArea.Value = r.row("ACTUALARRDATE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '受入日(実)
+                rngDetailArea = Me.ExcelWorkSheet.Range("R" + rIdx)
+                rngDetailArea.Value = r.row("ACTUALACCDATE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '空車着日日(実)
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + rIdx)
+                rngDetailArea.Value = r.row("ACTUALEMPARRDATE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積込入線列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("T" + rIdx)
+                rngDetailArea.Value = r.row("LOADINGIRILINEORDER")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積込入線順
+                rngDetailArea = Me.ExcelWorkSheet.Range("U" + rIdx)
+                rngDetailArea.Value = r.row("LINEORDER")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '回線
+                rngDetailArea = Me.ExcelWorkSheet.Range("V" + rIdx)
+                rngDetailArea.Value = r.row("LINE")
+                ExcelMemoryRelease(rngDetailArea)
+
+                '充填ポイント
+                rngDetailArea = Me.ExcelWorkSheet.Range("W" + rIdx)
+                rngDetailArea.Value = r.row("FILLINGPOINT")
+                ExcelMemoryRelease(rngDetailArea)
+
+                orderNo = r.row("ORDERNO").ToString()
+                rowIndex += 1
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+
+    Private Sub HiddenColumn(ByVal officeCode As String)
+        '列非表示処理構築
+        Dim funcHiddenColumn As Func(Of String, Boolean, Boolean) =
+            Function(ByVal strRange As String, ByVal hidden As Boolean)
+                Dim rngColumnArea As Excel.Range = Nothing
+                Dim rngEntryColumn As Excel.Range = Nothing
+                Try
+                    rngColumnArea = Me.ExcelWorkSheet.Range(strRange)
+                    rngEntryColumn = rngColumnArea.EntireColumn
+                    rngEntryColumn.Hidden = hidden
+                    ExcelMemoryRelease(rngColumnArea)
+                    ExcelMemoryRelease(rngEntryColumn)
+                Catch ex As Exception
+                    Throw
+                Finally
+                    ExcelMemoryRelease(rngColumnArea)
+                    ExcelMemoryRelease(rngEntryColumn)
+                End Try
+                Return True
+            End Function
+
+        '************
+        '列非表示設定
+        '************
+
+        '共通
+        '積込日(実)、発日(実)、積車着日(実)、受入日(実)、空車着日日(実)、積込入線列車、積込入線順
+        funcHiddenColumn("O:S", True)
+
+        '営業所別
+        Select Case officeCode
+            Case BaseDllConst.CONST_OFFICECODE_010402
+                '○仙台
+                'ジョイント
+                funcHiddenColumn("G:G", False)
+                '構内取
+                funcHiddenColumn("H:H", True)
+                '積置
+                funcHiddenColumn("I:I", False)
+                '先返し
+                funcHiddenColumn("J:J", True)
+                '後返し
+                funcHiddenColumn("K:K", True)
+                'OT輸送
+                funcHiddenColumn("L:L", True)
+                '積込入線列車
+                funcHiddenColumn("T:T", True)
+                '積込入線順
+                funcHiddenColumn("U:U", True)
+                '回線
+                funcHiddenColumn("V:V", True)
+                '充填ポイント
+                funcHiddenColumn("W:W", True)
+            Case BaseDllConst.CONST_OFFICECODE_011201
+                '○五井
+                'ジョイント
+                funcHiddenColumn("G:G", True)
+                '構内取
+                funcHiddenColumn("H:H", True)
+                '積置
+                funcHiddenColumn("I:I", True)
+                '先返し
+                funcHiddenColumn("J:J", True)
+                '後返し
+                funcHiddenColumn("K:K", True)
+                'OT輸送
+                funcHiddenColumn("L:L", False)
+                '積込入線列車
+                funcHiddenColumn("T:T", True)
+                '積込入線順
+                funcHiddenColumn("U:U", True)
+                '回線
+                funcHiddenColumn("V:V", False)
+                '充填ポイント
+                funcHiddenColumn("W:W", False)
+            Case BaseDllConst.CONST_OFFICECODE_011202
+                '○甲子
+                'ジョイント
+                funcHiddenColumn("G:G", True)
+                '構内取
+                funcHiddenColumn("H:H", True)
+                '積置
+                funcHiddenColumn("I:I", True)
+                '先返し
+                funcHiddenColumn("J:J", True)
+                '後返し
+                funcHiddenColumn("K:K", True)
+                'OT輸送
+                funcHiddenColumn("L:L", True)
+                '積込入線列車
+                funcHiddenColumn("T:T", True)
+                '積込入線順
+                funcHiddenColumn("U:U", True)
+                '回線
+                funcHiddenColumn("V:V", False)
+                '充填ポイント
+                funcHiddenColumn("W:W", False)
+            Case BaseDllConst.CONST_OFFICECODE_011203
+                '○袖ヶ浦
+                'ジョイント
+                funcHiddenColumn("G:G", True)
+                '構内取
+                funcHiddenColumn("H:H", False)
+                '積置
+                funcHiddenColumn("I:I", True)
+                '先返し
+                funcHiddenColumn("J:J", True)
+                '後返し
+                funcHiddenColumn("K:K", True)
+                'OT輸送
+                funcHiddenColumn("L:L", True)
+                '積込入線列車
+                funcHiddenColumn("T:T", False)
+                '積込入線順
+                funcHiddenColumn("U:U", False)
+                '回線
+                funcHiddenColumn("V:V", True)
+                '充填ポイント
+                funcHiddenColumn("W:W", True)
+            Case BaseDllConst.CONST_OFFICECODE_011402
+                '○根岸
+                'ジョイント
+                funcHiddenColumn("G:G", True)
+                '構内取
+                funcHiddenColumn("H:H", True)
+                '積置
+                funcHiddenColumn("I:I", False)
+                '先返し
+                funcHiddenColumn("J:J", False)
+                '後返し
+                funcHiddenColumn("K:K", False)
+                'OT輸送
+                funcHiddenColumn("L:L", True)
+                '積込入線列車
+                funcHiddenColumn("T:T", True)
+                '積込入線順
+                funcHiddenColumn("U:U", True)
+                '回線
+                funcHiddenColumn("V:V", True)
+                '充填ポイント
+                funcHiddenColumn("W:W", True)
+            Case Else
+                '○その他
+                'ジョイント
+                funcHiddenColumn("G:G", True)
+                '構内取
+                funcHiddenColumn("H:H", True)
+                '積置
+                funcHiddenColumn("I:I", True)
+                '先返し
+                funcHiddenColumn("J:J", True)
+                '後返し
+                funcHiddenColumn("K:K", True)
+                'OT輸送
+                funcHiddenColumn("L:L", True)
+                '積込入線列車
+                funcHiddenColumn("T:T", True)
+                '積込入線順
+                funcHiddenColumn("U:U", True)
+                '回線
+                funcHiddenColumn("V:V", True)
+                '充填ポイント
+                funcHiddenColumn("W:W", True)
+        End Select
     End Sub
 
 End Class

@@ -197,6 +197,22 @@ function reportRadioButton() {
     
 }
 
+// ○帳票(当日ボタンクリック)
+function reportDatrNowButton() {
+    var date = new Date();
+
+    if (document.getElementById("chkReportDateNowChk").checked) {
+        //当日を設定
+        document.getElementById("txtReportLodDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + date.getDate()).slice(-2);
+    } else {
+        //翌日を設定
+        document.getElementById("txtReportLodDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + (date.getDate() + 1)).slice(-2);
+    }
+
+}
+
 // ○ダウンロード処理
 function f_ExcelPrint() {
     

@@ -94,6 +94,7 @@ Public Class M00001MENU
            IsNumeric(Me.hdnRowLine.Value) = False Then
             Return
         End If
+        Dim posiRow As Integer = CInt(Me.hdnRowLine.Value)
         Dim posiCol As Integer = CInt(Me.hdnPosiCol.Value)
         Dim rowLine As Integer = CInt(Me.hdnRowLine.Value)
         Me.hdnPosiCol.Value = ""
@@ -128,6 +129,8 @@ Public Class M00001MENU
                 Master.MAPvariant = menuItm.Variant
                 Master.MAPID = menuItm.MapId
                 Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
+                Master.POSICOL = posiCol.ToString()
+                Master.POSIROW = posiRow.ToString()
                 Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
                 Master.ShowMessage()
 

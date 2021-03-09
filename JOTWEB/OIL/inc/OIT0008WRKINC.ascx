@@ -8,6 +8,7 @@
     <asp:TextBox ID="WF_SEL_LAST_OFFICECODE" runat="server"></asp:TextBox>          <!-- 最終表示営業所コード -->
     <asp:TextBox ID="WF_SEL_INIT_KEIJYO_YM" runat="server"></asp:TextBox>           <!-- 締め済み計上年月 -->
     <!-- 詳細画面 -->
+    <asp:TextBox ID="WF_SEL_OFFICENAME" runat="server"></asp:TextBox>               <!-- 営業所名 -->
     <asp:TextBox ID="WF_SEL_LINE" runat="server"></asp:TextBox>                     <!-- # -->
     <asp:TextBox ID="WF_SEL_ACCOUNTCODE" runat="server"></asp:TextBox>              <!-- 勘定科目コード -->
     <asp:TextBox ID="WF_SEL_ACCOUNTNAME" runat="server"></asp:TextBox>              <!-- 勘定科目名 -->

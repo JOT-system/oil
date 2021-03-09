@@ -48,7 +48,16 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INIT_KEIJYO_YM As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_OFFICENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_OFFICENAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_LINE コントロール。
     '''</summary>
@@ -66,7 +75,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ACCOUNTCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ACCOUNTNAME コントロール。
     '''</summary>
@@ -75,7 +84,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ACCOUNTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTCODE コントロール。
     '''</summary>
@@ -84,7 +93,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTNAME コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTBRANCHCODE コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTBRANCHCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTBRANCHNAME コントロール。
     '''</summary>
@@ -111,7 +120,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTBRANCHNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SHIPPERSCODE コントロール。
     '''</summary>
@@ -138,7 +147,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INVOICECODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INVOICENAME コントロール。
     '''</summary>
@@ -147,7 +156,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INVOICENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INVOICEDEPTNAME コントロール。
     '''</summary>
@@ -156,7 +165,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INVOICEDEPTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PAYEECODE コントロール。
     '''</summary>
@@ -165,7 +174,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PAYEECODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PAYEENAME コントロール。
     '''</summary>
@@ -174,7 +183,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PAYEENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PAYEEDEPTNAME コントロール。
     '''</summary>
@@ -183,7 +192,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PAYEEDEPTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TEKIYOU コントロール。
     '''</summary>

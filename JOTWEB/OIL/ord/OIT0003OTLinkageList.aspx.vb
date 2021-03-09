@@ -1174,7 +1174,7 @@ Public Class OIT0003OTLinkageList
             Using repCbj = New OIT0003CustomReportTakusouCsv(OIT0003Takusoutbl)
                 Dim url As String
                 Try
-                    url = repCbj.CreatePrintData()
+                    url = repCbj.CreatePrintData(writeHeader:=False)
                 Catch ex As Exception
                     Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
 
@@ -1383,8 +1383,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
-        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+        '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
@@ -1398,8 +1398,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
-        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+        '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
         '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
@@ -1419,8 +1419,8 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
             & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
-            & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
-            & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
+            & " , CONVERT(NCHAR(1), '0')                         AS LANDC" _
+            & " , CONVERT(NCHAR(1), '0')                         AS EMPTYFAREFLG" _
             & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,''))" _
             & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,'')))) AS OTDAILYDEPSTATIONN" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
@@ -1433,9 +1433,19 @@ Public Class OIT0003OTLinkageList
             & "   WHEN OIM0005.MODELTANKNO IS NULL THEN '000000'" _
             & "   ELSE FORMAT(OIM0005.MODELTANKNO , '000000')" _
             & "   END                                            AS TANKNO" _
-            & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
-            & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
-            & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
+            & " , CONVERT(NCHAR(1), '')                          AS OUTSIDEINFO" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & "       CASE" _
+            & String.Format("       WHEN OIT0002.TRAINNO = '{0}' THEN '1'", "8877") _
+            & "       END" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & "       CASE" _
+            & String.Format("       WHEN OIT0002.TRAINNO IN ('{0}','{1}') THEN '1'", "6078", "8380") _
+            & "       END" _
+            & "   ELSE CONVERT(NCHAR(1), '')" _
+            & "   END                                            AS GENERALCARTYPE" _
+            & " , CONVERT(NCHAR(1), '')                          AS RUNINFO" _
             & " , REPLACE (CONVERT(NCHAR (5), REPLACE(OIT0003.CARSAMOUNT,'.','')), SPACE (1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 "
@@ -1447,6 +1457,7 @@ Public Class OIT0003OTLinkageList
         '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN), SPACE (8))     AS OTDAILYSHIPPERN" _
         '& " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
         '& " , ISNULL(CONVERT(NCHAR(6), OIM0005.MODELTANKNO), SPACE (6))         AS TANKNO" _
+        '& " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
 
         '★積置フラグ無し用SQL
         SQLStrNashi &=
@@ -1627,9 +1638,12 @@ Public Class OIT0003OTLinkageList
                 Next
 
                 '○項目の再設定
+                Dim setSPACE As String = ""
+                '★仙台新港営業所対応用
                 Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
-                Dim setSPACE As String = ""
+                '★四日市営業所対応用
+                Dim OTTrainNoChg() As String = {"6078", "6089"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
@@ -1647,6 +1661,13 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"09"
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
+                    End If
+
+                    '★四日市営業所の場合(列車チェック)
+                    '　稲沢経由で列車Noが変更(四日市⇒稲沢(6078)　稲沢⇒南松本(6089))
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_012401 _
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoChg(1)
                     End If
                 Next
 
@@ -1997,9 +2018,9 @@ Public Class OIT0003OTLinkageList
                     newDr("積込年月日") = wrkDr("LODDATE").ToString()
                     newDr("運送状年月日") = wrkDr("LODDATE").ToString()
                     newDr("発車年月日") = wrkDr("ACCDATE").ToString()
-                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString()
+                    newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
-                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString()
+                    newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)
                     newDr("着専用線コード") = ""
                     newDr("予備１") = ""
                     newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString()
@@ -2013,7 +2034,9 @@ Public Class OIT0003OTLinkageList
                     newDr("荷受人コード（外部コード）") = shipperCode
                     newDr("荷受人コード") = shipperCode
                     Dim arrShipperCode As String = ""
-                    Select Case wrkDr("TRAINCLASS").ToString()
+                    Select Case wrkDr("CONSIGNEECODE").ToString()
+                        Case "40"
+                            arrShipperCode = "99"
                         Case "51", "52", "53", "54", "55", "56"
                             arrShipperCode = "2"
                         Case Else

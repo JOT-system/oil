@@ -28,7 +28,8 @@ Public Class OIT0003CustomReportTakusouCsv : Implements IDisposable
                                                    "PRINTWORK",
                                                    CS0050SESSION.USERID)
         Me.csvData = csvDataClass
-        Me.uploadTmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".csv"
+        'Me.uploadTmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".csv"
+        Me.uploadTmpFileName = "SE123.CSV"
         Me.uploadTmpFilePath = IO.Path.Combine(Me.uploadRootPath, Me.uploadTmpFileName)
 
         'ディレクトリが存在しない場合は生成

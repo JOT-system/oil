@@ -6068,8 +6068,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
             & "        , STACKINGFLG     , WHOLESALEFLG        , INSPECTIONFLG      , DETENTIONFLG" _
-            & "        , FIRSTRETURNFLG  , AFTERRETURNFLG      , OTTRANSPORTFLG     , UPGRADEFLG          , ORDERINFO" _
-            & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
+            & "        , FIRSTRETURNFLG  , AFTERRETURNFLG      , OTTRANSPORTFLG     , UPGRADEFLG          , TESTPRODUCTFLG" _
+            & "        , ORDERINFO       , SHIPPERSCODE        , SHIPPERSNAME       , OILCODE             , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
             & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
             & "        , REMARK          , CHANGETRAINNO       , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
@@ -6082,8 +6082,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04" _
             & "        , @P40, @P51, @P46, @P47" _
-            & "        , @P48, @P49, @P50, @P52, @P34" _
-            & "        , @P23, @P24, @P05, @P35" _
+            & "        , @P48, @P49, @P50, @P52, @P53" _
+            & "        , @P34, @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
             & "        , @P07, @P39, @P08" _
             & "        , @P38, @P26, @P27, @P28" _
@@ -6111,6 +6111,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
             & "    , UPGRADEFLG" _
+            & "    , TESTPRODUCTFLG" _
             & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
@@ -6187,6 +6188,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '### 20201208 START 指摘票No248対応 ############################################################
                 Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 1)   '格上可否フラグ
                 '### 20201208 START 指摘票No248対応 ############################################################
+                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar, 1)   'テスト積み可否フラグ
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
@@ -6293,6 +6295,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         PARA52.Value = "2"
                     End If
                     '### 20201208 START 指摘票No248対応 ############################################################
+                    PARA53.Value = "2"                                'テスト積み可否フラグ
 
                     PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
@@ -7278,6 +7281,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ISNULL(RTRIM(OIT0016.CMPRESULTSCODE), '')          AS CMPRESULTSCODE" _
+            & " , CASE " _
+            & "   WHEN OIT0016.CMPRESULTSCODE = '1' THEN '不一致'" _
+            & "   ELSE '' END                                        AS CMPRESULTSNAME" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
@@ -7316,6 +7323,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " LEFT JOIN OIL.OIT0016_OTORDER OIT0016 ON " _
+            & " OIT0016.ORDERNO = OIT0002.ORDERNO " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
             & "   AND OIT0002.LODDATE      >= @P2" _
             & "   AND OIT0002.DELFLG       <> @P3" _

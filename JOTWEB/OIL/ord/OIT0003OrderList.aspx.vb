@@ -110,6 +110,8 @@ Public Class OIT0003OrderList
                             WF_ButtonORDER_CANCEL_Click()
                         Case "WF_ButtonCSV"             'ダウンロードボタン押下
                             WF_ButtonDownload_Click()
+                        Case "WF_ButtonDetailDownload"  '明細ダウンロードボタン押下
+                            WF_ButtonDetailDownload_Click()
                         Case "WF_ButtonINSERT"          '受注新規作成ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonLinkINSERT"      '貨車連結選択ボタン押下
@@ -719,6 +721,183 @@ Public Class OIT0003OrderList
     End Sub
 
 #Region "帳票処理"
+
+    ''' <summary>
+    ''' 帳票(明細情報)出力
+    ''' </summary>
+    Protected Sub WF_ButtonDetailDownload_Click()
+
+        '******************************
+        '帳票表示データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            ExcelOrderDetailDataGet(SQLcon)
+        End Using
+
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Dim url As String
+        Try
+            url = OIT0003CustomMultiReport.CreateOrderDetail(Master.MAPID, OIT0003Reporttbl)
+        Catch ex As Exception
+            Throw
+        End Try
+
+        '○ 別画面でExcelを表示
+        WF_PrintURL.Value = url
+        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+    End Sub
+
+    Protected Sub ExcelOrderDetailDataGet(SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003Reporttbl) Then
+            OIT0003Reporttbl = New DataTable
+        End If
+
+        If OIT0003Reporttbl.Columns.Count <> 0 Then
+            OIT0003Reporttbl.Columns.Clear()
+        End If
+
+        OIT0003Reporttbl.Clear()
+
+        '画面上選択されたORDERNO一覧を生成
+        Dim qcheckedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "" Select Convert.ToString(dr("ORDERNO")))
+        '未選択ならば全て選択を想定
+        If qcheckedRow.Any = False Then
+            qcheckedRow = (From dr As DataRow In OIT0003tbl Select Convert.ToString(dr("ORDERNO")))
+        End If
+        Dim selectedOrderNo As List(Of String) = qcheckedRow.ToList
+        Dim selectedOrderNoInStat As String = String.Join(",", (From odrNo In selectedOrderNo Select "'" & odrNo & "'"))
+
+        '○ 取得SQL
+        '　 説明　：　出荷予定表(計画枠)取得用SQL
+        Dim SQLStr As String =
+              " SELECT " _
+            & "     ISNULL(RTRIM(OIT0002.ORDERNO), '')                         AS ORDERNO " _
+            & "   , ISNULL(RTRIM(OIT0003.DETAILNO), '')                        AS DETAILNO " _
+            & "   , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                      AS OFFICECODE " _
+            & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                         AS TRAINNO " _
+            & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')          AS LODDATE " _
+            & "   , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')          AS DEPDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPORDER), '')                       AS SHIPORDER " _
+            & "   , ISNULL(RTRIM(OIT0003.TANKNO), '')                          AS TANKNO " _
+            & "   , ISNULL(RTRIM(OIT0003.OILCODE), '')                         AS OILCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.OILNAME), '')                         AS OILNAME " _
+            & "   , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')                      AS CARSAMOUNT " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')                    AS SHIPPERSCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')                    AS SHIPPERSNAME " _
+            & "   , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                       AS JOINTCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.JOINT), '')                           AS JOINT " _
+            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '')             AS SECONDCONSIGNEECODE " _
+            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')             AS SECONDCONSIGNEENAME " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '') " _
+            & "     WHEN '1' THEN 'レ' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS STACKINGFLG " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '') " _
+            & "     WHEN '1' THEN 'レ' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS FIRSTRETURNFLG " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.AFTERRETURNFLG), '') " _
+            & "     WHEN '1' THEN 'レ' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS AFTERRETURNFLG " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '') " _
+            & "     WHEN '1' THEN 'レ' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS OTTRANSPORTFLG " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '') " _
+            & "     WHEN '0' THEN '' " _
+            & "     WHEN '1' THEN 'レ' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS UPGRADEFLG " _
+            & "   , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '') " _
+            & "     WHEN '0' THEN 'レ' " _
+            & "     WHEN '1' THEN '' " _
+            & "     WHEN '2' THEN '' " _
+            & "     ELSE '' " _
+            & "     END                                                        AS DOWNGRADEFLG " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), '')    AS ACTUALLODDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALDEPDATE, 'yyyy/MM/dd'), '')    AS ACTUALDEPDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '')    AS ACTUALARRDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '')    AS ACTUALACCDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '') AS ACTUALEMPARRDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')             AS LOADINGIRILINEORDER " _
+            & "   , ISNULL(RTRIM(OIT0003.LINEORDER), '')                       AS LINEORDER " _
+            & "   , ISNULL(RTRIM(OIT0003.LINE), '')                            AS LINE " _
+            & "   , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')                    AS FILLINGPOINT " _
+            & "   , ISNULL(RTRIM(OIM0024.PRIORITYNO), '')                      AS PRIORITYNO " _
+            & " FROM " _
+            & "   [oil].OIT0002_ORDER OIT0002 " _
+            & "   INNER JOIN [oil].OIT0003_DETAIL OIT0003 " _
+            & "     ON OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & "     AND OIT0003.DELFLG = @DELFLG " _
+            & "   LEFT JOIN [oil].OIM0024_PRIORITY OIM0024 " _
+            & "     ON OIM0024.OFFICECODE = OIT0002.OFFICECODE " _
+            & "     AND OIM0024.OILCODE = OIT0003.OILCODE " _
+            & "     AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & "     AND OIM0024.DELFLG = @DELFLG " _
+            & " WHERE " _
+            & "   OIT0002.DELFLG = @DELFLG "
+
+        If Not String.IsNullOrEmpty(selectedOrderNoInStat) Then
+            SQLStr &= String.Format("   AND OIT0002.ORDERNO IN ({0}) ", selectedOrderNoInStat)
+        Else
+            SQLStr &= " AND OIT0002.DELFLG <> @DELFLG "
+        End If
+
+        SQLStr &=
+              " ORDER BY " _
+            & "   OIT0002.ORDERNO " _
+            & "   , OIT0002.TRAINNO " _
+            & "   , OIT0002.LODDATE " _
+            & "   , OIT0002.DEPDATE "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1) '受注営業所コード
+                PARA01.Value = BaseDllConst.C_DELETE_FLG.ALIVE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Reporttbl.Load(SQLdr)
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LNEGISHI PLANFRAME_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LNEGISHI PLANFRAME_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0003ReportPlanFrame)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -3001,6 +3180,12 @@ Public Class OIT0003OrderList
 
     Protected Sub WF_ReportSelect()
 
+        '選択したチェックボックス(営業所)の名称を取得
+        work.WF_SEL_TH_ORDERSALESOFFICENAME.Text = tileSalesOffice.GetSelectedSingleText()
+        '選択したチェックボックス(営業所)のコードを取得
+        work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
+
+        '初期化
         Me.divRTrainNo.Visible = False
         Me.txtReportRTrainNo.Text = ""
         Me.divTrainNo.Visible = False
@@ -3048,6 +3233,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
+                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '袖ヶ浦のみ初期値を設定
+                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                End If
         End Select
 
     End Sub
@@ -7334,7 +7523,7 @@ Public Class OIT0003OrderList
             & "     OIT0002.OFFICECODE " _
             & "     , OIT0002.ACTUALLODDATE " _
             & "     , OIT0002.TRAINNO " _
-            & "     , OIT0003.SHIPORDER " _
+            & "     , CONVERT(INT, ISNULL(OIT0003.SHIPORDER, 99)) " _
             & "     , OIM0005.MODEL " _
             & "     , OIM0005.TANKNUMBER "
 

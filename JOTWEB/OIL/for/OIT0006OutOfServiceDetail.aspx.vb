@@ -24,7 +24,7 @@ Public Class OIT0006OutOfServiceDetail
     Private OIT0006Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0006His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0006His2tbl As DataTable                             '履歴格納用テーブル
-    Private OIT0003NEWKAISOUNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
+    Private OIT0003NEWKAISOUNOtbl As DataTable                       '取得用(新規回送No取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 99                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数

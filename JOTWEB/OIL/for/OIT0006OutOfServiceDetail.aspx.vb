@@ -7542,7 +7542,7 @@ Public Class OIT0006OutOfServiceDetail
         '     条件指定に従い該当データを受注テーブルから取得する
         Dim SQLStr As String =
             " SELECT" _
-            & "   'O' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.kaisou_sequence,'00') AS KAISOUNO"
+            & "   'K' + FORMAT(GETDATE(),'yyyyMMdd') + FORMAT(NEXT VALUE FOR oil.kaisou_sequence,'00') AS KAISOUNO"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

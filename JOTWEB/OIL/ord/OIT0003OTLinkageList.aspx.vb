@@ -2034,9 +2034,15 @@ Public Class OIT0003OTLinkageList
                     newDr("荷受人コード") = shipperCode
                     Dim arrShipperCode As String = ""
                     Select Case wrkDr("CONSIGNEECODE").ToString()
-                        Case "40"
+                        Case BaseDllConst.CONST_CONSIGNEECODE_40
                             arrShipperCode = "99"
-                        Case "51", "52", "53", "54", "55", "56"
+                        Case BaseDllConst.CONST_CONSIGNEECODE_30,
+                             BaseDllConst.CONST_CONSIGNEECODE_51,
+                             BaseDllConst.CONST_CONSIGNEECODE_52,
+                             BaseDllConst.CONST_CONSIGNEECODE_53,
+                             BaseDllConst.CONST_CONSIGNEECODE_54,
+                             BaseDllConst.CONST_CONSIGNEECODE_55,
+                             BaseDllConst.CONST_CONSIGNEECODE_56
                             arrShipperCode = "2"
                         Case Else
                             arrShipperCode = "1"

@@ -1014,7 +1014,7 @@ Public Class OIT0003OTLinkageList
             End If
             '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
             '対象の発日が統一されていない場合（同一発日以外は不許可）
-            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
             If qSameProcDateCnt > 1 Then
                 '選択されていない場合は、エラーメッセージを表示し終了
                 Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -1146,7 +1146,7 @@ Public Class OIT0003OTLinkageList
             End If
             '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
             '対象の発日が統一されていない場合（同一発日以外は不許可）
-            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
             If qSameProcDateCnt > 1 Then
                 '選択されていない場合は、エラーメッセージを表示し終了
                 Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

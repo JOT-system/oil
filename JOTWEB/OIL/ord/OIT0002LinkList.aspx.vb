@@ -289,7 +289,8 @@ Public Class OIT0002LinkList
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIT0002tbl)
 
-        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        TBLview.RowFilter = "HIDDEN = 0 and LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        'TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
@@ -497,7 +498,14 @@ Public Class OIT0002LinkList
 
                     '◯名称取得
                     '受注営業所
-                    CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)                               '会社コード
+                    CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)   '営業所コード
+                    Select Case Master.USER_ORG
+                        Case BaseDllConst.CONST_OFFICECODE_011201,
+                             BaseDllConst.CONST_OFFICECODE_011202,
+                             BaseDllConst.CONST_OFFICECODE_011203
+                            If OIT0002row("OFFICECODE") <> Master.USER_ORG Then OIT0002row("HIDDEN") = "1"
+                        Case Else
+                    End Select
                 Next
             End Using
         Catch ex As Exception
@@ -682,13 +690,13 @@ Public Class OIT0002LinkList
 
             '更新SQL文･･･貨車連結順序表を一括論理削除
             Dim SQLStr As String =
-                      " UPDATE OIL.OIT0004_LINK        " _
+                      " UPDATE OIL.OIT0011_RLINK        " _
                     & "    SET UPDYMD      = @P11,      " _
                     & "        UPDUSER     = @P12,      " _
                     & "        UPDTERMID   = @P13,      " _
                     & "        RECEIVEYMD  = @P14,      " _
                     & "        DELFLG      = @P02        " _
-                    & "  WHERE LINKNO      = @P01       " _
+                    & "  WHERE RLINKNO      = @P01       " _
                     & "    AND DELFLG     <> @P02       ;"
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -717,7 +725,7 @@ Public Class OIT0002LinkList
                     'OIT0002UPDrow("DELFLG") = C_DELETE_FLG.DELETE
                     OIT0002UPDrow("HIDDEN") = 1
 
-                    PARA01.Value = OIT0002UPDrow("LINKNO")
+                    PARA01.Value = OIT0002UPDrow("RLINKNO")
                     PARA02.Value = C_DELETE_FLG.DELETE
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -725,6 +733,10 @@ Public Class OIT0002LinkList
                     PARA14.Value = C_DEFAULT_YMD
 
                     SQLcmd.ExecuteNonQuery()
+
+                    For Each OIT0002CHKrow In OIT0002tbl.Select("RLINKNO='" + OIT0002UPDrow("RLINKNO") + "'")
+                        OIT0002CHKrow("HIDDEN") = 1
+                    Next
                 Else
                     i += 1
                     OIT0002UPDrow("LINECNT") = i        'LINECNT
@@ -2650,7 +2662,7 @@ Public Class OIT0002LinkList
             Dim SQLCmn As String =
                   " FROM OIL.OIT0011_RLINK OIT0011" _
                 & " LEFT JOIN OIL.VIW0002_LINKCONVERTMASTER VIW0002 ON" _
-                & "  VIW0002.DEPSTATIONNAME = OIT0011.DEPSTATIONNAME" _
+                & "  VIW0002.DEPSTATIONNAME = OIT0011.LOADARRSTATION" _
                 & "  AND VIW0002.ARRSTATIONNAME = OIT0011.ARRSTATIONNAME" _
                 & " LEFT JOIN OIL.OIM0007_TRAIN OIM0007 ON" _
                 & "  OIM0007.OTTRAINNO = OIT0011.TRAINNO" _
@@ -4291,6 +4303,7 @@ Public Class OIT0002LinkList
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
                     If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 _
                        AndAlso OIT0002row("CREATEFLAG").ToString() = "" Then Continue For
+                    If OIT0002row("TARGETOFFICECODE").ToString() <> OIT0002row("OFFICECODE").ToString() Then Continue For
 
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
@@ -4747,6 +4760,7 @@ Public Class OIT0002LinkList
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
                     If OIT0002row("LOADINGTRAINNO").ToString() = "" Then Continue For
                     If OIT0002row("ORDERSTATUS").ToString() <> BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+                    If OIT0002row("TARGETOFFICECODE").ToString() <> OIT0002row("OFFICECODE").ToString() Then Continue For
 
                     'DB更新
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                       '受注№

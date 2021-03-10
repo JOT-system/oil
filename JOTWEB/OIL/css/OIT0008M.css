@@ -33,6 +33,10 @@
     border-right: solid 1px #2bb6c1;
 }
 
+input#WF_DL_TRASPORTCOSTSDETAIL {
+    margin-left: 20px;
+}
+
 .memo_text {
     min-height: 1.0em;
 }

@@ -12,6 +12,7 @@ Public Class OIT0008CostManagement
     Private OIT0008tbl As DataTable                                 ' 一覧格納用テーブル
     Private OIT0008INPtbl As DataTable                              ' チェック用テーブル
     Private OIT0008SubTotaltbl As DataTable                         ' 小計テーブル
+    Private TMP0009tbl As DataTable                                 ' 輸送費明細テーブル
 
     Private OIM0002tbl As DataTable
 
@@ -63,7 +64,7 @@ Public Class OIT0008CostManagement
 
                     Dim DisplayGridViewFlg As Boolean = True
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonEND"             '「戻る」ボタンクリック
+                        Case "WF_ButtonEND"             '「戻る」ボタン押下
                             WF_ButtonEND_Click()
                             DisplayGridViewFlg = False
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
@@ -80,22 +81,24 @@ Public Class OIT0008CostManagement
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '（右ボックス）メモ欄更新
                             WF_RIGHTBOX_Change()
-                        Case "WF_Button_OfficeCode"     '「営業所」「表示する」ボタンクリック
+                        Case "WF_Button_OfficeCode"     '「営業所」「表示する」ボタン押下
                             WF_OfficeButton_Click()
                             DisplayGridViewFlg = False
-                        Case "WF_ButtonDELETEROW"       '「行削除」ボタンクリック
+                        Case "WF_ButtonDELETEROW"       '「行削除」ボタン押下
                             WF_Grid_DeleteRow()
-                        Case "WF_ButtonADDROW"          '「行追加」ボタンクリック
+                        Case "WF_ButtonADDROW"          '「行追加」ボタン押下
                             WF_Grid_AddRow()
-                        Case "WF_ButtonUPDATE"          '「保存する」ボタンクリック
+                        Case "WF_ButtonUPDATE"          '「保存する」ボタン押下
                             WF_ButtonUPDATE_Click()
-                            'Case "WF_ButtonCSV"             ' ダウンロードボタン押下
-                            '    WF_ButtonDownload_Click()
+                        Case "WF_Button_DLTransportCostsDetail" ' 「輸送費明細」ボタン押下
+                            WF_Button_DLTransportCostsDetail_Click()
+
                             'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
                             '    WF_ButtonPrint_Click()
+
                         Case Else
                             If WF_ButtonClick.Value.Contains("WF_ButtonShowDetail") Then
-                                WF_ButtonShowDetail()   '「詳細を見る」ボタンクリック
+                                WF_ButtonShowDetail()   '「詳細を見る」ボタン押下
                             End If
                     End Select
 
@@ -140,7 +143,7 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 「詳細を見る」ボタンクリック処理
+    ''' 「詳細を見る」ボタン押下処理
     ''' </summary>
     Protected Sub WF_ButtonShowDetail()
         Dim rowIdx As Integer = 0
@@ -190,7 +193,7 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 営業所ボタンクリック処理
+    ''' 営業所ボタン押下処理
     ''' </summary>
     Private Sub WF_OfficeButton_Click()
         '選択中の営業所から営業所コードを取得
@@ -1920,10 +1923,82 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
+    ''' 輸送費明細ダウンロードボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Button_DLTransportCostsDetail_Click()
+
+        If IsNothing(TMP0009tbl) Then
+            TMP0009tbl = New DataTable
+        End If
+
+        If TMP0009tbl.Columns.Count <> 0 Then
+            TMP0009tbl.Columns.Clear()
+        End If
+
+        TMP0009tbl.Clear()
+
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                Using SQLcmd As New SqlCommand
+                    SQLcmd.Connection = SQLcon
+                    SQLcmd.CommandType = CommandType.StoredProcedure
+                    SQLcmd.CommandText = "[oil].[GET_TRANSPORT_COST_DETAIL]"
+                    SQLcmd.Parameters.Clear()
+                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@KEIJYOYMD", SqlDbType.Date)         ' 計上年月日
+                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
+                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
+                    Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
+
+                    PARA1.Value = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                    PARA2.Value = work.WF_SEL_LAST_OFFICECODE.Text
+                    PARA3.Direction = ParameterDirection.Output
+                    RV.Direction = ParameterDirection.ReturnValue
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        TMP0009tbl.Load(SQLdr)
+                    End Using
+
+                End Using
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC GET_TRANSPORT_COST_DETAIL")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M EXEC GET_TRANSPORT_COST_DETAIL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+
+            Exit Sub
+        End Try
+
+        '帳票出力
+        Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TRASPORT_COST_DETAIL.xlsx", TMP0009tbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData_TransportCostDetail(Date.Parse(WW_KEIJYO_YM + "/01"))
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT TRASPORT_COST_DETAIL")
+                Exit Sub
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+    End Sub
+
+    ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonDownload_Click()
+    Protected Sub WF_ButtonCsv_Click()
 
         ''○ 帳票出力
         'CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       ' 会社コード

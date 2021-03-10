@@ -73,6 +73,7 @@
                     <asp:Button ID="WF_ALLRELEACE" runat="server" CssClass="btn-sticky" Text="選択解除" OnClientClick="selectAll(false); return false;"></asp:Button>
                     <asp:Button ID="WF_DELETEROW" runat="server" CssClass="btn-sticky" Text="行削除" OnClientClick="ButtonClick('WF_ButtonDELETEROW');"></asp:Button>
                     <asp:Button ID="WF_ADDROW" runat="server" CssClass="btn-sticky" Text="行追加" OnClientClick="ButtonClick('WF_ButtonADDROW');"></asp:Button>
+                    <asp:Button ID="WF_DL_TRASPORTCOSTSDETAIL" runat="server" CssClass="btn-sticky" Text="輸送費明細" OnClientClick="ButtonClick('WF_Button_DLTransportCostsDetail');"></asp:Button>
                 </div>
                 <div class="rightSide">
                     <asp:Button ID="WF_UPDATE" runat="server" CssClass="btn-sticky" Text="保存する" OnClientClick="ButtonClick('WF_ButtonUPDATE');"></asp:Button>

@@ -462,6 +462,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
             '列車番号
             rngHeaderArea = ExcelWorkSheet.Range("G31")
+            If trainNo = "5282" Then
+                trainNo = "5875"
+            ElseIf trainNo = "8072" Then
+                trainNo = "8081"
+            End If
             rngHeaderArea.Value = String.Format("{0}列車", trainNo)
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -535,7 +540,7 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                             Case "B"
                                 rngDetailArea.Value = "0.5AFO"
                             Case "C"
-                                rngDetailArea.Value = "LTA"
+                                rngDetailArea.Value = "ｶﾝﾚｲAFO"
                         End Select
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"
@@ -1024,7 +1029,7 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                             Case "B"
                                 rngDetailArea.Value = "0.5AFO"
                             Case "C"
-                                rngDetailArea.Value = "LTA"
+                                rngDetailArea.Value = "ｶﾝﾚｲAFO"
                         End Select
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"

@@ -1809,22 +1809,26 @@ Public Class OIT0002LinkList
                 If OIT0002EXLINSrow("ARTICLENAME") = WW_ARTICLENAME(0) _
                     OrElse OIT0002EXLINSrow("OBJECTIVENAME") = WW_OBJECTIVENAME(1) Then
                     '(タンク車所在TBL)の内容を更新
-                    '引数１：タンク車状態　⇒　変更あり("3"(到着))
-                    '引数２：積車区分　　　⇒　変更あり("E"(空車))
-                    '引数３：タンク車状況　⇒　変更あり("13"(交検中))
-                    '引数４：使用受注№　　⇒　初期化あり(TRUE)
+                    '引数１：所属営業所コード　⇒　変更あり(営業所コード)
+                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                    '引数４：タンク車状況　⇒　変更あり("13"(交検中))
+                    '引数５：使用受注№　　⇒　初期化あり(TRUE)
                     WW_UpdateTankShozai("3", "E",
+                                        I_OFFICECODE:=OIT0002EXLINSrow("OFFICECODE"),
                                         I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
                                         I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
                                         I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_13,
                                         I_USEORDERNO:=True)
                 Else
                     '(タンク車所在TBL)の内容を更新
-                    '引数１：タンク車状態　⇒　変更あり("3"(到着))
-                    '引数２：積車区分　　　⇒　変更あり("E"(空車))
-                    '引数３：タンク車状況　⇒　変更あり("1"(残車))
-                    '引数４：使用受注№　　⇒　初期化あり(TRUE)
+                    '引数１：所属営業所コード　⇒　変更あり(営業所コード)
+                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                    '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    '引数５：使用受注№　　⇒　初期化あり(TRUE)
                     WW_UpdateTankShozai("3", "E",
+                                        I_OFFICECODE:=OIT0002EXLINSrow("OFFICECODE"),
                                         I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
                                         I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
                                         I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
@@ -5991,6 +5995,7 @@ Public Class OIT0002LinkList
                                       ByVal I_KBN As String,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal I_BRANCH As String = Nothing,
+                                      Optional ByVal I_OFFICECODE As String = Nothing,
                                       Optional ByVal I_LOCATION As String = Nothing,
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_USEORDERNO As Boolean = False,
@@ -6012,6 +6017,10 @@ Public Class OIT0002LinkList
             '管轄支店コード
             If Not String.IsNullOrEmpty(I_BRANCH) Then
                 SQLStr &= String.Format("        BRANCHCODE   = '{0}', ", I_BRANCH)
+            End If
+            '営業所コード
+            If Not String.IsNullOrEmpty(I_OFFICECODE) Then
+                SQLStr &= String.Format("        OFFICECODE   = '{0}', ", I_OFFICECODE)
             End If
             '所在地コード
             If Not String.IsNullOrEmpty(I_LOCATION) Then

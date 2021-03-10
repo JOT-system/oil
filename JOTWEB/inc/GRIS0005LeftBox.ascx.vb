@@ -606,6 +606,7 @@ Public Class GRIS0005LeftBox
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TRAINNUMBER"
                 'デフォルトソート順設定 組織コード、着駅、積置フラグ、列車No（数値化）
                 Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "CAMPCODE, " &
+                                                                  "VALUE16," &
                                                                   "VALUE3," &
                                                                   "VALUE13," &
                     "CONVERT(decimal(16,2),case when isnumeric(VALUE1)=1 " &

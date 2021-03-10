@@ -1,11 +1,13 @@
 ﻿Option Strict On
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
+Imports JOTWEB.GRC0001TILESELECTORWRKINC
 
 Public Class OIT0005TankLocList
     Inherits System.Web.UI.Page
     '○ 検索結果格納Table
     Private OIT0005tbl As DataTable                                 '一覧格納用テーブル
+    Private OIT0005Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
@@ -59,9 +61,9 @@ Public Class OIT0005TankLocList
                             WF_ButtonLAST_Click()
                         Case "chklGroupFilter"
                             chklGroupFilter_Change()
-                        Case "WF_ButtonUPDATE"               '更新ボタン押下
+                        Case "WF_ButtonUpdateList"      '更新ボタン押下
                             WF_ButtonUPDATE_Click()
-                        Case "WF_ButtonEND"                  '戻るボタン押下
+                        Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                     End Select
                 End If
@@ -95,7 +97,45 @@ Public Class OIT0005TankLocList
     Protected Sub Initialize()
 
         '○画面ID設定
-        Master.MAPID = OIT0005WRKINC.MAPIDL
+        'Master.MAPID = OIT0005WRKINC.MAPIDL
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+            work.WF_MAIN_OFFICECODE.Text = ""
+            WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE", "", WW_GetValue)
+            For i = 0 To WW_GetValue.Length - 1
+                If WW_GetValue(i) = "" Then Continue For
+
+                If i = 0 Then
+                    work.WF_MAIN_OFFICECODE.Text &= "'" + WW_GetValue(i) + "'"
+                Else
+                    work.WF_MAIN_OFFICECODE.Text &= ",'" + WW_GetValue(i) + "'"
+                End If
+            Next
+
+            If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
+                '★受注着駅到着後状況
+                work.WF_COND_DETAILTYPE.Text = "9"
+                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+            ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
+                '★回送後状況
+                work.WF_COND_DETAILTYPE.Text = "10"
+                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+            Else
+                Exit Sub
+            End If
+
+            work.WF_MAIN_VIEWTABLE.Text = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
+            work.WF_MAIN_VIEWSORT.Text = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)
+
+            '○ 画面レイアウト設定
+            If Master.VIEWID = "" Then
+                'Dim rightview As New GRIS0003SRightBox
+                'rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+                'Master.VIEWID = rightview.GetViewId(work.WF_SEL_CAMPCODE.Text + "9")
+                Master.VIEWID = "jotsys"
+            End If
+
+        End If
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
@@ -122,11 +162,8 @@ Public Class OIT0005TankLocList
         '○ 画面の値設定
         WW_MAPValueSet()
 
-        '★その他状況(受注(未卸中・交検中・留置中))の場合
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
-            '○(一覧)テキストボックスの制御(読取専用)
-            WW_ListTextBoxReadControl()
-        End If
+        '○(一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
 
     End Sub
     ''' <summary>
@@ -192,7 +229,9 @@ Public Class OIT0005TankLocList
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
+        '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
+        If work.WF_COND_DETAILTYPE.Text = "9" _
+           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -237,23 +276,37 @@ Public Class OIT0005TankLocList
         End If
 
         OIT0005tbl.Clear()
-        Dim viewName As String = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
-        Dim salesOfficeInstat As String = GRC0001TILESELECTORWRKINC.GetSelectedSqlInStatement(work.WF_SEL_SALESOFFICE_TILES.Text)
-        Dim sotrOrderValue As String = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)
         Dim sqlStat As New StringBuilder
-        sqlStat.AppendFormat("SELECT ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", sotrOrderValue).AppendLine()
-        sqlStat.AppendLine("      ,'' AS OPERATION")
-        'sqlStat.AppendLine("     ,0  AS TIMSTP)
-        sqlStat.AppendLine("      ,1  AS 'SELECT'")
-        sqlStat.AppendLine("      ,0  AS HIDDEN")
-        sqlStat.AppendLine("      ,VTS.* ") 'ビューのフィールド追加しても動作可能なようにしている(削った場合は要稼働確認)
-        sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
-        sqlStat.AppendFormat(" WHERE VTS.OFFICECODE in ({0})", salesOfficeInstat).AppendLine()
-        If salesOfficeInstat.Contains("'110001'") Then
-            sqlStat.AppendFormat("    OR VTS.BRANCHCODE = '110001'", salesOfficeInstat).AppendLine()
-            'sqlStat.AppendFormat("    OR VTS.OFFICECODE = ''", salesOfficeInstat).AppendLine()
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005C Then
+            Dim viewName As String = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
+            Dim salesOfficeInstat As String = GRC0001TILESELECTORWRKINC.GetSelectedSqlInStatement(work.WF_SEL_SALESOFFICE_TILES.Text)
+            Dim sotrOrderValue As String = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)
+            sqlStat.AppendFormat("SELECT ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", sotrOrderValue).AppendLine()
+            sqlStat.AppendLine("      ,'' AS OPERATION")
+            'sqlStat.AppendLine("     ,0  AS TIMSTP)
+            sqlStat.AppendLine("      ,1  AS 'SELECT'")
+            sqlStat.AppendLine("      ,0  AS HIDDEN")
+            sqlStat.AppendLine("      ,VTS.* ") 'ビューのフィールド追加しても動作可能なようにしている(削った場合は要稼働確認)
+            sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
+            sqlStat.AppendFormat(" WHERE VTS.OFFICECODE in ({0})", salesOfficeInstat).AppendLine()
+            If salesOfficeInstat.Contains("'110001'") Then
+                sqlStat.AppendFormat("    OR VTS.BRANCHCODE = '110001'", salesOfficeInstat).AppendLine()
+                'sqlStat.AppendFormat("    OR VTS.OFFICECODE = ''", salesOfficeInstat).AppendLine()
+            End If
+            sqlStat.AppendFormat(" ORDER BY {0}", sotrOrderValue).AppendLine()
+        Else
+            sqlStat.AppendFormat("SELECT ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", work.WF_MAIN_VIEWSORT.Text).AppendLine()
+            'sqlStat.AppendFormat("SELECT ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)").AppendLine()
+            sqlStat.AppendLine("      ,'' AS OPERATION")
+            'sqlStat.AppendLine("     ,0  AS TIMSTP)
+            sqlStat.AppendLine("      ,1  AS 'SELECT'")
+            sqlStat.AppendLine("      ,0  AS HIDDEN")
+            sqlStat.AppendLine("      ,VTS.* ") 'ビューのフィールド追加しても動作可能なようにしている(削った場合は要稼働確認)
+            sqlStat.AppendFormat("  FROM {0} VTS", work.WF_MAIN_VIEWTABLE.Text).AppendLine()
+            sqlStat.AppendFormat(" WHERE VTS.OFFICECODE in ({0})", work.WF_MAIN_OFFICECODE.Text).AppendLine()
+            sqlStat.AppendFormat(" ORDER BY {0}", work.WF_MAIN_VIEWSORT.Text).AppendLine()
+            'sqlStat.AppendFormat(" ORDER BY {0}", "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)").AppendLine()
         End If
-        sqlStat.AppendFormat(" ORDER BY {0}", sotrOrderValue).AppendLine()
 
         Try
             Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
@@ -325,6 +378,25 @@ Public Class OIT0005TankLocList
 
         '明細更新ボタン押下時
         Me.WW_UPBUTTONFLG = "1"
+
+        Select Case work.WF_COND_DETAILTYPE.Text
+            '○受注着駅到着後状況
+            Case "9"
+                WW_UpdateOrderAfterSituation()
+            '○回送後状況
+            Case "10"
+                WW_UpdateKaisouAfterSituation()
+        End Select
+
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGet(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0005tbl)
 
     End Sub
     ''' <summary>
@@ -446,8 +518,8 @@ Public Class OIT0005TankLocList
                 If CInt(WF_LeftMViewChange.Value) = LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
                     '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                     Select Case WF_FIELD.Value
-                        '(一覧)受入日, (一覧)空車着日
-                        Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE"
+                        '(一覧)受入日, (一覧)空車着日, (一覧)次回交検日
+                        Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE", "JRINSPECTIONDATE"
 
                             '○ LINECNT取得
                             Dim WW_LINECNT As Integer = 0
@@ -458,7 +530,7 @@ Public Class OIT0005TankLocList
                                 FirstOrDefault(Function(x) CInt(x.Item("LINECNT")) = WW_LINECNT)
                             If IsNothing(updHeader) Then Exit Sub
 
-                            .WF_Calendar.Text = Convert.ToString(updHeader.Item("ORDER_ACTUALACCDATE"))
+                            .WF_Calendar.Text = Convert.ToString(updHeader.Item(WF_FIELD.Value))
                     End Select
                     .ActiveCalendar()
 
@@ -500,7 +572,9 @@ Public Class OIT0005TankLocList
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
             '(一覧)受入日, (一覧)空車着日
-            Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE"
+            '(一覧)次回交検日
+            Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE",
+                 "JRINSPECTIONDATE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -530,6 +604,41 @@ Public Class OIT0005TankLocList
                             updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
                         End If
                     Catch ex As Exception
+                    End Try
+
+                    '(一覧)次回交検日
+                ElseIf WF_FIELD.Value = "JRINSPECTIONDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                            updHeader.Item(WF_FIELD.Value) = ""
+                        Else
+                            '■ 選択した日付が未設定,
+                            '   選択した日付が現状の交検日より過去の場合
+                            If leftview.WF_Calendar.Text = "" _
+                                OrElse Convert.ToString(updHeader.Item(WF_FIELD.Value)) = "" Then
+                                '### 20201001 START 交検日が過去でも設定できるようにするため廃止 ################################################
+                                'OrElse Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(updHeader.Item(WF_FIELD.Value))) = -1 Then
+                                '### 20201001 END   交検日が過去でも設定できるようにするため廃止 ################################################
+                                Master.Output(C_MESSAGE_NO.OIL_TANKNO_KOUKENBI_PAST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                                '■ 選択した日付が現状の交検日と同日の場合
+                            ElseIf Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(Convert.ToString(updHeader.Item(WF_FIELD.Value)))) = 0 Then
+                                updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+
+                            Else
+                                '(一覧)交検日に指定した日付を設定
+                                updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+                                Master.SaveTable(OIT0005tbl)
+                                'タンク車マスタの交検日を更新
+                                WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                    I_ITEM:="JRINSPECTIONDATE",
+                                                    I_VALUE:=Convert.ToString(updHeader.Item(WF_FIELD.Value)))
+                            End If
+                        End If
+                    Catch ex As Exception
+
                     End Try
                 End If
 
@@ -659,7 +768,9 @@ Public Class OIT0005TankLocList
 
         '○ 一覧作成
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
+        '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
+        If work.WF_COND_DETAILTYPE.Text = "9" _
+           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -688,19 +799,470 @@ Public Class OIT0005TankLocList
         TBLview.Dispose()
         TBLview = Nothing
 
-        '★その他状況(受注(未卸中・交検中・留置中))の場合
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
-            '○(一覧)テキストボックスの制御(読取専用)
-            WW_ListTextBoxReadControl()
-        End If
+        '○(一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
 
     End Sub
+
+#Region "受注着駅到着後状況"
+    ''' <summary>
+    ''' 受注着駅到着後状況
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_UpdateOrderAfterSituation()
+        Dim iresult As Integer
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '★【未卸】対象データ更新
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION='" + BaseDllConst.CONST_TANKSITUATION_20 + "'")
+                '####################################
+                '○受入日に日付が未設定の場合はSKIP
+                '####################################
+                If Convert.ToString(OIT0005row("ORDER_ACTUALACCDATE")) = "" Then Continue For
+
+                '★①受注明細TBL更新(未卸を解除)
+                WW_UpdateOrderDetail(SQLcon,
+                                 I_OIT0005row:=OIT0005row,
+                                 I_ITEM:="WHOLESALEFLG",
+                                 I_VALUE:="2",
+                                 I_WHOLESALE:=True)
+                '★②受注明細TBL更新(未卸⇒留置に変更)
+                WW_UpdateOrderDetail(SQLcon,
+                                         I_OIT0005row:=OIT0005row,
+                                         I_ITEM:="DETENTIONFLG",
+                                         I_VALUE:="1")
+
+                '★タンク車所在TBL更新
+                WW_UpdateTankShozai(SQLcon,
+                                    OIT0005row,
+                                    I_LOCATION:=Convert.ToString(OIT0005row("DEPSTATION")),
+                                    I_KBN:="E",
+                                    I_STATUS:=BaseDllConst.CONST_TANKSTATUS_03,
+                                    I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_22)
+
+                '####################################
+                '○空車着日に日付が未設定の場合はSKIP
+                '####################################
+                If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then Continue For
+
+                '○ 日付妥当性チェック
+                '例) iresult = dt1.Date.CompareTo(dt2.Date)
+                '    iresultの意味
+                '     0 : dt1とdt2は同じ日
+                '    -1 : dt1はdt2より前の日
+                '     1 : dt1はdt2より後の日
+                '空車着日 と　現在日付を比較
+                iresult = Date.Parse(Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE"))).CompareTo(DateTime.Today)
+
+                '空車着日が同日より過去日で設定された場合
+                If iresult <> 1 Then
+                    '★受注明細TBL更新
+                    WW_UpdateOrderDetail(SQLcon,
+                                     I_OIT0005row:=OIT0005row,
+                                     I_ITEM:="DETENTIONFLG",
+                                     I_VALUE:="2")
+
+                    '★タンク車所在TBL更新
+                    WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row,
+                                        I_LOCATION:=Convert.ToString(OIT0005row("DEPSTATION")),
+                                        I_STATUS:=BaseDllConst.CONST_TANKSTATUS_02,
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_USEORDERNO:=True)
+                End If
+            Next
+
+            '★【交検】対象データ更新
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION='" + BaseDllConst.CONST_TANKSITUATION_21 + "'")
+                '○空車着日に日付が未設定の場合はSKIP
+                If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then Continue For
+
+                '○ 日付妥当性チェック
+                '例) iresult = dt1.Date.CompareTo(dt2.Date)
+                '    iresultの意味
+                '     0 : dt1とdt2は同じ日
+                '    -1 : dt1はdt2より前の日
+                '     1 : dt1はdt2より後の日
+                '空車着日 と　現在日付を比較
+                iresult = Date.Parse(Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE"))).CompareTo(DateTime.Today)
+
+                '空車着日が未来日で設定された場合
+                If iresult = 1 Then
+                    '★受注明細TBL更新(※未来日の場合は、交検のままとする)
+                    WW_UpdateOrderDetail(SQLcon,
+                                     I_OIT0005row:=OIT0005row,
+                                     I_ITEM:="INSPECTIONFLG",
+                                     I_VALUE:="1")
+
+                    '★タンク車所在TBL更新
+                    WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row)
+                Else
+                    '★受注明細TBL更新
+                    WW_UpdateOrderDetail(SQLcon,
+                                     I_OIT0005row:=OIT0005row,
+                                     I_ITEM:="INSPECTIONFLG",
+                                     I_VALUE:="2")
+
+                    '★タンク車所在TBL更新
+                    WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row,
+                                        I_LOCATION:=Convert.ToString(OIT0005row("DEPSTATION")),
+                                        I_STATUS:=BaseDllConst.CONST_TANKSTATUS_02,
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_USEORDERNO:=True)
+                End If
+            Next
+
+            '★【留置】対象データ更新
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION='" + BaseDllConst.CONST_TANKSITUATION_22 + "'")
+                '○空車着日に日付が未設定の場合はSKIP
+                If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then Continue For
+
+                '○ 日付妥当性チェック
+                '例) iresult = dt1.Date.CompareTo(dt2.Date)
+                '    iresultの意味
+                '     0 : dt1とdt2は同じ日
+                '    -1 : dt1はdt2より前の日
+                '     1 : dt1はdt2より後の日
+                '空車着日 と　現在日付を比較
+                iresult = Date.Parse(Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE"))).CompareTo(DateTime.Today)
+
+                '空車着日が未来日で設定された場合
+                If iresult = 1 Then
+                    '★受注明細TBL更新(※未来日の場合は、交検のままとする)
+                    WW_UpdateOrderDetail(SQLcon,
+                                     I_OIT0005row:=OIT0005row,
+                                     I_ITEM:="DETENTIONFLG",
+                                     I_VALUE:="1")
+
+                    '★タンク車所在TBL更新
+                    WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row)
+
+                Else
+                    '★受注明細TBL更新
+                    WW_UpdateOrderDetail(SQLcon,
+                                     I_OIT0005row:=OIT0005row,
+                                     I_ITEM:="DETENTIONFLG",
+                                     I_VALUE:="2")
+
+                    '★タンク車所在TBL更新
+                    WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row,
+                                        I_LOCATION:=Convert.ToString(OIT0005row("DEPSTATION")),
+                                        I_STATUS:=BaseDllConst.CONST_TANKSTATUS_02,
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
+                                        I_USEORDERNO:=True)
+                End If
+            Next
+        End Using
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車マスタTBL)の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankMaster(ByVal I_TANKNO As String,
+                                      Optional I_ITEM As String = Nothing,
+                                      Optional I_VALUE As String = Nothing)
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･タンク車マスタTBL更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIM0005_TANK " _
+                    & String.Format("        {0}  = '{1}', ", I_ITEM, I_VALUE)
+
+            SQLStr &=
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND DELFLG        <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = I_TANKNO
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005L_TANKMASTER UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005L_TANKMASTER UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 受注明細TBL更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_UpdateOrderDetail(ByVal SQLcon As SqlConnection,
+                                    Optional I_OIT0005row As DataRow = Nothing,
+                                    Optional I_ITEM As String = Nothing,
+                                    Optional I_VALUE As String = Nothing,
+                                    Optional I_WHOLESALE As Boolean = False)
+        Try
+            '更新SQL文･･･受注明細TBLのステータスを更新
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0003_DETAIL " _
+                    & "    SET " _
+                    & String.Format("        {0}  = '{1}', ", I_ITEM, I_VALUE)
+
+            '○未卸が有効
+            If I_WHOLESALE = True Then
+                '★受入日を更新対象とする
+                SQLStr &= "   ACTUALACCDATE = @ACTUALACCDATE, "
+            End If
+
+            SQLStr &=
+                      "   ACTUALEMPARRDATE = @ACTUALEMPARRDATE, " _
+                    & "        UPDYMD      = @UPDYMD, " _
+                    & "        UPDUSER     = @UPDUSER, " _
+                    & "        UPDTERMID   = @UPDTERMID, " _
+                    & "        RECEIVEYMD  = @RECEIVEYMD  " _
+                    & "  WHERE ORDERNO     = @ORDERNO  " _
+                    & "    AND TANKNO      = @TANKNO  "
+            '& "    AND DELFLG     <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
+            Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", System.Data.SqlDbType.NVarChar)
+            Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)
+            Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)
+            'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            'P_DELFLG.Value = C_DELETE_FLG.DELETE
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            If IsNothing(I_OIT0005row) Then
+                For Each OIT0005row As DataRow In OIT0005tbl.Rows
+                    P_ORDERNO.Value = OIT0005row("ORDERNO")
+                    P_TANKNO.Value = OIT0005row("TANKNO")
+                    P_ACTUALACCDATE.Value = OIT0005row("ORDER_ACTUALACCDATE")
+                    If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then
+                        P_ACTUALEMPARRDATE.Value = DBNull.Value
+                    Else
+                        P_ACTUALEMPARRDATE.Value = OIT0005row("ORDER_ACTUALEMPARRDATE")
+                    End If
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                P_ORDERNO.Value = I_OIT0005row("ORDERNO")
+                P_TANKNO.Value = I_OIT0005row("TANKNUMBER")
+                P_ACTUALACCDATE.Value = I_OIT0005row("ORDER_ACTUALACCDATE")
+                If Convert.ToString(I_OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then
+                    P_ACTUALEMPARRDATE.Value = DBNull.Value
+                Else
+                    P_ACTUALEMPARRDATE.Value = I_OIT0005row("ORDER_ACTUALEMPARRDATE")
+                End If
+                SQLcmd.ExecuteNonQuery()
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005L_ORDERDETAIL UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005L_ORDERDETAIL UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    End Sub
+    ''' <summary>
+    ''' (タンク車所在TBL)の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal SQLcon As SqlConnection,
+                                      ByVal I_OIT0005row As DataRow,
+                                      Optional I_LOCATION As String = Nothing,
+                                      Optional I_STATUS As String = Nothing,
+                                      Optional I_KBN As String = Nothing,
+                                      Optional I_SITUATION As String = Nothing,
+                                      Optional I_USEORDERNO As Boolean = False)
+
+        '更新SQL文･･･タンク車所在TBL更新
+        Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+        '○ 更新内容が指定されていれば追加する
+        '所在地コード
+        If Not String.IsNullOrEmpty(I_LOCATION) Then
+            SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+        End If
+        'タンク車状態コード
+        If Not String.IsNullOrEmpty(I_STATUS) Then
+            SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+        End If
+        '積車区分
+        If Not String.IsNullOrEmpty(I_KBN) Then
+            SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+        End If
+        'タンク車状況コード
+        If Not String.IsNullOrEmpty(I_SITUATION) Then
+            SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+        End If
+        '使用受注№
+        If I_USEORDERNO = True Then
+            SQLStr &= String.Format("        USEORDERNO = '{0}', ", "")
+        End If
+
+        '空車着日(実績)
+        SQLStr &= "      ACTUALEMPARRDATE = @ACTUALEMPARRDATE, "
+
+        SQLStr &=
+              "        UPDYMD         = @UPDYMD, " _
+            & "        UPDUSER        = @UPDUSER, " _
+            & "        UPDTERMID      = @UPDTERMID, " _
+            & "        RECEIVEYMD     = @RECEIVEYMD  " _
+            & "  WHERE TANKNUMBER     = @TANKNUMBER  " _
+            & "    AND DELFLG        <> @DELFLG "
+
+        Try
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim P_TANKNUMBER As SqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", System.Data.SqlDbType.NVarChar) 'タンク車№
+            Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date) '空車着日(実績)
+            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)         '削除フラグ
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            P_TANKNUMBER.Value = I_OIT0005row("TANKNUMBER")
+            If Convert.ToString(I_OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then
+                P_ACTUALEMPARRDATE.Value = DBNull.Value
+            Else
+                P_ACTUALEMPARRDATE.Value = I_OIT0005row("ORDER_ACTUALEMPARRDATE")
+            End If
+            P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005L_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005L_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+#End Region
+
+#Region "回送後状況"
+    ''' <summary>
+    ''' 回送後状況
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_UpdateKaisouAfterSituation()
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            '★回送明細TBL更新
+            WW_UpdateKaisouDetail(SQLcon)
+
+            '★タンク車所在TBL更新
+
+        End Using
+    End Sub
+    ''' <summary>
+    ''' 回送明細TBL更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_UpdateKaisouDetail(ByVal SQLcon As SqlConnection)
+
+    End Sub
+#End Region
 
     ''' <summary>
     ''' (一覧)テキストボックスの制御(読取専用)
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub WW_ListTextBoxReadControl()
+
+        Select Case work.WF_COND_DETAILTYPE.Text
+            '★その他状況(受注(未卸中・交検中・留置中))
+            Case "9"
+                WW_OrderListTextBoxReadControl()
+            '★その他状況(回送(修理・ＭＣ・交検・全検・留置・移動))
+            Case "10"
+                WW_KaisouListTextBoxReadControl()
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' 　　　(受注着駅到着後状況)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_OrderListTextBoxReadControl()
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
@@ -785,6 +1347,188 @@ Public Class OIT0005TankLocList
             End If
             rowIdx += 1
         Next
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' 　　　(回送後状況)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_KaisouListTextBoxReadControl()
 
     End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="O_VALUE"></param>
+    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String,
+                                          ByVal I_CLASS As String,
+                                          ByVal I_KEYCODE As String,
+                                          ByRef O_VALUE() As String)
+
+        If IsNothing(OIT0005Fixvaltbl) Then
+            OIT0005Fixvaltbl = New DataTable
+        End If
+
+        If OIT0005Fixvaltbl.Columns.Count <> 0 Then
+            OIT0005Fixvaltbl.Columns.Clear()
+        End If
+
+        OIT0005Fixvaltbl.Clear()
+
+        Try
+            'DBより取得
+            OIT0005Fixvaltbl = WW_FixvalueMasterDataGet(I_CODE, I_CLASS, I_KEYCODE)
+
+            If I_KEYCODE.Equals("") Then
+                Dim i As Integer = 0
+                For Each OIT0003WKrow As DataRow In OIT0005Fixvaltbl.Rows
+                    Try
+                        O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE"))
+                        i += 1
+                    Catch ex As Exception
+                        Exit For
+                    End Try
+                Next
+            Else
+                For Each OIT0003WKrow As DataRow In OIT0005Fixvaltbl.Rows
+                    For i = 1 To O_VALUE.Length
+                        O_VALUE(i - 1) = Convert.ToString(OIT0003WKrow("VALUE" & i.ToString()))
+                    Next
+                Next
+            End If
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理（同じパラメータならDB抽出せずに保持内容を返却）
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <returns></returns>
+    Private Function WW_FixvalueMasterDataGet(I_CODE As String, I_CLASS As String, I_KEYCODE As String) As DataTable
+        Static keyValues As Dictionary(Of String, String)
+        Static retDt As DataTable
+        Dim retFilterdDt As DataTable
+        'キー情報を比較または初期状態または異なるキーの場合は再抽出
+        If keyValues Is Nothing OrElse
+           (Not (keyValues("I_CODE") = I_CODE _
+                 AndAlso keyValues("I_CLASS") = I_CLASS)) Then
+            keyValues = New Dictionary(Of String, String) _
+                      From {{"I_CODE", I_CODE}, {"I_CLASS", I_CLASS}}
+            retDt = New DataTable
+        Else
+            retFilterdDt = retDt
+            '抽出キー情報が一致しているので保持内容を返却
+            If I_KEYCODE <> "" Then
+                Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+                If qKeyFilterd.Any Then
+                    retFilterdDt = qKeyFilterd.CopyToDataTable
+                Else
+                    retFilterdDt = retDt.Clone
+                End If
+            End If
+
+            Return retFilterdDt
+        End If
+        'キーが変更された場合の抽出処理
+        'DataBase接続文字
+        Dim SQLcon = CS0050SESSION.getConnection
+        SQLcon.Open() 'DataBase接続(Open)
+        SqlConnection.ClearPool(SQLcon)
+
+        '検索SQL文
+        Dim SQLStr As String =
+           " SELECT" _
+            & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+            & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+            & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+            & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+            & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE16), '')     AS VALUE16" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE17), '')     AS VALUE17" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE18), '')     AS VALUE18" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE19), '')     AS VALUE19" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE20), '')     AS VALUE20" _
+            & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+            & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
+            & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+            & " WHERE VIW0001.CLASS = @P01" _
+            & " AND VIW0001.DELFLG <> @P03"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '会社コード
+        If Not String.IsNullOrEmpty(I_CODE) Then
+            SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+        End If
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    VIW0001.KEYCODE"
+
+        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            PARA01.Value = I_CLASS
+            'PARA02.Value = I_KEYCODE
+            PARA03.Value = C_DELETE_FLG.DELETE
+
+            Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                '○ フィールド名とフィールドの型を取得
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    retDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+
+                '○ テーブル検索結果をテーブル格納
+                retDt.Load(SQLdr)
+            End Using
+            'CLOSE
+            SQLcmd.Dispose()
+        End Using
+
+        retFilterdDt = retDt
+        '抽出キー情報が一致しているので保持内容を返却
+        If I_KEYCODE <> "" Then
+            Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+            If qKeyFilterd.Any Then
+                retFilterdDt = qKeyFilterd.CopyToDataTable
+            Else
+                retFilterdDt = retDt.Clone
+            End If
+        End If
+
+        Return retFilterdDt
+    End Function
 End Class

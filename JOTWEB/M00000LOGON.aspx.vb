@@ -110,17 +110,17 @@ Public Class M00000LOGON
         '○オンラインサービス停止なら画面遷移しない 
         '接続サーバ（INIファイルのサーバ）、対象会社がオンラインか確認
 
-        CS0008ONLINEstat.COMPCODE = WF_TERMCAMP.Text
-        CS0008ONLINEstat.CS0008ONLINEstat()
-        If isNormal(CS0008ONLINEstat.ERR) Then
-            If CS0008ONLINEstat.ONLINESW = 0 Then
-                Master.Output(C_MESSAGE_NO.CLOSED_SERVICE, C_MESSAGE_TYPE.ERR)
-                Exit Sub
-            End If
-        Else
-            Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
-            Exit Sub
-        End If
+        'CS0008ONLINEstat.COMPCODE = WF_TERMCAMP.Text
+        'CS0008ONLINEstat.CS0008ONLINEstat()
+        'If isNormal(CS0008ONLINEstat.ERR) Then
+        '    If CS0008ONLINEstat.ONLINESW = 0 Then
+        '        Master.Output(C_MESSAGE_NO.CLOSED_SERVICE, C_MESSAGE_TYPE.ERR)
+        '        Exit Sub
+        '    End If
+        'Else
+        '    Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+        '    Exit Sub
+        'End If
 
 
         '■■■ 初期画面表示 ■■■

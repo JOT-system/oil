@@ -83,6 +83,8 @@
                 <asp:HiddenField ID="MF_PROF_REPORT" runat="server" />              <%-- 帳票プロフID          --%>
                 <asp:HiddenField ID="MF_USER_ORG" runat="server" />                 <%-- ユーザ所属部署        --%>
                 <asp:HiddenField ID="MF_USERTERMID" runat="server" />               <%-- ユーザ所属サーバ      --%>
+                <asp:HiddenField ID="MF_POSIROW" runat="server" />                  <%-- メニュー位置(縦)      --%>
+                <asp:HiddenField ID="MF_POSICOL" runat="server" />                  <%-- メニュー位置(横)      --%>
 
                 <asp:HiddenField ID="MF_MAPID" runat="server" value="" />           <%-- MAPID           --%>
                 <asp:HiddenField ID="MF_MAPvariant" runat="server" />               <%-- MAP変数         --%>

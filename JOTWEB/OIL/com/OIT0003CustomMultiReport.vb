@@ -462,6 +462,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
             '列車番号
             rngHeaderArea = ExcelWorkSheet.Range("G31")
+            If trainNo = "5282" Then
+                trainNo = "5875"
+            ElseIf trainNo = "8072" Then
+                trainNo = "8081"
+            End If
             rngHeaderArea.Value = String.Format("{0}列車", trainNo)
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -481,6 +486,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                 Case CONST_OFFICECODE_012402
                     rngHeaderArea.Value = "昭和四日市石油"
             End Select
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '受入基地
+            rngHeaderArea = ExcelWorkSheet.Range("G4")
+            rngHeaderArea.Value = "松本油槽所"
             ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
@@ -530,7 +540,7 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                             Case "B"
                                 rngDetailArea.Value = "0.5AFO"
                             Case "C"
-                                rngDetailArea.Value = "LTA"
+                                rngDetailArea.Value = "ｶﾝﾚｲAFO"
                         End Select
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"
@@ -953,6 +963,7 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
                 'GO
                 tankCount = query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1401")).Count
+                tankCount += query.Where(Function(x As DataRow) x.Item("OILCODE").ToString().Equals("1404")).Count
                 rngHeaderArea = Me.ExcelWorkSheet.Range("AH16")
                 rngHeaderArea.Value = IIf(tankCount > 0, tankCount.ToString(), "")
                 ExcelMemoryRelease(rngHeaderArea)
@@ -1018,7 +1029,7 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                             Case "B"
                                 rngDetailArea.Value = "0.5AFO"
                             Case "C"
-                                rngDetailArea.Value = "LTA"
+                                rngDetailArea.Value = "ｶﾝﾚｲAFO"
                         End Select
                     Case "2201"
                         rngDetailArea.Value = "0.1AFO"

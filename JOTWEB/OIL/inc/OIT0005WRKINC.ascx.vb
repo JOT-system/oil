@@ -89,6 +89,8 @@ Public Class OIT0005WRKINC
             '    viewName = "OIL.VIW0008_TANKLOC09_OTHERS"
             Case "9" 'その他状況(受注(未卸中・交検中・留置中))
                 viewName = "OIL.VIW0008_TANKLOC09_ORDER_MKR"
+            Case "10" 'その他(回送(修理・ＭＣ・交検・全検・留置・移動)
+                viewName = "OIL.VIW0008_TANKLOC09_KAISOU_MKR"
         End Select
         Return viewName
     End Function
@@ -124,6 +126,9 @@ Public Class OIT0005WRKINC
             Case "9" 'その他状況
                 'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
                 viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "10" 'その他状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
         End Select
         Return viewName
     End Function
@@ -148,7 +153,9 @@ Public Class OIT0005WRKINC
                                        New ConditionItem("5", "回送（修理）", "回送指示中分", 0, "回送中", 0),
                                        New ConditionItem("7", "回送（<span style='letter-spacing:0;'>疎開留</span>置）", "回送指示中分", 0, "回送中", 0),
                                        New ConditionItem("8", "回送（ＭＣ）", "回送指示中分", 0, "回送中", 0),
-                                       New ConditionItem("9", "その他状況", "未卸中", 0, "交検中", 0, "留置中", 0)})
+                                       New ConditionItem("9", "その他状況", "未卸中", 0, "交検中", 0, "留置中", 0),
+                                       New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0, "全検", 0, "留置", 0, "移動", 0)})
+            'New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0)})
             'New ConditionItem("9", "その他状況", "留置", 0, "その他", 0)})
 
         End Sub
@@ -174,6 +181,12 @@ Public Class OIT0005WRKINC
             dicRetVal.Add("1", selectedDetail.Value1Name)
             dicRetVal.Add("2", selectedDetail.Value2Name)
             If detailType = "9" Then dicRetVal.Add("3", selectedDetail.Value3Name)
+            If detailType = "10" Then
+                dicRetVal.Add("3", selectedDetail.Value3Name)
+                dicRetVal.Add("4", selectedDetail.Value4Name)
+                dicRetVal.Add("5", selectedDetail.Value5Name)
+                dicRetVal.Add("6", selectedDetail.Value6Name)
+            End If
             Return dicRetVal
         End Function
     End Class
@@ -183,7 +196,11 @@ Public Class OIT0005WRKINC
     <Serializable>
     Public Class ConditionItem
         Public Sub New(detailType As String, conditionName As String, value1Name As String, value1 As Decimal,
-                       value2Name As String, value2 As Decimal, Optional value3Name As String = Nothing, Optional value3 As Decimal = 0)
+                       value2Name As String, value2 As Decimal,
+                       Optional value3Name As String = Nothing, Optional value3 As Decimal = 0,
+                       Optional value4Name As String = Nothing, Optional value4 As Decimal = 0,
+                       Optional value5Name As String = Nothing, Optional value5 As Decimal = 0,
+                       Optional value6Name As String = Nothing, Optional value6 As Decimal = 0)
             Me.DetailType = detailType
             Me.ConditionName = conditionName
             Me.Value1Name = value1Name
@@ -192,6 +209,12 @@ Public Class OIT0005WRKINC
             Me.Value2 = value2
             Me.Value3Name = value3Name
             Me.Value3 = value3
+            Me.Value4Name = value4Name
+            Me.Value4 = value4
+            Me.Value5Name = value5Name
+            Me.Value5 = value5
+            Me.Value6Name = value6Name
+            Me.Value6 = value6
 
         End Sub
         Public Property DetailType As String = ""
@@ -202,6 +225,12 @@ Public Class OIT0005WRKINC
         Public Property Value2 As Decimal = 0
         Public Property Value3Name As String = ""
         Public Property Value3 As Decimal = 0
+        Public Property Value4Name As String = ""
+        Public Property Value4 As Decimal = 0
+        Public Property Value5Name As String = ""
+        Public Property Value5 As Decimal = 0
+        Public Property Value6Name As String = ""
+        Public Property Value6 As Decimal = 0
     End Class
 
 End Class

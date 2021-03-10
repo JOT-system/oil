@@ -43,7 +43,7 @@
                     <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
                 </div>
                 <%-- 20210121 END   ボタンの非表示(廃止) --%>
-                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
+                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>

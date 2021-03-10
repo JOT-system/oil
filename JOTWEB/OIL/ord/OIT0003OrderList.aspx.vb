@@ -7523,7 +7523,7 @@ Public Class OIT0003OrderList
             & "     OIT0002.OFFICECODE " _
             & "     , OIT0002.ACTUALLODDATE " _
             & "     , OIT0002.TRAINNO " _
-            & "     , OIT0003.SHIPORDER " _
+            & "     , CONVERT(INT, ISNULL(OIT0003.SHIPORDER, 99)) " _
             & "     , OIM0005.MODEL " _
             & "     , OIM0005.TANKNUMBER "
 

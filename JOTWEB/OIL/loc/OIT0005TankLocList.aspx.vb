@@ -162,11 +162,8 @@ Public Class OIT0005TankLocList
         '○ 画面の値設定
         WW_MAPValueSet()
 
-        '★その他状況(受注(未卸中・交検中・留置中))の場合
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
-            '○(一覧)テキストボックスの制御(読取専用)
-            WW_ListTextBoxReadControl()
-        End If
+        '○(一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
 
     End Sub
     ''' <summary>
@@ -232,7 +229,9 @@ Public Class OIT0005TankLocList
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
+        '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
+        If work.WF_COND_DETAILTYPE.Text = "9" _
+           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -769,7 +768,9 @@ Public Class OIT0005TankLocList
 
         '○ 一覧作成
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
+        '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
+        If work.WF_COND_DETAILTYPE.Text = "9" _
+           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -798,11 +799,8 @@ Public Class OIT0005TankLocList
         TBLview.Dispose()
         TBLview = Nothing
 
-        '★その他状況(受注(未卸中・交検中・留置中))の場合
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
-            '○(一覧)テキストボックスの制御(読取専用)
-            WW_ListTextBoxReadControl()
-        End If
+        '○(一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
 
     End Sub
 
@@ -1247,6 +1245,24 @@ Public Class OIT0005TankLocList
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub WW_ListTextBoxReadControl()
+
+        Select Case work.WF_COND_DETAILTYPE.Text
+            '★その他状況(受注(未卸中・交検中・留置中))
+            Case "9"
+                WW_OrderListTextBoxReadControl()
+            '★その他状況(回送(修理・ＭＣ・交検・全検・留置・移動))
+            Case "10"
+                WW_KaisouListTextBoxReadControl()
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' 　　　(受注着駅到着後状況)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_OrderListTextBoxReadControl()
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
@@ -1331,6 +1347,14 @@ Public Class OIT0005TankLocList
             End If
             rowIdx += 1
         Next
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' 　　　(回送後状況)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_KaisouListTextBoxReadControl()
 
     End Sub
 

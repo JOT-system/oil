@@ -7500,6 +7500,8 @@ Public Class OIT0003OrderDetail
         Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
+        If WW_TANKNUMBER = "" Then Exit Sub
+
         '会社コードが指定されていた場合
         If Not String.IsNullOrEmpty(I_CMPCD) Then
             '指定された会社コードをKEYとする。

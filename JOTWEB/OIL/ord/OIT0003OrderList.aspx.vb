@@ -51,6 +51,7 @@ Public Class OIT0003OrderList
     Private Const CONST_SODE_TRAIN_8877 As String = "8877"          '袖ヶ浦営業所(列車番号：8877)
     Private Const CONST_SODE_TRAIN_8883 As String = "8883"          '袖ヶ浦営業所(列車番号：8883)
     Private Const CONST_SODE_TRAIN_5461 As String = "5461"          '袖ヶ浦営業所(列車番号：5461)
+    Private Const CONST_SODE_TRAIN_9672 As String = "9672"          '袖ヶ浦営業所(列車番号：9672)
     Private Const CONST_SHIPPERSCODE_0122700010 As String = "0122700010"   '出光昭和シェル(荷主コード : 0122700010)
 
     '○ 帳票用
@@ -6138,8 +6139,8 @@ Public Class OIT0003OrderList
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                                 LineCnt -= 1
                             End If
-                        '列車№:5461(JR:5972)は上から
-                        Case CONST_SODE_TRAIN_5461
+                        '列車№:5461(JR:5972), 9672は上から
+                        Case CONST_SODE_TRAIN_5461, CONST_SODE_TRAIN_9672
                             If OIT0003Reprow("LOADINGIRILINEORDER") <= LineCnt Then
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                             End If

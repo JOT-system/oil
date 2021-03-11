@@ -189,7 +189,7 @@
             & "  , OIT0002.TRAINNO" _
             & "  , OIT0002.DEPSTATION" _
             & "  , OIM0003.OTOILCODE" _
-            & "  , OIT0003.LINEORDER" _
+            & "  , CONVERT(INT,OIT0003.LINEORDER)" _
             & "  , OIT0003.TANKNO"
 
         Return SQLStr

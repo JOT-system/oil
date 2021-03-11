@@ -38,26 +38,26 @@ function InitDisplay() {
         //★関東支店/五井/甲子/袖ヶ浦/根岸
         } else if (document.getElementById('WF_BUTTONpermitcode').value === "2") {
 
-            // ●袖ヶ浦は非表示
-            if (document.getElementById('WF_BUTTONofficecode').value === "011203") {
-                //OT連携選択ボタン(非表示)
-                document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
-            } else {
+            //// ●袖ヶ浦は非表示
+            //if (document.getElementById('WF_BUTTONofficecode').value === "011203") {
+            //    //OT連携選択ボタン(非表示)
+            //    document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
+            //} else {
                 //OT連携選択ボタン(表示)
                 document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
-            }
+            //}
         
         //★中部支店/四日市/三重塩浜
         } else if (document.getElementById('WF_BUTTONpermitcode').value === "3") {
 
-            // ●三重塩浜は非表示
-            if (document.getElementById('WF_BUTTONofficecode').value === "012402") {
-                //OT連携選択ボタン(非表示)
-                document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
-            } else {
+            //// ●三重塩浜は非表示
+            //if (document.getElementById('WF_BUTTONofficecode').value === "012402") {
+            //    //OT連携選択ボタン(非表示)
+            //    document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
+            //} else {
                 //OT連携選択ボタン(表示)
                 document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
-            }
+            //}
 
         }
     } else {

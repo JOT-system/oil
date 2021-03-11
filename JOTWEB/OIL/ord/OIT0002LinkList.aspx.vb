@@ -969,7 +969,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '利用可能日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'ステータス
@@ -996,7 +996,7 @@ Public Class OIT0002LinkList
                 Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20) '更新端末
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
 
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
@@ -1859,6 +1859,20 @@ Public Class OIT0002LinkList
                                         I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_13)
                 End If
                 '### 20201014 END   指摘票No169対応 ###########################################################
+
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：所属営業所コード　⇒　変更あり(営業所コード)
+                '引数４：所在地コード　⇒　変更あり(着駅コード)
+                '※タンク車状況が"1"(残車)の場合のみ更新
+                WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_OFFICECODE:=OIT0002EXLINSrow("OFFICECODE"),
+                                        I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_CONDITION:="TANKSITUATION",
+                                        I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_01)
+
             End If
         Next
 

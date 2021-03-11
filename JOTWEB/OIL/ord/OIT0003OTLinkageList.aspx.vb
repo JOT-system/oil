@@ -1643,6 +1643,7 @@ Public Class OIT0003OTLinkageList
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 '★四日市営業所対応用
                 Dim OTTrainNoChg() As String = {"6078", "6089"}
+                Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
@@ -1724,6 +1725,24 @@ Public Class OIT0003OTLinkageList
                     'OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8).Replace("  ", "　")
                     'OIT0003row("OTDAILYSHIPPERN") = setSPACE.PadLeft(8).Replace("  ", "　")
                     'OIT0003row("OTOILNAME") = setSPACE.PadLeft(12).Replace("  ", "　")
+
+                    ''OT油種名を半角カナで設定(暫定)
+                    'Select Case Convert.ToString(OIT0003row("OTOILCODE"))
+                    '    Case BaseDllConst.CONST_OTHTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(0).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTRTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(1).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTTTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(2).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTKTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(3).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTK3Tank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(4).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTLTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(5).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTATank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(6).PadLeft(12)
+                    'End Select
 
                 Next
 

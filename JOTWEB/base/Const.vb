@@ -998,6 +998,37 @@ Public Module BaseDllConst
     Public Const CONST_ATank3 As String = "2103"
 #End Region
 
+#Region "OT油種"
+    ''' <summary>
+    ''' OT油種(ハイオク)
+    ''' </summary>
+    Public Const CONST_OTHTank As String = "1100"
+    ''' <summary>
+    ''' OT油種(レギュラー)
+    ''' </summary>
+    Public Const CONST_OTRTank As String = "2100"
+    ''' <summary>
+    ''' OT油種(灯油)
+    ''' </summary>
+    Public Const CONST_OTTTank As String = "3100"
+    ''' <summary>
+    ''' OT油種(軽油)
+    ''' </summary>
+    Public Const CONST_OTKTank As String = "4100"
+    ''' <summary>
+    ''' OT３号軽油
+    ''' </summary>
+    Public Const CONST_OTK3Tank As String = "4930"
+    ''' <summary>
+    ''' OTＬＳＡ
+    ''' </summary>
+    Public Const CONST_OTLTank As String = "5100"
+    ''' <summary>
+    ''' OTＡ重油
+    ''' </summary>
+    Public Const CONST_OTATank As String = "5200"
+#End Region
+
 #Region "油種名(受発注用)"
     Public Const CONST_1001A As String = "ハイオク"
     Public Const CONST_1101A As String = "レギュラー"

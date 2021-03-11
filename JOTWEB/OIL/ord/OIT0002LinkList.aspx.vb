@@ -1859,6 +1859,20 @@ Public Class OIT0002LinkList
                                         I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_13)
                 End If
                 '### 20201014 END   指摘票No169対応 ###########################################################
+
+                '(タンク車所在TBL)の内容を更新
+                '引数１：タンク車状態　⇒　変更なし
+                '引数２：積車区分　　　⇒　変更なし
+                '引数３：所属営業所コード　⇒　変更あり(営業所コード)
+                '引数４：所在地コード　⇒　変更あり(着駅コード)
+                '※タンク車状況が"1"(残車)の場合のみ更新
+                WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_OFFICECODE:=OIT0002EXLINSrow("OFFICECODE"),
+                                        I_LOCATION:=OIT0002EXLINSrow("RETSTATION"),
+                                        I_TANKNO:=OIT0002EXLINSrow("TANKNUMBER"),
+                                        I_CONDITION:="TANKSITUATION",
+                                        I_CONDITION_VAL:=BaseDllConst.CONST_TANKSITUATION_01)
+
             End If
         Next
 

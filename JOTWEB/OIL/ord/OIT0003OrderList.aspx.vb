@@ -6133,14 +6133,14 @@ Public Class OIT0003OrderList
 
                     '★列車Noによって、上から設定/下から設定を切り分ける
                     Select Case OIT0003Reprow("TRAINNO")
-                        '列車№:8877, 8883は下から
-                        Case CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883
+                        '列車№:8877, 8883, 9672は下から
+                        Case CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883, CONST_SODE_TRAIN_9672
                             If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                                 LineCnt -= 1
                             End If
-                        '列車№:5461(JR:5972), 9672は上から
-                        Case CONST_SODE_TRAIN_5461, CONST_SODE_TRAIN_9672
+                        '列車№:5461(JR:5972)は上から
+                        Case CONST_SODE_TRAIN_5461
                             If OIT0003Reprow("LOADINGIRILINEORDER") <= LineCnt Then
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                             End If

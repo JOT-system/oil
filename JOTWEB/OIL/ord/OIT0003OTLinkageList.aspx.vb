@@ -3208,9 +3208,9 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem.OutputFiledList = outFieldList
                 fileLinkageItem.OutputReservedConstantField = False
                 fileLinkageItem.OutputReservedFileNameWithoutExtention = "富士石油貨車出荷データ"
-                fileLinkageItem.OutputReservedFileExtention = "xlsx"
+                fileLinkageItem.OutputReservedFileExtention = "xls"
                 fileLinkageItem.OutputReservedExcelDataStartAddress = "B4"
-                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Excel2007
+                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Excel2003
                 'ヘッダー必要なら↓のコメントOFF
                 fileLinkageItem.OutputReservedCustomOutputFiledHeader = "ステータス,SHELL受注番号,JOT受注番号,出荷日付,輸送方法,送荷先コード,送荷先,納入先コード,納入先,品名コード,品名,課税区分,実績数量,運送会社,輸送機関,便名,戻し"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)

@@ -816,6 +816,7 @@ Public Class OIT0003OrderDetail
         Else
             Me.TxtOrderOffice.Text = work.WF_SEL_SALESOFFICE.Text
             Me.TxtOrderOfficeCode.Text = work.WF_SEL_SALESOFFICECODE.Text
+            work.WF_SEL_ORDERSALESOFFICECODE.Text = work.WF_SEL_SALESOFFICECODE.Text
 
         End If
 

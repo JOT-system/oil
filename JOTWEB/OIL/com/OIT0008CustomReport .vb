@@ -131,6 +131,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
             Dim PageNum As Int32 = 1
             Dim pixel As Double = 0.0
             Dim row_cnt As Int32 = 0
+            Dim nowdate As DateTime = DateTime.Now
+
+            'フッターの設定
+            ExcelWorkSheet.PageSetup.LeftFooter = String.Format(
+                                                    "&L{0}                {1}",
+                                                    Format(nowdate, "yyyy年M月d日"),
+                                                    Format(nowdate, "H:mm"))
+            ExcelWorkSheet.PageSetup.RightFooter = "&R&P ページ     "
 
             For Each row As DataRow In PrintData.Rows
 

@@ -1402,14 +1402,14 @@ Public Class OIT0005TankLocList
         Dim rowIdx As Integer = 0
 
         For Each rowitem As TableRow In tblObj.Rows
-            '★修理・ＭＣ・交検・全検・留置・移動(チェックボックス)の制御
+            '○修理・ＭＣ・交検・全検・留置・移動(チェックボックス)の制御
             If OIT0005tbl.Rows.Count <> 0 Then
                 For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKNUMBER='" + rowitem.Cells.Item(0).Text + "'")
                     loopdr = OIT0005row
                     Exit For
                 Next
                 If loopdr Is Nothing Then loopdr = OIT0005tbl.Rows(rowIdx)
-                '修理
+                '★修理
                 chkObjREPId = chkObjIdWOREPcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjREP = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1422,7 +1422,7 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
-                'ＭＣ
+                '★ＭＣ
                 chkObjMCId = chkObjIdWOMCcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjMC = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1436,7 +1436,7 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
-                '交検
+                '★交検
                 chkObjINSId = chkObjIdWOINScnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjINS = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1449,7 +1449,7 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
-                '全検
+                '★全検
                 chkObjAINSId = chkObjIdWOAINScnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjAINS = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1462,7 +1462,7 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
-                '留置
+                '★留置
                 chkObjINDId = chkObjIdWOINDcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjIND = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1475,7 +1475,7 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
-                '移動
+                '★移動
                 chkObjMVId = chkObjIdWOMVcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjMV = Nothing
                 For Each cellObj As TableCell In rowitem.Controls
@@ -1488,6 +1488,29 @@ Public Class OIT0005TankLocList
                         Exit For
                     End If
                 Next
+
+                '○次回交検日・次回全検日・返送日(テキストボックス)の制御
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") Then
+                        '★交検の設定
+                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRALLINSPECTIONDATE") Then
+                        '★全検の設定
+                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "KAISOU_ACTUALEMPARRDATE") Then
+                        '★返送日の設定
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
+                    End If
+                Next
+
             End If
             rowIdx += 1
         Next

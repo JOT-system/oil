@@ -154,10 +154,8 @@ Public Class OIT0005WRKINC
                                        New ConditionItem("7", "回送（<span style='letter-spacing:0;'>疎開留</span>置）", "回送指示中分", 0, "回送中", 0),
                                        New ConditionItem("8", "回送（ＭＣ）", "回送指示中分", 0, "回送中", 0),
                                        New ConditionItem("9", "その他状況", "未卸中", 0, "交検中", 0, "留置中", 0),
-                                       New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0, "全検", 0, "留置", 0, "移動", 0)})
-            'New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0)})
-            'New ConditionItem("9", "その他状況", "留置", 0, "その他", 0)})
-
+                                       New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0, "全検", 0, "留置", 0)})
+            'New ConditionItem("10", "その他状況", "修理", 0, "ＭＣ", 0, "交検", 0, "全検", 0, "留置", 0, "移動", 0)})
         End Sub
         ''' <summary>
         ''' 状況表名の取得
@@ -185,7 +183,7 @@ Public Class OIT0005WRKINC
                 dicRetVal.Add("3", selectedDetail.Value3Name)
                 dicRetVal.Add("4", selectedDetail.Value4Name)
                 dicRetVal.Add("5", selectedDetail.Value5Name)
-                dicRetVal.Add("6", selectedDetail.Value6Name)
+                'dicRetVal.Add("6", selectedDetail.Value6Name)
             End If
             Return dicRetVal
         End Function
@@ -213,8 +211,8 @@ Public Class OIT0005WRKINC
             Me.Value4 = value4
             Me.Value5Name = value5Name
             Me.Value5 = value5
-            Me.Value6Name = value6Name
-            Me.Value6 = value6
+            'Me.Value6Name = value6Name
+            'Me.Value6 = value6
 
         End Sub
         Public Property DetailType As String = ""

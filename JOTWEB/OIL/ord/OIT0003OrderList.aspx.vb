@@ -7460,13 +7460,7 @@ Public Class OIT0003OrderList
             & "     , 0                                          AS HIDDEN " _
             & "     , OIT0002.OFFICECODE                         AS OFFICECODE " _
             & "     , OIT0003.ACTUALLODDATE                      AS ACTUALLODDATE " _
-            & "	    , CASE " _
-            & "         WHEN OIT0002.TRAINNO ='9672' " _
-            & "	        THEN '5461' " _
-            & "         WHEN OIT0002.TRAINNO ='5972' " _
-            & "	        THEN '5461' " _
-            & "	        ELSE OIT0002.TRAINNO " _
-            & "      END                                         AS TRAINNO " _
+            & "     , OIT0002.TRAINNO                            AS TRAINNO " _
             & "     , OIM0007.DEPSTATION                         AS DEPSTATION " _
             & "     , OIM0007.ARRSTATION                         AS ARRSTATION " _
             & "     , OIT0003.OILCODE                            AS OILCODE " _

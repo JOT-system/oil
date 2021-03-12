@@ -51,6 +51,7 @@ Public Class OIT0003OrderList
     Private Const CONST_SODE_TRAIN_8877 As String = "8877"          '袖ヶ浦営業所(列車番号：8877)
     Private Const CONST_SODE_TRAIN_8883 As String = "8883"          '袖ヶ浦営業所(列車番号：8883)
     Private Const CONST_SODE_TRAIN_5461 As String = "5461"          '袖ヶ浦営業所(列車番号：5461)
+    Private Const CONST_SODE_TRAIN_9672 As String = "9672"          '袖ヶ浦営業所(列車番号：9672)
     Private Const CONST_SHIPPERSCODE_0122700010 As String = "0122700010"   '出光昭和シェル(荷主コード : 0122700010)
 
     '○ 帳票用
@@ -1390,7 +1391,7 @@ Public Class OIT0003OrderList
                                         '着駅：倉賀野（高崎）南松本の列車を表示
                                         prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND VALUE3 IN ('5141', '4113') "
                                         '対象の列車
-                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND KEYCODE = '5461' "
+                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND KEYCODE IN ('5461', '9672', '5972')  "
                                     End If
 
                                 Case CONST_OFFICECODE_012402
@@ -3233,10 +3234,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
-                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                    '袖ヶ浦のみ初期値を設定
-                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
-                End If
+                '   If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '袖ヶ浦のみ初期値を設定
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                'End If
         End Select
 
     End Sub
@@ -6132,8 +6133,8 @@ Public Class OIT0003OrderList
 
                     '★列車Noによって、上から設定/下から設定を切り分ける
                     Select Case OIT0003Reprow("TRAINNO")
-                        '列車№:8877, 8883は下から
-                        Case CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883
+                        '列車№:8877, 8883, 9672は下から
+                        Case CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883, CONST_SODE_TRAIN_9672
                             If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                                 LineCnt -= 1
@@ -7153,7 +7154,7 @@ Public Class OIT0003OrderList
             & "   AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "   AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "   AND OIT0002.DELFLG <> @DELFLG " _
-            & "   AND OIT0003.ACTUALLODDATE = @LODDATE " _
+            & "   AND OIT0002.LODDATE = @LODDATE " _
             & "   AND OIT0003.DELFLG <> @DELFLG " _
             & "   AND OIM0005.DELFLG <> @DELFLG "
 
@@ -7326,7 +7327,7 @@ Public Class OIT0003OrderList
             & "   AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "   AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "   AND OIT0002.DELFLG <> @DELFLG " _
-            & "   AND OIT0003.ACTUALLODDATE = @LODDATE " _
+            & "   AND OIT0002.LODDATE = @LODDATE " _
             & "   AND OIT0003.DELFLG <> @DELFLG " _
             & "   AND OIM0005.DELFLG <> @DELFLG " _
             & "   AND ( " _
@@ -7516,7 +7517,7 @@ Public Class OIT0003OrderList
             & "     AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "     AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "     AND OIT0002.DELFLG <> @DELFLG " _
-            & "     AND OIT0003.ACTUALLODDATE = @LODDATE " _
+            & "     AND OIT0002.LODDATE = @LODDATE " _
             & "     AND OIT0003.DELFLG <> @DELFLG " _
             & "     AND OIM0005.DELFLG <> @DELFLG " _
             & " ORDER BY " _

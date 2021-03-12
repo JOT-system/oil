@@ -1496,6 +1496,13 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     rngHeaderArea = Me.ExcelWorkSheet.Range("M17")
                     rngHeaderArea.Value = PrintDatarow("ACCDATE")
                     ExcelMemoryRelease(rngHeaderArea)
+
+                    If Convert.ToString(PrintDatarow("JRTRAINNO1")) = "9672" Then
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("F24")
+                        rngHeaderArea.Value = PrintDatarow("JRTRAINNO1")
+                        ExcelMemoryRelease(rngHeaderArea)
+                    End If
+
                 End If
 
                 Exit For

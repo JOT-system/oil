@@ -1014,7 +1014,7 @@ Public Class OIT0003OTLinkageList
             End If
             '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
             '対象の発日が統一されていない場合（同一発日以外は不許可）
-            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
             If qSameProcDateCnt > 1 Then
                 '選択されていない場合は、エラーメッセージを表示し終了
                 Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -1146,7 +1146,7 @@ Public Class OIT0003OTLinkageList
             End If
             '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
             '対象の発日が統一されていない場合（同一発日以外は不許可）
-            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
             If qSameProcDateCnt > 1 Then
                 '選択されていない場合は、エラーメッセージを表示し終了
                 Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -1643,6 +1643,7 @@ Public Class OIT0003OTLinkageList
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 '★四日市営業所対応用
                 Dim OTTrainNoChg() As String = {"6078", "6089"}
+                Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
                     OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
@@ -1724,6 +1725,24 @@ Public Class OIT0003OTLinkageList
                     'OIT0003row("OTDAILYDEPSTATIONN") = setSPACE.PadLeft(8).Replace("  ", "　")
                     'OIT0003row("OTDAILYSHIPPERN") = setSPACE.PadLeft(8).Replace("  ", "　")
                     'OIT0003row("OTOILNAME") = setSPACE.PadLeft(12).Replace("  ", "　")
+
+                    ''OT油種名を半角カナで設定(暫定)
+                    'Select Case Convert.ToString(OIT0003row("OTOILCODE"))
+                    '    Case BaseDllConst.CONST_OTHTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(0).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTRTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(1).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTTTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(2).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTKTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(3).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTK3Tank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(4).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTLTank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(5).PadLeft(12)
+                    '    Case BaseDllConst.CONST_OTATank
+                    '        OIT0003row("OTOILNAME") = OTOilNameKana(6).PadLeft(12)
+                    'End Select
 
                 Next
 
@@ -2212,7 +2231,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '計画済'    AS SOD_STATUS")    '袖ヶ浦ステータス
         sqlStat.AppendLine("     , ''          AS SOD_SHELL_ORDERNO") '袖ヶ浦SHELL受注番号
         sqlStat.AppendLine("     , '0'         AS SOD_TRANS_KBN") '袖ヶ浦輸送方法
-        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE + '00000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , substring(isnull(PRD.SHIPPEROILCODE,''),1,4) + '00000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '課税' ELSE 'その他' END AS SOD_TAX_KBN") '袖ヶ浦課税区分
         sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
         sqlStat.AppendLine("     , ''          AS SOD_TRANS_COMP") '袖ヶ浦運送会社
@@ -3198,9 +3217,9 @@ Public Class OIT0003OTLinkageList
                 fileLinkageItem.OutputFiledList = outFieldList
                 fileLinkageItem.OutputReservedConstantField = False
                 fileLinkageItem.OutputReservedFileNameWithoutExtention = "富士石油貨車出荷データ"
-                fileLinkageItem.OutputReservedFileExtention = "xlsx"
+                fileLinkageItem.OutputReservedFileExtention = "xls"
                 fileLinkageItem.OutputReservedExcelDataStartAddress = "B4"
-                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Excel2007
+                fileLinkageItem.ReservedOutputType = FileLinkagePatternItem.ReserveOutputFileType.Excel2003
                 'ヘッダー必要なら↓のコメントOFF
                 fileLinkageItem.OutputReservedCustomOutputFiledHeader = "ステータス,SHELL受注番号,JOT受注番号,出荷日付,輸送方法,送荷先コード,送荷先,納入先コード,納入先,品名コード,品名,課税区分,実績数量,運送会社,輸送機関,便名,戻し"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)

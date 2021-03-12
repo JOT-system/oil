@@ -419,6 +419,11 @@ Public Class OIT0004OilStockSearch
                         End If
                         Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
                         .SetListBox(enumVal, WW_DUMMY, prmData)
+                        If Master.USER_ORG = "011203" AndAlso WF_FIELD.Value = "TxtSalesOffice" Then
+                            If leftview.WF_LeftListBox.Items.FindByValue("012402") Is Nothing Then
+                                leftview.WF_LeftListBox.Items.Add(New ListItem("三重塩浜営業所", "012402"))
+                            End If
+                        End If
                         .ActiveListBox()
                 End Select
             End With

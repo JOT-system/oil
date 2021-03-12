@@ -105,7 +105,9 @@ Public Class OIT0004OilStockCreate
             Else
                 WF_MAPpermitcode.Value = "FALSE"
             End If
-
+            If Master.USER_ORG = "011203" AndAlso work.WF_SEL_SALESOFFICECODE.Text = "012402" Then
+                Me.Form.Attributes.Add("CLASS", "mieReadOnly")
+            End If
             WF_BOXChange.Value = "detailbox"
 
         Finally
@@ -746,6 +748,7 @@ Public Class OIT0004OilStockCreate
         '******************************
         If Me.chkPrintENEOS.Checked = False AndAlso Me.chkPrintConsigneeRep.Checked = False Then
             Using repCbj = New OIT0004CustomReport(Master.MAPID, Master.MAPID & ".xlsx", printDataNormal)
+                repCbj.ReportYmd = Me.txtDownloadMonth.Text & "/01"
                 Dim url As String
                 Try
                     url = repCbj.CreateExcelPrintData
@@ -1660,16 +1663,31 @@ Public Class OIT0004OilStockCreate
         Dim dateFrom As String = dispDateList.First.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
         'Dim dateTo As String = dispData.StockDate.Last.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
         Dim dateTo As String = dispDateList.First.Value.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
+        Dim qDaysCount = From itm In dispDateList Where itm.Value.WeekNum <> "0" AndAlso itm.Value.ItemDate.ToString("yyyy/MM/dd") >= dateFrom AndAlso itm.Value.ItemDate.ToString("yyyy/MM/dd") <= dateTo
+        Dim daysCount = 0
+        Dim currentDate As String = dateFrom
+
+        Do Until currentDate > dateTo
+            If Not CDate(currentDate).DayOfWeek = DayOfWeek.Sunday Then
+                daysCount = daysCount + 1
+            End If
+            currentDate = CDate(currentDate).AddDays(1).ToString("yyyy/MM/dd")
+        Loop
+        If daysCount = 0 Then
+            daysCount = 1
+        End If
         sqlStr.AppendLine("SELECT DTL.OILCODE")
         sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
         sqlStr.AppendLine("     , DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO)  AS DAYSPAN")
-        sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
+        'sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
+        sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / @DAYSCNT,0)  AS SHIPAVERAGE")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
         sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
+        sqlStr.AppendLine("   AND DATEPART(WEEKDAY,ODR.ACTUALLODDATE) <> 1")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         '荷主取得条件(JOINTコード考慮)↓
@@ -1693,6 +1711,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
                 .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+                .Add("@DAYSCNT", SqlDbType.Decimal).Value = daysCount
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -6822,7 +6841,7 @@ Public Class OIT0004OilStockCreate
                     If Me.ShowSuggestList = True AndAlso itm.DaysItem.IsBeforeToday = False AndAlso needsSumSuggestValue Then
                         '提案リスト表示時
                         itm.Receive = GetSummarySuggestValue(itmDate, oilCode).ToString
-                    ElseIf Me.IsOtTrainMode AndAlso Me.SuggestList IsNot Nothing AndAlso Me.SuggestList.Count > 0 AndAlso needsSumSuggestValue Then
+                    ElseIf Me.IsOtTrainMode AndAlso itm.DaysItem.IsBeforeToday = False AndAlso Me.SuggestList IsNot Nothing AndAlso Me.SuggestList.Count > 0 AndAlso needsSumSuggestValue Then
                         itm.Receive = GetSummarySuggestValue(itmDate, oilCode).ToString
                     Else
                         'itm.Receive = 0 '？？？？？ここはどうする

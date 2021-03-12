@@ -536,7 +536,7 @@ Public Class OIT0003OrderList
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
-            SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)
+            SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", Integer.Parse(work.WF_SEL_TRAINNUMBER.Text))
         End If
         '荷卸地(荷受人)
         If Not String.IsNullOrEmpty(work.WF_SEL_UNLOADINGCODE.Text) Then
@@ -1391,7 +1391,7 @@ Public Class OIT0003OrderList
                                         '着駅：倉賀野（高崎）南松本の列車を表示
                                         prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND VALUE3 IN ('5141', '4113') "
                                         '対象の列車
-                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND KEYCODE = '5461' "
+                                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) += " AND KEYCODE IN ('5461', '9672', '5972')  "
                                     End If
 
                                 Case CONST_OFFICECODE_012402
@@ -1727,6 +1727,7 @@ Public Class OIT0003OrderList
             '○ UPLOAD XLSデータ取得
             CS0023XLSUPLOAD.CS0023XLSUPLOAD_NEGISHI_LOADPLAN(OIT0003EXLUPtbl)
         Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR)
             Exit Sub
         End Try
 
@@ -1760,7 +1761,6 @@ Public Class OIT0003OrderList
                 Exit Sub
             End If
         End Using
-
 
     End Sub
 
@@ -2181,30 +2181,30 @@ Public Class OIT0003OrderList
         '     条件指定に従い該当データを回線別積込取込(日新)テーブルから取得する
         Dim SQLTankStr As String =
               " SELECT " _
-           & "    FILENAME               AS FILENAME " _
-           & " ,  REGISTRATIONDATE       AS REGISTRATIONDATE " _
-           & " ,  LODDATE                AS LODDATE " _
-           & " ,  LINE                   AS LINE " _
-           & " ,  ARRSTATION             AS ARRSTATION " _
-           & " ,  TRAINNO                AS TRAINNO " _
-           & " ,  POINT                  AS POINT " _
-           & " ,  OIL                    AS OIL " _
-           & " ,  TANKNO                 AS TANKNO " _
-           & " ,  TRAINNODETAIL          AS TRAINNODETAIL " _
-           & " ,  LOADINGTRAINNO         AS LOADINGTRAINNO " _
-           & " ,  LOADINGTANKNO          AS LOADINGTANKNO " _
-           & " ,  LOADINGOILCODE         AS LOADINGOILCODE " _
-           & " ,  LOADINGOILNAME         AS LOADINGOILNAME " _
-           & " ,  LOADINGORDERINGTYPE    AS LOADINGORDERINGTYPE " _
-           & " ,  LOADINGORDERINGOILNAME AS LOADINGORDERINGOILNAME " _
-           & " ,  '0'                    AS USEFLAG " _
-           & " FROM OIL.TMP0006_NLINELOAD TMP0006 " _
-           & " WHERE TMP0006.LOADINGTRAINNO <> '' " _
-           & " ORDER BY " _
-           & "       TMP0006.LOADINGTRAINNO" _
-           & "     , TMP0006.TRAINNODETAIL" _
-           & "     , TMP0006.LINE" _
-           & "     , TMP0006.POINT "
+            & "    FILENAME               AS FILENAME " _
+            & " ,  REGISTRATIONDATE       AS REGISTRATIONDATE " _
+            & " ,  LODDATE                AS LODDATE " _
+            & " ,  LINE                   AS LINE " _
+            & " ,  ARRSTATION             AS ARRSTATION " _
+            & " ,  TRAINNO                AS TRAINNO " _
+            & " ,  POINT                  AS POINT " _
+            & " ,  OIL                    AS OIL " _
+            & " ,  TANKNO                 AS TANKNO " _
+            & " ,  TRAINNODETAIL          AS TRAINNODETAIL " _
+            & " ,  LOADINGTRAINNO         AS LOADINGTRAINNO " _
+            & " ,  LOADINGTANKNO          AS LOADINGTANKNO " _
+            & " ,  LOADINGOILCODE         AS LOADINGOILCODE " _
+            & " ,  LOADINGOILNAME         AS LOADINGOILNAME " _
+            & " ,  LOADINGORDERINGTYPE    AS LOADINGORDERINGTYPE " _
+            & " ,  LOADINGORDERINGOILNAME AS LOADINGORDERINGOILNAME " _
+            & " ,  '0'                    AS USEFLAG " _
+            & " FROM OIL.TMP0006_NLINELOAD TMP0006 " _
+            & " WHERE TMP0006.LOADINGTRAINNO <> '' " _
+            & " ORDER BY " _
+            & "       TMP0006.LOADINGTRAINNO" _
+            & "     , TMP0006.TRAINNODETAIL" _
+            & "     , TMP0006.LINE" _
+            & "     , TMP0006.POINT "
 
         Try
             Using SQLTankcmd As New SqlCommand(SQLTankStr, SQLcon)
@@ -3234,10 +3234,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
-                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                    '袖ヶ浦のみ初期値を設定
-                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
-                End If
+                '   If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '袖ヶ浦のみ初期値を設定
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                'End If
         End Select
 
     End Sub
@@ -7517,7 +7517,7 @@ Public Class OIT0003OrderList
             & "     AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "     AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "     AND OIT0002.DELFLG <> @DELFLG " _
-            & "     AND OIT0003.ACTUALLODDATE = @LODDATE " _
+            & "     AND OIT0002.LODDATE = @LODDATE " _
             & "     AND OIT0003.DELFLG <> @DELFLG " _
             & "     AND OIM0005.DELFLG <> @DELFLG " _
             & " ORDER BY " _

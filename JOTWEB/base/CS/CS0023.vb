@@ -1096,16 +1096,6 @@ Public Structure CS0023XLSUPLOAD
                 jPoint = 1
                 For z As Integer = 0 To jEnd
 
-                    rng = oSheet.Range(sCellDetailYoko2(i) + (jStart + 1).ToString())
-                    Dim trainNoDetail As String = rng.Text.ToString()
-                    ExcelMemoryRelease(rng)
-                    If trainNoDetail = "テスト積車" Then
-                        jStart += 2
-                        jPoint += 1
-                        j += 1
-                        Continue For
-                    End If
-
                     dt.Rows.Add(dt.NewRow())
                     dt.Rows(j)("FILENAME") = excelFileName
                     dt.Rows(j)("DATERECEIVEYMD") = Date.Parse(sCellTitleYMDC).ToString("yyyy/MM/dd")
@@ -1133,26 +1123,49 @@ Public Structure CS0023XLSUPLOAD
             Next
 
             '★指定された列車の再設定
-            Dim svTraiNo As String = ""
-            Dim reg = New Regex("[①-⑨]")
-            Dim regHalf = New Regex("[^０-９]")
+            Dim svTrainNo As String = ""
+            Dim regCircleNum = New Regex("[①-⑨]")
+            Dim regNotNum = New Regex("\D")
             For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
-                If svTraiNo = "" Then
-                    svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
-                ElseIf reg.Replace(svTraiNo, "") = Convert.ToString(dtrow("TRAINNO_DETAIL")) Then
-                    dtrow("TRAINNO_DETAIL") = svTraiNo
+                Dim xlsTrainNo As String = Convert.ToString(dtrow("TRAINNO_DETAIL"))
+                Dim xlsTankNo As String = Convert.ToString(dtrow("TANKNO_DETAIL"))
+                Dim xlsOil As String = Convert.ToString(dtrow("OIL_DETAIL"))
+
+                If String.IsNullOrEmpty(svTrainNo) Then
+                    '初回
+                    svTrainNo = xlsTrainNo
+                ElseIf String.IsNullOrEmpty(xlsTrainNo) OrElse
+                    xlsTrainNo = regCircleNum.Replace(svTrainNo, "") OrElse
+                    svTrainNo = regCircleNum.Replace(xlsTrainNo, "") Then
+                    '初回以降
+                    xlsTrainNo = svTrainNo
                 Else
-                    '○前回と同じ列車番号の場合
-                    If Convert.ToString(dtrow("TRAINNO_DETAIL")) = "" OrElse
-                        reg.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), "") = svTraiNo Then
-                        dtrow("TRAINNO_DETAIL") = svTraiNo
-                        '前回と異なる列車番号の場合
-                    Else
-                        svTraiNo = Convert.ToString(dtrow("TRAINNO_DETAIL"))
-                    End If
+                    svTrainNo = xlsTrainNo
                 End If
-                dtrow("TRAINNO") = StrConv(regHalf.Replace(Convert.ToString(dtrow("TRAINNO_DETAIL")), ""), VbStrConv.Narrow)
-                dtrow("TANKNO") = CInt(Convert.ToString(dtrow("TANKNO_DETAIL")).Replace("1-", ""))
+
+                '○設定
+
+                '列車番号
+                dtrow("TRAINNO_DETAIL") = xlsTrainNo
+
+                '列車番号（変換）
+                Dim trainNo As Integer
+                If Integer.TryParse(Strings.StrConv(regNotNum.Replace(xlsTrainNo, ""), VbStrConv.Narrow), trainNo) Then
+                    dtrow("TRAINNO") = trainNo.ToString()
+                End If
+
+                'タンク車番号（変換）
+                Dim tankNo As Integer
+                If Integer.TryParse(xlsTankNo.Replace("1-", ""), tankNo) Then
+                    dtrow("TANKNO") = tankNo.ToString()
+                End If
+
+                '油種
+                If xlsOil = "〇" Then
+                    '漢数字「〇」は記号「○」に変換
+                    dtrow("OIL_DETAIL") = "○"
+                End If
+
             Next
 
         Catch ex As Exception

@@ -1051,6 +1051,9 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
 
 End Class
 
+''' <summary>
+''' 受注明細
+''' </summary>
 Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
     Private Const TEMP_XLS_FILE_NAME As String = "ORDERDETAIL.xlsx"

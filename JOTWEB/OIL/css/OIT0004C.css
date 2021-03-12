@@ -917,3 +917,38 @@ input[type=text].modified:not(:disabled) {
     width: 0;
     height: 0;*/
 }
+form.mieReadOnly input:not([type=button]),
+form.mieReadOnly select {
+    pointer-events: none;
+    color: #888;
+    background-color: #dbdcdd;
+    border-width: 0px;
+    box-shadow: none;
+}
+form.mieReadOnly #pnlStockList #dispLorry,
+form.mieReadOnly #pnlStockList div.oilTypeData,
+form.mieReadOnly #pnlStockList div.headerDate,
+form.mieReadOnly #pnlStockList div.footer {
+    display: none;
+}
+form.mieReadOnly #pnlStockList div.emptyBox {
+    height:50px;
+}
+form.mieReadOnly #spnInventoryDays,
+form.mieReadOnly #WF_ButtonAUTOSUGGESTION,
+form.mieReadOnly #WF_ButtonORDERLIST,
+form.mieReadOnly #WF_ButtonINPUTCLEAR,
+form.mieReadOnly #WF_ButtonGETEMPTURN,
+form.mieReadOnly #WF_ButtonRECULC,
+form.mieReadOnly #WF_ButtonUPDATE,
+form.mieReadOnly #WF_ButtonReport,
+form.mieReadOnly .lockImgArea {
+    display: none !important;
+}
+form.mieReadOnly #pnlSuggestList #divSuggestList div.leftColumn div:nth-child(1) {
+    height: calc(24px * 2);
+}
+form.mieReadOnly #pnlSuggestList #divSuggestList > div.oilTypeColumn > div:nth-child(3),
+form.mieReadOnly #pnlSuggestList #divSuggestList > div.dataColumn > div.values > div:nth-child(2) {
+    display: none;
+}

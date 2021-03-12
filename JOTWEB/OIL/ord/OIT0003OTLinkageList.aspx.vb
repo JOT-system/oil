@@ -2231,7 +2231,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , '計画済'    AS SOD_STATUS")    '袖ヶ浦ステータス
         sqlStat.AppendLine("     , ''          AS SOD_SHELL_ORDERNO") '袖ヶ浦SHELL受注番号
         sqlStat.AppendLine("     , '0'         AS SOD_TRANS_KBN") '袖ヶ浦輸送方法
-        sqlStat.AppendLine("     , substring(isnull(PRD.SHIPPEROILCODE,''),1,4) + '00000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , substring(isnull(PRD.SHIPPEROILCODE,''),1,5) + '0000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
         sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '課税' ELSE 'その他' END AS SOD_TAX_KBN") '袖ヶ浦課税区分
         sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
         sqlStat.AppendLine("     , ''          AS SOD_TRANS_COMP") '袖ヶ浦運送会社

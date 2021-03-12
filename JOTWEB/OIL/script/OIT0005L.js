@@ -193,7 +193,10 @@ function ListField_Dbclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
 
         if (fieldNM === "ORDER_ACTUALACCDATE"
-            || fieldNM === "ORDER_ACTUALEMPARRDATE") {
+            || fieldNM === "ORDER_ACTUALEMPARRDATE"
+            || fieldNM === "KAISOU_ACTUALEMPARRDATE"
+            || fieldNM === "JRINSPECTIONDATE"
+            || fieldNM === "JRALLINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

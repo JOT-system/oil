@@ -456,6 +456,22 @@ Public Class OIT0005TankLocList
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0005tbl)
 
+        Select Case work.WF_COND_DETAILTYPE.Text
+            Case "9"
+                WW_CheckBoxSELECT09_Click(chkFieldName)
+            Case "10"
+            Case Else
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0005tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理(受注着駅到着後状況)
+    ''' </summary>
+    Protected Sub WW_CheckBoxSELECT09_Click(ByVal chkFieldName As String)
         Select Case chkFieldName
             Case "WF_CheckBoxSELECTWHOLESALE"
                 'チェックボックス判定
@@ -496,10 +512,6 @@ Public Class OIT0005TankLocList
                     End If
                 Next
         End Select
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0005tbl)
-
     End Sub
 
     ''' <summary>
@@ -1283,7 +1295,6 @@ Public Class OIT0005TankLocList
         '　データテーブルの行Index
         Dim rowIdx As Integer = 0
 
-
         For Each rowitem As TableRow In tblObj.Rows
             '★未卸・交検・留置(チェックボックス)の制御
             If OIT0005tbl.Rows.Count <> 0 Then
@@ -1355,6 +1366,131 @@ Public Class OIT0005TankLocList
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub WW_KaisouListTextBoxReadControl()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        Dim chkObjType As String = ""
+
+        '★修理チェックボックス用
+        Dim chkObjREP As CheckBox = Nothing
+        Dim chkObjIdWOREPcnt As String = "chk" & pnlListArea.ID & "REPAIRFLG"
+        Dim chkObjREPId As String = ""
+        '★ＭＣチェックボックス用
+        Dim chkObjMC As CheckBox = Nothing
+        Dim chkObjIdWOMCcnt As String = "chk" & pnlListArea.ID & "MCFLG"
+        Dim chkObjMCId As String = ""
+        '★交検チェックボックス用
+        Dim chkObjINS As CheckBox = Nothing
+        Dim chkObjIdWOINScnt As String = "chk" & pnlListArea.ID & "INSPECTIONFLG"
+        Dim chkObjINSId As String = ""
+        '★全検チェックボックス用
+        Dim chkObjAINS As CheckBox = Nothing
+        Dim chkObjIdWOAINScnt As String = "chk" & pnlListArea.ID & "ALLINSPECTIONFLG"
+        Dim chkObjAINSId As String = ""
+        '★留置チェックボックス用
+        Dim chkObjIND As CheckBox = Nothing
+        Dim chkObjIdWOINDcnt As String = "chk" & pnlListArea.ID & "INDWELLINGFLG"
+        Dim chkObjINDId As String = ""
+        '★移動チェックボックス用
+        Dim chkObjMV As CheckBox = Nothing
+        Dim chkObjIdWOMVcnt As String = "chk" & pnlListArea.ID & "MOVEFLG"
+        Dim chkObjMVId As String = ""
+
+        '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
+        Dim loopdr As DataRow = Nothing
+        '　データテーブルの行Index
+        Dim rowIdx As Integer = 0
+
+        For Each rowitem As TableRow In tblObj.Rows
+            '★修理・ＭＣ・交検・全検・留置・移動(チェックボックス)の制御
+            If OIT0005tbl.Rows.Count <> 0 Then
+                For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKNUMBER='" + rowitem.Cells.Item(0).Text + "'")
+                    loopdr = OIT0005row
+                    Exit For
+                Next
+                If loopdr Is Nothing Then loopdr = OIT0005tbl.Rows(rowIdx)
+                '修理
+                chkObjREPId = chkObjIdWOREPcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjREP = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjREP = DirectCast(cellObj.FindControl(chkObjREPId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjREP IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_11 Then
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjREP.Enabled = False
+                        Exit For
+                    End If
+                Next
+                'ＭＣ
+                chkObjMCId = chkObjIdWOMCcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjMC = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjMC = DirectCast(cellObj.FindControl(chkObjMCId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjMC IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 Then
+
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjMC.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '交検
+                chkObjINSId = chkObjIdWOINScnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjINS = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjINS = DirectCast(cellObj.FindControl(chkObjINSId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjINS IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 Then
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjINS.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '全検
+                chkObjAINSId = chkObjIdWOAINScnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjAINS = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjAINS = DirectCast(cellObj.FindControl(chkObjAINSId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjAINS IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 Then
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjAINS.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '留置
+                chkObjINDId = chkObjIdWOINDcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjIND = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjIND = DirectCast(cellObj.FindControl(chkObjINDId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjIND IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 Then
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjIND.Enabled = False
+                        Exit For
+                    End If
+                Next
+                '移動
+                chkObjMVId = chkObjIdWOMVcnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjMV = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObjMV = DirectCast(cellObj.FindControl(chkObjMVId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObjMV IsNot Nothing _
+                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_08 Then
+                        '修理フラグ(チェックボックス)を非活性
+                        chkObjMV.Enabled = False
+                        Exit For
+                    End If
+                Next
+            End If
+            rowIdx += 1
+        Next
 
     End Sub
 

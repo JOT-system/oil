@@ -523,7 +523,7 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                     Case "1001"
                         rngDetailArea.Value = "ﾌﾟﾚﾐｱﾑ"
                     Case "1101"
-                        rngDetailArea.Value = "ﾚｷﾞｭﾗｰG"
+                        rngDetailArea.Value = "ﾚｷﾞﾕﾗ-G"
                     Case "1301"
                         rngDetailArea.Value = "ﾄｳﾕ"
                     Case "1401"

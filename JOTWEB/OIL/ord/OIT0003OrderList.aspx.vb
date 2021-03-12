@@ -7154,7 +7154,7 @@ Public Class OIT0003OrderList
             & "   AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "   AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "   AND OIT0002.DELFLG <> @DELFLG " _
-            & "   AND OIT0003.ACTUALLODDATE = @LODDATE " _
+            & "   AND OIT0003.LODDATE = @LODDATE " _
             & "   AND OIT0003.DELFLG <> @DELFLG " _
             & "   AND OIM0005.DELFLG <> @DELFLG "
 

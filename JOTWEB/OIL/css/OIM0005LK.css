@@ -1,0 +1,11 @@
+﻿/* 削除データ行の背景色設定 （DELFLG='1'の時灰色）*/
+div[data-generated="1"] tr.hasDeleteRowValue td,
+div[data-generated="1"] tr.hasDeleteRowValue th {
+    background-color: gray;
+}
+
+/* 削除データ行にマウスオーバーの時、背景色設定 （濃い水色）*/
+div[data-generated="1"] tr.hasDeleteRowValue.hover td,
+div[data-generated="1"] tr.hasDeleteRowValue.hover th {
+    background-color: #32a3a3 !important;
+}

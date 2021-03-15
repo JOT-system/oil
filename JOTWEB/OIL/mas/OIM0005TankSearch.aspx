@@ -19,6 +19,7 @@
         <div class="actionButtonBox">
             <div class="leftSide"></div>
             <div class="rightSide">
+                <input type="button" id="WF_ButtonKINOENE"  class="btn-sticky" value="甲子貨車マスタメンテ"  runat="server" onclick="ButtonClick('WF_ButtonKINOENE');" />
                 <input type="button" id="WF_ButtonDO"  class="btn-sticky" value="検索"  onclick="ButtonClick('WF_ButtonDO');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  onclick="ButtonClick('WF_ButtonEND');" />
             </div>

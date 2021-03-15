@@ -123,6 +123,7 @@
     <Content Include="OIL\css\OIM0002L.css" />
     <Content Include="OIL\css\OIM0003S.css" />
     <Content Include="OIL\css\OIM0002S.css" />
+    <Content Include="OIL\css\OIM0005LK.css" />
     <Content Include="OIL\css\OIM0015C.css" />
     <Content Include="OIL\css\OIM0014C.css" />
     <Content Include="OIL\css\OIM0013C.css" />
@@ -279,6 +280,7 @@
     <Content Include="OIL\mas\OIM0003ProductSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationCreate.aspx" />
     <Content Include="OIL\mas\OIM0002OrgSearch.aspx" />
+    <Content Include="OIL\mas\OIM0005TankListKinoene.aspx" />
     <Content Include="OIL\mas\OIM0007TrainCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankList.aspx" />
@@ -362,6 +364,7 @@
     <Content Include="OIL\script\OIM0002L.js" />
     <Content Include="OIL\script\OIM0003S .js" />
     <Content Include="OIL\script\OIM0002S.js" />
+    <Content Include="OIL\script\OIM0005LK.js" />
     <Content Include="OIL\script\OIM0015C.js" />
     <Content Include="OIL\script\OIM0014C.js" />
     <Content Include="OIL\script\OIM0013C.js" />
@@ -858,6 +861,13 @@
     </Compile>
     <Compile Include="OIL\mas\OIM0002OrgSearch.aspx.vb">
       <DependentUpon>OIM0002OrgSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0005TankListKinoene.aspx.designer.vb">
+      <DependentUpon>OIM0005TankListKinoene.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0005TankListKinoene.aspx.vb">
+      <DependentUpon>OIM0005TankListKinoene.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIM0007TrainCreate.aspx.designer.vb">

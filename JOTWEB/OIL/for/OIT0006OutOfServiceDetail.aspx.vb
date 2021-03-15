@@ -5044,6 +5044,11 @@ Public Class OIT0006OutOfServiceDetail
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim iresult As Integer
 
+        '★新規登録時は、回送営業所のみチェックし処理を抜ける
+        '　※割当更新(一時更新)の場合も後続チェック不要
+        If work.WF_SEL_CREATEFLG.Text = "1" _
+            AndAlso (Me.WW_UPBUTTONFLG = "0" OrElse Me.WW_UPBUTTONFLG = "1") Then Exit Sub
+
         '○ (一覧)過去日付チェック
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
             '例) iresult = dt1.Date.CompareTo(dt2.Date)

@@ -1071,7 +1071,7 @@ Public Class OIT0005TankLocList
             If IsNothing(I_OIT0005row) Then
                 For Each OIT0005row As DataRow In OIT0005tbl.Rows
                     P_ORDERNO.Value = OIT0005row("ORDERNO")
-                    P_TANKNO.Value = OIT0005row("TANKNO")
+                    P_TANKNO.Value = OIT0005row("TANKNUMBER")
                     P_ACTUALACCDATE.Value = OIT0005row("ORDER_ACTUALACCDATE")
                     If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) = "" Then
                         P_ACTUALEMPARRDATE.Value = DBNull.Value
@@ -1307,13 +1307,22 @@ Public Class OIT0005TankLocList
                     WW_UpdateTankShozai(SQLcon,
                                         OIT0005row)
                 Else
-                    '★タンク車所在TBL更新
-                    WW_UpdateTankShozai(SQLcon,
+                    '○回送登録画面より登録した場合
+                    If Convert.ToString(OIT0005row("USEORDERNO")) <> "" Then
+                        '★タンク車所在TBL更新
+                        WW_UpdateTankShozai(SQLcon,
                                         OIT0005row,
                                         I_LOCATION:=Convert.ToString(OIT0005row("DEPSTATION")),
                                         I_STATUS:=BaseDllConst.CONST_TANKSTATUS_02,
                                         I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01,
                                         I_USEORDERNO:=True)
+                    Else
+                        '★タンク車所在TBL更新
+                        WW_UpdateTankShozai(SQLcon,
+                                        OIT0005row,
+                                        I_STATUS:=BaseDllConst.CONST_TANKSTATUS_02,
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01)
+                    End If
                 End If
             Next
         End Using
@@ -1326,7 +1335,69 @@ Public Class OIT0005TankLocList
                                      Optional I_OIT0005row As DataRow = Nothing,
                                      Optional I_ITEM As String = Nothing,
                                      Optional I_VALUE As String = Nothing)
+        Try
+            '更新SQL文･･･回送明細TBLのステータスを更新
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0007_KAISOUDETAIL " _
+                    & "    SET " _
+                    & String.Format("        {0}  = '{1}', ", I_ITEM, I_VALUE)
 
+            SQLStr &=
+                      "        UPDYMD      = @UPDYMD, " _
+                    & "        UPDUSER     = @UPDUSER, " _
+                    & "        UPDTERMID   = @UPDTERMID, " _
+                    & "        RECEIVEYMD  = @RECEIVEYMD  " _
+                    & "  WHERE KAISOUNO    = @KAISOUNO  " _
+                    & "    AND TANKNO     <> @TANKNO  "
+            '& "    AND DELFLG     <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", System.Data.SqlDbType.NVarChar)
+            Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", System.Data.SqlDbType.NVarChar)
+            'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            'P_DELFLG.Value = C_DELETE_FLG.DELETE
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            If IsNothing(I_OIT0005row) Then
+                For Each OIT0005row As DataRow In OIT0005tbl.Rows
+                    P_KAISOUNO.Value = OIT0005row("KAISOUNO")
+                    P_TANKNO.Value = OIT0005row("TANKNUMBER")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                P_KAISOUNO.Value = I_OIT0005row("KAISOUNO")
+                P_TANKNO.Value = I_OIT0005row("TANKNUMBER")
+                SQLcmd.ExecuteNonQuery()
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005L_KAISOUDETAIL UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005L_KAISOUDETAIL UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
     End Sub
     ''' <summary>
     ''' 回送TBL更新

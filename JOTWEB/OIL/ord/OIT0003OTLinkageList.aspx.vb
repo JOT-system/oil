@@ -2038,7 +2038,7 @@ Public Class OIT0003OTLinkageList
                     newDr("処理年月日") = processDate
                     newDr("積込年月日") = wrkDr("LODDATE").ToString()
                     newDr("運送状年月日") = wrkDr("LODDATE").ToString()
-                    newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    newDr("発車年月日") = wrkDr("LODDATE").ToString()
                     newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
                     newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)

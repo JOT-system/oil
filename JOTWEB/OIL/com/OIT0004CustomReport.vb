@@ -41,6 +41,11 @@ Public Class OIT0004CustomReport : Implements IDisposable
     Private UrlRoot As String = ""
     Private PrintData As OIT0004OilStockCreate.DispDataClass
     ''' <summary>
+    ''' 帳票年月(帳票年月/01で設定する※テンプレートの書式で文言変更を容易に）
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ReportYmd As String = ""
+    ''' <summary>
     ''' WindowハンドルよりProcessIDを取得
     ''' </summary>
     ''' <param name="hwnd"></param>
@@ -176,11 +181,21 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Dim formulaMorningStock As String = "=0"
         Dim formulaSend As String = "=0"
         Dim formulaReceve As String = "=0"
+        Dim formulaTrain(1) As String
+        formulaTrain(0) = "0"
+        formulaTrain(1) = "0"
         Dim flag3go As Boolean = False
         If {"010402", "011402"}.Contains(Me.PrintData.SalesOffice) AndAlso Me.PrintData.OilTypeList.ContainsKey("1404") AndAlso Me.PrintData.Shipper = "0005700010" Then
             flag3go = True
         End If
         Dim address3GoFlag As String = ""
+        Dim margeAddresses As New List(Of String)
+        '******************************
+        ' 帳票年月を設定
+        '******************************
+        rngValueSet = Me.ExcelWorkSheet.Range("RNG_REPORT_YMD")
+        rngValueSet.Value = Me.ReportYmd
+        ExcelMemoryRelease(rngValueSet)
         '******************************
         '油種の行拡張
         '******************************
@@ -227,7 +242,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 '合計用の数式生成
                 '***********************
 
-                rngValueSet = DirectCast(rngPasteOffset(2, 5), Excel.Range)
+                rngValueSet = DirectCast(rngPasteOffset(1, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
                     '軽油
                     formulaMorningStock = formulaMorningStock & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
@@ -263,6 +278,19 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 End If
                 ExcelMemoryRelease(rngValueSet)
 
+                For i = 0 To 1
+                    rngValueSet = DirectCast(rngPasteOffset(7 + i, 5), Excel.Range)
+                    If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
+                        '軽油
+                        formulaTrain(i) = formulaTrain(i) & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
+                    ElseIf flag3go AndAlso stkItm.OilInfo.OilCode = "1404" Then
+                        '3号
+                        formulaTrain(i) = formulaTrain(i) & " + IF({0}=1," & rngValueSet.Address(False, False) & ",0)"
+                    Else
+                        formulaTrain(i) = formulaTrain(i) & "+" & rngValueSet.Address(False, False)
+                    End If
+                    ExcelMemoryRelease(rngValueSet)
+                Next
                 '***********************
                 '各油種毎の値を設定する
                 '***********************
@@ -319,6 +347,19 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         hideRow.Hidden = True
                         ExcelMemoryRelease(hideRow)
                         ExcelMemoryRelease(rngSummaryRow)
+                        Dim rngMargeRange As Excel.Range = Nothing
+                        Dim rngMargeFrom As Excel.Range = Nothing
+                        Dim rngMargeTo As Excel.Range = Nothing
+                        For Each margeRangePair In {New With {.from = 2, .to = 4}, New With {.from = 5, .to = 6}}
+                            rngMargeFrom = DirectCast(rngPasteOffset(margeRangePair.from, 3), Excel.Range)
+                            rngMargeTo = DirectCast(rngPasteOffset(margeRangePair.to, 3), Excel.Range)
+                            rngMargeRange = Me.ExcelWorkSheet.Range(rngMargeFrom, rngMargeTo)
+                            margeAddresses.Add(rngMargeRange.Address)
+                            ExcelMemoryRelease(rngMargeRange)
+                            ExcelMemoryRelease(rngMargeFrom)
+                            ExcelMemoryRelease(rngMargeTo)
+                        Next
+
                         '条件付き書式の拡張ここから
                         Dim rngCondformula As Excel.Range = Nothing
                         rngValueSet = DirectCast(rngPasteOffset(1, 5), Excel.Range)
@@ -331,7 +372,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                             Dim resizeBaseRange As Excel.Range
                             resizeBaseRange = fcObj.AppliesTo
                             Dim resizeRange As Excel.Range
-                            Dim addCount = resizeBaseRange.Count + 4
+                            Dim addCount = resizeBaseRange.Count + summaryRowNum
                             resizeRange = resizeBaseRange.Resize(RowSize:=addCount)
                             fcObj.ModifyAppliesToRange(resizeRange)
 
@@ -360,6 +401,13 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         rngSummaryCell = DirectCast(rngPasteOffset(4, 5), Excel.Range)
                         rngSummaryCell.Formula = String.Format(formulaSend, address3GoFlag)
                         ExcelMemoryRelease(rngSummaryCell)
+                        For i = 0 To 1
+                            rngSummaryCell = DirectCast(rngPasteOffset(5 + i, 5), Excel.Range)
+                            Dim trainNameAdrs As String = "$F" & Split(rngSummaryCell.Address(True, False), "$"c)(1)
+
+                            rngSummaryCell.Formula = "=IF(" & trainNameAdrs & "="""",""""," & String.Format(formulaTrain(i), address3GoFlag) & ")"
+                            ExcelMemoryRelease(rngSummaryCell)
+                        Next
                     End With
                     '先頭行と最終行の保持
                     firstRowNum = rngPageteBase.Row
@@ -399,6 +447,8 @@ Public Class OIT0004CustomReport : Implements IDisposable
             formulaMorningStock = "=0"
             formulaSend = "=0"
             formulaReceve = "=0"
+            formulaTrain(0) = "0"
+            formulaTrain(1) = "0"
             For Each stkItm In Me.PrintData.MiDispData.StockList.Values
                 rngPasteOffset = rngPageteBase.Offset(RowOffset:=((pasteOffset - 1) * 10) + (footerRowNum + summaryRowNum))
                 If pasteOffsetStart = pasteOffset Then
@@ -408,7 +458,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                     ExcelMemoryRelease(pagePreakRows)
                     Dim pageSetUpObj As Excel.PageSetup = Nothing
                     pageSetUpObj = Me.ExcelWorkSheet.PageSetup
-                    pageSetUpObj.Zoom = 46
+                    pageSetUpObj.Zoom = 45
                     ExcelMemoryRelease(pageSetUpObj)
                 End If
                 rngSingleFlame.Copy(rngPasteOffset)
@@ -416,7 +466,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 '合計用の数式生成
                 '***********************
 
-                rngValueSet = DirectCast(rngPasteOffset(2, 5), Excel.Range)
+                rngValueSet = DirectCast(rngPasteOffset(1, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
                     '軽油
                     formulaMorningStock = formulaMorningStock & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
@@ -451,6 +501,19 @@ Public Class OIT0004CustomReport : Implements IDisposable
                     formulaSend = formulaSend & "+" & rngValueSet.Address(False, False)
                 End If
                 ExcelMemoryRelease(rngValueSet)
+                For i = 0 To 1
+                    rngValueSet = DirectCast(rngPasteOffset(7 + i, 5), Excel.Range)
+                    If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
+                        '軽油
+                        formulaTrain(i) = formulaTrain(i) & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
+                    ElseIf flag3go AndAlso stkItm.OilInfo.OilCode = "1404" Then
+                        '3号
+                        formulaTrain(i) = formulaTrain(i) & " + IF({0}=1," & rngValueSet.Address(False, False) & ",0)"
+                    Else
+                        formulaTrain(i) = formulaTrain(i) & "+" & rngValueSet.Address(False, False)
+                    End If
+                    ExcelMemoryRelease(rngValueSet)
+                Next
                 '***********************
                 '各油種毎の値を設定する
                 '***********************
@@ -499,8 +562,9 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         pasteOffset = pasteOffset + 1
                         ExcelMemoryRelease(rngPasteOffset)
                         Dim rngSummaryOffset As Excel.Range
-                        rngSummaryOffset = rngPageteBase.Offset(RowOffset:=pasteOffset * 10)
-                        rngPasteOffset = rngSummaryOffset.Resize(RowSize:=4)
+                        rngSummaryOffset = rngPageteBase.Offset(RowOffset:=(pasteOffset * 10) + 2)
+                        rngPasteOffset = rngSummaryOffset.Resize(RowSize:=summaryRowNum)
+
                         rngSummary.Copy(rngPasteOffset)
                         rngSummaryRow = rngPasteOffset.Rows
                         Dim hideRow As Excel.Range = Nothing
@@ -510,6 +574,19 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         ExcelMemoryRelease(rngSummaryOffset)
                         ExcelMemoryRelease(rngSummaryRow)
                         ExcelMemoryRelease(rngSummaryOffset)
+                        Dim rngMargeRange As Excel.Range = Nothing
+                        Dim rngMargeFrom As Excel.Range = Nothing
+                        Dim rngMargeTo As Excel.Range = Nothing
+                        For Each margeRangePair In {New With {.from = 2, .to = 4}, New With {.from = 5, .to = 6}}
+                            rngMargeFrom = DirectCast(rngPasteOffset(margeRangePair.from, 3), Excel.Range)
+                            rngMargeTo = DirectCast(rngPasteOffset(margeRangePair.to, 3), Excel.Range)
+                            rngMargeRange = Me.ExcelWorkSheet.Range(rngMargeFrom, rngMargeTo)
+                            margeAddresses.Add(rngMargeRange.Address)
+                            ExcelMemoryRelease(rngMargeRange)
+                            ExcelMemoryRelease(rngMargeFrom)
+                            ExcelMemoryRelease(rngMargeTo)
+                        Next
+
                         '条件付き書式の拡張ここから
                         Dim rngCondformula As Excel.Range = Nothing
                         rngValueSet = DirectCast(rngPasteOffset(1, 5), Excel.Range)
@@ -522,7 +599,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                             Dim resizeBaseRange As Excel.Range
                             resizeBaseRange = fcObj.AppliesTo
                             Dim resizeRange As Excel.Range
-                            Dim addCount = resizeBaseRange.Count + 4
+                            Dim addCount = resizeBaseRange.Count + summaryRowNum
                             resizeRange = resizeBaseRange.Resize(RowSize:=addCount)
                             fcObj.ModifyAppliesToRange(resizeRange)
 
@@ -551,6 +628,14 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         rngSummaryCell = DirectCast(rngPasteOffset(4, 5), Excel.Range)
                         rngSummaryCell.Formula = String.Format(formulaSend, address3GoFlag)
                         ExcelMemoryRelease(rngSummaryCell)
+
+                        For i = 0 To 1
+                            rngSummaryCell = DirectCast(rngPasteOffset(5 + i, 5), Excel.Range)
+                            Dim trainNameAdrs As String = "$F" & Split(rngSummaryCell.Address(True, False), "$"c)(1)
+
+                            rngSummaryCell.Formula = "=IF(" & trainNameAdrs & "="""",""""," & String.Format(formulaTrain(i), address3GoFlag) & ")"
+                            ExcelMemoryRelease(rngSummaryCell)
+                        Next
                     End With
                     '先頭行と最終行の保持
 
@@ -599,6 +684,15 @@ Public Class OIT0004CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngFooter)
             ExcelMemoryRelease(rngSummary)
         End Try
+        '******************************
+        ' 合計行の中分類列マージ
+        '******************************
+        Dim margeAdrs As Excel.Range = Nothing
+        For Each address In margeAddresses
+            margeAdrs = Me.ExcelWorkSheet.Range(address)
+            margeAdrs.MergeCells = True
+            ExcelMemoryRelease(margeAdrs)
+        Next
         '******************************
         '日付の列拡張
         '******************************

@@ -34,6 +34,8 @@ Public Class OIM0005TankSearch
             '○ 各ボタン押下処理
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 Select Case WF_ButtonClick.Value
+                    Case "WF_ButtonKINOENE"             '甲子貨車マスタメンテボタン押下
+                        WF_ButtonKINOENE_Click()
                     Case "WF_ButtonDO"                  '検索ボタン押下
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
@@ -108,11 +110,28 @@ Public Class OIM0005TankSearch
             WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text   'JOT車番
             WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text             '型式
             WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
+        Else
+            '画面項目設定処理（甲子貨車マスタメンテ画面からの遷移）
+            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
+            WF_ORG.Text = work.WF_SEL_ORG.Text                      '組織コード
+            WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text   'JOT車番
+            WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text             '型式
+            WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
         End If
 
         'JOT車番・利用フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.WF_TANKNUMBER_CODE.Attributes("onkeyPress") = "CheckNum()"
         Me.WF_USEDFLG_CODE.Attributes("onkeyPress") = "CheckNum()"
+
+        '甲子貨車マスタメンテボタンは、関東支店、甲子営業所、石油部、情シスのみ表示
+        If Master.USER_ORG = "011401" OrElse
+           Master.USER_ORG = "011202" OrElse
+           Master.USER_ORG = "010007" OrElse
+           Master.USER_ORG = "010006" Then
+            WF_ButtonKINOENE.Visible = True
+        Else
+            WF_ButtonKINOENE.Visible = False
+        End If
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0005WRKINC.MAPIDS
@@ -139,6 +158,24 @@ Public Class OIM0005TankSearch
 
     End Sub
 
+    ''' <summary>
+    ''' 甲子貨車マスタメンテボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonKINOENE_Click()
+
+        ''○ 画面レイアウト設定（特殊処理のため、会社コード＋"1"(011）でVIEWを登録）
+        If Master.VIEWID = "" Then
+            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        End If
+
+        Master.CheckParmissionCode(WF_CAMPCODE.Text)
+        If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
+            '画面遷移（特殊処理のため、会社コード＋"1"(011）でVIEWを登録）
+            Master.TransitionPage(WF_CAMPCODE.Text & "1")
+        End If
+
+    End Sub
 
     ''' <summary>
     ''' 実行ボタン押下時処理

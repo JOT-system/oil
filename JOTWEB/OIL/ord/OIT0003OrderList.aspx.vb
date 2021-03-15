@@ -536,7 +536,7 @@ Public Class OIT0003OrderList
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
-            SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)
+            SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", Integer.Parse(work.WF_SEL_TRAINNUMBER.Text))
         End If
         '荷卸地(荷受人)
         If Not String.IsNullOrEmpty(work.WF_SEL_UNLOADINGCODE.Text) Then

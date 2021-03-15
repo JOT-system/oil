@@ -2470,8 +2470,8 @@ Public Class OIT0002LinkList
                         Dim sLinkNoBak1 As String = sLinkNo
                         Dim iLinkNoBak1 As Integer
                         sLinkNo = sLinkNoBak1.Substring(0, 9)
-                        iLinkNoBak1 = Integer.Parse(sLinkNoBak1.Substring(9, 2)) + 1
-                        sLinkNo &= iLinkNoBak1.ToString("00")
+                        iLinkNoBak1 = Integer.Parse(sLinkNoBak1.Substring(9, 3)) + 1
+                        sLinkNo &= iLinkNoBak1.ToString("000")
                     End If
 
                     Dim cvTruckSymbol As String = StrConv(TRUCKSYMBOL.Value, Microsoft.VisualBasic.VbStrConv.Wide, &H411)

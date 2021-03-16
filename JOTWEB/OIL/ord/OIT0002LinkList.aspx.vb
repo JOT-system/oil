@@ -2069,7 +2069,8 @@ Public Class OIT0002LinkList
                         '★アップロード対象の営業所(対象の駅)の場合は引き継ぐ必要ないのでSKIP
                         If Convert.ToString(OIT0002ExlUProw("TARGETSTATIONNAME")) = Convert.ToString(OIT0002ExlUProw("ARRSTATIONNAME")) Then Continue For
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
-                            If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") Then
+                            If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") _
+                                OrElse OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") Then
                                 OIT0002ExlUProw("OBJECTIVENAME") = OIT0002Exlrow("OBJECTIVENAME")
                                 OIT0002ExlUProw("DAILYREPORTCODE") = OIT0002Exlrow("DAILYREPORTCODE")
                                 OIT0002ExlUProw("DAILYREPORTOILNAME") = OIT0002Exlrow("DAILYREPORTOILNAME")
@@ -2283,6 +2284,7 @@ Public Class OIT0002LinkList
                 '発駅・着駅名(保存用)
                 Dim strDepstationName As String = ""
                 Dim strArrstationName As String = ""
+                Dim dtInspectionDate As Date
                 '### 内部テーブルに出線順の値を設定するための準備 ########################
                 Dim dcOutOrder As DataColumn = New DataColumn
                 Dim iTblTotal As Integer = OIT0002EXLUPtbl.Select("TRUCKSYMBOL<>''").Count
@@ -2333,7 +2335,12 @@ Public Class OIT0002LinkList
                     If OIT0002EXLUProw("INSPECTIONDATE") = "" Then
                         INSPECTIONDATE.Value = DBNull.Value
                     Else
-                        INSPECTIONDATE.Value = OIT0002EXLUProw("INSPECTIONDATE")
+                        Try
+                            dtInspectionDate = Date.Parse(OIT0002EXLUProw("INSPECTIONDATE"))
+                            INSPECTIONDATE.Value = OIT0002EXLUProw("INSPECTIONDATE")
+                        Catch ex As Exception
+                            INSPECTIONDATE.Value = DBNull.Value
+                        End Try
                     End If
                     '換算数量
                     If OIT0002EXLUProw("CONVERSIONAMOUNT") = "" Then

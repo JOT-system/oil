@@ -235,16 +235,16 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '    AndAlso PrintDatarow("OTTRANSPORTFLG").ToString() = "2" Then
                 '    rngDetailArea.Value = PrintDatarow("ARTICLE").ToString() + "JOT"
                 'End If
-                '◯ 交検日
-                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("INSPECTIONDATE")
-                ExcelMemoryRelease(rngDetailArea)
                 '### 20201021 START 指摘票対応(No189)全体 #############################################
                 '◯ 前回油種
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
                 ExcelMemoryRelease(rngDetailArea)
                 '### 20201021 START 指摘票対応(No189)全体 #############################################
+                '◯ 交検日
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("INSPECTIONDATE")
+                ExcelMemoryRelease(rngDetailArea)
 
                 '### 運　用　指　示 ###########################################
                 '### 20201111 START 指摘票対応(No190)全体 #####################

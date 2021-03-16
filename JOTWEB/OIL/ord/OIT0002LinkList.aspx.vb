@@ -1885,7 +1885,7 @@ Public Class OIT0002LinkList
                     '引数１：タンク車状態　⇒　変更なし
                     '引数２：積車区分　　　⇒　変更なし
                     '引数３：所在地　　　　⇒　変更あり(ポラリス(回送先(着駅)))※浮島町のはず
-                    '引数４：タンク車状況　⇒　変更あり("4"(回送中(全件)))
+                    '引数４：タンク車状況　⇒　変更あり("4"(回送中(全検)))
                     WW_UpdateTankShozai(Nothing, Nothing,
                                         I_TANKNO:=OIT0002ExlUProw("TRUCKNO"),
                                         I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),

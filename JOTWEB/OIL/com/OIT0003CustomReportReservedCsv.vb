@@ -109,6 +109,17 @@ Public Class OIT0003CustomReportReservedCsv : Implements System.IDisposable
                     End If
                     'フィールドの取得
                     Dim field As String = Convert.ToString(row(fieldName))
+                    If Me.OutputDef.OutputReservedConstantField Then
+                        Dim fieldLength As Integer = Me.OutputDef.OutputFiledList.Values(i)
+                        If Me.OutputDef.OutputFiledIsFront Then
+                            '前埋め
+                            field = Right(Space(fieldLength) & field, fieldLength)
+                        Else
+                            '後埋め
+                            field = Left(field & Space(fieldLength), fieldLength)
+                        End If
+                    End If
+
                     '"で囲む
                     If blnFrame = True Then
                         field = EncloseDoubleQuotesIfNeed(field)

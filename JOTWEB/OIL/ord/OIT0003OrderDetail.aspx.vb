@@ -1740,9 +1740,9 @@ Public Class OIT0003OrderDetail
                   " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
-            '### 20201201 START ソート順(根岸営業所)対応 ###################################################
             '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
             Select Case Me.TxtOrderOfficeCode.Text
+                    '### 20201201 START ソート順(根岸営業所)対応 ###################################################
                 Case BaseDllConst.CONST_OFFICECODE_011402
                     SQLStr &=
                           " ORDER BY" _
@@ -1758,6 +1758,7 @@ Public Class OIT0003OrderDetail
                         & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                         & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+                    '### 20201201 END   ソート順(根岸営業所)対応 ###################################################
 
                     '### 20201224 START 指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
                 Case BaseDllConst.CONST_OFFICECODE_012402
@@ -1774,7 +1775,6 @@ Public Class OIT0003OrderDetail
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                         & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
             End Select
-            '### 20201201 END   ソート順(根岸営業所)対応 ###################################################
             'SQLStr &=
             '      " ORDER BY" _
             '    & "    OIM0024.PRIORITYNO" _
@@ -2675,9 +2675,19 @@ Public Class OIT0003OrderDetail
                   " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
-        '### 20201201 START ソート順(根岸営業所)対応 ###################################################
         '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
         Select Case Me.TxtOrderOfficeCode.Text
+            Case BaseDllConst.CONST_OFFICECODE_010402
+                SQLStr &=
+                          " ORDER BY" _
+                        & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                        & " ,  OIT0003.SHIPPERSCODE" _
+                        & " ,  OIM0024.PRIORITYNO" _
+                        & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
+                        & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+                        & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+
+                '### 20201201 START ソート順(根岸営業所)対応 ###################################################
             Case BaseDllConst.CONST_OFFICECODE_011402
                 SQLStr &=
                           " ORDER BY" _
@@ -2693,6 +2703,7 @@ Public Class OIT0003OrderDetail
                         & " ,  CASE OIT0003.OILCODE WHEN '" + BaseDllConst.CONST_ATank + "' THEN 1 ELSE 2 END" _
                         & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)"
+                '### 20201201 END   ソート順(根岸営業所)対応 ###################################################
 
                 '### 20201224 START 指摘票対応(No283)全体　ソート順(三重塩浜営業所)対応 ########################
             Case BaseDllConst.CONST_OFFICECODE_012402
@@ -2710,7 +2721,6 @@ Public Class OIT0003OrderDetail
                         & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                         & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
         End Select
-        '### 20201201 END   ソート順(根岸営業所)対応 ###################################################
         'SQLStr &=
         '      " ORDER BY" _
         '    & "    OIM0024.PRIORITYNO" _

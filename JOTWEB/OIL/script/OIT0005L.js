@@ -123,8 +123,8 @@ function ChangeCheckBox() {
     }
 
     // 留置フラグ
-    var chkObjsLight8 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaALLINDWELLINGFLG']");
-    var spnObjsLight8 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaALLINDWELLINGFLG']");
+    var chkObjsLight8 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINDWELLINGFLG']");
+    var spnObjsLight8 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINDWELLINGFLG']");
 
     for (let i = 0; i < chkObjsLight8.length; i++) {
 

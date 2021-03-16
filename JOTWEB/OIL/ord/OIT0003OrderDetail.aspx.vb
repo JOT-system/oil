@@ -1742,6 +1742,16 @@ Public Class OIT0003OrderDetail
 
             '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
             Select Case Me.TxtOrderOfficeCode.Text
+                Case BaseDllConst.CONST_OFFICECODE_010402
+                    SQLStr &=
+                          " ORDER BY" _
+                        & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                        & " ,  OIT0003.SHIPPERSCODE" _
+                        & " ,  OIM0024.PRIORITYNO" _
+                        & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
+                        & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+                        & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+
                     '### 20201201 START ソート順(根岸営業所)対応 ###################################################
                 Case BaseDllConst.CONST_OFFICECODE_011402
                     SQLStr &=

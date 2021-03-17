@@ -1892,7 +1892,7 @@ Public Class OIT0005TankLocList
                     If chkObjMC IsNot Nothing _
                         AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 Then
 
-                        '修理フラグ(チェックボックス)を非活性
+                        'ＭＣフラグ(チェックボックス)を非活性
                         chkObjMC.Enabled = False
                         Exit For
                     End If
@@ -1905,7 +1905,7 @@ Public Class OIT0005TankLocList
                     'コントロールが見つかったら脱出
                     If chkObjINS IsNot Nothing _
                         AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 Then
-                        '修理フラグ(チェックボックス)を非活性
+                        '交検フラグ(チェックボックス)を非活性
                         chkObjINS.Enabled = False
                         Exit For
                     End If
@@ -1918,7 +1918,7 @@ Public Class OIT0005TankLocList
                     'コントロールが見つかったら脱出
                     If chkObjAINS IsNot Nothing _
                         AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 Then
-                        '修理フラグ(チェックボックス)を非活性
+                        '全検フラグ(チェックボックス)を非活性
                         chkObjAINS.Enabled = False
                         Exit For
                     End If
@@ -1931,7 +1931,7 @@ Public Class OIT0005TankLocList
                     'コントロールが見つかったら脱出
                     If chkObjIND IsNot Nothing _
                         AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 Then
-                        '修理フラグ(チェックボックス)を非活性
+                        '留置フラグ(チェックボックス)を非活性
                         chkObjIND.Enabled = False
                         Exit For
                     End If
@@ -1944,7 +1944,7 @@ Public Class OIT0005TankLocList
                     'コントロールが見つかったら脱出
                     If chkObjMV IsNot Nothing _
                         AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_08 Then
-                        '修理フラグ(チェックボックス)を非活性
+                        '移動フラグ(チェックボックス)を非活性
                         chkObjMV.Enabled = False
                         Exit For
                     End If

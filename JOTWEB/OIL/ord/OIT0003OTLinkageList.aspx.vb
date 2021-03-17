@@ -2042,9 +2042,9 @@ Public Class OIT0003OTLinkageList
                     newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
                     newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)
-                    newDr("着専用線コード") = ""
-                    newDr("予備１") = ""
-                    newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString()
+                    newDr("着専用線コード") = "".PadRight(2, " "c)
+                    newDr("予備１") = "".PadRight(1, " "c)
+                    newDr("荷主コード") = wrkDr("SHIPPERCODE").ToString().PadRight(5, " "c)
                     Dim shipperCode As String = ""
                     Select Case wrkDr("TRAINCLASS").ToString()
                         Case "J"
@@ -2052,8 +2052,8 @@ Public Class OIT0003OTLinkageList
                         Case "O"
                             shipperCode = "2"
                     End Select
-                    newDr("荷受人コード（外部コード）") = shipperCode
-                    newDr("荷受人コード") = shipperCode
+                    newDr("荷受人コード（外部コード）") = shipperCode.PadRight(5, " "c)
+                    newDr("荷受人コード") = shipperCode.PadRight(5, " "c)
                     Dim arrShipperCode As String = ""
                     Select Case wrkDr("CONSIGNEECODE").ToString()
                         Case BaseDllConst.CONST_CONSIGNEECODE_40
@@ -2069,8 +2069,8 @@ Public Class OIT0003OTLinkageList
                         Case Else
                             arrShipperCode = "1"
                     End Select
-                    newDr("着荷主コード") = arrShipperCode
-                    newDr("着受託人コード") = arrShipperCode
+                    newDr("着荷主コード") = arrShipperCode.PadRight(5, " "c)
+                    newDr("着受託人コード") = arrShipperCode.PadRight(5, " "c)
                     newDr("品目コード") = wrkDr("OILCODE").ToString()
                     Dim tankType As String = ""
                     If wrkDr("TANKMODEL").ToString() = "タキ1000" Then
@@ -2078,17 +2078,17 @@ Public Class OIT0003OTLinkageList
                     Else
                         tankType = "4"
                     End If
-                    newDr("車種コード") = tankType
+                    newDr("車種コード") = tankType.PadLeft(2, "0"c).PadRight(3, " "c)
                     newDr("車番") = wrkDr("TANKNO").ToString()
                     newDr("本線列車番号") = wrkDr("TRAINNO").ToString()
-                    newDr("予備2") = ""
-                    newDr("予備3") = ""
-                    newDr("予備4") = ""
-                    newDr("予備5") = ""
-                    newDr("予備6") = ""
-                    newDr("予備7") = ""
-                    newDr("予備8") = ""
-                    newDr("予備9") = ""
+                    newDr("予備2") = "".PadRight(5, " "c)
+                    newDr("予備3") = "".PadRight(1, " "c)
+                    newDr("予備4") = "".PadRight(1, " "c)
+                    newDr("予備5") = "".PadRight(6, " "c)
+                    newDr("予備6") = "".PadRight(8, " "c)
+                    newDr("予備7") = "".PadRight(8, " "c)
+                    newDr("予備8") = "".PadRight(4, " "c)
+                    newDr("予備9") = "".PadRight(2, " "c)
                     Dim tsumiKaisen As String = ""
                     Dim tsumiBansen As String = ""
                     Dim tsumiPoint As String = ""
@@ -2118,12 +2118,12 @@ Public Class OIT0003OTLinkageList
                                 tsumiPoint = Strings.Right(wrkDr("FILLINGPOINT").ToString(), 1)
                             End If
                     End Select
-                    newDr("積込回線") = tsumiKaisen
-                    newDr("積込番線") = tsumiBansen
-                    newDr("積込ポイント") = tsumiPoint
-                    newDr("予備10") = ""
-                    newDr("予備11") = ""
-                    newDr("予備12") = ""
+                    newDr("積込回線") = tsumiKaisen.PadRight(2, " "c)
+                    newDr("積込番線") = tsumiBansen.PadRight(2, " "c)
+                    newDr("積込ポイント") = tsumiPoint.PadRight(2, " "c)
+                    newDr("予備10") = "".PadRight(8, " "c)
+                    newDr("予備11") = "".PadRight(4, " "c)
+                    newDr("予備12") = "".PadRight(2, " "c)
                     Dim strGyoNo As String = ""
                     If wrkDr("GYONO").ToString() = "" Then
                         gyoNo += 1
@@ -2132,7 +2132,7 @@ Public Class OIT0003OTLinkageList
                         strGyoNo = wrkDr("GYONO").ToString()
                     End If
                     newDr("絶対行番号") = wrkDr("LODDATE").ToString() & strGyoNo
-                    newDr("備考") = ""
+                    newDr("備考") = "".PadRight(14, " "c)
 
                     OIT0003Takusoutbl.Rows.Add(newDr)
                     Dim orderInf As OutputOrdedrInfo = New OutputOrdedrInfo(Convert.ToString(wrkDr("ORDERNO")), Convert.ToString(wrkDr("DETAILNO")))

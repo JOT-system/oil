@@ -7275,7 +7275,7 @@ Public Class OIT0003OrderList
             & "   , OIM0007.ARRSTATION AS ARRSTATION " _
             & "   , OIT0003.OILCODE AS OILCODE " _
             & "   , OIT0003.ORDERINGTYPE AS ORDERINGTYPE " _
-            & "   , ISNULL(OIT0003.CARSAMOUNT*100, '00000') AS CARSAMOUNT " _
+            & "   , FORMAT(ISNULL(CARSAMOUNT*1000, '00000'),'00000') AS CARSAMOUNT " _
             & "   , ISNULL(OIM0005.MODEL, '') AS MODEL " _
             & "   , ISNULL(OIM0005.TANKNUMBER, '') AS TANKNUMBER " _
             & "   , '' AS TANKNO " _

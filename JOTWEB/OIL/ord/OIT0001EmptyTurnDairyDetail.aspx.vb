@@ -8267,6 +8267,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                                 '交検可否フラグ(チェックボックス)を非活性
                                 chkObjIN.Enabled = False
                                 Exit For
+                                '★受注営業所が"010402"(仙台新港営業所)、かつ積置の場合
+                            ElseIf work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 _
+                                   AndAlso loopdr("STACKINGFLG") = "on" Then
+                                '交検可否フラグ(チェックボックス)を非活性
+                                chkObjIN.Enabled = False
+                                Exit For
                             End If
                         End If
                     Next

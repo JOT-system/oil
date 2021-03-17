@@ -1726,23 +1726,23 @@ Public Class OIT0003OTLinkageList
                     'OIT0003row("OTDAILYSHIPPERN") = setSPACE.PadLeft(8).Replace("  ", "　")
                     'OIT0003row("OTOILNAME") = setSPACE.PadLeft(12).Replace("  ", "　")
 
-                    ''OT油種名を半角カナで設定(暫定)
-                    'Select Case Convert.ToString(OIT0003row("OTOILCODE"))
-                    '    Case BaseDllConst.CONST_OTHTank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(0).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTRTank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(1).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTTTank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(2).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTKTank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(3).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTK3Tank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(4).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTLTank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(5).PadLeft(12)
-                    '    Case BaseDllConst.CONST_OTATank
-                    '        OIT0003row("OTOILNAME") = OTOilNameKana(6).PadLeft(12)
-                    'End Select
+                    'OT油種名を半角カナで設定(暫定)
+                    Select Case Convert.ToString(OIT0003row("OTOILCODE"))
+                        Case BaseDllConst.CONST_OTHTank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(0).PadLeft(12)
+                        Case BaseDllConst.CONST_OTRTank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(1).PadLeft(12)
+                        Case BaseDllConst.CONST_OTTTank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(2).PadLeft(12)
+                        Case BaseDllConst.CONST_OTKTank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(3).PadLeft(12)
+                        Case BaseDllConst.CONST_OTK3Tank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(4).PadLeft(12)
+                        Case BaseDllConst.CONST_OTLTank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(5).PadLeft(12)
+                        Case BaseDllConst.CONST_OTATank
+                            OIT0003row("OTOILNAME") = OTOilNameKana(6).PadLeft(12)
+                    End Select
 
                 Next
 
@@ -2223,7 +2223,8 @@ Public Class OIT0003OTLinkageList
         'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
         'sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
         sqlStat.AppendLine("     , TNK.JXTGTANKNUMBER4 AS NEG_KASHANO")
-        sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
+        'sqlStat.AppendLine("     , convert(int,PRD.SHIPPEROILCODE) AS NEG_SHIPPEROILCODE")
+        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE + ' ' AS NEG_SHIPPEROILCODE")
         sqlStat.AppendLine("     , '0'          AS NEG_SETTEI_NUM")
         sqlStat.AppendLine("     , '0'          AS NEG_ARM_CODE")
         sqlStat.AppendLine("     , '0'          AS NEG_TSUMI_NUM")
@@ -3230,22 +3231,24 @@ Public Class OIT0003OTLinkageList
                     "011402", True, True, False, False
                     )
                 outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_KAI", 0)
-                outFieldList.Add("TRAINNO_PAD_ZERO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_POINT", 0)
-                outFieldList.Add("NEG_KASHANO", 0)
-                outFieldList.Add("NEG_SHIPPEROILCODE", 0)
-                outFieldList.Add("NEG_SETTEI_NUM", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("NEG_ARM_CODE", 0)
-                outFieldList.Add("NEG_TSUMI_NUM", 0)
+                outFieldList.Add("LODDATE_WITHOUT_SLASH", 8)
+                outFieldList.Add("OUTPUTRESERVENO", 3)
+                outFieldList.Add("NEG_TUMIKOMI_KAI", 2)
+                outFieldList.Add("TRAINNO_PAD_ZERO", 4)
+                outFieldList.Add("NEG_TUMIKOMI_POINT", 3)
+                outFieldList.Add("NEG_KASHANO", 8)
+                outFieldList.Add("NEG_SHIPPEROILCODE", 6)
+                outFieldList.Add("NEG_SETTEI_NUM", 6)
+                outFieldList.Add("CONSIGNEECONVCODE", 2)
+                outFieldList.Add("NEG_ARM_CODE", 1)
+                outFieldList.Add("NEG_TSUMI_NUM", 6)
                 fileLinkageItem.OutputFiledList = outFieldList
-                fileLinkageItem.OutputReservedConstantField = False
+                'fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedConstantField = True
+                fileLinkageItem.OutputFiledIsFront = True
                 fileLinkageItem.OutputReservedFileNameWithoutExtention = "YOYAKU"
                 fileLinkageItem.OutputReservedFileExtention = "CSV"
-                fileLinkageItem.OutputReservedCustomOutputFiledHeader = "積込日,予約番号,積込回線,列車番号,積込ポイント,貨車番号,油種コード,設定数量,向先コード,アーム番号,積込数量"
+                'fileLinkageItem.OutputReservedCustomOutputFiledHeader = "積込日,予約番号,積込回線,列車番号,積込ポイント,貨車番号,油種コード,設定数量,向先コード,アーム番号,積込数量"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '四日市営業所
@@ -3398,6 +3401,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property OutputFiledList As Dictionary(Of String, Integer)
+        ''' <summary>
+        ''' 固定長先頭スペース埋め
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutputFiledIsFront As Boolean = False
         ''' <summary>
         ''' シーケンスファイル出力の実績要求ファイルのフィールドリスト（フィールド名、固定長用フィールドサイズ）
         ''' </summary>

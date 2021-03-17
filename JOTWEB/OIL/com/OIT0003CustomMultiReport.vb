@@ -549,7 +549,7 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
                 '積載実数量
                 rngDetailArea = ExcelWorkSheet.Range("C" + r.index.ToString())
-                rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString("#,##0")
+                rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString("####0")
                 ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号

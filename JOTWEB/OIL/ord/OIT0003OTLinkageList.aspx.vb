@@ -683,7 +683,7 @@ Public Class OIT0003OTLinkageList
         '******************************
         'CSV作成処理の実行
         '******************************
-        Dim OTFileName As String = SetCSVFileName()
+        Dim OTFileName As String = SetCSVFileName(work.WF_SEL_OTS_SALESOFFICECODE.Text)
         Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl,
                                      I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
                                      I_FileName:=OTFileName,
@@ -1307,7 +1307,7 @@ Public Class OIT0003OTLinkageList
     ''' 受注履歴テーブル用の履歴番号取得
     ''' </summary>
     ''' <returns>履歴番号</returns>
-    Private Function GetNewOrderHistoryNo(ByVal sqlCon As SqlConnection, sqlTran As SqlTransaction) As String
+    Public Function GetNewOrderHistoryNo(ByVal sqlCon As SqlConnection, sqlTran As SqlTransaction) As String
         Dim retVal As String = ""
         Try
             Dim sqlStr As New StringBuilder
@@ -1355,7 +1355,10 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Function OTLinkageDataGet(ByVal SQLcon As SqlConnection) As List(Of OutputOrdedrInfo)
+    Public Function OTLinkageDataGet(ByVal SQLcon As SqlConnection,
+                                     Optional ByVal I_MASTERSTS() As String = Nothing,
+                                     Optional ByVal I_ORDERNO As String = Nothing,
+                                     Optional ByRef I_OIT0003CsvOTLinkage As DataTable = Nothing) As List(Of OutputOrdedrInfo)
         Dim retVal As New List(Of OutputOrdedrInfo)
         If IsNothing(OIT0003CsvOTLinkagetbl) Then
             OIT0003CsvOTLinkagetbl = New DataTable
@@ -1536,16 +1539,22 @@ Public Class OIT0003OTLinkageList
 
         '一覧で指定された受注№を条件に設定
         Dim j As Integer = 0
-        Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
-        For Each OIT0003row As DataRow In checkedRow.Rows
+        Dim checkedRow As DataTable
+        'Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+        If IsNothing(I_ORDERNO) Then
+            checkedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+            For Each OIT0003row As DataRow In checkedRow.Rows
 
-            If j = 0 Then
-                SQLStrCmn &= "'" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
-            Else
-                SQLStrCmn &= ", '" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
-            End If
-            j += 1
-        Next
+                If j = 0 Then
+                    SQLStrCmn &= "'" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
+                Else
+                    SQLStrCmn &= ", '" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
+                End If
+                j += 1
+            Next
+        Else
+            SQLStrCmn &= "'" & I_ORDERNO & "' "
+        End If
         SQLStrCmn &= ")"
 
         '★積置フラグ無し用SQL
@@ -1615,26 +1624,35 @@ Public Class OIT0003OTLinkageList
                     End If
                 Next
 
-                Dim i As Integer = 0
-                Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
-                For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
-                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) 'AndAlso
-                    'Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
-                    If qHasSelectedRow.Any Then
-                        Dim newDr As DataRow = OIT0003CsvOTLinkagetbl.NewRow
-                        For Each col As DataColumn In wrkDt.Columns
-                            If Not {"ORDERNO", "DETAILNO"}.Contains(col.ColumnName) Then
-                                newDr(col.ColumnName) = sortedDr(col.ColumnName)
-                            End If
-                        Next
+                If IsNothing(I_ORDERNO) Then
+                    Dim i As Integer = 0
+                    Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
+                    For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
+                        Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) 'AndAlso
+                        'Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
+                        If qHasSelectedRow.Any Then
+                            Dim newDr As DataRow = OIT0003CsvOTLinkagetbl.NewRow
+                            For Each col As DataColumn In wrkDt.Columns
+                                If Not {"ORDERNO", "DETAILNO"}.Contains(col.ColumnName) Then
+                                    newDr(col.ColumnName) = sortedDr(col.ColumnName)
+                                End If
+                            Next
 
-                        OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
-                        retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
-                    End If
-                    'i += 1
-                    'OIT0003Csvrow("LINECNT") = i        'LINECNT
+                            OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
+                            retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+                        End If
+                        'i += 1
+                        'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
-                Next
+                    Next
+                Else
+                    OIT0003CsvOTLinkagetbl = wrkDt.Copy()
+                    For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                        retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
+                        OIT0003row("ORDERNO") = ""
+                        OIT0003row("DETAILNO") = ""
+                    Next
+                End If
 
                 '○項目の再設定
                 Dim setSPACE As String = ""
@@ -1690,15 +1708,29 @@ Public Class OIT0003OTLinkageList
                 Using tran = SQLcon.BeginTransaction
                     For Each hisDtrow As DataRow In hisDt.Rows
                         hisDtrow("HISTORYNO") = WW_GetHistoryNo(0)
-                        hisDtrow("MAPID") = Master.MAPID
+                        Try
+                            hisDtrow("MAPID") = Master.MAPID
+                        Catch ex As Exception
+                            hisDtrow("MAPID") = I_MASTERSTS(0)
+                        End Try
                         hisDtrow("DATESENDYMD") = WW_DATENOW
                         hisDtrow("DELFLG") = C_DELETE_FLG.ALIVE
                         hisDtrow("INITYMD") = WW_DATENOW
-                        hisDtrow("INITUSER") = Master.USERID
-                        hisDtrow("INITTERMID") = Master.USERTERMID
+                        Try
+                            hisDtrow("INITUSER") = Master.USERID
+                            hisDtrow("INITTERMID") = Master.USERTERMID
+                        Catch ex As Exception
+                            hisDtrow("INITUSER") = I_MASTERSTS(1)
+                            hisDtrow("INITTERMID") = I_MASTERSTS(2)
+                        End Try
                         hisDtrow("UPDYMD") = WW_DATENOW
-                        hisDtrow("UPDUSER") = Master.USERID
-                        hisDtrow("UPDTERMID") = Master.USERTERMID
+                        Try
+                            hisDtrow("UPDUSER") = Master.USERID
+                            hisDtrow("UPDTERMID") = Master.USERTERMID
+                        Catch ex As Exception
+                            hisDtrow("UPDUSER") = I_MASTERSTS(1)
+                            hisDtrow("UPDTERMID") = I_MASTERSTS(2)
+                        End Try
                         hisDtrow("RECEIVEYMD") = C_DEFAULT_YMD
                         EntryHistory.InsertOTShipSendHistory(SQLcon, tran, hisDtrow)
                     Next
@@ -1748,6 +1780,8 @@ Public Class OIT0003OTLinkageList
 
             End Using
 
+            If Not IsNothing(I_ORDERNO) Then I_OIT0003CsvOTLinkage = OIT0003CsvOTLinkagetbl.Copy
+
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL CSV_DATAGET")
 
@@ -1763,8 +1797,6 @@ Public Class OIT0003OTLinkageList
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003CsvOTLinkagetbl)
 
-        '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         Return retVal
     End Function
     ''' <summary>
@@ -2484,7 +2516,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="callerButton">呼出し元ボタン</param>
     ''' <param name="sqlCon">SQL接続</param>
     ''' <param name="sqlTran">トランザクション</param>
-    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False, Optional updateGyoNo As Boolean = False) As Boolean
+    Public Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False, Optional updateGyoNo As Boolean = False) As Boolean
         Try
 
             Dim sqlStat As StringBuilder
@@ -2569,7 +2601,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="sqlCon">SQLコネクション</param>
     ''' <param name="sqlTran">トランザクションオブジェクト</param>
     ''' <returns>ORDER番号とフラグ値のディクショナリ※nothing:エラー発生時</returns>
-    Private Function GetOutputFlag(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction) As Dictionary(Of String, String)
+    Public Function GetOutputFlag(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction) As Dictionary(Of String, String)
         Try
             '更新したオーダー番号をユニークにする
             Dim orderNoList = (From itm In uploadOrderInfo Group By g = itm.OrderNo Into Group Select g).ToList
@@ -2670,7 +2702,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="sqlTran">トランザクションオブジェクト</param>
     ''' <param name="procDate">処理日、※未指定日処理実行時点の日時</param>
     ''' <returns>処理結果：True:正常、False：異常</returns>
-    Private Function UpdateOrderOutputFlag(orderOutputFlags As Dictionary(Of String, String), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
+    Public Function UpdateOrderOutputFlag(orderOutputFlags As Dictionary(Of String, String), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
         Try
             Dim sqlStat As StringBuilder
             If procDate = #1900/1/1# Then
@@ -2740,7 +2772,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrderDetail(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Public Function GetUpdatedOrderDetail(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder
@@ -2795,7 +2827,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Public Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder
@@ -2836,7 +2868,7 @@ Public Class OIT0003OTLinkageList
     ''' 履歴テーブル用の情報を付与したデータテーブルに変換
     ''' </summary>
     ''' <returns></returns>
-    Private Function ModifiedHistoryDatatable(dt As DataTable, historyNo As String) As DataTable
+    Public Function ModifiedHistoryDatatable(dt As DataTable, historyNo As String) As DataTable
         Dim retDt As DataTable = dt.Clone
         '履歴とMAPIDの付与
         retDt.Columns.Add("HISTORYNO", GetType(String)).DefaultValue = historyNo
@@ -2856,7 +2888,7 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <param name="journalDt"></param>
     ''' <returns></returns>
-    Private Function OutputJournal(journalDt As DataTable, tabName As String) As Boolean
+    Public Function OutputJournal(journalDt As DataTable, tabName As String) As Boolean
         For Each dr As DataRow In journalDt.Rows
             CS0020JOURNAL.TABLENM = tabName
             CS0020JOURNAL.ACTION = "UPDATE"
@@ -3079,10 +3111,10 @@ Public Class OIT0003OTLinkageList
     ''' CSVファイル名取得
     ''' </summary>
     ''' <returns></returns>
-    Private Function SetCSVFileName() As String
+    Public Function SetCSVFileName(ByVal I_OFFICECODE As String) As String
         Dim fileName As String = ""
 
-        Select Case work.WF_SEL_OTS_SALESOFFICECODE.Text
+        Select Case I_OFFICECODE
             '★仙台新港営業所, 四日市営業所
             Case BaseDllConst.CONST_OFFICECODE_010402,
                  BaseDllConst.CONST_OFFICECODE_012401

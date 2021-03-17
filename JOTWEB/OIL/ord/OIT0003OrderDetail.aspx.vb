@@ -34,6 +34,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル(受注明細履歴)
     Private OIT0003Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0003ReportDeliverytbl As DataTable                   '帳票用(託送指示)テーブル
+    Private OIT0003ReportOTLinkagetbl As DataTable                  '帳票用(OT発送日報)テーブル
     'Private OIT0003FIDtbl_tab1 As DataTable                         '検索用テーブル(タブ１用)
     'Private OIT0003FIDtbl_tab2 As DataTable                         '検索用テーブル(タブ２用)
     Private OIT0003FIDtbl_tab3 As DataTable                         '検索用1テーブル(タブ３用)
@@ -147,6 +148,8 @@ Public Class OIT0003OrderDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDetailDownload"
                             WF_ButtonDetailDownload_Click()
+                        Case "WF_ButtonOTLINKAGE"
+                            WF_ButtonOTLINKAGE_Click()
                         Case "WF_ButtonCORRECTIONDATE",
                              "WF_ButtonCORRECTION_TAB3"       '実績日訂正ボタン押下
                             WF_ButtonCORRECTIONDATE_Click(WF_ButtonClick.Value)
@@ -6967,6 +6970,114 @@ Public Class OIT0003OrderDetail
 
     End Sub
 #End Region
+
+    ''' <summary>
+    ''' OT発送日報送信ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOTLINKAGE_Click()
+        Dim otLinkage As New OIT0003OTLinkageList
+        Dim selectedOrderInfo As New List(Of OIT0003OTLinkageList.OutputOrdedrInfo)
+
+        Dim otMasterSts() As String = {Master.MAPID, Master.USERID, Master.USERTERMID}
+        If IsNothing(OIT0003ReportOTLinkagetbl) Then
+            OIT0003ReportOTLinkagetbl = New DataTable
+        End If
+
+        If OIT0003ReportOTLinkagetbl.Columns.Count <> 0 Then
+            OIT0003ReportOTLinkagetbl.Columns.Clear()
+        End If
+        OIT0003ReportOTLinkagetbl.Clear()
+
+        '******************************
+        'OT発送日報データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            selectedOrderInfo = otLinkage.OTLinkageDataGet(SQLcon,
+                                       I_MASTERSTS:=otMasterSts,
+                                       I_ORDERNO:=Me.TxtOrderNo.Text,
+                                       I_OIT0003CsvOTLinkage:=OIT0003ReportOTLinkagetbl)
+        End Using
+
+        '******************************
+        'CSV作成処理の実行
+        '******************************
+        Dim OTFileName As String = otLinkage.SetCSVFileName(Me.TxtOrderOfficeCode.Text)
+        Using repCbj = New CsvCreate(OIT0003ReportOTLinkagetbl,
+                                     I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
+                                     I_FileName:=OTFileName,
+                                     I_Enc:="EBCDIC")
+            'I_Enc:="UTF8N")
+            'I_Enc:="EBCDIC")
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False, blnNewline:=False)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        '******************************
+        'OT発送日報データの（本体）ダウンロードフラグ更新
+        '                  （明細）ダウンロード数インクリメント
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = otLinkage.IncrementDetailOutputCount(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = otLinkage.GetOutputFlag(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = otLinkage.UpdateOrderOutputFlag(orderDlFlags, "WF_ButtonOtSend", SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = otLinkage.GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = otLinkage.GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = otLinkage.GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = otLinkage.ModifiedHistoryDatatable(orderTbl, historyNo)
+                    Dim hisDetailTbl As DataTable = otLinkage.ModifiedHistoryDatatable(detailTbl, historyNo)
+
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    otLinkage.OutputJournal(orderTbl, "OIT0002_ORDER")
+                    otLinkage.OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
+    End Sub
 
 #Region "実績日訂正"
     ''' <summary>

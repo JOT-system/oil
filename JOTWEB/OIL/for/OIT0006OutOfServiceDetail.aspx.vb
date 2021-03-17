@@ -660,6 +660,8 @@ Public Class OIT0006OutOfServiceDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS DEPSTATION" _
             & " , ''                                             AS DEPSTATIONNAME" _
+            & " , ''                                             AS TGHSTATION" _
+            & " , ''                                             AS TGHSTATIONNAME" _
             & " , ''                                             AS ARRSTATION" _
             & " , ''                                             AS ARRSTATIONNAME" _
             & " , ''                                             AS ACTUALDEPDATE" _
@@ -730,6 +732,8 @@ Public Class OIT0006OutOfServiceDetail
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
                 & " , ISNULL(RTRIM(OIT0007.DEPSTATION), '')                         AS DEPSTATION" _
                 & " , ISNULL(RTRIM(OIT0007.DEPSTATIONNAME), '')                     AS DEPSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0007.TGHSTATION), '')                         AS TGHSTATION" _
+                & " , ISNULL(RTRIM(OIT0007.TGHSTATIONNAME), '')                     AS TGHSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0007.ARRSTATION), '')                         AS ARRSTATION" _
                 & " , ISNULL(RTRIM(OIT0007.ARRSTATIONNAME), '')                     AS ARRSTATIONNAME" _
                 & " , ISNULL(FORMAT(OIT0007.ACTUALDEPDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALDEPDATE" _
@@ -1147,6 +1151,8 @@ Public Class OIT0006OutOfServiceDetail
                 OIT0006row("KAISOUTYPENAME") = OIT0006GETrow("PATNAME")
                 OIT0006row("DEPSTATION") = OIT0006GETrow("DEPSTATION")
                 OIT0006row("DEPSTATIONNAME") = OIT0006GETrow("DEPSTATIONNAME")
+                OIT0006row("TGHSTATION") = OIT0006GETrow("TGHSTATION")
+                OIT0006row("TGHSTATIONNAME") = OIT0006GETrow("TGHSTATIONNAME")
                 OIT0006row("ARRSTATION") = OIT0006GETrow("ARRSTATION")
                 OIT0006row("ARRSTATIONNAME") = OIT0006GETrow("ARRSTATIONNAME")
                 Try
@@ -1925,6 +1931,8 @@ Public Class OIT0006OutOfServiceDetail
                                 updHeader.Item("KAISOUTYPENAME") = OIT0006GETrow("PATNAME")
                                 updHeader.Item("DEPSTATION") = OIT0006GETrow("DEPSTATION")
                                 updHeader.Item("DEPSTATIONNAME") = OIT0006GETrow("DEPSTATIONNAME")
+                                updHeader.Item("TGHSTATION") = OIT0006GETrow("TGHSTATION")
+                                updHeader.Item("TGHSTATIONNAME") = OIT0006GETrow("TGHSTATIONNAME")
                                 updHeader.Item("ARRSTATION") = OIT0006GETrow("ARRSTATION")
                                 updHeader.Item("ARRSTATIONNAME") = OIT0006GETrow("ARRSTATIONNAME")
                                 Try
@@ -2424,6 +2432,8 @@ Public Class OIT0006OutOfServiceDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS DEPSTATION" _
             & " , ''                                             AS DEPSTATIONNAME" _
+            & " , ''                                             AS TGHSTATION" _
+            & " , ''                                             AS TGHSTATIONNAME" _
             & " , ''                                             AS ARRSTATION" _
             & " , ''                                             AS ARRSTATIONNAME" _
             & " , ''                                             AS ACTUALDEPDATE" _
@@ -5044,6 +5054,11 @@ Public Class OIT0006OutOfServiceDetail
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim iresult As Integer
 
+        '★新規登録時は、回送営業所のみチェックし処理を抜ける
+        '　※割当更新(一時更新)の場合も後続チェック不要
+        If work.WF_SEL_CREATEFLG.Text = "1" _
+            AndAlso (Me.WW_UPBUTTONFLG = "0" OrElse Me.WW_UPBUTTONFLG = "1") Then Exit Sub
+
         '○ (一覧)過去日付チェック
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
             '例) iresult = dt1.Date.CompareTo(dt2.Date)
@@ -7282,6 +7297,8 @@ Public Class OIT0006OutOfServiceDetail
             & " , OIM0029.VALUE07                 AS DEPDAYS" _
             & " , OIM0029.VALUE08                 AS ARRDAYS" _
             & " , OIM0029.VALUE09                 AS DEPSTATIONRTNDAYS" _
+            & " , OIM0029.VALUE10                 AS TGHSTATION" _
+            & " , OIM0029.VALUE11                 AS TGHSTATIONNAME" _
             & " FROM OIL.OIM0029_CONVERT OIM0029 " _
             & " WHERE OIM0029.CLASS = 'KAISOU_PATTERNMASTER' "
         '& " AND OIM0029.KEYCODE04 = 'def' "

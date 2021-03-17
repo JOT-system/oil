@@ -1445,7 +1445,7 @@ Public Structure CS0023XLSUPLOAD
                 rng = oSheet.Range("H" + jStart.ToString())
                 dt.Rows(i)("ARTICLE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
-                rng = oSheet.Range("I" + jStart.ToString())
+                rng = oSheet.Range("J" + jStart.ToString())
                 dt.Rows(i)("INSPECTIONDATE") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
 

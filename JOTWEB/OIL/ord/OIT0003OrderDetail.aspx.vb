@@ -17245,10 +17245,23 @@ Public Class OIT0003OrderDetail
         Dim OIT0003tbltab3_dv As DataView = New DataView(OIT0003tbltab3_DUMMY)
         Dim chkShipOrder As String = ""
 
+        '### 20210318 START 五井営業所独自対応 ################################################
+        '★五井営業所対応
+        '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+        '　そのため同一日で設定された場合は入力を可能とするため同時にチェックも実施する。
+        Dim blnGoiTrainflg As Boolean = False
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+           AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                    OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+           AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+            blnGoiTrainflg = True
+        End If
+        '### 20210318 END   五井営業所独自対応 ################################################
+
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
         WW_SHIPORDER = "0"
-        If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+        If work.WF_SEL_SHIPORDERCLASS.Text = "1" OrElse blnGoiTrainflg = True Then
             '発送順でソートし、重複がないかチェックする。
             OIT0003tbltab3_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbltab3_dv
@@ -17285,7 +17298,7 @@ Public Class OIT0003OrderDetail
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
             '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
             '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
-            If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+            If work.WF_SEL_SHIPORDERCLASS.Text = "1" OrElse blnGoiTrainflg = True Then
                 '(一覧)発送順(空白チェック)
                 If OIT0003tab3row("SHIPORDER") = "" And OIT0003tab3row("DELFLG") = "0" Then
                     Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
@@ -22415,8 +22428,20 @@ Public Class OIT0003OrderDetail
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-
+                                '### 20210318 START 五井営業所独自対応 ################################################
+                                'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★五井営業所対応
+                                '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                    '### 制約なし #####################################################
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                                '### 20210318 END   五井営業所独自対応 ################################################
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") Then
                                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
@@ -22537,7 +22562,20 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                     AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    '### 20210318 START 五井営業所独自対応 ################################################
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    '★五井営業所対応
+                                    '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                    '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                        '### 制約なし #####################################################
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    End If
+                                    '### 20210318 END   五井営業所独自対応 ################################################
                                 End If
                             End If
                             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
@@ -22550,7 +22588,20 @@ Public Class OIT0003OrderDetail
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '### 20210318 START 五井営業所独自対応 ################################################
+                                'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★五井営業所対応
+                                '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                    '### 制約なし #####################################################
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                                '### 20210318 END   五井営業所独自対応 ################################################
 
                                 '### 20200622 START((全体)No82対応) ######################################
                                 '★発送順

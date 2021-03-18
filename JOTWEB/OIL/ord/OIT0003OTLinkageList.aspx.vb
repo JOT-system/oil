@@ -2516,7 +2516,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="callerButton">呼出し元ボタン</param>
     ''' <param name="sqlCon">SQL接続</param>
     ''' <param name="sqlTran">トランザクション</param>
-    Public Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False, Optional updateGyoNo As Boolean = False) As Boolean
+    Public Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False, Optional updateGyoNo As Boolean = False, Optional ByVal masterSts() As String = Nothing) As Boolean
         Try
 
             Dim sqlStat As StringBuilder
@@ -2524,8 +2524,11 @@ Public Class OIT0003OTLinkageList
                 procDate = Now
             End If
 
-            '選択済の画面の行データ取得
-            Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+            Try
+                '選択済の画面の行データ取得
+                Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+            Catch ex As Exception
+            End Try
 
             '選択した受注No、積込日と合致する明細行のインクリメント
             'アップロード方式によりインクリメントフィールドを変更
@@ -2568,8 +2571,13 @@ Public Class OIT0003OTLinkageList
                             .Add("@GYONO", SqlDbType.NVarChar).Value = orderKey.GyoNo
                         End If
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
-                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
-                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        If IsNothing(masterSts) Then
+                            .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                            .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        Else
+                            .Add("@UPDUSER", SqlDbType.NVarChar).Value = masterSts(1)
+                            .Add("@UPDTERMID", SqlDbType.NVarChar).Value = masterSts(2)
+                        End If
                         .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
                         '条件
                         .Add("@ORDERNO", SqlDbType.NVarChar).Value = orderKey.OrderNo
@@ -2702,15 +2710,18 @@ Public Class OIT0003OTLinkageList
     ''' <param name="sqlTran">トランザクションオブジェクト</param>
     ''' <param name="procDate">処理日、※未指定日処理実行時点の日時</param>
     ''' <returns>処理結果：True:正常、False：異常</returns>
-    Public Function UpdateOrderOutputFlag(orderOutputFlags As Dictionary(Of String, String), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
+    Public Function UpdateOrderOutputFlag(orderOutputFlags As Dictionary(Of String, String), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional ByVal masterSts() As String = Nothing) As Boolean
         Try
             Dim sqlStat As StringBuilder
             If procDate = #1900/1/1# Then
                 procDate = Now
             End If
 
-            '選択済の画面の行データ取得
-            Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+            Try
+                '選択済の画面の行データ取得
+                Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+            Catch ex As Exception
+            End Try
 
             '選択した受注No、積込日と合致する明細行のインクリメント
             'アップロード方式によりインクリメントフィールドを変更
@@ -2741,8 +2752,13 @@ Public Class OIT0003OTLinkageList
                         '値
                         .Add("@FLAGVALUE", SqlDbType.NVarChar).Value = orderKey.Value
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
-                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
-                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        If IsNothing(masterSts) Then
+                            .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                            .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        Else
+                            .Add("@UPDUSER", SqlDbType.NVarChar).Value = masterSts(1)
+                            .Add("@UPDTERMID", SqlDbType.NVarChar).Value = masterSts(2)
+                        End If
                         .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
                         '条件
                         .Add("@ORDERNO", SqlDbType.NVarChar).Value = orderKey.Key
@@ -2868,11 +2884,15 @@ Public Class OIT0003OTLinkageList
     ''' 履歴テーブル用の情報を付与したデータテーブルに変換
     ''' </summary>
     ''' <returns></returns>
-    Public Function ModifiedHistoryDatatable(dt As DataTable, historyNo As String) As DataTable
+    Public Function ModifiedHistoryDatatable(dt As DataTable, historyNo As String, Optional ByVal masterSts() As String = Nothing) As DataTable
         Dim retDt As DataTable = dt.Clone
         '履歴とMAPIDの付与
         retDt.Columns.Add("HISTORYNO", GetType(String)).DefaultValue = historyNo
-        retDt.Columns.Add("MAPID", GetType(String)).DefaultValue = Master.MAPID
+        If IsNothing(masterSts) Then
+            retDt.Columns.Add("MAPID", GetType(String)).DefaultValue = Master.MAPID
+        Else
+            retDt.Columns.Add("MAPID", GetType(String)).DefaultValue = masterSts(0)
+        End If
         Dim retDr As DataRow = Nothing
         For Each dr As DataRow In dt.Rows
             retDr = retDt.NewRow

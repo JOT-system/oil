@@ -706,6 +706,8 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- OT発送日報フラグ -->
+        <input id="WF_OTLINKAGEFLG" runat="server" value="" type="text" />
         <!-- 実績日訂正フラグ -->
         <input id="WF_CORRECTIONDATEFLG" runat="server" value="" type="text" />
         <!-- 一括フラグ -->

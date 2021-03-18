@@ -148,7 +148,7 @@ Public Class OIT0003OrderDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDetailDownload"
                             WF_ButtonDetailDownload_Click()
-                        Case "WF_ButtonOTLINKAGE"
+                        Case "WF_ButtonOTLINKAGE"             'OT発送日報送信ボタン押下
                             WF_ButtonOTLINKAGE_Click()
                         Case "WF_ButtonCORRECTIONDATE",
                              "WF_ButtonCORRECTION_TAB3"       '実績日訂正ボタン押下
@@ -555,6 +555,15 @@ Public Class OIT0003OrderDetail
                 End If
                 '### 20200722 END   受注進行ステータスの制御を追加 #################################
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                If Date.Parse(Me.TxtLoadingDate.Text) >= Format(Now, "yyyy/MM/dd") Then
+                    '◯OT発送日報フラグ(活性)
+                    Me.WF_OTLINKAGEFLG.Value = "0"
+                Else
+                    '◯OT発送日報フラグ(非活性)
+                    Me.WF_OTLINKAGEFLG.Value = "1"
+                End If
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(活性)
                 WF_BULKFLG.Value = "0"
@@ -573,6 +582,10 @@ Public Class OIT0003OrderDetail
                 'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "1"
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -593,6 +606,10 @@ Public Class OIT0003OrderDetail
                 'タブ「タンク車割当」, タブ「入換・積込指示」, タブ「タンク車明細」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "3"
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -617,6 +634,10 @@ Public Class OIT0003OrderDetail
                     WF_MAPButtonControl.Value = "0"
                 End If
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -7034,7 +7055,7 @@ Public Class OIT0003OrderDetail
             Dim orderDlFlags As Dictionary(Of String, String) = Nothing
             Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
                 'オーダー明細のダウンロードカウントのインクリメント
-                resProc = otLinkage.IncrementDetailOutputCount(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran, procDate)
+                resProc = otLinkage.IncrementDetailOutputCount(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran, procDate, masterSts:=otMasterSts)
                 If resProc = False Then
                     Return
                 End If
@@ -7044,7 +7065,7 @@ Public Class OIT0003OrderDetail
                     Return
                 End If
                 'オーダーを更新
-                resProc = otLinkage.UpdateOrderOutputFlag(orderDlFlags, "WF_ButtonOtSend", SQLcon, sqlTran, procDate)
+                resProc = otLinkage.UpdateOrderOutputFlag(orderDlFlags, "WF_ButtonOtSend", SQLcon, sqlTran, procDate, masterSts:=otMasterSts)
                 If resProc = False Then
                     Return
                 End If
@@ -7057,8 +7078,8 @@ Public Class OIT0003OrderDetail
                 Dim orderTbl As DataTable = otLinkage.GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
                 Dim detailTbl As DataTable = otLinkage.GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
                 If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
-                    Dim hisOrderTbl As DataTable = otLinkage.ModifiedHistoryDatatable(orderTbl, historyNo)
-                    Dim hisDetailTbl As DataTable = otLinkage.ModifiedHistoryDatatable(detailTbl, historyNo)
+                    Dim hisOrderTbl As DataTable = otLinkage.ModifiedHistoryDatatable(orderTbl, historyNo, masterSts:=otMasterSts)
+                    Dim hisDetailTbl As DataTable = otLinkage.ModifiedHistoryDatatable(detailTbl, historyNo, masterSts:=otMasterSts)
 
                     '履歴テーブル登録
                     For Each dr As DataRow In hisOrderTbl.Rows
@@ -10910,8 +10931,12 @@ Public Class OIT0003OrderDetail
 
                     '★タブ<タンク車明細>で設定した「発送順」⇒「積込出線順」に設定
                     PARA32.Value = StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)
-                    '★全体の件数から積込出線順を引いた値を「積込入線順」に設定
-                    PARA33.Value = (intListCnt - Integer.Parse(StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)) + 1)
+                    Try
+                        '★全体の件数から積込出線順を引いた値を「積込入線順」に設定
+                        PARA33.Value = (intListCnt - Integer.Parse(StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)) + 1)
+                    Catch ex As Exception
+                        PARA33.Value = ""
+                    End Try
                 End If
                 '### 20201130 END   指摘票対応(No218)全体 #############################################################
 

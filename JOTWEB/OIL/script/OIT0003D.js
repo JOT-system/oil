@@ -15,6 +15,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 OT発送日報送信ボタン活性／非活性
+    if (document.getElementById('WF_OTLINKAGEFLG').value === "0") {
+        //活性
+        document.getElementById("WF_ButtonOTLINKAGE").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonOTLINKAGE").disabled = "disabled";
+    }
+
     //〇 実績日訂正ボタン活性／非活性
     if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
         //活性

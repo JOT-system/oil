@@ -34,6 +34,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル(受注明細履歴)
     Private OIT0003Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0003ReportDeliverytbl As DataTable                   '帳票用(託送指示)テーブル
+    Private OIT0003ReportOTLinkagetbl As DataTable                  '帳票用(OT発送日報)テーブル
     'Private OIT0003FIDtbl_tab1 As DataTable                         '検索用テーブル(タブ１用)
     'Private OIT0003FIDtbl_tab2 As DataTable                         '検索用テーブル(タブ２用)
     Private OIT0003FIDtbl_tab3 As DataTable                         '検索用1テーブル(タブ３用)
@@ -147,6 +148,8 @@ Public Class OIT0003OrderDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDetailDownload"
                             WF_ButtonDetailDownload_Click()
+                        Case "WF_ButtonOTLINKAGE"             'OT発送日報送信ボタン押下
+                            WF_ButtonOTLINKAGE_Click()
                         Case "WF_ButtonCORRECTIONDATE",
                              "WF_ButtonCORRECTION_TAB3"       '実績日訂正ボタン押下
                             WF_ButtonCORRECTIONDATE_Click(WF_ButtonClick.Value)
@@ -552,6 +555,15 @@ Public Class OIT0003OrderDetail
                 End If
                 '### 20200722 END   受注進行ステータスの制御を追加 #################################
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                If Date.Parse(Me.TxtLoadingDate.Text) >= Format(Now, "yyyy/MM/dd") Then
+                    '◯OT発送日報フラグ(活性)
+                    Me.WF_OTLINKAGEFLG.Value = "0"
+                Else
+                    '◯OT発送日報フラグ(非活性)
+                    Me.WF_OTLINKAGEFLG.Value = "1"
+                End If
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(活性)
                 WF_BULKFLG.Value = "0"
@@ -570,6 +582,10 @@ Public Class OIT0003OrderDetail
                 'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "1"
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -590,6 +606,10 @@ Public Class OIT0003OrderDetail
                 'タブ「タンク車割当」, タブ「入換・積込指示」, タブ「タンク車明細」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "3"
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -614,6 +634,10 @@ Public Class OIT0003OrderDetail
                     WF_MAPButtonControl.Value = "0"
                 End If
 
+                '### 20210317 START OT発送日報フラグ ########################################
+                '◯OT発送日報フラグ(非活性)
+                Me.WF_OTLINKAGEFLG.Value = "1"
+                '### 20210317 END   OT発送日報フラグ ########################################
                 '### 20200916 START 指摘票対応(No148) #######################################
                 '◯一括フラグ(非活性)
                 WF_BULKFLG.Value = "1"
@@ -6968,6 +6992,114 @@ Public Class OIT0003OrderDetail
     End Sub
 #End Region
 
+    ''' <summary>
+    ''' OT発送日報送信ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOTLINKAGE_Click()
+        Dim otLinkage As New OIT0003OTLinkageList
+        Dim selectedOrderInfo As New List(Of OIT0003OTLinkageList.OutputOrdedrInfo)
+
+        Dim otMasterSts() As String = {Master.MAPID, Master.USERID, Master.USERTERMID}
+        If IsNothing(OIT0003ReportOTLinkagetbl) Then
+            OIT0003ReportOTLinkagetbl = New DataTable
+        End If
+
+        If OIT0003ReportOTLinkagetbl.Columns.Count <> 0 Then
+            OIT0003ReportOTLinkagetbl.Columns.Clear()
+        End If
+        OIT0003ReportOTLinkagetbl.Clear()
+
+        '******************************
+        'OT発送日報データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            selectedOrderInfo = otLinkage.OTLinkageDataGet(SQLcon,
+                                       I_MASTERSTS:=otMasterSts,
+                                       I_ORDERNO:=Me.TxtOrderNo.Text,
+                                       I_OIT0003CsvOTLinkage:=OIT0003ReportOTLinkagetbl)
+        End Using
+
+        '******************************
+        'CSV作成処理の実行
+        '******************************
+        Dim OTFileName As String = otLinkage.SetCSVFileName(Me.TxtOrderOfficeCode.Text)
+        Using repCbj = New CsvCreate(OIT0003ReportOTLinkagetbl,
+                                     I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
+                                     I_FileName:=OTFileName,
+                                     I_Enc:="EBCDIC")
+            'I_Enc:="UTF8N")
+            'I_Enc:="EBCDIC")
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False, blnNewline:=False)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        '******************************
+        'OT発送日報データの（本体）ダウンロードフラグ更新
+        '                  （明細）ダウンロード数インクリメント
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = otLinkage.IncrementDetailOutputCount(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran, procDate, masterSts:=otMasterSts)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = otLinkage.GetOutputFlag(selectedOrderInfo, "WF_ButtonOtSend", SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = otLinkage.UpdateOrderOutputFlag(orderDlFlags, "WF_ButtonOtSend", SQLcon, sqlTran, procDate, masterSts:=otMasterSts)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = otLinkage.GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = otLinkage.GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = otLinkage.GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = otLinkage.ModifiedHistoryDatatable(orderTbl, historyNo, masterSts:=otMasterSts)
+                    Dim hisDetailTbl As DataTable = otLinkage.ModifiedHistoryDatatable(detailTbl, historyNo, masterSts:=otMasterSts)
+
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    otLinkage.OutputJournal(orderTbl, "OIT0002_ORDER")
+                    otLinkage.OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
+    End Sub
+
 #Region "実績日訂正"
     ''' <summary>
     ''' 実績日訂正ボタン押下時処理
@@ -10799,8 +10931,12 @@ Public Class OIT0003OrderDetail
 
                     '★タブ<タンク車明細>で設定した「発送順」⇒「積込出線順」に設定
                     PARA32.Value = StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)
-                    '★全体の件数から積込出線順を引いた値を「積込入線順」に設定
-                    PARA33.Value = (intListCnt - Integer.Parse(StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)) + 1)
+                    Try
+                        '★全体の件数から積込出線順を引いた値を「積込入線順」に設定
+                        PARA33.Value = (intListCnt - Integer.Parse(StrConv(OIT0003tab3row("SHIPORDER"), VbStrConv.Narrow)) + 1)
+                    Catch ex As Exception
+                        PARA33.Value = ""
+                    End Try
                 End If
                 '### 20201130 END   指摘票対応(No218)全体 #############################################################
 
@@ -17109,10 +17245,23 @@ Public Class OIT0003OrderDetail
         Dim OIT0003tbltab3_dv As DataView = New DataView(OIT0003tbltab3_DUMMY)
         Dim chkShipOrder As String = ""
 
+        '### 20210318 START 五井営業所独自対応 ################################################
+        '★五井営業所対応
+        '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+        '　そのため同一日で設定された場合は入力を可能とするため同時にチェックも実施する。
+        Dim blnGoiTrainflg As Boolean = False
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+           AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                    OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+           AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+            blnGoiTrainflg = True
+        End If
+        '### 20210318 END   五井営業所独自対応 ################################################
+
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
         WW_SHIPORDER = "0"
-        If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+        If work.WF_SEL_SHIPORDERCLASS.Text = "1" OrElse blnGoiTrainflg = True Then
             '発送順でソートし、重複がないかチェックする。
             OIT0003tbltab3_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbltab3_dv
@@ -17149,7 +17298,7 @@ Public Class OIT0003OrderDetail
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
             '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
             '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
-            If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+            If work.WF_SEL_SHIPORDERCLASS.Text = "1" OrElse blnGoiTrainflg = True Then
                 '(一覧)発送順(空白チェック)
                 If OIT0003tab3row("SHIPORDER") = "" And OIT0003tab3row("DELFLG") = "0" Then
                     Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
@@ -22279,8 +22428,20 @@ Public Class OIT0003OrderDetail
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-
+                                '### 20210318 START 五井営業所独自対応 ################################################
+                                'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★五井営業所対応
+                                '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                    '### 制約なし #####################################################
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                                '### 20210318 END   五井営業所独自対応 ################################################
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") Then
                                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
@@ -22401,7 +22562,20 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                     AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    '### 20210318 START 五井営業所独自対応 ################################################
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    '★五井営業所対応
+                                    '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                    '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                        '### 制約なし #####################################################
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    End If
+                                    '### 20210318 END   五井営業所独自対応 ################################################
                                 End If
                             End If
                             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
@@ -22414,7 +22588,20 @@ Public Class OIT0003OrderDetail
 
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '### 20210318 START 五井営業所独自対応 ################################################
+                                'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★五井営業所対応
+                                '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                    '### 制約なし #####################################################
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                                '### 20210318 END   五井営業所独自対応 ################################################
 
                                 '### 20200622 START((全体)No82対応) ######################################
                                 '★発送順

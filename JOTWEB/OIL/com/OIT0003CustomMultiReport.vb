@@ -521,13 +521,13 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
                 Select Case oilCode
                     Case "1001"
-                        rngDetailArea.Value = "ﾌﾟﾚﾐｱﾑ"
+                        rngDetailArea.Value = "ﾌﾟﾚﾐｱﾑ "
                     Case "1101"
                         rngDetailArea.Value = "ﾚｷﾞﾕﾗ-G"
                     Case "1301"
-                        rngDetailArea.Value = "ﾄｳﾕ"
+                        rngDetailArea.Value = "ﾄｳﾕ    "
                     Case "1401"
-                        rngDetailArea.Value = "ｹｲﾕ"
+                        rngDetailArea.Value = "ｹｲﾕ    "
                     Case "1404"
                         Select Case orderingType
                             Case "A"
@@ -538,12 +538,12 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
                     Case "2101"
                         Select Case orderingType
                             Case "B"
-                                rngDetailArea.Value = "0.5AFO"
+                                rngDetailArea.Value = "0.5AFO "
                             Case "C"
                                 rngDetailArea.Value = "ｶﾝﾚｲAFO"
                         End Select
                     Case "2201"
-                        rngDetailArea.Value = "0.1AFO"
+                        rngDetailArea.Value = "0.1AFO "
                 End Select
                 ExcelMemoryRelease(rngDetailArea)
 

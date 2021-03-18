@@ -231,6 +231,21 @@ Public Class OIT0003CustomReport : Implements IDisposable
             'rngHeaderArea = Me.ExcelWorkSheet.Range("O1")
             rngHeaderArea.Value = Now.AddDays(0).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
             ExcelMemoryRelease(rngHeaderArea)
+
+            ''★不要項目を非表示
+            'Select Case officeCode
+            '    Case BaseDllConst.CONST_OFFICECODE_011201
+            '        Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
+            '        Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
+            '        Me.ExcelWorkSheet.Range("K:K").Columns.Hidden = True
+            '    Case BaseDllConst.CONST_OFFICECODE_011202
+            '        Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
+            '        Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
+            '    Case BaseDllConst.CONST_OFFICECODE_011203
+            '        Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
+            '        Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
+            'End Select
+
         Catch ex As Exception
             Throw
         Finally

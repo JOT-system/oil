@@ -37,6 +37,10 @@ input#WF_DL_TRASPORTCOSTSDETAIL {
     margin-left: 20px;
 }
 
+input#WF_DL_TANKTRASPORTRESULT {
+    margin-left: 20px;
+}
+
 .memo_text {
     min-height: 1.0em;
 }

@@ -1,0 +1,36 @@
+﻿/* 費用明細(月単位)作成画面 */
+/* #################１行目 ################# */
+/* 計上年月(ラベル) */
+#WF_KEIJYOYM_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 120px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+}
+
+/*計上年月(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_KEIJYOYM_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*計上年月input tag*/
+#WF_KEIJYOYM {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+}
+    #WF_KEIJYOYM input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+

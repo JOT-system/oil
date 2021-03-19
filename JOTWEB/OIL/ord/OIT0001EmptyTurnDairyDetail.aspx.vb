@@ -2559,6 +2559,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         If OIT0001Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0001Reprow("RETURNDATETRAIN") = OIT0001Reprow("RETURNDATETRAINNO")
                     End If
 
+                    '★五井営業所対応(8883列車で"2"(OT輸送なし)の場合)
+                    If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                       AndAlso Me.TxtHeadOfficeTrain.Text = "8883" _
+                       AndAlso OIT0001Reprow("OTTRANSPORTFLG") = "2" Then
+                        OIT0001Reprow("REMARK") = "日輸車"
+                    End If
+
                 Next
             End Using
 

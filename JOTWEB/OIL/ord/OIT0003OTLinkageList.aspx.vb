@@ -1984,6 +1984,7 @@ Public Class OIT0003OTLinkageList
             '           .AppendLine("     ELSE ODR.TRAINNO ")
             .AppendLine("   , CASE LEFT(ODR.TRAINNAME,4) ")
             .AppendLine("   WHEN '5461' THEN TRA.OTTRAINNO  ")
+            .AppendLine("   WHEN '9672' THEN '5972' ")
             .AppendLine("   WHEN '2883' THEN '2883' ")
             .AppendLine("   WHEN '2181' THEN '2181' ")
             .AppendLine("   WHEN '2681' THEN '2681' ")
@@ -2081,6 +2082,8 @@ Public Class OIT0003OTLinkageList
                     ElseIf wrkDr("TRAINNO").ToString() = "2181" Then
                         newDr("発車年月日") = wrkDr("ACCDATE").ToString()
                     ElseIf wrkDr("TRAINNO").ToString() = "2681" Then
+                        newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    ElseIf wrkDr("TRAINNO").ToString() = "2685" Then
                         newDr("発車年月日") = wrkDr("ACCDATE").ToString()
                     Else
                         newDr("発車年月日") = wrkDr("LODDATE").ToString()

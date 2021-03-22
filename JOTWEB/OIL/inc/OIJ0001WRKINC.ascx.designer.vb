@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIJ0001WRKINC
-    
+
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -20,8 +20,8 @@ Partial Public Class OIJ0001WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_UORG コントロール。
     '''</summary>
@@ -29,8 +29,8 @@ Partial Public Class OIJ0001WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_LINECNT コントロール。
     '''</summary>
@@ -38,8 +38,8 @@ Partial Public Class OIJ0001WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_KEIJYOYM コントロール。
     '''</summary>
@@ -47,5 +47,5 @@ Partial Public Class OIJ0001WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_KEIJYOYM As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_KEIJYOYM As Global.System.Web.UI.WebControls.TextBox
 End Class

@@ -59,15 +59,6 @@ Partial Public Class OIJ0001BillingMonthCreate
     Protected WithEvents TxtKeijyoYM As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''LblStationCode コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblStationCode As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>
@@ -92,7 +83,7 @@ Partial Public Class OIJ0001BillingMonthCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIM0004WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIJ0001WRKINC
     
     '''<summary>
     '''WF_FIELD コントロール。

@@ -55,7 +55,7 @@
                     <asp:TextBox ID="TxtKeijyoYM" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
                 <a id="WF_KEIJYOYM_BUTTON">
-                    <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>
+                    <input type="button" class="btn-sticky" id="btnKeijyoYM" value="受注費用作成"  onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
             </div>
     </div> <!-- End searchbox -->

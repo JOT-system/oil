@@ -1979,9 +1979,16 @@ Public Class OIT0003OTLinkageList
             .AppendLine("   , CNV_OIL.VALUE01                 AS OILCODE ")
             .AppendLine("   , TNK.MODEL                       AS TANKMODEL ")
             .AppendLine("   , DET.TANKNO                      AS TANKNO ")
-            .AppendLine("   , CASE ODR.TRAINNO ")
-            .AppendLine("     WHEN '5461' THEN TRA.OTTRAINNO ")
-            .AppendLine("     ELSE ODR.TRAINNO ")
+            '            .AppendLine("   , CASE ODR.TRAINNO ")
+            '           .AppendLine("     WHEN '5461' THEN TRA.OTTRAINNO ")
+            '           .AppendLine("     ELSE ODR.TRAINNO ")
+            .AppendLine("   , CASE LEFT(ODR.TRAINNAME,4) ")
+            .AppendLine("   WHEN '5461' THEN TRA.OTTRAINNO  ")
+            .AppendLine("   WHEN '9672' THEN '5972' ")
+            .AppendLine("   WHEN '2883' THEN '2883' ")
+            .AppendLine("   WHEN '2181' THEN '2181' ")
+            .AppendLine("   WHEN '2681' THEN '2681' ")
+            .AppendLine("   Else ODR.TRAINNO  ")
             .AppendLine("     END                             AS TRAINNO ")
             .AppendLine("   , ODR.OFFICECODE                  AS OFFICECODE ")
             .AppendLine("   , DET.LINE                        AS LINE ")
@@ -2068,7 +2075,20 @@ Public Class OIT0003OTLinkageList
                     newDr("処理年月日") = processDate
                     newDr("積込年月日") = wrkDr("LODDATE").ToString()
                     newDr("運送状年月日") = wrkDr("LODDATE").ToString()
-                    newDr("発車年月日") = wrkDr("LODDATE").ToString()
+
+                    '積置列車2始まりは発日をセット
+                    If wrkDr("TRAINNO").ToString() = "2883" Then
+                        newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    ElseIf wrkDr("TRAINNO").ToString() = "2181" Then
+                        newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    ElseIf wrkDr("TRAINNO").ToString() = "2681" Then
+                        newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    ElseIf wrkDr("TRAINNO").ToString() = "2685" Then
+                        newDr("発車年月日") = wrkDr("ACCDATE").ToString()
+                    Else
+                        newDr("発車年月日") = wrkDr("LODDATE").ToString()
+                    End If
+
                     newDr("発駅コード") = wrkDr("DEPSTATION").ToString().PadRight(6, "0"c)
                     newDr("発専用線コード") = "00"
                     newDr("着駅コード") = wrkDr("ARRSTATION").ToString().PadRight(6, "0"c)

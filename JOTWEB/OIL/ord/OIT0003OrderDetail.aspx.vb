@@ -11934,6 +11934,20 @@ Public Class OIT0003OrderDetail
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIT0002.TRAINNO), '')" _
             & "   END                                                AS TRAINNO" _
+            & " , CASE " _
+            & "   WHEN OIT0002.OFFICECODE = '" + BaseDllConst.CONST_OFFICECODE_011201 + "' AND OIM0007.TSUMI = 'T' THEN" _
+            & "       CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
+            & "       WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIM0007.OTTRAINNO), '') + '</div>'" _
+            & "       WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIM0007.OTTRAINNO), '') + '</div>'" _
+            & "       ELSE ISNULL(RTRIM(OIM0007.OTTRAINNO), '')" _
+            & "       END" _
+            & "   ELSE" _
+            & "       CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
+            & "       WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
+            & "       WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
+            & "       ELSE ISNULL(RTRIM(OIT0002.TRAINNO), '')" _
+            & "       END" _
+            & "   END                                                AS OTTRAINNO" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')               AS ORDERTYPE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
@@ -12024,6 +12038,10 @@ Public Class OIT0003OrderDetail
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
             & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0002.ORDERINFO " _
+            & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
+            & "        OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
+            & "    AND OIM0007.TRAINNAME = OIT0002.TRAINNAME " _
+            & "    AND OIM0007.DEFAULTKBN = 'def' " _
             & " WHERE OIT0002.LODDATE    >= @P2" _
             & "   AND OIT0002.DELFLG     <> @P3"
 

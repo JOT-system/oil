@@ -2010,6 +2010,7 @@ Public Class OIT0003OTLinkageList
             .AppendLine("       END ")
             .AppendLine("     AND TRA.DEPSTATION = ODR.DEPSTATION ")
             .AppendLine("     AND TRA.ARRSTATION = ODR.ARRSTATION ")
+            .AppendLine("     AND TRA.DEFAULTKBN = 'def' ")
             .AppendLine("     AND TRA.DELFLG = @DELFLG ")
             .AppendLine("   INNER JOIN OIL.OIM0005_TANK TNK ")
             .AppendLine("     ON TNK.TANKNUMBER = DET.TANKNO ")

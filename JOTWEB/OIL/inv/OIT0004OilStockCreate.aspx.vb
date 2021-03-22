@@ -287,6 +287,14 @@ Public Class OIT0004OilStockCreate
         Dim prmData = work.CreateFIXParam(salesOffice, "CONSIGNEEPATTERN", I_ADDITIONALCONDITION:=additionalCond)
         leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, WW_DUMMY, prmData)
         leftview.ActiveListBox()
+        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            leftview.WF_LeftListBox.Items.Clear()
+            If Master.USER_ORG = "302001" Then
+                leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS北信油槽所", "10"))
+            Else
+                leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS甲府油槽所", "20"))
+            End If
+        End If
         Dim consigneeTag As New StringBuilder
         consigneeTag.AppendLine("<select id='selHeadConsignee' onchange='changeConsignee(this);'>")
         Dim itemString As String = ""

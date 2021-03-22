@@ -1622,13 +1622,22 @@ Public Class OIT0007FileInputList
                IsDate(inpItem.LodDate) = False Then
                 Continue For
             End If
-
+            '↓2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
             If isFirst Then
                 isFirst = False
                 sqlStat.AppendFormat("             ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
             Else
                 sqlStat.AppendFormat("         OR  ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
             End If
+            '↑2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            ''↓2021/03 --- 並行稼働用ロジック
+            'If isFirst Then
+            '    isFirst = False
+            '    sqlStat.AppendFormat("             ( ODR.LODDATE = '{0}')", inpItem.LodDate).AppendLine()
+            'Else
+            '    sqlStat.AppendFormat("         OR  ( ODR.LODDATE = '{0}')", inpItem.LodDate).AppendLine()
+            'End If
+            ''↑2021/03 --- 並行稼働用ロジック
             hasCondition = True
         Next
         If hasCondition = False Then

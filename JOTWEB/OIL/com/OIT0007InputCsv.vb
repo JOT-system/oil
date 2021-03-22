@@ -146,16 +146,18 @@ Public Class OIT0007InputCsv : Implements System.IDisposable
                 itmData.InpTnkNo = Trim(colItems(5))
                 itmData.InpOilTypeName = Trim(colItems(6))
                 itmData.InpCarsAmount = Trim(colItems(10))
-                If IsNumeric(itmData.InpCarsAmount) AndAlso Not (CDec(itmData.InpCarsAmount.Length) > 100000) Then
+                If IsNumeric(itmData.InpCarsAmount) AndAlso Not (CDec(itmData.InpCarsAmount) > 100000) Then
                     '小数点なしの為左２桁＆小数点＆右３桁で文字連結
-                    Dim intVal As String = "000"
-                    If IsNumeric(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)) Then
-                        intVal = CDec(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)).ToString("00")
-                    End If
-                    itmData.InpCarsAmount = intVal & "." & Right(itmData.InpCarsAmount, 3)
+                    'Dim intVal As String = "000"
+                    'If IsNumeric(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)) Then
+                    '    intVal = CDec(Left(itmData.InpCarsAmount, itmData.InpCarsAmount.Length - 3)).ToString("00")
+                    'End If
+                    'itmData.InpCarsAmount = intVal & "." & Right(itmData.InpCarsAmount, 3)
+                    Dim val = CDec(itmData.InpCarsAmount) / 1000
+                    itmData.InpCarsAmount = val.ToString("#0.000")
                 Else
-                        'それ以外は書式エラーとする
-                        itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
+                    'それ以外は書式エラーとする
+                    itmData.CheckReadonCode = OIT0007FileInputList.InputDataItem.CheckReasonCodes.AmountFormatError
                 End If
                 '取り込んだ予約番号を積込予定日と予約番号３桁に分離
                 If IsNumeric(itmData.InpReservedNo) AndAlso itmData.InpReservedNo.Length <= 3 Then

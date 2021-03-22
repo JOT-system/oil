@@ -85,6 +85,44 @@ Public Class MP0002MonthlyTransfer
                         clsPrint.CreateExcelFileStream(Me.Page)
                     End Using
                 End If
+                ' 2021.03.22 S.IGUSA ADD START
+                ' 「輸送実績表」ボタン押下時処理
+                If Me.hdnTransportResultCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    Me.ddlListPattern.Enabled = True
+                    Me.ddlMonthTransOffice.Enabled = True
+
+                    With Me.ddlListPattern
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    With Me.ddlMonthTransOffice
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    '帳票生成
+                    Dim tempFileName As String = "OIT0008M_TRASPORT_RESULT.xlsx"
+                    Using clsPrint As New OIT0008CustomReport(
+                            "OIT0008M", tempFileName, GetTransportResultData()
+                        )
+                        'URL取得
+                        Dim tmpfilePath As String = ""
+                        Dim url As String = clsPrint.CreateExcelPrintData_TansportResult(tmpfilePath)
+                        'ダウンロード
+                        Dim fi = New IO.FileInfo(tmpfilePath)
+                        Dim fileName As String = IO.Path.GetFileName(tmpfilePath)
+                        Dim encodeFileName As String = HttpUtility.UrlEncode(fileName)
+                        encodeFileName = encodeFileName.Replace("+", "%20")
+                        With Me.Page
+                            .Response.ContentType = "application/octet-stream"
+                            .Response.AddHeader("Content-Disposition", String.Format("attachment;filename*=utf-8''{0}", encodeFileName))
+                            .Response.AddHeader("Content-Length", fi.Length.ToString())
+                            .Response.AddHeader("Pragma", "no-cache")
+                            .Response.AddHeader("Cache-Control", "no-cache")
+                            .Response.WriteFile(tmpfilePath)
+                            .Response.End()
+                        End With
+                    End Using
+                End If
+                ' 2021.03.22 S.IGUSA ADD END
                 '処理フラグを落とす
                 Me.hdnRefreshCall.Value = ""
             Catch ex As Threading.ThreadAbortException
@@ -1044,5 +1082,53 @@ Public Class MP0002MonthlyTransfer
 
         Return newRow
     End Function
+
+    '2021.03.22 S.IGUSA ADD START
+    ''' <summary>
+    ''' 輸送実績表データ取得
+    ''' </summary>
+    ''' <returns>DataTable</returns>
+    Private Function GetTransportResultData() As DataTable
+        Dim WK_STYMD As DateTime = New DateTime(Now.Year, Now.Month, 1)
+        Dim WK_EDYMD As DateTime = Now
+        Dim dt As DataTable = New DataTable()
+        dt.Clear()
+
+        Using SQLcon As SqlConnection = CS0050Session.getConnection
+            SQLcon.Open()
+
+            Using SQLcmd As New SqlCommand
+                SQLcmd.Connection = SQLcon
+                SQLcmd.CommandType = CommandType.StoredProcedure
+                SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT]"
+                SQLcmd.Parameters.Clear()
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@STYMD", SqlDbType.Date)             ' 累計開始日
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@EDYMD", SqlDbType.Date)             ' 累計終了日
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
+                Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
+
+                PARA1.Value = WK_STYMD
+                PARA2.Value = WK_EDYMD
+                If "VIEW001".Equals(Me.ddlListPattern.SelectedValue) Then
+                    PARA3.Value = Me.ddlMonthTransOffice.SelectedValue
+                Else
+                    PARA3.Value = DBNull.Value
+                End If
+
+                PARA4.Direction = ParameterDirection.Output
+                RV.Direction = ParameterDirection.ReturnValue
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    dt.Load(SQLdr)
+                End Using
+
+            End Using
+
+        End Using
+
+        Return dt
+    End Function
+    '2021.03.22 S.IGUSA ADD END
 
 End Class

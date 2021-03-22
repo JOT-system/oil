@@ -86,6 +86,24 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents hdnDownloadCall As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''btnTransportResult コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents btnTransportResult As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''hdnTransportResultCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnTransportResultCall As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''mvwMonthlyTransfer コントロール。
     '''</summary>
     '''<remarks>

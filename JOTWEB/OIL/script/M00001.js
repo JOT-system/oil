@@ -198,3 +198,34 @@ function downloadPaneData(dlButtonId) {
         document.forms[0].submit();
     }
 }
+
+// 2021.03.22 S.IGUSA ADD START
+// 輸送実績表出力
+function printTransportResult(dlButtonId) {
+    let downLoadMarkObj = document.getElementById(dlButtonId);
+    if (downLoadMarkObj === null) {
+        return;
+    }
+    let dlMarkObj = document.querySelector("#" + dlButtonId + " + input[type=hidden]");
+    let menuVscrollObj = document.getElementById('hdnPaneAreaVScroll');
+    let menuPaneArea = document.querySelector('#Menuheaderbox > .menuMain');
+
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        if (menuVscrollObj !== null) {
+            if (menuPaneArea !== null) {
+                menuVscrollObj.value = menuPaneArea.scrollTop;
+            }
+        }
+
+        setTimeout(function () {
+            dlMarkObj.value = '';
+            downLoadMarkObj.disabled = false;
+            document.getElementById("MF_SUBMIT").value = "FALSE";
+        }, 2000);
+        dlMarkObj.value = '1';
+        downLoadMarkObj.disabled = true;
+        document.forms[0].submit();
+    }
+}
+// 2021.03.22 S.IGUSA ADD END

@@ -1126,6 +1126,7 @@ Public Structure CS0023XLSUPLOAD
             Dim svTrainNo As String = ""
             Dim regCircleNum = New Regex("[①-⑨]")
             Dim regNotNum = New Regex("\D")
+            Dim blnTestFlg As Boolean = False
             For Each dtrow As DataRow In dt.Select("OIL_DETAIL<>''", "LINE_HEADER, POINT")
                 Dim xlsTrainNo As String = Convert.ToString(dtrow("TRAINNO_DETAIL"))
                 Dim xlsTankNo As String = Convert.ToString(dtrow("TANKNO_DETAIL"))
@@ -1137,8 +1138,20 @@ Public Structure CS0023XLSUPLOAD
                 ElseIf String.IsNullOrEmpty(xlsTrainNo) OrElse
                     xlsTrainNo = regCircleNum.Replace(svTrainNo, "") OrElse
                     svTrainNo = regCircleNum.Replace(xlsTrainNo, "") Then
-                    '初回以降
-                    xlsTrainNo = svTrainNo
+                    If xlsOil <> "●" Then
+                        '初回以降
+                        xlsTrainNo = svTrainNo
+                        blnTestFlg = False
+
+                        '★★★テスト積車の場合、列車Noが未設定の場合もあるため考慮する。★★★
+                    ElseIf blnTestFlg = False Then
+                        '★テスト積車(初回)
+                        svTrainNo = xlsTrainNo
+                        blnTestFlg = True
+                    Else
+                        '★テスト積車(初回以降)
+                        xlsTrainNo = svTrainNo
+                    End If
                 Else
                     svTrainNo = xlsTrainNo
                 End If

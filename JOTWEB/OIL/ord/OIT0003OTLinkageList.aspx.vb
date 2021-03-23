@@ -518,7 +518,7 @@ Public Class OIT0003OTLinkageList
                         OIT0003row("CAN_RESERVED") = "0"
                     End If
                     '託送指示出力可否(発日 >= 翌日)
-                    If Convert.ToString(OIT0003row("DEPDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= today Then
                         OIT0003row("CAN_TAKUSOU") = "1"
                     Else
                         OIT0003row("CAN_TAKUSOU") = "0"

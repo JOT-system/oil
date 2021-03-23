@@ -16410,6 +16410,39 @@ Public Class OIT0003OrderDetail
                     'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
                     OIT0003tab3row("ORDERINFONAME") = sOrderInfo
 
+                    Continue For
+                End If
+
+                '★他の回送オーダー情報を取得
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    WW_SelectKaisou(SQLcon,
+                                   I_KAISOUNO:=OIT0003tab3row("USEORDERNO"),
+                                   O_dtKAISOU:=OIT0003FID2tbl_tab3,
+                                   I_TANKNO:=OIT0003tab3row("TANKNO"))
+                End Using
+
+                If OIT0003FID2tbl_tab3.Rows.Count <> 0 Then
+                    '(実績)積込日
+                    Me.TxtActualLoadingDate.Enabled = False
+                    '(実績)発日
+                    Me.TxtActualDepDate.Enabled = False
+                    '(実績)積車着日
+                    Me.TxtActualArrDate.Enabled = False
+                    '(実績)受入日
+                    Me.TxtActualAccDate.Enabled = False
+                    '(実績)空車着日
+                    Me.TxtActualEmparrDate.Enabled = False
+
+                    Dim sOrderInfo As String = "回送中 "
+                    sOrderInfo &= OIT0003FID2tbl_tab3.Rows(0)("TRAINNO") + " "
+                    sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("ACTUALDEPDATE")).ToString("MM/dd") + "発分"
+
+                    OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                    'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+                    OIT0003tab3row("ORDERINFONAME") = sOrderInfo
+
+                    Continue For
                 End If
 
             End If
@@ -21475,6 +21508,114 @@ Public Class OIT0003OrderDetail
         End Try
 
         'Master.Output(C_MESSAGE_NO.DATA_FILTER_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 回送TBL登録検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_SelectKaisou(ByVal SQLcon As SqlConnection,
+                                 ByVal I_KAISOUNO As String,
+                                 ByRef O_dtKAISOU As DataTable,
+                                 Optional I_OFFICECODE As String = Nothing,
+                                 Optional I_TANKNO As String = Nothing)
+
+        If IsNothing(O_dtKAISOU) Then
+            O_dtKAISOU = New DataTable
+        End If
+
+        If O_dtKAISOU.Columns.Count <> 0 Then
+            O_dtKAISOU.Columns.Clear()
+        End If
+
+        O_dtKAISOU.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   OIT0006.KAISOUNO" _
+            & " , OIT0007.DETAILNO" _
+            & " , OIT0006.KAISOUYMD" _
+            & " , OIT0006.KAISOUSTATUS" _
+            & " , OIT0007.TRAINNO" _
+            & " , OIT0007.OBJECTIVECODE" _
+            & " , OIT0007.KAISOUTYPE" _
+            & " , OIT0006.OFFICECODE" _
+            & " , OIT0006.OFFICENAME" _
+            & " , OIT0007.TANKNO" _
+            & " , OIT0007.DEPSTATION" _
+            & " , OIT0007.DEPSTATIONNAME" _
+            & " , OIT0007.TGHSTATION" _
+            & " , OIT0007.TGHSTATIONNAME" _
+            & " , OIT0007.ARRSTATION" _
+            & " , OIT0007.ARRSTATIONNAME" _
+            & " , OIT0007.ACTUALDEPDATE" _
+            & " , OIT0007.ACTUALEMPARRDATE" _
+            & " , OIT0006.TOTALREPAIR" _
+            & " , OIT0006.TOTALMC" _
+            & " , OIT0006.TOTALINSPECTION" _
+            & " , OIT0006.TOTALALLINSPECTION" _
+            & " , OIT0006.TOTALINDWELLING" _
+            & " , OIT0006.TOTALMOVE" _
+            & " , OIT0006.TOTALTANK" _
+            & " FROM oil.OIT0006_KAISOU OIT0006" _
+            & " INNER JOIN oil.OIT0007_KAISOUDETAIL OIT0007 ON" _
+            & " OIT0007.KAISOUNO = OIT0006.KAISOUNO" _
+
+        '○ 検索条件が指定されていれば追加する
+        'タンク車№
+        If Not String.IsNullOrEmpty(I_TANKNO) Then
+            SQLStr &= String.Format(" AND OIT0007.TANKNO = '{0}' ", I_TANKNO)
+        End If
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        '回送No
+        SQLStr &= String.Format(" WHERE OIT0006.KAISOUNO = '{0}' ", I_KAISOUNO)
+        '回送営業所コード
+        If Not String.IsNullOrEmpty(I_OFFICECODE) Then
+            SQLStr &= String.Format(" AND OIT0006.OFFICECODE = '{0}' ", I_OFFICECODE)
+        End If
+        '利用可否フラグ
+        SQLStr &= String.Format(" AND OIT0006.USEPROPRIETYFLG = '{0}' ", "1")
+        '回送進行ステータス
+        SQLStr &= String.Format(" AND OIT0006.KAISOUSTATUS <> '{0}' ", BaseDllConst.CONST_KAISOUSTATUS_900)
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtKAISOU.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtKAISOU.Load(SQLdr)
+                End Using
+
+                'Dim i As Integer = 0
+                'For Each O_dtORDERrow As DataRow In O_dtORDER.Rows
+                '    i += 1
+                '    O_dtORDERrow("LINECNT") = i        'LINECNT
+                'Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D SELECT_KAISOU")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D SELECT_KAISOU"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 

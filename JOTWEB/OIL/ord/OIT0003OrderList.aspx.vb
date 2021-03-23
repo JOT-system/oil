@@ -3767,6 +3767,18 @@ Public Class OIT0003OrderList
                     ExcelTankDispatchDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, {Me.txtReportTrainNo.Text}, BaseDllConst.CONST_CONSIGNEECODE_51, Nothing)
                 End Using
 
+                If OIT0003Reporttbl.Rows.Count > 0 Then
+                    '数量の単位
+                    OIT0003Reporttbl.AsEnumerable().ToList().
+                        ForEach(Function(r)
+                                    Dim carsMount As Decimal
+                                    If Decimal.TryParse(r("CARSAMOUNT"), carsMount) Then
+                                        r("CARSAMOUNT") = carsMount * 1000
+                                    End If
+                                    Return r
+                                End Function)
+                End If
+
                 '帳票作成
                 Dim url As String =
                 OIT0003CustomMultiReport.CreateTankDispatch(Master.MAPID, officeCode, OIT0003Reporttbl, txtReportLodDate.Text, BaseDllConst.CONST_CONSIGNEECODE_51, txtReportTrainNo.Text)

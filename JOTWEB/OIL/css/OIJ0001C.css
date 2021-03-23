@@ -1,0 +1,85 @@
+﻿/* 費用明細(月単位)作成画面 */
+/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 1.6em;
+    font-size: 13.5px;
+    box-sizing: border-box;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+#divContensbox {
+    height: calc(100% - 2.4em - 1.4em);
+}
+/* コンテンツの最小横幅 */
+.headerbox, .detailbox, #tabBox {
+    min-width: 1220px;
+}
+
+    .detailbox a {
+        font-size: 12.8px;
+    }
+
+    .headerbox a {
+        font-size: 0.8em;
+    }
+
+.actionButtonBox {
+    padding: 5px;
+}
+
+
+/* 計上年月(ラベル) */
+#WF_KEIJYOYM_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 120px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+}
+
+/*計上年月(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_KEIJYOYM_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*計上年月input tag*/
+#WF_KEIJYOYM {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+}
+    #WF_KEIJYOYM input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+

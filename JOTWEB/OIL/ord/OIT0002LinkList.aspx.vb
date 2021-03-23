@@ -2109,6 +2109,11 @@ Public Class OIT0002LinkList
                                     OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
                                     OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
                                     OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
+                                    '★今回アップロードした営業所(対象駅)と不一致の場合(無条件で引き継ぐ)
+                                ElseIf OIT0002ExlUProw("TARGETSTATIONNAME") <> OIT0002ExlUProw("ARRSTATIONNAME") Then
+                                    OIT0002ExlUProw("ORDERNO") = OIT0002Exlrow("ORDERNO")
+                                    OIT0002ExlUProw("DETAILNO") = OIT0002Exlrow("DETAILNO")
+                                    OIT0002ExlUProw("ORDERSTATUS") = OIT0002Exlrow("ORDERSTATUS")
                                 ElseIf OIT0002Exlrow("DETAIL_DELFLG") = C_DELETE_FLG.ALIVE Then
                                     OIT0002ExlUProw("ORDERSTATUS") = ""
                                     '★前回登録した受注明細の内容が今回とで変更されている場合

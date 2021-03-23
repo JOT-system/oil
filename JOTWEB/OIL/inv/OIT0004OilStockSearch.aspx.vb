@@ -117,6 +117,10 @@ Public Class OIT0004OilStockSearch
             prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
+            If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+                leftview.WF_LeftListBox.Items.Clear()
+                leftview.WF_LeftListBox.Items.Add(New ListItem("根岸営業所", "011402"))
+            End If
             If leftview.WF_LeftListBox.Items IsNot Nothing Then
                 '一旦根岸(011402)'本当はログインユーザーのORG
                 Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue("011402")
@@ -125,10 +129,16 @@ Public Class OIT0004OilStockSearch
                     TxtSalesOffice.Text = foundItem.Value
                 Else
                     TxtSalesOffice.Text = leftview.WF_LeftListBox.Items(0).Value
+
                 End If
 
                 If TxtSalesOffice.Text <> "" Then
                     GetDefRelateValues(TxtSalesOffice.Text, shipperCode, consigneeCode)
+                    If Master.USER_ORG = "302001" Then
+                        consigneeCode = "10"
+                    ElseIf Master.USER_ORG = "301901" Then
+                        consigneeCode = "20"
+                    End If
                 End If
 
             End If
@@ -422,6 +432,21 @@ Public Class OIT0004OilStockSearch
                         If Master.USER_ORG = "011203" AndAlso WF_FIELD.Value = "TxtSalesOffice" Then
                             If leftview.WF_LeftListBox.Items.FindByValue("012402") Is Nothing Then
                                 leftview.WF_LeftListBox.Items.Add(New ListItem("三重塩浜営業所", "012402"))
+                            End If
+
+                        End If
+                        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+                            If WF_FIELD.Value = "TxtSalesOffice" Then
+                                leftview.WF_LeftListBox.Items.Clear()
+                                leftview.WF_LeftListBox.Items.Add(New ListItem("根岸営業所", "011402"))
+                            End If
+                            If WF_FIELD.Value = "WF_CONSIGNEE" Then
+                                leftview.WF_LeftListBox.Items.Clear()
+                                If Master.USER_ORG = "302001" Then
+                                    leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS北信油槽所", "10"))
+                                Else
+                                    leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS甲府油槽所", "20"))
+                                End If
                             End If
                         End If
                         .ActiveListBox()

@@ -5699,7 +5699,7 @@ Public Class OIT0006OutOfServiceDetail
             'Me.TxtArrDate.Enabled = True
             ''(予定)受入日
             'Me.TxtAccDate.Enabled = True
-            '''(予定)発駅戻り日
+            ''(予定)発駅戻り日
             ''Me.TxtEmparrDate.Enabled = True
             ''### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
             'If Me.ChkFareFlg.Checked = True Then

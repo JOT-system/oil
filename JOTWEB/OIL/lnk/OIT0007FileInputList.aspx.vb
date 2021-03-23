@@ -1366,7 +1366,21 @@ Public Class OIT0007FileInputList
                 retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.NoOrderInfo
                 Continue For
             End If
-            Dim query = (From dr As DataRow In dt Where dr("RESERVEDNO").Equals(retItm.ReservedNo) AndAlso dr("LODDATE").Equals(retItm.LodDate))
+            '↓2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            'Dim query = (From dr As DataRow In dt Where dr("RESERVEDNO").Equals(retItm.ReservedNo) AndAlso dr("LODDATE").Equals(retItm.LodDate))
+            '↑2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+
+            '↓2021/03 --- 並行稼働用の予約番号マッチング
+            Dim fieldSettings = (From itm In {
+                                     New With {Key .office = "011201", .oilField = "SHIPPEROILCODE", .tankField = "SEQ_TANKNO"},
+                                     New With {Key .office = "012401", .oilField = "SHIPPEROILCODE", .tankField = "SEQ_TANKNO"},
+                                     New With {Key .office = "011202", .oilField = "REPORTOILNAME", .tankField = "KINO_TRAINNO"},
+                                     New With {Key .office = "011203", .oilField = "REPORTOILNAME", .tankField = "OLDTANKNUMBER"},
+                                     New With {Key .office = "011402", .oilField = "NEG_SHIPPEROILCODE", .tankField = "NEG_KASHANO"}
+                                     }).ToDictionary(Function(x) x.office, Function(x) x)
+            Dim fieldSetting = fieldSettings(work.WF_SEL_SALESOFFICECODE.Text)
+            Dim query = (From dr As DataRow In dt Where dr(fieldSetting.oilField).Equals(retItm.InpOilTypeName) AndAlso dr(fieldSetting.tankField).Equals(retItm.InpTnkNo) AndAlso dr("LODDATE").Equals(retItm.LodDate))
+            '↑2021/03 --- 並行稼働用の予約番号マッチング
             If query.Any = False Then
                 retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.NoOrderInfo
                 Continue For
@@ -1622,13 +1636,22 @@ Public Class OIT0007FileInputList
                IsDate(inpItem.LodDate) = False Then
                 Continue For
             End If
-
+            '↓2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            'If isFirst Then
+            '    isFirst = False
+            '    sqlStat.AppendFormat("             ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
+            'Else
+            '    sqlStat.AppendFormat("         OR  ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
+            'End If
+            '↑2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            '↓2021/03 --- 並行稼働用ロジック
             If isFirst Then
                 isFirst = False
-                sqlStat.AppendFormat("             ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
-            Else
-                sqlStat.AppendFormat("         OR  ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
+                '暫定で予約番号なしだとキャンセルは重複の恐れが高まるので条件に含めない
+                sqlStat.AppendFormat("             ODR.LODDATE = '{0}'", inpItem.LodDate).AppendLine()
+                sqlStat.AppendFormat("        AND ODR.ORDERSTATUS <> '{0}'", CONST_ORDERSTATUS_900).AppendLine()
             End If
+            '↑2021/03 --- 並行稼働用ロジック
             hasCondition = True
         Next
         If hasCondition = False Then

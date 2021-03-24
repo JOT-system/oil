@@ -20,6 +20,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0001Detailtbl As DataTable                           '受注明細TBL取込用テーブル
     Private OIT0001OTOrdertbl As DataTable                          'OT空回日報(OT受注TBL)取込用テーブル
     Private OIT0001OTDetailtbl As DataTable                         'OT空回日報(OT受注明細TBL)取込用テーブル
     Private OIT0001CHKOrdertbl As DataTable                         '受注TBLチェック用テーブル
@@ -1488,6 +1489,17 @@ Public Class OIT0001EmptyTurnDairyList
 
         OIT0001OTDetailtbl.Clear()
 
+        '○受注明細TBL取込用
+        If IsNothing(OIT0001Detailtbl) Then
+            OIT0001Detailtbl = New DataTable
+        End If
+
+        If OIT0001Detailtbl.Columns.Count <> 0 Then
+            OIT0001Detailtbl.Columns.Clear()
+        End If
+
+        OIT0001Detailtbl.Clear()
+
         '○受注TBLチェック用
         If IsNothing(OIT0001CHKOrdertbl) Then
             OIT0001CHKOrdertbl = New DataTable
@@ -1502,7 +1514,7 @@ Public Class OIT0001EmptyTurnDairyList
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データをOT受注データを取得する
-        Dim SQLOrderStr As String =
+        Dim SQLOTOrderStr As String =
               " SELECT" _
             & "   '0' AS ORDERFLAG" _
             & " , OIT0016.CMPRESULTSCODE" _
@@ -1623,7 +1635,7 @@ Public Class OIT0001EmptyTurnDairyList
 
         '　検索説明
         '     条件指定に従い該当データをOT受注明細データを取得する
-        Dim SQLDetailStr As String =
+        Dim SQLOTDetailStr As String =
               " SELECT" _
             & "   '0' AS ORDERFLAG" _
             & " , OIT0017.ORDERNO" _
@@ -1705,6 +1717,85 @@ Public Class OIT0001EmptyTurnDairyList
             & " WHERE " _
             & "     OIT0017.DELFLG    <> @DELFLG"
 
+        '　検索説明
+        '     条件指定に従い該当データを受注明細データを取得する
+        Dim SQLDetailStr As String =
+              " SELECT" _
+            & "   OIT0003.ORDERNO" _
+            & " , OIT0003.DETAILNO" _
+            & " , OIT0003.SHIPORDER" _
+            & " , OIT0003.LINEORDER" _
+            & " , OIT0003.TANKNO" _
+            & " , OIT0003.KAMOKU" _
+            & " , OIT0003.STACKINGORDERNO" _
+            & " , OIT0003.STACKINGFLG" _
+            & " , OIT0003.WHOLESALEFLG" _
+            & " , OIT0003.INSPECTIONFLG" _
+            & " , OIT0003.DETENTIONFLG" _
+            & " , OIT0003.FIRSTRETURNFLG" _
+            & " , OIT0003.AFTERRETURNFLG" _
+            & " , OIT0003.OTTRANSPORTFLG" _
+            & " , OIT0003.UPGRADEFLG" _
+            & " , OIT0003.ORDERINFO" _
+            & " , OIT0003.SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME" _
+            & " , OIT0003.OILCODE" _
+            & " , OIT0003.OILNAME" _
+            & " , OIT0003.ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME" _
+            & " , OIT0003.CARSNUMBER" _
+            & " , OIT0003.CARSAMOUNT" _
+            & " , OIT0003.RETURNDATETRAIN" _
+            & " , OIT0003.JOINTCODE" _
+            & " , OIT0003.JOINT" _
+            & " , OIT0003.REMARK" _
+            & " , OIT0003.CHANGETRAINNO" _
+            & " , OIT0003.CHANGETRAINNAME" _
+            & " , OIT0003.SECONDCONSIGNEECODE" _
+            & " , OIT0003.SECONDCONSIGNEENAME" _
+            & " , OIT0003.SECONDARRSTATION" _
+            & " , OIT0003.SECONDARRSTATIONNAME" _
+            & " , OIT0003.CHANGERETSTATION" _
+            & " , OIT0003.CHANGERETSTATIONNAME" _
+            & " , OIT0003.LINE" _
+            & " , OIT0003.FILLINGPOINT" _
+            & " , OIT0003.LOADINGIRILINETRAINNO" _
+            & " , OIT0003.LOADINGIRILINETRAINNAME" _
+            & " , OIT0003.LOADINGIRILINEORDER" _
+            & " , OIT0003.LOADINGOUTLETTRAINNO" _
+            & " , OIT0003.LOADINGOUTLETTRAINNAME" _
+            & " , OIT0003.LOADINGOUTLETORDER" _
+            & " , OIT0003.ACTUALLODDATE" _
+            & " , OIT0003.ACTUALDEPDATE" _
+            & " , OIT0003.ACTUALARRDATE" _
+            & " , OIT0003.ACTUALACCDATE" _
+            & " , OIT0003.ACTUALEMPARRDATE" _
+            & " , OIT0003.RESERVEDNO" _
+            & " , OIT0003.GYONO" _
+            & " , OIT0003.OTSENDCOUNT" _
+            & " , OIT0003.DLRESERVEDCOUNT" _
+            & " , OIT0003.DLTAKUSOUCOUNT" _
+            & " , OIT0003.SALSE" _
+            & " , OIT0003.SALSETAX" _
+            & " , OIT0003.TOTALSALSE" _
+            & " , OIT0003.PAYMENT" _
+            & " , OIT0003.PAYMENTTAX" _
+            & " , OIT0003.TOTALPAYMENT" _
+            & " , OIT0003.ANASYORIFLG" _
+            & " , OIT0003.VOLSYORIFLG" _
+            & " , OIT0003.DELFLG" _
+            & " , OIT0003.INITYMD" _
+            & " , OIT0003.INITUSER" _
+            & " , OIT0003.INITTERMID" _
+            & " , OIT0003.UPDYMD" _
+            & " , OIT0003.UPDUSER" _
+            & " , OIT0003.UPDTERMID" _
+            & " , OIT0003.RECEIVEYMD" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003" _
+            & " WHERE " _
+            & "     OIT0003.ORDERNO    = @ORDERNO" _
+            & " AND OIT0003.DELFLG    <> @DELFLG"
+
         '★受注TBL存在チェック用
         Dim SQLChkOrderStr As String =
               " SELECT" _
@@ -1713,17 +1804,18 @@ Public Class OIT0001EmptyTurnDairyList
             & " WHERE OIT0002.ORDERNO = @ORDERNO"
 
         Try
-            Using SQLOrdercmd As New SqlCommand(SQLOrderStr, SQLcon),
+            Using SQLOTOrdercmd As New SqlCommand(SQLOTOrderStr, SQLcon),
+                  SQLOTDetailcmd As New SqlCommand(SQLOTDetailStr, SQLcon),
                   SQLDetailcmd As New SqlCommand(SQLDetailStr, SQLcon),
                   SQLChkOrdercmd As New SqlCommand(SQLChkOrderStr, SQLcon)
                 '★OT受注TBLからデータを取得
-                With SQLOrdercmd.Parameters
+                With SQLOTOrdercmd.Parameters
                     .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text    '営業所コード
                     .Add("@ORDERYMD", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")                '登録日
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.DELETE                     '削除フラグ
                 End With
 
-                Using SQLdr As SqlDataReader = SQLOrdercmd.ExecuteReader()
+                Using SQLdr As SqlDataReader = SQLOTOrdercmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0001OTOrdertbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -1763,13 +1855,13 @@ Public Class OIT0001EmptyTurnDairyList
                 Next
 
                 '★OT受注明細TBLからデータを取得
-                With SQLDetailcmd.Parameters
+                With SQLOTDetailcmd.Parameters
                     .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text    '営業所コード
                     .Add("@ORDERYMD", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")                '登録日
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.DELETE                     '削除フラグ
                 End With
 
-                Using SQLdr As SqlDataReader = SQLDetailcmd.ExecuteReader()
+                Using SQLdr As SqlDataReader = SQLOTDetailcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0001OTDetailtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -1788,6 +1880,24 @@ Public Class OIT0001EmptyTurnDairyList
                     Next
                 Next
 
+                '★受注明細TBLからデータを取得
+                Dim P_DELFLG As SqlParameter = SQLDetailcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar) '削除フラグ
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                P_ORDERNO = SQLDetailcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar) '受注№
+                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                    P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
+                    Using SQLdr As SqlDataReader = SQLDetailcmd.ExecuteReader()
+                        If OIT0001Detailtbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0001Detailtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0001Detailtbl.Load(SQLdr)
+                    End Using
+                Next
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L GetOTOrderData")

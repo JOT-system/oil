@@ -21924,8 +21924,16 @@ Public Class OIT0003OrderDetail
                             'OT輸送可否フラグ(チェックボックス)を非活性
                             chkObjOT.Enabled = False
                         Else
-                            'OT輸送可否フラグ(チェックボックス)を活性
-                            chkObjOT.Enabled = True
+                            '### 20210324 START 仙台新港営業所独自対応 ############################################
+                            '◯ 受注営業所が"010402"(仙台新港営業所)の場合
+                            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                                'OT輸送可否フラグ(チェックボックス)を非活性
+                                chkObjOT.Enabled = False
+                            Else
+                                'OT輸送可否フラグ(チェックボックス)を活性
+                                chkObjOT.Enabled = True
+                            End If
+                            '### 20210324 END   仙台新港営業所独自対応 ############################################
                         End If
                         Exit For
                     End If
@@ -22053,8 +22061,16 @@ Public Class OIT0003OrderDetail
                             'OT輸送可否フラグ(チェックボックス)を非活性
                             chkObjOT.Enabled = False
                         Else
-                            'OT輸送可否フラグ(チェックボックス)を活性
-                            chkObjOT.Enabled = True
+                            '### 20210324 START 仙台新港営業所独自対応 ############################################
+                            '◯ 受注営業所が"010402"(仙台新港営業所)の場合
+                            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                                'OT輸送可否フラグ(チェックボックス)を非活性
+                                chkObjOT.Enabled = False
+                            Else
+                                'OT輸送可否フラグ(チェックボックス)を活性
+                                chkObjOT.Enabled = True
+                            End If
+                            '### 20210324 END   仙台新港営業所独自対応 ############################################
                         End If
                         Exit For
                     End If
@@ -22540,6 +22556,17 @@ Public Class OIT0003OrderDetail
                                 If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
                                     'OT輸送可否フラグ(チェックボックス)を非活性
                                     If chkObjOT IsNot Nothing Then chkObjOT.Enabled = False
+                                Else
+                                    '### 20210324 START 仙台新港営業所独自対応 ############################################
+                                    '◯ 受注営業所が"010402"(仙台新港営業所)の場合
+                                    If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                                        'OT輸送可否フラグ(チェックボックス)を非活性
+                                        chkObjOT.Enabled = False
+                                    Else
+                                        'OT輸送可否フラグ(チェックボックス)を活性
+                                        chkObjOT.Enabled = True
+                                    End If
+                                    '### 20210324 END   仙台新港営業所独自対応 ############################################
                                 End If
                                 Exit For
                             End If

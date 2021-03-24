@@ -8309,8 +8309,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                                 'OT輸送可否フラグ(チェックボックス)を非活性
                                 chkObjOT.Enabled = False
                             Else
-                                'OT輸送可否フラグ(チェックボックス)を活性
-                                chkObjOT.Enabled = True
+                                '◯ 受注営業所が"010402"(仙台新港営業所)の場合
+                                If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                                    'OT輸送可否フラグ(チェックボックス)を非活性
+                                    chkObjOT.Enabled = False
+                                Else
+                                    'OT輸送可否フラグ(チェックボックス)を活性
+                                    chkObjOT.Enabled = True
+                                End If
                             End If
                             Exit For
                         End If

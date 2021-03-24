@@ -19,9 +19,27 @@ Public Class OIT0003CustomMultiReport
 
     Public Shared Function CreateActualShip(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As String
         Dim url As String
+        Dim fileName As String = Nothing
+        Dim sheetName As String = Nothing
+
         Using repCbj = New ActualShip(mapId, officeCode, printDataClass)
             Try
-                url = repCbj.CreatePrintData(lodDate, trainNo)
+                Select Case officeCode
+                    Case BaseDllConst.CONST_OFFICECODE_011203
+                        fileName = "タンク車発送フォーマット７.xls"
+                        sheetName = "Sheet1"
+                    Case BaseDllConst.CONST_OFFICECODE_012402
+                        Select Case trainNo
+                            Case "8072"
+                                fileName = "タンク車発送フォーマット１.xls"
+                            Case "5282"
+                                fileName = "タンク車発送フォーマット３.xls"
+                            Case "174"
+                                fileName = "タンク車発送フォーマット４.xls"
+                        End Select
+                        sheetName = "Sheet1"
+                End Select
+                url = repCbj.CreatePrintData(lodDate, trainNo, outputFileName:=fileName, outputSheetName:=sheetName)
             Catch ex As Exception
                 Throw
             End Try
@@ -242,7 +260,7 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
         Return result
     End Function
 
-    Protected Sub ExcelSaveAs(filePath As String)
+    Protected Sub ExcelSaveAs(filePath As String, Optional uploadFilePath As String = Nothing)
         Try
 
             '保存処理実行
@@ -254,6 +272,12 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
                     ExcelBookObj.SaveAs(filePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
                 End If
             End SyncLock
+
+            '★別名が設定されている場合
+            If Not String.IsNullOrEmpty(uploadFilePath) AndAlso filePath <> uploadFilePath Then
+                '作成したファイルを指定パスに配置する。
+                System.IO.File.Copy(filePath, uploadFilePath)
+            End If
 
         Catch ex As Exception
             Throw '呼出し元にThrow
@@ -382,29 +406,35 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
         MyBase.New(mapId, TEMP_XLS_FILE_NAME)
         Me.OfficeCode = officeCode
         Me.PrintData = printDataClass
-
-        '○作業シート設定
-        TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
     End Sub
 
     ''' <summary>
     ''' 帳票作成処理
     ''' </summary>
     ''' <returns>ダウンロードURL</returns>
-    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
+    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String,
+                                    Optional ByVal outputFileName As String = Nothing,
+                                    Optional ByVal outputSheetName As String = Nothing) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xls"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
+
+        If String.IsNullOrEmpty(outputFileName) Then
+            outputFileName = tmpFileName
+        End If
+        Dim uploadFilePath As String = IO.Path.Combine(UploadRootPath, outputFileName)
+
+        If String.IsNullOrEmpty(outputSheetName) Then
+            outputSheetName = "出荷実績表"
+        End If
 
         Try
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
             Do
-                If rowIndex > 0 Then
-                    '○作業シート設定
-                    TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
-                End If
+                '○作業シート設定
+                TrySetExcelWorkSheet(outputSheetName, "TEMPLATE")
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -441,10 +471,10 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             End If
 
             '保存処理実行
-            ExcelSaveAs(tmpFilePath)
+            ExcelSaveAs(tmpFilePath, uploadFilePath)
             ExcelBookObj.Close(False)
 
-            Return UrlRoot & tmpFileName
+            Return UrlRoot & outputFileName
 
         Catch ex As Exception
             Throw '呼出し元にThrow

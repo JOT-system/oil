@@ -92,6 +92,7 @@
     ''' <param name="blnFrame">"(ダブルクオーテーション)で囲む時はtrue。</param>
     ''' <param name="blnSeparate">,(カンマ)で区切る時はtrue。</param>
     Public Function ConvertDataTableToCsv(writeHeader As Boolean,
+                                          Optional ByVal strOfficeCode As String = Nothing,
                                           Optional ByVal blnFrame As Boolean = False,
                                           Optional ByVal blnSeparate As Boolean = False,
                                           Optional ByVal blnNewline As Boolean = True) As String
@@ -154,8 +155,14 @@
 
             '★指定フォルダが設定されている場合
             If Me.UploadFilePath <> "" Then
-                '作成したファイルを指定フォルダに配置する。
-                System.IO.File.Copy(Me.UploadTmpFilePath, Me.UploadFilePath)
+                Select Case strOfficeCode
+                    Case BaseDllConst.CONST_OFFICECODE_011201,
+                         BaseDllConst.CONST_OFFICECODE_012401
+                        '(暫定対応)五井営業所・四日市営業所
+                    Case Else
+                        '作成したファイルを指定フォルダに配置する。
+                        System.IO.File.Copy(Me.UploadTmpFilePath, Me.UploadFilePath)
+                End Select
             End If
 
             'ストリーム生成

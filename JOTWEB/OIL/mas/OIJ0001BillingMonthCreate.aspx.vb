@@ -1,10 +1,20 @@
 ﻿Imports JOTWEB.GRIS0005LeftBox
+Imports System.Data.SqlClient
 ''' <summary>
 ''' 費用明細(月単位)作成画面
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIJ0001BillingMonthCreate
     Inherits System.Web.UI.Page
+    '○ 共通関数宣言(BASEDLL)
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
+    Private CS0023XLSUPLOAD As New CS0023XLSUPLOAD                  'XLSアップロード
+    Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
+    Private CS0030REPORT As New CS0030REPORT                        '帳票出力
+    Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private CS0052DetailView As New CS0052DetailView                'Repeterオブジェクト作成
 
     '○ 共通処理結果
     Private WW_ERR_SW As String
@@ -19,6 +29,8 @@ Public Class OIJ0001BillingMonthCreate
                     '    WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
                         WF_ButtonEND_Click()
+                    Case "WF_ButtonINSERT"              '受注費用明細ボタン押下
+                        WF_ButtonINSERT_Click()
                     Case "WF_Field_DBClick"             'フィールドダブルクリック
                         WF_FIELD_DBClick()
                     Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
@@ -125,6 +137,223 @@ Public Class OIJ0001BillingMonthCreate
 
         '○ 前画面遷移
         Master.TransitionPrevPage()
+
+    End Sub
+    ''' <summary>
+    ''' 受注費用明細ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSERT_Click()
+        '受注費用明細作成処理
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_ORDERDETAILBILLING(SQLcon)
+        End Using
+    End Sub
+    ''' <summary>
+    ''' 受注費用明細作成処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    Protected Sub WW_ORDERDETAILBILLING(ByVal SQLcon As SqlConnection)
+        Try
+            '追加SQL文･･･受注費用明細TBLに月単位で明細を作成
+            Dim SQLCmn1Str As String = ""
+            Dim SQLCmn2Str As String = ""
+            Dim SQLAct1Str As String = ""
+            Dim SQLAct2Str As String = ""
+            Dim SQLStr As String =
+                    String.Format(" DELETE FROM OIL.OIT0013_ORDERDETAILBILLINGMTH WHERE BILLINGMONTH='{0}'; ", Me.TxtKeijyoYM.Text)
+
+            '○INSERT分(投入用TBL)
+            SQLStr &=
+                  " INSERT INTO oil.OIT0013_ORDERDETAILBILLINGMTH " _
+                & " (" _
+                & "   BILLINGMONTH, BILLINGNO, ORDERNO, DETAILNO, PATCODE, PATNAME" _
+                & " , ACCOUNTCODE, ACCOUNTNAME, SEGMENTCODE, SEGMENTNAME, BREAKDOWNCODE, BREAKDOWN" _
+                & " , SHIPPERSCODE, SHIPPERSNAME, BASECODE, BASENAME, OFFICECODE, OFFICENAME" _
+                & " , DEPSTATION, DEPSTATIONNAME, ARRSTATION, ARRSTATIONNAME, CONSIGNEECODE, CONSIGNEENAME" _
+                & " , KEIJYOYMD, TRAINNO, TRAINNAME, MODEL, TANKNO, OTTRANSPORTFLG, CARSNUMBER, CARSAMOUNT" _
+                & " , LOAD, OILCODE, OILNAME, ORDERINGTYPE, ORDERINGOILNAME, CHANGETRAINNO, CHANGETRAINNAME" _
+                & " , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME, SECONDARRSTATION, SECONDARRSTATIONNAME" _
+                & " , CHANGERETSTATION, CHANGERETSTATIONNAME, TRKBN, TRKBNNAME, KIRO, CALCKBN, CALCKBNNAME" _
+                & " , JROILTYPE, CHARGE, DISCOUNT1, DISCOUNT2, DISCOUNT3, DISCOUNT4, DISCOUNT5, DISCOUNT6, DISCOUNT7" _
+                & " , APPLYCHARGE, AMOUNT, TAX, CONSUMPTIONTAX, INVOICECODE, INVOICENAME, INVOICEDEPTNAME" _
+                & " , PAYEECODE, PAYEENAME, PAYEEDEPTNAME, DELFLG, INITYMD, INITUSER, INITTERMID, UPDYMD, UPDUSER, UPDTERMID, RECEIVEYMD" _
+                & " )"
+
+            '★共通1SQL
+            SQLCmn1Str =
+                  " SELECT" _
+                & "    FORMAT(CONVERT(DATE,OIT0003.ACTUALLODDATE),'yyyy/MM') AS BILLINGMONTH" _
+                & "  , ISNULL(OIT0002.BILLINGNO, '') AS BILLINGNO" _
+                & "  , ISNULL(RTRIM(OIT0002.ORDERNO), '') AS ORDERNO" _
+                & "  , ISNULL(RTRIM(OIT0003.DETAILNO), '') AS DETAILNO" _
+                & "  , ISNULL(RTRIM(VIW0012.PATCODE), '') AS PATCODE" _
+                & "  , ISNULL(RTRIM(VIW0012.PATNAME), '') AS PATNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.ACCOUNTCODE), '') AS ACCOUNTCODE" _
+                & "  , ISNULL(RTRIM(VIW0012.ACCOUNTNAME), '') AS ACCOUNTNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.SEGMENTCODE), '') AS SEGMENTCODE" _
+                & "  , ISNULL(RTRIM(VIW0012.SEGMENTNAME), '') AS SEGMENTNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.BREAKDOWNCODE), '') AS BREAKDOWNCODE" _
+                & "  , ISNULL(RTRIM(VIW0012.BREAKDOWN), '') AS BREAKDOWN" _
+                & "  , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '') AS SHIPPERSCODE" _
+                & "  , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '') AS SHIPPERSNAME" _
+                & "  , ISNULL(RTRIM(OIT0002.BASECODE), '') AS BASECODE" _
+                & "  , ISNULL(RTRIM(OIT0002.BASENAME), '') AS BASENAME" _
+                & "  , ISNULL(RTRIM(OIT0002.OFFICECODE), '') AS OFFICECODE" _
+                & "  , ISNULL(RTRIM(OIT0002.OFFICENAME), '') AS OFFICENAME" _
+                & "  , ISNULL(RTRIM(OIT0002.DEPSTATION), '') AS DEPSTATION" _
+                & "  , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '') AS DEPSTATIONNAME" _
+                & "  , ISNULL(RTRIM(OIT0002.ARRSTATION), '') AS ARRSTATION" _
+                & "  , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '') AS ARRSTATIONNAME" _
+                & "  , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '') AS CONSIGNEECODE" _
+                & "  , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '') AS CONSIGNEENAME" _
+                & "  , ISNULL( " _
+                & "    RTRIM(OIT0003.ACTUALLODDATE)" _
+                & "    , FORMAT(GETDATE(), 'yyyy/MM/dd')" _
+                & "  ) AS KEIJYOYMD" _
+                & "  , ISNULL(RTRIM(OIT0002.TRAINNO), '') AS TRAINNO" _
+                & "  , ISNULL(RTRIM(OIT0002.TRAINNAME), '') AS TRAINNAME" _
+                & "  , ISNULL(RTRIM(OIM0005.MODEL), '') AS MODEL" _
+                & "  , ISNULL(RTRIM(OIT0003.TANKNO), '') AS TANKNO" _
+                & "  , ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '') AS OTTRANSPORTFLG" _
+                & "  , ISNULL(RTRIM(OIT0003.CARSNUMBER), '') AS CARSNUMBER" _
+                & "  , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '') AS CARSAMOUNT" _
+                & "  , ISNULL(RTRIM(OIM0005.LOAD), '') AS LOAD" _
+                & "  , ISNULL(RTRIM(OIT0003.OILCODE), '') AS OILCODE" _
+                & "  , ISNULL(RTRIM(OIT0003.OILNAME), '') AS OILNAME" _
+                & "  , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '') AS ORDERINGTYPE" _
+                & "  , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '') AS ORDERINGOILNAME" _
+                & "  , ISNULL(RTRIM(OIT0003.CHANGETRAINNO), '') AS CHANGETRAINNO" _
+                & "  , ISNULL(RTRIM(OIT0003.CHANGETRAINNAME), '') AS CHANGETRAINNAME" _
+                & "  , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '') AS SECONDCONSIGNEECODE" _
+                & "  , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '') AS SECONDCONSIGNEENAME" _
+                & "  , ISNULL(RTRIM(OIT0003.SECONDARRSTATION), '') AS SECONDARRSTATION" _
+                & "  , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '') AS SECONDARRSTATIONNAME" _
+                & "  , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '') AS CHANGERETSTATION" _
+                & "  , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '') AS CHANGERETSTATIONNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.TRKBN), '') AS TRKBN" _
+                & "  , ISNULL(RTRIM(VIW0012.TRKBNNAME), '') AS TRKBNNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.KIRO), '') AS KIRO" _
+                & "  , ISNULL(RTRIM(VIW0012.CALCKBN), '') AS CALCKBN" _
+                & "  , ISNULL(RTRIM(VIW0012.CALCKBNNAME), '') AS CALCKBNNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.JROILTYPE), '') AS JROILTYPE" _
+                & "  , ISNULL(RTRIM(VIW0012.FARE), '') AS CHARGE" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT1), '') AS DISCOUNT1" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT2), '') AS DISCOUNT2" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT3), '') AS DISCOUNT3" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT4), '') AS DISCOUNT4" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT5), '') AS DISCOUNT5" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT6), '') AS DISCOUNT6" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNT7), '') AS DISCOUNT7" _
+                & "  , ISNULL(RTRIM(VIW0012.DISCOUNTFARE), '') AS APPLYCHARGE" _
+                & "  , CASE" _
+                & "    WHEN VIW0012.CALCKBN = '1' THEN OIT0003.CARSNUMBER * VIW0012.DISCOUNTFARE" _
+                & "    WHEN VIW0012.CALCKBN = '2' THEN OIT0003.CARSAMOUNT * VIW0012.DISCOUNTFARE" _
+                & "    WHEN VIW0012.CALCKBN = '3' THEN OIM0005.LOAD * VIW0012.DISCOUNTFARE" _
+                & "    END                                    AS AMOUNT" _
+                & "  , CASE" _
+                & "    WHEN VIW0012.CALCKBN = '1' THEN OIT0003.CARSNUMBER * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))" _
+                & "    WHEN VIW0012.CALCKBN = '2' THEN OIT0003.CARSAMOUNT * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))" _
+                & "    WHEN VIW0012.CALCKBN = '3' THEN OIM0005.LOAD * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))" _
+                & "    END                                    AS TAX" _
+                & "  , CONVERT(DECIMAL(5,2), OIS0015.KEYCODE) AS CONSUMPTIONTAX" _
+                & "  , ISNULL(RTRIM(VIW0012.INVOICECODE), '') AS INVOICECODE" _
+                & "  , ISNULL(RTRIM(VIW0012.INVOICENAME), '') AS INVOICENAME" _
+                & "  , ISNULL(RTRIM(VIW0012.INVOICEDEPTNAME), '') AS INVOICEDEPTNAME" _
+                & "  , ISNULL(RTRIM(VIW0012.PAYEECODE), '') AS PAYEECODE" _
+                & "  , ISNULL(RTRIM(VIW0012.PAYEENAME), '') AS PAYEENAME" _
+                & "  , ISNULL(RTRIM(VIW0012.PAYEEDEPTNAME), '') AS PAYEEDEPTNAME" _
+                & String.Format("  , '{0}' AS DELFLG", C_DELETE_FLG.ALIVE) _
+                & String.Format("  , '{0}' AS INITYMD", Date.Now) _
+                & String.Format("  , '{0}' AS INITUSER", Master.USERID) _
+                & String.Format("  , '{0}' AS INITTERMID", Master.USERTERMID) _
+                & String.Format("  , '{0}' AS UPDYMD", Date.Now) _
+                & String.Format("  , '{0}' AS UPDUSER", Master.USERID) _
+                & String.Format("  , '{0}' AS UPDTERMID", Master.USERTERMID) _
+                & String.Format("  , '{0}' AS RECEIVEYMD", C_DEFAULT_YMD)
+
+            SQLCmn1Str &=
+                  " FROM" _
+                & "  OIL.OIT0002_ORDER OIT0002 " _
+                & "  INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
+                & "    ON OIT0003.ORDERNO = OIT0002.ORDERNO " _
+                & "    AND OIT0003.DELFLG <> '1' " _
+                & String.Format("    AND FORMAT(CONVERT(DATE,OIT0003.ACTUALLODDATE),'yyyy/MM') = '{0}'", Me.TxtKeijyoYM.Text) _
+                & "  INNER JOIN OIL.OIM0005_TANK OIM0005 " _
+                & "    ON OIT0003.TANKNO = OIM0005.TANKNUMBER " _
+                & "    AND OIM0005.DELFLG <> '1' "
+
+            '料金作成用1(共通)
+            SQLAct1Str =
+                  "   INNER JOIN OIL.VIW0012_ACCOUNTLIST VIW0012 " _
+                & "    ON VIW0012.OFFICECODE = OIT0002.OFFICECODE " _
+                & "    AND VIW0012.SHIPPERSCODE = OIT0003.SHIPPERSCODE " _
+                & "    AND VIW0012.BASECODE = OIT0002.BASECODE " _
+                & "    AND VIW0012.DEPSTATION = OIT0002.DEPSTATION " _
+                & "    AND VIW0012.ARRSTATION = OIT0002.ARRSTATION " _
+                & "    AND VIW0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
+                & "    AND VIW0012.LOAD = OIM0005.LOAD " _
+                & "    AND VIW0012.JROILTYPE = 'X' "
+
+            '料金作成用2(危険品・普通品)
+            SQLAct2Str =
+                  "   INNER JOIN OIL.VIW0012_ACCOUNTLIST VIW0012 " _
+                & "    ON VIW0012.OFFICECODE = OIT0002.OFFICECODE " _
+                & "    AND VIW0012.SHIPPERSCODE = OIT0003.SHIPPERSCODE " _
+                & "    AND VIW0012.BASECODE = OIT0002.BASECODE " _
+                & "    AND VIW0012.DEPSTATION = OIT0002.DEPSTATION " _
+                & "    AND VIW0012.ARRSTATION = OIT0002.ARRSTATION " _
+                & "    AND VIW0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
+                & "    AND VIW0012.LOAD = OIM0005.LOAD " _
+                & "    AND VIW0012.JROILTYPE <> 'X' " _
+                & "    AND VIW0012.JROILTYPE = CASE " _
+                & String.Format("      WHEN OIT0003.OILCODE = '{0}' ", BaseDllConst.CONST_HTank) _
+                & String.Format("      OR OIT0003.OILCODE = '{0}' ", BaseDllConst.CONST_RTank) _
+                & "        THEN 'D' " _
+                & "      ELSE 'N' " _
+                & "      END "
+
+            '★共通2SQL
+            SQLCmn2Str =
+                  "  INNER JOIN com.OIS0015_FIXVALUE OIS0015 ON" _
+               & "  OIS0015.CLASS = 'CONSUMPTIONTAX'" _
+               & "  AND OIT0003.ACTUALLODDATE BETWEEN OIS0015.STYMD AND OIS0015.ENDYMD" _
+               & " WHERE" _
+               & String.Format("  OIT0002.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
+               & String.Format("  AND OIT0002.ORDERSTATUS <> '{0}'", BaseDllConst.CONST_ORDERSTATUS_900)
+
+            '★SQL組み立て
+            SQLStr &=
+                 SQLCmn1Str & SQLAct1Str & SQLCmn2Str _
+               & "UNION ALL " _
+               & SQLCmn1Str & SQLAct2Str & SQLCmn2Str
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIJ0001C_ORDERDETAILBILLING INSERT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIJ0001C_ORDERDETAILBILLING INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
     ''' <summary>

@@ -1037,7 +1037,8 @@ Public Class OIT0006OutOfServiceList
                                             "3",
                                             "",
                                             BaseDllConst.CONST_TANKSITUATION_01,
-                                            I_TANKNO:=OIT0006His2tblrow("TANKNO"))
+                                            I_TANKNO:=OIT0006His2tblrow("TANKNO"),
+                                            upORDERNO:=True)
 
 #Region "### 20200115 新画面に整理後、不要と判断(廃止) #########################################################"
                     ''350：受注確定
@@ -1121,7 +1122,8 @@ Public Class OIT0006OutOfServiceList
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
                                       ByVal I_SITUATION As String,
-                                      Optional ByVal I_TANKNO As String = Nothing)
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal upORDERNO As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -1159,6 +1161,10 @@ Public Class OIT0006OutOfServiceList
             'If upActualEmparrDate = True Then
             '    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
             'End If
+            '使用受注No
+            If upORDERNO = True Then
+                SQLStr &= String.Format("        USEORDERNO = '{0}', ", "")
+            End If
 
             SQLStr &=
                       "        UPDYMD       = @P11, " _

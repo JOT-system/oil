@@ -19,9 +19,27 @@ Public Class OIT0003CustomMultiReport
 
     Public Shared Function CreateActualShip(mapId As String, officeCode As String, printDataClass As DataTable, ByVal lodDate As String, ByVal trainNo As String) As String
         Dim url As String
+        Dim fileName As String = Nothing
+        Dim sheetName As String = Nothing
+
         Using repCbj = New ActualShip(mapId, officeCode, printDataClass)
             Try
-                url = repCbj.CreatePrintData(lodDate, trainNo)
+                Select Case officeCode
+                    Case BaseDllConst.CONST_OFFICECODE_011203
+                        fileName = "タンク車発送フォーマット７.xls"
+                        sheetName = "Sheet1"
+                    Case BaseDllConst.CONST_OFFICECODE_012402
+                        Select Case trainNo
+                            Case "8072"
+                                fileName = "タンク車発送フォーマット１.xls"
+                            Case "5282"
+                                fileName = "タンク車発送フォーマット３.xls"
+                            Case "174"
+                                fileName = "タンク車発送フォーマット４.xls"
+                        End Select
+                        sheetName = "Sheet1"
+                End Select
+                url = repCbj.CreatePrintData(lodDate, trainNo, outputFileName:=fileName, outputSheetName:=sheetName)
             Catch ex As Exception
                 Throw
             End Try
@@ -242,7 +260,7 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
         Return result
     End Function
 
-    Protected Sub ExcelSaveAs(filePath As String)
+    Protected Sub ExcelSaveAs(filePath As String, Optional uploadFilePath As String = Nothing)
         Try
 
             '保存処理実行
@@ -254,6 +272,12 @@ Public MustInherit Class OIT0003CustomMultiReportBase : Implements IDisposable
                     ExcelBookObj.SaveAs(filePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
                 End If
             End SyncLock
+
+            '★別名が設定されている場合
+            If Not String.IsNullOrEmpty(uploadFilePath) AndAlso filePath <> uploadFilePath Then
+                '作成したファイルを指定パスに配置する。
+                System.IO.File.Copy(filePath, uploadFilePath)
+            End If
 
         Catch ex As Exception
             Throw '呼出し元にThrow
@@ -382,29 +406,35 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
         MyBase.New(mapId, TEMP_XLS_FILE_NAME)
         Me.OfficeCode = officeCode
         Me.PrintData = printDataClass
-
-        '○作業シート設定
-        TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
     End Sub
 
     ''' <summary>
     ''' 帳票作成処理
     ''' </summary>
     ''' <returns>ダウンロードURL</returns>
-    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
+    Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String,
+                                    Optional ByVal outputFileName As String = Nothing,
+                                    Optional ByVal outputSheetName As String = Nothing) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xls"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
+
+        If String.IsNullOrEmpty(outputFileName) Then
+            outputFileName = tmpFileName
+        End If
+        Dim uploadFilePath As String = IO.Path.Combine(UploadRootPath, outputFileName)
+
+        If String.IsNullOrEmpty(outputSheetName) Then
+            outputSheetName = "出荷実績表"
+        End If
 
         Try
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
             Do
-                If rowIndex > 0 Then
-                    '○作業シート設定
-                    TrySetExcelWorkSheet("出荷実績表", "TEMPLATE")
-                End If
+                '○作業シート設定
+                TrySetExcelWorkSheet(outputSheetName, "TEMPLATE")
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -441,10 +471,10 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
             End If
 
             '保存処理実行
-            ExcelSaveAs(tmpFilePath)
+            ExcelSaveAs(tmpFilePath, uploadFilePath)
             ExcelBookObj.Close(False)
 
-            Return UrlRoot & tmpFileName
+            Return UrlRoot & outputFileName
 
         Catch ex As Exception
             Throw '呼出し元にThrow
@@ -575,8 +605,9 @@ End Class
 Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
     Private Const TEMP_XLS_FILE_NAME As String = "TANKDISPATCH.xlsx"
-    Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 9
-    Private Const DETAIL_AREA_ROWS_COUNT As Integer = 20
+    Private Const A_AREA_BEGIN_ROW_INDEX As Integer = 3
+    Private Const B_AREA_BEGIN_ROW_INDEX As Integer = 9
+    Private Const B_AREA_ROWS_COUNT As Integer = 20
 
     Protected OfficeCode As String
     Protected PrintData As DataTable
@@ -606,7 +637,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
         Try
             '○作業シート設定
-            TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_{0}", OfficeCode))
+            TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
@@ -615,7 +646,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 '○NextPage
                 If rowIndex > 0 Then
                     '○作業シート設定
-                    TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_{0}", OfficeCode))
+                    TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
                 End If
 
                 '○出力シート設定
@@ -623,13 +654,26 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                     OutputSheetNames.Add(ExcelWorkSheet.Name)
                 End If
 
-                '◯ヘッダーの設定
-                EditHeaderArea(lodDate, trainNo, consigneeCode)
+                '○ヘッダーの設定
+                EditHeaderAreaB(lodDate, trainNo, consigneeCode)
 
-                '◯明細の設定
-                EditDetailArea(rowIndex)
+                '○明細の設定
+                EditDetailAreaB(rowIndex)
 
-                rowIndex += DETAIL_AREA_ROWS_COUNT
+                Dim detailSheetName As String = ExcelWorkSheet.Name
+
+                '○作業シート設定
+                TrySetExcelWorkSheet("出光昭和シェルUP用", String.Format("TEMPLATE_A_{0}", OfficeCode))
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
+                End If
+
+                '○明細の設定
+                EditDetailAreaA(rowIndex, detailSheetName)
+
+                rowIndex += B_AREA_ROWS_COUNT
             Loop While rowIndex < maxRowIndex
 
             '○出力シートのみ残す
@@ -643,7 +687,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 Next
                 For Each sheetName As String In allSeetName.
                     Where(Function(x) Not OutputSheetNames.Contains(x.Key)).
-                    OrderByDescending(Function(x) x.Value).
+                    OrderBy(Function(x) x.Value).
                     Select(Function(x) x.Key).ToList()
 
                     If TrySetExcelWorkSheet(sheetName) Then
@@ -667,7 +711,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea(ByVal lodDate As String, ByVal trainNo() As String, ByVal consigneeCode As String)
+    Private Sub EditHeaderAreaB(ByVal lodDate As String, ByVal trainNo() As String, ByVal consigneeCode As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
 
@@ -790,14 +834,14 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' 明細部分の編集
     ''' </summary>
-    Private Sub EditDetailArea(ByVal rowIndex As Integer)
+    Private Sub EditDetailAreaB(ByVal rowIndex As Integer)
         Dim rngDetailArea As Excel.Range = Nothing
         Try
 
             Dim printRows = PrintData.AsEnumerable.
                 Skip(rowIndex).
-                Take(DETAIL_AREA_ROWS_COUNT).
-                Select(Function(r, i) New With {.row = r, .index = i + DETAIL_AREA_BEGIN_ROW_INDEX}).ToList()
+                Take(B_AREA_ROWS_COUNT).
+                Select(Function(r, i) New With {.row = r, .index = i + B_AREA_BEGIN_ROW_INDEX}).ToList()
 
             For Each r In printRows
                 'コード
@@ -807,12 +851,194 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '積載実数量
                 rngDetailArea = ExcelWorkSheet.Range("D" + r.index.ToString())
-                rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString("#.##0")
+                rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString()
                 ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号
                 rngDetailArea = ExcelWorkSheet.Range("E" + r.index.ToString())
                 rngDetailArea.Value = r.row("TANKNUMBER")
+                ExcelMemoryRelease(rngDetailArea)
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 出光昭和シェルUP用明細の編集
+    ''' </summary>
+    Private Sub EditDetailAreaA(ByVal rowIndex As Integer, ByVal detailSheetName As String)
+        Dim rngDetailArea As Excel.Range = Nothing
+        Try
+
+            Dim printRows = PrintData.AsEnumerable.
+                Skip(rowIndex).
+                Take(B_AREA_ROWS_COUNT).
+                Select(Function(r, i) New With {.row = r, .index = i + A_AREA_BEGIN_ROW_INDEX}).ToList()
+
+            For Each r In printRows
+                '処理区分
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("A{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""A"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'スタート
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("B{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""S"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'エンド
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("C{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""E"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '販売伝票タイプ
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("D{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""ZST1"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '販売組織
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("E{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""MST"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '流通チャネル
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("F{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""S1"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '製品部門
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("G{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",10)", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '出荷先
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("I{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$H$4)", r.index, detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '出荷条件
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("K{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",35)", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '入荷ポイント
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("L{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",1000)", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '納入期日
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("O{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$G$3)", r.index, detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'SAP品目コード
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("P{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF('{0}'!$C$9=0,"""",'{0}'!$C$9)", detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '受注数量
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("Q{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF('{0}'!$D$9=0,"""",'{0}'!$D$9)", detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'プラント
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("R{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($Q{0}="""","""",'{1}'!$D$4)", r.index, detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '保管場所
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("S{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",1000)", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '明細番号
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("U{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($Q{0}="""","""",""1"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '処理区分
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AC{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""A"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'スタート
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AD{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""S"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'エンド
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AE{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""E"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '出荷ポイント
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AH{0}", r.index))
+                rngDetailArea.Value = String.Format("=$R{0}", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '出庫転記日
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AI{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$C$3)", r.index, detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '処理区分
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AQ{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""A"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'スタート
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AR{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""S"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'エンド
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AS{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""E"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '処理区分(01：流通/02：原油)
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AT{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""01"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '輸送計画ポイント
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AU{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""TP03"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                'シップメントタイプ
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AV{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""Z1R1"")", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '積載終了日
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AW{0}", r.index))
+                rngDetailArea.Value = String.Format("=$AI{0}", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '輸送確認終日
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AX{0}", r.index))
+                rngDetailArea.Value = String.Format("=$O{0}", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '輸送機関
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AY{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$E$9)", r.index, detailSheetName)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '運送業者
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("AZ{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",1286)", r.index)
+                ExcelMemoryRelease(rngDetailArea)
+
+                '経路
+                rngDetailArea = ExcelWorkSheet.Range(String.Format("BA{0}", r.index))
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""T00016"")", r.index)
                 ExcelMemoryRelease(rngDetailArea)
             Next
 
@@ -1074,8 +1300,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
         Me.PrintData = printDataClass
 
-        '○作業シート設定
-        TrySetExcelWorkSheet("受注明細", "TEMPLATE")
     End Sub
 
     Public Function CreatePrintData(Optional ByVal trainNo As String = Nothing, Optional ByVal lodDate As String = Nothing, Optional ByVal depDate As String = Nothing) As String
@@ -1088,12 +1312,14 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
             Dim query = Me.PrintData.AsEnumerable().
                 GroupBy(Function(r) New With {
                     Key .officeCode = r("OFFICECODE").ToString(),
+                    Key .orderNo = r("ORDERNO").ToString(),
                     Key .trainNo = r("TRAINNO").ToString(),
                     Key .lodDate = r("LODDATE").ToString(),
                     Key .depDate = r("DEPDATE").ToString()
                 }).
                 Select(Function(g) New With {
                     g.Key.officeCode,
+                    g.Key.orderNo,
                     g.Key.trainNo,
                     g.Key.lodDate,
                     g.Key.depDate,
@@ -1111,33 +1337,51 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                               selectFlg = (p.depDate = depDate)
                           End If
                           Return selectFlg
-                      End Function).ToList()
+                      End Function).
+                OrderBy(Function(p) p.officeCode).
+                ThenBy(Function(p) p.orderNo).
+                ThenBy(Function(p) p.trainNo).
+                ThenBy(Function(p) p.lodDate).
+                ThenBy(Function(p) p.depDate).
+                ToList()
 
             If query.Any() Then
 
-                Dim pageIndex As Integer = 0
+                Dim preOfficeCode As String = ""
+                Dim queryIndex As Integer = 0
                 Do
-                    '○NextPage
-                    If pageIndex > 0 Then
-                        '○作業シート設定
-                        TrySetExcelWorkSheet("受注明細", "TEMPLATE")
-                    End If
+                    '○作業シート設定
+                    TrySetExcelWorkSheet("受注明細", "TEMPLATE")
 
                     '○出力シート設定
                     If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
                         OutputSheetNames.Add(ExcelWorkSheet.Name)
-                        HiddenColumn(query.Item(pageIndex).officeCode)
+                        HiddenColumn(query.Item(queryIndex).officeCode)
                     End If
 
-                    '◯ヘッダーの設定
-                    EditHeaderArea(query.Item(pageIndex).trainNo, query.Item(pageIndex).lodDate, query.Item(pageIndex).depDate)
+                    For pageIndex As Integer = 1 To DETAIL_AREA_PAGE_COUNT
+                        If queryIndex >= query.Count() Then Exit For
+                        If preOfficeCode = "" Then
+                            preOfficeCode = query.Item(queryIndex).officeCode
+                        ElseIf preOfficeCode <> query.Item(queryIndex).officeCode Then
+                            preOfficeCode = query.Item(queryIndex).officeCode
+                            Exit For
+                        End If
 
-                    '◯明細の設定
-                    EditDetailArea(query.Item(pageIndex).rows, query.Item(pageIndex).officeCode)
+                        '◯ヘッダーの設定
+                        EditHeaderArea(pageIndex, query.Item(queryIndex).trainNo, query.Item(queryIndex).lodDate, query.Item(queryIndex).depDate)
 
-                    pageIndex += 1
-                Loop While pageIndex < query.Count()
+                        '◯明細の設定
+                        EditDetailArea(pageIndex, query.Item(queryIndex).rows, query.Item(queryIndex).officeCode)
+
+                        queryIndex += 1
+                    Next
+
+                Loop While queryIndex < query.Count()
             Else
+                '○作業シート設定
+                TrySetExcelWorkSheet("受注明細", "TEMPLATE")
+
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
                     OutputSheetNames.Add(ExcelWorkSheet.Name)
@@ -1145,7 +1389,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 End If
 
                 '◯ヘッダーの設定
-                EditHeaderArea(trainNo, lodDate, depDate)
+                EditHeaderArea(1, trainNo, lodDate, depDate)
             End If
 
             '○出力シートのみ残す
@@ -1183,24 +1427,24 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea(ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
+    Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
-
+        Dim rowIndex As Integer = 3 + ((pageIndex - 1) * 28)
         Try
 
             '列車番号
-            rngHeaderArea = Me.ExcelWorkSheet.Range("B3")
+            rngHeaderArea = Me.ExcelWorkSheet.Range("B" & rowIndex)
             rngHeaderArea.Value = trainNo
             ExcelMemoryRelease(rngHeaderArea)
 
             '積込予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("D3")
+            rngHeaderArea = Me.ExcelWorkSheet.Range("D" & rowIndex)
             rngHeaderArea.Value = lodDate
             ExcelMemoryRelease(rngHeaderArea)
 
             '発予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("F3")
+            rngHeaderArea = Me.ExcelWorkSheet.Range("F" & rowIndex)
             rngHeaderArea.Value = depDate
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -1215,91 +1459,95 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' 明細部分の編集
     ''' </summary>
-    Private Sub EditDetailArea(ByVal printRows As DataRow(), ByVal officeCode As String)
+    Private Sub EditDetailArea(ByVal pageIndex As Integer, ByVal printRows As DataRow(), ByVal officeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
         Try
 
             Select Case officeCode
-                Case BaseDllConst.CONST_OFFICECODE_011402
+                Case BaseDllConst.CONST_OFFICECODE_010402
                     printRows = printRows.
-                        OrderBy(Function(r) r("ORDERNO").ToString()).
-                        ThenBy(Function(r) IIf(r("ACTUALLODDATE").ToString() <> "", r("ACTUALLODDATE").ToString(), r("LODDATE").ToString())).
+                        OrderBy(Function(r) r("SHIPPERSCODE").ToString()).
+                        ThenBy(Function(r) r("SHIPORDER").ToString().PadLeft(2, "0"c)).
+                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
                         ThenBy(Function(r)
-                                   Dim result As Integer = 2
+                                   Dim result As Integer = 0
                                    Select Case r("OILCODE").ToString()
-                                       Case BaseDllConst.CONST_HTank,
-                                            BaseDllConst.CONST_RTank,
-                                            BaseDllConst.CONST_TTank,
-                                            BaseDllConst.CONST_MTTank,
-                                            BaseDllConst.CONST_KTank1,
-                                            BaseDllConst.CONST_K3Tank1,
-                                            BaseDllConst.CONST_LTank1,
-                                            BaseDllConst.CONST_ATank
+                                       Case BaseDllConst.CONST_HTank
                                            result = 1
-                                       Case Else
+                                       Case BaseDllConst.CONST_RTank
                                            result = 2
+                                       Case BaseDllConst.CONST_TTank
+                                           result = 3
+                                       Case BaseDllConst.CONST_MTTank
+                                           result = 4
+                                       Case BaseDllConst.CONST_KTank1
+                                           result = 5
+                                       Case BaseDllConst.CONST_KTank2
+                                           result = 6
+                                       Case BaseDllConst.CONST_K3Tank1
+                                           result = 7
+                                       Case BaseDllConst.CONST_K3Tank2
+                                           result = 8
+                                       Case BaseDllConst.CONST_K5Tank
+                                           result = 9
+                                       Case BaseDllConst.CONST_K10Tank
+                                           result = 10
+                                       Case BaseDllConst.CONST_ATank
+                                           result = 11
+                                       Case BaseDllConst.CONST_ATank2
+                                           result = 12
+                                       Case BaseDllConst.CONST_ATank3
+                                           result = 13
+                                       Case BaseDllConst.CONST_LTank1
+                                           result = 14
+                                       Case BaseDllConst.CONST_LTank2
+                                           result = 15
+                                       Case Else
+                                           result = 99
                                    End Select
                                    Return result
                                End Function
                         ).
-                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
-                        ThenBy(Function(r) r("LINEORDER").ToString().PadLeft(2, "0"c)).
-                        ThenBy(Function(r) r("SHIPORDER").ToString().PadLeft(2, "0"c)).
-                        ToArray()
-                Case BaseDllConst.CONST_OFFICECODE_012402
-                    printRows = printRows.
-                        OrderBy(Function(r) r("ORDERNO").ToString()).
-                        ThenBy(Function(r) r("DETAILNO").ToString()).
                         ToArray()
                 Case Else
                     printRows = printRows.
-                        OrderBy(Function(r) r("ORDERNO").ToString()).
-                        ThenBy(Function(r) IIf(r("ACTUALLODDATE").ToString() <> "", r("ACTUALLODDATE").ToString(), r("LODDATE").ToString())).
-                        ThenBy(Function(r) r("PRIORITYNO").ToString()).
-                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
-                        ThenBy(Function(r) r("LINEORDER").ToString().PadLeft(2, "0"c)).
+                        OrderBy(Function(r) r("SHIPPERSCODE").ToString()).
                         ThenBy(Function(r) r("SHIPORDER").ToString().PadLeft(2, "0"c)).
+                        ThenBy(Function(r) r("TANKNO").ToString().PadLeft(8, "0"c)).
+                        ThenBy(Function(r) r("OILCODE").ToString()).
                         ToArray()
             End Select
 
             Dim orderNo As String = ""
-            Dim pageCount As Integer = 1
-            Dim startRowIndex As Integer = DETAIL_AREA_BEGIN_ROW_INDEX
-            Dim rowIndex As Integer = 0
-            For Each r In printRows.Select(Function(x, i) New With {.row = x, .index = i + DETAIL_AREA_BEGIN_ROW_INDEX}).ToList()
-
-                If orderNo <> "" AndAlso orderNo <> r.row("ORDERNO").ToString() Then
-                    pageCount += 1
-                    startRowIndex = pageCount * DETAIL_AREA_ROWS_COUNT + DETAIL_AREA_BEGIN_ROW_INDEX
-                    rowIndex = 0
-                End If
+            Dim rowIndex As Integer = DETAIL_AREA_BEGIN_ROW_INDEX + ((pageIndex - 1) * 28)
+            For Each r In printRows.Select(Function(x, i) New With {.row = x, .index = i}).ToList()
 
                 'Excel行No
-                Dim rIdx As String = (startRowIndex + rowIndex).ToString()
+                Dim rIdx As String = (rowIndex + r.index).ToString()
+
+                '荷主
+                rngDetailArea = Me.ExcelWorkSheet.Range("A" + rIdx)
+                rngDetailArea.Value = r.row("SHIPPERSNAME")
+                ExcelMemoryRelease(rngDetailArea)
 
                 '発送順
-                rngDetailArea = Me.ExcelWorkSheet.Range("A" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + rIdx)
                 rngDetailArea.Value = r.row("SHIPORDER")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '車番
-                rngDetailArea = Me.ExcelWorkSheet.Range("B" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + rIdx)
                 rngDetailArea.Value = r.row("TANKNO")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '油種
-                rngDetailArea = Me.ExcelWorkSheet.Range("C" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + rIdx)
                 rngDetailArea.Value = r.row("OILNAME")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '数量
-                rngDetailArea = Me.ExcelWorkSheet.Range("E" + rIdx)
-                rngDetailArea.Value = r.row("CARSAMOUNT")
-                ExcelMemoryRelease(rngDetailArea)
-
-                '荷主
                 rngDetailArea = Me.ExcelWorkSheet.Range("F" + rIdx)
-                rngDetailArea.Value = r.row("SHIPPERSNAME")
+                rngDetailArea.Value = r.row("CARSAMOUNT")
                 ExcelMemoryRelease(rngDetailArea)
 
                 'ジョイント
@@ -1387,8 +1635,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 rngDetailArea.Value = r.row("FILLINGPOINT")
                 ExcelMemoryRelease(rngDetailArea)
 
-                orderNo = r.row("ORDERNO").ToString()
-                rowIndex += 1
             Next
         Catch ex As Exception
             Throw

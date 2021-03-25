@@ -178,9 +178,27 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Try
             Dim j As Integer = 0                            '次明細切り替え時用
-            Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
+            'Dim iTate() As Integer = {12, 54, 96, 138, 180}      '明細の開始行
+            Dim iTate() As Integer                          '明細の開始行
+            Dim iTPosi As Integer = 12
+            Dim iTRow As Integer = 42
+            iTate = {iTPosi, iTPosi + (iTRow * 1), iTPosi + (iTRow * 2), iTPosi + (iTRow * 3), iTPosi + (iTRow * 4) _
+                           , iTPosi + (iTRow * 5), iTPosi + (iTRow * 6), iTPosi + (iTRow * 7), iTPosi + (iTRow * 8) _
+                           , iTPosi + (iTRow * 9), iTPosi + (iTRow * 10), iTPosi + (iTRow * 11), iTPosi + (iTRow * 12) _
+                           , iTPosi + (iTRow * 13), iTPosi + (iTRow * 14), iTPosi + (iTRow * 15), iTPosi + (iTRow * 16) _
+                           , iTPosi + (iTRow * 17), iTPosi + (iTRow * 18), iTPosi + (iTRow * 19)}
+
             Dim i As Integer = iTate(j)
-            Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
+            'Dim iFooter() As Integer = {41, 83, 125, 167, 209}   'フッター行(配列)
+            Dim iFooter() As Integer                        'フッター行(配列)
+            Dim iFPosi As Integer = 41
+            Dim iFRow As Integer = 42
+            iFooter = {iFPosi, iFPosi + (iFRow * 1), iFPosi + (iFRow * 2), iFPosi + (iFRow * 3), iFPosi + (iFRow * 4) _
+                             , iFPosi + (iFRow * 5), iFPosi + (iFRow * 6), iFPosi + (iFRow * 7), iFPosi + (iFRow * 8) _
+                             , iFPosi + (iFRow * 9), iFPosi + (iFRow * 10), iFPosi + (iFRow * 11), iFPosi + (iFRow * 12) _
+                             , iFPosi + (iFRow * 13), iFPosi + (iFRow * 14), iFPosi + (iFRow * 15), iFPosi + (iFRow * 16) _
+                             , iFPosi + (iFRow * 17), iFPosi + (iFRow * 18), iFPosi + (iFRow * 19)}
+
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
@@ -237,13 +255,40 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                         ByVal I_rngHeaderArea As Excel.Range,
                                         ByVal PrintDatarow As DataRow,
                                         ByVal I_column As Integer)
-        Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+        'Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4},
+        '                             {45, 49, 51, 83, 46},
+        '                             {87, 91, 93, 125, 88},
+        '                             {129, 133, 135, 167, 130},
+        '                             {171, 175, 177, 209, 172}}
+        Dim iHPosi() As Integer = {3, 7, 9, 41, 4}
+        Dim iHRow As Integer = 42
+        Dim iHeader(,) As Integer = {{iHPosi(0), iHPosi(1), iHPosi(2), iHPosi(3), iHPosi(4)},
+                                     {iHPosi(0) + (iHRow * 1), iHPosi(1) + (iHRow * 1), iHPosi(2) + (iHRow * 1), iHPosi(3) + (iHRow * 1), iHPosi(4) + (iHRow * 1)},
+                                     {iHPosi(0) + (iHRow * 2), iHPosi(1) + (iHRow * 2), iHPosi(2) + (iHRow * 2), iHPosi(3) + (iHRow * 2), iHPosi(4) + (iHRow * 2)},
+                                     {iHPosi(0) + (iHRow * 3), iHPosi(1) + (iHRow * 3), iHPosi(2) + (iHRow * 3), iHPosi(3) + (iHRow * 3), iHPosi(4) + (iHRow * 3)},
+                                     {iHPosi(0) + (iHRow * 4), iHPosi(1) + (iHRow * 4), iHPosi(2) + (iHRow * 4), iHPosi(3) + (iHRow * 4), iHPosi(4) + (iHRow * 4)},
+                                     {iHPosi(0) + (iHRow * 5), iHPosi(1) + (iHRow * 5), iHPosi(2) + (iHRow * 5), iHPosi(3) + (iHRow * 5), iHPosi(4) + (iHRow * 5)},
+                                     {iHPosi(0) + (iHRow * 6), iHPosi(1) + (iHRow * 6), iHPosi(2) + (iHRow * 6), iHPosi(3) + (iHRow * 6), iHPosi(4) + (iHRow * 6)},
+                                     {iHPosi(0) + (iHRow * 7), iHPosi(1) + (iHRow * 7), iHPosi(2) + (iHRow * 7), iHPosi(3) + (iHRow * 7), iHPosi(4) + (iHRow * 7)},
+                                     {iHPosi(0) + (iHRow * 8), iHPosi(1) + (iHRow * 8), iHPosi(2) + (iHRow * 8), iHPosi(3) + (iHRow * 8), iHPosi(4) + (iHRow * 8)},
+                                     {iHPosi(0) + (iHRow * 9), iHPosi(1) + (iHRow * 9), iHPosi(2) + (iHRow * 9), iHPosi(3) + (iHRow * 9), iHPosi(4) + (iHRow * 9)},
+                                     {iHPosi(0) + (iHRow * 10), iHPosi(1) + (iHRow * 10), iHPosi(2) + (iHRow * 10), iHPosi(3) + (iHRow * 10), iHPosi(4) + (iHRow * 10)},
+                                     {iHPosi(0) + (iHRow * 11), iHPosi(1) + (iHRow * 11), iHPosi(2) + (iHRow * 11), iHPosi(3) + (iHRow * 11), iHPosi(4) + (iHRow * 11)},
+                                     {iHPosi(0) + (iHRow * 12), iHPosi(1) + (iHRow * 12), iHPosi(2) + (iHRow * 12), iHPosi(3) + (iHRow * 12), iHPosi(4) + (iHRow * 12)},
+                                     {iHPosi(0) + (iHRow * 13), iHPosi(1) + (iHRow * 13), iHPosi(2) + (iHRow * 13), iHPosi(3) + (iHRow * 13), iHPosi(4) + (iHRow * 13)},
+                                     {iHPosi(0) + (iHRow * 14), iHPosi(1) + (iHRow * 14), iHPosi(2) + (iHRow * 14), iHPosi(3) + (iHRow * 14), iHPosi(4) + (iHRow * 14)},
+                                     {iHPosi(0) + (iHRow * 15), iHPosi(1) + (iHRow * 15), iHPosi(2) + (iHRow * 15), iHPosi(3) + (iHRow * 15), iHPosi(4) + (iHRow * 15)},
+                                     {iHPosi(0) + (iHRow * 16), iHPosi(1) + (iHRow * 16), iHPosi(2) + (iHRow * 16), iHPosi(3) + (iHRow * 16), iHPosi(4) + (iHRow * 16)},
+                                     {iHPosi(0) + (iHRow * 17), iHPosi(1) + (iHRow * 17), iHPosi(2) + (iHRow * 17), iHPosi(3) + (iHRow * 17), iHPosi(4) + (iHRow * 17)},
+                                     {iHPosi(0) + (iHRow * 18), iHPosi(1) + (iHRow * 18), iHPosi(2) + (iHRow * 18), iHPosi(3) + (iHRow * 18), iHPosi(4) + (iHRow * 18)},
+                                     {iHPosi(0) + (iHRow * 19), iHPosi(1) + (iHRow * 19), iHPosi(2) + (iHRow * 19), iHPosi(3) + (iHRow * 19), iHPosi(4) + (iHRow * 19)}}
+
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0
 
         '◯ 営業所名
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i)))
-        I_rngHeaderArea.Value = Convert.ToString(PrintDatarow("OFFICENAME")) + " 作成"
+        I_rngHeaderArea.Value = Convert.ToString(PrintDatarow("OFFICENAME"))
         ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 向い先(着駅)
         I_rngHeaderArea = Me.ExcelWorkSheet.Range("E" + Convert.ToString(iHeader(I_column, i + 1)))
@@ -253,18 +298,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
         '★列車No(5461⇒5972へ変更)
         If Convert.ToString(PrintDatarow("TRAINNO")) = strTrainNo(0) Then
             '◯ 列車No
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 1)))
             I_rngHeaderArea.Value = strTrainNo(1)
             ExcelMemoryRelease(I_rngHeaderArea)
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 3)))
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
             I_rngHeaderArea.Value = strTrainNo(1)
             ExcelMemoryRelease(I_rngHeaderArea)
         Else
             '◯ 列車No
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 1)))
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 1)))
             I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
             ExcelMemoryRelease(I_rngHeaderArea)
-            I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 3)))
+            I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 3)))
             I_rngHeaderArea.Value = PrintDatarow("TRAINNO")
             ExcelMemoryRelease(I_rngHeaderArea)
         End If
@@ -278,11 +323,11 @@ Public Class OIT0001CustomReport : Implements IDisposable
         I_rngHeaderArea.Value = PrintDatarow("DEPDATE")
         ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 積車着日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("L" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("K" + Convert.ToString(iHeader(I_column, i + 2)))
         I_rngHeaderArea.Value = PrintDatarow("ARRDATE")
         ExcelMemoryRelease(I_rngHeaderArea)
         '◯ 受入日（予定）
-        I_rngHeaderArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(iHeader(I_column, i + 2)))
+        I_rngHeaderArea = Me.ExcelWorkSheet.Range("M" + Convert.ToString(iHeader(I_column, i + 2)))
         I_rngHeaderArea.Value = PrintDatarow("ACCDATE")
         ExcelMemoryRelease(I_rngHeaderArea)
 
@@ -355,8 +400,17 @@ Public Class OIT0001CustomReport : Implements IDisposable
             ExcelMemoryRelease(I_rngDetailArea)
         End If
 
+        '◯ ジョイント先
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("J" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("JOINT")
+        ExcelMemoryRelease(I_rngDetailArea)
+        '◯ OTジョイント先
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
+        I_rngDetailArea.Value = PrintDatarow("OT_JOINT")
+        ExcelMemoryRelease(I_rngDetailArea)
+
         '◯ 記事
-        I_rngDetailArea = Me.ExcelWorkSheet.Range("O" + I_column.ToString())
+        I_rngDetailArea = Me.ExcelWorkSheet.Range("L" + I_column.ToString())
         I_rngDetailArea.Value = PrintDatarow("COMPAREINFONM")
         ExcelMemoryRelease(I_rngDetailArea)
 
@@ -500,11 +554,16 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer)
 
-        Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
-        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
-            iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+        'Dim iHeader(,) As Integer = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
         'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
-        '    iHeader = {{6, 10, 12, 37, 7}, {45, 49, 51, 76, 46}, {84, 88, 90, 115, 85}, {123, 127, 129, 154, 124}}
+        '    iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+        Dim iHeader(,) As Integer
+        If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+        Else
+            iHeader = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+        End If
+
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0
 

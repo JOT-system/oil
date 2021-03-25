@@ -828,6 +828,7 @@ Public Class OIT0001EmptyTurnDairyList
             Try
                 url = repCbj.CreateExcelPrintData(work.WF_SEL_SALESOFFICECODE.Text, repPtn:=CONST_RPT_OTCOMPARE)
             Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:=ex.Message, needsPopUp:=True)
                 Return
             End Try
             '○ 別画面でExcelを表示
@@ -934,6 +935,9 @@ Public Class OIT0001EmptyTurnDairyList
             WW_UpdateOTOrderStatus(SQLcon, I_ITEM:="DELFLG", I_VALUE:=C_DELETE_FLG.DELETE)
 
         End Using
+
+        '○ 受注TBLとOT受注TBLデータの比較(前準備)
+        WW_CompareOrderToOTOrderAgo()
 
         '○ 受注TBLとOT受注TBLデータの比較
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1638,8 +1642,10 @@ Public Class OIT0001EmptyTurnDairyList
         Dim SQLOTDetailStr As String =
               " SELECT" _
             & "   '0' AS ORDERFLAG" _
+            & " , '0' AS USEFLG" _
             & " , OIT0017.ORDERNO" _
             & " , OIT0017.DETAILNO" _
+            & " , OIT0017.OTDETAILNO" _
             & " , OIT0017.SHIPORDER" _
             & " , OIT0017.LINEORDER" _
             & " , OIT0017.TANKNO" _
@@ -1721,7 +1727,8 @@ Public Class OIT0001EmptyTurnDairyList
         '     条件指定に従い該当データを受注明細データを取得する
         Dim SQLDetailStr As String =
               " SELECT" _
-            & "   OIT0003.ORDERNO" _
+            & "   '0' AS USEFLG" _
+            & " , OIT0003.ORDERNO" _
             & " , OIT0003.DETAILNO" _
             & " , OIT0003.SHIPORDER" _
             & " , OIT0003.LINEORDER" _
@@ -2562,6 +2569,124 @@ Public Class OIT0001EmptyTurnDairyList
 
         ''○メッセージ表示
         'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' OT受注明細TBLステータス更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOTDetailStatus(ByVal SQLcon As SqlConnection,
+                                         Optional OIT0001row As DataRow = Nothing,
+                                         Optional I_ITEM As String = Nothing,
+                                         Optional I_VALUE As String = Nothing)
+        Try
+            '更新SQL文･･･OT受注TBLのステータスを更新
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0017_OTDETAIL " _
+                    & "    SET " _
+                    & String.Format("        {0}  = '{1}', ", I_ITEM, I_VALUE)
+
+            SQLStr &=
+                      "        UPDYMD      = @UPDYMD, " _
+                    & "        UPDUSER     = @UPDUSER, " _
+                    & "        UPDTERMID   = @UPDTERMID, " _
+                    & "        RECEIVEYMD  = @RECEIVEYMD  " _
+                    & "  WHERE ORDERNO     = @ORDERNO  " _
+                    & "    AND DETAILNO    = @DETAILNO  "
+            '& "    AND DELFLG     <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
+            'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            'P_DELFLG.Value = C_DELETE_FLG.DELETE
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            If IsNothing(OIT0001row) Then
+                For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Rows
+                    P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
+                    P_DETAILNO.Value = OIT0001OTrow("DETAILNO")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+
+            Else
+                P_ORDERNO.Value = OIT0001row("ORDERNO")
+                P_DETAILNO.Value = OIT0001row("DETAILNO")
+                SQLcmd.ExecuteNonQuery()
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L_OTDETAILSTATUS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L_OTDETAILSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注TBLとOT受注TBL比較(前準備)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CompareOrderToOTOrderAgo()
+
+        '★タンク車Noと一致した明細Noを設定
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
+            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0'")
+                If Convert.ToString(OIT0001OTrow("TANKNO")) = Convert.ToString(OIT0001row("TANKNO")) Then
+                    OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
+                    OIT0001row("USEFLG") = "1"
+                    OIT0001OTrow("USEFLG") = "1"
+                    Exit For
+                End If
+            Next
+        Next
+
+        '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
+            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0' AND TANKNO = ''")
+                If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) Then
+                    OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
+                    OIT0001row("USEFLG") = "1"
+                    OIT0001OTrow("USEFLG") = "1"
+                    Exit For
+                End If
+            Next
+        Next
+
+        '★★★OT受注明細のOT空回明細Noを更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("OTDETAILNO <> ''")
+                WW_UpdateOTDetailStatus(SQLcon, OIT0001OTrow,
+                                        I_ITEM:="OTDETAILNO",
+                                        I_VALUE:=Convert.ToString(OIT0001OTrow("OTDETAILNO")))
+            Next
+        End Using
 
     End Sub
 

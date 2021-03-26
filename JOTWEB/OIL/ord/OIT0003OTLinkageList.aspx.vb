@@ -692,7 +692,9 @@ Public Class OIT0003OTLinkageList
             'I_Enc:="EBCDIC")
             Dim url As String
             Try
-                url = repCbj.ConvertDataTableToCsv(False, blnNewline:=False)
+                url = repCbj.ConvertDataTableToCsv(False,
+                                                   strOfficeCode:=work.WF_SEL_OTS_SALESOFFICECODE.Text,
+                                                   blnNewline:=False)
             Catch ex As Exception
                 Return
             End Try
@@ -1385,7 +1387,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE" _
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS DEPDATE"
         '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
@@ -1400,7 +1403,8 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE" _
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS DEPDATE"
         '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
 
         '  " SELECT " _
@@ -1656,6 +1660,8 @@ Public Class OIT0003OTLinkageList
 
                 '○項目の再設定
                 Dim setSPACE As String = ""
+                Dim setLodMonth As String = ""
+                Dim setDepMonth As String = ""
                 '★仙台新港営業所対応用
                 Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
@@ -1663,12 +1669,9 @@ Public Class OIT0003OTLinkageList
                 Dim OTTrainNoChg() As String = {"6078", "6089"}
                 Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
-                    '★積込日を[yyyymmdd]⇒[yymmdd]に変換
-                    OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
-
-                    '★仙台新港営業所の場合(荷主チェック)
+                    '★仙台新港営業所の場合
                     If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
-                        '荷受人が"ENEOS"以外が設定されている場合再設定する。
+                        '(荷主チェック)荷受人が"ENEOS"以外が設定されている場合再設定する。
                         Select Case Convert.ToString(OIT0003row("SHIPPERSCODE"))
                             '★コスモの場合
                             Case BaseDllConst.CONST_SHIPPERCODE_0094000010
@@ -1679,6 +1682,16 @@ Public Class OIT0003OTLinkageList
                                 OIT0003row("OTDAILYSHIPPERC") = OTSHIPPERC(2).PadRight(2) '"09"
                                 OIT0003row("OTDAILYSHIPPERN") = OTSHIPPERN(2).PadRight(6) '"昭シ    "
                         End Select
+
+                        '(月末月初チェック)下記の通り整理し設定
+                        '①積込日と発日の年月が一致していた場合(通常) ⇒発日を設定
+                        '②積込日と発日の年月が不一致の場合(月末月初) ⇒積込日を設定(そのまま)
+                        setLodMonth = Convert.ToString(OIT0003row("LODDATE")).Substring(0, 6)
+                        setDepMonth = Convert.ToString(OIT0003row("DEPDATE")).Substring(0, 6)
+                        If setLodMonth = setDepMonth Then
+                            OIT0003row("LODDATE") = OIT0003row("DEPDATE")
+                        End If
+
                     End If
 
                     '★四日市営業所の場合(列車チェック)
@@ -1687,6 +1700,10 @@ Public Class OIT0003OTLinkageList
                         AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoChg(0) Then
                         OIT0003row("TRAINNO") = OTTrainNoChg(1)
                     End If
+
+                    '★積込日を[yyyymmdd]⇒[yymmdd]に変換
+                    OIT0003row("LODDATE") = OIT0003row("LODDATE").ToString().Substring(OIT0003row("LODDATE").ToString().Length - 6)
+
                 Next
 
                 Dim hisDt As DataTable = OIT0003CsvOTLinkagetbl.Copy
@@ -1742,6 +1759,7 @@ Public Class OIT0003OTLinkageList
                     '★CSV出力に不必要なので削除
                     OIT0003row("OFFICECODE") = ""
                     OIT0003row("SHIPPERSCODE") = ""
+                    OIT0003row("DEPDATE") = ""
 
                     ''★シフトアウト(14)・シフトイン(15)設定
                     'OIT0003row("OTDAILYDEPSTATIONN") = Chr(14) + Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN")) + Chr(15)

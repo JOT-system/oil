@@ -636,18 +636,15 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
-            '○作業シート設定
-            TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
+            ''○作業シート設定
+            'TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
             Do
 
-                '○NextPage
-                If rowIndex > 0 Then
-                    '○作業シート設定
-                    TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
-                End If
+                '○作業シート設定
+                TrySetExcelWorkSheet("まとめ", String.Format("TEMPLATE_B_{0}", OfficeCode))
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -663,7 +660,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 Dim detailSheetName As String = ExcelWorkSheet.Name
 
                 '○作業シート設定
-                TrySetExcelWorkSheet("出光昭和シェルUP用", String.Format("TEMPLATE_A_{0}", OfficeCode))
+                TrySetExcelWorkSheet("昭和シェルUP用", String.Format("TEMPLATE_A_{0}", OfficeCode))
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -693,6 +690,18 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                     If TrySetExcelWorkSheet(sheetName) Then
                         ExcelWorkSheet.Delete()
                     End If
+                Next
+                allSeetName.Clear()
+                For Each sheet As Excel.Worksheet In ExcelWorkSheets
+                    allSeetName.Add(sheet.Name, sheet.Index)
+                    ExcelMemoryRelease(sheet)
+                Next
+                For i As Integer = allSeetName.Count() To 2 Step -1
+                    Dim moveSheet As Excel.Worksheet = DirectCast(ExcelWorkSheets(i), Excel.Worksheet)
+                    Dim beforSheet As Excel.Worksheet = DirectCast(ExcelWorkSheets(1), Excel.Worksheet)
+                    moveSheet.Move(Before:=beforSheet)
+                    ExcelMemoryRelease(moveSheet)
+                    ExcelMemoryRelease(beforSheet)
                 Next
             End If
 
@@ -880,6 +889,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 Take(B_AREA_ROWS_COUNT).
                 Select(Function(r, i) New With {.row = r, .index = i + A_AREA_BEGIN_ROW_INDEX}).ToList()
 
+            Dim ri As Integer = 9
             For Each r In printRows
                 '処理区分
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("A{0}", r.index))
@@ -938,12 +948,12 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 'SAP品目コード
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("P{0}", r.index))
-                rngDetailArea.Value = String.Format("=IF('{0}'!$C$9=0,"""",'{0}'!$C$9)", detailSheetName)
+                rngDetailArea.Value = String.Format("=IF('{0}'!$C$9=0,"""",'{0}'!$C${1})", detailSheetName, ri)
                 ExcelMemoryRelease(rngDetailArea)
 
                 '受注数量
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("Q{0}", r.index))
-                rngDetailArea.Value = String.Format("=IF('{0}'!$D$9=0,"""",'{0}'!$D$9)", detailSheetName)
+                rngDetailArea.Value = String.Format("=IF('{0}'!$D$9=0,"""",'{0}'!$D${1})", detailSheetName, ri)
                 ExcelMemoryRelease(rngDetailArea)
 
                 'プラント
@@ -1028,7 +1038,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '輸送機関
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("AY{0}", r.index))
-                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$E$9)", r.index, detailSheetName)
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",'{1}'!$E${2})", r.index, detailSheetName, ri)
                 ExcelMemoryRelease(rngDetailArea)
 
                 '運送業者
@@ -1038,8 +1048,10 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '経路
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("BA{0}", r.index))
-                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""T00016"")", r.index)
+                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",{1}!$H$6)", r.index, detailSheetName)
                 ExcelMemoryRelease(rngDetailArea)
+
+                ri += 1
             Next
 
         Catch ex As Exception

@@ -636,8 +636,6 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
-            ''○作業シート設定
-            'TrySetExcelWorkSheet("タンク車発送実績", String.Format("TEMPLATE_B_{0}", OfficeCode))
 
             Dim rowIndex As Integer = 0
             Dim maxRowIndex As Integer = CInt(IIf(PrintData Is Nothing, 0, PrintData.Rows.Count))
@@ -660,7 +658,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 Dim detailSheetName As String = ExcelWorkSheet.Name
 
                 '○作業シート設定
-                TrySetExcelWorkSheet("昭和シェルUP用", String.Format("TEMPLATE_A_{0}", OfficeCode))
+                TrySetExcelWorkSheet("昭和シェルUP用", "TEMPLATE_A")
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -668,7 +666,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                 End If
 
                 '○明細の設定
-                EditDetailAreaA(rowIndex, detailSheetName)
+                EditDetailAreaA(rowIndex, detailSheetName, consigneeCode)
 
                 rowIndex += B_AREA_ROWS_COUNT
             Loop While rowIndex < maxRowIndex
@@ -691,6 +689,8 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                         ExcelWorkSheet.Delete()
                     End If
                 Next
+
+                'シート順反転
                 allSeetName.Clear()
                 For Each sheet As Excel.Worksheet In ExcelWorkSheets
                     allSeetName.Add(sheet.Name, sheet.Index)
@@ -860,7 +860,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '積載実数量
                 rngDetailArea = ExcelWorkSheet.Range("D" + r.index.ToString())
-                rngDetailArea.Value = CDec(r.row("CARSAMOUNT")).ToString()
+                rngDetailArea.Value = (CDec(r.row("CARSAMOUNT")) * 1000).ToString("#,###")
                 ExcelMemoryRelease(rngDetailArea)
 
                 'ﾀﾝｸ車番号
@@ -880,7 +880,7 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' 出光昭和シェルUP用明細の編集
     ''' </summary>
-    Private Sub EditDetailAreaA(ByVal rowIndex As Integer, ByVal detailSheetName As String)
+    Private Sub EditDetailAreaA(ByVal rowIndex As Integer, ByVal detailSheetName As String, ByVal consigneeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
         Try
 
@@ -1033,7 +1033,20 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '輸送確認終日
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("AX{0}", r.index))
-                rngDetailArea.Value = String.Format("=$O{0}", r.index)
+                Select Case OfficeCode
+                    Case CONST_OFFICECODE_010402
+                        'ENEOS仙台～JOT盛岡
+                        rngDetailArea.Value = String.Format("=$O{0}", r.index)
+                    Case CONST_OFFICECODE_011203
+                        Select Case consigneeCode
+                            Case "54"
+                                '富士石油～JOT高崎
+                                rngDetailArea.Value = String.Format("=$AI{0}", r.index)
+                            Case "30"
+                                '富士石油～高崎
+                                rngDetailArea.Value = String.Format("=$AI{0}", r.index)
+                        End Select
+                End Select
                 ExcelMemoryRelease(rngDetailArea)
 
                 '輸送機関
@@ -1048,7 +1061,20 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
 
                 '経路
                 rngDetailArea = ExcelWorkSheet.Range(String.Format("BA{0}", r.index))
-                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",{1}!$H$6)", r.index, detailSheetName)
+                Select Case OfficeCode
+                    Case CONST_OFFICECODE_010402
+                        'ENEOS仙台～JOT盛岡
+                        rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""T00016"")", r.index)
+                    Case CONST_OFFICECODE_011203
+                        Select Case consigneeCode
+                            Case "54"
+                                '富士石油～JOT高崎
+                                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""T00026"")", r.index)
+                            Case "30"
+                                '富士石油～高崎
+                                rngDetailArea.Value = String.Format("=IF($P{0}="""","""",""T00021"")", r.index)
+                        End Select
+                End Select
                 ExcelMemoryRelease(rngDetailArea)
 
                 ri += 1

@@ -1309,14 +1309,25 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '出力行
                     Dim prow As DataRow = PrintData.Rows(idx + i)
                     If i = 0 Then
-                        '〇明細部1テンプレートセルコピー
-                        srcRange = ExcelTempSheet.Cells.Range("K7:BT7")
-                        destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
-                        srcRange.Copy(destRange)
-                        ExcelMemoryRelease(srcRange)
-                        ExcelMemoryRelease(destRange)
-                        '〇明細出力
-                        EditTansportResult_DetailArea(eridx, prow)
+                        If "9999999".Equals(prow("ARRSTATION").ToString()) Then
+                            '〇明細部4テンプレートセルコピー
+                            srcRange = ExcelTempSheet.Cells.Range("K13:BT13")
+                            destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                            srcRange.Copy(destRange)
+                            ExcelMemoryRelease(srcRange)
+                            ExcelMemoryRelease(destRange)
+                            '〇明細出力
+                            EditTansportResult_DetailArea(eridx, prow, 4)
+                        Else
+                            '〇明細部1テンプレートセルコピー
+                            srcRange = ExcelTempSheet.Cells.Range("K7:BT7")
+                            destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                            srcRange.Copy(destRange)
+                            ExcelMemoryRelease(srcRange)
+                            ExcelMemoryRelease(destRange)
+                            '〇明細出力
+                            EditTansportResult_DetailArea(eridx, prow)
+                        End If
                     ElseIf Not "9999".Equals(prow("OILCODE").ToString()) Then
                         '〇明細部2テンプレートセルコピー
                         srcRange = ExcelTempSheet.Cells.Range("K9:BT9")
@@ -1439,6 +1450,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                 End If
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + idx.ToString())
                 rngDetailArea.Value = wkConsigneeName
+                ExcelMemoryRelease(rngDetailArea)
+            End If
+
+            If type = 4 Then '明細部4の場合
+                '◯ 着駅 +「計」
+                Dim wkBaseName As String = row("BASENAME").ToString() + "計"
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + idx.ToString())
+                rngDetailArea.Value = wkBaseName
                 ExcelMemoryRelease(rngDetailArea)
             End If
 

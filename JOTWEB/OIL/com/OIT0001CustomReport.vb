@@ -127,14 +127,16 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     'ExcelTempSheet.Delete() '雛形シート削除
 
                 '★受注一覧(帳票)よりダウンロード
-                Case "KUUKAI_SODEGAURA"
+                '★空回一覧(帳票)よりダウンロード
+                Case "KUUKAI_SODEGAURA",
+                     "KUUKAI_LIST"
                     '***** TODO処理 ここから *****
                     '◯ヘッダーと明細の設定
                     EditHeaderDetailArea(I_officeCode)
                     '***** TODO処理 ここまで *****
                     'ExcelTempSheet.Delete() '雛形シート削除
 
-                    '★空回日報画面よりダウンロード
+                    '★空回日報明細画面よりダウンロード
                 Case Else
                     '***** TODO処理 ここから *****
                     '◯ヘッダーの設定
@@ -487,13 +489,47 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Try
             Dim j As Integer = 0                            '次明細切り替え時用
-            Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 53, 91, 129}
-            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 54, 93, 132}
+            'Dim iTate() As Integer = {12, 54, 96, 138}      '明細の開始行
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iTate = {15, 53, 91, 129}
+            Dim iTate() As Integer      '明細の開始行
+            Dim iTPosi As Integer
+            Dim iTRow As Integer
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                'iTate = {15, 53, 91, 129}
+                iTPosi = 15
+                iTRow = 38
+            Else
+                'iTate = {12, 54, 96, 138}
+                iTPosi = 12
+                iTRow = 42
+            End If
+            iTate = {iTPosi, iTPosi + (iTRow * 1), iTPosi + (iTRow * 2), iTPosi + (iTRow * 3), iTPosi + (iTRow * 4) _
+                           , iTPosi + (iTRow * 5), iTPosi + (iTRow * 6), iTPosi + (iTRow * 7), iTPosi + (iTRow * 8) _
+                           , iTPosi + (iTRow * 9), iTPosi + (iTRow * 10), iTPosi + (iTRow * 11), iTPosi + (iTRow * 12) _
+                           , iTPosi + (iTRow * 13), iTPosi + (iTRow * 14), iTPosi + (iTRow * 15), iTPosi + (iTRow * 16) _
+                           , iTPosi + (iTRow * 17), iTPosi + (iTRow * 18), iTPosi + (iTRow * 19)}
             Dim i As Integer = iTate(j)
-            Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
-            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 75, 113, 151}
-            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 76, 115, 154}
+
+            'Dim iFooter() As Integer = {41, 83, 125, 167}   'フッター行(配列)
+            'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then iFooter = {37, 75, 113, 151}
+            Dim iFooter() As Integer    'フッター行(配列)
+            Dim iFPosi As Integer
+            Dim iFRow As Integer
+            If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                'iFooter = {37, 75, 113, 151}
+                iFPosi = 37
+                iFRow = 38
+            Else
+                'iFooter = {41, 83, 125, 167}
+                iFPosi = 41
+                iFRow = 42
+            End If
+            iFooter = {iFPosi, iFPosi + (iFRow * 1), iFPosi + (iFRow * 2), iFPosi + (iFRow * 3), iFPosi + (iFRow * 4) _
+                             , iFPosi + (iFRow * 5), iFPosi + (iFRow * 6), iFPosi + (iFRow * 7), iFPosi + (iFRow * 8) _
+                             , iFPosi + (iFRow * 9), iFPosi + (iFRow * 10), iFPosi + (iFRow * 11), iFPosi + (iFRow * 12) _
+                             , iFPosi + (iFRow * 13), iFPosi + (iFRow * 14), iFPosi + (iFRow * 15), iFPosi + (iFRow * 16) _
+                             , iFPosi + (iFRow * 17), iFPosi + (iFRow * 18), iFPosi + (iFRow * 19)}
+
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
@@ -558,11 +594,37 @@ Public Class OIT0001CustomReport : Implements IDisposable
         'If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then _
         '    iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
         Dim iHeader(,) As Integer
+        Dim iHPosi() As Integer
+        Dim iHRow As Integer
         If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
-            iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+            'iHeader = {{6, 10, 12, 37, 7}, {44, 48, 50, 75, 45}, {82, 86, 88, 113, 83}, {120, 124, 126, 151, 121}}
+            iHPosi = {6, 10, 12, 37, 7}
+            iHRow = 38
         Else
-            iHeader = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+            'iHeader = {{3, 7, 9, 41, 4}, {45, 49, 51, 83, 46}, {87, 91, 93, 125, 88}, {129, 133, 135, 167, 130}}
+            iHPosi = {3, 7, 9, 41, 4}
+            iHRow = 42
         End If
+        iHeader = {{iHPosi(0), iHPosi(1), iHPosi(2), iHPosi(3), iHPosi(4)},
+                   {iHPosi(0) + (iHRow * 1), iHPosi(1) + (iHRow * 1), iHPosi(2) + (iHRow * 1), iHPosi(3) + (iHRow * 1), iHPosi(4) + (iHRow * 1)},
+                   {iHPosi(0) + (iHRow * 2), iHPosi(1) + (iHRow * 2), iHPosi(2) + (iHRow * 2), iHPosi(3) + (iHRow * 2), iHPosi(4) + (iHRow * 2)},
+                   {iHPosi(0) + (iHRow * 3), iHPosi(1) + (iHRow * 3), iHPosi(2) + (iHRow * 3), iHPosi(3) + (iHRow * 3), iHPosi(4) + (iHRow * 3)},
+                   {iHPosi(0) + (iHRow * 4), iHPosi(1) + (iHRow * 4), iHPosi(2) + (iHRow * 4), iHPosi(3) + (iHRow * 4), iHPosi(4) + (iHRow * 4)},
+                   {iHPosi(0) + (iHRow * 5), iHPosi(1) + (iHRow * 5), iHPosi(2) + (iHRow * 5), iHPosi(3) + (iHRow * 5), iHPosi(4) + (iHRow * 5)},
+                   {iHPosi(0) + (iHRow * 6), iHPosi(1) + (iHRow * 6), iHPosi(2) + (iHRow * 6), iHPosi(3) + (iHRow * 6), iHPosi(4) + (iHRow * 6)},
+                   {iHPosi(0) + (iHRow * 7), iHPosi(1) + (iHRow * 7), iHPosi(2) + (iHRow * 7), iHPosi(3) + (iHRow * 7), iHPosi(4) + (iHRow * 7)},
+                   {iHPosi(0) + (iHRow * 8), iHPosi(1) + (iHRow * 8), iHPosi(2) + (iHRow * 8), iHPosi(3) + (iHRow * 8), iHPosi(4) + (iHRow * 8)},
+                   {iHPosi(0) + (iHRow * 9), iHPosi(1) + (iHRow * 9), iHPosi(2) + (iHRow * 9), iHPosi(3) + (iHRow * 9), iHPosi(4) + (iHRow * 9)},
+                   {iHPosi(0) + (iHRow * 10), iHPosi(1) + (iHRow * 10), iHPosi(2) + (iHRow * 10), iHPosi(3) + (iHRow * 10), iHPosi(4) + (iHRow * 10)},
+                   {iHPosi(0) + (iHRow * 11), iHPosi(1) + (iHRow * 11), iHPosi(2) + (iHRow * 11), iHPosi(3) + (iHRow * 11), iHPosi(4) + (iHRow * 11)},
+                   {iHPosi(0) + (iHRow * 12), iHPosi(1) + (iHRow * 12), iHPosi(2) + (iHRow * 12), iHPosi(3) + (iHRow * 12), iHPosi(4) + (iHRow * 12)},
+                   {iHPosi(0) + (iHRow * 13), iHPosi(1) + (iHRow * 13), iHPosi(2) + (iHRow * 13), iHPosi(3) + (iHRow * 13), iHPosi(4) + (iHRow * 13)},
+                   {iHPosi(0) + (iHRow * 14), iHPosi(1) + (iHRow * 14), iHPosi(2) + (iHRow * 14), iHPosi(3) + (iHRow * 14), iHPosi(4) + (iHRow * 14)},
+                   {iHPosi(0) + (iHRow * 15), iHPosi(1) + (iHRow * 15), iHPosi(2) + (iHRow * 15), iHPosi(3) + (iHRow * 15), iHPosi(4) + (iHRow * 15)},
+                   {iHPosi(0) + (iHRow * 16), iHPosi(1) + (iHRow * 16), iHPosi(2) + (iHRow * 16), iHPosi(3) + (iHRow * 16), iHPosi(4) + (iHRow * 16)},
+                   {iHPosi(0) + (iHRow * 17), iHPosi(1) + (iHRow * 17), iHPosi(2) + (iHRow * 17), iHPosi(3) + (iHRow * 17), iHPosi(4) + (iHRow * 17)},
+                   {iHPosi(0) + (iHRow * 18), iHPosi(1) + (iHRow * 18), iHPosi(2) + (iHRow * 18), iHPosi(3) + (iHRow * 18), iHPosi(4) + (iHRow * 18)},
+                   {iHPosi(0) + (iHRow * 19), iHPosi(1) + (iHRow * 19), iHPosi(2) + (iHRow * 19), iHPosi(3) + (iHRow * 19), iHPosi(4) + (iHRow * 19)}}
 
         Dim strTrainNo() As String = {"5461", "5972"}
         Dim i As Integer = 0

@@ -811,6 +811,14 @@ Public Module Messages
         ''' OT比較行未存在
         ''' </summary>
         Public Const OIL_OTCOMPARELINE_NOTFOUND As String = "20102"
+        ''' <summary>
+        ''' 空回日報出力データ未存在
+        ''' </summary>
+        Public Const OIL_EMPTYTURNDAIRYDATA_NOTFOUND As String = "20103"
+        ''' <summary>
+        ''' 空回日報出力行未存在
+        ''' </summary>
+        Public Const OIL_EMPTYTURNDAIRYLINE_NOTFOUND As String = "20104"
 
 
 #End Region

@@ -4,7 +4,7 @@
     ''' </summary>
     ''' <param name="mapID">画面ID</param>
     ''' <remarks>空回日報の帳票を表示する際のSQLを設定</remarks>
-    Public Function EmptyTurnDairy(ByVal mapID As String)
+    Public Function EmptyTurnDairy(ByVal mapID As String, Optional ByVal dt As DataTable = Nothing)
 
         Dim SQLStr As String =
               " SELECT " _
@@ -141,7 +141,20 @@
             & "   AND OIM0003.DELFLG <> @P02 "
 
         Select Case mapID
-            '空回日報画面(ダウンロード)より出力
+            '空回日報一覧画面(ダウンロード)より出力
+            Case "OIT0001L"
+                SQLStr &=
+                  "   WHERE OIT0002.ORDERNO IN ( "
+                For Each dtrow As DataRow In dt.Select("OPERATION='on'")
+                    If dtrow("LINECNT") = 1 Then
+                        SQLStr &= "'" + dtrow("ORDERNO") + "'"
+                    Else
+                        SQLStr &= ",'" + dtrow("ORDERNO") + "'"
+                    End If
+                Next
+                SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
+
+            '空回日報明細画面(ダウンロード)より出力
             Case "OIT0001"
                 SQLStr &=
                   "   WHERE OIT0002.ORDERNO = @P01 "
@@ -169,7 +182,20 @@
             & " AND OTOILCT.OTOILCODE = OIM0003.OTOILCODE "
 
         Select Case mapID
-            '空回日報画面(ダウンロード)より出力
+            '空回日報一覧画面(ダウンロード)より出力
+            Case "OIT0001L"
+                SQLStr &=
+                  "   WHERE OIT0002.ORDERNO IN ( "
+                For Each dtrow As DataRow In dt.Select("OPERATION='on'")
+                    If dtrow("LINECNT") = 1 Then
+                        SQLStr &= "'" + dtrow("ORDERNO") + "'"
+                    Else
+                        SQLStr &= ",'" + dtrow("ORDERNO") + "'"
+                    End If
+                Next
+                SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
+
+            '空回日報明細画面(ダウンロード)より出力
             Case "OIT0001"
                 SQLStr &=
                   " WHERE OIT0002.ORDERNO = @P01 " _

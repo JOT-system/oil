@@ -108,7 +108,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_KINOENE_SHIPPLAN.xlsx" _
-                OrElse excelFileName = "OIT0003L_SODEGAURA_SHIPPLAN.xlsx" Then
+                OrElse excelFileName = "OIT0003L_SODEGAURA_SHIPPLAN.xlsx" _
+                OrElse excelFileName = "OIT0003L_MIESHIOHAMA_SHIPCONTACT.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入出力画面"), Excel.Worksheet)
                 'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_GOI_FILLINGPOINT.xlsx" Then
@@ -2247,6 +2248,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     '◯明細の設定
                     EditLoadPlanDetailArea()
                     '***** TODO処理 ここまで *****
+                'タンク車出荷連絡書
+                Case "SHIPCONTACT"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditShipContactHeaderArea(lodDate)
+                    '◯明細の設定
+                    EditShipContactDetailArea()
+                    '***** TODO処理 ここまで *****
             End Select
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -2421,6 +2430,180 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea.Value = PrintDatarow("TANKNO")
                 ExcelMemoryRelease(rngDetailArea)
                 i += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(タンク車出荷連絡書)
+    ''' </summary>
+    Private Sub EditShipContactHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '荷主名
+                rngHeaderArea = Me.ExcelWorkSheet.Range("A1")
+                rngHeaderArea.Value = PrintDatarow("CONSIGNEENAME")
+                ExcelMemoryRelease(rngHeaderArea)
+                '発日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("S1")
+                rngHeaderArea.Value = PrintDatarow("DEPDATE")
+                ExcelMemoryRelease(rngHeaderArea)
+                '列車（JR最終列車番号）
+                If PrintDatarow("TUMIOKIFLG").ToString = "0" Then
+                    '当日発
+                    rngHeaderArea = Me.ExcelWorkSheet.Range("AA1")
+                    rngHeaderArea.Value = PrintDatarow("JRTRAINNO3")
+                Else
+                    '積置
+                    rngHeaderArea = Me.ExcelWorkSheet.Range("AA1")
+                    rngHeaderArea.Value = PrintDatarow("TRAINNO_TUMIOKI")
+                End If
+                ExcelMemoryRelease(rngHeaderArea)
+                Exit For
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(タンク車出荷連絡書)
+    ''' </summary>
+    Private Sub EditShipContactDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 4
+            Dim DtlEnd As Integer = 23
+            '----------------------------------
+            '明細行の編集出力
+            '----------------------------------
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '固定NO
+                rngDetailArea = Me.ExcelWorkSheet.Range("A" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("LINECNT")
+                ExcelMemoryRelease(rngDetailArea)
+                '貨車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                'タキ1000の場合だけ型式+スペース + 車番
+                'タキ243000タキ43000は車番のみ出力
+                If PrintDatarow("MODEL").ToString = "タキ1000" Then
+                    rngDetailArea.Value = PrintDatarow("MODEL").ToString & " " & PrintDatarow("TANKNO").ToString
+                Else
+                    rngDetailArea.Value = PrintDatarow("TANKNO")
+                End If
+                ExcelMemoryRelease(rngDetailArea)
+                '油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+                ExcelMemoryRelease(rngDetailArea)
+                '数量
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CARSAMOUNT")
+                ExcelMemoryRelease(rngDetailArea)
+                i += 1
+            Next
+
+            '----------------------------------
+            '油種別合計行の編集（HIDDEN=0をキーとして利用、SELECT=1を列車数として利用）
+            '----------------------------------
+            Dim viw As New DataView(PrintData)
+            Dim isDistinct As Boolean = True
+            Dim cols() As String = {"HIDDEN", "OILCODE", "ORDERINGTYPE", "REPORTOILNAME"}
+            viw.Sort = "HIDDEN, OILCODE, ORDERINGTYPE"
+            Dim dtFilter As DataTable = viw.ToTable(isDistinct, cols)
+            dtFilter.Columns.Add("SELECT", GetType(Integer))
+            dtFilter.Columns.Add("CARSAMOUNT", GetType(Double))
+            For Each row As DataRow In dtFilter.Rows
+                Dim expr As String = String.Format("HIDDEN = '{0}' AND REPORTOILNAME = '{1}'", row("HIDDEN"), row("REPORTOILNAME"))
+                row("SELECT") = PrintData.Compute("SUM(SELECT)", expr)
+                row("CARSAMOUNT") = PrintData.Compute("SUM(CARSAMOUNT)", expr)
+            Next
+
+            Dim TtlRowCnt As Integer = 25
+            Dim TtlRowMax As Integer = 28
+            Dim TtlCol() As String = {"C", "I", "K", "L", "R", "X", "Z", "AA"}
+            Dim ColIdx As Integer = 0
+            For Each row As DataRow In dtFilter.Rows
+                '油種
+                rngDetailArea = Me.ExcelWorkSheet.Range(TtlCol(ColIdx) + TtlRowCnt.ToString)
+                rngDetailArea.Value = row("REPORTOILNAME")
+                ExcelMemoryRelease(rngDetailArea)
+                'タンク数
+                rngDetailArea = Me.ExcelWorkSheet.Range(TtlCol(ColIdx + 1) + TtlRowCnt.ToString)
+                rngDetailArea.Value = row("SELECT")
+                ExcelMemoryRelease(rngDetailArea)
+                '固定値
+                rngDetailArea = Me.ExcelWorkSheet.Range(TtlCol(ColIdx + 2) + TtlRowCnt.ToString)
+                rngDetailArea.Value = "車"
+                ExcelMemoryRelease(rngDetailArea)
+                '数量
+                rngDetailArea = Me.ExcelWorkSheet.Range(TtlCol(ColIdx + 3) + TtlRowCnt.ToString)
+                rngDetailArea.Value = row("CARSAMOUNT")
+                ExcelMemoryRelease(rngDetailArea)
+                TtlRowCnt += 1
+
+                If TtlRowCnt > TtlRowMax Then
+                    TtlRowCnt = 25
+                    ColIdx = 4
+                End If
+            Next
+
+            '----------------------------------
+            '合計行の編集
+            '----------------------------------
+            TtlRowCnt = 29
+            Dim cols2() As String = {"HIDDEN"}
+            dtFilter = viw.ToTable(isDistinct, cols2)
+            dtFilter.Columns.Add("SELECT", GetType(Integer))
+            dtFilter.Columns.Add("CARSAMOUNT", GetType(Double))
+            For Each row As DataRow In dtFilter.Rows
+                Dim expr As String = String.Format("HIDDEN = '{0}'", row("HIDDEN"))
+                row("SELECT") = PrintData.Compute("SUM(SELECT)", expr)
+                row("CARSAMOUNT") = PrintData.Compute("SUM(CARSAMOUNT)", expr)
+            Next
+
+            For Each row As DataRow In dtFilter.Rows
+                'タンク数
+                rngDetailArea = Me.ExcelWorkSheet.Range("X" + TtlRowCnt.ToString)
+                rngDetailArea.Value = row("SELECT")
+                ExcelMemoryRelease(rngDetailArea)
+                '固定値
+                rngDetailArea = Me.ExcelWorkSheet.Range("Z" + TtlRowCnt.ToString)
+                rngDetailArea.Value = "車"
+                ExcelMemoryRelease(rngDetailArea)
+                '数量
+                rngDetailArea = Me.ExcelWorkSheet.Range("AA" + TtlRowCnt.ToString)
+                rngDetailArea.Value = row("CARSAMOUNT")
+                ExcelMemoryRelease(rngDetailArea)
+            Next
+
+            '----------------------------------
+            '空白行の削除
+            '----------------------------------
+            '合計行の空白行を削除（28行目から25行目まで値が入ってない行を削除する）
+            For rowCnt As Integer = TtlRowMax To TtlRowMax - 3 Step -1
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" & rowCnt)
+                If IsNothing(rngDetailArea.Value) Then
+                    rngDetailArea.EntireRow.Delete()
+                End If
+            Next
+
+            '明細の空白行を削除（23行目から値が入っている行まで削除する）
+            For rowCnt As Integer = DtlEnd To i Step -1
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" & rowCnt)
+                If IsNothing(rngDetailArea.Value) Then
+                    rngDetailArea.EntireRow.Delete()
+                End If
             Next
 
         Catch ex As Exception

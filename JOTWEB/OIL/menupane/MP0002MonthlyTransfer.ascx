@@ -27,13 +27,6 @@
                     <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);'  />
                     <asp:HiddenField ID="hdnDownloadCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
                 </div>
-                <!-- 2021.03.22 S.IGUSA ADD START -->
-                <!-- 輸送実績表出力 -->
-                <div style="display:inline-block">
-                    <input id="btnTransportResult" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="輸送実績表" onclick='printTransportResult(this.id);'  />
-                    <asp:HiddenField ID="hdnTransportResultCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
-                </div>
-                <!-- 2021.03.22 S.IGUSA ADD END -->
                 <div class="measureText">
                     単位(kl)
                 </div>

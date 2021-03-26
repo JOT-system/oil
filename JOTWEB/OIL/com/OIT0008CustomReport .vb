@@ -32,14 +32,17 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' </summary>
     Private ExcelTempSheet As Excel.Worksheet
 
-    '輸送費明細の1ページ辺りの縦長さ
-    Const TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH As Double = 705.0
+    '輸送費明細
+    '1ページ辺りの縦長さ
+    Private Const TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH As Double = 705.0
 
-    'タンク車輸送実績表の1ページ辺りの縦長さ
-    Const TANK_TRANSPORT_RESULT_1PAGE_VERTICAL_LENGTH As Double = 628.5
+    'タンク車輸送実績表
+    '1ページ辺りの縦長さ
+    Private Const TANK_TRANSPORT_RESULT_1PAGE_VERTICAL_LENGTH As Double = 628.5
 
-    '輸送実績表の1ページ辺りの明細数
-    Const TRANSPORT_RESULT_1PAGE_DETAIL_COUNT As Integer = 48
+    '輸送実績表
+    '1ページ辺りの明細数
+    Private Const TRANSPORT_RESULT_1PAGE_DETAIL_COUNT As Integer = 48
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -104,14 +107,17 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                                     [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
             Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
 
-            If excelFileName = "OIT0008M_TRASPORT_COST_DETAIL.xlsx" Then
-                Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("輸送費明細"), Excel.Worksheet)
+            If CONST_TEMPNAME_TRANSPORT_COST_DETAIL.Equals(excelFileName) Then
+                Me.ExcelWorkSheet = DirectCast(
+                    Me.ExcelWorkSheets(CONST_REPORTNAME_TRANSPORT_COST_DETAIL), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
-            ElseIf excelFileName = "OIT0008M_TANK_TRASPORT_RESULT.xlsx" Then
-                Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("タンク車輸送実績表"), Excel.Worksheet)
+            ElseIf CONST_TEMPNAME_TANK_TRANSPORT_RESULT.Equals(excelFileName) Then
+                Me.ExcelWorkSheet = DirectCast(
+                    Me.ExcelWorkSheets(CONST_REPORTNAME_TANK_TRANSPORT_RESULT), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
-            ElseIf excelFileName = "OIT0008M_TRASPORT_RESULT.xlsx" Then
-                Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("輸送実績表"), Excel.Worksheet)
+            ElseIf CONST_TEMPNAME_TRANSPORT_RESULT.Equals(excelFileName) Then
+                Me.ExcelWorkSheet = DirectCast(
+                    Me.ExcelWorkSheets(CONST_REPORTNAME_TRANSPORT_RESULT), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             End If
         Catch ex As Exception
@@ -1255,13 +1261,10 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData_TansportResult(ByRef filePath As String) As String
+    Public Function CreateExcelPrintData_TansportResult(ByVal stYmd As Date, ByVal edYmd As Date) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
-
-        Dim stDate As Date = New Date(Date.Now.Year, Date.Now.Month, 1)
-        Dim edDate As Date = Date.Now
 
         Try
             Dim lastOfficeCode As String = ""       '前行の営業所コード
@@ -1290,7 +1293,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                 '◎ヘッダー部出力処理
                 If idx = 0 Then
                     '〇ヘッダー出力
-                    EditTansportResult_HeaderArea(eridx, nrow, stDate, edDate)
+                    EditTansportResult_HeaderArea(eridx, nrow, stYmd, edYmd)
                 ElseIf Not lastOfficeCode.Equals(nrow("OFFICECODE").ToString()) OrElse          '前行と営業所が異なる
                     Not lastShippersCode.Equals(nrow("SHIPPERSCODE").ToString()) OrElse         '前行と荷主が異なる
                     Not lastBaseCode.Equals(nrow("BASECODE").ToString()) OrElse                 '前行と出荷元が異なる
@@ -1298,7 +1301,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '〇改ページ処理
                     ChangeTansportResultPage(eridx, putDetailCnt)
                     '〇ヘッダー出力
-                    EditTansportResult_HeaderArea(eridx, nrow, stDate, edDate)
+                    EditTansportResult_HeaderArea(eridx, nrow, stYmd, edYmd)
                 End If
 
                 '◎明細部出力
@@ -1354,7 +1357,6 @@ Public Class OIT0008CustomReport : Implements IDisposable
             End SyncLock
             Me.ExcelBookObj.Close(False)
 
-            filePath = tmpFilePath
             Return UrlRoot & tmpFileName
 
         Catch ex As Exception
@@ -1368,7 +1370,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(輸送実績表)
     ''' </summary>
-    Private Sub EditTansportResult_HeaderArea(ByRef idx As Integer, ByVal row As DataRow, ByVal STYMD As Date, ByVal EDYMD As Date)
+    Private Sub EditTansportResult_HeaderArea(ByRef idx As Integer, ByVal row As DataRow, ByVal stYmd As Date, ByVal edYmd As Date)
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
@@ -1390,7 +1392,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
             '◯ 出力期間
             rngHeaderArea = Me.ExcelWorkSheet.Range("S" + idx.ToString())
-            rngHeaderArea.Value = String.Format("{0} ～ {1}", STYMD.ToString("yyyy年 MM月 dd日"), EDYMD.ToString("yyyy年 MM月 dd日"))
+            rngHeaderArea.Value = String.Format("{0} ～ {1}", stYmd.ToString("yyyy年 MM月 dd日"), edYmd.ToString("yyyy年 MM月 dd日"))
             ExcelMemoryRelease(rngHeaderArea)
 
             '◯ 営業所

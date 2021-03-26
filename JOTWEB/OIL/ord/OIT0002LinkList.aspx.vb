@@ -1568,6 +1568,21 @@ Public Class OIT0002LinkList
             '○ UPLOAD XLSデータ取得
             CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
 
+            '★タンク車No重複チェック
+            Dim chkTankNo As String = ""
+            For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select(Nothing, "TRUCKNO")
+                If chkTankNo <> "" _
+                    AndAlso chkTankNo = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
+                    '★タンク車が重複して設定されている場合はエラー
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                              "ポラリスで設定した貨車(車番)が重複して設定されています。再度確認をおねがいします。", needsPopUp:=True)
+                    WW_ERRCODE = "ERR"
+                    Exit For
+                End If
+                chkTankNo = Convert.ToString(OIT0002EXLUProw("TRUCKNO"))
+            Next
+            If WW_ERRCODE = "ERR" Then Exit Sub
+
             '◯ポラリス投入用の場合
             If useFlg = "4" Then
                 '○必須項目チェック(本線列車設定時のチェック)

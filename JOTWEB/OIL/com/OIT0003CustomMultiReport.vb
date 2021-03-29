@@ -1330,6 +1330,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     Private Const DETAIL_AREA_BEGIN_ROW_INDEX As Integer = 7
     Private Const DETAIL_AREA_ROWS_COUNT As Integer = 22
     Private Const DETAIL_AREA_PAGE_COUNT As Integer = 25
+    Private Const PAGE_ROWS_COUNT As Integer = 29
 
     Protected PrintData As DataTable
 
@@ -1468,7 +1469,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
-        Dim rowIndex As Integer = 3 + ((pageIndex - 1) * 28)
+        Dim rowIndex As Integer = 3 + ((pageIndex - 1) * PAGE_ROWS_COUNT)
         Try
 
             '列車番号
@@ -1557,7 +1558,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
             End Select
 
             Dim orderNo As String = ""
-            Dim rowIndex As Integer = DETAIL_AREA_BEGIN_ROW_INDEX + ((pageIndex - 1) * 28)
+            Dim rowIndex As Integer = DETAIL_AREA_BEGIN_ROW_INDEX + ((pageIndex - 1) * PAGE_ROWS_COUNT)
             For Each r In printRows.Select(Function(x, i) New With {.row = x, .index = i}).ToList()
 
                 'Excel行No
@@ -1655,12 +1656,12 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
                 '積込入線列車
                 rngDetailArea = Me.ExcelWorkSheet.Range("T" + rIdx)
-                rngDetailArea.Value = r.row("LOADINGIRILINEORDER")
+                rngDetailArea.Value = r.row("LOADINGIRILINETRAINNO")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積込入線順
                 rngDetailArea = Me.ExcelWorkSheet.Range("U" + rIdx)
-                rngDetailArea.Value = r.row("LINEORDER")
+                rngDetailArea.Value = r.row("LOADINGIRILINEORDER")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '回線

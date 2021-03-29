@@ -859,8 +859,8 @@ Public Class OIT0003OrderList
             & "   , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '')    AS ACTUALARRDATE " _
             & "   , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '')    AS ACTUALACCDATE " _
             & "   , ISNULL(FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '') AS ACTUALEMPARRDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')           AS LOADINGIRILINETRAINNO " _
             & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')             AS LOADINGIRILINEORDER " _
-            & "   , ISNULL(RTRIM(OIT0003.LINEORDER), '')                       AS LINEORDER " _
             & "   , ISNULL(RTRIM(OIT0003.LINE), '')                            AS LINE " _
             & "   , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')                    AS FILLINGPOINT " _
             & "   , ISNULL(RTRIM(OIM0024.PRIORITYNO), '')                      AS PRIORITYNO " _
@@ -879,8 +879,6 @@ Public Class OIT0003OrderList
 
         If Not String.IsNullOrEmpty(selectedOrderNoInStat) Then
             SQLStr &= String.Format("   AND OIT0002.ORDERNO IN ({0}) ", selectedOrderNoInStat)
-        Else
-            SQLStr &= " AND OIT0002.DELFLG <> @DELFLG "
         End If
 
         SQLStr &=

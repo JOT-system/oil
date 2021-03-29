@@ -6934,8 +6934,8 @@ Public Class OIT0003OrderDetail
             & "   , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '')    AS ACTUALARRDATE " _
             & "   , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '')    AS ACTUALACCDATE " _
             & "   , ISNULL(FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '') AS ACTUALEMPARRDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')           AS LOADINGIRILINETRAINNO " _
             & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')             AS LOADINGIRILINEORDER " _
-            & "   , ISNULL(RTRIM(OIT0003.LINEORDER), '')                       AS LINEORDER " _
             & "   , ISNULL(RTRIM(OIT0003.LINE), '')                            AS LINE " _
             & "   , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')                    AS FILLINGPOINT " _
             & "   , ISNULL(RTRIM(OIM0024.PRIORITYNO), '')                      AS PRIORITYNO " _

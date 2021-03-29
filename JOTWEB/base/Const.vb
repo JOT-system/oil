@@ -1222,4 +1222,23 @@ Public Module BaseDllConst
     End Class
 #End Region
 
+#Region "実績帳票出力"
+
+    '費用管理
+    Public Const CONST_MAPID_COST_MANAGEMENT As String = "OIT0008M"
+
+    '輸送費明細
+    Public Const CONST_REPORTNAME_TRANSPORT_COST_DETAIL As String = "輸送費明細"
+    Public Const CONST_TEMPNAME_TRANSPORT_COST_DETAIL As String = "OIT0008M_TRASPORT_COST_DETAIL.xlsx"
+
+    'タンク車輸送実績表
+    Public Const CONST_REPORTNAME_TANK_TRANSPORT_RESULT As String = "タンク車輸送実績表"
+    Public Const CONST_TEMPNAME_TANK_TRANSPORT_RESULT As String = "OIT0008M_TANK_TRASPORT_RESULT.xlsx"
+
+    '輸送実績表
+    Public Const CONST_REPORTNAME_TRANSPORT_RESULT As String = "輸送実績表"
+    Public Const CONST_TEMPNAME_TRANSPORT_RESULT As String = "OIT0008M_TRASPORT_RESULT.xlsx"
+
+#End Region
+
 End Module 'End BaseDllConst

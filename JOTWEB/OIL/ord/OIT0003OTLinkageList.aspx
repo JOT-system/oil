@@ -19,7 +19,7 @@
 <asp:Content ID="OIT0003OTL" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
-        <div class="headerboxOnly" id="headerbox">
+        <div class="headerboxOnly <%= If(Me.ShowReserveModifiedMode, "showModMode", "") %>" id="headerbox" >
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
@@ -59,9 +59,78 @@
                         </div>
                     </div>
                 </div>
- 
+                 <asp:Panel ID="pnlReserveModActionBox" runat="server" Visible='<%# Me.ShowReserveModifiedMode %>'>
+                    <input type="button" id="WF_ButtonReserveMod" class="btn-sticky" value="出荷予約訂正指示" runat="server" onclick="ButtonClick('WF_ButtonReserveMod');" />
+                    <span id="showCanceldOrder" onchange="ButtonClick('WF_ButtonFilter_Mod');">
+                        <asp:CheckBox ID="chkShowCanceldOrder" runat="server" Text="削除した列車を表示" />
+                    </span>
+                </asp:Panel>
             </div>
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+            <div id="divModFileDlList" class='<%= Me.ShowModFileDlChkConfirm  %>'>
+                <asp:HiddenField ID="hdnModFileDlChkConfirmIsActive" runat="server" Value="" />
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <span>選択した変更・削除予約ファイルをダウンロードします。</span>
+                    </div>
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonModDownLoad" class="btn-sticky" value="ダウンロード"   onclick="ButtonClick('WF_ButtonReserveModDownload');" />
+                        <input type="button" id="btnCloseModDownLoadConfirm" class="btn-sticky" value="閉じる"  onclick="closeModDownLoadConfirm();" />
+                    </div>
+                </div>
+                <div id="divInputResultWrapper">
+                    <asp:Repeater ID="repUpdateList" runat="server" ItemType="JOTWEB.OIT0003OTLinkageList.OutputOrdedrInfo" >
+                        <HeaderTemplate>
+                            <div class="updateList">
+                                <table class="tblUpdList">
+                                    <tr>
+                                        <th rowspan="2" class="headerLine1 modChk">指示</th>
+                                        <th colspan="2" class="headerLine1 file">予約情報</th>
+                                        <th colspan="8" class="headerLine1 db">受注情報</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="headerLine2 file trnNo">車番</th>
+                                        <th class="headerLine2 file oilName">油種名</th>
+                                        <th class="headerLine2 db dbReservedNo">予約番号</th>
+                                        <th class="headerLine2 db trnNo">車番</th>
+                                        <th class="headerLine2 db oilName">油種名</th>
+                                        <th class="headerLine2 db amount">数量</th>
+                                        <th class="headerLine2 db trainNo">列車番号</th>
+                                        <th class="headerLine2 db lodDate">積込日</th>
+                                        <th class="headerLine2 db depDate">発日</th>
+                                        <th class="headerLine2 db delDate">削除日</th>
+                                    </tr>
+                        </HeaderTemplate>
+                        <ItemTemplate>
+                            <tr class='delFalg<%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DeleteFlag %>'>
+                                <td class="modChk">
+                                    <asp:DropDownList ID="ddlModFlag" runat="server" SelectedValue='<%# DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).ModifiedFlag %>'>
+                                        <asp:ListItem Text ="" Value=""></asp:ListItem>
+                                        <asp:ListItem Text ="新規" Value="1"></asp:ListItem>
+                                        <asp:ListItem Text ="変更" Value="2"></asp:ListItem>
+                                        <asp:ListItem Text ="削除" Value="3"></asp:ListItem>
+                                    </asp:DropDownList>
+                                    <asp:HiddenField ID="hdnModIndex" runat="server" Value='<%# DirectCast(Container, RepeaterItem).ItemIndex %>' />
+                                </td>
+                                <td class="trnNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OutTankNo %></td>
+                                <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OutOilType   %></td>
+                                <td class="dbReservedNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DispReservedNo  %></td>
+                                <td class="trnNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).TankNo  %></td>
+                                <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OilName  %></td>
+                                <td class="amount"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).CarsAmount %></td>
+                                <td class="trainNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).TrainNo %></td>
+                                <td class="lodDate"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).LodDate %></td>
+                                <td class="depDate"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DepDate %></td>
+                                <td class="delDate"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DelUpdDate %></td>
+                            </tr>
+                        </ItemTemplate>
+                        <FooterTemplate>
+                                </table>
+                            </div>
+                        </FooterTemplate>
+                    </asp:Repeater>
+                </div>
+            </div>
         </div>
 
         <!-- rightbox レイアウト -->

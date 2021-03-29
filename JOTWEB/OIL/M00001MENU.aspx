@@ -1,6 +1,9 @@
 ﻿<%@ Page Title="M00001" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="M00001MENU.aspx.vb" Inherits="JOTWEB.M00001MENU" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %> 
 
+<%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
+
+<%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ register src="~/OIL/inc/GRM00001WRKINC.ascx" tagname="work" tagprefix="LSINC" %>
 <%@ Register Src="~/OIL/menupane/MP0001CycleBillingStatus.ascx" TagPrefix="LSINC" TagName="MP0001CycleBillingStatus" %>
 <%@ Register Src="~/OIL/menupane/MP0002MonthlyTransfer.ascx" TagPrefix="LSINC" TagName="MP0002MonthlyTransfer" %>
@@ -85,8 +88,8 @@
                             </ItemTemplate>
                             <FooterTemplate>
                                 <%#If(DirectCast(DirectCast(Container.Parent, Repeater).DataSource, System.Data.DataTable).Rows.Count = 0,
-                                                                                                            "<tr><td class='empty'>ガイダンスはありません</td></tr>",
-                                                                                                            "") %>
+                                                                                                                        "<tr><td class='empty'>ガイダンスはありません</td></tr>",
+                                                                                                                        "") %>
                                 </table>
                             </FooterTemplate>
                         </asp:Repeater>
@@ -99,6 +102,41 @@
                     </div>
                 </div>
                 <div class= "parsonalParts">
+                    <!-- 2021.03.23 S.IGUSA ADD START -->
+                    <div>
+                        <asp:Panel ID="reportDLAreaPane" runat="server" CssClass="reportDLArea">
+                            <div id="reportSelectArea">
+                                帳票
+                                <asp:HiddenField ID="ddlReportNameList_LaIdx" runat="server" Value="" />
+                                <asp:DropDownList ID="ddlReportNameList" runat="server" CssClass="ddlClass"></asp:DropDownList>
+                                <input id="btnTransportResult" type="button" runat="server" class="btn-sticky btnDownload" value="ダウンロード" onclick="ButtonClick('WF_DownLoadReport');"  />
+                            </div>
+                            <div id="reportConditionArea">
+                                <!-- 輸送実績表出力 -->
+                                <asp:Panel ID="transportResultCondPane" runat="server" Visible="false">
+                                    <!-- 対象期間 -->
+                                    <div style="display:inline-block; width: 100%;">
+                                        期間
+                                        <div class="termInputArea">
+                                            <span ondblclick="Field_DBclick('txtTrStYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                                <asp:TextBox ID="txtTrStYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                            </span>
+                                            ～
+                                            <span ondblclick="Field_DBclick('txtTrEdYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                                <asp:TextBox ID="txtTrEdYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                            </span>
+                                        </div>
+                                        営業所
+                                        <div class="officeSelectArea">
+                                            <asp:HiddenField ID="ddlTrOfficeNameList_LaIdx" runat="server" Value="" />
+                                            <asp:DropDownList ID="ddlTrOfficeNameList" runat="server" CssClass="ddlClass"></asp:DropDownList>
+                                        </div>
+                                    </div>
+                                </asp:Panel>
+                            </div>
+                        </asp:Panel>
+                    </div>
+                    <!-- 2021.03.23 S.IGUSA ADD END -->
                     <div id="paneList"> 
                         <!-- ペインの中身は /OIL/menupane/ の各カスタムコントロールを編集 -->
                         <!-- ここで設定したIDとユーザーマスタのOUTPUTID[n]が紐づけられる -->
@@ -117,6 +155,12 @@
         <!-- ***** ボタン押下 ***** -->
         <a hidden="hidden">
             <input id="WF_ButtonClick" runat="server" value=""  type="text" />
+            <input id="WF_FIELD" runat="server" value="" type="text" />                 <!-- Textbox DBクリックフィールド -->
+            <input id="WF_SelectedIndex" runat="server" value="" type="text" />         <!-- Textbox DBクリックフィールド -->
+            <input id="WF_LeftboxOpen" runat="server" value="" type="text" />           <!-- LeftBox 開閉 -->
+            <input id="WF_LeftMViewChange" runat="server" value="" type="text" />       <!-- LeftBox Mview切替 -->
+            <input id="WF_PrintURL" runat="server" value="" type="text" />              <!-- 帳票出力URL -->
+            <input id="WF_SelectChangeDdl" runat="server" value=""  type="text" />      <!-- DDL変更 -->
             <!-- 左ナビでクリックしたボタンにつきサーバー保持の遷移先情報を特定するためのキーを格納 -->
             <asp:HiddenField ID="hdnPosiCol" runat="server" Value="" />
             <asp:HiddenField ID="hdnRowLine" runat="server" Value="" /> 
@@ -126,5 +170,7 @@
     </div>
     <!-- Work レイアウト -->
     <LSINC:work id="work" runat="server" />
+    <!-- leftbox レイアウト -->
+    <MSINC:leftview id="leftview" runat="server" />
 </asp:Content>
 

@@ -4,7 +4,7 @@
     ''' </summary>
     ''' <param name="mapID">画面ID</param>
     ''' <remarks>空回日報の帳票を表示する際のSQLを設定</remarks>
-    Public Function EmptyTurnDairy(ByVal mapID As String)
+    Public Function EmptyTurnDairy(ByVal mapID As String, Optional ByVal dt As DataTable = Nothing)
 
         Dim SQLStr As String =
               " SELECT " _
@@ -141,7 +141,20 @@
             & "   AND OIM0003.DELFLG <> @P02 "
 
         Select Case mapID
-            '空回日報画面(ダウンロード)より出力
+            '空回日報一覧画面(ダウンロード)より出力
+            Case "OIT0001L"
+                SQLStr &=
+                  "   WHERE OIT0002.ORDERNO IN ( "
+                For Each dtrow As DataRow In dt.Select("OPERATION='on'")
+                    If dtrow("LINECNT") = 1 Then
+                        SQLStr &= "'" + dtrow("ORDERNO") + "'"
+                    Else
+                        SQLStr &= ",'" + dtrow("ORDERNO") + "'"
+                    End If
+                Next
+                SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
+
+            '空回日報明細画面(ダウンロード)より出力
             Case "OIT0001"
                 SQLStr &=
                   "   WHERE OIT0002.ORDERNO = @P01 "
@@ -169,7 +182,20 @@
             & " AND OTOILCT.OTOILCODE = OIM0003.OTOILCODE "
 
         Select Case mapID
-            '空回日報画面(ダウンロード)より出力
+            '空回日報一覧画面(ダウンロード)より出力
+            Case "OIT0001L"
+                SQLStr &=
+                  "   WHERE OIT0002.ORDERNO IN ( "
+                For Each dtrow As DataRow In dt.Select("OPERATION='on'")
+                    If dtrow("LINECNT") = 1 Then
+                        SQLStr &= "'" + dtrow("ORDERNO") + "'"
+                    Else
+                        SQLStr &= ",'" + dtrow("ORDERNO") + "'"
+                    End If
+                Next
+                SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
+
+            '空回日報明細画面(ダウンロード)より出力
             Case "OIT0001"
                 SQLStr &=
                   " WHERE OIT0002.ORDERNO = @P01 " _
@@ -923,7 +949,7 @@
             & " , OIT0002.BTRAINNO " _
             & " , OT.IMPORTFLG AS IMPORTFLG " _
             & " , OT.ORDERNO AS OT_ORDERNO " _
-            & " , OT.DETAILNO AS OT_DETAILNO " _
+            & " , OT.OTDETAILNO AS OT_DETAILNO " _
             & " , OT.ORDERSTATUS AS OT_ORDERSTATUS " _
             & " , OT.TRAINNO AS OT_TRAINNO " _
             & " , OT.TRAINNAME AS OT_TRAINNAME " _
@@ -978,7 +1004,7 @@
             & "     SELECT " _
             & "       OIT0016.IMPORTFLG " _
             & "     , OIT0016.ORDERNO " _
-            & "     , OIT0017.DETAILNO " _
+            & "     , OIT0017.OTDETAILNO " _
             & "     , OIT0016.ORDERSTATUS " _
             & "     , OIT0016.TRAINNO " _
             & "     , OIT0016.TRAINNAME " _
@@ -1023,7 +1049,7 @@
             & "     AND OIT0016.ORDERYMD = @ORDERYMD " _
             & "     ) OT ON " _
             & " OT.ORDERNO = OIT0002.ORDERNO " _
-            & " AND OT.DETAILNO = OIT0003.DETAILNO "
+            & " AND OT.OTDETAILNO = OIT0003.DETAILNO "
 
         SQLORDERStr &=
               String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
@@ -1035,7 +1061,7 @@
         Dim SQLOTORDERStr As String =
               " SELECT " _
             & "   OIT0016.ORDERNO AS KEYCODE1 " _
-            & " , OIT0017.DETAILNO AS KEYCODE2 " _
+            & " , OIT0017.OTDETAILNO AS KEYCODE2 " _
             & " , OIT0016.OFFICECODE AS KEYCODE3 " _
             & " , CASE " _
             & "   WHEN OIT0016.IMPORTFLG = '0' THEN '0' " _
@@ -1092,7 +1118,7 @@
             & " , JOT.BTRAINNO AS JOT_BTRAINNO " _
             & " , OIT0016.IMPORTFLG " _
             & " , OIT0016.ORDERNO " _
-            & " , OIT0017.DETAILNO " _
+            & " , OIT0017.OTDETAILNO " _
             & " , OIT0016.ORDERSTATUS " _
             & " , OIT0016.TRAINNO " _
             & " , OIT0016.TRAINNAME " _
@@ -1191,7 +1217,7 @@
             & "     AND OIT0002.OFFICECODE = @OFFICECODE " _
             & "     ) JOT ON " _
             & " JOT.ORDERNO = OIT0016.ORDERNO " _
-            & " AND JOT.DETAILNO = OIT0017.DETAILNO "
+            & " AND JOT.DETAILNO = OIT0017.OTDETAILNO "
 
         SQLOTORDERStr &=
               " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
@@ -1267,6 +1293,8 @@
             & " , OIT0020.TANKNO                                           AS TANKNO" _
             & " , OIM0005_OT.MODEL                                         AS OT_MODEL" _
             & " , OIT0020.OT_TANKNO                                        AS OT_TANKNO" _
+            & " , OIT0020.JOINT                                            AS JOINT" _
+            & " , OIT0020.OT_JOINT                                         AS OT_JOINT" _
             & " FROM oil.OIT0020_OTCOMPARE OIT0020 " _
             & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003_JOT ON " _
             & "     OIM0003_JOT.OFFICECODE = OIT0020.KEYCODE3 " _

@@ -1564,6 +1564,25 @@ div[data-generated="1"] tr.hover th {
     background-color: #FFDADA !important;
 }
 /* ------------------------------
+OT空回連携情報有の場合の設定
+------------------------------ */
+div[data-generated="1"] tr.hasCmpResultsInfoValue td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue th {
+    background-color: indianred;
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.hover td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.hover th {
+    background-color: #32a3a3 !important;
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo th {
+    background-color:#ffffa3
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo.hover td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo.hover th {
+    background-color: #a3a4ff !important;
+}
+/* ------------------------------
 受注情報有の場合の設定
 ------------------------------ */
 div[data-generated="1"] tr.hasOrderInfoValue td,

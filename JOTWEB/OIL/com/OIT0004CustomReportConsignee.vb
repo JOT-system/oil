@@ -252,13 +252,15 @@ Public Class OIT0004CustomReportConsignee : Implements IDisposable
                 '****************************
                 '３号or軽油の対象行の非表示
                 '****************************
-                For Each rowNum As String In rowNumList
-                    rngHideRow = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", rowNum))
-                    rowHide = rngHideRow.Rows
-                    rowHide.Hidden = True
-                    ExcelMemoryRelease(rowHide)
-                    ExcelMemoryRelease(rngHideRow)
-                Next
+                If rowNumList IsNot Nothing Then
+                    For Each rowNum As String In rowNumList
+                        rngHideRow = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", rowNum))
+                        rowHide = rngHideRow.Rows
+                        rowHide.Hidden = True
+                        ExcelMemoryRelease(rowHide)
+                        ExcelMemoryRelease(rngHideRow)
+                    Next
+                End If
                 '****************************
                 '非表示行に三号期間のフラグを設定
                 '(合計の計算に含めない）

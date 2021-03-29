@@ -945,7 +945,7 @@ Public Class OIT0001EmptyTurnDairyList
             SQLcon.Open()       'DataBase接続
 
             '★受注TBLとOT受注TBL比較
-            WW_CompareOrderToOTOrder(SQLcon)
+            WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
         End Using
 
         '○ 画面表示データ取得(一覧再取得)
@@ -957,6 +957,11 @@ Public Class OIT0001EmptyTurnDairyList
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
+
+        '★比較結果が不一致の場合、エラーメッセージを表示
+        If WW_ERRCODE = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_EMPTYTURNDAIRYDATA_UNMATCH_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        End If
 
     End Sub
 
@@ -2849,8 +2854,9 @@ Public Class OIT0001EmptyTurnDairyList
     ''' 受注TBLとOT受注TBL比較
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_CompareOrderToOTOrder(ByVal SQLcon As SqlConnection)
+    Protected Sub WW_CompareOrderToOTOrder(ByVal SQLcon As SqlConnection, ByRef O_RTN As String)
 
+        O_RTN = C_MESSAGE_NO.NORMAL
         Dim inOrder As String = ""
 
         If IsNothing(OIT0001CMPOrdertbl) Then
@@ -2961,6 +2967,7 @@ Public Class OIT0001EmptyTurnDairyList
                     '★OT受注TBLの比較結果を"不一致"とする。
                     WW_UpdateOTOrderStatus(SQLcon, OIT0001Cmprow, I_ITEM:="CMPRESULTSCODE", I_VALUE:="1")
                     OIT0001Cmprow("ORDERNO") = svOrderNo
+                    O_RTN = "ERR"
                 Next
 
             End Using

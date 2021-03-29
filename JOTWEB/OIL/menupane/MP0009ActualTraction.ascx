@@ -7,6 +7,9 @@
             <div class="paneTitleLeft">
                 <asp:Label ID="lblPaneTitle" runat="server" Text="" ClientIDMode="Predictable"></asp:Label>
             </div>
+            <div class="paneTitleMiddle">
+                <asp:Label ID="lblPaneDownloadTitle" runat="server" Text="" ClientIDMode="Predictable"></asp:Label>
+            </div>
             <div class="paneTitleRight">
                 <div class="paneTitleRefresh" onclick="refreshPane('<%= Me.hdnRefreshCall.ClientId %>');" title="最新化" ><div class="paneRefreshImg"></div></div>
                 <!-- 上記ボタン内容更新のアイコンボタンを押下された時の呼出しに"1"を設定 -->
@@ -15,16 +18,29 @@
         </div> 
         <!-- ペインの内部コンテンツ -->
         <div class="paneContent">
-            <!-- 営業所選択 -->
-            <div class="actualTractionDdl" onchange="refreshPane('<%= Me.hdnRefreshCall.ClientId %>');">
-                <span>
-                    表示する営業所 
-                    <asp:DropDownList ID="ddlActualTractionOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
-                </span>
-                <span>
-                    着駅
-                    <asp:DropDownList ID="ddlActualTractionArrStation" runat="server" ClientIDMode="Predictable" CssClass="stationDdl"></asp:DropDownList>
-                </span>
+            <div class="flexCondition">
+                <!-- 営業所選択 -->
+                <div class="actualTractionDdl" onchange="refreshPane('<%= Me.hdnRefreshCall.ClientId %>');">
+                    <span>
+                        表示する営業所 
+                        <asp:DropDownList ID="ddlActualTractionOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
+                    </span>
+                    <span>
+                        着駅
+                        <asp:DropDownList ID="ddlActualTractionArrStation" runat="server" ClientIDMode="Predictable" CssClass="stationDdl"></asp:DropDownList>
+                    </span>
+                </div>
+                <!-- ダウンロード -->
+                <div class="actualTravtionDownloadDbl" >
+                    <span>
+                        年月
+                        <asp:DropDownList ID="ddlActualTractionYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>
+                    </span>
+                    <span>
+                        <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);'  />
+                        <asp:HiddenField ID="hdnDownloadCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
+                    </span>
+                </div>
             </div>
             <!-- グラフコントロール -->
             <asp:Chart ID="chtActualTraction" runat="server" EnableViewState="true"
@@ -74,4 +90,5 @@
     </div>
     <asp:HiddenField ID="hdnPaneOrder" runat="server" Visible="false" ClientIDMode="Predictable" />
     <asp:HiddenField ID="hdnCurrentOfficeCode" runat="server" Visible="false" ClientIDMode="Predictable" /> 
+    <%--<asp:HiddenField ID="hdnYearMonth" runat="server" Visible="false" ClientIDMode="Predictable" />--%> 
 </asp:Panel>

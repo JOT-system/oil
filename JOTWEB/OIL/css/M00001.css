@@ -383,19 +383,21 @@ div.showGuidance a[id^="Menu_"] {
 }
 /* ペインタイトルエリア */
 .paneTitle {
-    width:100%;
+    width: 100%;
+    display: flex;
 }
 .paneTitle > div {
     display:inline-block;
     vertical-align:top;
 }
-.paneTitleLeft {
-    width:calc(100% - 40px);
-    font-size:16pt;
-    font-weight:bold;
-    height:32px;
-    margin-top:5px;
-    box-sizing:border-box;
+.paneTitleLeft,
+.paneTitleMiddle {
+    flex: 1;
+    font-size: 16pt;
+    font-weight: bold;
+    height: 32px;
+    margin-top: 5px;
+    box-sizing: border-box;
 }
 
 /* 再描画ボタンアイコン */
@@ -433,8 +435,17 @@ div.showGuidance a[id^="Menu_"] {
     }
 }
 /* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
+.paneContent > .flexCondition {
+    display: flex;
+}
+
+.flexCondition > div {
+    flex: 1;
+}
+
 .paneContent select.officeDdl,
-.paneContent select.stationDdl {
+.paneContent select.stationDdl,
+.paneContent select.yearMonthDdl {
     height: 28px;
     font-size: 12pt;
     padding: 2px;
@@ -805,4 +816,15 @@ div.showGuidance a[id^="Menu_"] {
     /* 棒 */
     content:'―';
     font-weight:bolder;
+}
+
+/* ******************************** */
+/* 営業所別列車牽引実績ペイン個別 */
+/* ******************************** */
+#P009_contentPane .btnDownload {
+    margin-left: 10px;
+    height: 28px;
+    padding-top: 0px;
+    box-sizing: border-box;
+    width: 140px;
 }

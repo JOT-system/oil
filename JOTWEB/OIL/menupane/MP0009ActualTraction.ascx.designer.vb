@@ -32,6 +32,15 @@ Partial Public Class MP0009ActualTraction
     Protected WithEvents lblPaneTitle As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''lblPaneDownloadTitle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblPaneDownloadTitle As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''hdnRefreshCall コントロール。
     '''</summary>
     '''<remarks>
@@ -57,6 +66,33 @@ Partial Public Class MP0009ActualTraction
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents ddlActualTractionArrStation As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''ddlActualTractionYearMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlActualTractionYearMonth As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''btnDownload コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents btnDownload As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''hdnDownloadCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDownloadCall As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''chtActualTraction コントロール。

@@ -168,6 +168,10 @@ window.addEventListener('DOMContentLoaded', function () {
     /* ************************************  */
     commonBindDblTapEvents();
     /* ************************************  */
+    /* OT空回連携情報ステータス行ハイライト  */
+    /* ************************************  */
+    commonSetHasCmpResultsInfoToHighlight();
+    /* ************************************  */
     /* 受注情報行ハイライト                  */
     /* ************************************  */
     commonSetHasOrderInfoToHighlight();
@@ -1489,6 +1493,61 @@ function commonBindDblTapEvents() {
  * @return {undefined} なし
  * @description 左ボックステーブル表示のフィルタイベント
  */
+function commonSetHasCmpResultsInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'CMPRESULTSNAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '' || cellObj.textContent === '一致') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasCmpResultsInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasCmpResultsInfoValue');
+            ////ワーニング（黄色）判定
+            //if (cellObj.textContent === '検査間近有'
+            //    || cellObj.textContent === '前回黒油'
+            //    || cellObj.textContent === '前回揮発油'
+            //    || cellObj.textContent === '前回灯軽油') {
+            //    rightTableObj.rows[rowIdx].classList.add('warnInfo');
+            //    leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            //}
+        }
+    }
+}
 function commonSetHasOrderInfoToHighlight() {
     let generatedTables = document.querySelectorAll("div[data-generated='1']");
     if (generatedTables === null) {

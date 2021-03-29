@@ -290,17 +290,18 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstation.Text, WW_GetValue)
-        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
-        work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
-        work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
-        work.WF_SEL_TRKBN.Text = WW_GetValue(8)
+        WW_SetOfficeUnderInfo()
+        'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstation.Text, WW_GetValue)
+        'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        'work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+        'work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+        'work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
         '○ 名称設定処理
         '会社コード
@@ -910,17 +911,18 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
+        WW_SetOfficeUnderInfo()
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
-        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
-        work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
-        work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
-        work.WF_SEL_TRKBN.Text = WW_GetValue(8)
+        'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+        'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        'work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+        'work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+        'work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
         'タンク車数の件数カウント用
         Dim intTankCnt As Integer = 0
@@ -1524,13 +1526,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtATank.Text = "0"
 
                     '〇営業所配下情報を取得・設定
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
-                    work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-                    work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-                    work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-                    work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-                    work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-                    work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                    WW_SetOfficeUnderInfo()
+                    'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+                    'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                    'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                    'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                    'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                    'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                    'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1619,17 +1622,18 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtEmparrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
 
                 '〇営業所配下情報を取得・設定
-                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
-                work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-                work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-                work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-                work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-                work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-                work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
-                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
-                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
-                work.WF_SEL_TRKBN.Text = WW_GetValue(8)
+                WW_SetOfficeUnderInfo()
+                'WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+                'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                'work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                'work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+                'work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
             Case "TxtDepstation"        '発駅
                 TxtDepstation.Text = WW_SelectValue
@@ -1642,16 +1646,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtArrstation.Focus()
 
                 '〇営業所配下情報を取得・設定
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
-                work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-                work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-                work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-                work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-                work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-                work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
-                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
-                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
-                work.WF_SEL_TRKBN.Text = WW_GetValue(8)
+                WW_SetOfficeUnderInfo()
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+                'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                'work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                'work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+                'work.WF_SEL_TRKBN.Text = WW_GetValue(8)
 
             Case "TxtLoadingDate"       '(予定)積込日
                 Dim WW_DATE As Date
@@ -8429,4 +8434,21 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 営業所配下情報を取得・設定
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_SetOfficeUnderInfo()
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstation.Text, WW_GetValue)
+        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+        work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+        work.WF_SEL_TRKBN.Text = WW_GetValue(8)
+    End Sub
 End Class

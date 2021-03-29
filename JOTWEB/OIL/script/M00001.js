@@ -33,6 +33,15 @@ function InitDisplay() {
             closeBottom.style.width = branchSize + "px";
         }
     }
+
+    // 左ボックス
+    if (document.getElementById("WF_LeftboxOpen").value === "Open") {
+        document.getElementById("LF_LEFTBOX").style.display = "block";
+    }
+
+    // 左ボックス拡張機能追加
+    addLeftBoxExtention(leftListExtentionTarget);
+
 }
 /**
  * 左ナビゲーションクリックイベントバインド
@@ -199,33 +208,36 @@ function downloadPaneData(dlButtonId) {
     }
 }
 
-// 2021.03.22 S.IGUSA ADD START
-// 輸送実績表出力
-function printTransportResult(dlButtonId) {
-    let downLoadMarkObj = document.getElementById(dlButtonId);
-    if (downLoadMarkObj === null) {
-        return;
-    }
-    let dlMarkObj = document.querySelector("#" + dlButtonId + " + input[type=hidden]");
-    let menuVscrollObj = document.getElementById('hdnPaneAreaVScroll');
-    let menuPaneArea = document.querySelector('#Menuheaderbox > .menuMain');
-
+/* 
+ * ○ドロップダウンリスト選択変更
+ */
+function selectChangeDdl(ddl) {
+    /* サーバー未処理（MF_SUBMIT="FALSE"）のときのみ、SUBMIT */
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
-        if (menuVscrollObj !== null) {
-            if (menuPaneArea !== null) {
-                menuVscrollObj.value = menuPaneArea.scrollTop;
-            }
-        }
-
-        setTimeout(function () {
-            dlMarkObj.value = '';
-            downLoadMarkObj.disabled = false;
-            document.getElementById("MF_SUBMIT").value = "FALSE";
-        }, 2000);
-        dlMarkObj.value = '1';
-        downLoadMarkObj.disabled = true;
+        /* 選択値を取得 */
+        let idx = document.getElementById(ddl).selectedIndex;
+        document.getElementById(ddl + "_LaIdx").value = idx;
+        /* 押下されたボタンを設定 */
+        document.getElementById("WF_SelectChangeDdl").value = ddl;
+        document.body.style.cursor = "wait";
         document.forms[0].submit();
+    } else {
+        return false;
     }
 }
-// 2021.03.22 S.IGUSA ADD END
+
+/**
+ * ロード時処理(共通処理により、カレンダーアイコン付きTextBoxの幅がcalc(100% + 1px)に補正されるのを指定幅に戻す)
+ */
+window.addEventListener('load', function () {
+    /* 帳票条件エリアのカレンダーアイコン付きテキストボックスのstyleを削除 */
+    let queryString = "#reportDLAreaPane #reportConditionArea input[type=text].calendarIcon"
+    var targetTextBoxList = document.querySelectorAll(queryString);
+    if (targetTextBoxList != null) {
+        for (let i = 0; i < targetTextBoxList.length; i++) {
+            let inputObj = targetTextBoxList[i];
+            inputObj.removeAttribute('style')
+        }
+    }
+});

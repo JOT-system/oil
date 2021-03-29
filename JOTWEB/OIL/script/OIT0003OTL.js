@@ -137,3 +137,16 @@ function f_ExcelPrint() {
         window.open(url2.value, "view2", "_blank");
     }
 }
+/**
+ * 更新確認ポップアップを閉じる
+ * @return {undefined} なし
+ * @description
+ */
+function closeModDownLoadConfirm() {
+    let updateConfirmObj = document.getElementById('divModFileDlList');
+    if (updateConfirmObj !== null) {
+        updateConfirmObj.classList.remove('showModFileDlConfirm');
+        let hdnUpdConfirmObj = document.getElementById('hdnModFileDlChkConfirmIsActive');
+        hdnUpdConfirmObj.value = '';
+    }
+}

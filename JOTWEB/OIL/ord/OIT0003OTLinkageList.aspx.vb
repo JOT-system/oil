@@ -2189,8 +2189,10 @@ Public Class OIT0003OTLinkageList
                 '★仙台新港営業所対応用
                 Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
+                '★根岸営業所対応用
+                Dim OTTrainNoNegishiChg() As String = {"5692", "8461"}
                 '★四日市営業所対応用
-                Dim OTTrainNoChg() As String = {"6078", "6089"}
+                Dim OTTrainNoYokkaishiChg() As String = {"6078", "6089"}
                 Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★仙台新港営業所の場合
@@ -2218,11 +2220,18 @@ Public Class OIT0003OTLinkageList
 
                     End If
 
+                    '★根岸営業所の場合(列車チェック)
+                    '　列車No変更(八王子(5692)⇒OT八王子(8461))
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_011402 _
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoNegishiChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoNegishiChg(1)
+                    End If
+
                     '★四日市営業所の場合(列車チェック)
                     '　稲沢経由で列車Noが変更(四日市⇒稲沢(6078)　稲沢⇒南松本(6089))
                     If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_012401 _
-                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoChg(0) Then
-                        OIT0003row("TRAINNO") = OTTrainNoChg(1)
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoYokkaishiChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoYokkaishiChg(1)
                     End If
 
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換

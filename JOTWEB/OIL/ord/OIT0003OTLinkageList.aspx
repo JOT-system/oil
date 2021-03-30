@@ -143,7 +143,7 @@
                     </div>
                 </div>
                 <div id="divInputOTResultWrapper">
-                    <asp:Repeater ID="Repeater1" runat="server" ItemType="JOTWEB.OIT0003OTLinkageList.OutputOrdedrInfo" >
+                    <asp:Repeater ID="repUpdateOTList" runat="server" ItemType="JOTWEB.OIT0003OTLinkageList.OutputOrdedrInfo" >
                         <HeaderTemplate>
                             <div class="updateList">
                                 <table class="tblUpdList">

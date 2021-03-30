@@ -150,3 +150,11 @@ function closeModDownLoadConfirm() {
         hdnUpdConfirmObj.value = '';
     }
 }
+function closeOTLinkageSendConfirm() {
+    let updateConfirmObj = document.getElementById('divOTLinkageSendList');
+    if (updateConfirmObj !== null) {
+        updateConfirmObj.classList.remove('showOTLinkageSendConfirm');
+        let hdnUpdConfirmObj = document.getElementById('hdnOTLinkageSendChkConfirmIsActive');
+        hdnUpdConfirmObj.value = '';
+    }
+}

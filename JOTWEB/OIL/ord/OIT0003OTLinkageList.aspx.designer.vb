@@ -167,6 +167,24 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents repUpdateList As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''hdnOTLinkageSendChkConfirmIsActive コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnOTLinkageSendChkConfirmIsActive As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''Repeater1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents Repeater1 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

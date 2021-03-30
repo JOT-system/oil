@@ -54,19 +54,31 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <returns></returns>
     Public Property ShowReserveModifiedMode As Boolean = False
+    ''' <summary>
+    ''' OT発送日報送信データ一覧表示(showOTLinkageSendConfirm)を設定時に表示
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ShowOTLinkageSendChkConfirm As String = ""
+    ''' <summary>
+    ''' OT発送日報送信機能表示フラグ(True:表示,False:非表示)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ShowReserveOTModifiedMode As Boolean = False
 
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Try
             If IsPostBack Then
-                If Me.hdnModFileDlChkConfirmIsActive.Value <> "1" Then
+                If Me.hdnModFileDlChkConfirmIsActive.Value = "1" Then
+                    Me.ShowModFileDlChkConfirm = "showModFileDlConfirm"
+                ElseIf Me.hdnOTLinkageSendChkConfirmIsActive.Value = "1" Then
+                    Me.ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
+                Else
                     Me.ShowModFileDlChkConfirm = ""
                     Me.repUpdateList.DataSource = Nothing
                     Me.repUpdateList.DataBind()
                     ViewState("VS_OUTPUTINFO") = Nothing
-                Else
-                    Me.ShowModFileDlChkConfirm = "showModFileDlConfirm"
                 End If
 
                 '○ 各ボタン押下処理
@@ -751,6 +763,12 @@ Public Class OIT0003OTLinkageList
                 Return
             End If
         End Using
+        ''更新確認に値を設定
+        'Me.repUpdateList.DataSource = selectedOrderInfo
+        'Me.repUpdateList.DataBind()
+        'ViewState("VS_OUTPUTINFO") = selectedOrderInfo
+        'Me.hdnOTLinkageSendChkConfirmIsActive.Value = "1"
+        'ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
 
         '******************************
         'CSV作成処理の実行
@@ -1906,7 +1924,7 @@ Public Class OIT0003OTLinkageList
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
-            & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
+            & " , FORMAT(OIT0002.TOTALTANKCH, '00')              AS TOTALTANK" _
             & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '0')                         AS LANDC" _
@@ -2127,7 +2145,18 @@ Public Class OIT0003OTLinkageList
                             Next
 
                             OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
-                            retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+                            Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
+                            orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEC"))
+                            orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
+                            orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
+                            orderInf.OTShipOrder = Convert.ToString(sortedDr("SHIPORDER"))
+                            orderInf.OTDepStationName = Convert.ToString(sortedDr("OTDAILYDEPSTATIONN"))
+                            orderInf.OTShippersName = Convert.ToString(sortedDr("OTDAILYSHIPPERN"))
+                            orderInf.OTOilName = Convert.ToString(sortedDr("OTOILNAME"))
+                            orderInf.OTTankNo = Convert.ToString(sortedDr("TANKNO"))
+                            orderInf.OTAmount = Convert.ToString(sortedDr("CARSAMOUNT"))
+                            retVal.Add(orderInf)
+                            'retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
                         End If
                         'i += 1
                         'OIT0003Csvrow("LINECNT") = i        'LINECNT
@@ -2136,7 +2165,18 @@ Public Class OIT0003OTLinkageList
                 Else
                     OIT0003CsvOTLinkagetbl = wrkDt.Copy()
                     For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
-                        retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
+                        Dim orderInf = New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO")))
+                        orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC"))
+                        orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
+                        orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
+                        orderInf.OTShipOrder = Convert.ToString(OIT0003row("SHIPORDER"))
+                        orderInf.OTDepStationName = Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN"))
+                        orderInf.OTShippersName = Convert.ToString(OIT0003row("OTDAILYSHIPPERN"))
+                        orderInf.OTOilName = Convert.ToString(OIT0003row("OTOILNAME"))
+                        orderInf.OTTankNo = Convert.ToString(OIT0003row("TANKNO"))
+                        orderInf.OTAmount = Convert.ToString(OIT0003row("CARSAMOUNT"))
+                        retVal.Add(orderInf)
+                        'retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
                         OIT0003row("ORDERNO") = ""
                         OIT0003row("DETAILNO") = ""
                     Next
@@ -4234,6 +4274,54 @@ Public Class OIT0003OTLinkageList
         ''' <returns></returns>
         Public Property DispReservedNo As String = ""
 #End Region
+#Region "OT発送日報送信確認用のプロパティ"
+        ''' <summary>
+        ''' OT営業所名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTOfficeName As String = ""
+        ''' <summary>
+        ''' 発送年月日
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTSendYMD As String = ""
+        ''' <summary>
+        ''' 列車No
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTTrainNo As String = ""
+        ''' <summary>
+        ''' 連結順位
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTShipOrder As String = ""
+        ''' <summary>
+        ''' 発駅名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTDepStationName As String = ""
+        ''' <summary>
+        ''' 荷主名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTShippersName As String = ""
+        ''' <summary>
+        ''' 油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTOilName As String = ""
+        ''' <summary>
+        ''' 車号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTTankNo As String = ""
+        ''' <summary>
+        ''' 数量
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTAmount As String = ""
+#End Region
+
     End Class
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***

@@ -4278,7 +4278,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New CsvCreate(OIT0003CsvActualLoadtbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
                     Dim url As String
                     Try
-                        url = repCbj.ConvertDataTableToCsv(False, False, True)
+                        url = repCbj.ConvertDataTableToCsv(writeHeader:=False, strOfficeCode:="", blnFrame:=False, blnSeparate:=True, blnNewline:=True)
                     Catch ex As Exception
                         Return
                     End Try

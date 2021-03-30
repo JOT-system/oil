@@ -823,7 +823,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-4091
             Dim setData = allData.Where(Function(r)
                                             Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                            r.ARRSTATIONCODE = "4427" AndAlso
+                                            r.ARRSTATIONCODE = "4425" AndAlso
                                             r.TRAINNO = "4091"
                                         End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).
@@ -833,7 +833,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-8571
             setData = allData.Where(Function(r)
                                         Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                        r.ARRSTATIONCODE = "4427" AndAlso
+                                        r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8571"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).
@@ -843,7 +843,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-8569
             setData = allData.Where(Function(r)
                                         Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                        r.ARRSTATIONCODE = "4427" AndAlso
+                                        r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8569"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).

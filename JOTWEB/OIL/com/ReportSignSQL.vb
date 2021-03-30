@@ -260,9 +260,17 @@
             & "   END                                            AS ARTICLENAME"
         '### 20201021 END   指摘票対応(No183)全体 #############################################
 
+        '### 20210330 START ﾀｷ1000以外は交検を未反映 ##########################################
+        'SQLStr &=
+        '      " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE"
         SQLStr &=
-              " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
-            & " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
+              " , CASE" _
+            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,1) = 'ｺ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
+            & "   ELSE ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE)" _
+            & "   END                                            AS INSPECTIONDATE"
+        '### 20210330 END   ﾀｷ1000以外は交検を未反映 ##########################################
+        SQLStr &=
+              " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
             & " , OIT0011.ARTICLE                                AS ARTICLE" _
             & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
             & " , OIT0011.EXTEND                                 AS EXTEND" _
@@ -275,13 +283,23 @@
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
 
+        '### 20210330 START ﾀｷ1000以外は前回油種を未反映 ######################################
         '### 20201021 START 指摘票対応(No189)全体 #############################################
+        'SQLStr &=
+        '      " , OIT0005_LASTOIL.LASTOILCODE                    AS LASTOILCODE" _
+        '    & " , OIT0005_LASTOIL.LASTOILNAME                    AS LASTOILNAME" _
+        '    & " , OIT0005_LASTOIL.PREORDERINGTYPE                AS PREORDERINGTYPE" _
+        '    & " , OIT0005_LASTOIL.PREORDERINGOILNAME             AS PREORDERINGOILNAME"
         SQLStr &=
               " , OIT0005_LASTOIL.LASTOILCODE                    AS LASTOILCODE" _
             & " , OIT0005_LASTOIL.LASTOILNAME                    AS LASTOILNAME" _
             & " , OIT0005_LASTOIL.PREORDERINGTYPE                AS PREORDERINGTYPE" _
-            & " , OIT0005_LASTOIL.PREORDERINGOILNAME             AS PREORDERINGOILNAME"
+            & " , CASE" _
+            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,1) = 'ｺ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
+            & "   ELSE OIT0005_LASTOIL.PREORDERINGOILNAME" _
+            & "   END                                            AS PREORDERINGOILNAME"
         '### 20201021 END   指摘票対応(No189)全体 #############################################
+        '### 20210330 END   ﾀｷ1000以外は前回油種を未反映 ######################################
 
         '### 20201002 START 変換マスタに移行したため修正 ########################
         SQLStr &=
@@ -304,7 +322,7 @@
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "' THEN OIT0011.LOADINGTRAINNO" _
-            & "   ELSE OIT0002.TRAINNO" _
+            & "   ELSE OIT0011.LOADINGOTTRAINNO" _
             & "   END                                            AS ORDERTRAINNO " _
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _

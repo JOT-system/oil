@@ -544,8 +544,10 @@ Public Class OIT0003OTLinkageList
                 PARA02.Value = targetDate
                 PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
-                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
-                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                'PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                'PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA08.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARA04.Value = C_DELETE_FLG.DELETE

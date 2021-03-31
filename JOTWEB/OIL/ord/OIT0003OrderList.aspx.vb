@@ -51,6 +51,7 @@ Public Class OIT0003OrderList
     Private Const CONST_SODE_TRAIN_8877 As String = "8877"          '袖ヶ浦営業所(列車番号：8877)
     Private Const CONST_SODE_TRAIN_8883 As String = "8883"          '袖ヶ浦営業所(列車番号：8883)
     Private Const CONST_SODE_TRAIN_5461 As String = "5461"          '袖ヶ浦営業所(列車番号：5461)
+    Private Const CONST_SODE_TRAIN_5972 As String = "5972"          '袖ヶ浦営業所(列車番号：5972)
     Private Const CONST_SODE_TRAIN_9672 As String = "9672"          '袖ヶ浦営業所(列車番号：9672)
     Private Const CONST_SHIPPERSCODE_0122700010 As String = "0122700010"   '出光昭和シェル(荷主コード : 0122700010)
 
@@ -1370,7 +1371,7 @@ Public Class OIT0003OrderList
                         Case "txtReportTrainNo"
 
                             ' 営業所指定
-                            prmData = work.CreateFIXParam(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                            prmData = work.CreateFIXParam(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_REPCNV")
 
                             Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
                                 Case CONST_OFFICECODE_010402
@@ -3261,7 +3262,7 @@ Public Class OIT0003OrderList
                 Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877
             Case Me.rbTankDispatch40Btn.Checked     'タンク車発送実績<br>(ＪＯＮＥＴ松本)
                 Me.divTrainNo.Visible = True
-                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
+                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5972
             Case Me.rbTankDispatch54Btn.Checked     'タンク車発送実績<br>(構内取り)
                 Me.divTrainNo.Visible = True
                 Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_8877
@@ -3269,10 +3270,10 @@ Public Class OIT0003OrderList
                 Me.divTrainNo.Visible = True
             Case Me.rbConcatOederBtn.Checked        '連結順序表
                 Me.divTrainNo.Visible = True
-                '   If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                '袖ヶ浦のみ初期値を設定
-                Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5461
-                'End If
+                If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '袖ヶ浦のみ初期値を設定
+                    Me.txtReportTrainNo.Text = CONST_SODE_TRAIN_5972
+                End If
             Case Me.rbShipContactBtn.Checked           'タンク車出荷連絡書
                 Me.divTrainNo.Visible = True
         End Select
@@ -7334,22 +7335,25 @@ Public Class OIT0003OrderList
         '　 説明　：　帳票表示用SQL
         Dim SQLStr As String =
               " SELECT " _
-            & "   0 AS LINECNT " _
-            & "   , '' AS OPERATION " _
-            & "   , '0' AS TIMSTP " _
-            & "   , 1 AS 'SELECT' " _
-            & "   , 0 AS HIDDEN " _
-            & "   , OIT0002.OFFICECODE AS OFFICECODE " _
-            & "   , OIT0003.ACTUALLODDATE AS ACTUALLODDATE " _
-            & "   , OIT0002.TRAINNO AS TRAINNO " _
-            & "   , OIM0007.DEPSTATION AS DEPSTATION " _
-            & "   , OIM0007.ARRSTATION AS ARRSTATION " _
-            & "   , OIT0003.OILCODE AS OILCODE " _
-            & "   , OIT0003.ORDERINGTYPE AS ORDERINGTYPE " _
-            & "   , FORMAT(ISNULL(CARSAMOUNT*1000, '00000'),'00000') AS CARSAMOUNT " _
-            & "   , ISNULL(OIM0005.MODEL, '') AS MODEL " _
-            & "   , ISNULL(OIM0005.TANKNUMBER, '') AS TANKNUMBER " _
-            & "   , '' AS TANKNO " _
+            & "     0                                                   AS LINECNT " _
+            & "   , ''                                                  AS OPERATION " _
+            & "   , '0'                                                 AS TIMSTP " _
+            & "   , 1                                                   AS 'SELECT' " _
+            & "   , 0                                                   AS HIDDEN " _
+            & "   , OIT0002.OFFICECODE                                  AS OFFICECODE " _
+            & "   , OIT0003.ACTUALLODDATE                               AS ACTUALLODDATE " _
+            & "   , CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END                                                 AS TRAINNO " _
+            & "   , OIM0007.DEPSTATION                                  AS DEPSTATION " _
+            & "   , OIM0007.ARRSTATION                                  AS ARRSTATION " _
+            & "   , OIT0003.OILCODE                                     AS OILCODE " _
+            & "   , OIT0003.ORDERINGTYPE                                AS ORDERINGTYPE " _
+            & "   , FORMAT(ISNULL(CARSAMOUNT * 1000, '00000'), '00000') AS CARSAMOUNT " _
+            & "   , ISNULL(OIM0005.MODEL, '')                           AS MODEL " _
+            & "   , ISNULL(OIM0005.TANKNUMBER, '')                      AS TANKNUMBER " _
+            & "   , ''                                                  AS TANKNO " _
             & " FROM " _
             & "   OIL.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
@@ -7361,14 +7365,14 @@ Public Class OIT0003OrderList
             & "     ON OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & "   INNER JOIN ( " _
             & "     SELECT " _
-            & "       OIM0003.OFFICECODE AS OFFICECODE " _
-            & "       , OIM0003.SHIPPERCODE AS SHIPPERCODE " _
-            & "       , OIM0003.PLANTCODE AS PLANTCODE " _
-            & "       , OIM0003.OILCODE AS OILCODE " _
-            & "       , OIM0003.SEGMENTOILCODE AS SEGMENTOILCODE " _
+            & "         OIM0003.OFFICECODE                           AS OFFICECODE " _
+            & "       , OIM0003.SHIPPERCODE                          AS SHIPPERCODE " _
+            & "       , OIM0003.PLANTCODE                            AS PLANTCODE " _
+            & "       , OIM0003.OILCODE                              AS OILCODE " _
+            & "       , OIM0003.SEGMENTOILCODE                       AS SEGMENTOILCODE " _
             & "       , " _
             & "       LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9) AS SHIPPEROILCODE " _
-            & "       , OIM0003.SHIPPEROILNAME AS SHIPPEROILNAME " _
+            & "       , OIM0003.SHIPPEROILNAME                       AS SHIPPEROILNAME " _
             & "     FROM " _
             & "       OIL.OIM0003_PRODUCT OIM0003 " _
             & "     WHERE " _
@@ -7381,9 +7385,9 @@ Public Class OIT0003OrderList
             & "     AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & "   LEFT JOIN ( " _
             & "     SELECT " _
-            & "       OIS0015.KEYCODE AS SHIPPEROILCODE " _
-            & "       , OIS0015.VALUE1 AS SHIPPEROILNAME " _
-            & "       , OIS0015.VALUE2 AS SHIPPEROILCODESEQ " _
+            & "         OIS0015.KEYCODE AS SHIPPEROILCODE " _
+            & "       , OIS0015.VALUE1  AS SHIPPEROILNAME " _
+            & "       , OIS0015.VALUE2  AS SHIPPEROILCODESEQ " _
             & "     FROM " _
             & "       COM.OIS0015_FIXVALUE OIS0015 " _
             & "     WHERE " _
@@ -7392,9 +7396,17 @@ Public Class OIT0003OrderList
             & "       AND OIS0015.DELFLG <> @DELFLG " _
             & "   ) ACTUALSHIP " _
             & "     ON OIM0003.SHIPPEROILCODE = ACTUALSHIP.SHIPPEROILCODE " _
+            & "   LEFT JOIN OIL.OIM0029_CONVERT TRACNV " _
+            & "     ON TRACNV.CLASS = 'ORDERREPORTTRAINNO' " _
+            & "     AND TRACNV.DELFLG <> '1' " _
+            & "     AND OIT0002.OFFICECODE = TRACNV.KEYCODE01 " _
+            & "     AND OIT0002.TRAINNO = TRACNV.KEYCODE02 " _
             & " WHERE " _
             & "   OIT0002.OFFICECODE = @OFFICECODE " _
-            & "   AND OIT0002.TRAINNO = @TRAINNO " _
+            & "   AND CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END = @TRAINNO " _
             & "   AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
             & "   AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
             & "   AND OIT0002.DELFLG <> @DELFLG " _
@@ -7411,7 +7423,10 @@ Public Class OIT0003OrderList
             & " ORDER BY " _
             & "   OIT0002.OFFICECODE " _
             & "   , OIT0002.ACTUALLODDATE " _
-            & "   , OIT0002.TRAINNO " _
+            & "   , CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END " _
             & "   , ACTUALSHIP.SHIPPEROILCODESEQ "
 
         Try
@@ -7524,80 +7539,94 @@ Public Class OIT0003OrderList
         '　 説明　：　帳票表示用SQL
         Dim SQLStr As String =
               " SELECT " _
-            & "       0                                          AS LINECNT " _
-            & "     , ''                                         AS OPERATION " _
-            & "     , '0'                                        AS TIMSTP " _
-            & "     , 1                                          AS 'SELECT' " _
-            & "     , 0                                          AS HIDDEN " _
-            & "     , OIT0002.OFFICECODE                         AS OFFICECODE " _
-            & "     , OIT0003.ACTUALLODDATE                      AS ACTUALLODDATE " _
-            & "     , OIT0002.TRAINNO                            AS TRAINNO " _
-            & "     , OIM0007.DEPSTATION                         AS DEPSTATION " _
-            & "     , OIM0007.ARRSTATION                         AS ARRSTATION " _
-            & "     , OIT0003.OILCODE                            AS OILCODE " _
-            & "     , OIT0003.ORDERINGTYPE                       AS ORDERINGTYPE " _
-            & "     , ISNULL(OIT0003.SHIPORDER, '')              AS SHIPORDER " _
-            & "     , ISNULL(OIM0005.MODEL, '')                  AS MODEL " _
-            & "     , ISNULL(OIM0005.TANKNUMBER, '')             AS TANKNUMBER " _
-            & "     , ''                                         AS TANKNO " _
+            & "     0                              AS LINECNT " _
+            & "   , ''                             AS OPERATION " _
+            & "   , '0'                            AS TIMSTP " _
+            & "   , 1                              AS 'SELECT' " _
+            & "   , 0                              AS HIDDEN " _
+            & "   , OIT0002.OFFICECODE             AS OFFICECODE " _
+            & "   , OIT0003.ACTUALLODDATE          AS ACTUALLODDATE " _
+            & "   , CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END                            AS TRAINNO " _
+            & "   , OIM0007.DEPSTATION             AS DEPSTATION " _
+            & "   , OIM0007.ARRSTATION             AS ARRSTATION " _
+            & "   , OIT0003.OILCODE                AS OILCODE " _
+            & "   , OIT0003.ORDERINGTYPE           AS ORDERINGTYPE " _
+            & "   , ISNULL(OIT0003.SHIPORDER, '')  AS SHIPORDER " _
+            & "   , ISNULL(OIM0005.MODEL, '')      AS MODEL " _
+            & "   , ISNULL(OIM0005.TANKNUMBER, '') AS TANKNUMBER " _
+            & "   , ''                             AS TANKNO " _
             & " FROM " _
-            & "     OIL.OIT0002_ORDER OIT0002 " _
-            & "     INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
-            & "         ON OIT0002.ORDERNO = OIT0003.ORDERNO " _
-            & "     INNER JOIN OIL.OIM0007_TRAIN OIM0007 " _
-            & "         ON OIT0002.OFFICECODE = OIM0007.OFFICECODE " _
-            & "         AND OIT0002.TRAINNO = OIM0007.TRAINNO " _
-            & "     INNER JOIN OIL.OIM0005_TANK OIM0005 " _
-            & "         ON OIM0005.TANKNUMBER = OIT0003.TANKNO " _
-            & "     INNER JOIN ( " _
-            & "         SELECT " _
-            & "               OIM0003.OFFICECODE                           AS OFFICECODE " _
-            & "             , OIM0003.SHIPPERCODE                          AS SHIPPERCODE " _
-            & "             , OIM0003.PLANTCODE                            AS PLANTCODE " _
-            & "             , OIM0003.OILCODE                              AS OILCODE " _
-            & "             , OIM0003.SEGMENTOILCODE                       AS SEGMENTOILCODE " _
-            & "             , " _
-            & "             LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9) AS SHIPPEROILCODE " _
-            & "             , OIM0003.SHIPPEROILNAME                       AS SHIPPEROILNAME " _
-            & "         FROM " _
-            & "             OIL.OIM0003_PRODUCT OIM0003 " _
-            & "         WHERE " _
-            & "             OIM0003.DELFLG <> @DELFLG " _
-            & "     ) OIM0003 " _
-            & "         ON OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
-            & "         AND OIM0003.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
-            & "         AND OIM0003.PLANTCODE = OIT0002.BASECODE " _
-            & "         AND OIM0003.OILCODE = OIT0003.OILCODE " _
-            & "         AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & "     LEFT JOIN ( " _
-            & "         SELECT " _
-            & "               OIS0015.KEYCODE AS SHIPPEROILCODE " _
-            & "             , OIS0015.VALUE1  AS SHIPPEROILNAME " _
-            & "             , OIS0015.VALUE2  AS SHIPPEROILCODESEQ " _
-            & "         FROM " _
-            & "             COM.OIS0015_FIXVALUE OIS0015 " _
-            & "         WHERE " _
-            & "             OIS0015.CAMPCODE = @OFFICECODE " _
-            & "             AND OIS0015.CLASS = 'ACTUALSHIP_OILCODE' " _
-            & "             AND OIS0015.DELFLG <> @DELFLG " _
-            & "     ) ACTUALSHIP " _
-            & "         ON OIM0003.SHIPPEROILCODE = ACTUALSHIP.SHIPPEROILCODE " _
+            & "   OIL.OIT0002_ORDER OIT0002 " _
+            & "   INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
+            & "     ON OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & "   INNER JOIN OIL.OIM0007_TRAIN OIM0007 " _
+            & "     ON OIT0002.OFFICECODE = OIM0007.OFFICECODE " _
+            & "     AND OIT0002.TRAINNO = OIM0007.TRAINNO " _
+            & "   INNER JOIN OIL.OIM0005_TANK OIM0005 " _
+            & "     ON OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & "   INNER JOIN ( " _
+            & "     SELECT " _
+            & "         OIM0003.OFFICECODE                           AS OFFICECODE " _
+            & "       , OIM0003.SHIPPERCODE                          AS SHIPPERCODE " _
+            & "       , OIM0003.PLANTCODE                            AS PLANTCODE " _
+            & "       , OIM0003.OILCODE                              AS OILCODE " _
+            & "       , OIM0003.SEGMENTOILCODE                       AS SEGMENTOILCODE " _
+            & "       , " _
+            & "       LEFT (OIM0003.SHIPPEROILCODE + '000000000', 9) AS SHIPPEROILCODE " _
+            & "       , OIM0003.SHIPPEROILNAME                       AS SHIPPEROILNAME " _
+            & "     FROM " _
+            & "       OIL.OIM0003_PRODUCT OIM0003 " _
+            & "     WHERE " _
+            & "       OIM0003.DELFLG <> @DELFLG " _
+            & "   ) OIM0003 " _
+            & "     ON OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & "     AND OIM0003.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & "     AND OIM0003.PLANTCODE = OIT0002.BASECODE " _
+            & "     AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & "     AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & "   LEFT JOIN ( " _
+            & "     SELECT " _
+            & "         OIS0015.KEYCODE AS SHIPPEROILCODE " _
+            & "       , OIS0015.VALUE1  AS SHIPPEROILNAME " _
+            & "       , OIS0015.VALUE2  AS SHIPPEROILCODESEQ " _
+            & "     FROM " _
+            & "       COM.OIS0015_FIXVALUE OIS0015 " _
+            & "     WHERE " _
+            & "       OIS0015.CAMPCODE = @OFFICECODE " _
+            & "       AND OIS0015.CLASS = 'ACTUALSHIP_OILCODE' " _
+            & "       AND OIS0015.DELFLG <> @DELFLG " _
+            & "   ) ACTUALSHIP " _
+            & "     ON OIM0003.SHIPPEROILCODE = ACTUALSHIP.SHIPPEROILCODE " _
+            & "   LEFT JOIN OIL.OIM0029_CONVERT TRACNV " _
+            & "     ON TRACNV.CLASS = 'ORDERREPORTTRAINNO' " _
+            & "     AND TRACNV.DELFLG <> '1' " _
+            & "     AND OIT0002.OFFICECODE = TRACNV.KEYCODE01 " _
+            & "     AND OIT0002.TRAINNO = TRACNV.KEYCODE02 " _
             & " WHERE " _
-            & "     OIT0002.OFFICECODE = @OFFICECODE " _
-            & "     AND OIT0002.TRAINNO = @TRAINNO " _
-            & "     AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
-            & "     AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
-            & "     AND OIT0002.DELFLG <> @DELFLG " _
-            & "     AND OIT0002.LODDATE = @LODDATE " _
-            & "     AND OIT0003.DELFLG <> @DELFLG " _
-            & "     AND OIM0005.DELFLG <> @DELFLG " _
+            & "   OIT0002.OFFICECODE = @OFFICECODE " _
+            & "   AND CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END = @TRAINNO " _
+            & "   AND OIT0003.SHIPPERSCODE = @SHIPPERSCODE " _
+            & "   AND OIT0002.ORDERSTATUS <> @ORDERSTATUS " _
+            & "   AND OIT0002.DELFLG <> @DELFLG " _
+            & "   AND OIT0002.LODDATE = @LODDATE " _
+            & "   AND OIT0003.DELFLG <> @DELFLG " _
+            & "   AND OIM0005.DELFLG <> @DELFLG " _
             & " ORDER BY " _
-            & "     OIT0002.OFFICECODE " _
-            & "     , OIT0002.ACTUALLODDATE " _
-            & "     , OIT0002.TRAINNO " _
-            & "     , CONVERT(INT, ISNULL(OIT0003.SHIPORDER, 99)) " _
-            & "     , OIM0005.MODEL " _
-            & "     , OIM0005.TANKNUMBER "
+            & "   OIT0002.OFFICECODE " _
+            & "   , OIT0002.ACTUALLODDATE " _
+            & "   , CASE OIT0002.TRAINNO " _
+            & "     WHEN TRACNV.KEYCODE02 THEN TRACNV.VALUE01 " _
+            & "     ELSE OIT0002.TRAINNO " _
+            & "     END " _
+            & "   , CONVERT(INT, ISNULL(OIT0003.SHIPORDER, 99)) " _
+            & "   , OIM0005.MODEL " _
+            & "   , OIM0005.TANKNUMBER "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

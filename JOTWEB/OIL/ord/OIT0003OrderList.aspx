@@ -229,7 +229,7 @@
     <div id="divTrainNo" runat="server">
         <span id="spnTrainNo">
             <asp:Label ID="lblReportTrainNo" runat="server" Text="列車番号"></asp:Label>
-            <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
+            <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);">
                 <asp:TextBox ID="txtReportTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>

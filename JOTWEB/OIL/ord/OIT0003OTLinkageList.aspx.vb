@@ -376,6 +376,7 @@ Public Class OIT0003OTLinkageList
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                  AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')                  AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')                     AS ORDERNO" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')                 AS ORDERSTATUS" _
 
         '★積置フラグ無し用SQL
         Dim SQLStrNashi As String =
@@ -584,7 +585,8 @@ Public Class OIT0003OTLinkageList
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
                     'OT発送日報出力可否(発日 >= 当日)
-                    If Convert.ToString(OIT0003row("DEPDATE")) >= today AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" Then
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= today _
+                        AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> "100" Then
                         OIT0003row("CAN_OTSEND") = "1"
                     Else
                         OIT0003row("CAN_OTSEND") = "0"
@@ -2176,7 +2178,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) " _
-            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06" _
+            & "   AND (FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06 OR FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05)" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _

@@ -515,18 +515,26 @@ Public Class OIT0003OTLinkageList
         SQLStrNashi &=
               SQLStrCmn _
             & "  , OIT0002.LODDATE"
-        '★積置フラグ有り用SQL
-        SQLStrAri &=
-              SQLStrCmn _
-            & "  , OIT0003.ACTUALLODDATE" _
-            & " ORDER BY" _
+
+        '### 20210331 START 仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
+        ''★積置フラグ有り用SQL
+        'SQLStrAri &=
+        '      SQLStrCmn _
+        '    & "  , OIT0003.ACTUALLODDATE" _
+        '    & " ORDER BY" _
+        '    & "    OFFICECODE" _
+        '    & "  , TRAINNO" _
+        '    & "  , LODDATE"
+        ''◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        'SQLStrNashi &=
+        '      " UNION ALL" _
+        '    & SQLStrAri
+        SQLStrNashi &=
+              " ORDER BY" _
             & "    OFFICECODE" _
             & "  , TRAINNO" _
             & "  , LODDATE"
-        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
-        SQLStrNashi &=
-              " UNION ALL" _
-            & SQLStrAri
+        '### 20210331 END   仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
 
         Try
             Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
@@ -566,6 +574,8 @@ Public Class OIT0003OTLinkageList
                 '各ボタンで処理が可能か判定するフラグフィールド（３ボタン分追加）
                 'OT発送日報出力可否
                 dtWrk.Columns.Add("CAN_OTSEND", GetType(String)).DefaultValue = "0"
+                'OT発送日報出力可否(受注進行ステータス判断用)
+                dtWrk.Columns.Add("CAN_OTSEND_ORST", GetType(String)).DefaultValue = "0"
                 '製油所出荷予約出力可否
                 dtWrk.Columns.Add("CAN_RESERVED", GetType(String)).DefaultValue = "0"
                 '託送指示出力可否
@@ -586,10 +596,17 @@ Public Class OIT0003OTLinkageList
                     OIT0003row("LINECNT") = i        'LINECNT
                     'OT発送日報出力可否(発日 >= 当日)
                     If Convert.ToString(OIT0003row("DEPDATE")) >= today _
-                        AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> "100" Then
+                        AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" Then
                         OIT0003row("CAN_OTSEND") = "1"
                     Else
                         OIT0003row("CAN_OTSEND") = "0"
+                    End If
+                    'OT発送日報出力可否(受注進行ステータス <> 100(受注受付))
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= today _
+                        AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                        OIT0003row("CAN_OTSEND_ORST") = "1"
+                    Else
+                        OIT0003row("CAN_OTSEND_ORST") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
                     If Convert.ToString(OIT0003row("LODDATE")) >= today AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" Then
@@ -744,10 +761,17 @@ Public Class OIT0003OTLinkageList
         '処理対象外のチェックがなされている場合
         Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
                                                          AndAlso dr("CAN_OTSEND").Equals("0")
+        '処理対象外のチェックがなされている場合
+        Dim qCannotProcST = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                         AndAlso dr("CAN_OTSEND_ORST").Equals("0")
 
         If qCannotProc.Any Then
             '選択されていない場合は、エラーメッセージを表示し終了
             Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        ElseIf qCannotProcST.Any Then
+            '受注進行ステータスが"100"(受注受付)の場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_ORDERTANK_MIWARIATE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
         '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）

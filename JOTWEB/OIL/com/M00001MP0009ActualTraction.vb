@@ -388,8 +388,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-コスモ 出光-盛岡-8081
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "8081"
                                     End Function).
@@ -399,8 +399,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-コスモ 出光-盛岡-5081
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "5081"
                                     End Function).
@@ -410,8 +410,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-コスモ 出光-盛岡-5575
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "5575"
                                     End Function).

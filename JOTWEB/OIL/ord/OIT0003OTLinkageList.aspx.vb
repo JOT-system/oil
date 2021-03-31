@@ -54,19 +54,34 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <returns></returns>
     Public Property ShowReserveModifiedMode As Boolean = False
+    ''' <summary>
+    ''' OT発送日報送信データ一覧表示(showOTLinkageSendConfirm)を設定時に表示
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ShowOTLinkageSendChkConfirm As String = ""
+    ''' <summary>
+    ''' OT発送日報送信機能表示フラグ(True:表示,False:非表示)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ShowReserveOTModifiedMode As Boolean = False
 
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Try
             If IsPostBack Then
-                If Me.hdnModFileDlChkConfirmIsActive.Value <> "1" Then
+                If Me.hdnModFileDlChkConfirmIsActive.Value = "1" Then
+                    Me.ShowModFileDlChkConfirm = "showModFileDlConfirm"
+                ElseIf Me.hdnOTLinkageSendChkConfirmIsActive.Value = "1" Then
+                    Me.ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
+                Else
                     Me.ShowModFileDlChkConfirm = ""
+                    Me.ShowOTLinkageSendChkConfirm = ""
                     Me.repUpdateList.DataSource = Nothing
                     Me.repUpdateList.DataBind()
+                    Me.repUpdateOTList.DataSource = Nothing
+                    Me.repUpdateOTList.DataBind()
                     ViewState("VS_OUTPUTINFO") = Nothing
-                Else
-                    Me.ShowModFileDlChkConfirm = "showModFileDlConfirm"
                 End If
 
                 '○ 各ボタン押下処理
@@ -87,8 +102,10 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonFilter_Click(False)
                         Case "WF_ButtonFilterClear"
                             WF_ButtonFilter_Click(True)
-                        Case "WF_ButtonOtSend"          'OT連携ボタン押下
+                        Case "WF_ButtonOtSend"                  'OT連携ボタン押下(確認)
                             WF_ButtonOtSend_Click()
+                        Case "WF_ButtonReserveOTLinkageSend"    'OT連携ボタン押下(送信)
+                            WF_ButtonOtRsvSend_Click()
                         Case "WF_ButtonReserved"          '製油所出荷予約ボタン押下時
                             WF_ButtonReserved_Click()
                         Case "WF_ButtonTakusou"          '託送指示ボタン押下時
@@ -709,7 +726,7 @@ Public Class OIT0003OTLinkageList
         Master.SaveTable(OIT0003tbl)
     End Sub
     ''' <summary>
-    ''' OT連携ボタン押下時処理
+    ''' OT連携ボタン押下時処理(確認)
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOtSend_Click()
@@ -751,6 +768,12 @@ Public Class OIT0003OTLinkageList
                 Return
             End If
         End Using
+        '更新確認に値を設定
+        'Me.repUpdateOTList.DataSource = selectedOrderInfo
+        'Me.repUpdateOTList.DataBind()
+        'ViewState("VS_OUTPUTINFO") = selectedOrderInfo
+        'Me.hdnOTLinkageSendChkConfirmIsActive.Value = "1"
+        'ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
 
         '******************************
         'CSV作成処理の実行
@@ -830,12 +853,113 @@ Public Class OIT0003OTLinkageList
 
         End Using
 
-
         ''○ 遷移先(OT連携一覧画面)退避データ保存先の作成
         'WW_CreateXMLSaveFile()
 
         ''○ 画面表示データ保存
         'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
+
+    End Sub
+    ''' <summary>
+    ''' OT連携ボタン押下時処理(送信)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOtRsvSend_Click()
+        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+        '******************************
+        'OT発送日報データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            selectedOrderInfo = OTLinkageDataGet(SQLcon)
+            If selectedOrderInfo Is Nothing Then
+                Return
+            End If
+        End Using
+        '******************************
+        'CSV作成処理の実行
+        '******************************
+        Dim OTFileName As String = SetCSVFileName(work.WF_SEL_OTS_SALESOFFICECODE.Text)
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl,
+                                     I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
+                                     I_FileName:=OTFileName,
+                                     I_Enc:="EBCDIC")
+            'I_Enc:="UTF8N")
+            'I_Enc:="EBCDIC")
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False,
+                                                   strOfficeCode:=work.WF_SEL_OTS_SALESOFFICECODE.Text,
+                                                   blnNewline:=False)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+        '******************************
+        'OT発送日報データの（本体）ダウンロードフラグ更新
+        '                  （明細）ダウンロード数インクリメント
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                    Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    OutputJournal(orderTbl, "OIT0002_ORDER")
+                    OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
+
+        Me.ShowOTLinkageSendChkConfirm = ""
+        Me.repUpdateOTList.DataSource = Nothing
+        Me.repUpdateOTList.DataBind()
+        ViewState("VS_OUTPUTINFO") = Nothing
+        Me.hdnOTLinkageSendChkConfirmIsActive.Value = ""
 
     End Sub
     ''' <summary>
@@ -1906,7 +2030,7 @@ Public Class OIT0003OTLinkageList
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
-            & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
+            & " , FORMAT(OIT0002.TOTALTANKCH, '00')              AS TOTALTANK" _
             & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '0')                         AS LANDC" _
@@ -2050,7 +2174,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) " _
-            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05" _
+            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _
@@ -2078,6 +2202,7 @@ Public Class OIT0003OTLinkageList
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '積込日(年月)
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)     '積込日(年月)
                 Dim PARATODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '積込日
                 'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
@@ -2085,6 +2210,7 @@ Public Class OIT0003OTLinkageList
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA05.Value = Format(Now.AddDays(1), "yyyy/MM")
+                PARA06.Value = Format(Now.AddDays(0), "yyyy/MM")
                 PARATODAY.Value = Format(Now, "yyyy/MM/dd")
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
@@ -2127,7 +2253,18 @@ Public Class OIT0003OTLinkageList
                             Next
 
                             OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
-                            retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+                            Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
+                            orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEC"))
+                            orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
+                            orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
+                            orderInf.OTShipOrder = Convert.ToString(sortedDr("SHIPORDER"))
+                            orderInf.OTDepStationName = Convert.ToString(sortedDr("OTDAILYDEPSTATIONN"))
+                            orderInf.OTShippersName = Convert.ToString(sortedDr("OTDAILYSHIPPERN"))
+                            orderInf.OTOilName = Convert.ToString(sortedDr("OTOILNAME"))
+                            orderInf.OTTankNo = Convert.ToString(sortedDr("TANKNO"))
+                            orderInf.OTAmount = Convert.ToString(sortedDr("CARSAMOUNT"))
+                            retVal.Add(orderInf)
+                            'retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
                         End If
                         'i += 1
                         'OIT0003Csvrow("LINECNT") = i        'LINECNT
@@ -2136,7 +2273,18 @@ Public Class OIT0003OTLinkageList
                 Else
                     OIT0003CsvOTLinkagetbl = wrkDt.Copy()
                     For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
-                        retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
+                        Dim orderInf = New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO")))
+                        orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC"))
+                        orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
+                        orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
+                        orderInf.OTShipOrder = Convert.ToString(OIT0003row("SHIPORDER"))
+                        orderInf.OTDepStationName = Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN"))
+                        orderInf.OTShippersName = Convert.ToString(OIT0003row("OTDAILYSHIPPERN"))
+                        orderInf.OTOilName = Convert.ToString(OIT0003row("OTOILNAME"))
+                        orderInf.OTTankNo = Convert.ToString(OIT0003row("TANKNO"))
+                        orderInf.OTAmount = Convert.ToString(OIT0003row("CARSAMOUNT"))
+                        retVal.Add(orderInf)
+                        'retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
                         OIT0003row("ORDERNO") = ""
                         OIT0003row("DETAILNO") = ""
                     Next
@@ -2149,8 +2297,10 @@ Public Class OIT0003OTLinkageList
                 '★仙台新港営業所対応用
                 Dim OTSHIPPERC() As String = {"01", "04", "09"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
+                '★根岸営業所対応用
+                Dim OTTrainNoNegishiChg() As String = {"5692", "8461"}
                 '★四日市営業所対応用
-                Dim OTTrainNoChg() As String = {"6078", "6089"}
+                Dim OTTrainNoYokkaishiChg() As String = {"6078", "6089"}
                 Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★仙台新港営業所の場合
@@ -2178,11 +2328,18 @@ Public Class OIT0003OTLinkageList
 
                     End If
 
+                    '★根岸営業所の場合(列車チェック)
+                    '　列車No変更(八王子(5692)⇒OT八王子(8461))
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_011402 _
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoNegishiChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoNegishiChg(1)
+                    End If
+
                     '★四日市営業所の場合(列車チェック)
                     '　稲沢経由で列車Noが変更(四日市⇒稲沢(6078)　稲沢⇒南松本(6089))
                     If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_012401 _
-                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoChg(0) Then
-                        OIT0003row("TRAINNO") = OTTrainNoChg(1)
+                        AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoYokkaishiChg(0) Then
+                        OIT0003row("TRAINNO") = OTTrainNoYokkaishiChg(1)
                     End If
 
                     '★積込日を[yyyymmdd]⇒[yymmdd]に変換
@@ -3120,7 +3277,7 @@ Public Class OIT0003OTLinkageList
             'アップロード方式によりインクリメントフィールドを変更
             Dim incFieldName As String = ""
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     incFieldName = "OTSENDCOUNT"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     incFieldName = "DLRESERVEDCOUNT"
@@ -3202,7 +3359,7 @@ Public Class OIT0003OTLinkageList
             '呼出し元ボタンに応じカウントアップしたフィールドを取得
             Dim incFieldName As String
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     incFieldName = "OTSENDCOUNT"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     incFieldName = "DLRESERVEDCOUNT"
@@ -3245,7 +3402,7 @@ Public Class OIT0003OTLinkageList
                             End If
                             retDec.Add(orderNo, "0")
                             Continue While
-                        ElseIf callerButton <> "WF_ButtonOtSend" Then
+                        ElseIf callerButton <> "WF_ButtonReserveOTLinkageSend" Then
                             '発送日報以外で未送信以外は基本的に送信済
                             '再送信の情報も押えない
                             retDec.Add(orderNo, "1")
@@ -3319,7 +3476,7 @@ Public Class OIT0003OTLinkageList
             'アップロード方式によりインクリメントフィールドを変更
             Dim updFieldName As String = ""
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     updFieldName = "OTSENDSTATUS"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     updFieldName = "RESERVEDSTATUS"
@@ -4234,6 +4391,54 @@ Public Class OIT0003OTLinkageList
         ''' <returns></returns>
         Public Property DispReservedNo As String = ""
 #End Region
+#Region "OT発送日報送信確認用のプロパティ"
+        ''' <summary>
+        ''' OT営業所名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTOfficeName As String = ""
+        ''' <summary>
+        ''' 発送年月日
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTSendYMD As String = ""
+        ''' <summary>
+        ''' 列車No
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTTrainNo As String = ""
+        ''' <summary>
+        ''' 連結順位
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTShipOrder As String = ""
+        ''' <summary>
+        ''' 発駅名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTDepStationName As String = ""
+        ''' <summary>
+        ''' 荷主名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTShippersName As String = ""
+        ''' <summary>
+        ''' 油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTOilName As String = ""
+        ''' <summary>
+        ''' 車号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTTankNo As String = ""
+        ''' <summary>
+        ''' 数量
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTAmount As String = ""
+#End Region
+
     End Class
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***

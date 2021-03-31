@@ -756,6 +756,31 @@ Public Class OIT0003OrderList
     ''' </summary>
     Protected Sub WF_ButtonDetailDownload_Click()
 
+        Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
+
+        '件数を取得
+        intTblCnt = OIT0003tbl.Rows.Count
+
+        '行が選択されているかチェック
+        For Each OIT0003UPDrow In OIT0003tbl.Rows
+            If OIT0003UPDrow("OPERATION") = "on" Then
+                SelectChk = True
+            End If
+        Next
+
+        '○メッセージ表示
+        '一覧件数が０件の時の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.SELECT_DETAIL_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+
+            '一覧件数が１件以上で未選択の場合
+        ElseIf SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.SELECT_DETAIL_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
         '******************************
         '帳票表示データ取得処理
         '******************************
@@ -806,65 +831,72 @@ Public Class OIT0003OrderList
         '　 説明　：　出荷予定表(計画枠)取得用SQL
         Dim SQLStr As String =
               " SELECT " _
-            & "     ISNULL(RTRIM(OIT0002.ORDERNO), '')                         AS ORDERNO " _
-            & "   , ISNULL(RTRIM(OIT0003.DETAILNO), '')                        AS DETAILNO " _
-            & "   , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                      AS OFFICECODE " _
-            & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                         AS TRAINNO " _
-            & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')          AS LODDATE " _
-            & "   , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')          AS DEPDATE " _
-            & "   , ISNULL(RTRIM(OIT0003.SHIPORDER), '')                       AS SHIPORDER " _
-            & "   , ISNULL(RTRIM(OIT0003.TANKNO), '')                          AS TANKNO " _
-            & "   , ISNULL(RTRIM(OIT0003.OILCODE), '')                         AS OILCODE " _
-            & "   , ISNULL(RTRIM(OIT0003.OILNAME), '')                         AS OILNAME " _
-            & "   , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')                      AS CARSAMOUNT " _
-            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')                    AS SHIPPERSCODE " _
-            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')                    AS SHIPPERSNAME " _
-            & "   , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                       AS JOINTCODE " _
-            & "   , ISNULL(RTRIM(OIT0003.JOINT), '')                           AS JOINT " _
-            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '')             AS SECONDCONSIGNEECODE " _
-            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')             AS SECONDCONSIGNEENAME " _
+            & "     ISNULL(RTRIM(OIT0002.ORDERNO), '')                      AS ORDERNO " _
+            & "   , ISNULL(RTRIM(OIT0003.DETAILNO), '')                     AS DETAILNO " _
+            & "   , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                   AS OFFICECODE " _
+            & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                      AS TRAINNO " _
+            & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')       AS LODDATE " _
+            & "   , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')       AS DEPDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPORDER), '')                    AS SHIPORDER " _
+            & "   , CASE ISNULL(OIM0005.MODEL, '') " _
+            & "     WHEN 'タキ1000' THEN '1000-' + " _
+            & "   RIGHT ('0000' + ISNULL(RTRIM(OIT0003.TANKNO), ''), 4) " _
+            & "   ELSE ISNULL(RTRIM(OIT0003.TANKNO), '') " _
+            & "   END                                                       AS TANKNO " _
+            & "   , ISNULL(RTRIM(OIT0003.OILCODE), '')                      AS OILCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.OILNAME), '')                      AS OILNAME " _
+            & "   , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')                   AS CARSAMOUNT " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')                 AS SHIPPERSCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')                 AS SHIPPERSNAME " _
+            & "   , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                    AS JOINTCODE " _
+            & "   , ISNULL(RTRIM(OIT0003.JOINT), '')                        AS JOINT " _
+            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '')          AS SECONDCONSIGNEECODE " _
+            & "   , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')          AS SECONDCONSIGNEENAME " _
             & "   , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '') " _
-            & "     WHEN '1' THEN 'レ' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS STACKINGFLG " _
+            & "   WHEN '1' THEN 'レ' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS STACKINGFLG " _
             & "   , CASE ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '') " _
-            & "     WHEN '1' THEN 'レ' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS FIRSTRETURNFLG " _
+            & "   WHEN '1' THEN 'レ' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS FIRSTRETURNFLG " _
             & "   , CASE ISNULL(RTRIM(OIT0003.AFTERRETURNFLG), '') " _
-            & "     WHEN '1' THEN 'レ' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS AFTERRETURNFLG " _
+            & "   WHEN '1' THEN 'レ' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS AFTERRETURNFLG " _
             & "   , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '') " _
-            & "     WHEN '1' THEN 'レ' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS OTTRANSPORTFLG " _
+            & "   WHEN '1' THEN 'レ' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS OTTRANSPORTFLG " _
             & "   , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '') " _
-            & "     WHEN '0' THEN '' " _
-            & "     WHEN '1' THEN 'レ' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS UPGRADEFLG " _
+            & "   WHEN '0' THEN '' " _
+            & "   WHEN '1' THEN 'レ' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS UPGRADEFLG " _
             & "   , CASE ISNULL(RTRIM(OIT0003.UPGRADEFLG), '') " _
-            & "     WHEN '0' THEN 'レ' " _
-            & "     WHEN '1' THEN '' " _
-            & "     WHEN '2' THEN '' " _
-            & "     ELSE '' " _
-            & "     END                                                        AS DOWNGRADEFLG " _
-            & "   , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), '')    AS ACTUALLODDATE " _
-            & "   , ISNULL(FORMAT(OIT0003.ACTUALDEPDATE, 'yyyy/MM/dd'), '')    AS ACTUALDEPDATE " _
-            & "   , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '')    AS ACTUALARRDATE " _
-            & "   , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '')    AS ACTUALACCDATE " _
-            & "   , ISNULL(FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '') AS ACTUALEMPARRDATE " _
-            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')           AS LOADINGIRILINETRAINNO " _
-            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')             AS LOADINGIRILINEORDER " _
-            & "   , ISNULL(RTRIM(OIT0003.LINE), '')                            AS LINE " _
-            & "   , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')                    AS FILLINGPOINT " _
-            & "   , ISNULL(RTRIM(OIM0024.PRIORITYNO), '')                      AS PRIORITYNO " _
+            & "   WHEN '0' THEN 'レ' " _
+            & "   WHEN '1' THEN '' " _
+            & "   WHEN '2' THEN '' " _
+            & "   ELSE '' " _
+            & "   END                                                       AS DOWNGRADEFLG " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), '') AS ACTUALLODDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALDEPDATE, 'yyyy/MM/dd'), '') AS ACTUALDEPDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '') AS ACTUALARRDATE " _
+            & "   , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '') AS ACTUALACCDATE " _
+            & "   , ISNULL( " _
+            & "   FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd') " _
+            & "   , '' " _
+            & " )                                                           AS ACTUALEMPARRDATE " _
+            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')        AS LOADINGIRILINETRAINNO " _
+            & "   , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')          AS LOADINGIRILINEORDER " _
+            & "   , ISNULL(RTRIM(OIT0003.LINE), '')                         AS LINE " _
+            & "   , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')                 AS FILLINGPOINT " _
+            & "   , ISNULL(RTRIM(OIM0024.PRIORITYNO), '')                   AS PRIORITYNO " _
             & " FROM " _
             & "   [oil].OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN [oil].OIT0003_DETAIL OIT0003 " _
@@ -875,6 +907,9 @@ Public Class OIT0003OrderList
             & "     AND OIM0024.OILCODE = OIT0003.OILCODE " _
             & "     AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & "     AND OIM0024.DELFLG = @DELFLG " _
+            & "   LEFT JOIN [oil].OIM0005_TANK OIM0005 " _
+            & "     ON OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & "     AND OIM0005.DELFLG = @DELFLG " _
             & " WHERE " _
             & "   OIT0002.DELFLG = @DELFLG "
 

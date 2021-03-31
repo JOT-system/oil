@@ -801,6 +801,9 @@ Public Class OIT0003OTLinkageList
             WF_PrintURL.Value = url
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
         End Using
+
+        If OIT0003CsvOTLinkagetbl.Rows.Count = 0 Then Exit Sub
+
         '******************************
         'OT発送日報データの（本体）ダウンロードフラグ更新
         '                  （明細）ダウンロード数インクリメント
@@ -2093,7 +2096,7 @@ Public Class OIT0003OTLinkageList
             & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & " AND OIT0003.DELFLG <> @P02 " _
             & " AND OIT0003.STACKINGFLG = '1' " _
-            & " AND FORMAT(OIT0003.ACTUALLODDATE,'yyyy/MM') = @P05 "
+            & " AND FORMAT(OIT0003.ACTUALLODDATE,'yyyy/MM') = @P06 "
         'SQLStrAri &=
         '      SQLStrCmn _
         '    & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -2178,7 +2181,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) " _
-            & "   AND (FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06 OR FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05)" _
+            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _

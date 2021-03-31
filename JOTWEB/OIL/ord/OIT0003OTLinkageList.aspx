@@ -146,20 +146,19 @@
                     <asp:Repeater ID="repUpdateOTList" runat="server" ItemType="JOTWEB.OIT0003OTLinkageList.OutputOrdedrInfo" >
                         <HeaderTemplate>
                             <div class="updateList">
-                                <table class="tblUpdList">
+                                <table class="tblUpdOTList">
                                     <tr>
-                                        <th colspan="2" class="headerLine1 officeName">OT営業所</th>
-                                        <th colspan="2" class="headerLine1 sendYMD">発送年月日</th>
-                                        <th colspan="2" class="headerLine1 trainNo">列車№</th>
-                                        <th colspan="2" class="headerLine1 shipOrder">連結順位</th>
-                                        <th colspan="2" class="headerLine1 depStation">発駅</th>
-                                        <th colspan="2" class="headerLine1 shippersName">荷主</th>
-                                        <th colspan="2" class="headerLine1 oilName">油種</th>
-                                        <th colspan="2" class="headerLine1 tankNo">車号</th>
-                                        <th colspan="2" class="headerLine1 amount">数量</th>
+                                        <th class="headerLine1 officeName">OT営業所</th>
+                                        <th class="headerLine1 sendYMD">発送年月日</th>
+                                        <th class="headerLine1 trainNo">列車№</th>
+                                        <th class="headerLine1 shipOrder">連結順位</th>
+                                        <th class="headerLine1 depStation">発駅</th>
+                                        <th class="headerLine1 shippersName">荷主</th>
+                                        <th class="headerLine1 oilName">油種</th>
+                                        <th class="headerLine1 tankNo">車号</th>
+                                        <th class="headerLine1 amount">数量</th>
                                     </tr>
-                                </table>
-                            </div>
+
                         </HeaderTemplate>
                         <ItemTemplate>
                             <tr class='delFalg<%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DeleteFlag %>'>
@@ -175,6 +174,8 @@
                             </tr>
                         </ItemTemplate>
                         <FooterTemplate>
+                            </table>
+                          </div>
                         </FooterTemplate>
                     </asp:Repeater>
                 </div>

@@ -76,8 +76,11 @@ Public Class OIT0003OTLinkageList
                     Me.ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
                 Else
                     Me.ShowModFileDlChkConfirm = ""
+                    Me.ShowOTLinkageSendChkConfirm = ""
                     Me.repUpdateList.DataSource = Nothing
                     Me.repUpdateList.DataBind()
+                    Me.repUpdateOTList.DataSource = Nothing
+                    Me.repUpdateOTList.DataBind()
                     ViewState("VS_OUTPUTINFO") = Nothing
                 End If
 
@@ -99,8 +102,10 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonFilter_Click(False)
                         Case "WF_ButtonFilterClear"
                             WF_ButtonFilter_Click(True)
-                        Case "WF_ButtonOtSend"          'OT連携ボタン押下
+                        Case "WF_ButtonOtSend"                  'OT連携ボタン押下(確認)
                             WF_ButtonOtSend_Click()
+                        Case "WF_ButtonReserveOTLinkageSend"    'OT連携ボタン押下(送信)
+                            WF_ButtonOtRsvSend_Click()
                         Case "WF_ButtonReserved"          '製油所出荷予約ボタン押下時
                             WF_ButtonReserved_Click()
                         Case "WF_ButtonTakusou"          '託送指示ボタン押下時
@@ -721,7 +726,7 @@ Public Class OIT0003OTLinkageList
         Master.SaveTable(OIT0003tbl)
     End Sub
     ''' <summary>
-    ''' OT連携ボタン押下時処理
+    ''' OT連携ボタン押下時処理(確認)
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOtSend_Click()
@@ -763,9 +768,9 @@ Public Class OIT0003OTLinkageList
                 Return
             End If
         End Using
-        ''更新確認に値を設定
-        'Me.repUpdateList.DataSource = selectedOrderInfo
-        'Me.repUpdateList.DataBind()
+        '更新確認に値を設定
+        'Me.repUpdateOTList.DataSource = selectedOrderInfo
+        'Me.repUpdateOTList.DataBind()
         'ViewState("VS_OUTPUTINFO") = selectedOrderInfo
         'Me.hdnOTLinkageSendChkConfirmIsActive.Value = "1"
         'ShowOTLinkageSendChkConfirm = "showOTLinkageSendConfirm"
@@ -848,12 +853,113 @@ Public Class OIT0003OTLinkageList
 
         End Using
 
-
         ''○ 遷移先(OT連携一覧画面)退避データ保存先の作成
         'WW_CreateXMLSaveFile()
 
         ''○ 画面表示データ保存
         'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
+
+    End Sub
+    ''' <summary>
+    ''' OT連携ボタン押下時処理(送信)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOtRsvSend_Click()
+        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+        '******************************
+        'OT発送日報データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            selectedOrderInfo = OTLinkageDataGet(SQLcon)
+            If selectedOrderInfo Is Nothing Then
+                Return
+            End If
+        End Using
+        '******************************
+        'CSV作成処理の実行
+        '******************************
+        Dim OTFileName As String = SetCSVFileName(work.WF_SEL_OTS_SALESOFFICECODE.Text)
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl,
+                                     I_FolderPath:=CS0050SESSION.OTFILESEND_PATH,
+                                     I_FileName:=OTFileName,
+                                     I_Enc:="EBCDIC")
+            'I_Enc:="UTF8N")
+            'I_Enc:="EBCDIC")
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False,
+                                                   strOfficeCode:=work.WF_SEL_OTS_SALESOFFICECODE.Text,
+                                                   blnNewline:=False)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+        '******************************
+        'OT発送日報データの（本体）ダウンロードフラグ更新
+        '                  （明細）ダウンロード数インクリメント
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                    Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    OutputJournal(orderTbl, "OIT0002_ORDER")
+                    OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
+
+        Me.ShowOTLinkageSendChkConfirm = ""
+        Me.repUpdateOTList.DataSource = Nothing
+        Me.repUpdateOTList.DataBind()
+        ViewState("VS_OUTPUTINFO") = Nothing
+        Me.hdnOTLinkageSendChkConfirmIsActive.Value = ""
 
     End Sub
     ''' <summary>
@@ -2068,7 +2174,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) " _
-            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P05" _
+            & "   AND FORMAT(OIT0002.LODDATE,'yyyy/MM') = @P06" _
         '★積置フラグ有り用SQL
         SQLStrAri &=
               SQLStrCmn _
@@ -2096,6 +2202,7 @@ Public Class OIT0003OTLinkageList
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)     '積込日(年月)
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)     '積込日(年月)
                 Dim PARATODAY As SqlParameter = SQLcmd.Parameters.Add("@TODAY", SqlDbType.Date)         '積込日
                 'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
@@ -2103,6 +2210,7 @@ Public Class OIT0003OTLinkageList
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA05.Value = Format(Now.AddDays(1), "yyyy/MM")
+                PARA06.Value = Format(Now.AddDays(0), "yyyy/MM")
                 PARATODAY.Value = Format(Now, "yyyy/MM/dd")
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
@@ -3169,7 +3277,7 @@ Public Class OIT0003OTLinkageList
             'アップロード方式によりインクリメントフィールドを変更
             Dim incFieldName As String = ""
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     incFieldName = "OTSENDCOUNT"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     incFieldName = "DLRESERVEDCOUNT"
@@ -3251,7 +3359,7 @@ Public Class OIT0003OTLinkageList
             '呼出し元ボタンに応じカウントアップしたフィールドを取得
             Dim incFieldName As String
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     incFieldName = "OTSENDCOUNT"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     incFieldName = "DLRESERVEDCOUNT"
@@ -3294,7 +3402,7 @@ Public Class OIT0003OTLinkageList
                             End If
                             retDec.Add(orderNo, "0")
                             Continue While
-                        ElseIf callerButton <> "WF_ButtonOtSend" Then
+                        ElseIf callerButton <> "WF_ButtonReserveOTLinkageSend" Then
                             '発送日報以外で未送信以外は基本的に送信済
                             '再送信の情報も押えない
                             retDec.Add(orderNo, "1")
@@ -3368,7 +3476,7 @@ Public Class OIT0003OTLinkageList
             'アップロード方式によりインクリメントフィールドを変更
             Dim updFieldName As String = ""
             Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
+                Case "WF_ButtonOtSend", "WF_ButtonReserveOTLinkageSend" 'OT発送日報出力
                     updFieldName = "OTSENDSTATUS"
                 Case "WF_ButtonReserved", "WF_ButtonReserveModDownload" '製油所出荷予約
                     updFieldName = "RESERVEDSTATUS"

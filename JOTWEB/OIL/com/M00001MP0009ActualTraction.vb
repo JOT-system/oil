@@ -388,8 +388,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-ÉRÉXÉÇ èoåı-ê∑â™-8081
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "8081"
                                     End Function).
@@ -399,8 +399,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-ÉRÉXÉÇ èoåı-ê∑â™-5081
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "5081"
                                     End Function).
@@ -410,8 +410,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
             'OT-ÉRÉXÉÇ èoåı-ê∑â™-5575
             setData = allData.Where(Function(r)
-                                        Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010 AndAlso
+                                        Return (r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 OrElse
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0122700010) AndAlso
                                         r.ARRSTATIONCODE = "2018" AndAlso
                                         r.TRAINNO = "5575"
                                     End Function).
@@ -823,7 +823,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-4091
             Dim setData = allData.Where(Function(r)
                                             Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                            r.ARRSTATIONCODE = "4427" AndAlso
+                                            r.ARRSTATIONCODE = "4425" AndAlso
                                             r.TRAINNO = "4091"
                                         End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).
@@ -833,7 +833,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-8571
             setData = allData.Where(Function(r)
                                         Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                        r.ARRSTATIONCODE = "4427" AndAlso
+                                        r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8571"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).
@@ -843,7 +843,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             'êøïâ-ENEOS-âFìsã{-8569
             setData = allData.Where(Function(r)
                                         Return r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0005700010 AndAlso
-                                        r.ARRSTATIONCODE = "4427" AndAlso
+                                        r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8569"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.LODDATE}).

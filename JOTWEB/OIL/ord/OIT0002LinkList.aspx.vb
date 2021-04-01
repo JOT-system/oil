@@ -2016,6 +2016,7 @@ Public Class OIT0002LinkList
             & "    , OIT0011.INLINETRAIN                 AS INLINETRAIN " _
             & "    , OIT0011.LOADARRSTATION              AS LOADARRSTATION " _
             & "    , OIT0011.LOADINGKTRAINNO             AS LOADINGKTRAINNO " _
+            & "    , OIT0011.LOADINGOTTRAINNO            AS LOADINGOTTRAINNO " _
             & "    , OIT0011.LOADINGTRAINNO              AS LOADINGTRAINNO " _
             & "    , OIT0011.LOADINGLODDATE              AS LOADINGLODDATE " _
             & "    , OIT0011.LOADINGDEPDATE              AS LOADINGDEPDATE " _
@@ -2095,6 +2096,7 @@ Public Class OIT0002LinkList
                                 OIT0002ExlUProw("INLINETRAIN") = OIT0002Exlrow("INLINETRAIN")
                                 OIT0002ExlUProw("LOADARRSTATION") = OIT0002Exlrow("LOADARRSTATION")
                                 OIT0002ExlUProw("LOADINGKTRAINNO") = OIT0002Exlrow("LOADINGKTRAINNO")
+                                OIT0002ExlUProw("LOADINGOTTRAINNO") = OIT0002Exlrow("LOADINGOTTRAINNO")
                                 OIT0002ExlUProw("LOADINGTRAINNO") = OIT0002Exlrow("LOADINGTRAINNO")
                                 OIT0002ExlUProw("LOADINGLODDATE") = OIT0002Exlrow("LOADINGLODDATE")
                                 OIT0002ExlUProw("LOADINGDEPDATE") = OIT0002Exlrow("LOADINGDEPDATE")
@@ -2201,7 +2203,7 @@ Public Class OIT0002LinkList
                 & " , TRAINNO       , CONVENTIONAL   , CONVENTIONALTIME, SERIALNUMBER        , TRUCKSYMBOL        , TRUCKNO" _
                 & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME     , INSPECTIONDATE      , CONVERSIONAMOUNT" _
                 & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME  , OBJECTIVENAME       , DAILYREPORTCODE    , DAILYREPORTOILNAME" _
-                & " , OILNAME       , LINE           , POSITION        , INLINETRAIN         , LOADARRSTATION     , LOADINGKTRAINNO" _
+                & " , OILNAME       , LINE           , POSITION        , INLINETRAIN         , LOADARRSTATION     , LOADINGKTRAINNO   , LOADINGOTTRAINNO" _
                 & " , LOADINGTRAINNO, LOADINGLODDATE , LOADINGDEPDATE  , FORWARDINGARRSTATION, FORWARDINGCONFIGURE" _
                 & " , CURRENTCARTOTAL, EXTEND        , CONVERSIONTOTAL , LINKNO              , ORDERNO            , DETAILNO" _
                 & " , DELFLG        , INITYMD        , INITUSER        , INITTERMID" _
@@ -2213,7 +2215,7 @@ Public Class OIT0002LinkList
                 & " , @TRAINNO        , @CONVENTIONAL   , @CONVENTIONALTIME, @SERIALNUMBER        , @TRUCKSYMBOL        , @TRUCKNO" _
                 & " , @DEPSTATIONNAME , @ARRSTATIONNAME , @ARTICLENAME     , @INSPECTIONDATE      , @CONVERSIONAMOUNT" _
                 & " , @ARTICLE        , @ARTICLETRAINNO , @ARTICLEOILNAME  , @OBJECTIVENAME       , @DAILYREPORTCODE    , @DAILYREPORTOILNAME" _
-                & " , @OILNAME        , @LINE           , @POSITION        , @INLINETRAIN         , @LOADARRSTATION     , @LOADINGKTRAINNO" _
+                & " , @OILNAME        , @LINE           , @POSITION        , @INLINETRAIN         , @LOADARRSTATION     , @LOADINGKTRAINNO   , @LOADINGOTTRAINNO" _
                 & " , @LOADINGTRAINNO , @LOADINGLODDATE , @LOADINGDEPDATE  , @FORWARDINGARRSTATION, @FORWARDINGCONFIGURE" _
                 & " , @CURRENTCARTOTAL, @EXTEND         , @CONVERSIONTOTAL , @LINKNO              , @ORDERNO            , @DETAILNO" _
                 & " , @DELFLG         , @INITYMD        , @INITUSER        , @INITTERMID" _
@@ -2280,6 +2282,9 @@ Public Class OIT0002LinkList
                 '### 20210121 START 向き先複数駅ある列車対応 ##############################
                 Dim LOADINGKTRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGKTRAINNO", SqlDbType.NVarChar)       '本線列車(運用指示)
                 '### 20210121 END   向き先複数駅ある列車対応 ##############################
+                '### 20210330 START OT列車退避用 ##########################################
+                Dim LOADINGOTTRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGOTTRAINNO", SqlDbType.NVarChar)       '本線列車(運用指示)
+                '### 20210330 START OT列車退避用 ##########################################
                 Dim LOADINGTRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGTRAINNO", SqlDbType.NVarChar)       '本線列車(運用指示)
                 Dim LOADINGLODDATE As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGLODDATE", SqlDbType.NVarChar)       '積込日(運用指示)
                 Dim LOADINGDEPDATE As SqlParameter = SQLRLinkcmd.Parameters.Add("@LOADINGDEPDATE", SqlDbType.NVarChar)       '発日(運用指示)
@@ -2412,6 +2417,10 @@ Public Class OIT0002LinkList
                         '空回日報列車(運用指示)
                         LOADINGKTRAINNO.Value = OIT0002EXLUProw("LOADINGKTRAINNO")
                         '### 20210121 END   向き先複数駅ある列車対応 ##############################
+                        '### 20210330 START OT列車退避用 ##########################################
+                        'OT本線列車(運用指示)
+                        LOADINGOTTRAINNO.Value = OIT0002EXLUProw("LOADINGOTTRAINNO")
+                        '### 20210330 START OT列車退避用 ##########################################
                         '本線列車(運用指示)
                         LOADINGTRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO")
                         '積込日(運用指示)
@@ -2455,6 +2464,10 @@ Public Class OIT0002LinkList
                         '空回日報列車(運用指示)
                         LOADINGKTRAINNO.Value = ""
                         '### 20210121 END   向き先複数駅ある列車対応 ##############################
+                        '### 20210330 START OT列車退避用 ##########################################
+                        'OT本線列車(運用指示)
+                        LOADINGOTTRAINNO.Value = ""
+                        '### 20210330 START OT列車退避用 ##########################################
                         '本線列車(運用指示)
                         LOADINGTRAINNO.Value = ""
                         '積込日(運用指示)

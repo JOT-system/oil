@@ -113,6 +113,15 @@ Partial Public Class OIT0004OilStockSearch
     Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''divUpdateInfo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divUpdateInfo As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''WF_UpdateUser コントロール。
     '''</summary>
     '''<remarks>
@@ -129,6 +138,33 @@ Partial Public Class OIT0004OilStockSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UpdateDtm As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''divConsigneeUpdateInfo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divConsigneeUpdateInfo As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_ConsigneeUser コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeUser As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ConsigneeUpdateDtm コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeUpdateDtm As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。

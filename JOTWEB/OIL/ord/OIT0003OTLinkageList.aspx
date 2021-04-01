@@ -131,6 +131,55 @@
                     </asp:Repeater>
                 </div>
             </div>
+            <div id="divOTLinkageSendList" class='<%= Me.ShowOTLinkageSendChkConfirm  %>'>
+                <asp:HiddenField ID="hdnOTLinkageSendChkConfirmIsActive" runat="server" Value="" />
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <span>表示されている内容で発送日報を送信しますよろしいですか？</span>
+                    </div>
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonOTLinkageSend" class="btn-sticky" value="送信"   onclick="ButtonClick('WF_ButtonReserveOTLinkageSend');" />
+                        <input type="button" id="btnCloseOTLinkageSendConfirm" class="btn-sticky" value="閉じる"  onclick="closeOTLinkageSendConfirm();" />
+                    </div>
+                </div>
+                <div id="divInputOTResultWrapper">
+                    <asp:Repeater ID="repUpdateOTList" runat="server" ItemType="JOTWEB.OIT0003OTLinkageList.OutputOrdedrInfo" >
+                        <HeaderTemplate>
+                            <div class="updateList">
+                                <table class="tblUpdOTList">
+                                    <tr>
+                                        <th class="headerLine1 officeName">OT営業所</th>
+                                        <th class="headerLine1 sendYMD">発送年月日</th>
+                                        <th class="headerLine1 trainNo">列車№</th>
+                                        <th class="headerLine1 shipOrder">連結順位</th>
+                                        <th class="headerLine1 depStation">発駅</th>
+                                        <th class="headerLine1 shippersName">荷主</th>
+                                        <th class="headerLine1 oilName">油種</th>
+                                        <th class="headerLine1 tankNo">車号</th>
+                                        <th class="headerLine1 amount">数量</th>
+                                    </tr>
+
+                        </HeaderTemplate>
+                        <ItemTemplate>
+                            <tr class='delFalg<%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DeleteFlag %>'>
+                                <td class="officeName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTOfficeName %></td>
+                                <td class="sendYMD"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTSendYMD   %></td>
+                                <td class="trainNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTTrainNo  %></td>
+                                <td class="shipOrder"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShipOrder  %></td>
+                                <td class="depStation"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTDepStationName  %></td>
+                                <td class="shippersName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShippersName %></td>
+                                <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTOilName %></td>
+                                <td class="tankNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTTankNo %></td>
+                                <td class="amount"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTAmount %></td>
+                            </tr>
+                        </ItemTemplate>
+                        <FooterTemplate>
+                            </table>
+                          </div>
+                        </FooterTemplate>
+                    </asp:Repeater>
+                </div>
+            </div>
         </div>
 
         <!-- rightbox レイアウト -->

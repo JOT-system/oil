@@ -26,10 +26,11 @@ Public Class M00001MENU
         If IsPostBack Then
             '左ナビの開閉状態をcookieに記憶（Initializeで復元します）
             Me.LeftNavCollectToSaveCookie()
-
-            'ドロップダウンリスト選択値の保存
-            Me.ddlReportNameList.SelectedIndex = Integer.Parse(Me.ddlReportNameList_LaIdx.Value)
-            Me.ddlTrOfficeNameList.SelectedIndex = Integer.Parse(Me.ddlTrOfficeNameList_LaIdx.Value)
+            If "01".Equals(Master.USERCAMP) Then
+                'ドロップダウンリスト選択値の保存
+                Me.ddlReportNameList.SelectedIndex = Integer.Parse(Me.ddlReportNameList_LaIdx.Value)
+                Me.ddlTrOfficeNameList.SelectedIndex = Integer.Parse(Me.ddlTrOfficeNameList_LaIdx.Value)
+            End If
 
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then

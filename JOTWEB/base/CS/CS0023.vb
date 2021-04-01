@@ -1525,6 +1525,11 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("LOADINGKTRAINNO") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
                 '### 20210121 END   向き先複数駅ある列車対応 ####################
+                '### 20210330 START OT列車退避用 ################################
+                rng = oSheet.Range("U" + jStart.ToString())
+                'rng = oSheet.Range("T" + jStart.ToString())
+                dt.Rows(i)("LOADINGOTTRAINNO") = rng.Text.ToString()
+                '### 20210330 END   OT列車退避用 ################################
                 rng = oSheet.Range("U" + jStart.ToString())
                 'rng = oSheet.Range("T" + jStart.ToString())
                 dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
@@ -2046,6 +2051,9 @@ Public Structure CS0023XLSUPLOAD
         '### 20210121 START 向き先複数駅ある列車対応 ####################
         dt.Columns.Add("LOADINGKTRAINNO", Type.GetType("System.String"))
         '### 20210121 END   向き先複数駅ある列車対応 ####################
+        '### 20210330 START OT列車退避用 ################################
+        dt.Columns.Add("LOADINGOTTRAINNO", Type.GetType("System.String"))
+        '### 20210330 END   OT列車退避用 ################################
         dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))
         dt.Columns.Add("LOADINGDEPDATE", Type.GetType("System.String"))

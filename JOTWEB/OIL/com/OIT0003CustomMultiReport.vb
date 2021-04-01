@@ -1197,8 +1197,6 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
             rngHeaderArea = Me.ExcelWorkSheet.Range("AG4")
             If trainNo = "9672" Then
                 trainNo = "5461"
-            ElseIf trainNo = "5972" Then
-                trainNo = "5461"
             End If
             rngHeaderArea.Value = trainNo
             ExcelMemoryRelease(rngHeaderArea)

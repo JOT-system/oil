@@ -823,6 +823,10 @@ Public Module Messages
         ''' OT空回日報連携データ不一致
         ''' </summary>
         Public Const OIL_EMPTYTURNDAIRYDATA_UNMATCH_ERROR As String = "20105"
+        ''' <summary>
+        ''' 受注タンク車未割当エラー
+        ''' </summary>
+        Public Const OIL_ORDERTANK_MIWARIATE_ERROR As String = "20106"
 
 
 #End Region

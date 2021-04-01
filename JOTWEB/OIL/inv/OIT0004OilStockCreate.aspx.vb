@@ -89,7 +89,9 @@ Public Class OIT0004OilStockCreate
                         Case "WF_ButtonOkCommonPopUp" 'カスタムポップアップOK押下時
                             '帳票出力
                             WF_ButtonDownload_Click() 'チェック・条件などもろもろの改修がある為一旦コメント
-
+                        Case "WF_ButtonBackToMenu"
+                            'メニューへでCAMPを書き換え
+                            work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
                             'Case "WF_ButtonCSV" 'ダウンロードボタン押下
                             '    WF_ButtonDownload_Click()
                     End Select
@@ -929,7 +931,6 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
-
         '○ 前画面遷移
         Master.TransitionPrevPage()
 
@@ -1082,6 +1083,11 @@ Public Class OIT0004OilStockCreate
                         If salesOffice = "012402" AndAlso consignee = "40" AndAlso trainCode = "5461" Then
                             tlItem.DispTrainNo = "富士"
                         End If
+                        '袖ヶ浦営業所-JONET松本特殊処理:5461列車枠の生成 表示は
+                        If salesOffice = "011203" AndAlso consignee = "40" AndAlso trainCode = "5461" Then
+                            tlItem.DispTrainNo = "5972"
+                        End If
+
                         '重複列車番号はスキップ
                         If resultVal.ContainsKey(tlItem.TrainNo) Then
                             Continue While
@@ -1149,7 +1155,7 @@ Public Class OIT0004OilStockCreate
             sqlStr.AppendLine("      ,MIN(ODR.TRAINNAME) AS TRAINNAME")
             sqlStr.AppendLine("      ,ISNULL(MIN(TRA.ACCDAYS),0) AS ACCDAYS")
             sqlStr.AppendLine("      ,ISNULL(MIN(TRA.MAXTANK1),0) AS MAXVOLUME")
-            sqlStr.AppendLine("      ,MIN(TRA.ZAIKOSORT) AS ZAIKOSORT")
+            sqlStr.AppendLine("      ,MAX(TRA.ZAIKOSORT) AS ZAIKOSORT")
             sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
             sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
             sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
@@ -1158,7 +1164,7 @@ Public Class OIT0004OilStockCreate
             sqlStr.AppendLine(" LEFT JOIN OIL.OIM0007_TRAIN TRA")
             sqlStr.AppendLine("    ON TRA.OFFICECODE  =  @OFFICECODE")
             sqlStr.AppendLine("   AND TRA.TRAINNO     =  ODR.TRAINNO")
-            sqlStr.AppendLine("   AND TRA.TSUMI       =  CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
+            'sqlStr.AppendLine("   AND TRA.TSUMI       =  CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
             sqlStr.AppendLine("   AND TRA.DEPSTATION  =  ODR.DEPSTATION")
             sqlStr.AppendLine("   AND TRA.ARRSTATION  =  ODR.ARRSTATION")
             sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
@@ -1188,7 +1194,7 @@ Public Class OIT0004OilStockCreate
             sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
             sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
             sqlStr.AppendLine(" GROUP BY ODR.TRAINNO")
-            sqlStr.AppendLine(" ORDER BY ZAIKOSORT, ODR.TRAINNO")
+            sqlStr.AppendLine(" ORDER BY MAX(TRA.ZAIKOSORT), ODR.TRAINNO")
             Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
                 With sqlCmd.Parameters
                     .Add("@OFFICECODE", SqlDbType.NVarChar).Value = salesOffice
@@ -3456,7 +3462,14 @@ Public Class OIT0004OilStockCreate
     ''' 一旦、新規登録後に油種マスタから削除された後の更新パターンは考慮しない
     ''' （このパターンは画面上は出ないが宙に浮いたDELFLGが生きたままのデータが残る想定）</remarks>
     Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
-
+        Dim fieldList As New Dictionary(Of String, String)
+        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            fieldList.Add("USER", "ENEOSUPDUSER")
+            fieldList.Add("DATE", "ENEOSUPDYMD")
+        Else
+            fieldList.Add("USER", "UPDUSER")
+            fieldList.Add("DATE", "UPDYMD")
+        End If
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("DECLARE @hensuu AS bigint ;")
         sqlStat.AppendLine("    SET @hensuu = 0 ;")
@@ -3490,8 +3503,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,MFLG_SHIPPINGVOL = CASE WHEN MFLG_SHIPPINGVOL = '0' AND @SHIPPINGVOL <> SHIPPINGVOL AND SHIPPINGVOL <> 0 THEN '1' ELSE MFLG_SHIPPINGVOL END")
 
         sqlStat.AppendLine("               ,DELFLG      = @DELFLG")
-        sqlStat.AppendLine("               ,UPDYMD      = @UPDYMD")
-        sqlStat.AppendLine("               ,UPDUSER     = @UPDUSER")
+        sqlStat.AppendFormat("               ,{0}      = @UPDYMD", fieldList("DATE")).AppendLine()
+        sqlStat.AppendFormat("               ,{0}      = @UPDUSER", fieldList("USER")).AppendLine()
         sqlStat.AppendLine("               ,UPDTERMID   = @UPDTERMID")
         sqlStat.AppendLine("               ,RECEIVEYMD  = @RECEIVEYMD")
         sqlStat.AppendLine("          WHERE STOCKYMD      = @STOCKYMD")
@@ -3526,8 +3539,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,INITYMD")
         sqlStat.AppendLine("            ,INITUSER")
         sqlStat.AppendLine("            ,INITTERMID")
-        sqlStat.AppendLine("            ,UPDYMD")
-        sqlStat.AppendLine("            ,UPDUSER")
+        sqlStat.AppendFormat("            ,{0}", fieldList("DATE")).AppendLine()
+        sqlStat.AppendFormat("            ,{0}", fieldList("USER")).AppendLine()
         sqlStat.AppendLine("            ,UPDTERMID")
         sqlStat.AppendLine("            ,RECEIVEYMD")
         sqlStat.AppendLine("         ) VALUES (")
@@ -3582,6 +3595,8 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ARRVOL))      AS ARRVOL")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ARRLORRYVOL)) AS ARRLORRYVOL")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,EVESTOCK))    AS EVESTOCK")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ENEOSUPDYMD))      AS ENEOSUPDYMD")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ENEOSUPDUSER))     AS ENEOSUPDUSER")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,DELFLG))      AS DELFLG")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITYMD))     AS INITYMD")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITUSER))    AS INITUSER")
@@ -3594,7 +3609,7 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine(" WHERE OFFICECODE    = @OFFICECODE")
         journalSqlStat.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
         journalSqlStat.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
-        journalSqlStat.AppendLine("   AND UPDYMD        = @UPDYMD")
+        journalSqlStat.AppendFormat("   AND {0}        = @UPDYMD", fieldList("DATE")).AppendLine()
 
         '処理日付引数が初期値なら現時刻設定
         If procDtm.ToString("yyyy/MM/dd").Equals("1900/01/01") Then
@@ -3907,6 +3922,15 @@ Public Class OIT0004OilStockCreate
             {"1101", "RTANK"}, {"1001", "HTANK"}, {"1301", "TTANK"}, {"1302", "MTTANK"},
             {"1401", "KTANK"}, {"1404", "K3TANK"}, {"2201", "LTANK"}, {"2101", "ATANK"}}
 
+        Dim fieldList As New Dictionary(Of String, String)
+        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            fieldList.Add("USER", "ENEOSUPDUSER")
+            fieldList.Add("DATE", "ENEOSUPDYMD")
+        Else
+            fieldList.Add("USER", "UPDUSER")
+            fieldList.Add("DATE", "UPDYMD")
+        End If
+
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("DECLARE @hensuu AS bigint ;")
         sqlStat.AppendLine("    SET @hensuu = 0 ;")
@@ -3960,8 +3984,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,MFLG_ATANK2     = CASE WHEN MFLG_ATANK2  = '0' AND @ATANK2  <> ATANK2  AND ATANK2  <> 0 THEN '1' ELSE MFLG_ATANK2  END")
 
         sqlStat.AppendLine("               ,DELFLG     = @DELFLG")
-        sqlStat.AppendLine("               ,UPDYMD     = @UPDYMD")
-        sqlStat.AppendLine("               ,UPDUSER    = @UPDUSER")
+        sqlStat.AppendFormat("               ,{0}     = @UPDYMD", fieldList("DATE")).AppendLine()
+        sqlStat.AppendFormat("               ,{0}     = @UPDUSER", fieldList("USER")).AppendLine()
         sqlStat.AppendLine("               ,UPDTERMID  = @UPDTERMID")
         sqlStat.AppendLine("               ,RECEIVEYMD = @RECEIVEYMD")
         sqlStat.AppendLine("          WHERE STOCKYMD      = @STOCKYMD")
@@ -4016,8 +4040,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,INITYMD")
         sqlStat.AppendLine("            ,INITUSER")
         sqlStat.AppendLine("            ,INITTERMID")
-        sqlStat.AppendLine("            ,UPDYMD")
-        sqlStat.AppendLine("            ,UPDUSER")
+        sqlStat.AppendFormat("            ,{0}", fieldList("DATE")).AppendLine()
+        sqlStat.AppendFormat("            ,{0}", fieldList("USER")).AppendLine()
         sqlStat.AppendLine("            ,UPDTERMID")
         sqlStat.AppendLine("            ,RECEIVEYMD")
         sqlStat.AppendLine("         ) VALUES (")
@@ -4100,6 +4124,9 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,LTANK2))  AS LTANK2")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ATANK2))  AS ATANK2")
 
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ENEOSUPDYMD))     AS ENEOSUPDYMD")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ENEOSUPDUSER))    AS ENEOSUPDUSER")
+
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,DELFLG))      AS DELFLG")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITYMD))     AS INITYMD")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITUSER))    AS INITUSER")
@@ -4112,7 +4139,7 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine(" WHERE OFFICECODE    = @OFFICECODE")
         journalSqlStat.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
         journalSqlStat.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
-        journalSqlStat.AppendLine("   AND UPDYMD        = @UPDYMD")
+        journalSqlStat.AppendFormat("   AND {0}        = @UPDYMD", fieldList("DATE")).AppendLine()
 
         '処理日付引数が初期値なら現時刻設定
         If procDtm.ToString("yyyy/MM/dd").Equals("1900/01/01") Then
@@ -6072,7 +6099,7 @@ Public Class OIT0004OilStockCreate
                     Me.LastSendAverage = 250
                     'Me.OffScreenLastEveningStock = 1360
                 Case "1401" '軽油
-                    Me.Weight = 0.75D
+                    Me.Weight = 0.83D
                     Me.LastSendAverage = 5800
                     'Me.OffScreenLastEveningStock = 11000
                 Case "2101" 'Ａ重油
@@ -6084,7 +6111,7 @@ Public Class OIT0004OilStockCreate
                     Me.LastSendAverage = 75
                     'Me.OffScreenLastEveningStock = 400
                 Case "1302" '未添加灯油
-                    Me.Weight = 0.75D
+                    Me.Weight = 0.79D
                     Me.LastSendAverage = 800
                     'Me.OffScreenLastEveningStock = 1360
                 Case "1404" '３号軽油

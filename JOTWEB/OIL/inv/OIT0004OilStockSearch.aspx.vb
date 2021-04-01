@@ -375,9 +375,10 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
-
+        Me.WF_CAMPCODE.Text = Master.USERCAMP
+        work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
         '○ 前画面遷移
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 

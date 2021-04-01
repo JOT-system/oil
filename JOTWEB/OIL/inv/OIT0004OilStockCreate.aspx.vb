@@ -89,7 +89,9 @@ Public Class OIT0004OilStockCreate
                         Case "WF_ButtonOkCommonPopUp" 'カスタムポップアップOK押下時
                             '帳票出力
                             WF_ButtonDownload_Click() 'チェック・条件などもろもろの改修がある為一旦コメント
-
+                        Case "WF_ButtonBackToMenu"
+                            'メニューへでCAMPを書き換え
+                            work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
                             'Case "WF_ButtonCSV" 'ダウンロードボタン押下
                             '    WF_ButtonDownload_Click()
                     End Select
@@ -929,7 +931,6 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
-
         '○ 前画面遷移
         Master.TransitionPrevPage()
 

@@ -6552,6 +6552,7 @@ Public Class OIT0003OrderList
             & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
             & " , VIW0013.TSUMI                                  AS TSUMI" _
             & " , ''                                             AS FILLINGPOINT" _
+            & " , ROW_NUMBER() OVER(PARTITION BY VIW0013.No, VIW0013.ZAIKOSORT ORDER BY VIW0013.No, VIW0013.ZAIKOSORT, VIW0013.JRTRAINNO1) AS FILLINGPOINT_KAI" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIM0003.OILNAME                                AS OILNAME" _
             & " , OIM0003.OILKANA                                AS OILKANA" _
@@ -6936,8 +6937,14 @@ Public Class OIT0003OrderList
 
                     '★表示用の油種コードと充填ポイントで設定している油種コードを比較
                     For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                        '### 20210401 START 油種を優先順に上から設定するに変更 ##########################
+                        '①充填ポイントで一致する(油種順に設定)
+                        '②油種で一致する(テンプレートに設定された油種で設定)
+                        '### 20210401 END   油種を優先順に上から設定するに変更 ##########################
+                        'If OIT0003Wkrow("DELFLG") <> "1" _
+                        'AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
                         If OIT0003Wkrow("DELFLG") <> "1" _
-                            AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
+                            AndAlso OIT0003Wkrow("LOADINGPOINT") = OIT0003Reprow("FILLINGPOINT_KAI") Then
                             OIT0003Reprow("FILLINGPOINT") = OIT0003Wkrow("LOADINGPOINT")
                             OIT0003Wkrow("DELFLG") = "1"
 

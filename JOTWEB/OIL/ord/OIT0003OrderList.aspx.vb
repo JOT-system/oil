@@ -6411,7 +6411,7 @@ Public Class OIT0003OrderList
         SQLStr &=
               " WHERE OIT0002.OFFICECODE    = @P01 " _
             & " AND   OIT0002.CONSIGNEECODE = @P06 " _
-            & " AND   OIT0002.ACTUALLODDATE = @P03 " _
+            & " AND   OIT0002.LODDATE       = @P03 " _
             & " AND   OIT0002.ORDERSTATUS  <> @P04 " _
             & " AND   OIT0002.DELFLG       <> @P02 " _
             & " ORDER BY" _
@@ -6434,7 +6434,7 @@ Public Class OIT0003OrderList
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
-                PARA05.Value = "ACTUALLOAD_OILCODE"
+                PARA05.Value = "LOAD_OILCODE"
                 Select Case tyohyoType
                     Case CONST_CSV_ACTUALLOAD_10
                         PARA06.Value = "10"

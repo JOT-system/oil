@@ -84,7 +84,7 @@
                     <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
                 </a>
             </div>
-            <div class="inputItem">
+            <div class="inputItem" id="divUpdateInfo" runat="server" enableviewstate="true">
                 <a id="WF_LASTUPDATE_LABEL">更新情報</a>
                 <a class="ef" id="WF_LASTUPDATE" >
                     <table class="tblLastupdate">
@@ -92,7 +92,7 @@
                             <th class="userName">更新者</th>
                             <th class="update">更新日時</th>
                         </tr>
-                        <tr>
+                        <tr >
                             <td>
                                 <asp:Label ID="WF_UpdateUser" runat="server" Text=""></asp:Label>
                             </td>
@@ -100,8 +100,30 @@
                                 <asp:Label ID="WF_UpdateDtm" runat="server" Text=""></asp:Label>
                             </td>
                         </tr>
+
                     </table>
+
                 </a>
+            </div>
+            <div class="inputItem"  id="divConsigneeUpdateInfo" runat="server" enableviewstate="true">
+               <a id="WF_CONSIGNEE_UPDINFO_LABEL">油槽所更新情報</a>
+               <a class="ef" id="WF_CONSIGNEE_UPDINFO" >
+                    <table class="tblLastupdate">
+                        <tr>
+                            <th class="userName">更新者</th>
+                            <th class="update">更新日時</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:Label ID="WF_ConsigneeUser" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                            <td>
+                                <asp:Label ID="WF_ConsigneeUpdateDtm" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                        </tr>
+                    </table>
+               </a>
+
             </div>
         </div>
     </div>

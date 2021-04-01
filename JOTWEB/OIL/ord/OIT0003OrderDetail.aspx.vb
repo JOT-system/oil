@@ -20421,7 +20421,7 @@ Public Class OIT0003OrderDetail
         '　A004:２石最大チェック(DGO, DGO-3)
         Dim chkCosmoOilCode As String() = {"A001", "A002", "A003", "A004"}
         'コスモ千葉タンク件数用
-        Dim chkCosmoOilCnt As String() = {"7", "13", "11", "7"}
+        Dim chkCosmoOilCnt As String() = {"7", "13", "11", "8"}
 
         '○全体(合計)を変更
         Dim strTotal As String = "合計"

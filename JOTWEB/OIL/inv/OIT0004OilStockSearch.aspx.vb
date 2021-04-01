@@ -736,58 +736,63 @@ Public Class OIT0004OilStockSearch
                IsDate(Me.WF_STYMD_CODE.Text) = False Then
                 Return
             End If
-
-            Dim sqlStat As New StringBuilder
-            sqlStat.AppendLine("Select format(SQ.UPDYMD,'yyyy/MM/dd HH:mm') AS UPDYMD")
-            sqlStat.AppendLine("      ,isnull(UM.STAFFNAMEL, SQ.UPDUSER)    AS UPDUSER")
-            sqlStat.AppendLine("FROM (")
-            sqlStat.AppendLine("SELECT UPDYMD")
-            sqlStat.AppendLine("      ,UPDUSER")
-            sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
-            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
-            'sqlStat.AppendLine(" WHERE 1=1")
-            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
-            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
-            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
-            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
-            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
-            sqlStat.AppendLine(" UNION ALL")
-            sqlStat.AppendLine("SELECT UPDYMD")
-            sqlStat.AppendLine("      ,UPDUSER")
-            sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
-            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
-            'sqlStat.AppendLine(" WHERE 1=1")
-            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
-            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
-            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
-            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
-            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
-            sqlStat.AppendLine(" ) SQ")
-            sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
-            sqlStat.AppendLine("   ON UM.USERID = SQ.UPDUSER")
-            sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
-            sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
-            sqlStat.AppendLine(" ORDER BY SQ.UPDYMD DESC")
-            'DataBase接続文字
-            Using sqlCon = CS0050SESSION.getConnection,
+            '通常更新情報と油槽所更新情報のフィールド設定
+            Dim fieldItems = {New With {.updUserField = "UPDUSER", .updUserObj = Me.WF_UpdateUser, .updDtmField = "UPDYMD", .updDtmObj = Me.WF_UpdateDtm},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm}}
+            For Each fieldItem In fieldItems
+                Dim sqlStat As New StringBuilder
+                sqlStat.AppendFormat("SELECT format(SQ.{0},'yyyy/MM/dd HH:mm') AS {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,isnull(UM.STAFFNAMEL, SQ.{0})     AS {0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("FROM (")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" UNION ALL")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" ) SQ")
+                sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
+                sqlStat.AppendFormat("   ON UM.USERID = SQ.{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
+                sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
+                sqlStat.AppendFormat(" ORDER BY SQ.{0} DESC", fieldItem.updDtmField).AppendLine()
+                'DataBase接続文字
+                Using sqlCon = CS0050SESSION.getConnection,
               sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
-                sqlCon.Open() 'DataBase接続(Open)
-                SqlConnection.ClearPool(sqlCon)
-                With sqlCmd.Parameters
-                    .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
-                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
-                    .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
-                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
-                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                End With
-                Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
-                    If sqlDr.HasRows Then
-                        sqlDr.Read()
-                        Me.WF_UpdateUser.Text = Convert.ToString(sqlDr("UPDUSER"))
-                        Me.WF_UpdateDtm.Text = Convert.ToString(sqlDr("UPDYMD"))
-                    End If
-                End Using 'sqlDr
-            End Using 'sqlCon, sqlCmd
+                    sqlCon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(sqlCon)
+                    With sqlCmd.Parameters
+                        .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
+                        .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
+                        .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
+                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    End With
+                    Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                        If sqlDr.HasRows Then
+                            sqlDr.Read()
+                            fieldItem.updUserObj.Text = Convert.ToString(sqlDr(fieldItem.updUserField))
+                            fieldItem.updDtmObj.Text = Convert.ToString(sqlDr(fieldItem.updDtmField))
+                        End If
+                    End Using 'sqlDr
+                End Using 'sqlCon, sqlCmd
+
+            Next
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004S LASTUPDATE_SELECT")

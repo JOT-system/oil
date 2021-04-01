@@ -151,12 +151,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
             Dim row_cnt As Int32 = 0
             Dim nowdate As DateTime = DateTime.Now
 
-            'フッターの設定
-            ExcelWorkSheet.PageSetup.LeftFooter = String.Format(
-                                                    "&L{0}                {1}",
-                                                    Format(nowdate, "yyyy年M月d日"),
-                                                    Format(nowdate, "H:mm"))
-            ExcelWorkSheet.PageSetup.RightFooter = "&R&P ページ     "
+            ''フッターの設定
+            'Dim pageSetup As Excel.PageSetup = Nothing
+            'pageSetup = ExcelWorkSheet.PageSetup
+            'pageSetup.LeftFooter = String.Format("&L{0}                {1}",
+            '                                    Format(nowdate, "yyyy年M月d日"),
+            '                                    Format(nowdate, "H:mm"))
+            'pageSetup.RightFooter = "&R&P ページ     "
+            'ExcelMemoryRelease(pageSetup)
 
             For Each row As DataRow In PrintData.Rows
 
@@ -177,7 +179,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     'ピクセル加算
                     pixel += 14.25
                     '2行目の高さを調整
-                    ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                    destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                    destRange.RowHeight = 3.75
+                    ExcelMemoryRelease(destRange)
                     idx += 1
                     pixel += 3.75
 
@@ -225,7 +229,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             pixel += 14.25
 
                             '空行を差し込む
-                            ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                            destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                            destRange.RowHeight = 3.75
+                            ExcelMemoryRelease(destRange)
                             idx += 1
                             pixel += 3.75
 
@@ -242,7 +248,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             pixel += 14.25
 
                             '空行を差し込む
-                            ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                            destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                            destRange.RowHeight = 3.75
+                            ExcelMemoryRelease(destRange)
                             idx += 1
                             pixel += 3.75
 
@@ -263,7 +271,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 pixel += 14.25
 
                                 '空行を差し込む
-                                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                destRange.RowHeight = 3.75
+                                ExcelMemoryRelease(destRange)
                                 idx += 1
                                 pixel += 3.75
                             End If
@@ -297,7 +307,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 pixel += 14.25
 
                                 '空行を差し込む
-                                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                destRange.RowHeight = 3.75
+                                ExcelMemoryRelease(destRange)
                                 idx += 1
                                 pixel += 3.75
                             ElseIf "9999".Equals(row("BASECODE").ToString()) Then
@@ -313,7 +325,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 'ピクセル加算
                                 pixel += 14.25
                                 '2行目の高さを調整
-                                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                destRange.RowHeight = 3.75
+                                ExcelMemoryRelease(destRange)
                                 idx += 1
                                 pixel += 3.75
                             Else
@@ -354,7 +368,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 pixel += 14.25
 
                                 '空行を差し込む
-                                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                destRange.RowHeight = 3.75
+                                ExcelMemoryRelease(destRange)
                                 idx += 1
                                 pixel += 3.75
                             Else
@@ -376,7 +392,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                         pixel += 14.25
 
                                         '空行を差し込む
-                                        ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                        destRange.RowHeight = 3.75
+                                        ExcelMemoryRelease(destRange)
                                         idx += 1
                                         pixel += 3.75
                                     Else
@@ -429,7 +447,9 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                                 pixel += 14.25
 
                                                 '空行を差し込む
-                                                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                                destRange.RowHeight = 3.75
+                                                ExcelMemoryRelease(destRange)
                                                 idx += 1
                                                 pixel += 3.75
                                             End If
@@ -446,12 +466,16 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             'ピクセル加算
                                             pixel += 14.25
                                             '2行目の高さを調整
-                                            ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                            destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                            destRange.RowHeight = 3.75
+                                            ExcelMemoryRelease(destRange)
                                             idx += 1
                                             pixel += 3.75
 
                                             '空行を差し込む
-                                            ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 3.75
+                                            destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                                            destRange.RowHeight = 3.75
+                                            ExcelMemoryRelease(destRange)
                                             idx += 1
                                             pixel += 3.75
                                         Else
@@ -891,19 +915,27 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' <param name="idx">行インデックス</param>
     ''' <param name="pixel">出力済みPixel数</param>
     Private Sub ChangeTansportCostDetailPage(ByRef idx As Int32, ByRef pixel As Double, Optional type As Int32 = 0)
+        Dim srcRange As Excel.Range = Nothing
+        Dim destRange As Excel.Range = Nothing
+
         '出力済みPixel数が最大に達してない場合、ページ埋め処理
         While (pixel < TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH)
             '明細1行分(14.25)以上
             If TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel > 14.25 Then
                 '高さの調整のみ
-                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight = 14.25
+                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                destRange.RowHeight = 14.25
+                ExcelMemoryRelease(destRange)
                 pixel += 14.25
             Else
                 '1行以下（フッター行）の場合、MAX - 出力済みPixel数分の高さにして、下罫線を引く
-                ExcelWorkSheet.Range(String.Format("{0}:{0}", idx)).RowHeight =
-                    TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel
-                ExcelWorkSheet.Range(String.Format("B{0}:CA{0}", idx)) _
-                .Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
+                destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
+                destRange.RowHeight = TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel
+                ExcelMemoryRelease(destRange)
+
+                destRange = ExcelWorkSheet.Range(String.Format("B{0}:CA{0}", idx))
+                destRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
+                ExcelMemoryRelease(destRange)
 
                 pixel += TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel
             End If
@@ -917,23 +949,45 @@ Public Class OIT0008CustomReport : Implements IDisposable
         If type = 1 Then Exit Sub
 
         'テンプレートのコピー
-        Dim srcRange As Excel.Range = ExcelTempSheet.Cells.Range("I1:CJ11")
-        Dim destRange As Excel.Range = ExcelWorkSheet.Range("A" + idx.ToString())
+        srcRange = ExcelTempSheet.Cells.Range("I1:CJ11")
+        destRange = ExcelWorkSheet.Range("A" + idx.ToString())
         srcRange.Copy(destRange)
         ExcelMemoryRelease(srcRange)
         ExcelMemoryRelease(destRange)
         '行の高さ設定
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx))).RowHeight = 14.25
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 1))).RowHeight = 15.75
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 2))).RowHeight = 15.75
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 3))).RowHeight = 14.25
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 4))).RowHeight = 3.75
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 5))).RowHeight = 14.25
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 6))).RowHeight = 3.75
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 7))).RowHeight = 3.75
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 8))).RowHeight = 14.25
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 9))).RowHeight = 14.25
-        ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 10))).RowHeight = 3.75
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx)))
+        destRange.RowHeight = 14.25
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 1)))
+        destRange.RowHeight = 15.75
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 2)))
+        destRange.RowHeight = 15.75
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 3)))
+        destRange.RowHeight = 14.25
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 4)))
+        destRange.RowHeight = 3.75
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 5)))
+        destRange.RowHeight = 14.25
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 6)))
+        destRange.RowHeight = 3.75
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 7)))
+        destRange.RowHeight = 3.75
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 8)))
+        destRange.RowHeight = 14.25
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 9)))
+        destRange.RowHeight = 14.25
+        ExcelMemoryRelease(destRange)
+        destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 10)))
+        destRange.RowHeight = 3.75
+        ExcelMemoryRelease(destRange)
     End Sub
 #End Region
 

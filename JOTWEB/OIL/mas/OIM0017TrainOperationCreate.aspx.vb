@@ -1201,8 +1201,15 @@ Public Class OIM0017TrainOperationCreate
             WW_TEXT = OIM0017INProw("TRAINNO")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                '列車マスタの存在チェック
-
+                ' 値存在チェックT
+                CODENAME_get("TRAINNO", OIM0017INProw("TRAINNO"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(JOT列車番号エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0017INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(JOT列車番号エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1400,23 +1407,24 @@ Public Class OIM0017TrainOperationCreate
 
             OIM0017INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0017row As DataRow In OIM0017tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0017row("OFFICECODE") = OIM0017INProw("OFFICECODE") AndAlso
                     OIM0017row("TRAINNO") = OIM0017INProw("TRAINNO") AndAlso
                     OIM0017row("WORKINGDATE") = OIM0017INProw("WORKINGDATE") AndAlso
                     OIM0017row("TSUMI") = OIM0017INProw("TSUMI") AndAlso
                     OIM0017row("DEPSTATION") = OIM0017INProw("DEPSTATION") AndAlso
                     OIM0017row("ARRSTATION") = OIM0017INProw("ARRSTATION") Then
-                    ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0017row("TRAINNAME") = OIM0017INProw("TRAINNAME") AndAlso
                         OIM0017row("RUN") = OIM0017INProw("RUN") AndAlso
-                        OIM0017row("DELFLG") = OIM0017INProw("DELFLG") AndAlso
-                        OIM0017INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0017row("DELFLG") = OIM0017INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0017INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0017INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1558,7 +1566,7 @@ Public Class OIM0017TrainOperationCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TRAINNO"
                     ' JOT列車番号
-                    prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
+                    prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE2.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TSUMI"
                     ' 積置フラグ
@@ -1570,11 +1578,11 @@ Public Class OIM0017TrainOperationCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "RUN"
                     ' 稼働フラグ
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "RUN")
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "RUN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"
                     ' 削除
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG")
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

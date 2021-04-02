@@ -913,20 +913,20 @@ Public Class OIM0014LoadcalcCreate
 
             OIM0014INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0014row As DataRow In OIM0014tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0014row("PLANTCODE") = OIM0014INProw("PLANTCODE") AndAlso
                     OIM0014row("BIGOILCODE") = OIM0014INProw("BIGOILCODE") AndAlso
-                    OIM0014row("CHECKOILCODE") = OIM0014row("CHECKOILCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0014row("TANKCOUNT") = OIM0014row("TANKCOUNT") AndAlso
-                        OIM0014row("BIGOILCODE") = OIM0014row("BIGOILCODE") AndAlso
-                        OIM0014row("DELFLG") = OIM0014INProw("DELFLG") AndAlso
-                        OIM0014INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    OIM0014row("CHECKOILCODE") = OIM0014INProw("CHECKOILCODE") Then
+                    ' KEY項目以外の項目の差異をチェック
+                    If OIM0014row("TANKCOUNT") = OIM0014INProw("TANKCOUNT") AndAlso
+                        OIM0014row("DELFLG") = OIM0014INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0014INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0014INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

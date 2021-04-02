@@ -256,7 +256,12 @@ Public Class OIM0007TrainSearch
                 End If
                 ' 本線列車番号
                 If WF_FIELD.Value = WF_TRAINNO.ID Then
-                    prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text)
+                    If String.IsNullOrEmpty(WF_OFFICECODE.Text) Then
+                        '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                        prmData = work.CreateTrainNoParam(Master.USER_ORG)
+                    Else
+                        prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text)
+                    End If
                 End If
                 ' 積置フラグ
                 If WF_FIELD.Value = WF_TSUMI.ID Then
@@ -422,7 +427,12 @@ Public Class OIM0007TrainSearch
                     prmData = work.CreateOfficeCodeParam(Master.USER_ORG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TRAINNO"      ' 本線列車番号
-                    prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text, I_VALUE)
+                    If String.IsNullOrEmpty(WF_OFFICECODE.Text) Then
+                        '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                        prmData = work.CreateTrainNoParam(Master.USER_ORG, I_VALUE)
+                    Else
+                        prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text, I_VALUE)
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TSUMI"        ' 積置フラグ
                     prmData = work.CreateFIXParam(Master.USERCAMP, "TSUMI")

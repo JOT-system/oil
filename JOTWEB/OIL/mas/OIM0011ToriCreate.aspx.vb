@@ -1283,37 +1283,38 @@ Public Class OIM0011ToriCreate
 
             OIM0011INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0011row As DataRow In OIM0011tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0011row("TORICODE") = OIM0011INProw("TORICODE") AndAlso
-                    OIM0011row("STYMD") = OIM0011row("STYMD") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0011row("ENDYMD") = OIM0011row("ENDYMD") AndAlso
-                        OIM0011row("TORINAME") = OIM0011row("TORINAME") AndAlso
-                        OIM0011row("TORINAMES") = OIM0011row("TORINAMES") AndAlso
-                        OIM0011row("TORINAMEKANA") = OIM0011row("TORINAMEKANA") AndAlso
-                        OIM0011row("DEPTNAME") = OIM0011row("DEPTNAME") AndAlso
-                        OIM0011row("POSTNUM1") = OIM0011row("POSTNUM1") AndAlso
-                        OIM0011row("POSTNUM2") = OIM0011row("POSTNUM2") AndAlso
-                        OIM0011row("ADDR1") = OIM0011row("ADDR1") AndAlso
-                        OIM0011row("ADDR2") = OIM0011row("ADDR2") AndAlso
-                        OIM0011row("ADDR3") = OIM0011row("ADDR3") AndAlso
-                        OIM0011row("ADDR4") = OIM0011row("ADDR4") AndAlso
-                        OIM0011row("TEL") = OIM0011row("TEL") AndAlso
-                        OIM0011row("FAX") = OIM0011row("FAX") AndAlso
-                        OIM0011row("MAIL") = OIM0011row("MAIL") AndAlso
-                        OIM0011row("OILUSEFLG") = OIM0011row("OILUSEFLG") AndAlso
-                        OIM0011row("BANKCODE") = OIM0011row("BANKCODE") AndAlso
-                        OIM0011row("BANKBRANCHCODE") = OIM0011row("BANKBRANCHCODE") AndAlso
-                        OIM0011row("ACCOUNTTYPE") = OIM0011row("ACCOUNTTYPE") AndAlso
-                        OIM0011row("ACCOUNTNUMBER") = OIM0011row("ACCOUNTNUMBER") AndAlso
-                        OIM0011row("ACCOUNTNAME") = OIM0011row("ACCOUNTNAME") AndAlso
-                        OIM0011row("DELFLG") = OIM0011INProw("DELFLG") AndAlso
-                        OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    OIM0011row("STYMD") = OIM0011INProw("STYMD") Then
+                    ' KEY項目以外の項目の差異をチェック
+                    If OIM0011row("ENDYMD") = OIM0011INProw("ENDYMD") AndAlso
+                        OIM0011row("TORINAME") = OIM0011INProw("TORINAME") AndAlso
+                        OIM0011row("TORINAMES") = OIM0011INProw("TORINAMES") AndAlso
+                        OIM0011row("TORINAMEKANA") = OIM0011INProw("TORINAMEKANA") AndAlso
+                        OIM0011row("DEPTNAME") = OIM0011INProw("DEPTNAME") AndAlso
+                        OIM0011row("POSTNUM1") = OIM0011INProw("POSTNUM1") AndAlso
+                        OIM0011row("POSTNUM2") = OIM0011INProw("POSTNUM2") AndAlso
+                        OIM0011row("ADDR1") = OIM0011INProw("ADDR1") AndAlso
+                        OIM0011row("ADDR2") = OIM0011INProw("ADDR2") AndAlso
+                        OIM0011row("ADDR3") = OIM0011INProw("ADDR3") AndAlso
+                        OIM0011row("ADDR4") = OIM0011INProw("ADDR4") AndAlso
+                        OIM0011row("TEL") = OIM0011INProw("TEL") AndAlso
+                        OIM0011row("FAX") = OIM0011INProw("FAX") AndAlso
+                        OIM0011row("MAIL") = OIM0011INProw("MAIL") AndAlso
+                        OIM0011row("OILUSEFLG") = OIM0011INProw("OILUSEFLG") AndAlso
+                        OIM0011row("BANKCODE") = OIM0011INProw("BANKCODE") AndAlso
+                        OIM0011row("BANKBRANCHCODE") = OIM0011INProw("BANKBRANCHCODE") AndAlso
+                        OIM0011row("ACCOUNTTYPE") = OIM0011INProw("ACCOUNTTYPE") AndAlso
+                        OIM0011row("ACCOUNTNUMBER") = OIM0011INProw("ACCOUNTNUMBER") AndAlso
+                        OIM0011row("ACCOUNTNAME") = OIM0011INProw("ACCOUNTNAME") AndAlso
+                        OIM0011row("DELFLG") = OIM0011INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0011INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1349,7 +1350,8 @@ Public Class OIM0011ToriCreate
         For Each OIM0011row As DataRow In OIM0011tbl.Rows
 
             '同一レコードか判定
-            If OIM0011INProw("TORICODE") = OIM0011row("TORICODE") Then
+            If OIM0011INProw("TORICODE") = OIM0011row("TORICODE") AndAlso
+                OIM0011INProw("STYMD") = OIM0011row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0011INProw("LINECNT") = OIM0011row("LINECNT")
                 OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -1402,7 +1404,8 @@ Public Class OIM0011ToriCreate
         For Each OIM0011row As DataRow In OIM0011tbl.Rows
 
             '同一レコードか判定
-            If OIM0011INProw("TORICODE") = OIM0011row("TORICODE") Then
+            If OIM0011INProw("TORICODE") = OIM0011row("TORICODE") AndAlso
+                OIM0011INProw("STYMD") = OIM0011row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0011INProw("LINECNT") = OIM0011row("LINECNT")
                 OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED

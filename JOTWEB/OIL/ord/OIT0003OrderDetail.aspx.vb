@@ -18034,6 +18034,7 @@ Public Class OIT0003OrderDetail
                     'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0003row("ORDERINFO") = ""
                     OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格上)"
                     'OIT0003row("ORDERINFONAME") = "前回揮発油(確認)"
                 End If
@@ -18072,6 +18073,7 @@ Public Class OIT0003OrderDetail
                     End Select
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0003row("ORDERINFO") = ""
                     OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格下)"
                 End If
 

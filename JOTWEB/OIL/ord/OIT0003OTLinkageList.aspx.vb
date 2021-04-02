@@ -553,8 +553,14 @@ Public Class OIT0003OTLinkageList
                 PARA02.Value = targetDate
                 PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
-                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
-                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                '★仙台新港営業所対応(受注受付は表示しない(200(手配)以降を表示))
+                If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                    PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                Else
+                    PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                    PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                End If
                 'PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 'PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310

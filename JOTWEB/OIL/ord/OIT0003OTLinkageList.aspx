@@ -135,7 +135,7 @@
                 <asp:HiddenField ID="hdnOTLinkageSendChkConfirmIsActive" runat="server" Value="" />
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <span>表示されている内容で発送日報を送信しますよろしいですか？</span>
+                        <span>表示されている内容で発送日報を送信します。</span>
                     </div>
                     <div class="rightSide">
                         <input type="button" id="WF_ButtonOTLinkageSend" class="btn-sticky" value="送信"   onclick="ButtonClick('WF_ButtonReserveOTLinkageSend');" />

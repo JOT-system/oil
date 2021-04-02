@@ -111,7 +111,7 @@ Public Class M00001MP0002CustomReport : Implements IDisposable
             End Try
         Next targetFile
         'URLのルートを表示
-        Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
+        Me.UrlRoot = String.Format("{0}://{1}/{3}/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID, CS0050SESSION.PRINT_ROOT_URL_NAME)
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
         ExcelAppObj.DisplayAlerts = False
@@ -1012,35 +1012,36 @@ Public Class M00001MP0002CustomReport : Implements IDisposable
                 ' TODO: マネージド状態を破棄します (マネージド オブジェクト)。
             End If
 
-            ' TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、下の Finalize() をオーバーライドします。
-            ' TODO: 大きなフィールドを null に設定します。
-            ''Excel 作業シートオブジェクトの解放
-            'ExcelMemoryRelease(ExcelTempSheet)
-            'Excel Sheetオブジェクトの解放
-            ExcelMemoryRelease(ExcelWorkSheet)
-            'Excel Sheetコレクションの解放
-            ExcelMemoryRelease(ExcelWorkSheets)
-            'Excel Bookオブジェクトを閉じる
-            If ExcelBookObj IsNot Nothing Then
-                Try
-                    'ExcelBookObj.Close(Excel.XlSaveAction.xlDoNotSaveChanges)
-                    ExcelBookObj.Close(False)
-                Catch ex As Exception
-                End Try
-            End If
-
-            ExcelMemoryRelease(ExcelBookObj)
-            'Excel Bookコレクションの解放
-            ExcelMemoryRelease(ExcelBooksObj)
-            'Excel Appの終了
-            If ExcelAppObj IsNot Nothing Then
-                Try
-                    ExcelAppObj.Quit()
-                Catch ex As Exception
-                End Try
-            End If
-            ExcelProcEnd()
         End If
+
+        ' TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、下の Finalize() をオーバーライドします。
+        ' TODO: 大きなフィールドを null に設定します。
+        ''Excel 作業シートオブジェクトの解放
+        'ExcelMemoryRelease(ExcelTempSheet)
+        'Excel Sheetオブジェクトの解放
+        ExcelMemoryRelease(ExcelWorkSheet)
+        'Excel Sheetコレクションの解放
+        ExcelMemoryRelease(ExcelWorkSheets)
+        'Excel Bookオブジェクトを閉じる
+        If ExcelBookObj IsNot Nothing Then
+            Try
+                'ExcelBookObj.Close(Excel.XlSaveAction.xlDoNotSaveChanges)
+                ExcelBookObj.Close(False)
+            Catch ex As Exception
+            End Try
+        End If
+
+        ExcelMemoryRelease(ExcelBookObj)
+        'Excel Bookコレクションの解放
+        ExcelMemoryRelease(ExcelBooksObj)
+        'Excel Appの終了
+        If ExcelAppObj IsNot Nothing Then
+            Try
+                ExcelAppObj.Quit()
+            Catch ex As Exception
+            End Try
+        End If
+        ExcelProcEnd()
         disposedValue = True
     End Sub
 

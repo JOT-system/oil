@@ -27,6 +27,8 @@
     <asp:TextBox ID="WF_SEL_STATUSCODE" runat="server"></asp:TextBox>
     <!-- 状態名 -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>
+    <!-- 受注キャンセルフラグ -->
+    <asp:TextBox ID="WF_SEL_ORDERCANCELFLG" runat="server"></asp:TextBox>
 
     <!-- ■受注一覧用 -->
     <!-- 選択行 -->
@@ -232,6 +234,9 @@
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_LINK_DELFLG" runat="server"></asp:TextBox>
 
+    <!-- (根岸営業所)「灯油＋３号軽油＝１０両以上」フラグ -->
+    <asp:TextBox ID="WG_SEL_KEROSENE_3DIESEL_FLG" runat="server"></asp:TextBox>
+
     <!-- ■受注手配（費用入力）用 -->
     <!-- 支払請求№ -->
     <asp:TextBox ID="WF_SEL_BILLINGNO" runat="server"></asp:TextBox>
@@ -268,6 +273,8 @@
     <!-- MAPID退避(受注明細画面への遷移制御のため) -->
     <asp:TextBox ID="WF_SEL_MAPIDBACKUP" runat="server"></asp:TextBox>
 
+    <!-- 実績日訂正フラグ -->
+    <asp:TextBox ID="WF_SEL_CORRECTIONDATEFLG" runat="server"></asp:TextBox>
     <!-- 手配連絡フラグ -->
     <asp:TextBox ID="WF_SEL_CONTACTFLG" runat="server"></asp:TextBox>
     <!-- 結果受理フラグ -->

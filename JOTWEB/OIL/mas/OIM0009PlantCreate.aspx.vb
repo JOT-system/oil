@@ -517,8 +517,6 @@ Public Class OIM0009PlantCreate
         Select Case WF_FIELD.Value
             Case "WF_DELFLG"        '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
-            Case "WF_PLANTNAME"     '基地名
-                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
             Case "WF_SHIPPERCODE"   '荷主コード
                 CODENAME_get("SHIPPERCODE", WF_SHIPPERCODE.Text, WF_SHIPPERCODE_TEXT.Text, WW_RTN_SW)
         End Select
@@ -752,7 +750,6 @@ Public Class OIM0009PlantCreate
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
-
             Else
                 WW_CheckMES1 = "・更新できないレコード(荷主コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -862,20 +859,20 @@ Public Class OIM0009PlantCreate
 
             OIM0009INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0009row As DataRow In OIM0009tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0009row("PLANTCODE") = OIM0009INProw("PLANTCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0009row("PLANTCODE") = OIM0009INProw("PLANTCODE") AndAlso
-                        OIM0009row("PLANTNAME") = OIM0009INProw("PLANTNAME") AndAlso
+                    ' KEY項目以外の項目の差異をチェック
+                    If OIM0009row("PLANTNAME") = OIM0009INProw("PLANTNAME") AndAlso
                         OIM0009row("PLANTNAMEKANA") = OIM0009INProw("PLANTNAMEKANA") AndAlso
                         OIM0009row("SHIPPERCODE") = OIM0009INProw("SHIPPERCODE") AndAlso
-                        OIM0009row("DELFLG") = OIM0009INProw("DELFLG") AndAlso
-                        OIM0009INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0009row("DELFLG") = OIM0009INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0009INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        '変更がある時は「操作」の項目を「更新」に設定する
                         OIM0009INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1003,11 +1000,6 @@ Public Class OIM0009PlantCreate
             prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
 
             Select Case I_FIELD
-                Case "CAMPCODE"                     '会社コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"                          '運用部署
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "SHIPPERCODE"                  '荷主コード
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, prmData)

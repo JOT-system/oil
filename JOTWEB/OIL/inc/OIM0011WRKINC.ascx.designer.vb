@@ -75,7 +75,7 @@ Partial Public Class OIM0011WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TORICODE2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STYMD2 コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIM0011WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STYMD2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ENDYMD2 コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class OIM0011WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ENDYMD2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TORINAME コントロール。
     '''</summary>
@@ -120,6 +120,15 @@ Partial Public Class OIM0011WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TORINAMEKANA As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_DEPTNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DEPTNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_POSTNUM1 コントロール。
@@ -210,6 +219,51 @@ Partial Public Class OIM0011WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OILUSEFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_BANKCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_BANKCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_BANKBRANCHCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_BANKBRANCHCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_ACCOUNTTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ACCOUNTTYPE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_ACCOUNTNUMBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ACCOUNTNUMBER As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_ACCOUNTNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ACCOUNTNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_DELFLG コントロール。

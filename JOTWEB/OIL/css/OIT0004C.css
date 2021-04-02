@@ -8,9 +8,38 @@
     width: calc(100% - 20px);
     height: calc(100% - 20px);
 }
+/*
+#WF_ButtonUPDATE {
+    color: #b6c12b;
+    border: solid 1px #b6c12b;
+}
+#WF_ButtonUPDATE:hover {
+    background: #b6c12b;
+    color: #fff;
+}
+*/
+/* 在庫表更新ボタンのカスタマイズ */
+#WF_ButtonUPDATE {
+    border: solid 1px #b6c12b;
+    background: #b6c12b;
+    color: #fff;
+}
+#WF_ButtonUPDATE:hover {
+    background: #5e6216;
+}
+/* 受注作成ボタンのカスタマイズ */
+#WF_ButtonORDERLIST {
+    border: solid 1px #2bb6c1;
+    background: #2bb6c1;
+    color: #fff;
+}
+
+#WF_ButtonORDERLIST:hover {
+    background: #0C3337;
+}
 /* 各表名称のDiv */
 .listTitle {
-    margin-top:10px;
+    margin-top: 10px;
 }
 /* 上部テキストボックス */
 #WF_INVENTORYDAYS,
@@ -99,52 +128,52 @@
 }
 /* 提案表列車No、油種チェックボックス、油種ごとのテキストボックスセルの幅 */
 #divSuggestList > div.dataColumn > div.values > div {
-    width:65px;
-    min-width:65px;
-    max-width:65px;
+    width:70px;
+    min-width:70px;
+    max-width:70px;
 }
 /* 提案表列車Noが6個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has6Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ６倍 */
-    width : calc(65px * 6);
-    min-width: calc(65px * 6);
-    max-width: calc(65px * 6);
+    width : calc(70px * 6);
+    min-width: calc(70px * 6);
+    max-width: calc(70px * 6);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが5個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has5Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ５倍 */
-    width : calc(65px * 5);
-    min-width: calc(65px * 5);
-    max-width: calc(65px * 5);
+    width : calc(70px * 5);
+    min-width: calc(70px * 5);
+    max-width: calc(70px * 5);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが4個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has4Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ４倍 */
-    width : calc(65px * 4);
-    min-width: calc(65px * 4);
-    max-width: calc(65px * 4);
+    width : calc(70px * 4);
+    min-width: calc(70px * 4);
+    max-width: calc(70px * 4);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが3個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has3Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ３倍 */
-    width : calc(65px * 3);
-    min-width: calc(65px * 3);
-    max-width: calc(65px * 3);
+    width : calc(70px * 3);
+    min-width: calc(70px * 3);
+    max-width: calc(70px * 3);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが2個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has2Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ２倍 */
-    width : calc(65px * 2);
-    min-width: calc(65px * 2);
-    max-width: calc(65px * 2);
+    width : calc(70px * 2);
+    min-width: calc(70px * 2);
+    max-width: calc(70px * 2);
     display:flex;
     flex-wrap:wrap;
 }
@@ -258,6 +287,78 @@
     background-image:none;
     display:none;
 }
+/* 日付枠の黒ボーダー */
+.suggestDate {
+    border-top-color: black !important;
+    border-top-width: 2px !important;
+    border-left-color: black !important;
+    border-left-width: 2px !important;
+    border-right-color: black !important;
+    border-right-width: 2px !important;
+}
+div.dataColumn > div:nth-child(2) > div {
+    border-left-color: black !important;
+    border-left-width: 2px !important;
+}
+
+div.dataColumn:nth-last-child(2) > div:last-child > div {
+    border-right-color: black !important;
+    border-right-width: 2px !important;
+}
+div.dataColumn > div.values > div:last-child {
+    border-bottom-color: black !important;
+    border-bottom-width: 2px !important;
+}
+div[data-hasmiitem="True"] div.dataColumn > div.values > div[data-oilcode='Summary']:not(.mi) {
+    border-bottom-color: black !important;
+    border-bottom-width: 2px !important;
+}
+/* 提案表日付期間ドロップダウン設定 */
+.suggestHDays {
+    position: relative;
+    border-bottom: red !important;
+    height: 22px !important;
+}
+.suggestHdaysText {
+    position: absolute;
+    width: calc(76px + 86px);
+    background-color: #51986D;
+    margin-left: -4px;
+    margin-top: -2px;
+    padding-top: 1px;
+    padding-left: 2px;
+    height: 22px;
+    border-left: 1px solid darkgray;
+    border-bottom: 1px solid darkgray;
+}
+/*#divSuggestList > div.dataColumn.dataColumn .values div:last-child > span {
+    display: none;
+}
+#divSuggestList > div.dataColumn.dataColumn .values:not(:nth-child(2)) div:last-child {
+    border-left-color:transparent;
+} 
+#divSuggestList > div.dataColumn.dataColumn .values:nth-child(2) div:last-child {
+    position: relative;
+} 
+#divSuggestList > div.dataColumn.dataColumn .values:nth-child(2) div:last-child > span {
+    display: block;
+    position:absolute ;
+    width:190px;
+}*/
+#divSuggestList .values select {
+    width: calc(100% - 4px);
+    margin-left: -2px;
+    margin-top: -2px;
+    border-color: skyblue;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
+}
+#divSuggestList .values select {
+    /*padding-left:16px;
+    text-align:right;*/
+}
+
 /* *********************** */
 /* 比重表 設定             */
 /* *********************** */
@@ -276,56 +377,117 @@
 #weightListContainer > div:not(:last-child) > div {
     padding:2px;
     border:1px solid darkgray;
-}
-#weightListContainer > div > div:last-child {
+} #weightListContainer > div > div:last-child {
     border-top:0;
-}
-#weightListContainer > div:not(:nth-last-child(2)) > div{
+} #weightListContainer > div:not(:nth-last-child(2)) > div{
     border-right:0;
-}
-#weightListContainer > div:last-child {
+} #weightListContainer > div:last-child {
     width:auto;
     min-width:0;
     max-width: none;
     margin-left:auto;
-}
-#weightListContainer > div > div.weightListOilType {
+} #weightListContainer > div > div.weightListOilType {
     text-align:center;
-}
-#weightListContainer > div > div.weightListValue {
+} #weightListContainer > div > div.weightListValue {
     text-align:right;
-}
-div.weightListOilType {
+} div.weightListOilType {
     height:24px;
 }
 /* *********************** */
 /* 在庫表 設定             */
 /* *********************** */
 #pnlStockList {
-    margin-top: -20px;
+    /* margin-top: -20px; */
     margin-bottom: 10px;
     margin-right: 10px;
-}
-#divStockList {
+} #divStockList {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-}
-#divStockList,
-#divStockList div{
+} #divStockList, #divStockList div{
     box-sizing:border-box;
-}
-#divStockList > div.header,
-#divStockList > div.oilTypeData {
+} #divStockList > div.header, #divStockList > div.oilTypeData {
     display:flex;
     flex-wrap: nowrap;
-}
-#divStockList div.lastMargin {
+} #divStockList div.lastMargin {
     margin-left:auto;
+}
+/* 合計一覧の設定 */
+#divStockList > div.footer {
+    display:flex;
+    flex-wrap: nowrap;
+    height:70px;
+}
+#divStockList div.footer > div {
+    align-items:stretch; 
+    display:flex;
+    flex-wrap:nowrap ; 
+
+}
+#divStockList div.footer .col1To3s {
+    width:270px;
+    min-width:270px;
+    border:1px solid darkgray;
+    border-right:0;
+}
+#divStockList div.footer .col1To3s > div {
+    background-color:cadetblue;
+    width:100%;
+    padding-top:2px;
+    padding-left :2px;
+    font-weight:bold;
+    letter-spacing :10px;
+}
+#divStockList div.footer .col4s {
+    width:95px;
+    min-width:95px;
+    display:flex;
+    flex-wrap:nowrap;
+    flex-direction:column;
+}
+#divStockList div.footer .col4s > div.colStockInfoBottomRow {
+    height:calc(100% / 3);
+    max-height:23.5px;
+    background-color:#51986D;
+    color:#ffffff;
+    border:1px solid darkgray;
+    border-right:0;
+    border-bottom:0;
+    padding:2px;
+    padding-bottom:1px;
+} 
+
+#divStockList div.footer .col4s > div.colStockInfoBottomRow:last-child {
+    border-bottom:1px;
+}
+#divStockList div.footer .colStockInfo {
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    display:flex;
+    flex-wrap :nowrap;
+    flex-direction :column ;
+}
+#divStockList div.footer .colStockInfo > div {
+    height:calc(100% / 3);
+    max-height:23.5px;
+    border:1px solid darkgray;
+    border-right:0;
+    border-bottom:0;
+    padding:2px;
+    padding-bottom:1px;
+    text-align:right;
+    padding-right:8px !important;
+}
+#divStockList div.footer .colStockInfo > div:last-child {
+    border-bottom:1px solid darkgray !important;
+}
+#divStockList div.footer .colStockInfo:nth-last-child(2) > div {
+    border-right:1px solid darkgray !important;
 }
 /* マイナス金額の場合強調表示 */
 span.minus {
-    color:red;
+    color: red;
 }
 /* ヘッダー行 日付（文言）、日付関連 */
 /* データ行の１～６列目の幅を足す
@@ -333,17 +495,14 @@ span.minus {
 #divStockList div.emptyBox {
     width: calc(90px + 110px + 70px + 95px);
     min-width: calc(90px + 110px + 70px + 95px);
-}
-#divStockList > div.header > div.headerDate {
+} #divStockList > div.header > div.headerDate {
     display:flex;
     flex-wrap: nowrap;
     flex-direction:column;
-}
-#divStockList > div.header > div.headerDate div.dateItem {
+} #divStockList > div.header > div.headerDate div.dateItem {
     display:flex;
     flex-wrap: nowrap;
-}
-#divStockList div.oilTypeData {
+} #divStockList div.oilTypeData {
     align-items: stretch
 }
 /* 一列目 油種文言 */
@@ -352,89 +511,57 @@ span.minus {
     min-width:90px;
 }
 /* 二列目 ～ 四列目 調整 */
-#divStockList div.col2,
-#divStockList div.col3,
-#divStockList div.col4,
-#divStockList div.col5{
+#divStockList div.col2, #divStockList div.col3, #divStockList div.col4, #divStockList div.col5{
     width:110px;
     min-width:110px;
     display:flex;
     flex-wrap: nowrap;
     flex-direction:column;
-}
-#divStockList div.col3,
-#divStockList div.col5{
+} #divStockList div.col3, #divStockList div.col5{
     width:70px;
     min-width:70px;
     text-align:right;
-}
-#divStockList div.col6 {
+} #divStockList div.col6 {
     width:95px;
     min-width:95px;
     display:flex;
     flex-wrap: nowrap;
     flex-direction:column;
-}
-#divStockList div.colStockInfo.date, 
-#divStockList div.colStockValue > div {
+} #divStockList div.colStockInfo.date, #divStockList div.colStockValue > div {
     text-align:center;
     width:105px;
     min-width:105px;
-}
-#divStockList div.colStockValue > div {
+} #divStockList div.colStockValue > div {
     text-align:right;
 }
-    /* #divStockList div.colStockValue > div:not(:nth-child(5)) */
+/* #divStockList div.colStockValue > div:not(:nth-child(5)) */
 #divStockList div.colStockValue > div {
     padding-right:8px !important;
-}
-#divStockList div.col2 > div,
-#divStockList div.col3 > div,
-#divStockList div.col4 > div,
-#divStockList div.col5 > div{
+} #divStockList div.col2 > div, #divStockList div.col3 > div, #divStockList div.col4 > div, #divStockList div.col5 > div{
     height:calc(100% / 6);
-}
-#divStockList div.col2 > div > span,
-#divStockList div.col3 > div > span,
-#divStockList div.col4 > div > span,
-#divStockList div.col5 > div > span{
+} #divStockList div.col2 > div > span, #divStockList div.col3 > div > span, #divStockList div.col4 > div > span, #divStockList div.col5 > div > span{
     display:inline-block;
-}
-#divStockList div.col3 > div > span,
-#divStockList div.col5 > div > span {
+} #divStockList div.col3 > div > span, #divStockList div.col5 > div > span {
     //margin-top:calc(100% / 3 + 1px);
-}
-#divStockList div.col3 > div > span,
-#divStockList div.col5 > div > span,
-#divStockList div.colStockValue > div:not(:nth-child(5)) span {
+} #divStockList div.col3 > div > span, #divStockList div.col5 > div > span, #divStockList div.colStockValue > div:not(:nth-child(5)) span {
     display:inline-block;
     margin-top:2px;
-}
-@media all and (-ms-high-contrast: none) {
+} @media all and (-ms-high-contrast: none) {
     *::-ms-backdrop, 
     #divStockList div.col3 > div > span,
     #divStockList div.col5 > div > span,
     #divStockList div.colStockValue > div:not(:nth-child(5)) span {
         margin-top: 0px;
     }
-}
-#divStockList.full div.col6 > div,
-#divStockList.full div.colStockValue > div {
+} #divStockList.full div.col6 > div, #divStockList.full div.colStockValue > div {
     height: calc(100% / 8);
     max-height: 23.5px;
-}
-#divStockList.hideLorry div.col6 > div.receiveFromLorry,
-#divStockList.hideLorry div.colStockValue > div.receiveFromLorry,
-#divStockList.hideLorry div.col6 > div.receiveSummary,
-#divStockList.hideLorry div.colStockValue > div.receiveSummary {
+} #divStockList.hideLorry div.col6 > div.receiveFromLorry, #divStockList.hideLorry div.colStockValue > div.receiveFromLorry, #divStockList.hideLorry div.col6 > div.receiveSummary, #divStockList.hideLorry div.colStockValue > div.receiveSummary {
     display: none;
-}
-#divStockList.hideLorry div.col6 > div,
-#divStockList.hideLorry div.colStockValue > div {
+} #divStockList.hideLorry div.col6 > div, #divStockList.hideLorry div.colStockValue > div {
     height: calc(100% / 6);
     max-height: 23.5px;
-}
-#dispLorry {
+} #dispLorry {
     margin-top: auto;
     margin-left: auto;
     border: none !important;
@@ -443,39 +570,27 @@ span.minus {
     color: #2bb6c1 !important;
     font-size:15px !important;
     order:9999;
-}
-#dispLorry:hover > span:after {
+} #dispLorry:hover > span:after {
     text-decoration:underline;
     color: #2bb6c1 !important;
-}
-#divStockList.full #dispLorry > span:after {
+} #divStockList.full #dispLorry > span:after {
     content: "ﾛｰﾘｰ非表示";
-}
-#divStockList.full #dispLorry > span:before {
+} #divStockList.full #dispLorry > span:before {
     content: "◆";
-}
-#divStockList.hideLorry #dispLorry > span:after {
+} #divStockList.hideLorry #dispLorry > span:after {
     content: "ﾛｰﾘｰ表示"
-}
-#divStockList.hideLorry #dispLorry > span:before {
+} #divStockList.hideLorry #dispLorry > span:before {
     content: "◇";
-}
-#divStockList.hideLorry.hasLorryValue #dispLorry > span:before {
+} #divStockList.hideLorry.hasLorryValue #dispLorry > span:before {
     content: "◆";
     color: red !important;
-}
-#divStockList div.colStockInfoTopRow {
+} #divStockList div.colStockInfoTopRow {
     max-height: 24px;
-}
-#divStockList.hideLorry div.col2 > div,
-#divStockList.hideLorry div.col3 > div,
-#divStockList.hideLorry div.col4 > div,
-#divStockList.hideLorry div.col5 > div {
+} #divStockList.hideLorry div.col2 > div, #divStockList.hideLorry div.col3 > div, #divStockList.hideLorry div.col4 > div, #divStockList.hideLorry div.col5 > div {
     height: 23.5px;
 }
 /* 在庫表の全てのテキストボックス */
-#divStockList input[type=text],
-#divStockList input[type=number] {
+#divStockList input[type=text], #divStockList input[type=number] {
     text-align: right;
     box-sizing: border-box;
     height: calc(100% - 1px);
@@ -484,46 +599,26 @@ span.minus {
     padding-bottom: 0px;
     line-height: 1em;
     height: 18px;
-}
-span.morningStockIdx0 {
+} span.morningStockIdx0 {
     margin-top:0px !important; 
-}
-#divStockList input[type=text][data-textfield="MorningStock"],
-#divStockList input[type=number][data-textfield="MorningStock"] {
+} #divStockList input[type=text][data-textfield="MorningStock"], #divStockList input[type=number][data-textfield="MorningStock"] {
     width: calc(100% + 5.5px);
-}
-#divStockList input[type=text][name$="txtSend"],
-#divStockList input[type=number][name$="txtSend"],
-#divStockList input[type=text][name$="txtReceive"],
-#divStockList input[type=text][name$="txtReceiveFromLorry"],
-#divStockList input[type=number][name$="txtReceiveFromLorry"] {
+} #divStockList input[type=text][name$="txtSend"], #divStockList input[type=number][name$="txtSend"], #divStockList input[type=text][name$="txtReceive"], #divStockList input[type=text][name$="txtReceiveFromLorry"], #divStockList input[type=number][name$="txtReceiveFromLorry"] {
     width: calc(100% + 5.5px);
 }
 /* :not(.col1) > div:last-child > span */
-#divStockList div.oilTypeData div[class^="col"] > div > span.stockinputtext,
-#divStockList div.oilTypeData div[class^="col"] > div > span[class^="morningStockIdx"] {
+#divStockList div.oilTypeData div[class^="col"] > div > span.stockinputtext, #divStockList div.oilTypeData div[class^="col"] > div > span[class^="morningStockIdx"] {
     margin-top: 0;
 }
 /*#divStockList div.oilTypeData div[class^="col"]:not(.col1):not(.col2):not(.col3):not(.col4):not(.col5) > div:last-child > span {
     margin-top: 0;
 }*/
-
 /* ************** */
 /* 在庫表罫線制御 */
 /* ************** */
 #divStockList div.col1 div {
     height: 100%;
-}
-#divStockList div.colStockInfoTopRow,
-#divStockList div.col1 div,
-#divStockList div.col2 div,
-#divStockList div.col3 div,
-#divStockList div.col4 div,
-#divStockList div.col5 div,
-#divStockList div.col6 div,
-#divStockList div.colStockInfo.date, 
-#divStockList div.colStockValue > div
-{
+} #divStockList div.colStockInfoTopRow, #divStockList div.col1 div, #divStockList div.col2 div, #divStockList div.col3 div, #divStockList div.col4 div, #divStockList div.col5 div, #divStockList div.col6 div, #divStockList div.colStockInfo.date, #divStockList div.colStockValue > div {
     border: 1px solid darkgray;
     border-right: 0;
     border-bottom:0;
@@ -531,30 +626,21 @@ span.morningStockIdx0 {
     padding-left:2px;
     padding-right:2px;
     padding-bottom:1px;
-}
-#divStockList div.colStockInfo.date:nth-last-child(1),
-#divStockList div.colStockValue:nth-last-child(2) > div
-{
+} #divStockList div.colStockInfo.date:nth-last-child(1), #divStockList div.colStockValue:nth-last-child(2) > div {
     border-right: 1px solid darkgray;
-}
-#divStockList div.oilTypeData:nth-last-child(1) > div{
+} #divStockList div.oilTypeData:nth-last-child(1) > div{
     border-bottom: 1px solid darkgray;
-}
-#divStockList div.oilTypeData.lastRow > div {
+} #divStockList div.oilTypeData.lastRow > div {
     border-bottom: 1px solid darkgray;
-}
-#divStockList div.colStockInfoTopRow {
+} #divStockList div.colStockInfoTopRow {
     border-right: 1px solid darkgray;
 }
 /* 在庫表の油種ごとの隙間あけて見やすくする場合↓2つ有効化 */
 div.oilTypeData {
     margin-bottom: 2px;
-}
-#divStockList div.oilTypeData > div {
+} #divStockList div.oilTypeData > div {
     border-bottom: 1px solid darkgray;
-}
-
-@media all and (-ms-high-contrast: none) {
+} @media all and (-ms-high-contrast: none) {
     #divStockList div.header + div.oilTypeData > div.colStockValue > div:last-child {
         //border-bottom: 1px solid darkgray;
     }
@@ -565,8 +651,7 @@ div.oilTypeData {
 #divEmptyBox {
     display: flex;
     flex-wrap: wrap;
-}
-#divEmptyBox > div {
+} #divEmptyBox > div {
     font-size: 0.8em;
     border: 1px solid darkgray;
     background-color: #2B8E56;
@@ -579,95 +664,77 @@ div.oilTypeData {
     height:0;
     height:calc(50% - 2px);
     cursor:pointer;
-}
-#divEmptyBox > div:hover {
+} #divEmptyBox > div:hover {
     background-color: #8e2b63;
-}
-div[data-oilcode][data-title='suggestValue'] span[data-tiptext],
-div.oilTypeData div.col1 span[data-tiptext] {
+} div[data-oilcode][data-title='suggestValue'] span[data-tiptext], div.oilTypeData div.col1 span[data-tiptext] {
     cursor: pointer;
 }
 /* ************** */
 /* 表の色         */
 /* ************** */
 /* 大見出し色 */
-#divStockList div.col1 div,
-#divStockList div.colStockInfoTopRow,
-#divStockList div.col6 div,
-#divStockList div.dateItem div,
-#divSuggestList div.oilTypeColumn div,
-#divSuggestList div.leftColumn div,
-#divSuggestList div.suggestDate,
-#divSuggestList div.values div:nth-child(1),
-#pnlWeightList div.weightListOilType {
+#divStockList div.col1 div, #divStockList div.colStockInfoTopRow, #divStockList div.col6 div, #divStockList div.dateItem div, #divSuggestList div.oilTypeColumn div, #divSuggestList div.leftColumn div, #divSuggestList div.suggestDate, #divSuggestList div.values div:nth-child(1), #pnlWeightList div.weightListOilType {
     /* background-color: #2B8E56; */
     background-color: #51986D;
     color: #FFFFFF;
 }
 /* 見出し色 */
-#divStockList div.col2 div,
-#divStockList div.col4 div,
-#divSuggestList div.values div:nth-child(2){
+#divStockList div.col2 div, #divStockList div.col4 div, #divSuggestList div.values div:nth-child(2) {
     background-color:#64A466;
 }
 /* 付帯情報色 */
-#divStockList div.col3 div,
-#divStockList div.col5 div{
+#divStockList div.col3 div, #divStockList div.col5 div{
     background-color:#A6D5AE;
 }
 /* データ色(１つの油種に対して行が9と奇数なので交互に表示させるためこの記載) 
     「#divStockList div.oilTypeData div.colStockValue div」←単色にするなら
     :nth-child(odd) = 奇数の要素 , :nth-child(even) = 偶数の要素
 */
-#divStockList div.oilTypeData:nth-child(odd) div.colStockValue div:nth-child(even),
-#divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
+#divStockList div.oilTypeData:nth-child(odd) div.colStockValue div:nth-child(even), #divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
     background-color: #DEF4E9;
 }
 /* **************************** */
 /* 表の色(油種個別設定)         */
 /* **************************** */
 /* ハイオク */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1001"],
-#divStockList div.oilTypeData[data-oilcode="1001"] div.col1 > div {
+#divSuggestList div[data-title=suggestValue][data-oilcode="1001"], #divStockList div.oilTypeData[data-oilcode="1001"] div.col1 > div {
+    color: #14171A;
+    /* background-color: rgb(255,255,0); */
+    background-color: rgb(245, 142, 126);
+}
+/* レギュラー */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1101"], #divStockList div.oilTypeData[data-oilcode="1101"] div.col1 > div {
+    /*background-color: rgb(255,192,0);*/
+    background-color: rgb(223, 32, 32);
+}
+/* 灯油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1301"], #divStockList div.oilTypeData[data-oilcode="1301"] div.col1 > div {
+    color: #14171A;
+    /*background-color: rgb(255,255,255);*/
+    background-color: rgb(255,255,0);
+}
+/* 未添加灯油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1302"], #divStockList div.oilTypeData[data-oilcode="1302"] div.col1 > div {
     color: #14171A;
     background-color: rgb(255,255,0);
 }
-/* レギュラー */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1101"],
-#divStockList div.oilTypeData[data-oilcode="1101"] div.col1 > div {
-    background-color: rgb(255,192,0);
-}
-/* 灯油 */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1301"],
-#divStockList div.oilTypeData[data-oilcode="1301"] div.col1 > div {
-    color: #14171A;
-    background-color: rgb(255,255,255);
-}
-/* 未添加灯油 */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1302"],
-#divStockList div.oilTypeData[data-oilcode="1302"] div.col1 > div {
-    color: #14171A;
-    background-color: rgb(221,245,253);
-}
 /* 軽油 */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1401"],
-#divStockList div.oilTypeData[data-oilcode="1401"] div.col1 > div {
+#divSuggestList div[data-title=suggestValue][data-oilcode="1401"], #divStockList div.oilTypeData[data-oilcode="1401"] div.col1 > div {
     background-color: rgb(0,176,80);
 }
 /* 3号軽油 */
-#divSuggestList div[data-title=suggestValue][data-oilcode="1404"],
-#divStockList div.oilTypeData[data-oilcode="1404"] div.col1 > div {
+#divSuggestList div[data-title=suggestValue][data-oilcode="1404"], #divStockList div.oilTypeData[data-oilcode="1404"] div.col1 > div {
     background-color: rgb(146,208,80);
 }
 /* A重油 */
-#divSuggestList div[data-title=suggestValue][data-oilcode="2101"],
-#divStockList div.oilTypeData[data-oilcode="2101"] div.col1 > div {
-    background-color: rgb(0,112,192);
+#divSuggestList div[data-title=suggestValue][data-oilcode="2101"], #divStockList div.oilTypeData[data-oilcode="2101"] div.col1 > div {
+    /*background-color: rgb(0,112,192);*/
+    background-color: rgb(0, 3, 194);
 }
 /* LSA */
-#divSuggestList div[data-title=suggestValue][data-oilcode="2201"],
-#divStockList div.oilTypeData[data-oilcode="2201"] div.col1 > div {
-    background-color: rgb(0,176,240);
+#divSuggestList div[data-title=suggestValue][data-oilcode="2201"], #divStockList div.oilTypeData[data-oilcode="2201"] div.col1 > div {
+    /*background-color: rgb(0,176,240);*/
+    background-color: rgb(240, 116, 0);
 }
 /* ****************** */
 /* 日付部分の土日編集 */
@@ -683,7 +750,6 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #divStockList div.dateItem div.week0 {
     background-color: red;
 }*/
-
 /* 曜日文言のみ塗りつぶしパターン */
 /* 土曜 */
 /*#divSuggestList div.suggestDate.week6 > span > span,
@@ -695,38 +761,54 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #divStockList div.dateItem div.week0 > span > span {
     color: red;
 }*/
-
 /* 列塗りつぶしパターン */
 /* 土曜 */
-#divSuggestList div.dataColumn.week6 > div.suggestDate,
-#divSuggestList div.dataColumn.week6 > div.values > div,
-#divStockList div.dateItem div.week6,
-#divStockList div.oilTypeData div.week6,
-#divStockList div.oilTypeData div.week6 > div{
+#divSuggestList div.dataColumn.week6 > div.suggestDate, #divSuggestList div.dataColumn.week6 > div.values > div, #divStockList div.dateItem div.week6, #divStockList div.oilTypeData div.week6, #divStockList div.oilTypeData div.week6 > div, #divStockList div.footer div.week6, #divStockList div.footer div.week6 > div {
     color: #14171A;
     background-color: rgb(189,215,238) !important;
 }
 /* 日曜祝日 */
-#divSuggestList div.dataColumn.week0 > div.suggestDate,
-#divSuggestList div.dataColumn.week0 > div.values > div,
-#divSuggestList div.dataColumn.holiday1 > div.suggestDate,
-#divSuggestList div.dataColumn.holiday1 > div.values > div,
-#divStockList div.dateItem div.week0,
-#divStockList div.oilTypeData div.week0,
-#divStockList div.oilTypeData div.week0 > div,
-#divStockList div.dateItem div.holiday1,
-#divStockList div.oilTypeData div.holiday1,
-#divStockList div.oilTypeData div.holiday1 > div {
+#divSuggestList div.dataColumn.week0 > div.suggestDate, #divSuggestList div.dataColumn.week0 > div.values > div, #divSuggestList div.dataColumn.holiday1 > div.suggestDate, #divSuggestList div.dataColumn.holiday1 > div.values > div, #divStockList div.dateItem div.week0, #divStockList div.oilTypeData div.week0, #divStockList div.oilTypeData div.week0 > div, #divStockList div.dateItem div.holiday1, #divStockList div.oilTypeData div.holiday1, #divStockList div.oilTypeData div.holiday1 > div,
+#divStockList div.footer div.week0, #divStockList div.footer div.week0 > div, #divStockList div.footer div.holiday1, #divStockList div.footer div.holiday1 > div {
     color: #14171A;
     background-color: rgb(248,203,173) !important;
+}
+/* チェックボックス背景色上書き */
+#divSuggestList div.dataColumn div.values div:nth-child(2) {
+    background-color: darkslategray !important;
+}
+/* ************************** */
+/* 提案表の日付増殖ボタン     */
+/* ************************** */
+.suggestDate > span.suggestDayAddRemove {
+    //display: inline-block;
+    display:none;
+    height: 14px;
+    width: 14px;
+    color: white !important;
+    font-weight: bolder;
+    margin-left: 10px;
+    cursor: pointer !important;
+}
+.suggestDateTest > span:after {
+    /* TODO これは初期値用 */
+    //display: inline-block;
+    display: none;
+    height: 14px;
+    width: 14px;
+    color: white !important;
+    content: "＋";
+    font-weight: bolder;
+    margin-left: 10px;
+    font-size: 14px;
+    overflow: visible;
+    cursor: pointer !important;
 }
 /* TIP表示 */
 [data-tiptext] {
     position: relative;
     display: inline-block;
-}
-
-[data-tiptext]::after {
+} [data-tiptext]::after {
     position: absolute;
     transition: all 0.3s ease 0s;
     opacity: 0;
@@ -742,8 +824,7 @@ div.oilTypeData div.col1 span[data-tiptext] {
     z-index:5;
     pointer-events:none;
     white-space:pre;
-}
-[data-tiptext]:hover::after {
+} [data-tiptext]:hover::after {
     top: 24px; /*HOVER位置*/
     opacity: 1;
 }
@@ -757,37 +838,25 @@ div.oilTypeData div.col1 span[data-tiptext] {
 /* IEはposition sticky未対応なのでそのまま */
 #divStockList > .header {
     position: sticky;
-    top: 26px;
+    top: 25px;
     z-index: 3;
-}
-
-_:-ms-lang(x)::backdrop,
-#divStockList > .header {
+} _:-ms-lang(x)::backdrop, #divStockList > .header {
     top: 36px;
-}
-
-#divStockList > .header > .emptyBox {
+} #divStockList > .header > .emptyBox {
     background-color:rgb(249,249,249);
-}
-#divSuggestList > .leftColumn {
+} #divSuggestList > .leftColumn {
     position:sticky;
     left:-10px;
     z-index:4;
-}
-#divSuggestList > .oilTypeColumn {
+} #divSuggestList > .oilTypeColumn {
     position: sticky;
     left: 70px;
     z-index: 3;
-}
-_:-ms-lang(x)::backdrop,
-#divSuggestList > .leftColumn {
+} _:-ms-lang(x)::backdrop, #divSuggestList > .leftColumn {
     left: 0;
-}
-_:-ms-lang(x)::backdrop,
-#divSuggestList > .oilTypeColumn {
+} _:-ms-lang(x)::backdrop, #divSuggestList > .oilTypeColumn {
     left: 80px;
-}
-#tblTitlebox tr:nth-child(2) td:nth-child(1) {
+} #tblTitlebox tr:nth-child(2) td:nth-child(1) {
     padding-left:0;
     font-weight:bold;
 }
@@ -799,8 +868,7 @@ _:-ms-lang(x)::backdrop,
 /* ************************ */
 #pnlSuggestList {
     margin-top:30px;
-}
-.actionButtonBox {
+} .actionButtonBox {
     margin: 0px;
     margin-top: -10px;
     margin-left: -10px;
@@ -822,24 +890,65 @@ _:-ms-lang(x)::backdrop,
     line-height: 17.5px;
     outline: none;
     font-size:11.5px;
-}
-#selHeadConsignee option {
+} #selHeadConsignee option {
     outline: none;
 }
 /* ************************ */
 /* ↑油槽所選択ここまで↑   */
 /* ************************ */
-
 /* ************************ */
 /* ポップアップ内コンテンツ */
 /* ************************ */
 div.popUpContents > div {
     margin-bottom:5px;
-}
-#txtReportFromDate,
-#txtReportToDate {
+} #txtReportFromDate, #txtReportToDate {
     width: 150px !important;
-}
-.calendarIconArea div {
+} .calendarIconArea div {
     margin-top:calc(100% - 14px) !important;
+}
+/* 変更された情報を押えるテキストボックススタイル */
+input[type=text].modified:not(:disabled) {
+    background-color:blue;
+    color:white;
+}
+/* リリース前なので隠す */
+#chkPrintConsigneeRep, #chkConsigneeRepDoubleSpan, #chkPrintConsigneeRep + label, #chkConsigneeRepDoubleSpan + label{
+    /*display: none !important;
+    width: 0;
+    height: 0;*/
+}
+form.mieReadOnly input:not([type=button]),
+form.mieReadOnly select {
+    pointer-events: none;
+    color: #888;
+    background-color: #dbdcdd;
+    border-width: 0px;
+    box-shadow: none;
+}
+form.mieReadOnly #pnlStockList #dispLorry,
+form.mieReadOnly #pnlStockList div.oilTypeData,
+form.mieReadOnly #pnlStockList div.headerDate,
+form.mieReadOnly #pnlStockList div.footer {
+    display: none;
+}
+form.mieReadOnly #pnlStockList div.emptyBox {
+    height:50px;
+}
+form.mieReadOnly #spnInventoryDays,
+form.mieReadOnly #WF_ButtonAUTOSUGGESTION,
+form.mieReadOnly #WF_ButtonORDERLIST,
+form.mieReadOnly #WF_ButtonINPUTCLEAR,
+form.mieReadOnly #WF_ButtonGETEMPTURN,
+form.mieReadOnly #WF_ButtonRECULC,
+form.mieReadOnly #WF_ButtonUPDATE,
+form.mieReadOnly #WF_ButtonReport,
+form.mieReadOnly .lockImgArea {
+    display: none !important;
+}
+form.mieReadOnly #pnlSuggestList #divSuggestList div.leftColumn div:nth-child(1) {
+    height: calc(24px * 2);
+}
+form.mieReadOnly #pnlSuggestList #divSuggestList > div.oilTypeColumn > div:nth-child(3),
+form.mieReadOnly #pnlSuggestList #divSuggestList > div.dataColumn > div.values > div:nth-child(2) {
+    display: none;
 }

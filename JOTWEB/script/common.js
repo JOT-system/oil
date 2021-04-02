@@ -168,9 +168,21 @@ window.addEventListener('DOMContentLoaded', function () {
     /* ************************************  */
     commonBindDblTapEvents();
     /* ************************************  */
+    /* OT空回連携情報ステータス行ハイライト  */
+    /* ************************************  */
+    commonSetHasCmpResultsInfoToHighlight();
+    /* ************************************  */
     /* 受注情報行ハイライト                  */
     /* ************************************  */
     commonSetHasOrderInfoToHighlight();
+    /* ************************************  */
+    /* 回送情報行ハイライト                  */
+    /* ************************************  */
+    commonSetHasKaisouInfoToHighlight();
+    /* ************************************  */
+    /* 受注進行ステータス行ハイライト        */
+    /* ************************************  */
+    commonSetHasOrderStatusToHighlight();
     /* ************************************  */
     /* カスタムポップアップ                  */
     /* ************************************  */
@@ -817,6 +829,37 @@ function f_ExcelPrint() {
     // リンク参照
     window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
 }
+// ○ダウンロード処理フォルダ固定でバッチでフォルダ指定ダウンロード(テスト用)
+// 対象[ダウンロードファイル名].batを生成し指定フォルダダウンロードバッチを作成する
+function f_ExcelPrintTsst() {
+    // リンク参照
+    let url = document.getElementById("WF_PrintURL").value;
+    // URLよりファイル名のみ抜き出し
+    let arr = url.split("/");
+    let fileName = arr[arr.length - 1];
+    // バッチコマンド生成
+    let textContents = "";
+    textContents = textContents + 'cd c:\r\n';
+    textContents = textContents + 'bitsadmin /transfer download \"' + url + '\" \"C:\\test\\' + fileName + '\"\r\n';
+    // コマンドテキストよりファイルBlob生成
+    var blob = new Blob([textContents], { "type": "text/plain" });
+    // ダウンロード処理実行
+    if (window.navigator.msSaveBlob) {
+        // ブラウザIEの場合こちらの分岐
+        window.navigator.msSaveBlob(blob, fileName + ".bat");
+        // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+        window.navigator.msSaveOrOpenBlob(blob, fileName + ".bat");
+    } else {
+        // ブラウザIE以外の場合はこちらの分岐
+        let downloadLink = document.createElement("a");
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.download = fileName + ".bat";
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+}
 
 function f_PDFPrint() {
     // リンク参照
@@ -1450,6 +1493,61 @@ function commonBindDblTapEvents() {
  * @return {undefined} なし
  * @description 左ボックステーブル表示のフィルタイベント
  */
+function commonSetHasCmpResultsInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'CMPRESULTSNAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '' || cellObj.textContent === '一致') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasCmpResultsInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasCmpResultsInfoValue');
+            ////ワーニング（黄色）判定
+            //if (cellObj.textContent === '検査間近有'
+            //    || cellObj.textContent === '前回黒油'
+            //    || cellObj.textContent === '前回揮発油'
+            //    || cellObj.textContent === '前回灯軽油') {
+            //    rightTableObj.rows[rowIdx].classList.add('warnInfo');
+            //    leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            //}
+        }
+    }
+}
 function commonSetHasOrderInfoToHighlight() {
     let generatedTables = document.querySelectorAll("div[data-generated='1']");
     if (generatedTables === null) {
@@ -1495,7 +1593,123 @@ function commonSetHasOrderInfoToHighlight() {
             rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             //ワーニング（黄色）判定
-            if (cellObj.textContent === '検査間近有' || cellObj.textContent === '前回揮発油') {
+            if (cellObj.textContent === '検査間近有'
+                || cellObj.textContent === '前回黒油'
+                || cellObj.textContent === '前回揮発油'
+                || cellObj.textContent === '前回灯軽油') {
+                rightTableObj.rows[rowIdx].classList.add('warnInfo');
+                leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            }
+        }
+    }
+}
+function commonSetHasKaisouInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let kaisouStatusFieldName = 'KAISOUINFONAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + kaisouStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '' || cellObj.textContent === '積置') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasKaisouInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasKaisouInfoValue');
+            //ワーニング（黄色）判定
+            if (cellObj.textContent === '検査間近有'
+                || cellObj.textContent === '前回黒油'
+                || cellObj.textContent === '前回揮発油'
+                || cellObj.textContent === '前回灯軽油') {
+                rightTableObj.rows[rowIdx].classList.add('warnInfo');
+                leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            }
+        }
+    }
+}
+
+/**
+ * 一覧表の受注進行ステータス列が存在する場合ハイライトする情報を仕込む(cssでハイライトは定義)
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonSetHasOrderStatusToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'ORDERSTATUSNAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent !== '受注受付' && cellObj.textContent !== '受注キャンセル') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            //ワーニング（黄色）判定
+            if (cellObj.textContent === '受注受付') {
                 rightTableObj.rows[rowIdx].classList.add('warnInfo');
                 leftTableObj.rows[rowIdx].classList.add('warnInfo');
             }
@@ -1884,6 +2098,24 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
                 inputObj.classList.add('boxIcon');
             }
         }
+        /* 削除アイコンの追加 */
+        if (inputObj.classList.contains('iconOnly') && inputObj.classList.contains('showDeleteIcon')) {
+            let delIconElm = document.createElement('div');
+            let delInputObjId = inputObj.id;
+            let delObjId = delInputObjId + 'commonDelIcon';
+            let delIconElmImage = document.createElement('div');
+            delIconElm.appendChild(delIconElmImage);
+            delIconElm.id = delObjId;
+            delIconElm.classList.add('delIconArea');
+            insertAfter(delIconElm, inputObj);
+            delIconElm = document.getElementById(delObjId);
+            delIconElm.addEventListener('click', (function (delInputObjId) {
+                return function () {
+                    commonDeleteIconClick(delInputObjId);
+                };
+            })(delInputObjId), false);
+        }
+        /* アイコンの追加 */
         let iconElm = document.createElement('div');
         let inputObjId = inputObj.id;
         let orgWidth = inputObj.scrollWidth;
@@ -1931,6 +2163,66 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
         //currentWidth = iconElm.getComputedStyle()
         inputObj.style.width = "calc(100% + 1px)";
     }
+}
+/**
+ * 指定したノードの後ろにエレメントを追加する
+ * @param {Element} newItem 追加するノード
+ * @param {Element} target 追加するノード
+ * @return {undefined} なし
+ */
+function insertAfter(newItem, target) {
+    target.parentNode.insertBefore(newItem, target.nextSibling);
+}
+/**
+ * 削除アイコン押下時処理
+ * @param {string} objId 削除ボタンを押下したテキストボックスID
+ * @return {undefined} なし
+ */
+function commonDeleteIconClick(objId) {
+    let txtObj = document.getElementById(objId);
+    let comTargetNameObj = document.getElementById('MF_CommonDeleteItemName');
+    let comTargetRowObj = document.getElementById('MF_CommonDeleteRow');
+    let comTargetListIdObj = document.getElementById('MF_CommonDeleteListId');
+    let btnClickObj = document.getElementById('WF_ButtonClick');
+    let submitObj = document.getElementById('MF_SUBMIT');
+    // 対象のオブジェクト群が存在しない場合そのまま終了
+    if (txtObj === null) {
+        return;
+    }
+    if (btnClickObj === null) {
+        return;
+    }
+    if (submitObj === null) {
+        return;
+    }
+    // サーバー処理実行中ならそのままスキップ
+    if (submitObj.value === "TRUE") {
+        return;
+    }
+    if (comTargetNameObj === null) {
+        return;
+    }
+    if (comTargetRowObj === null) {
+        return;
+    }
+    if (comTargetListIdObj === null) {
+        return;
+    }
+    
+    if (txtObj.hasAttribute("rownum")) {
+        // テキストボックスにrownumの属性を持つ場合は行内に描画されたリストと判定
+        let parentPanelObj = txtObj.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+        comTargetListIdObj.value = parentPanelObj.id;
+        comTargetRowObj.value = txtObj.getAttribute("rownum");
+        comTargetNameObj.value = txtObj.dataset.fieldName;
+    } else {
+        // 通常時はテキストボックスのID保持
+        comTargetNameObj.value = txtObj.id;
+    }
+    // サーバー処理呼出しのサブミット
+    submitObj.value = "TRUE";
+    btnClickObj.value = "WF_ComDeleteIconClick";
+    document.forms[0].submit();
 }
 /**
  * ポップアップの背面操作禁止を解除
@@ -2264,9 +2556,11 @@ function commonBindEnterToVerticalTabStep() {
             if (textBoxes.length === j + 1) {
                 // 最後のテキストボックスは先頭のフィールド
                 nextTextFieldName = textBoxes[0].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[0].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             } else if (textBoxes.length > j + 1) {
                 nextTextFieldName = textBoxes[j + 1].id.substring(("txt" + panelId).length);
+                lineCnt = textBoxes[j + 1].attributes.getNamedItem("rownum").value;
                 nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
             }
 

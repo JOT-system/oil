@@ -1041,17 +1041,24 @@ Public Class OIM0002OrgCreate
 
             OIM0002INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0002row As DataRow In OIM0002tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0002row("CAMPCODE") = OIM0002INProw("CAMPCODE") AndAlso
-                    OIM0002row("ORGCODE") = OIM0002INProw("ORGCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    OIM0002row("ORGCODE") = OIM0002INProw("ORGCODE") AndAlso
+                    OIM0002row("STYMD") = OIM0002INProw("STYMD") Then
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0002row("DELFLG") = OIM0002INProw("DELFLG") AndAlso
-                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0002row("ENDYMD") = OIM0002INProw("ENDYMD") AndAlso
+                        OIM0002row("NAME") = OIM0002INProw("NAME") AndAlso
+                        OIM0002row("NAMES") = OIM0002INProw("NAMES") AndAlso
+                        OIM0002row("NAMEKANA") = OIM0002INProw("NAMEKANA") AndAlso
+                        OIM0002row("NAMEKANAS") = OIM0002INProw("NAMEKANAS") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0002INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1088,7 +1095,8 @@ Public Class OIM0002OrgCreate
 
             '同一レコードか判定
             If OIM0002INProw("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
-                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") Then
+                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") AndAlso
+                OIM0002INProw("STYMD") = OIM0002row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0002INProw("LINECNT") = OIM0002row("LINECNT")
                 OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -1143,7 +1151,8 @@ Public Class OIM0002OrgCreate
 
             '同一レコードか判定
             If OIM0002INProw("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
-               OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") Then
+                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") AndAlso
+                OIM0002INProw("STYMD") = OIM0002row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0002INProw("LINECNT") = OIM0002row("LINECNT")
                 OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED

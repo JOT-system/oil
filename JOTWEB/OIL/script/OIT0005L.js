@@ -76,6 +76,82 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    // 修理フラグ
+    var chkObjsLight5 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaREPAIRFLG']");
+    var spnObjsLight5 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaREPAIRFLG']");
+
+    for (let i = 0; i < chkObjsLight5.length; i++) {
+
+        if (chkObjsLight5[i] !== null) {
+            if (spnObjsLight5[i].innerText === "on") {
+                chkObjsLight5[i].checked = true;
+            } else {
+                chkObjsLight5[i].checked = false;
+            }
+        }
+    }
+
+    // ＭＣフラグ
+    var chkObjsLight6 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaMCFLG']");
+    var spnObjsLight6 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaMCFLG']");
+
+    for (let i = 0; i < chkObjsLight6.length; i++) {
+
+        if (chkObjsLight6[i] !== null) {
+            if (spnObjsLight6[i].innerText === "on") {
+                chkObjsLight6[i].checked = true;
+            } else {
+                chkObjsLight6[i].checked = false;
+            }
+        }
+    }
+
+    // 全検フラグ
+    var chkObjsLight7 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaALLINSPECTIONFLG']");
+    var spnObjsLight7 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaALLINSPECTIONFLG']");
+
+    for (let i = 0; i < chkObjsLight7.length; i++) {
+
+        if (chkObjsLight7[i] !== null) {
+            if (spnObjsLight7[i].innerText === "on") {
+                chkObjsLight7[i].checked = true;
+            } else {
+                chkObjsLight7[i].checked = false;
+            }
+        }
+    }
+
+    // 留置フラグ
+    var chkObjsLight8 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINDWELLINGFLG']");
+    var spnObjsLight8 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINDWELLINGFLG']");
+
+    for (let i = 0; i < chkObjsLight8.length; i++) {
+
+        if (chkObjsLight8[i] !== null) {
+            if (spnObjsLight8[i].innerText === "on") {
+                chkObjsLight8[i].checked = true;
+            } else {
+                chkObjsLight8[i].checked = false;
+            }
+        }
+    }
+
+    // 移動フラグ
+    var chkObjsLight9 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaALLMOVEFLG']");
+    var spnObjsLight9 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaALLMOVEFLG']");
+
+    for (let i = 0; i < chkObjsLight9.length; i++) {
+
+        if (chkObjsLight9[i] !== null) {
+            if (spnObjsLight9[i].innerText === "on") {
+                chkObjsLight9[i].checked = true;
+            } else {
+                chkObjsLight9[i].checked = false;
+            }
+        }
+    }
+
 }
 
 // ○チェックボックス選択
@@ -117,7 +193,10 @@ function ListField_Dbclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
 
         if (fieldNM === "ORDER_ACTUALACCDATE"
-            || fieldNM === "ORDER_ACTUALEMPARRDATE") {
+            || fieldNM === "ORDER_ACTUALEMPARRDATE"
+            || fieldNM === "KAISOU_ACTUALEMPARRDATE"
+            || fieldNM === "JRINSPECTIONDATE"
+            || fieldNM === "JRALLINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

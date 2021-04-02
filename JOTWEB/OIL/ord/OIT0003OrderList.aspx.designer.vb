@@ -239,6 +239,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents WF_BUTTONofficecode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''lblReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportDateNowChk As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''chkReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkReportDateNowChk As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''lblReportLodDate コントロール。
     '''</summary>
     '''<remarks>
@@ -284,24 +302,6 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbDeliveryCSVBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
-    '''rbLoadBtn コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
-    
-    '''<summary>
-    '''rbOTLoadBtn コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents rbOTLoadBtn As Global.System.Web.UI.WebControls.RadioButton
-    
-    '''<summary>
     '''rbShipBtn コントロール。
     '''</summary>
     '''<remarks>
@@ -311,13 +311,13 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbShipBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
-    '''rbLineBtn コントロール。
+    '''rbFillingPointBtn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rbLineBtn As Global.System.Web.UI.WebControls.RadioButton
+    Protected WithEvents rbFillingPointBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rbKinoeneLoadBtn コントロール。
@@ -338,6 +338,132 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbNegishiLoadBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''rbActualLoad10Btn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbActualLoad10Btn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbActualLoad20Btn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbActualLoad20Btn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbLineBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbLineBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbKuukaiBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbKuukaiBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbOTLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbOTLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbTankDispatchBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbTankDispatchBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbTankDispatch30Btn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbTankDispatch30Btn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbTankDispatch40Btn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbTankDispatch40Btn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbTankDispatch54Btn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbTankDispatch54Btn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbShipContactBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbShipContactBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbActualShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbActualShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbConcatOederBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbConcatOederBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''divRTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divRTrainNo As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''lblReportRTrainNo コントロール。
     '''</summary>
     '''<remarks>
@@ -354,6 +480,60 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''divTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divTrainNo As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''lblReportTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportTrainNo As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''divEndMonthChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divEndMonthChk As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''lblEndMonthChkDmy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblEndMonthChkDmy As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''ChkEndMonthChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkEndMonthChk As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''Master プロパティ。

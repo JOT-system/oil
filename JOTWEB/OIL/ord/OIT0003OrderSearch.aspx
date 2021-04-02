@@ -65,7 +65,7 @@
                 <a id="WF_DATE_SYMBOL"><span>～</span></a>
             </div>
             <!-- 発日 -->
-            <div class="inputItem">
+            <div class="inputItem" style="display:none;">
                 <a id="WF_DEPDATE_LABEL">(予定)発日</a>
                 <a class="ef" id="WF_DEPDATE" ondblclick="Field_DBclick('TxtDepDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="TxtDepDateStart" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
@@ -97,6 +97,12 @@
                 </a>
                 <a id="WF_STATUS_TEXT" >
                     <asp:Label ID="LblStatusName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+            <!-- 受注キャンセルフラグ -->
+            <div class="inputItem">
+                <a id="WF_ORDERCANCELFLG">
+                    <asp:CheckBox ID="ChkOrderCancelFlg" runat="server" Text="受注キャンセルを含む" />
                 </a>
             </div>
         </div>

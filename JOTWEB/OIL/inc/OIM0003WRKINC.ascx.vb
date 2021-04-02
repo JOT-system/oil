@@ -38,7 +38,7 @@ Public Class OIM0003WRKINC
     ''' <param name="I_SALESOFFICEPT"></param>
     ''' <returns></returns>
     ''' <remarks>全て</remarks>
-    Function CreateSALESOFFICEParam(ByVal I_COMPCODE As String, ByVal I_SALESOFFICEPT As String) As Hashtable
+    Function CreateSALESOFFICEParam(ByVal I_COMPCODE As String, Optional ByVal I_SALESOFFICEPT As String = "") As Hashtable
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
         prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT

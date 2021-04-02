@@ -31,7 +31,7 @@ Public Class OIT0007FileInputList
     ''' </summary>
     ''' <returns></returns>
     Public Property AcceptExtentions As String = ""
-
+    Public Property ShowUpdConfirm As String = ""
     ''' <summary>
     ''' ページロード時
     ''' </summary>
@@ -40,13 +40,39 @@ Public Class OIT0007FileInputList
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             If IsPostBack Then
+                If Me.hdnUpdateConfirmIsActive.Value <> "1" Then
+                    Me.ShowUpdConfirm = ""
+                    Me.repUpdateList.DataSource = Nothing
+                    Me.repUpdateList.DataBind()
+                    ViewState("VS_OUTPUTINFO") = Nothing
+                Else
+                    ShowUpdConfirm = "showUpdConfirm"
+                End If
+
                 '添付ファイルアップロード処理
                 If Me.WF_FILENAMELIST.Value <> "" Then
                     'Dim retMes = UploadAttachments()
                     'If retMes.MessageNo <> C_MESSAGE_NO.NORMAL Then
                     '    Master.Output(retMes.MessageNo, C_MESSAGE_TYPE.ERR, retMes.Pram01, needsPopUp:=True)
                     'End If
+                    Dim outPutInfo = FileUploaded()
+                    outPutInfo = GetOrderUpdateOrderInfo(outPutInfo)
+
                     Me.WF_FILENAMELIST.Value = ""
+                    '○ 一覧再表示処理
+                    Master.RecoverTable(OIT0007tbl)
+                    DisplayGrid()
+                    'TODO outPutInfoの数が0なら対象外ファイルを上げたと想定
+                    If outPutInfo Is Nothing OrElse outPutInfo.Count = 0 Then
+                        Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ERR, "正しい出荷実績ファイルをアップロードしてください。", needsPopUp:=True)
+                        Return
+                    End If
+                    '更新確認に値を設定
+                    Me.repUpdateList.DataSource = outPutInfo
+                    Me.repUpdateList.DataBind()
+                    ViewState("VS_OUTPUTINFO") = outPutInfo
+                    Me.hdnUpdateConfirmIsActive.Value = "1"
+                    ShowUpdConfirm = "showUpdConfirm"
                 End If
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
@@ -85,6 +111,9 @@ Public Class OIT0007FileInputList
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "WF_ButtonUpadteAmount"    '(更新ボタン押下時)
+                            WF_ButtonUpadteAmount_Click()
+
                     End Select
 
                     '○ 一覧再表示処理
@@ -111,7 +140,11 @@ Public Class OIT0007FileInputList
             End If
             Dim flp As New FileLinkagePattern
             Dim settings = flp(work.WF_SEL_SALESOFFICECODE.Text)
-            Dim ext = (From itm In settings.InputExtention.Split(","c) Select """" & itm & """")
+            Dim inputExt As String = settings.InputExtention
+            If inputExt = "xlsx" Then
+                inputExt = inputExt & ",xls"
+            End If
+            Dim ext = (From itm In inputExt.Split(","c) Select """" & itm & """")
             If ext.Any Then
                 Me.AcceptExtentions = String.Join(",", ext)
             End If
@@ -383,7 +416,7 @@ Public Class OIT0007FileInputList
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "   AND (    OIT0002.LODDATE     >= @TODAY" _
             & "         OR OIT0002.DEPDATE     >= @TODAY) "
 
         '★積置フラグ有り用SQL
@@ -483,7 +516,7 @@ Public Class OIT0007FileInputList
                         OIT0007row("CAN_OTSEND") = "0"
                     End If
                     '出荷予約出力可否(積日 >= 翌日)
-                    If Convert.ToString(OIT0007row("LODDATE")) >= targetDate Then
+                    If Convert.ToString(OIT0007row("LODDATE")) >= today Then
                         OIT0007row("CAN_RESERVED") = "1"
                     Else
                         OIT0007row("CAN_RESERVED") = "0"
@@ -601,7 +634,102 @@ Public Class OIT0007FileInputList
         '○ 画面表示データ保存
         Master.SaveTable(OIT0007tbl)
     End Sub
+    ''' <summary>
+    ''' ポップアップの更新ボタン押下時
+    ''' </summary>
+    Protected Sub WF_ButtonUpadteAmount_Click()
+        Dim updList = CollectScreenValue()
+        'チェックボックスの値が１件もない場合
+        Dim qChkItm = From itm In updList Where itm.InputCheck = True
+        '１件もチェックがない場合は終了
+        If qChkItm.Any = False Then
+            Master.Output(C_MESSAGE_NO.SELECT_DETAIL_ERROR, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+            Me.repUpdateList.DataSource = updList
+            Me.repUpdateList.DataBind()
+            Return
+        End If
+        Dim chkItems = qChkItm.ToList
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                Dim procDate As Date = Now
+                Dim resProc As Boolean = False
+                Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                    '数量更新
+                    UpdateOrderDetailAmount(chkItems, SQLcon, sqlTran, procDate)
+                    Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                    If historyNo = "" Then
+                        Return
+                    End If
+                    '履歴テーブル登録
+                    Dim orderTbl As DataTable = GetUpdatedOrder(chkItems, SQLcon, sqlTran)
+                    Dim detailTbl As DataTable = GetUpdatedOrderDetail(chkItems, SQLcon, sqlTran)
+                    If detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                        Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
 
+                        For Each dr As DataRow In hisDetailTbl.Rows
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                        Next
+                        'ジャーナル登録
+                        OutputJournal(detailTbl, "OIT0003_DETAIL")
+                    End If
+                    'ここまで来たらコミット
+                    sqlTran.Commit()
+                End Using
+            End Using
+            Me.hdnUpdateConfirmIsActive.Value = ""
+            Me.ShowUpdConfirm = ""
+            Me.repUpdateList.DataSource = Nothing
+            Me.repUpdateList.DataBind()
+            ViewState("VS_OUTPUTINFO") = Nothing
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            Return
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, Me.Title)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "WF_ButtonUpadteAmount_Click"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        End Try
+    End Sub
+    ''' <summary>
+    ''' 画面上のチェックボックスの値を収集しリストの一覧データを返却
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function CollectScreenValue() As List(Of InputDataItem)
+        Dim retValue As New List(Of InputDataItem)
+        retValue = DirectCast(ViewState("VS_OUTPUTINFO"), List(Of InputDataItem))
+        'そもそも一覧表示が無ければこれ以降の処理の意味が無い為終了
+        If retValue Is Nothing OrElse retValue.Count = 0 Then
+            Return retValue
+        End If
+        Dim hdnIdxObj As HiddenField = Nothing
+        Dim checkBoxObj As CheckBox = Nothing
+        For Each repItm As RepeaterItem In repUpdateList.Items
+            hdnIdxObj = DirectCast(repItm.FindControl("hdnUpdIndex"), HiddenField)
+            checkBoxObj = DirectCast(repItm.FindControl("chkUpdate"), CheckBox)
+            If hdnIdxObj Is Nothing OrElse checkBoxObj Is Nothing Then
+                Continue For
+            End If
+            If IsNumeric(hdnIdxObj.Value) = False Then
+                Continue For
+            End If
+            Dim idx As Integer = CInt(hdnIdxObj.Value)
+            With retValue.Item(idx)
+                .InputCheck = checkBoxObj.Checked
+            End With
+        Next
+        Return retValue
+    End Function
     ''' <summary>
     ''' 受注履歴テーブル用の履歴番号取得
     ''' </summary>
@@ -651,13 +779,12 @@ Public Class OIT0007FileInputList
     End Function
 
     ''' <summary>
-    ''' 受注・受注明細テーブルの各出力フラグ及び、カウントをインクリメント
+    ''' 受注明細の実績値を更新
     ''' </summary>
     ''' <param name="uploadOrderInfo">出力した受注キー情報</param>
-    ''' <param name="callerButton">呼出し元ボタン</param>
     ''' <param name="sqlCon">SQL接続</param>
     ''' <param name="sqlTran">トランザクション</param>
-    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False) As Boolean
+    Private Function UpdateOrderDetailAmount(uploadOrderInfo As List(Of InputDataItem), sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
         Try
 
             Dim sqlStat As StringBuilder
@@ -665,43 +792,22 @@ Public Class OIT0007FileInputList
                 procDate = Now
             End If
 
-            '選択済の画面の行データ取得
-            Dim checkedRow As DataTable = (From dr As DataRow In OIT0007tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
-
-            '選択した受注No、積込日と合致する明細行のインクリメント
-            'アップロード方式によりインクリメントフィールドを変更
-            Dim incFieldName As String = ""
-            Select Case callerButton
-                Case "WF_ButtonOtSend" 'OT発送日報出力
-                    incFieldName = "OTSENDCOUNT"
-                Case "WF_ButtonReserved" '製油所出荷予約
-                    incFieldName = "DLRESERVEDCOUNT"
-                Case "WF_ButtonTakusou" '託送指示
-                    incFieldName = "DLTAKUSOUCOUNT"
-                Case Else
-                    Throw New Exception("想定外のボタンが押されました")
-            End Select
             sqlStat = New StringBuilder
             sqlStat.AppendLine("UPDATE OIL.OIT0003_DETAIL")
-            sqlStat.AppendFormat("   SET {0} = ISNULL({0},0) + 1", incFieldName).AppendLine()
-            If updateReservedNo Then
-                sqlStat.AppendLine("       ,RESERVEDNO         = @RESERVEDNO")
-            End If
-            sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
-            sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
-            sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
-            sqlStat.AppendLine("       ,RECEIVEYMD         = @RECEIVEYMD")
+            sqlStat.AppendLine("   SET  CARSAMOUNT = @CARSAMOUNT")
+            sqlStat.AppendLine("       ,UPDYMD     = @UPDYMD")
+            sqlStat.AppendLine("       ,UPDUSER    = @UPDUSER")
+            sqlStat.AppendLine("       ,UPDTERMID  = @UPDTERMID")
+            sqlStat.AppendLine("       ,RECEIVEYMD = @RECEIVEYMD")
             sqlStat.AppendLine(" WHERE ORDERNO  = @ORDERNO")
             sqlStat.AppendLine("   AND DETAILNO = @DETAILNO")
             sqlStat.AppendLine("   AND DELFLG   = @DELFLG") 'ここまで来て削除フラグ1はありえないが念の為
 
             For Each orderKey In uploadOrderInfo
                 Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+
                     With sqlCmd.Parameters
-                        '値
-                        If updateReservedNo Then
-                            .Add("@RESERVEDNO", SqlDbType.NVarChar).Value = orderKey.ReservedNo
-                        End If
+                        .Add("@CARSAMOUNT", SqlDbType.Decimal).Value = CDec(orderKey.InpCarsAmount)
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
                         .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
                         .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
@@ -716,10 +822,10 @@ Public Class OIT0007FileInputList
             Next orderKey
             Return True
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0007L INCREMENT_OUTPUT_CNT", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0007L UPDATE_ORDERDETAIL", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0007L INCREMENT_OUTPUT_CNT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0007L UPDATE_ORDERDETAIL"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -907,7 +1013,7 @@ Public Class OIT0007FileInputList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrderDetail(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Private Function GetUpdatedOrderDetail(uploadOrderInfo As List(Of InputDataItem), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder
@@ -962,7 +1068,7 @@ Public Class OIT0007FileInputList
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <returns></returns>
-    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of InputDataItem), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
         Dim retDt As New DataTable
         Try
             Dim sqlStat = New StringBuilder
@@ -1195,7 +1301,403 @@ Public Class OIT0007FileInputList
         TBLview = Nothing
 
     End Sub
+    ''' <summary>
+    ''' ファイルアップロード時イベント
+    ''' </summary>
+    Private Function FileUploaded() As List(Of InputDataItem)
+        Dim retItem As New List(Of InputDataItem)
+        Dim uploadFiles As List(Of AttachmentFile)
+        Dim tp As Type = GetType(List(Of AttachmentFile))
+        Dim serializer As New Runtime.Serialization.Json.DataContractJsonSerializer(tp)
+        Dim flp As New FileLinkagePattern
+        Dim settings = flp(work.WF_SEL_SALESOFFICECODE.Text)
+        Try
+            'アップロードワークフォルダ
+            Dim uploadWorkDir = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, "UPLOAD_TMP", CS0050SESSION.USERID)
+            If Not IO.Directory.Exists(uploadWorkDir) Then
+                Return Nothing
+            End If
 
+            Using stream As New IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(Me.WF_FILENAMELIST.Value))
+                uploadFiles = DirectCast(serializer.ReadObject(stream), List(Of AttachmentFile))
+            End Using
+            Dim uploadFilePath As String = IO.Path.Combine(uploadWorkDir, uploadFiles(0).FileName)
+            If {"xls", "xlsx"}.Contains(settings.InputExtention) Then
+                Using excelReadObj As New OIT0007InputExcel(settings, uploadFilePath)
+                    retItem = excelReadObj.ReadExcel()
+                End Using
+            Else
+                Using csvReadObj As New OIT0007InputCsv(settings, uploadFilePath)
+                    retItem = csvReadObj.ReadCsv()
+                End Using
+            End If
+        Catch ex As Exception
+            Return Nothing
+        End Try
+        Return retItem
+    End Function
+    ''' <summary>
+    ''' オーダー情報付与
+    ''' </summary>
+    ''' <param name="inpData"></param>
+    ''' <returns></returns>
+    Private Function GetOrderUpdateOrderInfo(inpData As List(Of InputDataItem)) As List(Of InputDataItem)
+        If inpData Is Nothing OrElse inpData.Count = 0 Then
+            '0件の場合はやる意味がないので終了
+            Return inpData
+        End If
+
+        Dim retVal = inpData
+        '*********************************************
+        '予約番号、積込予定日を元に受注データを取得
+        '*********************************************
+        Dim dt = ReservedDataGet(retVal)
+        '*********************************************
+        'アップロードデータに受注情報を付与
+        '*********************************************
+        For Each retItm In retVal
+            '予約番号未設定
+            If retItm.ReservedNo = "" Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.NoReservedNo
+                Continue For
+            End If
+            '抽出結果を検索
+            If dt Is Nothing Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.NoOrderInfo
+                Continue For
+            End If
+            '↓2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            'Dim query = (From dr As DataRow In dt Where dr("RESERVEDNO").Equals(retItm.ReservedNo) AndAlso dr("LODDATE").Equals(retItm.LodDate))
+            '↑2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+
+            '↓2021/03 --- 並行稼働用の予約番号マッチング
+            Dim fieldSettings = (From itm In {
+                                     New With {Key .office = "011201", .oilField = "SHIPPEROILCODE", .tankField = "SEQ_TANKNO"},
+                                     New With {Key .office = "012401", .oilField = "SHIPPEROILCODE", .tankField = "SEQ_TANKNO"},
+                                     New With {Key .office = "011202", .oilField = "REPORTOILNAME", .tankField = "KINO_TRAINNO"},
+                                     New With {Key .office = "011203", .oilField = "REPORTOILNAME", .tankField = "OLDTANKNUMBER"},
+                                     New With {Key .office = "011402", .oilField = "NEG_SHIPPEROILCODE", .tankField = "NEG_KASHANO"}
+                                     }).ToDictionary(Function(x) x.office, Function(x) x)
+            Dim fieldSetting = fieldSettings(work.WF_SEL_SALESOFFICECODE.Text)
+            Dim query = (From dr As DataRow In dt Where dr(fieldSetting.oilField).Equals(retItm.InpOilTypeName) AndAlso dr(fieldSetting.tankField).Equals(retItm.InpTnkNo) AndAlso dr("LODDATE").Equals(retItm.LodDate))
+            '↑2021/03 --- 並行稼働用の予約番号マッチング
+            If query.Any = False Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.NoOrderInfo
+                Continue For
+            End If
+            Dim targetRows = query.ToList
+            'ありえないが同一予約番号、積込予定日で複数件マッチした場合
+            If targetRows.Count > 1 Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.TooMenyOrderInfo
+                '念のためカンマ区切りで受注番号、明細番号保持
+                retItm.OrderNo = String.Join(",", From dr In targetRows Select Convert.ToString(dr("ORDERNO")))
+                retItm.DetailNo = String.Join(",", From dr In targetRows Select Convert.ToString(dr("DETAILNO")))
+                Continue For
+            End If
+            Dim targetRow = targetRows(0)
+            'ここから値転送
+            retItm.DbReservedNo = Convert.ToString(targetRow("RESERVEDNO"))
+            retItm.OrderNo = Convert.ToString(targetRow("ORDERNO"))
+            retItm.DetailNo = Convert.ToString(targetRow("DETAILNO"))
+            retItm.CarsAmount = Convert.ToString(targetRow("CARSAMOUNT"))
+            retItm.CarsAmount = Convert.ToString(targetRow("CARSAMOUNT"))
+            retItm.OilName = Convert.ToString(targetRow("OILNAME"))
+            retItm.TankNo = Convert.ToString(targetRow("TANKNO"))
+            retItm.DbLodDate = Convert.ToString(targetRow("LODDATE"))
+            retItm.DepDate = Convert.ToString(targetRow("DEPDATE"))
+            retItm.TrainNo = Convert.ToString(targetRow("TRAINNO"))
+            retItm.OrderStatus = Convert.ToString(targetRow("ORDERSTATUS_NAME"))
+            '受注情報とファイルを比較するため営業所により異なる設定の油種、及び貨車番号を取得
+            Dim oilName As String = ""
+            Dim tankNo As String = ""
+            Select Case work.WF_SEL_SALESOFFICECODE.Text
+                Case "011202"
+                    '甲子
+                    oilName = Convert.ToString(targetRow("REPORTOILNAME"))
+                    tankNo = Convert.ToString(targetRow("KINO_TRAINNO"))
+                Case "011402"
+                    '根岸
+                    oilName = Convert.ToString(targetRow("NEG_SHIPPEROILCODE"))
+                    tankNo = Convert.ToString(targetRow("NEG_KASHANO"))
+                Case "011203"
+                    '袖ヶ浦
+                    oilName = Convert.ToString(targetRow("REPORTOILNAME"))
+                    tankNo = Convert.ToString(targetRow("OLDTANKNUMBER"))
+                Case "011201", "012401"
+                    '五井、四日市
+                    oilName = Convert.ToString(targetRow("SHIPPEROILCODE"))
+                    tankNo = Convert.ToString(targetRow("SEQ_TANKNO"))
+            End Select
+
+            '油種不一致チェック
+            '取り込んだファイルと比較不一致なら油種不一致
+            If Not retItm.InpOilTypeName = oilName Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OilUnMatch
+                Continue For
+            End If
+            '車番チェック
+            If Not retItm.InpTnkNo = tankNo Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.TankUnmatch
+                Continue For
+            End If
+            '受注ステータスチェック(200：手配～310：手配完了の間であること）
+            If Not (Convert.ToString(targetRow("ORDERSTATUS")) >= BaseDllConst.CONST_ORDERSTATUS_200 AndAlso
+                    Convert.ToString(targetRow("ORDERSTATUS")) <= BaseDllConst.CONST_ORDERSTATUS_310) Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusCannotAccept
+                If Convert.ToString(targetRow("ORDERSTATUS")) = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                    retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusCancel
+                ElseIf Convert.ToString(targetRow("ORDERSTATUS")) < BaseDllConst.CONST_ORDERSTATUS_200 Then
+                    retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OrderStatusBackToBefore200
+                End If
+                Continue For
+            End If
+            '出荷実績0チェック
+            If IsNumeric(retItm.InpCarsAmount) AndAlso CDec(retItm.InpCarsAmount) = 0 Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.AmountZero
+            End If
+            'ここまで来てチェック状態が初期なら更新可能
+            If retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.InitVal Then
+                retItm.CheckReadonCode = InputDataItem.CheckReasonCodes.OK
+                retItm.InputCheck = True
+            End If
+        Next
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 出荷予約データを取得
+    ''' </summary>
+    ''' <returns>処理対象の受注Noと明細No</returns>
+    ''' <remarks>このロジックにたどりつけるのは積置無しのみ、積置を許容するなら要修正</remarks>
+    Private Function ReservedDataGet(inpData As List(Of InputDataItem)) As DataTable
+        '当処理の抽出結果の全フィールドを帳票に出すわけではない
+        Dim retDt As New DataTable
+        Dim retVal As New List(Of OutputOrdedrInfo)
+
+        Dim sqlStat As New StringBuilder
+
+        sqlStat.AppendLine("SELECT ODR.ORDERNO")            'キー情報
+        sqlStat.AppendLine("     , DET.DETAILNO")           'キー情報
+        sqlStat.AppendLine("     , ODR.OFFICECODE AS OFFICECODE")     '営業所コード
+        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS LODDATE")     '積込日
+        sqlStat.AppendLine("     , format(ODR.DEPDATE,'yyyy/MM/dd') AS DEPDATE")     '発日
+        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyyMMdd') AS LODDATE_WITHOUT_SLASH")     '積込日(スラなし）
+        sqlStat.AppendLine("     , ISNULL(DET.RESERVEDNO,'')        AS RESERVEDNO")  '予約番号
+        sqlStat.AppendLine("     , PRD.REPORTOILNAME")            '油種コード(甲子用？）
+        sqlStat.AppendLine("     , LRV.RESERVEDQUANTITY")         '予約数量
+        sqlStat.AppendLine("     , ODR.TRAINNO")
+        sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4) AS TRAINNO_PAD_ZERO")
+        sqlStat.AppendLine("     , DET.TANKNO")
+        sqlStat.AppendLine("     , TNK.MODEL")  'モデル⇒ﾀｷ1000の場合・・・など後続の設定処理の分岐で利用
+        sqlStat.AppendLine("     , TNK.OLDTANKNUMBER") '旧JOT車番
+        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE") '荷主油種コード
+        sqlStat.AppendLine("     , PRD.SHIPPEROILNAME") '荷主油種名
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO")
+        sqlStat.AppendLine("     , ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("     , ODR.CONSIGNEECODE")
+        sqlStat.AppendLine("     , CCNV.VALUE01 AS CONSIGNEECONVCODE")
+        sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
+        sqlStat.AppendLine("     , CCNV.VALUE03 AS TRANSNAME") '便名 現状袖ヶ浦のみ
+        sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
+        sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
+
+        'sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) between 1 and 999 THEN '1000-' + RIGHT('000' + DET.TANKNO,3) ")
+        'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ1000' AND convert(int,DET.TANKNO) >= 1000           THEN '1001-' + RIGHT(DET.TANKNO,3)  ")
+        'sqlStat.AppendLine("            ELSE DET.TANKNO END AS NEG_KASHANO")
+        sqlStat.AppendLine("     , TNK.JXTGTANKNUMBER4 AS NEG_KASHANO")
+
+        sqlStat.AppendLine("     , RIGHT('00000' + convert(nvarchar,convert(int,PRD.SHIPPEROILCODE)),5) AS NEG_SHIPPEROILCODE")
+
+
+
+        sqlStat.AppendLine("     , substring(isnull(PRD.SHIPPEROILCODE,''),1,5) + '0000' AS SOD_SHIPPEROILCODE") '袖ヶ浦輸送方法
+        sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '課税' ELSE 'その他' END AS SOD_TAX_KBN") '袖ヶ浦課税区分
+        sqlStat.AppendLine("     , format(LRV.RESERVEDQUANTITY,'#0.000') AS SOD_RESERVEDQUANTITY")    '袖ヶ浦用_予約数量
+        sqlStat.AppendLine("     , ODR.ORDERSTATUS")
+        sqlStat.AppendLine("     , FXOST.VALUE1   AS ORDERSTATUS_NAME")
+        sqlStat.AppendLine("     , DET.CARSAMOUNT ")
+        sqlStat.AppendLine("     , PRD.OILNAME ")
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '06' ELSE '08' END AS SEQ_DEPT_CODE") 'シーケンスファイル支店コード
+        sqlStat.AppendLine("     , '03'         AS SEQ_TORIKBN") 'シーケンスファイル取引区分コード
+        sqlStat.AppendLine("     , '00000'         AS SEQ_TOKUISAKI") 'シーケンスファイル得意先コード
+        sqlStat.AppendLine("     , format(ODR.ARRDATE,'yyyyMMdd') AS ARRDATE_WITHOUT_SLASH")     '積車着日(スラなし）
+        sqlStat.AppendLine("     , CASE WHEN PRD.MIDDLEOILCODE = '1' THEN '1' ELSE '0' END AS SEQ_TAX_KBN")     'シーケンスファイル課税区分
+        sqlStat.AppendLine("     , '010'         AS SEQ_NISCODE") 'シーケンスファイル荷姿コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '0011'  ELSE '0012' END AS SEQ_UKEHARAI_CODE") 'シーケンスファイル受払い基地コード
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '01000' ELSE '99999' END AS SEQ_ORDERAMOUNT") 'シーケンスファイルオーダー数量
+        sqlStat.AppendLine("     , '1'           AS SEQ_TRANSWAY") 'シーケンスファイル輸送方法
+        sqlStat.AppendLine("     , CASE WHEN TRA.TRAINCLASS = 'O'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND DET.OTTRANSPORTFLG = '1'")
+        sqlStat.AppendLine("                 THEN '023'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '011201'")
+        sqlStat.AppendLine("                 THEN '022'")
+        sqlStat.AppendLine("            WHEN TRA.TRAINCLASS = 'J' AND ODR.OFFICECODE = '012401'")
+        sqlStat.AppendLine("                 THEN '017'")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_GYOUSYACODE") 'シーケンス業者コード
+        'sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' OR TNK.MODEL = 'タキ43000'")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + TNK.TANKNUMBER,6)")
+        'sqlStat.AppendLine("            WHEN TNK.MODEL = 'タキ243000'")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        'sqlStat.AppendLine("            ELSE '000000'")
+        'sqlStat.AppendLine("             END")
+        'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
+        sqlStat.AppendLine("             END")
+        sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
+        sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
+        sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
+        sqlStat.AppendLine("     , '00000' AS SEQ_ACCTUAL_AMOUNT") 'シーケンス実績数量
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_BEGIN_TIME") 'シーケンス荷役開始時刻
+        sqlStat.AppendLine("     , '0000'  AS SEQ_NIYAKU_END_TIME") 'シーケンス荷役終了時刻
+        sqlStat.AppendLine("     , RIGHT('0000' + ODR.TRAINNO,4)  AS SEQ_TRAINNO") 'シーケンス列車番号
+        sqlStat.AppendLine("     , ''  AS SEQ_TOKUISAKI_KANA") 'シーケンス得意先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HAISOU_KANA") 'シーケンス配送先名（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_HINMEI_KANA") 'シーケンス品名コード（略称カナ）
+        sqlStat.AppendLine("     , ''  AS SEQ_TAXKBN_KANA") '税区分名（略称カナ）（略称カナ）
+        sqlStat.AppendLine("     , Format(GetDate(),'yyyyMMddHHmm')  AS SEQ_CREATEDATETIME") 'シーケンスデータ作成年月日時分
+        sqlStat.AppendLine("     , CASE WHEN ODR.OFFICECODE = '011201' THEN '046'  ELSE '071' END  AS SEQ_PLANTCODE") 'シーケンス当社基地コード
+        sqlStat.AppendLine("     , '016'  AS SEQ_SHIPPERCODE") 'シーケンス当社荷主コード
+        sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
+        sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
+        sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
+        sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
+        sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
+        sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR WITH(nolock)")
+        '明細結合ここから↓
+        sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET WITH(nolock)")
+        sqlStat.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
+        sqlStat.AppendLine("   AND DET.DELFLG  = @DELFLG")
+        '明細結合ここまで↑
+        '油種マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0003_PRODUCT PRD WITH(nolock)")
+        sqlStat.AppendLine("    ON PRD.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   AND PRD.PLANTCODE      = ODR.BASECODE")
+        sqlStat.AppendLine("   AND PRD.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND PRD.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND PRD.DELFLG         = @DELFLG")
+        '油種マスタ結合ここまで↑
+        'タンク車マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK WITH(nolock)")
+        sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
+        sqlStat.AppendLine("   AND TNK.DELFLG      = @DELFLG")
+        'タンク車マスタ結合ここまで↑
+        '列車マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0007_TRAIN TRA WITH(nolock)")
+        sqlStat.AppendLine("    ON TRA.OFFICECODE  = @OFFICECODE")
+        sqlStat.AppendLine("   And TRA.TRAINNO     = ODR.TRAINNO")
+        sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
+        sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
+        sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
+        '列車マスタ結合ここまで↑
+        '積込予約マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0021_LOADRESERVE LRV WITH(nolock)")
+        sqlStat.AppendLine("    ON LRV.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND ODR.LODDATE        BETWEEN LRV.FROMYMD AND LRV.TOYMD")
+        sqlStat.AppendLine("   AND LRV.LOAD           = TNK.LOAD")
+        sqlStat.AppendLine("   AND LRV.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND LRV.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND LRV.DELFLG         = @DELFLG")
+        '積込予約マスタ結合ここまで↑
+        '変換マスタ（荷受人）結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CCNV WITH(nolock)")
+        sqlStat.AppendLine("    ON CCNV.CLASS          = 'RESERVED_NIUKE'")
+        sqlStat.AppendLine("   AND CCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND CCNV.KEYCODE02      = ODR.CONSIGNEECODE")
+        sqlStat.AppendLine("   AND CCNV.DELFLG         = @DELFLG")
+        '変換マスタ（荷受人）結合ここまで↑
+        '変換マスタ（荷主）結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT SCNV WITH(nolock)")
+        sqlStat.AppendLine("    ON SCNV.CLASS          = 'RESERVED_SHIPPER'")
+        sqlStat.AppendLine("   AND SCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND SCNV.KEYCODE02      = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   AND SCNV.DELFLG         = @DELFLG")
+        '変換マスタ（荷主）結合ここまで↑
+        '固定値マスタ（受注ステータス）結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN COM.OIS0015_FIXVALUE FXOST WITH(nolock)")
+        sqlStat.AppendLine("    ON FXOST.CAMPCODE   = '01'")
+        sqlStat.AppendLine("   AND FXOST.CLASS      = 'ORDERSTATUS'")
+        sqlStat.AppendLine("   AND FXOST.KEYCODE    = ODR.ORDERSTATUS")
+        sqlStat.AppendLine("   AND FXOST.DELFLG     = @DELFLG")
+        '固定値マスタ（受注ステータス）結合ここまで↑
+        sqlStat.AppendLine(" WHERE ODR.DELFLG       = @DELFLG")
+        sqlStat.AppendLine("   AND ODR.OFFICECODE   = @OFFICECODE")
+        sqlStat.AppendLine("   AND ( ")
+        Dim isFirst As Boolean = True
+        Dim hasCondition As Boolean = False
+        For Each inpItem In inpData
+            '予約番号や積込予定日がない事はありえないが念の為スキップ
+            If inpItem.ReservedNo = "" OrElse inpItem.LodDate = "" OrElse
+               IsDate(inpItem.LodDate) = False Then
+                Continue For
+            End If
+            '↓2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            'If isFirst Then
+            '    isFirst = False
+            '    sqlStat.AppendFormat("             ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
+            'Else
+            '    sqlStat.AppendFormat("         OR  ( DET.RESERVEDNO = {0} AND ODR.LODDATE = '{1}')", inpItem.ReservedNo, inpItem.LodDate).AppendLine()
+            'End If
+            '↑2021/03 --- 並行稼働用の予約番号マッチングを行わないようにするため暫定的にコメント
+            '↓2021/03 --- 並行稼働用ロジック
+            If isFirst Then
+                isFirst = False
+                '暫定で予約番号なしだとキャンセルは重複の恐れが高まるので条件に含めない
+                sqlStat.AppendFormat("             ODR.LODDATE = '{0}'", inpItem.LodDate).AppendLine()
+                sqlStat.AppendFormat("        AND ODR.ORDERSTATUS <> '{0}'", CONST_ORDERSTATUS_900).AppendLine()
+            End If
+            '↑2021/03 --- 並行稼働用ロジック
+            hasCondition = True
+        Next
+        If hasCondition = False Then
+            '予約番号、受注日の条件が全くないので不一致になる条件を付与
+            sqlStat.AppendLine("'0'='1'")
+        End If
+        sqlStat.AppendLine("       )")
+
+        Try
+            '並び順は抽出後
+
+            Using sqlCon = CS0050SESSION.getConnection _
+                 , sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()       'DataBase接続
+                SqlConnection.ClearPool(sqlCon)
+                'SQLパラメータ設定
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text
+                    '.Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
+                End With
+                'SQL実行
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        retDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    retDt.Load(sqlDr)
+                End Using
+
+            End Using
+            Return retDt
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL RESERVED_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0007L RESERVED_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+    End Function
     ''' <summary>
     ''' 一覧表フィルタ処理実行
     ''' </summary>
@@ -1246,7 +1748,7 @@ Public Class OIT0007FileInputList
             Me._Item = New Dictionary(Of String, FileLinkagePatternItem)
             Dim fileLinkageItem As FileLinkagePatternItem
             With Me._Item
-                Dim outFieldList As Dictionary(Of String, Integer)
+                Dim inpFieldList As Dictionary(Of String, Integer)
                 '***************************
                 '仙台新港営業所
                 '***************************
@@ -1258,8 +1760,46 @@ Public Class OIT0007FileInputList
                 '五井営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011201", False
+                    "011201", True
                     )
+                inpFieldList = New Dictionary(Of String, Integer)
+                With inpFieldList
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
+                End With
+                fileLinkageItem.InputFiledList = inpFieldList
+                fileLinkageItem.InputExtention = "seq"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '甲子営業所
@@ -1267,17 +1807,7 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011202", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("KINO_DATAKBN", 0)
-                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("KINO_TRAINNO", 0)
-                outFieldList.Add("REPORTOILNAME", 0)
-                outFieldList.Add("RESERVEDQUANTITY", 0)
-                outFieldList.Add("KINO_TOKUISAKICODE", 0)
-                outFieldList.Add("KINO_TOKUISAKINAME", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("CONSIGNEECONVVALUE", 0)
+
                 fileLinkageItem.InputExtention = "csv"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
@@ -1286,24 +1816,6 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011203", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("SOD_STATUS", 0)
-                outFieldList.Add("SOD_SHELL_ORDERNO", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("LODDATE", 0)
-                outFieldList.Add("SOD_TRANS_KBN", 0)
-                outFieldList.Add("SHIPPERCONVCODE", 0)
-                outFieldList.Add("SHIPPERCONVVALUE", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("CONSIGNEECONVVALUE", 0)
-                outFieldList.Add("SOD_SHIPPEROILCODE", 0)
-                outFieldList.Add("SHIPPEROILNAME", 0)
-                outFieldList.Add("SOD_TAX_KBN", 0)
-                outFieldList.Add("SOD_RESERVEDQUANTITY", 0)
-                outFieldList.Add("SOD_TRANS_COMP", 0)
-                outFieldList.Add("OLDTANKNUMBER", 0)
-                outFieldList.Add("TRANSNAME", 0)
-                outFieldList.Add("SOD_BACKNAME", 0)
                 fileLinkageItem.InputExtention = "xlsx"
                 'ヘッダー必要なら↓のコメントOFF
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
@@ -1313,26 +1825,52 @@ Public Class OIT0007FileInputList
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011402", True
                     )
-                outFieldList = New Dictionary(Of String, Integer)
-                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
-                outFieldList.Add("OUTPUTRESERVENO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_KAI", 0)
-                outFieldList.Add("TRAINNO_PAD_ZERO", 0)
-                outFieldList.Add("NEG_TUMIKOMI_POINT", 0)
-                outFieldList.Add("NEG_KASHANO", 0)
-                outFieldList.Add("NEG_SHIPPEROILCODE", 0)
-                outFieldList.Add("NEG_SETTEI_NUM", 0)
-                outFieldList.Add("CONSIGNEECONVCODE", 0)
-                outFieldList.Add("NEG_ARM_CODE", 0)
-                outFieldList.Add("NEG_TSUMI_NUM", 0)
                 fileLinkageItem.InputExtention = "csv"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '四日市営業所
                 '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012401", False
+                    "012401", True
                     )
+                inpFieldList = New Dictionary(Of String, Integer)
+                With inpFieldList
+                    .Add("SEQ_DATATYPE_RESERVED", 2)
+                    .Add("SEQ_PROC_KBN", 1)
+                    .Add("LODDATE_WITHOUT_SLASH", 8)
+                    .Add("SEQ_DEPT_CODE", 2)
+                    .Add("OUTPUTRESERVENO", 3)
+                    .Add("SEQ_TORIKBN", 2)
+                    .Add("SEQ_TOKUISAKI", 5)
+                    .Add("CONSIGNEECONVCODE", 6)
+                    .Add("ARRDATE_WITHOUT_SLASH", 8)
+                    .Add("SHIPPEROILCODE", 7)
+                    .Add("SEQ_TAX_KBN", 1)
+                    .Add("SEQ_NISCODE", 3)
+                    .Add("SEQ_UKEHARAI_CODE", 4)
+                    .Add("SEQ_ORDERAMOUNT", 5)
+                    .Add("SEQ_TRANSWAY", 1)
+                    .Add("SEQ_GYOUSYACODE", 3)
+                    .Add("SEQ_TANKNO", 6)
+                    .Add("SEQ_KAIJI", 1)
+                    .Add("SEQ_DEN_NO", 5)
+                    .Add("SEQ_DEN_MEI_NO", 1)
+                    .Add("SEQ_ACCTUAL_AMOUNT", 5)
+                    .Add("SEQ_NIYAKU_BEGIN_TIME", 4)
+                    .Add("SEQ_NIYAKU_END_TIME", 4)
+                    .Add("SEQ_TRAINNO", 4)
+                    .Add("SEQ_TOKUISAKI_KANA", 8)
+                    .Add("SEQ_HAISOU_KANA", 8)
+                    .Add("SEQ_HINMEI_KANA", 10)
+                    .Add("SEQ_TAXKBN_KANA", 1)
+                    .Add("SEQ_CREATEDATETIME", 12)
+                    .Add("SEQ_PLANTCODE", 3)
+                    .Add("SEQ_SHIPPERCODE", 3)
+                    .Add("SEQ_CONSIGNEECODE", 6)
+                    .Add("SEQ_YOBI", 109)
+                End With
+                fileLinkageItem.InputFiledList = inpFieldList
+                fileLinkageItem.InputExtention = "seq"
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '三重塩浜営業所
@@ -1424,6 +1962,12 @@ Public Class OIT0007FileInputList
         ''' <returns></returns>
         Public Property InputConstantField As Boolean = False
         Public Property InputDelem As String = ","
+        ''' <summary> 
+        ''' 出力フィールドリスト(フィールド名、固定長用フィールドサイズ）
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>SEQファイル専用</remarks>
+        Public Property InputFiledList As Dictionary(Of String, Integer)
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス
@@ -1432,9 +1976,9 @@ Public Class OIT0007FileInputList
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>
-        Public Sub New(orderNo As String, detailNo As String)
-            Me.OrderNo = orderNo
-            Me.DetailNo = detailNo
+        Public Sub New()
+            Me.OrderNo = OrderNo
+            Me.DetailNo = DetailNo
         End Sub
         ''' <summary>
         ''' オーダー番号
@@ -1451,6 +1995,233 @@ Public Class OIT0007FileInputList
         ''' </summary>
         ''' <returns></returns>
         Public Property ReservedNo As String
+    End Class
+    ''' <summary>
+    ''' 取込ファイル情報クラス
+    ''' </summary>
+    <Serializable>
+    Public Class InputDataItem
+        ''' <summary>
+        ''' チェック結果コード
+        ''' </summary>
+        ''' <remarks>現在単一使用想定だがビットマスクを考慮した数値</remarks>
+        Public Enum CheckReasonCodes
+            ''' <summary>
+            ''' 正常
+            ''' </summary>
+            OK = 0
+            ''' <summary>
+            ''' 予約番号が未設定
+            ''' </summary>
+            NoReservedNo = 1
+            ''' <summary>
+            ''' 受注情報無し
+            ''' </summary>
+            NoOrderInfo = 2
+            ''' <summary>
+            ''' アップロードファイルの油種と受注情報の油種が不一致
+            ''' </summary>
+            OilUnMatch = 4
+            ''' <summary>
+            ''' 数量書式エラー
+            ''' </summary>
+            AmountFormatError = 8
+            ''' <summary>
+            ''' 実績値が0
+            ''' </summary>
+            AmountZero = 16
+            ''' <summary>
+            ''' タンク車不一致
+            ''' </summary>
+            TankUnmatch = 32
+            ''' <summary>
+            ''' 受注ステータスが登録範囲外(実績登録済みです。)
+            ''' </summary>
+            OrderStatusCannotAccept = 64
+            ''' <summary>
+            ''' 受注ステータスが登録ｷｬﾝｾﾙ(受注がキャンセルされています)
+            ''' </summary>
+            OrderStatusCancel = 128
+            ''' <summary>
+            ''' 受注ステータスが受注受付に戻される(タンク車割当が確定していないです)
+            ''' </summary>
+            OrderStatusBackToBefore200 = 256
+            ''' <summary>
+            ''' 本来ありえないが同一の予約番号、積込予定日で複数合致した場合
+            ''' </summary>
+            TooMenyOrderInfo = 32768
+            ''' <summary>
+            ''' 初期値
+            ''' </summary>
+            InitVal = 65536
+        End Enum
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New()
+        End Sub
+        ''' <summary>
+        ''' 取込ファイルの行番号(念のため)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpRowNum As Integer = 0
+        ''' <summary>
+        ''' 取込対象フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InputCheck As Boolean = False
+        ''' <summary>
+        ''' 画面表示用予約番号（ファイルにあったまま）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpReservedNo As String = ""
+        ''' <summary>
+        ''' ファイルにあったままのタンクNo
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpTnkNo As String = ""
+        ''' <summary>
+        ''' ファイルにあったままの列車No（根岸のみの想定）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpTrainNo As String = ""
+        ''' <summary>
+        ''' ファイルにあったままの油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpOilTypeName As String = ""
+        ''' <summary>
+        ''' ファイルにあったままの数量（この数値を受注テーブルのデータを更新）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property InpCarsAmount As String = ""
+        ''' <summary>
+        ''' チェック結果コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CheckReadonCode As CheckReasonCodes = CheckReasonCodes.InitVal
+        ''' <summary>
+        ''' 取込理由、取込「OK」や取込不可の理由を設定
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property CheckReason As String
+            Get
+                Select Case Me.CheckReadonCode
+                    Case CheckReasonCodes.OK
+                        Return "正常"
+                    Case CheckReasonCodes.NoReservedNo
+                        Return "予約番号無し"
+                    Case CheckReasonCodes.NoOrderInfo
+                        Return "受注情報無し"
+                    Case CheckReasonCodes.OilUnMatch
+                        Return "油種不一致"
+                    Case CheckReasonCodes.AmountFormatError
+                        Return "数量書式エラー"
+                    Case CheckReasonCodes.AmountZero
+                        Return "出荷実績0"
+                    Case CheckReasonCodes.TankUnmatch
+                        Return "車番不一致"
+                    Case CheckReasonCodes.OrderStatusCannotAccept
+                        Return "実績登録済みです"
+                    Case CheckReasonCodes.OrderStatusCancel
+                        Return "受注がキャンセルされています"
+                    Case CheckReasonCodes.OrderStatusBackToBefore200
+                        Return "タンク車割当が確定していないです"
+                    Case CheckReasonCodes.TooMenyOrderInfo
+                        '本来ありえない想定だが念の為
+                        Return "受注結果複数"
+                    Case Else
+                        Return ""
+                End Select
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' 受注テーブルに引き当てる予約番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReservedNo As String = ""
+        ''' <summary>
+        ''' 受注テーブルより取得した予約番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DbReservedNo As String = ""
+        ''' <summary>
+        ''' 積込日（予定）予約番号とセットで受注テーブルに引当特定する
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property LodDate As String = ""
+        ''' <summary>
+        ''' 積込日（予定）(DBより取得した日付）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DbLodDate As String = ""
+        ''' <summary>
+        ''' 発日(予定)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DepDate As String = ""
+        ''' <summary>
+        ''' 受注番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OrderNo As String = ""
+        ''' <summary>
+        ''' 受注明細番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DetailNo As String = ""
+        ''' <summary>
+        ''' チェック時点で保存されている数量
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CarsAmount As String = ""
+        ''' <summary>
+        ''' 受注テーブル登録の油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OilName As String = ""
+        ''' <summary>
+        ''' 受注テーブル登録のタンクNo
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TankNo As String = ""
+        ''' <summary>
+        ''' 列車番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainNo As String = ""
+        ''' <summary>
+        ''' 更新する実績積込日（ブランクの場合は更新しない）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property UpdActualLodDate As String = ""
+        ''' <summary>
+        ''' 受注状況
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OrderStatus As String = ""
+        ''' <summary>
+        ''' チェック可否プロパティ
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property CanUpdate As Boolean
+            Get
+                If Me.CheckReadonCode = CheckReasonCodes.OK Then
+                    Return True
+                Else
+                    Return False
+                End If
+            End Get
+        End Property
+    End Class
+    ''' <summary>
+    ''' ファイル情報クラス
+    ''' </summary>
+    <System.Runtime.Serialization.DataContract()>
+    Public Class AttachmentFile
+        <System.Runtime.Serialization.DataMember()>
+        Public Property FileName As String
     End Class
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***

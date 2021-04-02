@@ -14,42 +14,6 @@ Option Explicit On
 Partial Public Class OIM0003ProductCreate
     
     '''<summary>
-    '''TxtCampCodeMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtCampCodeMy As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''txtCampNameMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtCampNameMy As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtOrgCodeMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtOrgCodeMy As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''txtOrgNameMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtOrgNameMy As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_Sel_LINECNT_L コントロール。
     '''</summary>
     '''<remarks>
@@ -68,598 +32,670 @@ Partial Public Class OIM0003ProductCreate
     Protected WithEvents WF_Sel_LINECNT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblDelFlg コントロール。
+    '''WF_DELFLG_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblDelFlg As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDelFlg コントロール。
+    '''WF_DELFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDelFlg As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_DELFLG As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label1 コントロール。
+    '''WF_DELFLG_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label1 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_DELFLG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOfficeCode コントロール。
+    '''WF_OFFICECODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOfficeCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OFFICECODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOfficeCode コントロール。
+    '''WF_OFFICECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOfficeCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OFFICECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label2 コントロール。
+    '''WF_OFFICECODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label2 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OFFICECODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblShipperCode コントロール。
+    '''WF_SHIPPERCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblShipperCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPERCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtShipperCode コントロール。
+    '''WF_SHIPPERCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtShipperCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SHIPPERCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label3 コントロール。
+    '''WF_SHIPPERCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label3 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPERCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblPlantCode コントロール。
+    '''WF_PLANTCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblPlantCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_PLANTCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtPlantCode コントロール。
+    '''WF_PLANTCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtPlantCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_PLANTCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label4 コントロール。
+    '''WF_PLANTCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label4 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_PLANTCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblBigoilCode コントロール。
+    '''WF_BIGOILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblBigoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtBigoilCode コントロール。
+    '''WF_BIGOILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtBigoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_BIGOILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label5 コントロール。
+    '''WF_BIGOILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label5 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblBigoilName コントロール。
+    '''WF_BIGOILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblBigoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtBigoilName コントロール。
+    '''WF_BIGOILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtBigoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_BIGOILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label6 コントロール。
+    '''WF_BIGOILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label6 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblBigoilKana コントロール。
+    '''WF_BIGOILKANA_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblBigoilKana As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILKANA_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtBigoilKana コントロール。
+    '''WF_BIGOILKANA コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtBigoilKana As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_BIGOILKANA As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label7 コントロール。
+    '''WF_BIGOILKANA_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label7 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGOILKANA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblMiddleoilCode コントロール。
+    '''WF_MIDDLEOILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblMiddleoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtMiddleoilCode コントロール。
+    '''WF_MIDDLEOILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtMiddleoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_MIDDLEOILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label18 コントロール。
+    '''WF_MIDDLEOILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label18 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblMiddleoilName コントロール。
+    '''WF_MIDDLEOILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblMiddleoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtMiddleoilName コントロール。
+    '''WF_MIDDLEOILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtMiddleoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_MIDDLEOILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label9 コントロール。
+    '''WF_MIDDLEOILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label9 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblMiddleoilKana コントロール。
+    '''WF_MIDDLEOILKANA_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblMiddleoilKana As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILKANA_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtMiddleoilKana コントロール。
+    '''WF_MIDDLEOILKANA コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtMiddleoilKana As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_MIDDLEOILKANA As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label10 コントロール。
+    '''WF_MIDDLEOILKANA_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label10 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDDLEOILKANA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOilCode コントロール。
+    '''WF_OILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOilCode コントロール。
+    '''WF_OILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label11 コントロール。
+    '''WF_OILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label11 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOilName コントロール。
+    '''WF_OILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOilName コントロール。
+    '''WF_OILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label12 コントロール。
+    '''WF_OILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label12 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOilKana コントロール。
+    '''WF_OILKANA_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOilKana As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILKANA_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOilKana コントロール。
+    '''WF_OILKANA コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOilKana As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OILKANA As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label13 コントロール。
+    '''WF_OILKANA_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label13 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OILKANA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblSegmentoilCode コントロール。
+    '''WF_SEGMENTOILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblSegmentoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SEGMENTOILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtSegmentoilCode コントロール。
+    '''WF_SEGMENTOILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtSegmentoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SEGMENTOILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label14 コントロール。
+    '''WF_SEGMENTOILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label14 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SEGMENTOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblSegmentoilName コントロール。
+    '''WF_SEGMENTOILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblSegmentoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SEGMENTOILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtSegmentoilName コントロール。
+    '''WF_SEGMENTOILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtSegmentoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SEGMENTOILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label15 コントロール。
+    '''WF_SEGMENTOILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label15 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SEGMENTOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOtoilCode コントロール。
+    '''WF_OTOILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOtoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OTOILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOtoilCode コントロール。
+    '''WF_OTOILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOtoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OTOILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label16 コントロール。
+    '''WF_OTOILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label16 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OTOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblOtoilName コントロール。
+    '''WF_OTOILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblOtoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OTOILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtOtoilName コントロール。
+    '''WF_OTOILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOtoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_OTOILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label17 コントロール。
+    '''WF_OTOILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label17 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_OTOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblShipperoilCode コントロール。
+    '''WF_SHIPPEROILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblShipperoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPEROILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtShipperoilCode コントロール。
+    '''WF_SHIPPEROILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtShipperoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SHIPPEROILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label18 コントロール。
+    '''WF_SHIPPEROILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label18 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPEROILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblShipperoilName コントロール。
+    '''WF_SHIPPEROILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblShipperoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPEROILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtShipperoilName コントロール。
+    '''WF_SHIPPEROILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtShipperoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SHIPPEROILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label19 コントロール。
+    '''WF_SHIPPEROILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label19 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SHIPPEROILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblCheckoilCode コントロール。
+    '''WF_CHECKOILCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblCheckoilCode As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CHECKOILCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtCheckoilCode コントロール。
+    '''WF_CHECKOILCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtCheckoilCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_CHECKOILCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label20 コントロール。
+    '''WF_CHECKOILCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label20 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CHECKOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblCheckoilName コントロール。
+    '''WF_CHECKOILNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblCheckoilName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CHECKOILNAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtCheckoilName コントロール。
+    '''WF_CHECKOILNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtCheckoilName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_CHECKOILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label21 コントロール。
+    '''WF_CHECKOILNAME_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label21 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CHECKOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblStockFlg コントロール。
+    '''WF_STOCKFLG_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblStockFlg As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_STOCKFLG_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtStockFlg コントロール。
+    '''WF_STOCKFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtStockFlg As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_STOCKFLG As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''Label22 コントロール。
+    '''WF_STOCKFLG_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Label22 As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_STOCKFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ORDERFROMDATE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERFROMDATE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ORDERFROMDATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERFROMDATE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ORDERFROMDATE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERFROMDATE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ORDERTODATE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERTODATE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ORDERTODATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERTODATE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ORDERTODATE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORDERTODATE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_OILTERMTBL_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OILTERMTBL_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_OILTERMTBL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OILTERMTBL As Global.System.Web.UI.WebControls.GridView
     
     '''<summary>
     '''rightview コントロール。
@@ -686,7 +722,7 @@ Partial Public Class OIM0003ProductCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIM0002WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIM0003WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。

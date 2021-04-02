@@ -350,9 +350,33 @@ div[data-generated='1'] input[type=password] {
     opacity: 0.8;
     filter: alpha(opacity=8);
 }
+/* 削除アイコン */
+.delIconArea {
+    position: absolute;
+    display: table-cell;
+    top: 0;
+    right: 0;
+    padding-right: 5px;
+    width: 16px;
+    height: 100%;
+    vertical-align: middle;
+    z-index: 2;
+}
+.delIconArea div {
+    width: 16px;
+    height: 16px;
+    margin-top: calc(100% - 8px); /* 全体の高さ - (画像の高さ ÷ 2) */
+    font-size: 16px;
+    color: red;
+    cursor:pointer;
+}
+.delIconArea div:after {
+    content: "×";
+}
 /* グリッド内の補正 */
 div[data-generated='1'] .boxIconArea div,
-div[data-generated='1'] .richTextIconArea div {
+div[data-generated='1'] .richTextIconArea div,
+div[data-generated='1'] .delIconArea div {
     margin-top: calc(100% - 12px);
 }
 /* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
@@ -681,6 +705,7 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     left:0em;
     width:1.4em;
     height:1.4em;
+    vertical-align:middle;
 }
 
 /* 実行画面 ヘッダー部 */
@@ -1539,6 +1564,25 @@ div[data-generated="1"] tr.hover th {
     background-color: #FFDADA !important;
 }
 /* ------------------------------
+OT空回連携情報有の場合の設定
+------------------------------ */
+div[data-generated="1"] tr.hasCmpResultsInfoValue td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue th {
+    background-color: indianred;
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.hover td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.hover th {
+    background-color: #32a3a3 !important;
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo th {
+    background-color:#ffffa3
+}
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo.hover td,
+div[data-generated="1"] tr.hasCmpResultsInfoValue.warnInfo.hover th {
+    background-color: #a3a4ff !important;
+}
+/* ------------------------------
 受注情報有の場合の設定
 ------------------------------ */
 div[data-generated="1"] tr.hasOrderInfoValue td,
@@ -1557,6 +1601,26 @@ div[data-generated="1"] tr.hasOrderInfoValue.warnInfo.hover td,
 div[data-generated="1"] tr.hasOrderInfoValue.warnInfo.hover th {
     background-color: #a3a4ff !important;
 }
+/* ------------------------------
+回送情報有の場合の設定
+------------------------------ */
+div[data-generated="1"] tr.hasKaisouInfoValue td,
+div[data-generated="1"] tr.hasKaisouInfoValue th {
+    background-color: indianred;
+}
+div[data-generated="1"] tr.hasKaisouInfoValue.hover td,
+div[data-generated="1"] tr.hasKaisouInfoValue.hover th {
+    background-color: #32a3a3 !important;
+}
+div[data-generated="1"] tr.hasKaisouInfoValue.warnInfo td,
+div[data-generated="1"] tr.hasKaisouInfoValue.warnInfo th {
+    background-color:#ffffa3
+}
+div[data-generated="1"] tr.hasKaisouInfoValue.warnInfo.hover td,
+div[data-generated="1"] tr.hasKaisouInfoValue.warnInfo.hover th {
+    background-color: #a3a4ff !important;
+}
+
 /* ************************ */
 /* タブ下部の入力エリア     */
 /* ************************ */

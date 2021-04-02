@@ -128,3 +128,33 @@ function reportRadioButton() {
         txtObj.style.display = 'none';
     }
 }
+// ○ダウンロード処理
+function f_ExcelPrint() {
+    // リンク参照
+    window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
+    let url2 = document.getElementById("WF_PrintURL2");
+    if (url2 !== null) {
+        window.open(url2.value, "view2", "_blank");
+    }
+}
+/**
+ * 更新確認ポップアップを閉じる
+ * @return {undefined} なし
+ * @description
+ */
+function closeModDownLoadConfirm() {
+    let updateConfirmObj = document.getElementById('divModFileDlList');
+    if (updateConfirmObj !== null) {
+        updateConfirmObj.classList.remove('showModFileDlConfirm');
+        let hdnUpdConfirmObj = document.getElementById('hdnModFileDlChkConfirmIsActive');
+        hdnUpdConfirmObj.value = '';
+    }
+}
+function closeOTLinkageSendConfirm() {
+    let updateConfirmObj = document.getElementById('divOTLinkageSendList');
+    if (updateConfirmObj !== null) {
+        updateConfirmObj.classList.remove('showOTLinkageSendConfirm');
+        let hdnUpdConfirmObj = document.getElementById('hdnOTLinkageSendChkConfirmIsActive');
+        hdnUpdConfirmObj.value = '';
+    }
+}

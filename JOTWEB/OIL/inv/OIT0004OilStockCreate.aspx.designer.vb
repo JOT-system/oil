@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIT0004OilStockCreate
-
+    
     '''<summary>
     '''spnInventoryDays コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents spnInventoryDays As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''WF_INVENTORYDAYS コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_INVENTORYDAYS As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_ButtonAUTOSUGGESTION コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonAUTOSUGGESTION As Global.System.Web.UI.HtmlControls.HtmlInputButton
-
+    
     '''<summary>
     '''WF_ButtonORDERLIST コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonORDERLIST As Global.System.Web.UI.HtmlControls.HtmlInputButton
-
+    
     '''<summary>
     '''WF_ButtonINPUTCLEAR コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonINPUTCLEAR As Global.System.Web.UI.HtmlControls.HtmlInputButton
-
+    
     '''<summary>
     '''WF_ButtonGETEMPTURN コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
-
+    
     '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''WF_ButtonLAST コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''pnlSuggestList コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlSuggestList As Global.System.Web.UI.WebControls.Panel
-
+    
     '''<summary>
     '''frvSuggest コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents frvSuggest As Global.System.Web.UI.WebControls.FormView
-
+    
     '''<summary>
     '''pnlWeightList コントロール。
     '''</summary>
@@ -111,7 +111,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlWeightList As Global.System.Web.UI.WebControls.Panel
-
+    
     '''<summary>
     '''repWeightList コントロール。
     '''</summary>
@@ -120,7 +120,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repWeightList As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''pnlStockList コントロール。
     '''</summary>
@@ -129,7 +129,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlStockList As Global.System.Web.UI.WebControls.Panel
-
+    
     '''<summary>
     '''repStockDate コントロール。
     '''</summary>
@@ -138,7 +138,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repStockDate As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''repStockOilTypeItem コントロール。
     '''</summary>
@@ -147,7 +147,16 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repStockOilTypeItem As Global.System.Web.UI.WebControls.Repeater
-
+    
+    '''<summary>
+    '''repStockSummary コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repStockSummary As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -156,7 +165,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
-
+    
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -165,7 +174,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -174,7 +183,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0004WRKINC
-
+    
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
@@ -183,7 +192,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_GridPosition コントロール。
     '''</summary>
@@ -192,7 +201,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -201,7 +210,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_FIELD_REP コントロール。
     '''</summary>
@@ -210,7 +219,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -219,7 +228,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -228,7 +237,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -237,7 +246,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_RightViewChange コントロール。
     '''</summary>
@@ -246,7 +255,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -255,7 +264,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -264,7 +273,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
@@ -273,7 +282,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -282,7 +291,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_MAPpermitcode コントロール。
     '''</summary>
@@ -291,7 +300,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''lstDispStockOilType コントロール。
     '''</summary>
@@ -300,7 +309,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents lstDispStockOilType As Global.System.Web.UI.WebControls.ListBox
-
+    
     '''<summary>
     '''hdnDispLorry コントロール。
     '''</summary>
@@ -309,7 +318,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnDispLorry As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnChgConsignee コントロール。
     '''</summary>
@@ -318,7 +327,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnChgConsignee As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnChgConsigneeName コントロール。
     '''</summary>
@@ -327,7 +336,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnChgConsigneeName As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnChgConsigneeFirstLoad コントロール。
     '''</summary>
@@ -336,7 +345,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnChgConsigneeFirstLoad As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnDispReportSettings コントロール。
     '''</summary>
@@ -345,7 +354,16 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnDispReportSettings As Global.System.Web.UI.WebControls.HiddenField
-
+    
+    '''<summary>
+    '''hdnSuggestDateAddRemoveKey コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnSuggestDateAddRemoveKey As Global.System.Web.UI.WebControls.HiddenField
+    
     '''<summary>
     '''divChkEneos コントロール。
     '''</summary>
@@ -354,7 +372,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents divChkEneos As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''chkPrintENEOS コントロール。
     '''</summary>
@@ -363,7 +381,16 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents chkPrintENEOS As Global.System.Web.UI.WebControls.CheckBox
-
+    
+    '''<summary>
+    '''chkPrintConsigneeRep コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkPrintConsigneeRep As Global.System.Web.UI.WebControls.CheckBox
+    
     '''<summary>
     '''hdnShowPnlToDate コントロール。
     '''</summary>
@@ -372,7 +399,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnShowPnlToDate As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''Label1 コントロール。
     '''</summary>
@@ -381,7 +408,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents Label1 As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''txtDownloadMonth コントロール。
     '''</summary>
@@ -390,7 +417,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''lblReportFromDate コントロール。
     '''</summary>
@@ -399,7 +426,7 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents lblReportFromDate As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''txtReportFromDate コントロール。
     '''</summary>
@@ -408,7 +435,16 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
-
+    
+    '''<summary>
+    '''chkConsigneeRepDoubleSpan コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkConsigneeRepDoubleSpan As Global.System.Web.UI.WebControls.CheckBox
+    
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -417,7 +453,7 @@ Partial Public Class OIT0004OilStockCreate
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

@@ -80,6 +80,8 @@
 
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
+    <!-- 空回日報取込データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_OTRECEIVETBL" runat="server"></asp:TextBox>
     <!-- 荷主コード -->
     <asp:TextBox ID="WF_SEL_SHIPPERSCODE" runat="server"></asp:TextBox>
     <!-- 荷主名 -->
@@ -96,5 +98,7 @@
     <asp:TextBox ID="WF_SEL_PATTERNCODE" runat="server"></asp:TextBox>
     <!-- パターン名 -->
     <asp:TextBox ID="WF_SEL_PATTERNNAME" runat="server"></asp:TextBox>
+    <!-- 輸送形態区分 -->
+    <asp:TextBox ID="WF_SEL_TRKBN" runat="server"></asp:TextBox>
 
 </div>

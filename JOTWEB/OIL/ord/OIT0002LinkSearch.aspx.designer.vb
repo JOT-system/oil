@@ -77,6 +77,15 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents TxtEmparrDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_STYMD_CODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>
@@ -93,7 +102,7 @@ Partial Public Class OIT0002LinkSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class OIT0002LinkSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
-
+    
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>

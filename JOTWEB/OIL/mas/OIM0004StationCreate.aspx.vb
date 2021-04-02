@@ -968,17 +968,23 @@ Public Class OIM0004StationCreate
 
             OIM0004INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0004row As DataRow In OIM0004tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0004row("STATIONCODE") = OIM0004INProw("STATIONCODE") AndAlso
                     OIM0004row("BRANCH") = OIM0004INProw("BRANCH") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0004row("DELFLG") = OIM0004INProw("DELFLG") AndAlso
-                        OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    ' KEY項目以外の項目の差異をチェック
+                    If OIM0004row("STATONNAME") = OIM0004INProw("STATONNAME") AndAlso
+                        OIM0004row("STATIONNAMEKANA") = OIM0004INProw("STATIONNAMEKANA") AndAlso
+                        OIM0004row("TYPENAME") = OIM0004INProw("TYPENAME") AndAlso
+                        OIM0004row("TYPENAMEKANA") = OIM0004INProw("TYPENAMEKANA") AndAlso
+                        OIM0004row("DEPARRSTATIONFLG") = OIM0004INProw("DEPARRSTATIONFLG") AndAlso
+                        OIM0004row("DELFLG") = OIM0004INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0004INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

@@ -76,7 +76,7 @@ Public Class OIT0003OTLinkageSearch
         WF_LeftMViewChange.Value = ""
         WF_RightboxOpen.Value = ""
         Master.MAPID = OIT0003WRKINC.MAPIDOTS
-        If work.WF_SEL_MAPIDBACKUP.Text = "" Then
+        If work.WF_SEL_MAPIDBACKUP.Text = "" OrElse work.WF_SEL_MAPIDBACKUP.Text = OIT0003WRKINC.MAPIDD Then
             If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.MENU Then
                 'Master.MAPID = OIT0003WRKINC.MAPIDD
                 work.WF_SEL_MAPIDBACKUP.Text = OIT0003WRKINC.MAPIDOTS
@@ -115,6 +115,7 @@ Public Class OIT0003OTLinkageSearch
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所(検索条件を引き継ぐ）
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text
+            'work.WF_SEL_MAPIDBACKUP.Text = ""
         Else
             '会社コード
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
@@ -158,6 +159,10 @@ Public Class OIT0003OTLinkageSearch
                 Me.TxtSalesOffice.Text = topListItem.Value
                 Me.LblSalesOfficeName.Text = topListItem.Text
             End If
+            work.WF_SEL_CAN_BYPASS_SERACH.Text = "1"
+        ElseIf work.WF_SEL_SALESOFFICECODE.Text <> "" Then
+            Me.TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
+            Me.LblSalesOfficeName.Text = work.WF_SEL_SALESOFFICE.Text
             work.WF_SEL_CAN_BYPASS_SERACH.Text = "1"
         Else
             work.WF_SEL_CAN_BYPASS_SERACH.Text = ""

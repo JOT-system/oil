@@ -11,7 +11,43 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIS0001UserList
+Partial Public Class OIM0001CampList
+    
+    '''<summary>
+    '''WF_SEL_CAMPCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SEL_CAMPNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELUCamp_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELUCamp_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELUCamp_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELUCamp_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_ListCNT コントロール。
@@ -74,7 +110,7 @@ Partial Public Class OIS0001UserList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIS0001WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIM0001WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。

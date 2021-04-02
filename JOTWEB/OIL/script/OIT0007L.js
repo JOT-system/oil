@@ -129,6 +129,12 @@ function dragEventLeave(event) {
 function dropEvent(e, acceptExtentions) {
     e.preventDefault();
     commonDispWait();
+    // ポップアップ表示している場合はアップロードスキップ
+    let canUploadObj = document.getElementById('hdnUpdateConfirmIsActive');
+    if (canUploadObj.value === '1') {
+        commonHideWait();
+        return;
+    }
     // ********************************
     // フッターボックスのオブジェクト取得
     // ********************************
@@ -308,6 +314,19 @@ function bindUploadButton() {
             }
         };
     })(attachAreaObj.id, fupObj);
+}
+/**
+ * 更新確認ポップアップを閉じる
+ * @return {undefined} なし
+ * @description
+ */
+function closeThisConfirm() {
+    let updateConfirmObj = document.getElementById('divUpdList');
+    if (updateConfirmObj !== null) {
+        updateConfirmObj.classList.remove('showUpdConfirm');
+        let hdnUpdConfirmObj = document.getElementById('hdnUpdateConfirmIsActive');
+        hdnUpdConfirmObj.value = '';
+    }
 }
 //// ◯帳票(ラジオボタンクリック)
 //function reportRadioButton() {

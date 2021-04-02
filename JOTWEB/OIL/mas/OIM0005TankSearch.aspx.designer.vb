@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class OIM0005TankSearch
     
     '''<summary>
+    '''WF_ButtonKINOENE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonKINOENE As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
     '''WF_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>

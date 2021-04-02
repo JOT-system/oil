@@ -100,3 +100,222 @@ a.ef input {
 #rblFilterDateFiled {
     height:100%;
 }
+/* ************************** */
+/* 変更指示確認ボックス関連   */
+/* ************************** */
+/* 初期は非表示 */
+#divModFileDlList {
+    display: none;
+    pointer-events: none;
+}
+/* 初期は非表示 */
+#divModFileDlList.showModFileDlConfirm {
+    padding:5px;
+    display:block;
+    position:absolute;
+    top:0;
+    background-color:white;
+    width:100%;
+    height:100%;
+    z-index:10;
+    pointer-events:auto;
+}
+#divModFileDlList .actionButtonBox {
+    width:100vw;
+}
+#divModFileDlList #divInputResultWrapper {
+    width:calc(100% - 5px);
+    height:calc(100% - 35px);
+    overflow:auto;
+}
+#divModFileDlList .updateList {
+    //height: calc(100% - 20px);
+    margin-bottom:20px;
+    min-height:410px;
+}
+#btnCloseModDownLoadConfirm {
+    margin-right: 10px;
+}
+.tblUpdList {
+    border-collapse :collapse;
+    table-layout:fixed;
+} 
+.tblUpdList th,
+.tblUpdList td {
+    padding: 5px;
+    vertical-align :middle;
+    border:1px solid gray;
+}
+.tblUpdList td { 
+    vertical-align :top;
+}
+.tblUpdList td.updChk {
+    text-align:center;
+    vertical-align :middle;
+} 
+.tblUpdList th.updChk {
+    width:32px;
+}
+.tblUpdList th.reservedNo {
+    width:100px;
+}
+.tblUpdList th.trnNo {
+    width:90px;
+}
+.tblUpdList th.oilName {
+    width:80px;
+}
+.tblUpdList th.amount {
+    width:50px;
+}
+.tblUpdList th.reason {
+    width:150px;
+}
+.tblUpdList th.dbReservedNo {
+    width:65px;
+}
+.tblUpdList th.trainNo {
+    width:65px;
+}
+.tblUpdList th.lodDate,
+.tblUpdList th.depDate{
+    width:90px;
+}
+
+.tblUpdList th {
+    background-color:rgb(189,215,238);
+}
+.tblUpdList th.db {
+    background-color:rgb(248,203,173);
+}
+.tblUpdList td.amount {
+    text-align:right;
+}
+.tblUpdList tr.delFalg1 td {
+    background-color:lightgray ;
+}
+/* 画面上部のボタンエリアを二段表示 */
+.Operation #pnlReserveModActionBox {
+    display: none;
+}
+.showModMode .Operation #pnlReserveModActionBox {
+    display: block;
+}
+.showModMode .Operation {
+    height: 3.2em;
+}
+.showModMode .Operation #WF_ButtonReserveMod {
+    width:auto;
+    padding-left:5px;
+    padding-right:5px;
+}
+.showModMode .Operation input[type=checkbox] {
+    margin-left:10px;
+    margin-right:5px;
+}
+#chkShowCanceldOrder + label[for='chkShowCanceldOrder'] {
+    margin-top:-2px;
+}
+#chkShowCanceldOrder:checked + label[for='chkShowCanceldOrder'] {
+    color: darkcyan;
+}
+/* 一覧表のキャンセルオーダーの色 */
+#pnlListArea tr[data-cancelorder='1'] td,
+#pnlListArea tr[data-cancelorder='1'] th
+{
+    background-color: gray;
+    color: black;
+}
+#pnlListArea tr[data-cancelorder='1'].hover td,
+#pnlListArea tr[data-cancelorder='1'].hover th {
+    background-color: darkgrey !important;
+    color: white;
+}
+/* ************************** */
+/* OT発送日報送信確認ボックス関連   */
+/* ************************** */
+/* 初期は非表示 */
+#divOTLinkageSendList {
+    display: none;
+    pointer-events: none;
+}
+/* 初期は非表示 */
+#divOTLinkageSendList.showOTLinkageSendConfirm {
+    padding:5px;
+    display:block;
+    position:absolute;
+    top:0;
+    background-color:white;
+    width:100%;
+    height:100%;
+    z-index:10;
+    pointer-events:auto;
+}
+#divOTLinkageSendList .actionButtonBox {
+    width:100vw;
+}
+#divOTLinkageSendList #divInputOTResultWrapper {
+    width:calc(100% - 5px);
+    height:calc(100% - 35px);
+    overflow:auto;
+}
+#divOTLinkageSendList .updateList {
+    margin-bottom:20px;
+    min-height:410px;
+}
+#btnCloseOTLinkageSendConfirm {
+    margin-right: 10px;
+}
+.tblUpdOTList {
+    border-collapse: collapse;
+    table-layout: fixed;
+} 
+.tblUpdOTList th,
+.tblUpdOTList td {
+    padding: 5px;
+    vertical-align :middle;
+    border:1px solid gray;
+}
+.tblUpdOTList td { 
+    vertical-align :top;
+}
+.tblUpdOTList td.officeName {
+    width:90px;
+}
+.tblUpdOTList td.sendYMD {
+    width:80px;
+}
+.tblUpdOTList td.trainNo {
+    width:50px;
+}
+.tblUpdOTList td.shipOrder {
+    width:70px;
+}
+.tblUpdOTList td.depStation {
+    width:65px;
+}
+.tblUpdOTList td.shippersName {
+    width:65px;
+}
+.tblUpdOTList td.oilName {
+    width:80px;
+}
+.tblUpdOTList td.tankNo {
+    width:65px;
+}
+.tblUpdOTList td.amount {
+    width:65px;
+}
+
+.tblUpdOTList th {
+    background-color:rgb(189,215,238);
+}
+/*.tblUpdList th.db {
+    background-color:rgb(248,203,173);
+}
+.tblUpdList td.amount {
+    text-align:right;
+}
+.tblUpdList tr.delFalg1 td {
+    background-color:lightgray ;
+}*/

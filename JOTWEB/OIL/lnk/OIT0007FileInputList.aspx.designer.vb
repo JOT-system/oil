@@ -113,6 +113,24 @@ Partial Public Class OIT0007FileInputList
     Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
+    '''hdnUpdateConfirmIsActive コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnUpdateConfirmIsActive As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''repUpdateList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repUpdateList As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

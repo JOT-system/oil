@@ -84,8 +84,79 @@ body:before {
         width: 70px;
     }
 
+/* ************** */
+/* ヘッダー部         */
+/* ************** */
+/* 油種別タンク車数(車)レイアウト */
+.summaryAreaWrapper {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+.summaryAreaWrapper .rightSpace {
+    margin-left: auto; /* 右に寄せる為マージンで埋める */
+    box-sizing: border-box;
+}
+.summaryArea {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column; /* 上下→左右の順で折り返す  */
+    justify-content: center;
+    align-items: center;
+    height: 65px; /* .summaryArea > span の高さが50の為 ２項目分の行となる */
+    box-sizing: border-box;
+}
+/* 1項目ごとの共通設定 */
+.summaryArea > span {
+    height:55px;
+    width:90px;
+    box-sizing:border-box;
+    display:block;
+}
+/* １項目内にあるa要素はブロック要素にする */
+.summaryArea > span > a {
+    display:block;
+    vertical-align:middle;
+}
+/* 表名称項目 2行分の高さと幅調整 */
+.summaryArea > span:nth-child(1) {
+    height:55px;
+    width:148px;
+}
+.summaryArea > span:nth-child(1) .requiredMark::after {
+    margin-top: -0.8em !important; 
+}
+/* 合計項目 2行分の高さと調整 */
+.summaryArea > span:nth-child(2) {
+    height:55px;
 
-
+}
+.summaryArea > span:nth-child(2) > a:nth-child(2) {
+    background-color: rgb(240, 240, 240);
+    border:1px solid darkgray;
+    border-radius :5px;
+    height:28px;
+}
+/* 合計項目のテキストボックス高さ調整 */
+.summaryArea > span:nth-child(2) input[type=text] {
+    border-color: transparent; /* rgb(240, 240, 240);*/
+    height:28px;
+}
+/* 合計表内のテキストボックスの文字はすべて右寄せ */
+.summaryArea input[type=text] {
+    width:100%;
+    text-align:right;
+    height:30px;
+}
+/* 表名称を除き項目名は中央寄せ */
+.summaryArea > span:nth-child(n + 2) > a:nth-child(1) {
+    text-align:center;
+}
+#WF_OILTANKCNT_LABEL {
+    text-align: right;
+    padding-right: 24px;
+}
 /* ************** */
 /* 詳細部         */
 /* ************** */

@@ -58,7 +58,7 @@
                         <div class="popUpTitle"><asp:ContentPlaceHolder ID="contentsPopUpTitle" runat="server"></asp:ContentPlaceHolder></div>
                         <div class="popUpButtons">
                             <input type="button" id="WF_ButtonOkCommonPopUp"     class="btn-sticky" value="OK"  onclick="ButtonClick('WF_ButtonOkCommonPopUp');" />
-                            <input type="button" id="WF_ButtonCancelCommonPopUp" class="btn-sticky" value="ｷｬﾝｾﾙ" onclick="commonHideCustomPopup();" />
+                            <input type="button" id="WF_ButtonCancelCommonPopUp" class="btn-sticky" value="閉じる" onclick="commonHideCustomPopup();" />
                         </div>
                         <div class="popUpContents">
                             <asp:ContentPlaceHolder ID="contentsPopUpInside" runat="server"></asp:ContentPlaceHolder>
@@ -83,6 +83,8 @@
                 <asp:HiddenField ID="MF_PROF_REPORT" runat="server" />              <%-- 帳票プロフID          --%>
                 <asp:HiddenField ID="MF_USER_ORG" runat="server" />                 <%-- ユーザ所属部署        --%>
                 <asp:HiddenField ID="MF_USERTERMID" runat="server" />               <%-- ユーザ所属サーバ      --%>
+                <asp:HiddenField ID="MF_POSIROW" runat="server" />                  <%-- メニュー位置(縦)      --%>
+                <asp:HiddenField ID="MF_POSICOL" runat="server" />                  <%-- メニュー位置(横)      --%>
 
                 <asp:HiddenField ID="MF_MAPID" runat="server" value="" />           <%-- MAPID           --%>
                 <asp:HiddenField ID="MF_MAPvariant" runat="server" />               <%-- MAP変数         --%>
@@ -100,6 +102,11 @@
                 <asp:HiddenField ID="MF_ALERT" runat="server" Value="FALSE" />      <%-- 確認ポップアップ処理可能 --%>
 
                 <asp:HiddenField ID="MF_SHOWCUSTOMOPOUP" runat="server" Value="0" />      <%-- カスタムポップアップ表示(0:非表示,1:表示) --%>
+                
+                <asp:HiddenField ID="MF_CommonDeleteItemName" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象名称（共通処理一覧表内部のテキストの場合フィールド名、それ以外はID) --%>
+                <asp:HiddenField ID="MF_CommonDeleteRow" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象行（共通処理一覧表内部のテキストの場合LINECNT、それ以外は未設定) --%>
+                <asp:HiddenField ID="MF_CommonDeleteListId" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象表ID（共通処理一覧表内部のテキストの場合表ID（パネルID）、それ以外は未設定) --%>
+
             </div>
         </div>
     </form>

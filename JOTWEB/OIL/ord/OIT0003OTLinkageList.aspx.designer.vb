@@ -113,6 +113,33 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
+    '''pnlReserveModActionBox コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlReserveModActionBox As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''WF_ButtonReserveMod コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonReserveMod As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''chkShowCanceldOrder コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkShowCanceldOrder As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>
@@ -120,6 +147,42 @@ Partial Public Class OIT0003OTLinkageList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''hdnModFileDlChkConfirmIsActive コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnModFileDlChkConfirmIsActive As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''repUpdateList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repUpdateList As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''hdnOTLinkageSendChkConfirmIsActive コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnOTLinkageSendChkConfirmIsActive As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''repUpdateOTList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repUpdateOTList As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
     '''rightview コントロール。

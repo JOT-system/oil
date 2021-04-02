@@ -29,67 +29,36 @@ function InitDisplay() {
             //OT連携選択ボタン(表示)
             document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
 
-            ////再表示(仙台)
-            //document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "inlineblock";
-            //document.getElementById("WF_ButtonSendaiLOADCSV").value = "積込予定(仙)";
-
-            ////再表示(根岸)
-            //document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "inlineblock";
-            //document.getElementById("WF_ButtonNegishiSHIPCSV").value = "出荷予定(根)";
-            //document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "inlineblock";
-            //document.getElementById("WF_ButtonNegishiLOADCSV").value = "積込予定(根)";
-
         //★東北支店/仙台
         } else if (document.getElementById('WF_BUTTONpermitcode').value === "1") {
 
             //OT連携選択ボタン(表示)
             document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
-
-            ////再表示(仙台)
-            ////document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "inlineblock";
-            //document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
-
-            ////非表示(根岸)
-            //document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "none";
-            //document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "none";
-        
+       
         //★関東支店/五井/甲子/袖ヶ浦/根岸
         } else if (document.getElementById('WF_BUTTONpermitcode').value === "2") {
 
-            // ●袖ヶ浦は非表示
-            if (document.getElementById('WF_BUTTONofficecode').value === "011203") {
-                //OT連携選択ボタン(非表示)
-                document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
-            } else {
+            //// ●袖ヶ浦は非表示
+            //if (document.getElementById('WF_BUTTONofficecode').value === "011203") {
+            //    //OT連携選択ボタン(非表示)
+            //    document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
+            //} else {
                 //OT連携選択ボタン(表示)
                 document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
-            }
-
-            ////非表示(仙台)
-            //document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
-
-            ////再表示(根岸)
-            //document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "inlineblock";
-            //document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "inlineblock";
+            //}
         
         //★中部支店/四日市/三重塩浜
         } else if (document.getElementById('WF_BUTTONpermitcode').value === "3") {
 
-            // ●三重塩浜は非表示
-            if (document.getElementById('WF_BUTTONofficecode').value === "012402") {
-                //OT連携選択ボタン(非表示)
-                document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
-            } else {
+            //// ●三重塩浜は非表示
+            //if (document.getElementById('WF_BUTTONofficecode').value === "012402") {
+            //    //OT連携選択ボタン(非表示)
+            //    document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "none";
+            //} else {
                 //OT連携選択ボタン(表示)
                 document.getElementById("WF_ButtonOTLinkageINSERT").style.display = "inlineblock";
-            }
+            //}
 
-            ////非表示(仙台)
-            //document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
-
-            ////非表示(根岸)
-            //document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "none";
-            //document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "none";
         }
     } else {
         //非活性 
@@ -111,8 +80,8 @@ function InitDisplay() {
     // 使用有無初期設定
     ChangeOrgUse();
 
-    // (帳票)ラジオボタン
-    reportRadioButton();
+    //// (帳票)ラジオボタン
+    //reportRadioButton();
 }
 
 // ○チェックボックス変更
@@ -190,17 +159,60 @@ function ChangeOrgUse(obj, lineCnt) {
 
 // ◯帳票(ラジオボタンクリック)
 function reportRadioButton() {
-    let chkObj = document.getElementById('rbLineBtn');
-    let txtObj = document.getElementById('divRTrainNo'); //←表示非表示切替用
 
-    if (chkObj === null) {
-        txtObj.style.display = 'none'
-        return;
+    document.getElementById("WF_ButtonClick").value = "tileReport";
+    document.body.style.cursor = "wait";
+    document.forms[0].submit();
+    
+}
+
+// ○帳票(当日ボタンクリック)
+function reportDatrNowButton() {
+    var date = new Date();
+
+    if (document.getElementById("chkReportDateNowChk").checked) {
+        //当日を設定
+        document.getElementById("txtReportLodDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + date.getDate()).slice(-2);
+    } else {
+        //翌日を設定
+        document.getElementById("txtReportLodDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + (date.getDate() + 1)).slice(-2);
     }
 
-    if (chkObj.checked) {
-        txtObj.style.display = 'block'
-    } else {
-        txtObj.style.display = 'none'
+}
+
+// ○ダウンロード処理
+function f_ExcelPrint() {
+    
+    // リンク参照
+    let urlObj = document.getElementById("WF_PrintURL");
+    if (urlObj !== null) {
+        if (isJSON(urlObj.value)) {
+            let urlList = JSON.parse(urlObj.value);
+            for (i = 0; i < urlList.length; i++) {
+                if (urlList[i].url !== null) {
+                    window.open(urlList[i].url, "view" + i, "_blank");
+                }
+            }
+        } else {
+            if (urlObj.value !== null) {
+                window.open(urlObj.value, "view", "_blank");
+            }
+        }
     }
 }
+
+// JSON判定
+function isJSON(arg) {
+    arg = (typeof arg === "function") ? arg() : arg;
+    if (typeof arg !== "string") {
+        return false;
+    }
+    try {
+        arg = (!JSON) ? eval("(" + arg + ")") : JSON.parse(arg);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};

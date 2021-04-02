@@ -40,6 +40,7 @@
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->
+                        <input type="button" id="WF_ButtonDetailDownload" class="btn-sticky" value="明細ﾀﾞｳﾝﾛｰﾄﾞ" style="width:7em;"  onclick="ButtonClick('WF_ButtonDetailDownload');" />
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="社外連携" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
                         <a style="display:none;">
@@ -137,7 +138,13 @@
                 <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>--%>
-    <div>
+    <div class="grc0001Wrapper">
+        <span id="spnReportDateNowChk">
+            <asp:Label ID="lblReportDateNowChk" runat="server" Text=""></asp:Label>
+            <a id="aReportDateNowChk" onclick="reportDatrNowButton();" >
+                <asp:CheckBox ID="chkReportDateNowChk" runat="server" Text="当日" />
+            </a>
+        </span>
         <span id="spnLodDate">
             <asp:Label ID="lblReportLodDate" runat="server" Text="積込日"></asp:Label>
             <a class="ef" id="aReportLodDate" ondblclick="Field_DBclick('txtReportLodDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
@@ -159,16 +166,10 @@
                 <asp:RadioButton ID="rbDeliveryCSVBtn" runat="server" GroupName="WF_SW" Text="託送指示(CSV)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示" onclick="reportRadioButton();" />
-            </li>
-            <li>
-                <asp:RadioButton ID="rbOTLoadBtn" runat="server" GroupName="WF_SW" Text="OT積込指示" onclick="reportRadioButton();" />
-            </li>
-            <li>
                 <asp:RadioButton ID="rbShipBtn" runat="server" GroupName="WF_SW" Text="出荷予定" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbFillingPointBtn" runat="server" GroupName="WF_SW" Text="充填ポイント表" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbKinoeneLoadBtn" runat="server" GroupName="WF_SW" Text="回線別指示書<br>(甲子)" onclick="reportRadioButton();" />
@@ -176,9 +177,48 @@
             <li>
                 <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbActualLoad10Btn" runat="server" GroupName="WF_SW" Text="積込実績(北信)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbActualLoad20Btn" runat="server" GroupName="WF_SW" Text="積込実績(甲府)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbKuukaiBtn" runat="server" GroupName="WF_SW" Text="空回日報" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示書" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbOTLoadBtn" runat="server" GroupName="WF_SW" Text="OT積込指示" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbTankDispatchBtn" runat="server" GroupName="WF_SW" Text="タンク車発送実績" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbTankDispatch30Btn" runat="server" GroupName="WF_SW" Text="タンク車発送実績<br>(コウショウ高崎)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbTankDispatch40Btn" runat="server" GroupName="WF_SW" Text="タンク車発送実績<br>(ＪＯＮＥＴ松本)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbTankDispatch54Btn" runat="server" GroupName="WF_SW" Text="タンク車発送実績<br>(構内取り)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbShipContactBtn" runat="server" GroupName="WF_SW" Text="タンク車<br>出荷連絡書" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbActualShipBtn" runat="server" GroupName="WF_SW" Text="出荷実績" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbConcatOederBtn" runat="server" GroupName="WF_SW" Text="連結順序表" onclick="reportRadioButton();" />
+            </li>
         </ul>
     </div>
-    <div id="divRTrainNo">
+    <div id="divRTrainNo" runat="server">
         <span id="spnRTrainNo">
             <asp:Label ID="lblReportRTrainNo" runat="server" Text="列車番号(臨海)"></asp:Label>
             <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
@@ -186,4 +226,21 @@
             </a>
         </span>
     </div>
+    <div id="divTrainNo" runat="server">
+        <span id="spnTrainNo">
+            <asp:Label ID="lblReportTrainNo" runat="server" Text="列車番号"></asp:Label>
+            <a class="ef" id="aReportTrainNo" ondblclick="Field_DBclick('txtReportTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);">
+                <asp:TextBox ID="txtReportTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+    <div id="divEndMonthChk" runat="server">
+        <span id="spnEndMonthChk">
+            <asp:Label ID="lblEndMonthChkDmy" runat="server" Text="　　　　　　　　　"></asp:Label>
+            <a id="aEndMonthChk">
+                <asp:CheckBox ID="ChkEndMonthChk" runat="server" Text=" 当月積込、翌月発分を含める" />
+            </a>
+        </span>
+    </div>
+
 </asp:Content>

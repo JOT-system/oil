@@ -1,2 +1,45 @@
-﻿body {
+﻿.tblLastupdate {
+    border-collapse: separate;
+    table-layout: fixed;
+    width: 300px;
+    box-sizing: border-box;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+    border-spacing:1px;
+}
+.tblLastupdate td, .tblLastupdate th {
+    border: 1px solid darkgray;
+    padding:5px;
+    //border-radius:5px;
+}
+td.consigneeMark {
+    text-align: center;
+}
+.tblLastupdate th.userName {
+    width: 150px;
+}
+
+.tblLastupdate th:first-child {
+    border-top-left-radius: 5px;
+}
+.tblLastupdate th:last-child {
+    width:150px;
+    border-top-right-radius:5px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+} 
+.tblLastupdate th {
+    font-size:14px;
+    background-color:dodgerblue;
+    color:white;
+}
+.tblLastupdate tr:last-child>td:first-child  {
+    border-bottom-left-radius: 5px;
+}
+.tblLastupdate tr:last-child>td:last-child  {
+    border-bottom-right-radius: 5px;
+}
+#divConsigneeUpdateInfo {
+    display:none !important;
 }

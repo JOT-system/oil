@@ -2,17 +2,14 @@
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
-<%@ Import Namespace="JOTWEB.GRIS0003SRightBox" %>
 
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIM0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<%@ Register src="../inc/GRC0001TILESELECTORWRKINC.ascx" tagname="tilelist" tagprefix="MSINC" %>
-
 <asp:Content id="OIM0003SH" contentplaceholderid="head" runat="server">
-    <!-- <link href='<%=ResolveUrl("~/OIL/css/OIM0003S.css")%>' rel="stylesheet" type="text/css" /> -->
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0003S.js")%>'></script>
+    <%-- <link href='<%=ResolveUrl("~/OIL/css/OIM0003S.css")%>' rel="stylesheet" type="text/css" /> --%>
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0003S .js")%>'></script>
 </asp:Content>
 
 <asp:Content ID="OIM0003S" ContentPlaceHolderID="contents1" runat="server">
@@ -30,90 +27,72 @@
 
         <!-- ○ 変動項目 ○ -->
         <div class="inputBox">
-            <!-- 会社コード -->
-            <div class="inputItem" style="display:none">
-                <a id="LblCampCodeMy" class="requiredMark">会社コード</a>
-                <a class="ef" id="WF_CAMPCODE_MY" ondblclick="Field_DBclick('WF_CAMPCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE_MY');">
-                    <asp:TextBox ID="TxtCampCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox></a>
-                <a id="WF_CAMPNAME_MY">
-                    <asp:Label ID="txtCampNameMy" runat="server" CssClass="WF_TEXT"></asp:Label></a>
-            </div>
-
-            <!-- 運用部署 -->
-            <div class="inputItem" style="display:none">
-                <a id="LblOrgCodeMy" class="requiredMark">運用部署</a>
-                <a class="ef" id="WF_ORGCODE_MY" style="display:none" ondblclick="Field_DBclick('WF_ORGCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE_MY');">
-                    <asp:TextBox ID="TxtOrgCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_ORGNAME_MY" style="display:none">
-                    <asp:Label ID="txtOrgNameMy" runat="server" CssClass="WF_TEXT"></asp:Label></a>
-            </div>
 
             <!-- 営業所コード -->
             <div class="inputItem">
-                <a id="LblOfficeCode">営業所コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_SEL_OFFICECODE" ondblclick="Field_DBclick('WF_OFFICECODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_SEL_OFFICECODE');">
-                        <asp:TextBox ID="TxtOfficeCode" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox></a>
-                <a id="WF_OFFICECODE">
-                    <asp:Label ID="TxtOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="LblOfficeCode">営業所コード</a>
+                <span ondblclick="Field_DBclick('WF_OFFICECODE', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('WF_OFFICECODE');">
+                    <asp:TextBox ID="WF_OFFICECODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_OFFICECODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
 
             <!-- 荷主コード -->
             <div class="inputItem">
-                <a id="LblShipperCode" >荷主コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_SEL_SHIPPERCODE" ondblclick="Field_DBclick('WF_SHIPPERCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_SEL_SHIPPERCODE');">
-                        <asp:TextBox ID="TxtShipperCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_SHIPPERCODE">
-                    <asp:Label ID="TxtShipperName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="WF_SHIPPERCODE_LABEL" >荷主コード</a>
+                <span ondblclick="Field_DBclick('WF_SHIPPERCODE', <%=LIST_BOX_CLASSIFICATION.LC_JOINTLIST%>);" onchange="TextBox_change('WF_SHIPPERCODE');">
+                    <asp:TextBox ID="WF_SHIPPERCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_SHIPPERCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
             
             <!-- 基地コード -->
             <div class="inputItem">
-                <a id="LblPlantCode" >基地コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_SEL_PLANTCODE" ondblclick="Field_DBclick('WF_PLANTCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_SEL_PLANTCODE');">
-                        <asp:TextBox ID="TxtPlantCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_PLANTCODE">
-                    <asp:Label ID="TxtPlantName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="WF_PLANTCODE_LABEL" >基地コード</a>
+                <span ondblclick="Field_DBclick('WF_PLANTCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_PLANTCODE');">
+                    <asp:TextBox ID="WF_PLANTCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_PLANTCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
 
             <!-- 油種大分類コード -->
             <div class="inputItem">
-                <a id="LblBigoilCode" >油種大分類コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_SEL_BIGOILCODE" ondblclick="Field_DBclick('WF_BIGOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_SEL_BIGOILCODE');">
-                        <asp:TextBox ID="TxtBigoilCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_BIGOILCODE">
-                    <asp:Label ID="TxtBigoilName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="WF_BIGOILCODE_LABEL" >油種大分類コード</a>
+                <span ondblclick="Field_DBclick('WF_BIGOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_BIGOILCODE');">
+                    <asp:TextBox ID="WF_BIGOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_BIGOILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
             
             <!-- 油種中分類コード -->
             <div class="inputItem">
-                <a id="LblMiddleoilCode" >油種中分類コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_SEL_MIDDLEOILCODE" ondblclick="Field_DBclick('WF_MIDDLEOILNAME', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_SEL_MIDDLEOILCODE');">
-                        <asp:TextBox ID="TxtMiddleoilCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_MIDDLEOILNAME">
-                    <asp:Label ID="TxtMiddleoilName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="WF_MIDDLEOILCODE_LABEL" >油種中分類コード</a>
+                <span ondblclick="Field_DBclick('WF_MIDDLEOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_MIDDLEOILCODE');">
+                    <asp:TextBox ID="WF_MIDDLEOILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_MIDDLEOILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
             
             <!-- 油種コード -->
             <div class="inputItem">
-                <a id="LblOilCode" >油種コード</a><br/>&nbsp;
-                    <a class="ef" id="WF_ORGCODE" ondblclick="Field_DBclick('WF_OILCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE');">
-                        <asp:TextBox ID="TxtOilCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox></a>
-                <a id="WF_OILCODE">
-                    <asp:Label ID="TxtOilName" runat="server" CssClass="WF_TEXT"></asp:Label></a>
+                <a id="WF_OILCODE_LABEL" >油種コード</a>
+                <span ondblclick="Field_DBclick('WF_OILCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_OILCODE');">
+                    <asp:TextBox ID="WF_OILCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+                </span>
+                <asp:Label ID="WF_OILCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </div>
 
             <!-- 削除フラグ -->
             <div class="inputItem">
-                <a id="LblSearch">検索条件</a><br/>&nbsp;
-                <a id="WF_SW">
-                    <asp:RadioButton ID="RdBSearch1" runat="server" GroupName="RdBSearch" Text="削除除く" /><br/>
-                    <asp:RadioButton ID="RdBSearch2" runat="server" GroupName="RdBSearch" Text="削除のみ" />
-                </a>
+                <a id="WF_DELFLG_LABEL">検索条件</a>
+                <span id="WF_DELFLG">
+                    <asp:RadioButton ID="WF_DELFLG_NOTDELETED" runat="server" GroupName="WF_DELFLG" Text="削除除く" /><br/>
+                    <asp:RadioButton ID="WF_DELFLG_DELETED" runat="server" GroupName="WF_DELFLG" Text="削除のみ" />
+                </span>
             </div>
-
-            <!-- 削除フラグ -->
+            
             <div class="inputItem">
-                <a id="LblWord">※条件指定がない時は全件表示</a><br/>
+                <a id="WF_DELFLG_ANNOTATION">※条件指定がない時は全件表示</a>
             </div>
 
         </div> <!-- End inputBox -->

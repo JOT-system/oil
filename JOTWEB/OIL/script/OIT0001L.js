@@ -29,6 +29,17 @@ function InitDisplay() {
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
     }
+
+    //〇 空回日報取込ボタン活性／非活性
+    if (document.getElementById('WF_OTReceiveFLG').value === "TRUE") {
+        //活性
+        document.getElementById("WF_ButtonOTINSERT").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonOTINSERT").disabled = "disabled";
+    }
+
     /* 共通一覧のスクロールイベント紐づけ */
     //bindListCommonEvents(pnlListAreaId, IsPostBack);
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);

@@ -12,7 +12,43 @@ Option Explicit On
 
 
 Partial Public Class OIM0001CampCreate
-    
+
+    '''<summary>
+    '''TxtCampCodeMy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents TxtCampCodeMy As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''txtCampNameMy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents txtCampNameMy As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''TxtOrgCodeMy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents TxtOrgCodeMy As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''txtOrgNameMy コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents txtOrgNameMy As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''WF_Sel_LINECNT_L コントロール。
     '''</summary>
@@ -20,8 +56,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_Sel_LINECNT_L As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents WF_Sel_LINECNT_L As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''WF_Sel_LINECNT コントロール。
     '''</summary>
@@ -29,35 +65,35 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_Sel_LINECNT As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents WF_Sel_LINECNT As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_DELFLG_L コントロール。
+    '''LblDelFlg コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblDelFlg As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_DELFLG コントロール。
+    '''TxtDelFlg コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DELFLG As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtDelFlg As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_DELFLG_TEXT コントロール。
+    '''LblDelFlgText コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DELFLG_TEXT As Global.System.Web.UI.WebControls.Label
-    
+    Protected WithEvents LblDelFlgText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblCampCode コントロール。
     '''</summary>
@@ -65,26 +101,26 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblCampCode As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblCampCode As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''TxtStationCode コントロール。
+    '''TxtCampCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtStationCode As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtCampCode As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''LblCampCodeText コントロール。
+    '''LblCampCodetext コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblCampCodeText As Global.System.Web.UI.WebControls.Label
-    
+    Protected WithEvents LblCampCodetext As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblStymd コントロール。
     '''</summary>
@@ -92,8 +128,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblStymd As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblStymd As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtStymd コントロール。
     '''</summary>
@@ -101,8 +137,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtStymd As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtStymd As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblStymdText コントロール。
     '''</summary>
@@ -110,8 +146,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblStymdText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblStymdText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblEndymd コントロール。
     '''</summary>
@@ -119,8 +155,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblEndymd As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblEndymd As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtEndymd コントロール。
     '''</summary>
@@ -128,8 +164,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtEndymd As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtEndymd As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblEndymdText コントロール。
     '''</summary>
@@ -137,8 +173,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblEndymdText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblEndymdText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblName コントロール。
     '''</summary>
@@ -146,8 +182,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblName As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblName As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtName コントロール。
     '''</summary>
@@ -155,8 +191,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtName As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtName As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblNameText コントロール。
     '''</summary>
@@ -164,8 +200,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNameText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNameText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblNames コントロール。
     '''</summary>
@@ -173,8 +209,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNames As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNames As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtNames コントロール。
     '''</summary>
@@ -182,8 +218,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtNames As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtNames As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblTypeNameText コントロール。
     '''</summary>
@@ -191,8 +227,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblTypeNameText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblTypeNameText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblNameKana コントロール。
     '''</summary>
@@ -200,8 +236,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNameKana As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNameKana As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtNameKana コントロール。
     '''</summary>
@@ -209,8 +245,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtNameKana As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtNameKana As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblNameKanaText コントロール。
     '''</summary>
@@ -218,8 +254,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNameKanaText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNameKanaText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblNameKanas コントロール。
     '''</summary>
@@ -227,8 +263,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNameKanas As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNameKanas As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtNameKanas コントロール。
     '''</summary>
@@ -236,8 +272,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtNameKanas As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtNameKanas As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblNameKanasText コントロール。
     '''</summary>
@@ -245,8 +281,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblNameKanasText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblNameKanasText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblPostName1 コントロール。
     '''</summary>
@@ -254,8 +290,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblPostName1 As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblPostName1 As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtPostName1 コントロール。
     '''</summary>
@@ -263,8 +299,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtPostName1 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtPostName1 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblPostName1Text コントロール。
     '''</summary>
@@ -272,8 +308,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblPostName1Text As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblPostName1Text As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtPostName2 コントロール。
     '''</summary>
@@ -281,8 +317,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtPostName2 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtPostName2 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblAddr1 コントロール。
     '''</summary>
@@ -290,8 +326,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr1 As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr1 As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtAddr1 コントロール。
     '''</summary>
@@ -299,8 +335,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtAddr1 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtAddr1 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblAddr1Text コントロール。
     '''</summary>
@@ -308,8 +344,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr1Text As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr1Text As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblAddr2 コントロール。
     '''</summary>
@@ -317,8 +353,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr2 As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr2 As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtAddr2 コントロール。
     '''</summary>
@@ -326,8 +362,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtAddr2 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtAddr2 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblAddr2Text コントロール。
     '''</summary>
@@ -335,8 +371,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr2Text As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr2Text As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblAddr3 コントロール。
     '''</summary>
@@ -344,8 +380,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr3 As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr3 As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtAddr3 コントロール。
     '''</summary>
@@ -353,8 +389,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtAddr3 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtAddr3 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblAddr3Text コントロール。
     '''</summary>
@@ -362,8 +398,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr3Text As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr3Text As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblAddr4 コントロール。
     '''</summary>
@@ -371,8 +407,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr4 As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr4 As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtAddr4 コントロール。
     '''</summary>
@@ -380,8 +416,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtAddr4 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtAddr4 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblAddr4Text コントロール。
     '''</summary>
@@ -389,8 +425,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblAddr4Text As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblAddr4Text As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblTel コントロール。
     '''</summary>
@@ -398,8 +434,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblTel As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblTel As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtTel コントロール。
     '''</summary>
@@ -407,8 +443,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtTel As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtTel As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblTelText コントロール。
     '''</summary>
@@ -416,8 +452,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblTelText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblTelText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblFax コントロール。
     '''</summary>
@@ -425,8 +461,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblFax As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblFax As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtFax コントロール。
     '''</summary>
@@ -434,8 +470,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtFax As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtFax As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblFaxText コントロール。
     '''</summary>
@@ -443,8 +479,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblFaxText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblFaxText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''LblMail コントロール。
     '''</summary>
@@ -452,8 +488,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblMail As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblMail As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''TxtMail コントロール。
     '''</summary>
@@ -461,8 +497,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtMail As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents TxtMail As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''LblMailText コントロール。
     '''</summary>
@@ -470,8 +506,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblMailText As Global.System.Web.UI.WebControls.Label
-    
+    Public WithEvents LblMailText As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -479,8 +515,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
-    
+    Public WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
+
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -488,8 +524,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+    Public WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -497,8 +533,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIM0001WRKINC
-    
+    Public WithEvents work As Global.JOTWEB.OIM0001WRKINC
+
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
@@ -506,8 +542,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_GridPosition コントロール。
     '''</summary>
@@ -515,8 +551,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -524,8 +560,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_FIELD_REP コントロール。
     '''</summary>
@@ -533,8 +569,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -542,8 +578,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -551,8 +587,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -560,8 +596,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_RightViewChange コントロール。
     '''</summary>
@@ -569,8 +605,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -578,8 +614,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -587,8 +623,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
@@ -596,8 +632,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -605,8 +641,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_MAPpermitcode コントロール。
     '''</summary>
@@ -614,8 +650,8 @@ Partial Public Class OIM0001CampCreate
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -624,7 +660,7 @@ Partial Public Class OIM0001CampCreate
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

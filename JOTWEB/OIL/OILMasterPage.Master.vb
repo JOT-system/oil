@@ -83,15 +83,16 @@ Public Class OILMasterPage
             '画面間情報取得処理
             SetMAPValue()
         End If
-        'オンラインサービス判定 
-        Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
-        CS0008ONLINEstat.COMPCODE = GetTargetComp()
-        CS0008ONLINEstat.CS0008ONLINEstat()
 
-        If Not isNormal(CS0008ONLINEstat.ERR) OrElse CS0008ONLINEstat.ONLINESW = 0 Then
-            Server.Transfer(C_URL.LOGIN)
-            Exit Sub
-        End If
+        'オンラインサービス判定 
+        '        Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
+        '        CS0008ONLINEstat.COMPCODE = GetTargetComp()
+        '        CS0008ONLINEstat.CS0008ONLINEstat()
+
+        '        If Not isNormal(CS0008ONLINEstat.ERR) OrElse CS0008ONLINEstat.ONLINESW = 0 Then
+        '        Server.Transfer(C_URL.LOGIN)
+        '        Exit Sub
+        '        End If
 
     End Sub
 
@@ -1230,5 +1231,75 @@ Public Class OILMasterPage
             MF_USERTERMID.Value = value
         End Set
     End Property
+    ''' <summary>
+    ''' POSIROW
+    ''' </summary>
+    Property POSIROW As String
+        Get
+            Return MF_POSIROW.Value
+        End Get
+        Set(value As String)
+            MF_POSIROW.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' POSICOL
+    ''' </summary>
+    Property POSICOL As String
+        Get
+            Return MF_POSICOL.Value
+        End Get
+        Set(value As String)
+            MF_POSICOL.Value = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' ×ボタン情報保持
+    ''' </summary>
+    Private mMasterDeleteFieldInfo As MasterDeleteFieldInfo
+    ''' <summary>
+    ''' ×ボタン情報保持クラス
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property DELETE_FIELDINFO As MasterDeleteFieldInfo
+        Get
+            If mMasterDeleteFieldInfo Is Nothing Then
+                mMasterDeleteFieldInfo = New MasterDeleteFieldInfo
+                With mMasterDeleteFieldInfo
+                    .FieldName = Me.MF_CommonDeleteItemName.Value
+                    .ListId = Me.MF_CommonDeleteListId.Value
+                    .LineCnt = Me.MF_CommonDeleteRow.Value
+                End With
+                Me.MF_CommonDeleteItemName.Value = ""
+                Me.MF_CommonDeleteRow.Value = ""
+                Me.MF_CommonDeleteListId.Value = ""
+            End If
+            Return mMasterDeleteFieldInfo
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' ×ボタンアイコン押下時の情報
+    ''' </summary>
+    Public Class MasterDeleteFieldInfo
+        ''' <summary>
+        ''' 一覧内部のテキストの場合はフィールド名、それ以外はID
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FieldName As String
+        ''' <summary>
+        ''' 一覧内部のテキストの場合ListのID
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ListId As String
+        ''' <summary>
+        ''' 一覧内部のテキストの場合行、それ以外未設定
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property LineCnt As String
+
+
+    End Class
 #End Region
 End Class

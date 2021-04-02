@@ -908,6 +908,9 @@ Public Class OIM0005TankCreate
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
+                            'リース先C
+                            Case "WF_LEASECODE"
+                                prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
 
                             '自動延長
                             Case "WF_AUTOEXTENTION"
@@ -1812,7 +1815,7 @@ Public Class OIM0005TankCreate
             If isNormal(WW_CS0024FCHECKERR) Then
                 If WW_TEXT <> "" Then
                     '値存在チェック
-                    CODENAME_get("LEASECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    CODENAME_get("CAMPCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
                     If Not isNormal(WW_RTN_SW) Then
                         WW_CheckMES1 = "・更新できないレコード(リース先C入力エラー)です。"
                         WW_CheckMES2 = "マスタに存在しません。"
@@ -3416,10 +3419,11 @@ Public Class OIM0005TankCreate
 
             OIM0005INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0005row As DataRow In OIM0005tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
                         OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
                         OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
@@ -3509,12 +3513,12 @@ Public Class OIM0005TankCreate
                         OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                         OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0005INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -3643,6 +3647,7 @@ Public Class OIM0005TankCreate
 
             Select Case I_FIELD
                 Case "CAMPCODE"                     '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"                          '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)

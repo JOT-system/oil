@@ -131,6 +131,15 @@ Partial Public Class OIT0003OrderSearch
     Protected WithEvents LblStatusName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''ChkOrderCancelFlg コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkOrderCancelFlg As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

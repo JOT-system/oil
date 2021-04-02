@@ -69,6 +69,28 @@ Public Class MP0009ActualTraction
                     SetDisplayValues()
 
                 End If
+                'ダウンロードボタン押下時処理
+                If Me.hdnDownloadCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    'ダウンロードデータ取得
+                    Dim dt As DataTable
+                    Using sqlCon As SqlConnection = CS0050Session.getConnection
+                        sqlCon.Open()
+                        SqlConnection.ClearPool(sqlCon)
+                        dt = GetDownloadListData(sqlCon)
+                    End Using
+                    '帳票生成
+                    Dim tempFileName As String = String.Format("{0}_ACTUALTRACTION_{1}.xlsx", Me.ID, Me.ddlActualTractionOffice.SelectedValue)
+                    Using clsPrint As New M00001MP0009ActualTraction(
+                        Me.Page.Title, tempFileName, dt,
+                        Me.ddlActualTractionOffice.SelectedValue, Me.ddlActualTractionOffice.SelectedItem.Text,
+                        Me.ddlActualTractionArrStation.SelectedValue, Me.ddlActualTractionArrStation.SelectedItem.Text,
+                        Me.ddlActualTractionYearMonth.SelectedItem.Text
+                        )
+                        clsPrint.CreateExcelFileStream(Me.Page)
+                    End Using
+                    SetDisplayValues()
+                End If
                 '処理フラグを落とす
                 Me.hdnRefreshCall.Value = ""
             Catch ex As Exception
@@ -92,6 +114,7 @@ Public Class MP0009ActualTraction
     ''' </summary>
     Protected Sub Initialize()
         Me.lblPaneTitle.Text = "営業所別　列車牽引実績"
+        Me.lblPaneDownloadTitle.Text = "月間列車別牽引実績のダウンロード"
         'MP0000Baseの共通処理の営業所抽出を呼出し営業所ドロップダウン生成
         Dim retDdl As DropDownList = Me.GetOfficeList()
         If retDdl.Items.Count > 0 Then
@@ -113,6 +136,22 @@ Public Class MP0009ActualTraction
             Dim savedSelectedVal As String = ""
             savedSelectedVal = Me.LoadCookie(Me.ddlActualTractionArrStation.ClientID)
             SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
+        End If
+        '年月ドロップダウンの生成
+        Dim ymDdl As New DropDownList
+        Dim dt As Date = Now
+        For pMonth As Integer = 0 To -12 Step -1
+            ymDdl.Items.Add(dt.AddMonths(pMonth).ToString("yyyy/MM"))
+        Next
+        If ymDdl.Items.Count > 0 Then
+            Me.ddlActualTractionYearMonth.Items.AddRange(ymDdl.Items.Cast(Of ListItem).ToArray)
+            Dim savedSelectedVal As String = ""
+            savedSelectedVal = Me.LoadCookie(ddlActualTractionYearMonth.ClientID)
+            If savedSelectedVal = "" Then
+                Me.ddlActualTractionYearMonth.SelectedIndex = ymDdl.SelectedIndex
+            Else
+                SetDdlDefaultValue(Me.ddlActualTractionYearMonth, savedSelectedVal)
+            End If
         End If
 
         'グラフ情報の設定
@@ -147,10 +186,12 @@ Public Class MP0009ActualTraction
         sqlStat.AppendLine("              ,DTL.CARSNUMBER")
         sqlStat.AppendLine("          FROM COM.OIS0021_CALENDAR CAL with(nolock)")
         sqlStat.AppendLine("     LEFT JOIN OIL.OIT0002_ORDER ODR  with(nolock)")
-        sqlStat.AppendLine("            ON CAL.WORKINGYMD =  ODR.LODDATE")
-        sqlStat.AppendLine("           AND CAL.DELFLG     =  @DELFLG")
-        sqlStat.AppendLine("           AND ODR.DELFLG     =  @DELFLG")
+        sqlStat.AppendLine("            ON CAL.WORKINGYMD  =  ODR.LODDATE")
+        sqlStat.AppendLine("           AND CAL.DELFLG      =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.DELFLG      =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.ORDERSTATUS <> @ORDERSTATUS")
         sqlStat.AppendLine("           AND ODR.LODDATE IS NOT NULL")
+        sqlStat.AppendLine("           AND ODR.OFFICECODE  = @OFFICECODE")
         sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL  with(nolock)")
         sqlStat.AppendLine("            ON ODR.ORDERNO = DTL.ORDERNO")
         sqlStat.AppendLine("           AND DTL.DELFLG     =  @DELFLG")
@@ -163,7 +204,7 @@ Public Class MP0009ActualTraction
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.ddlActualTractionOffice.SelectedValue
                 .Add("@ARRSTATION", SqlDbType.NVarChar).Value = Me.ddlActualTractionArrStation.SelectedValue
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-
+                .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
             Dim fieldList As String = ""
             Dim firldListWithIsNull As String = ""
@@ -203,7 +244,7 @@ Public Class MP0009ActualTraction
     ''' <summary>
     ''' グラフ及び一覧表のデータを設定
     ''' </summary>
-    Private Sub SetDisplayValues()
+    Private Function SetDisplayValues() As DataTable
         Dim dt As DataTable
         Using sqlCon As SqlConnection = CS0050Session.getConnection
             sqlCon.Open()
@@ -243,5 +284,117 @@ Public Class MP0009ActualTraction
             .DataBind()
 
         End With
-    End Sub
+        Return dt
+    End Function
+
+    ''' <summary>
+    ''' 一覧表データ取得
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function GetDownloadListData(sqlCon As SqlConnection) As DataTable
+
+        Dim sqlStat As New StringBuilder
+        Dim retTbl As DataTable = Nothing
+
+        With sqlStat
+            .AppendLine(" SELECT ")
+            .AppendLine("     LH.OFFICECODE                          AS OFFICECODE ")
+            .AppendLine("   , LH.SHIPPERCODE                         AS SHIPPERCODE ")
+            .AppendLine("   , LH.ARRSTATIONCODE                      AS ARRSTATIONCODE ")
+            .AppendLine("   , LH.TRAINNO                             AS TRAINNO ")
+            .AppendLine("   , FORMAT(ODR.LODDATE, 'yyyy/MM/dd')      AS LODDATE ")
+            .AppendLine("   , FORMAT(ODR.DEPDATE, 'yyyy/MM/dd')      AS DEPDATE ")
+            .AppendLine("   , DTL.OTTRANSPORTFLG                     AS OTTRANSPORTFLG ")
+            .AppendLine("   , CASE DTL.OTTRANSPORTFLG ")
+            .AppendLine("     WHEN 1 THEN SUM(DTL.CARSNUMBER) ")
+            .AppendLine("     WHEN 2 THEN SUM(DTL.CARSNUMBER) ")
+            .AppendLine("     ELSE 0 ")
+            .AppendLine("     END                                    AS CARSNUMBER ")
+            .AppendLine("   , ISNULL(MAX(CONVERT(INT, DTL.LINE)), 0) AS LINE ")
+            .AppendLine(" FROM ")
+            .AppendLine("   ( ")
+            .AppendLine("     SELECT ")
+            .AppendLine("         STP.CAMPCODE    AS OFFICECODE ")
+            .AppendLine("       , SHP.SHIPPERCODE AS SHIPPERCODE ")
+            .AppendLine("       , SHP.SHIPPERNAME AS SHIPPERNAME ")
+            .AppendLine("       , STP.KEYCODE     AS ARRSTATIONCODE ")
+            .AppendLine("       , STP.VALUE1      AS ARRSTATIONNAME ")
+            .AppendLine("       , TRA.KEYCODE     AS TRAINNO ")
+            .AppendLine("       , TRA.VALUE1      AS TRAINNAME ")
+            .AppendLine("     FROM ")
+            .AppendLine("       OIL.VIW0002_SHIPPERS SHP ")
+            .AppendLine("       , OIL.VIW0001_FIXVALUE STP ")
+            .AppendLine("       , OIL.VIW0001_FIXVALUE TRA ")
+            .AppendLine("     WHERE ")
+            .AppendLine("       STP.CLASS = 'STATIONPATTERN' ")
+            .AppendLine("       AND STP.DELFLG = @DELFLG ")
+            .AppendLine("       AND STP.CAMPCODE = @OFFICECODE ")
+            .AppendLine("       AND TRA.CLASS = 'TRAINNUMBER' ")
+            .AppendLine("       AND STP.DELFLG = @DELFLG ")
+            .AppendLine("       AND STP.CAMPCODE = TRA.CAMPCODE ")
+            .AppendLine("   ) LH ")
+            .AppendLine("   LEFT JOIN OIL.OIT0002_ORDER ODR WITH (NOLOCK) ")
+            .AppendLine("     ON LH.OFFICECODE = ODR.OFFICECODE ")
+            .AppendLine("     AND LH.TRAINNO = ODR.TRAINNO ")
+            .AppendLine("     AND LH.ARRSTATIONCODE = ODR.ARRSTATION ")
+            .AppendLine("   LEFT JOIN OIL.OIT0003_DETAIL DTL WITH (NOLOCK) ")
+            .AppendLine("     ON ODR.ORDERNO = DTL.ORDERNO ")
+            .AppendLine("     AND LH.SHIPPERCODE = DTL.SHIPPERSCODE ")
+            .AppendLine(" WHERE ")
+            .AppendLine("   ODR.DELFLG = @DELFLG ")
+            .AppendLine("   AND DTL.DELFLG = @DELFLG ")
+            .AppendLine("   AND ( ")
+            .AppendLine("     ODR.LODDATE BETWEEN @BEGINDATE AND @ENDDATE ")
+            .AppendLine("     OR ODR.DEPDATE BETWEEN @BEGINDATE AND @ENDDATE ")
+            .AppendLine("   ) ")
+            .AppendLine(" GROUP BY ")
+            .AppendLine("   LH.OFFICECODE ")
+            .AppendLine("   , LH.SHIPPERCODE ")
+            .AppendLine("   , LH.ARRSTATIONCODE ")
+            .AppendLine("   , LH.TRAINNO ")
+            .AppendLine("   , ODR.LODDATE ")
+            .AppendLine("   , ODR.DEPDATE ")
+            .AppendLine("   , DTL.OTTRANSPORTFLG ")
+            .AppendLine(" ORDER BY ")
+            .AppendLine("   LH.OFFICECODE ")
+            .AppendLine("   , LH.SHIPPERCODE ")
+            .AppendLine("   , LH.ARRSTATIONCODE ")
+            .AppendLine("   , LH.TRAINNO ")
+            .AppendLine("   , ODR.LODDATE ")
+            .AppendLine("   , ODR.DEPDATE ")
+        End With
+
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+
+            Dim strDt As String = String.Format("{0}/01", Me.ddlActualTractionYearMonth.SelectedValue)
+            Dim dt As Date = Nothing
+            If Not Date.TryParse(strDt, dt) Then
+                dt = Now
+            End If
+
+            With sqlCmd.Parameters
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.ddlActualTractionOffice.SelectedValue
+                .Add("@BEGINDATE", SqlDbType.NVarChar).Value = dt.AddDays(-1).ToString("yyyy/MM/dd")
+                .Add("@ENDDATE", SqlDbType.NVarChar).Value = dt.AddMonths(1).ToString("yyyy/MM/dd")
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If IsNothing(retTbl) Then
+                    retTbl = New DataTable
+
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        retTbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                End If
+
+                retTbl.Clear()
+                retTbl.Load(sqlDr)
+            End Using
+
+        End Using 'sqlCmd
+        Return retTbl
+    End Function
+
 End Class

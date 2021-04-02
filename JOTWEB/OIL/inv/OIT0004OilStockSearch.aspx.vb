@@ -9,6 +9,7 @@
 ' 修正履歴:
 '         :
 ''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -59,10 +60,14 @@ Public Class OIT0004OilStockSearch
                     Case "HELP"                         'ヘルプ表示
                         WF_HELP_Click()
                 End Select
+                If Not {"WF_ButtonDO", "WF_ButtonEND"}.Contains(WF_ButtonClick.Value) Then
+                    GetLastUpdate()
+                End If
             End If
         Else
             '○ 初期化処理
             Initialize()
+            GetLastUpdate()
         End If
 
     End Sub
@@ -112,6 +117,10 @@ Public Class OIT0004OilStockSearch
             prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
+            If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+                leftview.WF_LeftListBox.Items.Clear()
+                leftview.WF_LeftListBox.Items.Add(New ListItem("根岸営業所", "011402"))
+            End If
             If leftview.WF_LeftListBox.Items IsNot Nothing Then
                 '一旦根岸(011402)'本当はログインユーザーのORG
                 Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue("011402")
@@ -120,10 +129,16 @@ Public Class OIT0004OilStockSearch
                     TxtSalesOffice.Text = foundItem.Value
                 Else
                     TxtSalesOffice.Text = leftview.WF_LeftListBox.Items(0).Value
+
                 End If
 
                 If TxtSalesOffice.Text <> "" Then
                     GetDefRelateValues(TxtSalesOffice.Text, shipperCode, consigneeCode)
+                    If Master.USER_ORG = "302001" Then
+                        consigneeCode = "10"
+                    ElseIf Master.USER_ORG = "301901" Then
+                        consigneeCode = "20"
+                    End If
                 End If
 
             End If
@@ -360,9 +375,10 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
-
+        Me.WF_CAMPCODE.Text = Master.USERCAMP
+        work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
         '○ 前画面遷移
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 
@@ -414,6 +430,26 @@ Public Class OIT0004OilStockSearch
                         End If
                         Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
                         .SetListBox(enumVal, WW_DUMMY, prmData)
+                        If Master.USER_ORG = "011203" AndAlso WF_FIELD.Value = "TxtSalesOffice" Then
+                            If leftview.WF_LeftListBox.Items.FindByValue("012402") Is Nothing Then
+                                leftview.WF_LeftListBox.Items.Add(New ListItem("三重塩浜営業所", "012402"))
+                            End If
+
+                        End If
+                        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+                            If WF_FIELD.Value = "TxtSalesOffice" Then
+                                leftview.WF_LeftListBox.Items.Clear()
+                                leftview.WF_LeftListBox.Items.Add(New ListItem("根岸営業所", "011402"))
+                            End If
+                            If WF_FIELD.Value = "WF_CONSIGNEE" Then
+                                leftview.WF_LeftListBox.Items.Clear()
+                                If Master.USER_ORG = "302001" Then
+                                    leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS北信油槽所", "10"))
+                                Else
+                                    leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS甲府油槽所", "20"))
+                                End If
+                            End If
+                        End If
                         .ActiveListBox()
                 End Select
             End With
@@ -653,6 +689,7 @@ Public Class OIT0004OilStockSearch
             Using sqlCon = CS0050SESSION.getConnection,
                   sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
                 sqlCon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@CAMPCODE", SqlDbType.NVarChar).Value = "01"
                     .Add("@CLASS", SqlDbType.NVarChar).Value = "STOCKSELECTDEFOFFICE"
@@ -677,6 +714,96 @@ Public Class OIT0004OilStockSearch
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
+        End Try
+    End Sub
+    ''' <summary>
+    ''' 最終更新者取得
+    ''' </summary>
+    Public Sub GetLastUpdate()
+        Try
+            '一旦初期化
+            Me.WF_UpdateUser.Text = "&nbsp;"
+            Me.WF_UpdateDtm.Text = "&nbsp;"
+
+            Dim officeCode As String = ""
+            '取得出来ない条件の場合はスキップ
+            If Me.TxtSalesOffice.Text.Trim = "" OrElse
+               Me.LblSalesOfficeName.Text = "" OrElse
+               Me.TxtShipper.Text.Trim = "" OrElse
+               Me.LblShipperName.Text = "" OrElse
+               Me.WF_CONSIGNEE_CODE.Text.Trim = "" OrElse
+               Me.WF_CONSIGNEE_NAME.Text = "" OrElse
+               Me.WF_STYMD_CODE.Text.Trim = "" OrElse
+               IsDate(Me.WF_STYMD_CODE.Text) = False Then
+                Return
+            End If
+            '通常更新情報と油槽所更新情報のフィールド設定
+            Dim fieldItems = {New With {.updUserField = "UPDUSER", .updUserObj = Me.WF_UpdateUser, .updDtmField = "UPDYMD", .updDtmObj = Me.WF_UpdateDtm},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm}}
+            For Each fieldItem In fieldItems
+                Dim sqlStat As New StringBuilder
+                sqlStat.AppendFormat("SELECT format(SQ.{0},'yyyy/MM/dd HH:mm') AS {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,isnull(UM.STAFFNAMEL, SQ.{0})     AS {0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("FROM (")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" UNION ALL")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" ) SQ")
+                sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
+                sqlStat.AppendFormat("   ON UM.USERID = SQ.{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
+                sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
+                sqlStat.AppendFormat(" ORDER BY SQ.{0} DESC", fieldItem.updDtmField).AppendLine()
+                'DataBase接続文字
+                Using sqlCon = CS0050SESSION.getConnection,
+              sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
+                    sqlCon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(sqlCon)
+                    With sqlCmd.Parameters
+                        .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
+                        .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
+                        .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
+                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    End With
+                    Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                        If sqlDr.HasRows Then
+                            sqlDr.Read()
+                            fieldItem.updUserObj.Text = Convert.ToString(sqlDr(fieldItem.updUserField))
+                            fieldItem.updDtmObj.Text = Convert.ToString(sqlDr(fieldItem.updDtmField))
+                        End If
+                    End Using 'sqlDr
+                End Using 'sqlCon, sqlCmd
+
+            Next
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004S LASTUPDATE_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004S LASTUPDATE_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return
         End Try
     End Sub
 End Class

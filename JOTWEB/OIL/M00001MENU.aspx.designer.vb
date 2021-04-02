@@ -41,6 +41,87 @@ Partial Public Class M00001MENU
     Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''reportDLAreaPane コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents reportDLAreaPane As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''ddlReportNameList_LaIdx コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlReportNameList_LaIdx As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlReportNameList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlReportNameList As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''btnTransportResult コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents btnTransportResult As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''transportResultCondPane コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents transportResultCondPane As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''txtTrStYmd コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtTrStYmd As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''txtTrEdYmd コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtTrEdYmd As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''ddlTrOfficeNameList_LaIdx コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTrOfficeNameList_LaIdx As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlTrOfficeNameList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTrOfficeNameList As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''P001 コントロール。
     '''</summary>
     '''<remarks>
@@ -113,6 +194,60 @@ Partial Public Class M00001MENU
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_FIELD コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SelectedIndex コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_LeftboxOpen コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_LeftMViewChange コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_PrintURL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SelectChangeDdl コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SelectChangeDdl As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''hdnPosiCol コントロール。
     '''</summary>
     '''<remarks>
@@ -156,6 +291,15 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.GRM00001WRKINC
+    
+    '''<summary>
+    '''leftview コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
     
     '''<summary>
     '''Master プロパティ。

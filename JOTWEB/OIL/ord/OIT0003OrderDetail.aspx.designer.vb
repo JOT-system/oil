@@ -1067,6 +1067,24 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_CREATELINKFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_OTLINKAGEFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OTLINKAGEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_CORRECTIONDATEFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CORRECTIONDATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_BULKFLG コントロール。
     '''</summary>
     '''<remarks>

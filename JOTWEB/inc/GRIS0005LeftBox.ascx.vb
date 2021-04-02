@@ -606,6 +606,7 @@ Public Class GRIS0005LeftBox
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TRAINNUMBER"
                 'デフォルトソート順設定 組織コード、着駅、積置フラグ、列車No（数値化）
                 Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "CAMPCODE, " &
+                                                                  "VALUE16," &
                                                                   "VALUE3," &
                                                                   "VALUE13," &
                     "CONVERT(decimal(16,2),case when isnumeric(VALUE1)=1 " &
@@ -870,10 +871,10 @@ Public Class GRIS0005LeftBox
                 '上記データテーブルの表示対象項目を定義(フィールド、表示名）
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("VALUE9", "状態"),
-                     New LeftTableDefItem("VALUE15", "状況", 13),
-                     New LeftTableDefItem("VALUE5", "管轄支店", 9),
+                     New LeftTableDefItem("VALUE15", "状況", 6),
+                     New LeftTableDefItem("VALUE5", "管轄支店", 6),
                      New LeftTableDefItem("VALUE7", "所属営業所", 9),
-                     New LeftTableDefItem("VALUE3", "所在地", 9),
+                     New LeftTableDefItem("VALUE3", "所在地", 7),
                      New LeftTableDefItem("VALUE11", "積車", 4),
                      New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
                      New LeftTableDefItem("VALUE1", "型式", 6),

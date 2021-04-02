@@ -46,11 +46,26 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
 
                 //活性
                 document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "";
                 
+            }
+            else if(document.getElementById('WF_MAPButtonControl').value === "2") {
+                //非活性
+                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+                //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+
+                //非活性
+                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "disabled";
+
             }
             else if (document.getElementById('WF_CREATEFLG').value === "1") {
                 //非活性
@@ -61,6 +76,7 @@ function InitDisplay() {
                 //document.getElementById("WF_ButtonCSV").disabled = "";
 
                 //活性
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "disabled";
 
@@ -72,6 +88,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
 
                 //非活性
@@ -92,7 +109,9 @@ function InitDisplay() {
             document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "disabled";
         }
         ////〇タブ２
         //else if (objDtabNo === "1") {
@@ -195,44 +214,18 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             //document.getElementById('WF_LeftMViewChange').value = 20;
             document.getElementById('WF_LeftMViewChange').value = 65;
         }
-        else if (fieldNM === "OILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 24;
+        else if (fieldNM === "KAISOUTYPENAME") {
+            document.getElementById('WF_LeftMViewChange').value = 58;
         }
-        else if (fieldNM === "ORDERINGOILNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 46;
-        }
-        else if (fieldNM === "SHIPPERSNAME") {
-            document.getElementById('WF_LeftMViewChange').value = 42;
-        }
-        else if (fieldNM === "RETURNDATETRAIN") {
-            document.getElementById('WF_LeftMViewChange').value = 17;
-        }
-        else if (fieldNM === "LOADINGIRILINETRAINNO") {
-            document.getElementById('WF_LeftMViewChange').value = 47;
-        }
-        else if (fieldNM === "LOADINGOUTLETTRAINNO") {
-            document.getElementById('WF_LeftMViewChange').value = 48;
-        }
-        else if (fieldNM === "LINE") {
-            document.getElementById('WF_LeftMViewChange').value = 49;
-        }
-        else if (fieldNM === "SECONDCONSIGNEENAME") {
-            document.getElementById('WF_LeftMViewChange').value = 43;
-        }
-        else if (fieldNM === "SECONDARRSTATIONNAME") {
+        else if (fieldNM === "ARRSTATIONNAME") {
             document.getElementById('WF_LeftMViewChange').value = 51;
-        }
-        else if (fieldNM === "FILLINGPOINT") {
-            document.getElementById('WF_LeftMViewChange').value = 52;
-        }
-        else if (fieldNM === "JOINT") {
-            document.getElementById('WF_LeftMViewChange').value = 53;
         }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 
             || fieldNM === "ACTUALARRDATE" 
             || fieldNM === "ACTUALACCDATE" 
-            || fieldNM === "ACTUALEMPARRDATE") {
+            || fieldNM === "ACTUALEMPARRDATE"
+            || fieldNM === "JRINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

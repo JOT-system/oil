@@ -28,6 +28,7 @@ Public Structure CS0001INIFILEget
         UPF_DIR
         SYS_DIR
         OTFILESEND_DIR
+        PRINTROOT
     End Enum
 
     Private Const IniFileC As String = "C:\APPL\APPLINI\OIL\JOTWEB.ini"
@@ -48,9 +49,23 @@ Public Structure CS0001INIFILEget
         Dim IniBuf As String = ""
         Dim IniRef As Integer = 0
 
-        Dim INIFILE As String = IniFileC
-        'ファイル存在チェック
-        If Not File.Exists(IniFileC) Then INIFILE = IniFileD
+        Dim INIFILE As String = ""
+        'WebConfigのAPPStrringsに指定したパス優先
+        If ConfigurationManager.AppSettings.AllKeys.Contains("InifilePath") AndAlso
+           ConfigurationManager.AppSettings("InifilePath") <> "" Then
+            'WebConfigの設定が存在したら
+            'ファイルの存在有無に関わらず最優先
+            INIFILE = ConfigurationManager.AppSettings("InifilePath")
+            If IO.File.Exists(INIFILE) = False Then
+                '存在しない場合は例外スロー(503エラー Service Unavailable)
+                Throw New HttpException(503, "WebConfigに定義したIniファイルが存在しません")
+            End If
+        Else
+            'WebConfigの設定が存在しない場合は
+            '固定パスCとDを
+            INIFILE = IniFileC
+            If Not File.Exists(IniFileC) Then INIFILE = IniFileD
+        End If
 
         Using sr As StreamReader = New StreamReader(INIFILE, Encoding.UTF8)
             Try
@@ -220,7 +235,24 @@ Public Structure CS0001INIFILEget
                         End If
                     End If
                     '### 20200828 END   OT発送日報送信用追加 #########################################
+                    'APサーバー名称
+                    If IniBuf.IndexOf("<print root>") >= 0 OrElse IniType = STRINGTYPE.PRINTROOT Then
+                        IniType = STRINGTYPE.PRINTROOT
+                        IniString &= IniBuf
 
+                        If IniBuf.IndexOf("</print root>") >= 0 Then
+                            IniString = IniString.Replace("<name string>", "")
+                            IniString = IniString.Replace("</name string>", "")
+                            IniString = IniString.Replace("<print root>", "")
+                            IniString = IniString.Replace("</print root>", "")
+                            IniString = IniString.Replace(ControlChars.Quote, "")
+                            IniString = IniString.Replace("value=", "")
+
+                            CS0050SESSION.PRINT_ROOT_URL_NAME = Trim(IniString)
+                            IniString = ""
+                            IniType = STRINGTYPE.NONE
+                        End If
+                    End If
                 End While
             Catch ex As Exception
                 ERR = C_MESSAGE_NO.SYSTEM_ADM_ERROR

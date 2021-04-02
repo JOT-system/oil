@@ -111,7 +111,7 @@
                 <p id="KEY_LINE_7">
                     <!-- OT列車番号 -->
                     <span class="ef">
-                        <asp:Label ID="WF_OTTRAINNO_L" runat="server" Text="OT列車番号" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_OTTRAINNO_L" runat="server" Text="OT列車番号" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <asp:TextBox ID="WF_OTTRAINNO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
                         <asp:Label ID="WF_OTTRAINNO_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>

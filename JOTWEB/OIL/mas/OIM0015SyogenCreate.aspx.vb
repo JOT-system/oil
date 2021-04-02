@@ -2,7 +2,7 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' タンク車マスタ登録（実行）
+''' 油槽所諸元マスタメンテナンス登録・更新（実行）
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIM0015SyogenCreate
@@ -1053,23 +1053,24 @@ Public Class OIM0015SyogenCreate
 
             OIM0015INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0015row As DataRow In OIM0015tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0015row("CONSIGNEECODE") = OIM0015INProw("CONSIGNEECODE") AndAlso
                     OIM0015row("SHIPPERSCODE") = OIM0015INProw("SHIPPERSCODE") AndAlso
-                    OIM0015row("OILCODE") = OIM0015row("OILCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    OIM0015row("OILCODE") = OIM0015INProw("OILCODE") Then
+                    ' KEY項目以外の項目の差異チェック
                     If OIM0015row("FROMMD") = OIM0015INProw("FROMMD") AndAlso
                         OIM0015row("TOMD") = OIM0015INProw("TOMD") AndAlso
                         OIM0015row("TANKCAP") = OIM0015INProw("TANKCAP") AndAlso
                         OIM0015row("TARGETCAPRATE") = OIM0015INProw("TARGETCAPRATE") AndAlso
                         OIM0015row("DS") = OIM0015INProw("DS") AndAlso
-                        OIM0015row("DELFLG") = OIM0015INProw("DELFLG") AndAlso
-                        OIM0015INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0015row("DELFLG") = OIM0015INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0015INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0015INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

@@ -331,6 +331,7 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("     OIM0007.OFFICECODE ")
         SQLStrBldr.AppendLine("     , OIM0007.TRAINNO ")
         SQLStrBldr.AppendLine("     , OIM0007.TSUMI ")
+        SQLStrBldr.AppendLine("     , OIM0007.OTTRAINNO ")
         SQLStrBldr.AppendLine("     , OIM0007.DEPSTATION ")
         SQLStrBldr.AppendLine("     , OIM0007.ARRSTATION ")
 
@@ -669,6 +670,8 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("        AND ")
         SQLStrBldr.AppendLine("        TSUMI = @P03 ")
         SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        OTTRAINNO = @P04 ")
+        SQLStrBldr.AppendLine("        AND ")
         SQLStrBldr.AppendLine("        DEPSTATION = @P06 ")
         SQLStrBldr.AppendLine("        AND ")
         SQLStrBldr.AppendLine("        ARRSTATION = @P07; ")
@@ -678,7 +681,6 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("     UPDATE OIL.OIM0007_TRAIN ")
         SQLStrBldr.AppendLine("     SET ")
         SQLStrBldr.AppendLine("         TRAINNAME = @P02 ")
-        SQLStrBldr.AppendLine("         , OTTRAINNO = @P04 ")
         SQLStrBldr.AppendLine("         , OTFLG = @P05 ")
         SQLStrBldr.AppendLine("         , JRTRAINNO1 = @P08 ")
         SQLStrBldr.AppendLine("         , MAXTANK1 = @P09 ")
@@ -700,14 +702,10 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("         , ZAIKOSORT = @P25 ")
         SQLStrBldr.AppendLine("         , BIKOU = @P26 ")
         SQLStrBldr.AppendLine("         , DELFLG = @P27 ")
-        'SQLStrBldr.AppendLine("         , INITYMD = @P28 ")
-        'SQLStrBldr.AppendLine("         , INITUSER = @P29 ")
-        'SQLStrBldr.AppendLine("         , INITTERMID = @P30 ")
         SQLStrBldr.AppendLine("         , UPDYMD = @P31 ")
         SQLStrBldr.AppendLine("         , UPDUSER = @P32 ")
         SQLStrBldr.AppendLine("         , UPDTERMID = @P33 ")
         SQLStrBldr.AppendLine("         , RECEIVEYMD = @P34 ")
-        'SQLStrBldr.AppendLine("         , UPDTIMSTP = @P35 ")
         SQLStrBldr.AppendLine("     WHERE ")
         SQLStrBldr.AppendLine("         OFFICECODE = @P00 ")
         SQLStrBldr.AppendLine("         AND ")
@@ -715,12 +713,14 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("         AND ")
         SQLStrBldr.AppendLine("         TSUMI = @P03 ")
         SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         OTTRAINNO = @P04 ")
+        SQLStrBldr.AppendLine("         AND ")
         SQLStrBldr.AppendLine("         DEPSTATION = @P06 ")
         SQLStrBldr.AppendLine("         AND ")
         SQLStrBldr.AppendLine("         ARRSTATION = @P07; ")
         SQLStrBldr.AppendLine("  IF (@@FETCH_STATUS <> 0) ")
-        SQLStrBldr.AppendLine("     INSERT INTO OIL.OIM0007_TRAIN ")
-        SQLStrBldr.AppendLine("         (OFFICECODE ")
+        SQLStrBldr.AppendLine("     INSERT INTO OIL.OIM0007_TRAIN( ")
+        SQLStrBldr.AppendLine("         OFFICECODE ")
         SQLStrBldr.AppendLine("         , TRAINNO ")
         SQLStrBldr.AppendLine("         , TRAINNAME ")
         SQLStrBldr.AppendLine("         , TSUMI ")
@@ -755,7 +755,6 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("         , UPDUSER ")
         SQLStrBldr.AppendLine("         , UPDTERMID ")
         SQLStrBldr.AppendLine("         , RECEIVEYMD) ")
-        'SQLStrBldr.AppendLine("         , UPDTIMSTP) ")
         SQLStrBldr.AppendLine("     VALUES ")
         SQLStrBldr.AppendLine("         (@P00 ")
         SQLStrBldr.AppendLine("         , @P01 ")
@@ -792,7 +791,6 @@ Public Class OIM0007TrainList
         SQLStrBldr.AppendLine("         , @P32 ")
         SQLStrBldr.AppendLine("         , @P33 ")
         SQLStrBldr.AppendLine("         , @P34); ")
-        'SQLStrBldr.AppendLine("         , @P35); ")
         SQLStrBldr.AppendLine("  CLOSE hensuu; ")
         SQLStrBldr.AppendLine("  DEALLOCATE hensuu; ")
 
@@ -844,85 +842,57 @@ Public Class OIM0007TrainList
         SQLJnlBldr.AppendLine("        AND ")
         SQLJnlBldr.AppendLine("        TSUMI = @P03 ")
         SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        OTTRAINNO = @P04 ")
+        SQLJnlBldr.AppendLine("        AND ")
         SQLJnlBldr.AppendLine("        DEPSTATION = @P06 ")
         SQLJnlBldr.AppendLine("        AND ")
         SQLJnlBldr.AppendLine("        ARRSTATION = @P07 ")
 
         Try
             Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon), SQLcmdJnl As New SqlCommand(SQLJnlBldr.ToString(), SQLcon)
-                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 12)          ' 管轄受注営業所
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 8)           ' 本線列車番号
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 40)          ' 本線列車番号名
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 2)           ' 積置フラグ
-                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 8)           ' OT列車番号
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 2)           ' OT発送日報送信フラグ
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 14)          ' 発駅コード
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 14)          ' 着駅コード
-                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 8)           ' JR発列車番号
-                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int, 4)                ' JR発列車牽引車数
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 8)           ' JR中継列車番号
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int, 4)                ' JR中継列車牽引車数
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 8)           ' JR最終列車番号
-                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Int, 4)                ' JR最終列車牽引車数
-                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 2)           ' 列車区分
-                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 2)           ' 高速列車区分
-                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 2)           ' 発送順区分
-                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.Int, 4)                ' 発日日数
-                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.Int, 4)                ' 特継日数
-                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.Int, 4)                ' 積車着日数
-                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.Int, 4)                ' 受入日数
-                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Int, 4)                ' 空車着日数
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Int, 4)                ' 当日利用日数
-                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 2)           ' 料金マスタ区分
-                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 2)           ' 稼働フラグ
-                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int, 4)                ' 在庫管理表表示ソート区分
-                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 400)         ' 備考
-                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 2)           ' 削除フラグ
-                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.DateTime, 8)           ' 登録年月日
-                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 40)          ' 登録ユーザーＩＤ
-                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 40)          ' 登録端末
-                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime, 8)           ' 更新年月日
-                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)          ' 更新ユーザーＩＤ
-                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 40)          ' 更新端末
-                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.DateTime, 8)           ' 集信日時
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 6)           ' 管轄受注営業所
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 4)           ' 本線列車番号
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)          ' 本線列車番号名
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)           ' 積置フラグ
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)           ' OT列車番号
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)           ' OT発送日報送信フラグ
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 7)           ' 発駅コード
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)           ' 着駅コード
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 4)           ' JR発列車番号
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)                   ' JR発列車牽引車数
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4)           ' JR中継列車番号
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)                   ' JR中継列車牽引車数
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4)           ' JR最終列車番号
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Int)                   ' JR最終列車牽引車数
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 1)           ' 列車区分
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 1)           ' 高速列車区分
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 1)           ' 発送順区分
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.Int)                   ' 発日日数
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.Int)                   ' 特継日数
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.Int)                   ' 積車着日数
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.Int)                   ' 受入日数
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Int)                   ' 空車着日数
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Int)                   ' 当日利用日数
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)           ' 料金マスタ区分
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 1)           ' 稼働フラグ
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)                   ' 在庫管理表表示ソート区分
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 200)         ' 備考
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 1)           ' 削除フラグ
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.DateTime)              ' 登録年月日
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 20)          ' 登録ユーザーＩＤ
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          ' 登録端末
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime)              ' 更新年月日
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)          ' 更新ユーザーＩＤ
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          ' 更新端末
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.DateTime)              ' 集信日時
 
 
-                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 12)         ' 管轄受注営業所
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)          ' 本線列車番号
-                'Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 40)         ' 本線列車番号名
-                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 2)          ' 積置フラグ
-                'Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 8)          ' OT列車番号
-                'Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 2)          ' OT発送日報送信フラグ
-                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 14)         ' 発駅コード
-                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 14)         ' 着駅コード
-                'Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.NVarChar, 8)          ' JR発列車番号
-                'Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.Int, 4)               ' JR発列車牽引車数
-                'Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 8)          ' JR中継列車番号
-                'Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.Int, 4)               ' JR中継列車牽引車数
-                'Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.NVarChar, 8)          ' JR最終列車番号
-                'Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.Int, 4)               ' JR最終列車牽引車数
-                'Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 2)          ' 列車区分
-                'Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.NVarChar, 2)          ' 高速列車区分
-                'Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.NVarChar, 2)          ' 発送順区分
-                'Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.Int, 4)               ' 発日日数
-                'Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.Int, 4)               ' 特継日数
-                'Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.Int, 4)               ' 積車着日数
-                'Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.Int, 4)               ' 受入日数
-                'Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Int, 4)               ' 空車着日数
-                'Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Int, 4)               ' 当日利用日数
-                'Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 2)          ' 料金マスタ区分
-                'Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 2)          ' 稼働フラグ
-                'Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.Int, 4)               ' 在庫管理表表示ソート区分
-                'Dim JPARA26 As SqlParameter = SQLcmdJnl.Parameters.Add("@P26", SqlDbType.NVarChar, 400)        ' 備考
-                'Dim JPARA27 As SqlParameter = SQLcmdJnl.Parameters.Add("@P27", SqlDbType.NVarChar, 2)          ' 削除フラグ
-                'Dim JPARA28 As SqlParameter = SQLcmdJnl.Parameters.Add("@P28", SqlDbType.DateTime, 8)          ' 登録年月日
-                'Dim JPARA29 As SqlParameter = SQLcmdJnl.Parameters.Add("@P29", SqlDbType.NVarChar, 40)         ' 登録ユーザーＩＤ
-                'Dim JPARA30 As SqlParameter = SQLcmdJnl.Parameters.Add("@P30", SqlDbType.NVarChar, 40)         ' 登録端末
-                'Dim JPARA31 As SqlParameter = SQLcmdJnl.Parameters.Add("@P31", SqlDbType.DateTime, 8)          ' 更新年月日
-                'Dim JPARA32 As SqlParameter = SQLcmdJnl.Parameters.Add("@P32", SqlDbType.NVarChar, 40)         ' 更新ユーザーＩＤ
-                'Dim JPARA33 As SqlParameter = SQLcmdJnl.Parameters.Add("@P33", SqlDbType.NVarChar, 40)         ' 更新端末
-                'Dim JPARA34 As SqlParameter = SQLcmdJnl.Parameters.Add("@P34", SqlDbType.DateTime, 8)          ' 集信日時
-
+                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 6)       ' 管轄受注営業所
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 4)       ' 本線列車番号
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 1)       ' 積置フラグ
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 4)       ' OT列車番号
+                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 7)       ' 発駅コード
+                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 7)       ' 着駅コード
                 For Each OIM0007row As DataRow In OIM0007tbl.Rows
                     If Trim(OIM0007row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                         Trim(OIM0007row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
@@ -974,40 +944,10 @@ Public Class OIM0007TrainList
                         ' 更新ジャーナル出力
                         JPARA00.Value = OIM0007row("OFFICECODE")
                         JPARA01.Value = OIM0007row("TRAINNO")
-                        'JPARA02.Value = OIM0007row("TRAINNAME")
                         JPARA03.Value = OIM0007row("TSUMI")
-                        'JPARA04.Value = OIM0007row("OTTRAINNO")
-                        'JPARA05.Value = OIM0007row("OTFLG")
+                        JPARA04.Value = OIM0007row("OTTRAINNO")
                         JPARA06.Value = OIM0007row("DEPSTATION")
                         JPARA07.Value = OIM0007row("ARRSTATION")
-                        'JPARA08.Value = OIM0007row("JRTRAINNO1")
-                        'JPARA09.Value = OIM0007row("MAXTANK1")
-                        'JPARA10.Value = OIM0007row("JRTRAINNO2")
-                        'JPARA11.Value = OIM0007row("MAXTANK2")
-                        'JPARA12.Value = OIM0007row("JRTRAINNO3")
-                        'JPARA13.Value = OIM0007row("MAXTANK3")
-                        'JPARA14.Value = OIM0007row("TRAINCLASS")
-                        'JPARA15.Value = OIM0007row("SPEEDCLASS")
-                        'JPARA16.Value = OIM0007row("SHIPORDERCLASS")
-                        'JPARA17.Value = OIM0007row("DEPDAYS")
-                        'JPARA18.Value = OIM0007row("MARGEDAYS")
-                        'JPARA19.Value = OIM0007row("ARRDAYS")
-                        'JPARA20.Value = OIM0007row("ACCDAYS")
-                        'JPARA21.Value = OIM0007row("EMPARRDAYS")
-                        'JPARA22.Value = OIM0007row("USEDAYS")
-                        'JPARA23.Value = OIM0007row("FEEKBN")
-                        'JPARA24.Value = OIM0007row("RUN")
-                        'JPARA25.Value = OIM0007row("ZAIKOSORT")
-                        'JPARA26.Value = OIM0007row("BIKOU")
-                        'JPARA27.Value = OIM0007row("DELFLG")
-                        'JPARA28.Value = OIM0007row("INITYMD")
-                        'JPARA29.Value = OIM0007row("INITUSER")
-                        'JPARA30.Value = OIM0007row("INITTERMID")
-                        'JPARA31.Value = OIM0007row("UPDYMD")
-                        'JPARA32.Value = OIM0007row("UPDUSER")
-                        'JPARA33.Value = OIM0007row("UPDTERMID")
-                        'JPARA34.Value = OIM0007row("RECEIVEYMD")
-
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
                             If IsNothing(OIM0007UPDtbl) Then
@@ -1404,61 +1344,18 @@ Public Class OIM0007TrainList
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TRAINNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRAINNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TSUMI") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("OTTRAINNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OTFLG") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ARRSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRTRAINNO1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MAXTANK1") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRTRAINNO2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MAXTANK2") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRTRAINNO3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MAXTANK3") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRAINCLASS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SPEEDCLASS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SHIPORDERCLASS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DEPDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MARGEDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ARRDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ACCDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EMPARRDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USEDAYS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("FEEKBN") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RUN") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ZAIKOSORT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("BIKOU") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                WW_COLUMNS.IndexOf("ARRSTATION") >= 0 Then
                 For Each OIM0007row As DataRow In OIM0007tbl.Rows
+                    ' キー項目が一致する場合、変更元情報を入力レコードにコピーする
                     If XLSTBLrow("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
                         XLSTBLrow("TRAINNO") = OIM0007row("TRAINNO") AndAlso
-                        XLSTBLrow("TRAINNAME") = OIM0007row("TRAINNAME") AndAlso
                         XLSTBLrow("TSUMI") = OIM0007row("TSUMI") AndAlso
                         XLSTBLrow("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
-                        XLSTBLrow("OTFLG") = OIM0007row("OTFLG") AndAlso
                         XLSTBLrow("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
-                        XLSTBLrow("ARRSTATION") = OIM0007row("ARRSTATION") AndAlso
-                        XLSTBLrow("JRTRAINNO1") = OIM0007row("JRTRAINNO1") AndAlso
-                        XLSTBLrow("MAXTANK1") = OIM0007row("MAXTANK1") AndAlso
-                        XLSTBLrow("JRTRAINNO2") = OIM0007row("JRTRAINNO2") AndAlso
-                        XLSTBLrow("MAXTANK2") = OIM0007row("MAXTANK2") AndAlso
-                        XLSTBLrow("JRTRAINNO3") = OIM0007row("JRTRAINNO3") AndAlso
-                        XLSTBLrow("MAXTANK3") = OIM0007row("MAXTANK3") AndAlso
-                        XLSTBLrow("TRAINCLASS") = OIM0007row("TRAINCLASS") AndAlso
-                        XLSTBLrow("SPEEDCLASS") = OIM0007row("SPEEDCLASS") AndAlso
-                        XLSTBLrow("SHIPORDERCLASS") = OIM0007row("SHIPORDERCLASS") AndAlso
-                        XLSTBLrow("DEPDAYS") = OIM0007row("DEPDAYS") AndAlso
-                        XLSTBLrow("MARGEDAYS") = OIM0007row("MARGEDAYS") AndAlso
-                        XLSTBLrow("ARRDAYS") = OIM0007row("ARRDAYS") AndAlso
-                        XLSTBLrow("ACCDAYS") = OIM0007row("ACCDAYS") AndAlso
-                        XLSTBLrow("EMPARRDAYS") = OIM0007row("EMPARRDAYS") AndAlso
-                        XLSTBLrow("USEDAYS") = OIM0007row("USEDAYS") AndAlso
-                        XLSTBLrow("FEEKBN") = OIM0007row("FEEKBN") AndAlso
-                        XLSTBLrow("RUN") = OIM0007row("RUN") AndAlso
-                        XLSTBLrow("ZAIKOSORT") = OIM0007row("ZAIKOSORT") AndAlso
-                        XLSTBLrow("BIKOU") = OIM0007row("BIKOU") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0007row("DELFLG") Then
+                        XLSTBLrow("ARRSTATION") = OIM0007row("ARRSTATION") Then
                         OIM0007INProw.ItemArray = OIM0007row.ItemArray
                         Exit For
                     End If
@@ -2306,16 +2203,17 @@ Public Class OIM0007TrainList
 
             OIM0007INProw.Item("OPERATION") = CONST_INSERT
 
-            ' KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0007row As DataRow In OIM0007tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0007row("OFFICECODE") = OIM0007INProw("OFFICECODE") AndAlso
                     OIM0007row("TRAINNO") = OIM0007INProw("TRAINNO") AndAlso
                     OIM0007row("TSUMI") = OIM0007INProw("TSUMI") AndAlso
+                    OIM0007row("OTTRAINNO") = OIM0007INProw("OTTRAINNO") AndAlso
                     OIM0007row("DEPSTATION") = OIM0007INProw("DEPSTATION") AndAlso
                     OIM0007row("ARRSTATION") = OIM0007INProw("ARRSTATION") Then
-                    ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    '  KEY項目以外の項目に差異があるかチェック
                     If OIM0007row("TRAINNAME") = OIM0007INProw("TRAINNAME") AndAlso
-                        OIM0007row("OTTRAINNO") = OIM0007INProw("OTTRAINNO") AndAlso
                         OIM0007row("OTFLG") = OIM0007INProw("OTFLG") AndAlso
                         OIM0007row("JRTRAINNO1") = OIM0007INProw("JRTRAINNO1") AndAlso
                         OIM0007row("MAXTANK1") = OIM0007INProw("MAXTANK1") AndAlso
@@ -2336,12 +2234,12 @@ Public Class OIM0007TrainList
                         OIM0007row("RUN") = OIM0007INProw("RUN") AndAlso
                         OIM0007row("ZAIKOSORT") = OIM0007INProw("ZAIKOSORT") AndAlso
                         OIM0007row("BIKOU") = OIM0007INProw("BIKOU") AndAlso
-                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") AndAlso
-                        OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") Then
+                        '変更がないときは「操作」の項目は空白にする
+                        OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        '変更がある時は「操作」の項目を「更新」に設定する
                         OIM0007INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -2380,6 +2278,7 @@ Public Class OIM0007TrainList
             If OIM0007INProw("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
                 OIM0007INProw("TRAINNO") = OIM0007row("TRAINNO") AndAlso
                 OIM0007INProw("TSUMI") = OIM0007row("TSUMI") AndAlso
+                OIM0007INProw("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
                 OIM0007INProw("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
                 OIM0007INProw("ARRSTATION") = OIM0007row("ARRSTATION") Then
                 ' 画面入力テーブル項目設定
@@ -2436,6 +2335,7 @@ Public Class OIM0007TrainList
             If OIM0007INProw("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
                 OIM0007INProw("TRAINNO") = OIM0007row("TRAINNO") AndAlso
                 OIM0007INProw("TSUMI") = OIM0007row("TSUMI") AndAlso
+                OIM0007INProw("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
                 OIM0007INProw("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
                 OIM0007INProw("ARRSTATION") = OIM0007row("ARRSTATION") Then
                 ' 画面入力テーブル項目設定
@@ -2480,7 +2380,12 @@ Public Class OIM0007TrainList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TRAINNO"
                     ' 本線列車番号
-                    prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
+                    If String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
+                        '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                        prmData = work.CreateTrainNoParam(Master.USER_ORG, I_VALUE)
+                    Else
+                        prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TSUMI"
                     ' 積置フラグ

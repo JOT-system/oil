@@ -111,7 +111,9 @@
                             <HeaderTemplate>荷主</HeaderTemplate>
                             <ItemTemplate>
                                 <!-- 荷受人名 -->
-                                <asp:Label ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSNAME") %>' />
+                                <span ondblclick="Field_DBclick('WF_COSTLISTTBL_SHIPPERSNAME<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST %>)">
+                                    <asp:TextBox ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" CssClass='<%# GetAccountCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' ReadOnly="true" Text='<%# Bind("SHIPPERSNAME")%>' />
+                                </span>
                                 <!-- 荷受人コード -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSCODE") %>' />
                             </ItemTemplate>

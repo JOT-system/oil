@@ -294,6 +294,9 @@ a.ef input {
 .tblUpdOTList td.depStation {
     width:65px;
 }
+.tblUpdOTList td.arrStation {
+    width:65px;
+}
 .tblUpdOTList td.shippersName {
     width:65px;
 }

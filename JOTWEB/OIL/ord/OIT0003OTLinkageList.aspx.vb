@@ -2297,6 +2297,7 @@ Public Class OIT0003OTLinkageList
                             orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
                             orderInf.OTShipOrder = Convert.ToString(sortedDr("SHIPORDER"))
                             orderInf.OTDepStationName = Convert.ToString(sortedDr("OTDAILYDEPSTATIONN"))
+                            orderInf.OTArrStationName = ""
                             orderInf.OTShippersName = Convert.ToString(sortedDr("OTDAILYSHIPPERN"))
                             orderInf.OTOilName = Convert.ToString(sortedDr("OTOILNAME"))
                             orderInf.OTTankNo = Convert.ToString(sortedDr("TANKNO"))
@@ -2317,6 +2318,7 @@ Public Class OIT0003OTLinkageList
                         orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
                         orderInf.OTShipOrder = Convert.ToString(OIT0003row("SHIPORDER"))
                         orderInf.OTDepStationName = Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN"))
+                        orderInf.OTArrStationName = ""
                         orderInf.OTShippersName = Convert.ToString(OIT0003row("OTDAILYSHIPPERN"))
                         orderInf.OTOilName = Convert.ToString(OIT0003row("OTOILNAME"))
                         orderInf.OTTankNo = Convert.ToString(OIT0003row("TANKNO"))
@@ -4455,6 +4457,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property OTDepStationName As String = ""
+        ''' <summary>
+        ''' 着駅名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTArrStationName As String = ""
         ''' <summary>
         ''' 荷主名
         ''' </summary>

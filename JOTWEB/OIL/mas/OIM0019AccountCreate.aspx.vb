@@ -1129,27 +1129,27 @@ Public Class OIM0019AccountCreate
 
             OIM0019INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0019row As DataRow In OIM0019tbl.Rows
-
+                'KEY項目が等しい時
                 If OIM0019row("FROMYMD") = OIM0019INProw("FROMYMD") AndAlso
                     OIM0019row("ENDYMD") = OIM0019INProw("ENDYMD") AndAlso
                     OIM0019row("ACCOUNTCODE") = OIM0019INProw("ACCOUNTCODE") AndAlso
                     OIM0019row("SEGMENTCODE") = OIM0019INProw("SEGMENTCODE") AndAlso
                     OIM0019row("SEGMENTBRANCHCODE") = OIM0019INProw("SEGMENTBRANCHCODE") Then
 
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0019row("ACCOUNTNAME") = OIM0019INProw("ACCOUNTNAME") AndAlso
                         OIM0019row("SEGMENTNAME") = OIM0019INProw("SEGMENTNAME") AndAlso
                         OIM0019row("SEGMENTBRANCHNAME") = OIM0019INProw("SEGMENTBRANCHNAME") AndAlso
                         OIM0019row("ACCOUNTTYPE") = OIM0019INProw("ACCOUNTTYPE") AndAlso
                         OIM0019row("ACCOUNTTYPENAME") = OIM0019INProw("ACCOUNTTYPENAME") AndAlso
-                        OIM0019row("DELFLG") = OIM0019INProw("DELFLG") AndAlso
-                        OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0019row("DELFLG") = OIM0019INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0019INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

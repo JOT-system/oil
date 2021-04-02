@@ -3419,10 +3419,11 @@ Public Class OIM0005TankCreate
 
             OIM0005INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0005row As DataRow In OIM0005tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
                         OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
                         OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
@@ -3512,12 +3513,12 @@ Public Class OIM0005TankCreate
                         OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                         OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0005INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

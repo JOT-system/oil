@@ -589,18 +589,7 @@ Public Class OIM0009PlantList
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.DateTime)              '集信日時
 
 
-                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 4)       '基地コード
-                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 20)      '基地名
-                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 20)      '基地名カナ
-                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 10)      '荷主コード
-                'Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.DateTime)          '登録年月日
-                'Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 20)      '登録ユーザーＩＤ
-                'Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 20)      '登録端末
-                'Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.DateTime)          '更新年月日
-                'Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.NVarChar, 20)      '更新ユーザーＩＤ
-                'Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 20)      '更新端末
-                'Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.DateTime)          '集信日時
 
                 For Each OIM0009row As DataRow In OIM0009tbl.Rows
                     If Trim(OIM0009row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -627,18 +616,7 @@ Public Class OIM0009PlantList
                         OIM0009row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
 
                         '更新ジャーナル出力
-                        JPARA00.Value = OIM0009row("DELFLG")
                         JPARA01.Value = OIM0009row("PLANTCODE")
-                        JPARA02.Value = OIM0009row("PLANTNAME")
-                        JPARA03.Value = OIM0009row("PLANTNAMEKANA")
-                        JPARA04.Value = OIM0009row("SHIPPERCODE")
-                        'JPARA05.Value = WW_DATENOW
-                        'JPARA06.Value = Master.USERID
-                        'JPARA07.Value = Master.USERTERMID
-                        'JPARA08.Value = WW_DATENOW
-                        'JPARA09.Value = Master.USERID
-                        'JPARA10.Value = Master.USERTERMID
-                        'JPARA11.Value = C_DEFAULT_YMD
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
                             If IsNothing(OIM0009UPDtbl) Then
@@ -962,17 +940,9 @@ Public Class OIM0009PlantList
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("PLANTCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PLANTNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PLANTNAMEKANA") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SHIPPERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+            If WW_COLUMNS.IndexOf("PLANTCODE") >= 0 Then
                 For Each OIM0009row As DataRow In OIM0009tbl.Rows
-                    If XLSTBLrow("PLANTCODE") = OIM0009row("PLANTCODE") AndAlso
-                        XLSTBLrow("PLANTNAME") = OIM0009row("PLANTNAME") AndAlso
-                        XLSTBLrow("PLANTNAMEKANA") = OIM0009row("PLANTNAMEKANA") AndAlso
-                        XLSTBLrow("SHIPPERCODE") = OIM0009row("SHIPPERCODE") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0009row("DELFLG") Then
+                    If XLSTBLrow("PLANTCODE") = OIM0009row("PLANTCODE") Then
                         OIM0009INProw.ItemArray = OIM0009row.ItemArray
                         Exit For
                     End If
@@ -1000,12 +970,12 @@ Public Class OIM0009PlantList
                 OIM0009INProw("SHIPPERCODE") = XLSTBLrow("SHIPPERCODE")
             End If
 
-            ''削除フラグ
-            'If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-            '    OIM0009INProw("DELFLG") = XLSTBLrow("DELFLG")
-            'Else
-            '    OIM0009INProw("DELFLG") = "0"
-            'End If
+            '削除フラグ
+            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                OIM0009INProw("DELFLG") = XLSTBLrow("DELFLG")
+            Else
+                OIM0009INProw("DELFLG") = "0"
+            End If
 
             OIM0009INPtbl.Rows.Add(OIM0009INProw)
         Next
@@ -1097,7 +1067,6 @@ Public Class OIM0009PlantList
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
@@ -1166,17 +1135,7 @@ Public Class OIM0009PlantList
             '基地コード(バリデーションチェック)
             WW_TEXT = OIM0009INProw("PLANTCODE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PLANTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("PLANTCODE", OIM0009INProw("PLANTCODE"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(基地コード入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(基地コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
@@ -1187,17 +1146,7 @@ Public Class OIM0009PlantList
             '基地名(バリデーションチェック)
             WW_TEXT = OIM0009INProw("PLANTNAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PLANTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("PLANTNAME", OIM0009INProw("PLANTNAME"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(基地名入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(基地名入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
@@ -1208,17 +1157,7 @@ Public Class OIM0009PlantList
             '基地名カナ(バリデーションチェック)
             WW_TEXT = OIM0009INProw("PLANTNAMEKANA")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PLANTNAMEKANA", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("PLANTNAMEKANA", OIM0009INProw("PLANTNAMEKANA"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(基地名カナ入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(基地名カナ入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
@@ -1235,6 +1174,14 @@ Public Class OIM0009PlantList
                 If Not isNormal(WW_RTN_SW) Then
                     WW_CheckMES1 = "・更新できないレコード(荷主コード入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+                '「9999999999-キグナス石油」は除外
+                If OIM0009INProw("SHIPPERCODE") = "9999999999" Then
+                    WW_CheckMES1 = "・更新できないレコード(荷主コード入力エラー)です。"
+                    WW_CheckMES2 = "登録できない荷主コードです。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0009INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
@@ -1334,19 +1281,20 @@ Public Class OIM0009PlantList
 
             OIM0009INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0009row As DataRow In OIM0009tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0009row("PLANTCODE") = OIM0009INProw("PLANTCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0009row("PLANTNAME") = OIM0009INProw("PLANTNAME") AndAlso
                         OIM0009row("PLANTNAMEKANA") = OIM0009INProw("PLANTNAMEKANA") AndAlso
                         OIM0009row("SHIPPERCODE") = OIM0009INProw("SHIPPERCODE") AndAlso
-                        OIM0009row("DELFLG") = OIM0009INProw("DELFLG") AndAlso
-                        OIM0009INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0009row("DELFLG") = OIM0009INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0009INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0009INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1471,14 +1419,6 @@ Public Class OIM0009PlantList
 
         Try
             Select Case I_FIELD
-                Case "CAMPCODE"         '会社コード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"              '運用部署
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "PLANTCODE"        '基地コード
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "SHIPPERCODE"      '荷主コード
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, prmData)

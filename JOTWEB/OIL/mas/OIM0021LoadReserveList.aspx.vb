@@ -1079,23 +1079,15 @@ Public Class OIM0021LoadReserveList
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("FROMYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TOYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MODEL") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("LOAD") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("OILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SEGMENTOILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RESERVEDQUANTITY") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                WW_COLUMNS.IndexOf("SEGMENTOILCODE") >= 0 Then
                 For Each OIM0021row As DataRow In OIM0021tbl.Rows
                     If XLSTBLrow("OFFICECODE") = OIM0021row("OFFICECODE") AndAlso
                         XLSTBLrow("FROMYMD") = OIM0021row("FROMYMD") AndAlso
-                        XLSTBLrow("TOYMD") = OIM0021row("TOYMD") AndAlso
-                        XLSTBLrow("MODEL") = OIM0021row("MODEL") AndAlso
                         XLSTBLrow("LOAD") = OIM0021row("LOAD") AndAlso
                         XLSTBLrow("OILCODE") = OIM0021row("OILCODE") AndAlso
-                        XLSTBLrow("SEGMENTOILCODE") = OIM0021row("SEGMENTOILCODE") AndAlso
-                        XLSTBLrow("RESERVEDQUANTITY") = OIM0021row("RESERVEDQUANTITY") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0021row("DELFLG") Then
+                        XLSTBLrow("SEGMENTOILCODE") = OIM0021row("SEGMENTOILCODE") Then
                         OIM0021INProw.ItemArray = OIM0021row.ItemArray
                         Exit For
                     End If
@@ -1577,23 +1569,24 @@ Public Class OIM0021LoadReserveList
 
             OIM0021INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0021row As DataRow In OIM0021tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0021row("OFFICECODE") = OIM0021INProw("OFFICECODE") AndAlso
                     OIM0021row("FROMYMD") = OIM0021INProw("FROMYMD") AndAlso
                     OIM0021row("LOAD") = OIM0021INProw("LOAD") AndAlso
                     OIM0021row("OILCODE") = OIM0021INProw("OILCODE") AndAlso
                     OIM0021row("SEGMENTOILCODE") = OIM0021INProw("SEGMENTOILCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0021row("TOYMD") = OIM0021INProw("TOYMD") AndAlso
                         OIM0021row("MODEL") = OIM0021INProw("MODEL") AndAlso
                         OIM0021row("RESERVEDQUANTITY") = OIM0021INProw("RESERVEDQUANTITY") AndAlso
-                        OIM0021row("DELFLG") = OIM0021INProw("DELFLG") AndAlso
-                        OIM0021INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0021row("DELFLG") = OIM0021INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0021INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0021INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

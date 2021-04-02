@@ -205,7 +205,7 @@ Public Class OIM0017TrainOperationList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -469,7 +469,7 @@ Public Class OIM0017TrainOperationList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -646,14 +646,10 @@ Public Class OIM0017TrainOperationList
         SQLStrBldr.AppendLine("         TRAINNAME = @P02 ")
         SQLStrBldr.AppendLine("         , RUN = @P07 ")
         SQLStrBldr.AppendLine("         , DELFLG = @P08 ")
-        'SQLStrBldr.AppendLine("         , INITYMD = @P09 ")
-        'SQLStrBldr.AppendLine("         , INITUSER = @P10 ")
-        'SQLStrBldr.AppendLine("         , INITTERMID = @P11 ")
         SQLStrBldr.AppendLine("         , UPDYMD = @P12 ")
         SQLStrBldr.AppendLine("         , UPDUSER = @P13 ")
         SQLStrBldr.AppendLine("         , UPDTERMID = @P14 ")
         SQLStrBldr.AppendLine("         , RECEIVEYMD = @P15 ")
-        'SQLStrBldr.AppendLine("         , UPDTIMSTP = @P16 ")
         SQLStrBldr.AppendLine("     WHERE ")
         SQLStrBldr.AppendLine("         OFFICECODE = @P00 ")
         SQLStrBldr.AppendLine("         AND ")
@@ -760,21 +756,10 @@ Public Class OIM0017TrainOperationList
 
                 Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 12)      ' 管轄受注営業所
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       ' JOT列車番号
-                'Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 40)     ' 列車名
                 Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.Date)              ' 運行日
                 Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 2)       ' 積置フラグ
                 Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 14)      ' 発駅コード
                 Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 14)      ' 着駅コード
-                'Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 2)      ' 稼働フラグ
-                'Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.NVarChar, 2)      ' 削除フラグ
-                'Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.DateTime, 8)      ' 登録年月日
-                'Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 40)     ' 登録ユーザーＩＤ
-                'Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.NVarChar, 40)     ' 登録端末
-                'Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.DateTime, 8)      ' 更新年月日
-                'Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.NVarChar, 40)     ' 更新ユーザーＩＤ
-                'Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 40)     ' 更新端末
-                'Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.DateTime, 8)      ' 集信日時
-
 
                 For Each OIM0017row As DataRow In OIM0017tbl.Rows
                     If Trim(OIM0017row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -808,21 +793,10 @@ Public Class OIM0017TrainOperationList
                         ' 更新ジャーナル出力
                         JPARA00.Value = OIM0017row("OFFICECODE")
                         JPARA01.Value = OIM0017row("TRAINNO")
-                        'JPARA02.Value = OIM0017row("TRAINNAME")
                         JPARA03.Value = OIM0017row("WORKINGDATE")
                         JPARA04.Value = OIM0017row("TSUMI")
                         JPARA05.Value = OIM0017row("DEPSTATION")
                         JPARA06.Value = OIM0017row("ARRSTATION")
-                        'JPARA07.Value = OIM0017row("RUN")
-                        'JPARA08.Value = OIM0017row("DELFLG")
-                        'JPARA09.Value = WW_DATENOW
-                        'JPARA10.Value = Master.USERID
-                        'JPARA11.Value = Master.USERTERMID
-                        'JPARA12.Value = WW_DATENOW
-                        'JPARA13.Value = Master.USERID
-                        'JPARA14.Value = Master.USERTERMID
-                        'JPARA15.Value = C_DEFAULT_YMD
-
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
                             If IsNothing(OIM0017UPDtbl) Then
@@ -1162,25 +1136,17 @@ Public Class OIM0017TrainOperationList
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TRAINNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRAINNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("WORKINGDATE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TSUMI") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ARRSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RUN") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                WW_COLUMNS.IndexOf("ARRSTATION") >= 0 Then
                 For Each OIM0017row As DataRow In OIM0017tbl.Rows
                     If XLSTBLrow("OFFICECODE") = OIM0017row("OFFICECODE") AndAlso
                         XLSTBLrow("TRAINNO") = OIM0017row("TRAINNO") AndAlso
-                        XLSTBLrow("TRAINNAME") = OIM0017row("TRAINNAME") AndAlso
                         XLSTBLrow("WORKINGDATE") = OIM0017row("WORKINGDATE") AndAlso
                         XLSTBLrow("TSUMI") = OIM0017row("TSUMI") AndAlso
                         XLSTBLrow("DEPSTATION") = OIM0017row("DEPSTATION") AndAlso
-                        XLSTBLrow("ARRSTATION") = OIM0017row("ARRSTATION") AndAlso
-                        XLSTBLrow("RUN") = OIM0017row("RUN") AndAlso
-                        XLSTBLrow("ZAIKOSORT") = OIM0017row("ZAIKOSORT") AndAlso
-                        XLSTBLrow("BIKOU") = OIM0017row("BIKOU") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0017row("DELFLG") Then
+                        XLSTBLrow("ARRSTATION") = OIM0017row("ARRSTATION") Then
                         OIM0017INProw.ItemArray = OIM0017row.ItemArray
                         Exit For
                     End If
@@ -1414,7 +1380,17 @@ Public Class OIM0017TrainOperationList
             ' JOT列車番号（バリデーションチェック）
             WW_TEXT = OIM0017INProw("TRAINNO")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ' 値存在チェックT
+                CODENAME_get("TRAINNO", OIM0017INProw("TRAINNO"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(JOT列車番号エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0017INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
                 WW_CheckMES1 = "・更新できないレコード(JOT列車番号エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0017INProw)
@@ -1666,23 +1642,24 @@ Public Class OIM0017TrainOperationList
 
             OIM0017INProw.Item("OPERATION") = CONST_INSERT
 
-            ' KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0017row As DataRow In OIM0017tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0017row("OFFICECODE") = OIM0017INProw("OFFICECODE") AndAlso
                     OIM0017row("TRAINNO") = OIM0017INProw("TRAINNO") AndAlso
                     OIM0017row("WORKINGDATE") = OIM0017INProw("WORKINGDATE") AndAlso
                     OIM0017row("TSUMI") = OIM0017INProw("TSUMI") AndAlso
                     OIM0017row("DEPSTATION") = OIM0017INProw("DEPSTATION") AndAlso
                     OIM0017row("ARRSTATION") = OIM0017INProw("ARRSTATION") Then
-                    ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0017row("TRAINNAME") = OIM0017INProw("TRAINNAME") AndAlso
                         OIM0017row("RUN") = OIM0017INProw("RUN") AndAlso
-                        OIM0017row("DELFLG") = OIM0017INProw("DELFLG") AndAlso
-                        OIM0017INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0017row("DELFLG") = OIM0017INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0017INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0017INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1720,6 +1697,7 @@ Public Class OIM0017TrainOperationList
             ' 同一レコードか判定
             If OIM0017INProw("OFFICECODE") = OIM0017row("OFFICECODE") AndAlso
                 OIM0017INProw("TRAINNO") = OIM0017row("TRAINNO") AndAlso
+                OIM0017INProw("WORKINGDATE") = OIM0017row("WORKINGDATE") AndAlso
                 OIM0017INProw("TSUMI") = OIM0017row("TSUMI") AndAlso
                 OIM0017INProw("DEPSTATION") = OIM0017row("DEPSTATION") AndAlso
                 OIM0017INProw("ARRSTATION") = OIM0017row("ARRSTATION") Then
@@ -1822,7 +1800,12 @@ Public Class OIM0017TrainOperationList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TRAINNO"
                     ' JOT列車番号
-                    prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
+                    If String.IsNullOrEmpty(work.WF_SEL_OFFICECODE.Text) Then
+                        '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                        prmData = work.CreateTrainNoParam(Master.USER_ORG, I_VALUE)
+                    Else
+                        prmData = work.CreateTrainNoParam(work.WF_SEL_OFFICECODE.Text, I_VALUE)
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TSUMI"
                     ' 積置フラグ
@@ -1834,11 +1817,11 @@ Public Class OIM0017TrainOperationList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "RUN"
                     ' 稼働フラグ
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "RUN")
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "RUN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"
                     ' 削除
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG")
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

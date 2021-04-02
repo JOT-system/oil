@@ -1107,26 +1107,14 @@ Public Class OIM0019AccountList
             If WW_COLUMNS.IndexOf("FROMYMD") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ENDYMD") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ACCOUNTCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ACCOUNTNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("SEGMENTCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SEGMENTNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SEGMENTBRANCHCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SEGMENTBRANCHNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ACCOUNTTYPE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ACCOUNTTYPENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                WW_COLUMNS.IndexOf("SEGMENTBRANCHCODE") >= 0 Then
                 For Each OIM0019row As DataRow In OIM0019tbl.Rows
                     If XLSTBLrow("FROMYMD") = OIM0019row("FROMYMD") AndAlso
                         XLSTBLrow("ENDYMD") = OIM0019row("ENDYMD") AndAlso
                         XLSTBLrow("ACCOUNTCODE") = OIM0019row("ACCOUNTCODE") AndAlso
-                        XLSTBLrow("ACCOUNTNAME") = OIM0019row("ACCOUNTNAME") AndAlso
                         XLSTBLrow("SEGMENTCODE") = OIM0019row("SEGMENTCODE") AndAlso
-                        XLSTBLrow("SEGMENTNAME") = OIM0019row("SEGMENTNAME") AndAlso
-                        XLSTBLrow("SEGMENTBRANCHCODE") = OIM0019row("SEGMENTBRANCHCODE") AndAlso
-                        XLSTBLrow("SEGMENTBRANCHNAME") = OIM0019row("SEGMENTBRANCHNAME") AndAlso
-                        XLSTBLrow("ACCOUNTTYPE") = OIM0019row("ACCOUNTTYPE") AndAlso
-                        XLSTBLrow("ACCOUNTTYPENAME") = OIM0019row("ACCOUNTTYPENAME") AndAlso
-                        XLSTBLrow("DELFLG") = OIM0019row("DELFLG") Then
+                        XLSTBLrow("SEGMENTBRANCHCODE") = OIM0019row("SEGMENTBRANCHCODE") Then
                         OIM0019INProw.ItemArray = OIM0019row.ItemArray
                         Exit For
                     End If
@@ -1607,26 +1595,27 @@ Public Class OIM0019AccountList
 
             OIM0019INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0019row As DataRow In OIM0019tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0019row("FROMYMD") = OIM0019INProw("FROMYMD") AndAlso
                     OIM0019row("ENDYMD") = OIM0019INProw("ENDYMD") AndAlso
                     OIM0019row("ACCOUNTCODE") = OIM0019INProw("ACCOUNTCODE") AndAlso
                     OIM0019row("SEGMENTCODE") = OIM0019INProw("SEGMENTCODE") AndAlso
                     OIM0019row("SEGMENTBRANCHCODE") = OIM0019INProw("SEGMENTBRANCHCODE") Then
 
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0019row("ACCOUNTNAME") = OIM0019INProw("ACCOUNTNAME") AndAlso
                         OIM0019row("SEGMENTNAME") = OIM0019INProw("SEGMENTNAME") AndAlso
                         OIM0019row("SEGMENTBRANCHNAME") = OIM0019INProw("SEGMENTBRANCHNAME") AndAlso
                         OIM0019row("ACCOUNTTYPE") = OIM0019INProw("ACCOUNTTYPE") AndAlso
                         OIM0019row("ACCOUNTTYPENAME") = OIM0019INProw("ACCOUNTTYPENAME") AndAlso
-                        OIM0019row("DELFLG") = OIM0019INProw("DELFLG") AndAlso
-                        OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0019row("DELFLG") = OIM0019INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        '変更がある時は「操作」の項目を「更新」に設定する
                         OIM0019INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

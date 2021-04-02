@@ -2211,6 +2211,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & " ORDER BY" _
             & "    OURDAILYBRANCHC" _
+            & "  , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')" _
             & "  , SHIPORDER" _
             & "  , OTOILCODE"
         '& " ORDER BY" _

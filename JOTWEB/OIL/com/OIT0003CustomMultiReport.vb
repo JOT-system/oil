@@ -492,11 +492,11 @@ Public Class ActualShip : Inherits OIT0003CustomMultiReportBase
 
             '列車番号
             rngHeaderArea = ExcelWorkSheet.Range("G31")
-            If trainNo = "5282" Then
-                trainNo = "5875"
-            ElseIf trainNo = "8072" Then
-                trainNo = "8081"
-            End If
+            'If trainNo = "5282" Then
+            '    trainNo = "5875"
+            'ElseIf trainNo = "8072" Then
+            '    trainNo = "8081"
+            'End If
             rngHeaderArea.Value = String.Format("{0}列車", trainNo)
             ExcelMemoryRelease(rngHeaderArea)
 

@@ -3078,6 +3078,8 @@ Public Class OIT0003OrderList
         Me.rbActualShipBtn.Checked = False
         '連結順序表
         Me.rbConcatOederBtn.Checked = False
+        'タンク車出荷連絡書
+        Me.rbShipContactBtn.Checked = False
 
         '託送指示(ラジオボタン)を非表示
         Me.rbDeliveryBtn.Visible = False

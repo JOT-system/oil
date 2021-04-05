@@ -92,8 +92,8 @@ Public Class OIT0008CostManagement
                             WF_ButtonUPDATE_Click()
                         Case "WF_Button_DLTransportCostsDetail" ' 「輸送費明細」ボタン押下
                             WF_Button_DLTransportCostsDetail_Click()
-                        Case "WF_Button_DLTankTransportResult" ' 「タンク車輸送実績表」ボタン押下
-                            WF_Button_DLTankTransportResult_Click()
+                            'Case "WF_Button_DLTankTransportResult" ' 「タンク車輸送実績表」ボタン押下
+                            '    WF_Button_DLTankTransportResult_Click()
                             'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
                             '    WF_ButtonPrint_Click()
 
@@ -2192,7 +2192,7 @@ Public Class OIT0008CostManagement
         Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TANK_TRASPORT_RESULT.xlsx", TMP0009tbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData_TankTansportResult(WK_STYMD, WK_EDYMD)
+                url = repCbj.CreateExcelPrintData_TankTansportResult(WK_STYMD, WK_EDYMD, 1)
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT TANK_TRASPORT_RESULT")
                 Exit Sub

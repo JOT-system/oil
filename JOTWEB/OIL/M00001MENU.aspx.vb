@@ -481,24 +481,43 @@ Public Class M00001MENU
         Me.transportResultCondPane.Visible = False
 
         '帳票条件ぺインの表示変更
-        If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) OrElse
-            CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) Then
+        If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) Then
             '輸送実績表条件パネル表示
             Me.transportResultCondPane.Visible = True
         End If
 
+        '帳票条件ぺインの表示変更
+        If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) OrElse
+            CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR.Equals(Me.ddlReportNameList.SelectedItem.Text) Then
+            '輸送実績表条件パネル表示
+            Me.TankTransportResultCondPane.Visible = True
+        End If
+
         '初期化フラグON
         If initFlag Then
-            '期間開始日の初期化(当月月初)
+            '------------'
+            ' 初期化処理 '
+            '------------'
+            '〇輸送実績表
+            '期間開始日(当月月初)
             Me.txtTrStYmd.Text = New Date(Now.Year, Now.Month, 1).ToString("yyyy/MM/dd")
-            '期間終了日の初期化(当日)
+            '期間終了日(当日)
             Me.txtTrEdYmd.Text = Now.ToString("yyyy/MM/dd")
-            '営業所選択リストの初期化
+            '営業所選択リスト
             Me.ddlTrOfficeNameList.Attributes.Add("onchange", "selectChangeDdl('" + Me.ddlTrOfficeNameList.ClientID + "');")
-            'Me.ddlTrOfficeNameList.Items.AddRange(Me.GetTrOfficeNameList.Cast(Of ListItem).ToArray())
-            'Me.ddlTrOfficeNameList.SelectedIndex = 0
-            'Me.ddlTrOfficeNameList_LaIdx.Value = "0"
             Me.InitTrOfficeNameList()
+
+            '〇タンク車運賃実績表
+            '期間開始日(当月月初)
+            Me.txtTtrStYmd.Text = New Date(Now.Year, Now.Month, 1).ToString("yyyy/MM/dd")
+            '期間終了日(当日)
+            Me.txtTtrEdYmd.Text = Now.ToString("yyyy/MM/dd")
+            '営業所選択リスト
+            Me.ddlTtrOfficeNameList.Attributes.Add("onchange", "selectChangeDdl('" + Me.ddlTtrOfficeNameList.ClientID + "');")
+            Me.InitTtrOfficeNameList()
+            '種別
+            Me.ddlTtrTypeList.Attributes.Add("onchange", "selectChangeDdl('" + Me.ddlTtrTypeList.ClientID + "');")
+            Me.InitTtrTypeList()
         End If
     End Sub
 
@@ -513,8 +532,9 @@ Public Class M00001MENU
         list.Add(New ListItem(CONST_REPORTNAME_TRANSPORT_RESULT, String.Format("{0:999}", codeIndex)))
         codeIndex += 1
         list.Add(New ListItem(CONST_REPORTNAME_TANK_TRANSPORT_RESULT, String.Format("{0:999}", codeIndex)))
+        codeIndex += 1
+        list.Add(New ListItem(CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR, String.Format("{0:999}", codeIndex)))
         'codeIndex += 1
-        'list.Add(New ListItem("ダミー", String.Format("{0:999}", codeIndex)))
 
         Return list
     End Function
@@ -550,6 +570,56 @@ Public Class M00001MENU
     End Sub
 
     ''' <summary>
+    ''' (タンク車運賃実績表)営業所リスト初期化
+    ''' </summary>
+    Private Sub InitTtrOfficeNameList()
+
+        Using obj As GRIS0005LeftBox = DirectCast(LoadControl("~/inc/GRIS0005LeftBox.ascx"), GRIS0005LeftBox)
+            Dim prmData As New Hashtable
+            Dim ddlList As New DropDownList
+            Dim selectedIdx As Integer = 0
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = Me.Master.USER_ORG
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_SALESOFFICE) = ""
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+            Dim wkDUMMY As String = ""
+            obj.SetListBox(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, wkDUMMY, prmData)
+
+            For Each listitm As ListItem In obj.WF_LeftListBox.Items
+                Dim ddlItm As New ListItem(listitm.Text, listitm.Value)
+                If listitm.Value.Equals(Me.Master.USER_ORG) Then
+                    ddlItm.Selected = True
+                Else
+                    ddlItm.Selected = False
+                End If
+                ddlList.Items.Add(ddlItm)
+            Next
+            Me.ddlTtrOfficeNameList.Items.AddRange(ddlList.Items.Cast(Of ListItem).ToArray)
+            Me.ddlTtrOfficeNameList_LaIdx.Value = Me.ddlTrOfficeNameList.SelectedIndex.ToString
+        End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車運賃実績表)種別リスト初期化
+    ''' </summary>
+    Private Sub InitTtrTypeList()
+
+        Dim ddlList As New DropDownList
+        Dim selectedIdx As Integer = 0
+
+        Dim ddlItm As New ListItem("往路所定運賃", "1")
+        ddlItm.Selected = True
+        ddlList.Items.Add(ddlItm)
+        ddlItm = New ListItem("往路割引後運賃", "2")
+        ddlItm.Selected = False
+        ddlList.Items.Add(ddlItm)
+
+        Me.ddlTtrTypeList.Items.AddRange(ddlList.Items.Cast(Of ListItem).ToArray)
+        Me.ddlTtrTypeList_LaIdx.Value = Me.ddlTrOfficeNameList.SelectedIndex.ToString
+
+    End Sub
+
+    ''' <summary>
     ''' 帳票ダウンロード
     ''' </summary>
     Private Sub BtnDownLoadReport()
@@ -570,13 +640,57 @@ Public Class M00001MENU
 
             'タンク車輸送実績表
             If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+                Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT
+                '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
+                If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                    tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_010402
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
-                        CONST_MAPID_COST_MANAGEMENT,            '費用管理
-                        CONST_TEMPNAME_TANK_TRANSPORT_RESULT,   'タンク車輸送実績表
+                        CONST_MAPID_COST_MANAGEMENT,    '費用管理
+                        tempName,                       'タンク車輸送実績表
                         Me.GetTankTransportResultData)
                     '帳票出力＆ファイルパス取得
-                    WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult(
-                        CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
+                    If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        'タンク車運賃実績表-列車別-仙台
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult_010402(
+                            CDate(txtTtrStYmd.Text), CDate(txtTtrEdYmd.Text),
+                            Integer.Parse(ddlTtrTypeList.SelectedValue))
+                    Else
+                        'タンク車運賃実績表-列車別-仙台以外
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult(
+                            CDate(txtTtrStYmd.Text), CDate(txtTtrEdYmd.Text),
+                            Integer.Parse(ddlTtrTypeList.SelectedValue))
+                    End If
+
+                    '帳票ダウンロード
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+            End If
+
+            'タンク車輸送実績表（着駅別）
+            If CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR.Equals(ddlReportNameList.SelectedItem.Text) Then
+                Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR
+                '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
+                If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                    tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR_010402
+                End If
+
+                Using clsPrint As New OIT0008CustomReport(
+                        CONST_MAPID_COST_MANAGEMENT,    '費用管理
+                        tempName,                       'タンク車輸送実績表（着駅別）
+                        Me.GetTankTransportResultData)
+                    '帳票出力＆ファイルパス取得
+                    If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult_Arr_010402(
+                            CDate(txtTtrStYmd.Text), CDate(txtTtrEdYmd.Text),
+                            Integer.Parse(ddlTtrTypeList.SelectedValue))
+                    Else
+                        'タンク車運賃実績表-着駅別-仙台以外
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult_Arr(
+                            CDate(txtTtrStYmd.Text), CDate(txtTtrEdYmd.Text),
+                            Integer.Parse(ddlTtrTypeList.SelectedValue))
+                    End If
                     '帳票ダウンロード
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
@@ -589,6 +703,8 @@ Public Class M00001MENU
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.FILE_IO_ERROR
             CS0011LOGWRITE.CS0011LOGWrite()
+
+            Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "帳票出力に失敗しました。")
         End Try
 
     End Sub
@@ -649,20 +765,44 @@ Public Class M00001MENU
             Using SQLcmd As New SqlCommand
                 SQLcmd.Connection = SQLcon
                 SQLcmd.CommandType = CommandType.StoredProcedure
-                SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT2]"
+
+                'プロシージャ名
+                If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+                    '帳票名が「タンク車運賃実績表」の場合、列車別データ取得プロシージャを呼び出す
+                    If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_010402]"
+                    Else
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT]"
+                    End If
+                Else
+                    '帳票名が「タンク車運賃実績表（着駅別）」の場合、着駅別データ取得プロシージャを呼び出す
+                    If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR_010402]"
+                    Else
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR]"
+                    End If
+                End If
+
                 SQLcmd.Parameters.Clear()
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@STYMD", SqlDbType.Date)             ' 累計開始日
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@EDYMD", SqlDbType.Date)             ' 累計終了日
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@TYPE", SqlDbType.Int)               ' 種別
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
                 Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
 
-                PARA1.Value = CDate(txtTrStYmd.Text)
-                PARA2.Value = CDate(txtTrEdYmd.Text)
-                PARA3.Value = ddlTrOfficeNameList.SelectedValue
-
-                PARA4.Direction = ParameterDirection.Output
+                PARA1.Value = CDate(txtTtrStYmd.Text)
+                PARA2.Value = CDate(txtTtrEdYmd.Text)
+                PARA4.Value = Integer.Parse(ddlTtrTypeList.SelectedValue)
+                PARA5.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
+
+                '営業所が「仙台新港営業所」以外の場合、営業所コードをパラメータに付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
+                    PARA3.Value = ddlTtrOfficeNameList.SelectedValue
+                End If
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     dt.Load(SQLdr)
@@ -696,10 +836,14 @@ Public Class M00001MENU
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "txtStYMD"     '期間FROM
+                            Case txtTrStYmd.ID     '(輸送実績表)期間FROM
                                 .WF_Calendar.Text = txtTrStYmd.Text
-                            Case "txtEdYMD"     '期間FROM
+                            Case txtTrEdYmd.ID     '(輸送実績表)期間FROM
                                 .WF_Calendar.Text = txtTrEdYmd.Text
+                            Case txtTtrStYmd.ID    '(タンク車運賃実績表)期間FROM
+                                .WF_Calendar.Text = txtTtrStYmd.Text
+                            Case txtTtrEdYmd.ID    '(タンク車運賃実績表)期間FROM
+                                .WF_Calendar.Text = txtTtrEdYmd.Text
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -738,7 +882,7 @@ Public Class M00001MENU
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "txtTrStYmd"
+            Case txtTrStYmd.ID  '(輸送実績表)期間FROM
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, wkDate)
                     If wkDate < CDate(C_DEFAULT_YMD) Then
@@ -750,7 +894,7 @@ Public Class M00001MENU
                 End Try
                 txtTrStYmd.Focus()
 
-            Case "txtTrEdYmd"
+            Case txtTrEdYmd.ID  '(輸送実績表)期間TO
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, wkDate)
                     If wkDate < CDate(C_DEFAULT_YMD) Then
@@ -761,6 +905,30 @@ Public Class M00001MENU
                 Catch ex As Exception
                 End Try
                 txtTrEdYmd.Focus()
+
+            Case txtTtrStYmd.ID '(タンク車運賃実績表)期間FROM
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, wkDate)
+                    If wkDate < CDate(C_DEFAULT_YMD) Then
+                        txtTtrStYmd.Text = ""
+                    Else
+                        txtTtrStYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+                txtTtrStYmd.Focus()
+
+            Case txtTtrEdYmd.ID '(タンク車運賃実績表)期間TO
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, wkDate)
+                    If wkDate < CDate(C_DEFAULT_YMD) Then
+                        txtTtrEdYmd.Text = ""
+                    Else
+                        txtTtrEdYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+                txtTtrEdYmd.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

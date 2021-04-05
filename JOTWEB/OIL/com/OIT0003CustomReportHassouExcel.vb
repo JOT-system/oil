@@ -175,7 +175,7 @@ Public Class OIT0003CustomReportHassouExcel : Implements IDisposable
     ''' </summary>
     Private Sub EditOTHassouHeaderArea(ByVal lodDate As String, ByVal officeCode As String)
         Dim rngHeaderArea As Excel.Range = Nothing
-        Dim value As String = Now.AddDays(1).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
+        Dim value As String = Now.AddDays(0).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
 
         Try
             For Each PrintDatarow As DataRow In PrintData.Rows

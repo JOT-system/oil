@@ -122,6 +122,69 @@ Partial Public Class M00001MENU
     Protected WithEvents ddlTrOfficeNameList As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''TankTransportResultCondPane コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TankTransportResultCondPane As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''txtTtrStYmd コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtTtrStYmd As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''txtTtrEdYmd コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtTtrEdYmd As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''ddlTtrOfficeNameList_LaIdx コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTtrOfficeNameList_LaIdx As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlTtrOfficeNameList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTtrOfficeNameList As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''ddlTtrTypeList_LaIdx コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTtrTypeList_LaIdx As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlTtrTypeList コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlTtrTypeList As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''P001 コントロール。
     '''</summary>
     '''<remarks>

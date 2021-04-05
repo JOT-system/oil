@@ -884,7 +884,8 @@ div.showGuidance a[id^="Menu_"] {
 }
 
 #reportDLAreaPane #reportConditionArea .termInputArea,
-#reportDLAreaPane #reportConditionArea .officeSelectArea {
+#reportDLAreaPane #reportConditionArea .officeSelectArea,
+#reportDLAreaPane #reportConditionArea .typeSelectArea {
     display: inline-block;
     margin-left: 5px;
 }

@@ -134,11 +134,6 @@ Public Class OIT0004OilStockSearch
 
                 If TxtSalesOffice.Text <> "" Then
                     GetDefRelateValues(TxtSalesOffice.Text, shipperCode, consigneeCode)
-                    If Master.USER_ORG = "302001" Then
-                        consigneeCode = "10"
-                    ElseIf Master.USER_ORG = "301901" Then
-                        consigneeCode = "20"
-                    End If
                 End If
 
             End If
@@ -702,6 +697,13 @@ Public Class OIT0004OilStockSearch
                         shippersCode = Convert.ToString(sqlDr("SHIPPERSCODE"))
                         consigneeCode = Convert.ToString(sqlDr("CONSIGNEECODE"))
                     End If
+
+                    If Master.USER_ORG = "302001" Then
+                        consigneeCode = "10"
+                    ElseIf Master.USER_ORG = "301901" Then
+                        consigneeCode = "20"
+                    End If
+
                 End Using 'sqlDr
             End Using 'sqlCon, sqlCmd
 
@@ -721,9 +723,14 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     Public Sub GetLastUpdate()
         Try
+            Dim valueHasNone = "―"
+            divUpdateInfo.Visible = False
+            divConsigneeUpdateInfo.Visible = False
             '一旦初期化
-            Me.WF_UpdateUser.Text = "&nbsp;"
-            Me.WF_UpdateDtm.Text = "&nbsp;"
+            Me.WF_UpdateUser.Text = valueHasNone
+            Me.WF_UpdateDtm.Text = valueHasNone
+            Me.WF_ConsigneeUser.Text = valueHasNone
+            Me.WF_ConsigneeUpdateDtm.Text = valueHasNone
 
             Dim officeCode As String = ""
             '取得出来ない条件の場合はスキップ
@@ -787,14 +794,29 @@ Public Class OIT0004OilStockSearch
                     Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
                         If sqlDr.HasRows Then
                             sqlDr.Read()
-                            fieldItem.updUserObj.Text = Convert.ToString(sqlDr(fieldItem.updUserField))
-                            fieldItem.updDtmObj.Text = Convert.ToString(sqlDr(fieldItem.updDtmField))
+                            Dim userName As String = Convert.ToString(sqlDr(fieldItem.updUserField))
+                            Dim updDtm As String = Convert.ToString(sqlDr(fieldItem.updDtmField))
+                            If userName = "" Then
+                                userName = "―"
+                                updDtm = "―"
+                            End If
+                            fieldItem.updUserObj.Text = userName
+                            fieldItem.updDtmObj.Text = updDtm
                         End If
                     End Using 'sqlDr
                 End Using 'sqlCon, sqlCmd
 
             Next
 
+            If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+                '北信・甲府しか操作できない前提のため、他の油槽所を開放するなら要変更
+                divConsigneeUpdateInfo.Visible = True
+            Else
+                divUpdateInfo.Visible = True
+                If {"10", "20"}.Contains(Me.WF_CONSIGNEE_CODE.Text) Then
+                    divConsigneeUpdateInfo.Visible = True
+                End If
+            End If
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004S LASTUPDATE_SELECT")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名

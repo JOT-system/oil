@@ -40,6 +40,6 @@ td.consigneeMark {
 .tblLastupdate tr:last-child>td:last-child  {
     border-bottom-right-radius: 5px;
 }
-#divConsigneeUpdateInfo {
+/*#divConsigneeUpdateInfo {
     display:none !important;
-}
+}*/

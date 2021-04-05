@@ -7714,6 +7714,16 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRINSPECTIONFLG = "3"
                 End If
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '### 20210402 START 袖ヶ浦営業所対応 ###############################################
+                If WW_JRINSPECTIONCNT <= 1 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 2 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   袖ヶ浦営業所対応 ###############################################
             Else
                 If WW_JRINSPECTIONCNT <= 3 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7766,6 +7776,16 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '### 20210402 START 袖ヶ浦営業所対応 ###############################################
+                If WW_JRALLINSPECTIONCNT <= 1 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 2 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   袖ヶ浦営業所対応 ###############################################
             Else
                 If WW_JRALLINSPECTIONCNT <= 3 Then
                     WW_JRALLINSPECTIONFLG = "1"
@@ -18034,6 +18054,7 @@ Public Class OIT0003OrderDetail
                     'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0003row("ORDERINFO") = ""
                     OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格上)"
                     'OIT0003row("ORDERINFONAME") = "前回揮発油(確認)"
                 End If
@@ -18072,6 +18093,7 @@ Public Class OIT0003OrderDetail
                     End Select
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0003row("ORDERINFO")), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0003row("ORDERINFO") = ""
                     OIT0003row("ORDERINFONAME") = WW_GetValue(3) + "(格下)"
                 End If
 

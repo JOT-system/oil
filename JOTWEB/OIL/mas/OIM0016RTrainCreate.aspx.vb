@@ -904,7 +904,7 @@ Public Class OIM0016RTrainCreate
 
             ' 管轄受注営業所（バリデーションチェック）
             WW_TEXT = OIM0016INProw("OFFICECODE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "OFFICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("OFFICECODE", OIM0016INProw("OFFICECODE"), WW_DUMMY, WW_RTN_SW)
@@ -925,7 +925,7 @@ Public Class OIM0016RTrainCreate
 
             ' 入線出線区分（バリデーションチェック）
             WW_TEXT = OIM0016INProw("IOKBN")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "IOKBN", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "IOKBN", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("IOKBN", OIM0016INProw("IOKBN"), WW_DUMMY, WW_RTN_SW)
@@ -946,7 +946,7 @@ Public Class OIM0016RTrainCreate
 
             ' 入線出線列車番号（バリデーションチェック）
             WW_TEXT = OIM0016INProw("TRAINNO")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "TRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(入線出線列車番号エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -957,7 +957,7 @@ Public Class OIM0016RTrainCreate
 
             ' 入線出線列車名（バリデーションチェック）
             WW_TEXT = OIM0016INProw("TRAINNAME")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "TRAINNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(入線出線列車名エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -968,7 +968,7 @@ Public Class OIM0016RTrainCreate
 
             ' 発駅コード（バリデーションチェック）
             WW_TEXT = OIM0016INProw("DEPSTATION")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "DEPSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("STATION", OIM0016INProw("DEPSTATION"), WW_DUMMY, WW_RTN_SW)
@@ -989,7 +989,7 @@ Public Class OIM0016RTrainCreate
 
             ' 着駅コード（バリデーションチェック）
             WW_TEXT = OIM0016INProw("ARRSTATION")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ARRSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ARRSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("STATION", OIM0016INProw("ARRSTATION"), WW_DUMMY, WW_RTN_SW)
@@ -1010,7 +1010,7 @@ Public Class OIM0016RTrainCreate
 
             ' プラントコード（バリデーションチェック）
             WW_TEXT = OIM0016INProw("PLANTCODE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PLANTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "PLANTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("PLANTCODE", OIM0016INProw("PLANTCODE"), WW_DUMMY, WW_RTN_SW)
@@ -1031,7 +1031,7 @@ Public Class OIM0016RTrainCreate
 
             ' 回線（バリデーションチェック）
             WW_TEXT = OIM0016INProw("LINE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LINE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "LINE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(回線エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1042,7 +1042,7 @@ Public Class OIM0016RTrainCreate
 
             ' 削除フラグ（バリデーションチェック）
             WW_TEXT = OIM0016INProw("DELFLG")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "DELFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ' 値存在チェックT
                 CODENAME_get("DELFLG", OIM0016INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
@@ -1204,23 +1204,24 @@ Public Class OIM0016RTrainCreate
 
             OIM0016INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0016row As DataRow In OIM0016tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0016row("OFFICECODE") = OIM0016INProw("OFFICECODE") AndAlso
                     OIM0016row("IOKBN") = OIM0016INProw("IOKBN") AndAlso
                     OIM0016row("LINE") = OIM0016INProw("LINE") Then
-                    ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0016row("TRAINNO") = OIM0016INProw("TRAINNO") AndAlso
                         OIM0016row("TRAINNAME") = OIM0016INProw("TRAINNAME") AndAlso
                         OIM0016row("DEPSTATION") = OIM0016INProw("DEPSTATION") AndAlso
                         OIM0016row("ARRSTATION") = OIM0016INProw("ARRSTATION") AndAlso
                         OIM0016row("PLANTCODE") = OIM0016INProw("PLANTCODE") AndAlso
-                        OIM0016row("DELFLG") = OIM0016INProw("DELFLG") AndAlso
-                        OIM0016INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0016row("DELFLG") = OIM0016INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0016INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0016INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

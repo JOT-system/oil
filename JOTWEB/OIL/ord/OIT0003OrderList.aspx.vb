@@ -4184,15 +4184,17 @@ Public Class OIT0003OrderList
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
+                Dim cvtTrainNo As String = ""
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelActualShipDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                    ExcelActualShipDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text, cvtTrainNo)
                 End Using
 
                 '帳票作成
                 Dim url As String =
-                OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, cvtTrainNo)
+                'OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
 
                 '○ 別画面でExcelを表示
                 WF_PrintURL.Value = url
@@ -4203,15 +4205,17 @@ Public Class OIT0003OrderList
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
+                Dim cvtTrainNo As String = ""
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelConcatOrderDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                    ExcelConcatOrderDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text, cvtTrainNo)
                 End Using
 
                 '帳票作成
                 Dim url As String =
-                OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, cvtTrainNo)
+                'OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
 
                 '○ 別画面でExcelを表示
                 WF_PrintURL.Value = url
@@ -4450,15 +4454,17 @@ Public Class OIT0003OrderList
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
+                Dim cvtTrainNo As String = ""
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelActualShipDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                    ExcelActualShipDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text, cvtTrainNo)
                 End Using
 
                 '帳票作成
                 Dim url As String =
-                OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, cvtTrainNo)
+                'OIT0003CustomMultiReport.CreateActualShip(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
 
                 '○ 別画面でExcelを表示
                 WF_PrintURL.Value = url
@@ -4469,15 +4475,17 @@ Public Class OIT0003OrderList
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
+                Dim cvtTrainNo As String = ""
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelConcatOrderDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                    ExcelConcatOrderDataGet(SQLcon, officeCode, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text, cvtTrainNo)
                 End Using
 
                 '帳票作成
                 Dim url As String =
-                OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
+                OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, cvtTrainNo)
+                'OIT0003CustomMultiReport.CreateContactOrder(Master.MAPID, officeCode, OIT0003Reporttbl, Me.txtReportLodDate.Text, Me.txtReportTrainNo.Text)
 
                 '○ 別画面でExcelを表示
                 WF_PrintURL.Value = url
@@ -6554,6 +6562,7 @@ Public Class OIT0003OrderList
             & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
             & " , VIW0013.TSUMI                                  AS TSUMI" _
             & " , ''                                             AS FILLINGPOINT" _
+            & " , ROW_NUMBER() OVER(PARTITION BY VIW0013.No, VIW0013.ZAIKOSORT ORDER BY VIW0013.No, VIW0013.ZAIKOSORT, VIW0013.JRTRAINNO1) AS FILLINGPOINT_KAI" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIM0003.OILNAME                                AS OILNAME" _
             & " , OIM0003.OILKANA                                AS OILKANA" _
@@ -6938,8 +6947,14 @@ Public Class OIT0003OrderList
 
                     '★表示用の油種コードと充填ポイントで設定している油種コードを比較
                     For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                        '### 20210401 START 油種を優先順に上から設定するに変更 ##########################
+                        '①充填ポイントで一致する(油種順に設定)
+                        '②油種で一致する(テンプレートに設定された油種で設定)
+                        '### 20210401 END   油種を優先順に上から設定するに変更 ##########################
+                        'If OIT0003Wkrow("DELFLG") <> "1" _
+                        'AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
                         If OIT0003Wkrow("DELFLG") <> "1" _
-                            AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
+                            AndAlso OIT0003Wkrow("LOADINGPOINT") = OIT0003Reprow("FILLINGPOINT_KAI") Then
                             OIT0003Reprow("FILLINGPOINT") = OIT0003Wkrow("LOADINGPOINT")
                             OIT0003Wkrow("DELFLG") = "1"
 
@@ -7398,7 +7413,8 @@ Public Class OIT0003OrderList
     Protected Sub ExcelActualShipDataGet(ByVal SQLcon As SqlConnection,
                                          ByVal officeCode As String,
                                          ByVal lodDate As String,
-                                         ByVal trainNo As String)
+                                         ByVal trainNo As String,
+                                         ByRef trainNoCvt As String)
 
         If IsNothing(OIT0003Reporttbl) Then
             OIT0003Reporttbl = New DataTable
@@ -7433,6 +7449,8 @@ Public Class OIT0003OrderList
             & "   , ISNULL(OIM0005.MODEL, '')                           AS MODEL " _
             & "   , ISNULL(OIM0005.TANKNUMBER, '')                      AS TANKNUMBER " _
             & "   , ''                                                  AS TANKNO " _
+            & "   , OIT0002.LODDATE                                     AS LODDATE" _
+            & "   , OIT0002.DEPDATE                                     AS DEPDATE" _
             & " FROM " _
             & "   OIL.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
@@ -7572,6 +7590,9 @@ Public Class OIT0003OrderList
 
                     OIT0003Reprow("TANKNO") = tankNo.ToString().PadLeft(7, "0"c)
 
+                    '★営業所別列車No変換処理
+                    WW_CvtOfficeTrainNo(officeCode, OIT0003Reprow, trainNoCvt)
+
                 Next
 
             End Using
@@ -7602,7 +7623,8 @@ Public Class OIT0003OrderList
     Protected Sub ExcelConcatOrderDataGet(ByVal SQLcon As SqlConnection,
                                           ByVal officeCode As String,
                                           ByVal lodDate As String,
-                                          ByVal trainNo As String)
+                                          ByVal trainNo As String,
+                                          ByVal trainNoCvt As String)
 
         If IsNothing(OIT0003Reporttbl) Then
             OIT0003Reporttbl = New DataTable
@@ -7637,6 +7659,8 @@ Public Class OIT0003OrderList
             & "   , ISNULL(OIM0005.MODEL, '')      AS MODEL " _
             & "   , ISNULL(OIM0005.TANKNUMBER, '') AS TANKNUMBER " _
             & "   , ''                             AS TANKNO " _
+            & "   , OIT0002.LODDATE                AS LODDATE" _
+            & "   , OIT0002.DEPDATE                AS DEPDATE" _
             & " FROM " _
             & "   OIL.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _
@@ -7770,6 +7794,9 @@ Public Class OIT0003OrderList
                     End Select
 
                     OIT0003Reprow("TANKNO") = tankNo.ToString().PadLeft(7, "0"c)
+
+                    '★営業所別列車No変換処理
+                    WW_CvtOfficeTrainNo(officeCode, OIT0003Reprow, trainNoCvt)
 
                 Next
 
@@ -8240,6 +8267,36 @@ Public Class OIT0003OrderList
 
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' 営業所別列車No変換処理
+    ''' </summary>
+    Protected Sub WW_CvtOfficeTrainNo(ByVal officeCode As String,
+                                      ByVal OIT0003Reprow As DataRow,
+                                      ByRef trainNoCvt As String)
+        If officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            Select Case OIT0003Reprow("TRAINNO")
+                Case "9672"
+                    OIT0003Reprow("TRAINNO") = "5461"
+            End Select
+        ElseIf officeCode = BaseDllConst.CONST_OFFICECODE_012402 Then
+            Select Case OIT0003Reprow("TRAINNO")
+                Case "5282"
+                    If OIT0003Reprow("LODDATE") = OIT0003Reprow("DEPDATE") Then
+                        OIT0003Reprow("TRAINNO") = "5875"
+                    Else
+                        OIT0003Reprow("TRAINNO") = "6883"
+                    End If
+                Case "8072"
+                    If OIT0003Reprow("LODDATE") = OIT0003Reprow("DEPDATE") Then
+                        OIT0003Reprow("TRAINNO") = "8081"
+                    Else
+                        OIT0003Reprow("TRAINNO") = "9081"
+                    End If
+            End Select
+        End If
+        trainNoCvt = OIT0003Reprow("TRAINNO")
     End Sub
 
     ''' <summary>

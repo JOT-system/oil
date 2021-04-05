@@ -1926,11 +1926,12 @@ Public Class OIM0011ToriList
 
             OIM0011INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0011row As DataRow In OIM0011tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0011row("TORICODE") = OIM0011INProw("TORICODE") AndAlso
                     OIM0011row("STYMD") = OIM0011INProw("STYMD") Then
-                    'KEY項目以外の項目の変更をチェック
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0011row("ENDYMD") = OIM0011INProw("ENDYMD") AndAlso
                         OIM0011row("TORINAME") = OIM0011INProw("TORINAME") AndAlso
                         OIM0011row("TORINAMES") = OIM0011INProw("TORINAMES") AndAlso
@@ -1952,12 +1953,11 @@ Public Class OIM0011ToriList
                         OIM0011row("ACCOUNTNUMBER") = OIM0011INProw("ACCOUNTNUMBER") AndAlso
                         OIM0011row("ACCOUNTNAME") = OIM0011INProw("ACCOUNTNAME") AndAlso
                         OIM0011row("DELFLG") = OIM0011INProw("DELFLG") Then
-                        'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                        ' 変更がないときは「操作」の項目は空白にする
                         OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0011INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

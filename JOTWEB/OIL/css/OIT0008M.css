@@ -191,6 +191,11 @@ span.WF_COSTLISTTBL_CALCACCOUNT {
     display: inline-block;
 }
 
+input#WF_COSTLISTTBL_SHIPPERSNAME {
+    width: 112px;
+    padding-left: 25px;
+}
+
 input#WF_COSTLISTTBL_ACCOUNTCODE {
     width: 112px;
     padding-left:25px;

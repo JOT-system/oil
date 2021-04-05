@@ -553,8 +553,14 @@ Public Class OIT0003OTLinkageList
                 PARA02.Value = targetDate
                 PARA_TODAY.Value = today
                 'PARA02.Value = "2020/08/20"
-                PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
-                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                '★仙台新港営業所対応(受注受付は表示しない(200(手配)以降を表示))
+                If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                    PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
+                Else
+                    PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                    PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_100
+                End If
                 'PARA07.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 'PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_200
                 PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_310
@@ -2026,6 +2032,7 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
+            & " , OIM0029.KEYCODE04                                                 AS OTDAILYCONSIGNEEN" _
             & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE" _
             & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS DEPDATE"
         '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
@@ -2042,6 +2049,7 @@ Public Class OIT0003OTLinkageList
               " SELECT " _
             & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
+            & " , OIM0029.KEYCODE04                                                 AS OTDAILYCONSIGNEEN" _
             & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE" _
             & " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS DEPDATE"
         '& " , FORMAT(OIT0002.DEPDATE, 'yyyyMMdd')            AS LODDATE"
@@ -2059,6 +2067,7 @@ Public Class OIT0003OTLinkageList
             & " , OIT0003.DETAILNO                               AS DETAILNO" _
             & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , FORMAT(OIT0002.TOTALTANKCH, '00')              AS TOTALTANK" _
@@ -2068,6 +2077,7 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(NCHAR(1), '0')                         AS EMPTYFAREFLG" _
             & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,''))" _
             & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,'')))) AS OTDAILYDEPSTATIONN" _
+            & " , OIT0002.ARRSTATIONNAME" _
             & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
             & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))" _
             & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))))    AS OTDAILYSHIPPERN" _
@@ -2175,8 +2185,16 @@ Public Class OIT0003OTLinkageList
             & " AND OIM0025.OURDAILYMARKTUN = OIM0005.LOAD " _
             & " AND OIM0025.TRKBN = OIM0010.TRKBN " _
             & " AND OIM0025.OTTRANSPORTFLG = ISNULL(OIT0003.OTTRANSPORTFLG,'2') " _
-            & " AND OIM0025.DELFLG <> @P02 " _
-            & " WHERE OIT0002.DELFLG <> @P02 " _
+            & " AND OIM0025.DELFLG <> @P02 "
+
+        SQLStrCmn &=
+              " LEFT JOIN OIL.OIM0029_CONVERT OIM0029 ON " _
+            & "     OIM0029.CLASS = 'OT_OFFICEMASTER' " _
+            & " AND OIM0029.KEYCODE01 = OIM0025.OTDAILYCONSIGNEEC " _
+            & " AND OIM0029.DELFLG <> @P02 "
+
+        SQLStrCmn &=
+              " WHERE OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.ORDERSTATUS <= @P04 " _
             & "   AND OIT0002.ORDERNO IN ( "
 
@@ -2211,6 +2229,7 @@ Public Class OIT0003OTLinkageList
               SQLStrCmn _
             & " ORDER BY" _
             & "    OURDAILYBRANCHC" _
+            & "  , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')" _
             & "  , SHIPORDER" _
             & "  , OTOILCODE"
         '& " ORDER BY" _
@@ -2271,7 +2290,7 @@ Public Class OIT0003OTLinkageList
 
                 If IsNothing(I_ORDERNO) Then
                     Dim i As Integer = 0
-                    Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
+                    Dim sortedDt = From dr As DataRow In wrkDt 'Order By dr("LODDATE")
                     For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
                         Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) 'AndAlso
                         'Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
@@ -2285,12 +2304,13 @@ Public Class OIT0003OTLinkageList
 
                             OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
                             Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
-                            orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEC"))
+                            orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEN"))
                             orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
                             orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
                             orderInf.OTShipOrder = Convert.ToString(sortedDr("SHIPORDER"))
                             orderInf.OTDepStationName = Convert.ToString(sortedDr("OTDAILYDEPSTATIONN"))
-                            orderInf.OTShippersName = Convert.ToString(sortedDr("OTDAILYSHIPPERN"))
+                            orderInf.OTArrStationName = Convert.ToString(sortedDr("ARRSTATIONNAME"))
+                            orderInf.OTShippersName = Convert.ToString(sortedDr("SHIPPERSNAME"))
                             orderInf.OTOilName = Convert.ToString(sortedDr("OTOILNAME"))
                             orderInf.OTTankNo = Convert.ToString(sortedDr("TANKNO"))
                             orderInf.OTAmount = Convert.ToString(sortedDr("CARSAMOUNT"))
@@ -2305,12 +2325,13 @@ Public Class OIT0003OTLinkageList
                     OIT0003CsvOTLinkagetbl = wrkDt.Copy()
                     For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                         Dim orderInf = New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO")))
-                        orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC"))
+                        orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEN"))
                         orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
                         orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
                         orderInf.OTShipOrder = Convert.ToString(OIT0003row("SHIPORDER"))
                         orderInf.OTDepStationName = Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN"))
-                        orderInf.OTShippersName = Convert.ToString(OIT0003row("OTDAILYSHIPPERN"))
+                        orderInf.OTArrStationName = Convert.ToString(OIT0003row("ARRSTATIONNAME"))
+                        orderInf.OTShippersName = Convert.ToString(OIT0003row("SHIPPERSNAME"))
                         orderInf.OTOilName = Convert.ToString(OIT0003row("OTOILNAME"))
                         orderInf.OTTankNo = Convert.ToString(OIT0003row("TANKNO"))
                         orderInf.OTAmount = Convert.ToString(OIT0003row("CARSAMOUNT"))
@@ -2429,8 +2450,11 @@ Public Class OIT0003OTLinkageList
 
                 For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                     '★CSV出力に不必要なので削除
+                    OIT0003row("OTDAILYCONSIGNEEN") = ""
+                    OIT0003row("ARRSTATIONNAME") = ""
                     OIT0003row("OFFICECODE") = ""
                     OIT0003row("SHIPPERSCODE") = ""
+                    OIT0003row("SHIPPERSNAME") = ""
                     OIT0003row("DEPDATE") = ""
 
                     ''★シフトアウト(14)・シフトイン(15)設定
@@ -4448,6 +4472,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property OTDepStationName As String = ""
+        ''' <summary>
+        ''' 着駅名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OTArrStationName As String = ""
         ''' <summary>
         ''' 荷主名
         ''' </summary>

@@ -84,7 +84,7 @@
                     <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
                 </a>
             </div>
-            <div class="inputItem" id="divUpdateInfo" runat="server" enableviewstate="true">
+            <div class="inputItem" id="divUpdateInfo" runat="server" enableviewstate="true" visible="false">
                 <a id="WF_LASTUPDATE_LABEL">更新情報</a>
                 <a class="ef" id="WF_LASTUPDATE" >
                     <table class="tblLastupdate">
@@ -105,7 +105,7 @@
 
                 </a>
             </div>
-            <div class="inputItem"  id="divConsigneeUpdateInfo" runat="server" enableviewstate="true">
+            <div class="inputItem"  id="divConsigneeUpdateInfo" runat="server" enableviewstate="true" visible="false">
                <a id="WF_CONSIGNEE_UPDINFO_LABEL">油槽所更新情報</a>
                <a class="ef" id="WF_CONSIGNEE_UPDINFO" >
                     <table class="tblLastupdate">

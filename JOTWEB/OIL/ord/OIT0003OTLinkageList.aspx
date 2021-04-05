@@ -138,6 +138,7 @@
                         <span>表示されている内容で発送日報を送信します。</span>
                     </div>
                     <div class="rightSide">
+                        <input type="button" id="WF_ButtonOTLinkageDownLoad" class="btn-sticky" value="ダウンロード"   onclick="ButtonClick('WF_ButtonOTLinkageDownLoad');" />
                         <input type="button" id="WF_ButtonOTLinkageSend" class="btn-sticky" value="送信"   onclick="ButtonClick('WF_ButtonReserveOTLinkageSend');" />
                         <input type="button" id="btnCloseOTLinkageSendConfirm" class="btn-sticky" value="閉じる"  onclick="closeOTLinkageSendConfirm();" />
                     </div>

@@ -827,6 +827,10 @@ Public Module Messages
         ''' 受注タンク車未割当エラー
         ''' </summary>
         Public Const OIL_ORDERTANK_MIWARIATE_ERROR As String = "20106"
+        ''' <summary>
+        ''' ファイル送信成功
+        ''' </summary>
+        Public Const FILE_EXPORT_SUCCESSFUL As String = "20107"
 
 
 #End Region

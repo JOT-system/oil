@@ -534,8 +534,18 @@ Public Class OIT0003OrderList
             & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
             & "        OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
             & "    AND OIM0007.TRAINNAME = OIT0002.TRAINNAME " _
-            & "    AND OIM0007.DEFAULTKBN = 'def' " _
-            & " WHERE OIT0002.DELFLG     <> @P3" _
+            & "    AND OIM0007.DEFAULTKBN = 'def' "
+
+        '### 20210405 START 受注一覧のソート順対応 #########################################
+        SQLStr &=
+              "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "        OIM0029.CLASS = 'ORDERLIST_SORT' " _
+            & "    AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "    AND OIM0029.KEYCODE04 = OIT0002.TRAINNAME "
+        '### 20210405 END   受注一覧のソート順対応 #########################################
+
+        SQLStr &=
+              " WHERE OIT0002.DELFLG     <> @P3" _
             & "   AND OIT0002.LODDATE    >= @P2"
 
         '20210322(条件変更：五井営業所の場合、OT列車番号を表示)
@@ -584,9 +594,18 @@ Public Class OIT0003OrderList
         End If
         '### 20201126 END   指摘票対応(No233)全体 ################################
 
+        '### 20210405 START 受注一覧のソート順対応 #########################################
         SQLStr &=
               " ORDER BY" _
-            & "    OIT0002.ORDERNO"
+            & "    OIT0002.OFFICECODE" _
+            & " ,  OIT0002.LODDATE" _
+            & " ,  OIM0029.KEYCODE05" _
+            & " ,  OIM0029.KEYCODE06" _
+            & " ,  OIT0002.ORDERNO"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0002.ORDERNO"
+        '### 20210405 END   受注一覧のソート順対応 #########################################
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

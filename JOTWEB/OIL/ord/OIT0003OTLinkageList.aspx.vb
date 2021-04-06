@@ -2359,6 +2359,9 @@ Public Class OIT0003OTLinkageList
                     End If
                 Next
 
+                Dim strTrainNoSave As String = ""
+                Dim iTotalCnt As Integer = 0
+                Dim iTotalAmount As Decimal = 0
                 If IsNothing(I_ORDERNO) Then
                     Dim i As Integer = 0
                     Dim sortedDt = From dr As DataRow In wrkDt 'Order By dr("LODDATE")
@@ -2375,6 +2378,27 @@ Public Class OIT0003OTLinkageList
 
                             OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
                             Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
+                            If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(sortedDr("TRAINNO")) Then
+                                '★合計欄の表示
+                                Dim orderInfT1 = New OutputOrdedrInfo("", "")
+                                orderInfT1.OTOfficeName = ""
+                                orderInfT1.OTSendYMD = ""
+                                orderInfT1.OTTrainNo = ""
+                                orderInfT1.OTShipOrder = ""
+                                orderInfT1.OTDepStationName = ""
+                                orderInfT1.OTArrStationName = ""
+                                orderInfT1.OTShippersName = ""
+                                orderInfT1.OTOilName = "計"
+                                orderInfT1.OTTankNo = Convert.ToString(iTotalCnt) + "両"
+                                If I_blnTYOHYO = False Then
+                                    orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                                Else
+                                    orderInfT1.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
+                                End If
+                                retVal.Add(orderInfT1)
+                                iTotalCnt = 0
+                                iTotalAmount = 0
+                            End If
                             orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEN"))
                             orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
                             orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
@@ -2391,11 +2415,39 @@ Public Class OIT0003OTLinkageList
                         'i += 1
                         'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
+                        strTrainNoSave = Convert.ToString(sortedDr("TRAINNO"))
+                        iTotalCnt += 1
+                        If I_blnTYOHYO = False Then
+                            iTotalAmount += Decimal.Parse(Convert.ToString(sortedDr("CARSAMOUNT")).Substring(0, 2) + "." + Convert.ToString(sortedDr("CARSAMOUNT")).Substring(2, 3))
+                        Else
+                            iTotalAmount += Decimal.Parse(Convert.ToString(sortedDr("CARSAMOUNT")))
+                        End If
                     Next
                 Else
                     OIT0003CsvOTLinkagetbl = wrkDt.Copy()
                     For Each OIT0003row As DataRow In OIT0003CsvOTLinkagetbl.Rows
                         Dim orderInf = New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO")))
+                        If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(OIT0003row("TRAINNO")) Then
+                            '★合計欄の表示
+                            Dim orderInfT1 = New OutputOrdedrInfo("", "")
+                            orderInfT1.OTOfficeName = ""
+                            orderInfT1.OTSendYMD = ""
+                            orderInfT1.OTTrainNo = ""
+                            orderInfT1.OTShipOrder = ""
+                            orderInfT1.OTDepStationName = ""
+                            orderInfT1.OTArrStationName = ""
+                            orderInfT1.OTShippersName = ""
+                            orderInfT1.OTOilName = "計"
+                            orderInfT1.OTTankNo = Convert.ToString(iTotalCnt) + "両"
+                            If I_blnTYOHYO = False Then
+                                orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                            Else
+                                orderInfT1.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
+                            End If
+                            retVal.Add(orderInfT1)
+                            iTotalCnt = 0
+                            iTotalAmount = 0
+                        End If
                         orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEN"))
                         orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
                         orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
@@ -2410,8 +2462,35 @@ Public Class OIT0003OTLinkageList
                         'retVal.Add(New OutputOrdedrInfo(Convert.ToString(OIT0003row("ORDERNO")), Convert.ToString(OIT0003row("DETAILNO"))))
                         OIT0003row("ORDERNO") = ""
                         OIT0003row("DETAILNO") = ""
+
+                        strTrainNoSave = Convert.ToString(OIT0003row("TRAINNO"))
+                        iTotalCnt += 1
+                        If I_blnTYOHYO = False Then
+                            iTotalAmount += Decimal.Parse(Convert.ToString(OIT0003row("CARSAMOUNT")).Substring(0, 2) + "." + Convert.ToString(OIT0003row("CARSAMOUNT")).Substring(2, 3))
+                        Else
+                            iTotalAmount += Decimal.Parse(Convert.ToString(OIT0003row("CARSAMOUNT")))
+                        End If
                     Next
+
                 End If
+
+                '★★最終行の合計欄の表示
+                Dim orderInfT2 = New OutputOrdedrInfo("", "")
+                orderInfT2.OTOfficeName = ""
+                orderInfT2.OTSendYMD = ""
+                orderInfT2.OTTrainNo = ""
+                orderInfT2.OTShipOrder = ""
+                orderInfT2.OTDepStationName = ""
+                orderInfT2.OTArrStationName = ""
+                orderInfT2.OTShippersName = ""
+                orderInfT2.OTOilName = "計"
+                orderInfT2.OTTankNo = Convert.ToString(iTotalCnt) + "両"
+                If I_blnTYOHYO = False Then
+                    orderInfT2.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                Else
+                    orderInfT2.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
+                End If
+                retVal.Add(orderInfT2)
 
                 '○項目の再設定
                 Dim setSPACE As String = ""

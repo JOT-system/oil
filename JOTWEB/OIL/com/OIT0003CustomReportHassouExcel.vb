@@ -213,7 +213,10 @@ Public Class OIT0003CustomReportHassouExcel : Implements IDisposable
         Dim blnNewLine As Boolean = False
 
         Try
-            Dim i As Integer = 5
+            Dim iLine() As Integer = {5, 35, 65, 95, 125, 155, 185, 215, 245, 275, 305}
+            Dim j As Integer = 0
+            Dim i As Integer = iLine(j)
+            'Dim i As Integer = 5
             Dim iNo As Integer = 1
             Dim iTotalCnt As Integer = 0
             Dim iTotalAmount As Decimal = 0
@@ -245,7 +248,9 @@ Public Class OIT0003CustomReportHassouExcel : Implements IDisposable
                     rngDetailArea.Value = Convert.ToString(iTotalAmount) + "(kl)"
                     ExcelMemoryRelease(rngDetailArea)
 
-                    i += 1
+                    j += 1
+                    i = iLine(j)
+                    'i += 1
                     iNo = 1
                     iTotalCnt = 0
                     iTotalAmount = 0

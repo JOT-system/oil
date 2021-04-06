@@ -265,7 +265,7 @@
         '      " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE"
         SQLStr &=
               " , CASE" _
-            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,1) = 'ｺ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
+            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,2) = 'ｺｷ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
             & "   ELSE ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE)" _
             & "   END                                            AS INSPECTIONDATE"
         '### 20210330 END   ﾀｷ1000以外は交検を未反映 ##########################################
@@ -295,7 +295,7 @@
             & " , OIT0005_LASTOIL.LASTOILNAME                    AS LASTOILNAME" _
             & " , OIT0005_LASTOIL.PREORDERINGTYPE                AS PREORDERINGTYPE" _
             & " , CASE" _
-            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,1) = 'ｺ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
+            & "   WHEN SUBSTRING(TRUCKSYMBOL,1,2) = 'ｺｷ' OR SUBSTRING(TRUCKSYMBOL,1,1) = 'ﾁ' THEN NULL" _
             & "   ELSE OIT0005_LASTOIL.PREORDERINGOILNAME" _
             & "   END                                            AS PREORDERINGOILNAME"
         '### 20201021 END   指摘票対応(No189)全体 #############################################

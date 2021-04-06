@@ -3990,6 +3990,13 @@ Public Class OIT0003OrderDetail
             For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_LTank1 + "'")
                 WW_OilTermSearch(OIT0003row)
             Next
+
+            '○袖ヶ浦営業所の場合
+        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★油種の出荷期間に合致した「軽油」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_KTank1 + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
         End If
 
         '○ 画面表示データ保存
@@ -14532,7 +14539,7 @@ Public Class OIT0003OrderDetail
                 Dim P_ORDERTODATE As SqlParameter = SQLcmd.Parameters.Add("@ORDERTODATE", System.Data.SqlDbType.Date)
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
 
-                P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
+                P_OFFICECODE.Value = Me.TxtOrderOfficeCode.Text
                 P_CONSIGNEECODE.Value = OIT0003row("CONSIGNEECODE")
                 P_OILCODE.Value = OIT0003row("OILCODE")
                 P_ORDERFROMDATE.Value = Me.TxtLoadingDate.Text

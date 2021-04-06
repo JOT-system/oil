@@ -626,13 +626,26 @@ Public Class M00001MENU
         Try
             '輸送実績表
             If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+                Dim tempName As String = CONST_TEMPNAME_TRANSPORT_RESULT
+                '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
+                If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
+                End If
                 Using clsPrint As New OIT0008CustomReport(
-                        CONST_MAPID_COST_MANAGEMENT,        '費用管理
-                        CONST_TEMPNAME_TRANSPORT_RESULT,    '輸送実績表
+                        CONST_MAPID_COST_MANAGEMENT,    '費用管理
+                        tempName,                       '輸送実績表
                         Me.GetTransportResultData)
-                    '帳票出力＆ファイルパス取得
-                    WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult(
+
+                    If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                        '帳票出力＆ファイルパス取得
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_010402(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
+                    Else
+                        '帳票出力＆ファイルパス取得
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult(
+                        CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
+                    End If
+
                     '帳票ダウンロード
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
@@ -724,20 +737,30 @@ Public Class M00001MENU
             Using SQLcmd As New SqlCommand
                 SQLcmd.Connection = SQLcon
                 SQLcmd.CommandType = CommandType.StoredProcedure
-                SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT]"
+
+                '営業所が仙台の場合は、仙台用のプロシージャを指定
+                If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT_010402]"
+                Else
+                    SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT]"
+                End If
                 SQLcmd.Parameters.Clear()
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@STYMD", SqlDbType.Date)             ' 累計開始日
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@EDYMD", SqlDbType.Date)             ' 累計終了日
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
                 Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
 
+
                 PARA1.Value = CDate(txtTrStYmd.Text)
                 PARA2.Value = CDate(txtTrEdYmd.Text)
-                PARA3.Value = ddlTrOfficeNameList.SelectedValue
-
                 PARA4.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
+
+                '営業所が仙台以外の場合は、営業所を引数に付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
+                    PARA3.Value = ddlTrOfficeNameList.SelectedValue
+                End If
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     dt.Load(SQLdr)

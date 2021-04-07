@@ -27,6 +27,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001CMPOrdertbl As DataTable                         '受注TBL, OT受注TBL比較用テーブル
     Private OIT0001ReportOTComparetbl As DataTable                  '帳票(受注TBL, OT受注TBL)比較結果テーブル
     Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
+    Private OIT0001EXLUPtbl As DataTable                            'EXCELアップロード用
 
     '帳票用
     Private Const CONST_RPT_OTCOMPARE As String = "OTCOMPARE"       '空回日報(受注TBL, OT受注TBL)比較
@@ -91,6 +92,8 @@ Public Class OIT0001EmptyTurnDairyList
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
+                        Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
+                            'WF_FILEUPLOAD()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -1382,6 +1385,37 @@ Public Class OIT0001EmptyTurnDairyList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_Grid_Scroll()
+
+    End Sub
+
+    ''' <summary>
+    ''' ファイルアップロード時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FILEUPLOAD()
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '★ファイル判別フラグ
+        Dim useFlg As String = ""
+
+        Try
+            '○ UPLOAD XLSデータ取得
+            CS0023XLSUPLOAD.CS0023XLSUPLOAD_ORDER(OIT0001EXLUPtbl, useFlg)
+
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGet(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
 
     End Sub
 

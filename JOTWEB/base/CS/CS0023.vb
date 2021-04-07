@@ -2069,6 +2069,283 @@ Public Structure CS0023XLSUPLOAD
     End Sub
 #End Region
 
+#Region "XLSアップロード(空回日報(受注作成))"
+    ''' <summary>
+    ''' XLSアップロード(空回日報(受注作成))
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub CS0023XLSUPLOAD_ORDER(ByRef dt As DataTable, ByRef useFlg As String)
+
+        If IsNothing(dt) Then
+            dt = New DataTable
+        End If
+
+        If dt.Columns.Count <> 0 Then
+            dt.Columns.Clear()
+        End If
+
+        dt.Clear()
+
+        '■共通宣言
+        Dim CS0011LOGWRITE As New CS0011LOGWrite                'LogOutput DirString Get
+        Dim CS0021PROFXLS As New CS0021PROFXLS                  'プロファイル(帳票)取得
+        Dim CS0028STRUCT As New CS0028STRUCT                    '構造取得
+        Dim CS0050SESSION As New CS0050SESSION                  'セッション情報操作処理
+
+        Dim excelName As String = Nothing                       ' ファイル保管場所(ファイル名含む)
+        Dim excelFileName As String = Nothing                   ' ファイル名
+        Dim excelSheetName As String = Nothing                  ' シート名
+        Dim oXls As Excel.Application = Nothing                 ' Excelオブジェクト
+        Dim oWBooks As Excel.Workbooks = Nothing                ' Workbookオブジェクト
+        Dim oWBook As Excel.Workbook = Nothing                  ' Workbookオブジェクト
+        Dim oSheets As Excel.Sheets = Nothing                   ' sheets オブジェクト
+        Dim oSheet As Excel.Worksheet = Nothing                 ' Worksheet オブジェクト
+        Dim rng As Excel.Range = Nothing                        ' Range オブジェクト
+
+        oXls = New Excel.Application()
+        'oXls.Visible = True ' 確認のためExcelのウィンドウを表示する
+
+        '★ファイルパスからファイル名を取得
+        For Each tempFile As String In Directory.GetFiles(CS0050SESSION.UPLOAD_PATH & "\UPLOAD_TMP\" & CS0050SESSION.USERID, "*.*")
+            excelName = tempFile
+            excelFileName = Path.GetFileName(excelName)
+            excelSheetName = excelFileName.Substring(0, 4)
+            Exit For
+        Next
+
+        '★Excelファイルをオープンする
+        Try
+            oWBooks = oXls.Workbooks
+            '2020/07/16三宅コメント 任意ファイルすぎるので外部リンク更新メッセージ抑止と読み取り専用モードの引数は追加
+            oWBook = oWBooks.Open(excelName, UpdateLinks:=False, ReadOnly:=True)
+
+        Catch ex As Exception
+            'EXCEL OPENエラー
+            ERR = C_MESSAGE_NO.EXCEL_OPEN_ERROR
+
+            CS0011LOGWRITE.INFSUBCLASS = "CS0023XLSUPLOAD_ORDER" 'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "Excel_Open"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = ERR
+            CS0011LOGWRITE.CS0011LOGWrite()                      'ログ出力
+
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+            Throw
+            Exit Sub
+        End Try
+
+        Try
+            '★与えられたワークシート名から、Worksheetオブジェクトを得る
+            Dim sheetName As String = excelSheetName
+
+            oSheets = oWBook.Worksheets
+            '2020/7/16三宅メモ ↓oWBook.Sheets(1) か(0)で確か先頭のシートになります「getSheetIndex(sheetName, oSheets)」は不要
+            'oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
+            oSheet = CType(oSheets.Item(1), Excel.Worksheet)
+
+            '★セルの内容を取得
+            Dim sCellType As String = ""     '投入用区別
+
+            '◯アップロードファイルの見分け用
+            rng = oSheet.Range("B1")
+            sCellType = rng.Text.ToString()
+            ExcelMemoryRelease(rng)
+
+            '############################################################################
+            'ファイルの見分けは下記の通りとする
+            '　useFlg："0"(空回日報取込)
+            '　useFlg："9"(判別不可)
+            '############################################################################
+
+            '    ###  ★A1セルに「空回日報投入用」と設定されている場合(空回日報投入用と判別)
+            If sCellType <> "" Then
+                useFlg = "0"
+                '◯DataTable作成(空回日報投入用)
+                dtOrder(dt, excelFileName, oSheet, rng)
+            Else
+                'ファイル判別不可
+                useFlg = "9"
+
+            End If
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' DataTable作成(空回日報投入用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub dtOrder(ByRef dt As DataTable,
+                                   ByVal excelFileName As String,
+                                   ByVal oSheet As Excel.Worksheet,
+                                   ByVal rng As Excel.Range)
+
+        '★セルの内容を取得
+        'Dim sCellAgoBehind() As String = {"", ""}
+        Dim sCellOffice() As String = {"", "", ""}
+        Dim sCellTitle() As String = {"", ""}
+        Dim sCellFooter() As String = {"", "", ""}
+
+        Try
+            '◯ヘッダー情報取得
+
+            '◯明細情報取得
+            ExcelUploadOrderItemSet(dt)
+            '明細行の開始
+            Dim jStart As Integer = 4
+            '明細行の終了
+            Dim jEnd As Integer = 23
+            For i As Integer = 0 To jEnd
+                '★受注営業所が未設定の場合はSKIP
+                If Convert.ToString(dt.Rows(i)("OFFICENAME")) = "" Then Continue For
+
+                dt.Rows.Add(dt.NewRow())
+
+                '○NO.
+                rng = oSheet.Range("B" + jStart.ToString())
+                dt.Rows(i)("NO") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
+                '○受注営業所
+                rng = oSheet.Range("C" + jStart.ToString())
+                dt.Rows(i)("OFFICENAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
+                Select Case Convert.ToString(dt.Rows(i)("OFFICENAME"))
+                    Case "五井営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011201
+                        sCellOffice(2) = "浜五井"
+                    Case "甲子営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011202
+                        sCellOffice(2) = "甲子"
+                    Case "袖ヶ浦営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011203
+                        sCellOffice(2) = "北袖"
+                    Case "仙台新港営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_010402
+                        sCellOffice(2) = "仙台北港"
+                    Case "根岸営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_011402
+                        sCellOffice(2) = "根岸"
+                    Case "四日市営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_012401
+                        sCellOffice(2) = "四日市"
+                    Case "三重塩浜営業所"
+                        sCellOffice(0) = BaseDllConst.CONST_OFFICECODE_012402
+                        sCellOffice(2) = "塩浜"
+                End Select
+                dt.Rows(i)("OFFICECODE") = sCellOffice(0)
+                dt.Rows(i)("EMPTYTURNFLG") = "1"            '"1"(空回日報取込)
+
+                '○本線列車(名称)
+                rng = oSheet.Range("D" + jStart.ToString())
+                dt.Rows(i)("TRAINNAME") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○積込日
+                rng = oSheet.Range("E" + jStart.ToString())
+                dt.Rows(i)("LODDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○発日
+                rng = oSheet.Range("F" + jStart.ToString())
+                dt.Rows(i)("DEPDATE") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(ハイオク)
+                rng = oSheet.Range("G" + jStart.ToString())
+                dt.Rows(i)("HTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(レギュラー)
+                rng = oSheet.Range("H" + jStart.ToString())
+                dt.Rows(i)("RTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(灯油)
+                rng = oSheet.Range("I" + jStart.ToString())
+                dt.Rows(i)("TTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(未添加灯油)
+                rng = oSheet.Range("J" + jStart.ToString())
+                dt.Rows(i)("MTTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(軽油)
+                rng = oSheet.Range("K" + jStart.ToString())
+                dt.Rows(i)("KTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(3号軽油)
+                rng = oSheet.Range("L" + jStart.ToString())
+                dt.Rows(i)("K3TANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(5号軽油)
+                rng = oSheet.Range("M" + jStart.ToString())
+                dt.Rows(i)("K5TANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(10号軽油)
+                rng = oSheet.Range("N" + jStart.ToString())
+                dt.Rows(i)("K10TANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(LSA)
+                rng = oSheet.Range("O" + jStart.ToString())
+                dt.Rows(i)("LTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(A重油)
+                rng = oSheet.Range("P" + jStart.ToString())
+                dt.Rows(i)("ATANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+                '○油種数(合計)
+                rng = oSheet.Range("Q" + jStart.ToString())
+                dt.Rows(i)("TOTALTANK") = rng.Text.ToString()
+                ExcelMemoryRelease(rng)
+
+                jStart += 1
+            Next
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+            'Excelリリース
+            ExcelMemoryRelease(rng)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' アップロード項目設定(空回日報(受注作成))
+    ''' </summary>
+    Private Sub ExcelUploadOrderItemSet(ByRef dt As DataTable)
+        '◯明細情報取得
+        '　フィールド名とフィールドの型を設定
+        dt.Columns.Add("NO", Type.GetType("System.String"))
+        dt.Columns.Add("ORDERNO", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
+        dt.Columns.Add("TRAINNAME", Type.GetType("System.String"))
+        dt.Columns.Add("OFFICECODE", Type.GetType("System.String"))
+        dt.Columns.Add("OFFICENAME", Type.GetType("System.String"))
+        dt.Columns.Add("EMPTYTURNFLG", Type.GetType("System.String"))
+        dt.Columns.Add("LODDATE", Type.GetType("System.String"))
+        dt.Columns.Add("DEPDATE", Type.GetType("System.String"))
+        dt.Columns.Add("RTANK", Type.GetType("System.String"))
+        dt.Columns.Add("HTANK", Type.GetType("System.String"))
+        dt.Columns.Add("TTANK", Type.GetType("System.String"))
+        dt.Columns.Add("MTTANK", Type.GetType("System.String"))
+        dt.Columns.Add("KTANK", Type.GetType("System.String"))
+        dt.Columns.Add("K3TANK", Type.GetType("System.String"))
+        dt.Columns.Add("K5TANK", Type.GetType("System.String"))
+        dt.Columns.Add("K10TANK", Type.GetType("System.String"))
+        dt.Columns.Add("LTANK", Type.GetType("System.String"))
+        dt.Columns.Add("ATANK", Type.GetType("System.String"))
+        dt.Columns.Add("TOTALTANK", Type.GetType("System.String"))
+
+    End Sub
+#End Region
+
     ''' <summary>
     ''' Excel操作のメモリ開放
     ''' </summary>

@@ -42,7 +42,14 @@ Public Class OIT0004OilStockCreate
     Public UKEIRE_BASE_NUM As Decimal = 45
     '何日分増加ドロップダウンを追加するか
     Public SHIP_DATE_ADD_SPAN As Integer = 10
-
+    ''' <summary>
+    ''' 確定表示文言(確定時)
+    ''' </summary>
+    Public Const DISP_FIXED As String = "確定済"
+    ''' <summary>
+    ''' 確定表示文言(未確定)
+    ''' </summary>
+    Public Const DISP_NOT_FIXED As String = "未確定"
     ''' <summary>
     ''' サーバー処理の遷移先
     ''' </summary>
@@ -87,8 +94,14 @@ Public Class OIT0004OilStockCreate
                         Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
                         Case "WF_ButtonOkCommonPopUp" 'カスタムポップアップOK押下時
-                            '帳票出力
-                            WF_ButtonDownload_Click() 'チェック・条件などもろもろの改修がある為一旦コメント
+
+                            If Me.hdnPopUpType.Value = "fix" Then
+                                '在庫確定ポップアップの在庫確定(OK)ボタン
+                                WF_ButtonFix_Click()
+                            Else
+                                '帳票出力ポップアップのダウンロード(OK)ボタン
+                                WF_ButtonDownload_Click()
+                            End If
                         Case "WF_ButtonBackToMenu"
                             'メニューへでCAMPを書き換え
                             work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
@@ -147,7 +160,12 @@ Public Class OIT0004OilStockCreate
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
-
+        '在庫確定ボタンの表示非表示制御
+        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            Me.WF_ButtonFixedStock.Visible = True
+        Else
+            Me.WF_ButtonFixedStock.Visible = False
+        End If
         '○ 画面の値設定
         WW_MAPValueSet()
 
@@ -279,6 +297,15 @@ Public Class OIT0004OilStockCreate
               (From itm In dispDataObj.TrainList.Values Where itm.TrainNo.Equals("川崎")).Any Then
 
             End If
+            '******************************
+            '確定情報の設定
+            '******************************
+            Me.txtFixDate.Text = Now.ToString("yyyy/MM/dd")
+            If GetIsStockFixed(Me.txtFixDate.Text, dispDataObj, sqlCon) Then
+                Me.lblFixStatus.Text = DISP_FIXED
+            Else
+                Me.lblFixStatus.Text = DISP_NOT_FIXED
+            End If
         End Using
         '取得値を元に再計算
         dispDataObj.RecalcStockList(False)
@@ -399,6 +426,7 @@ Public Class OIT0004OilStockCreate
         If mesNo <> C_MESSAGE_NO.NORMAL Then
             Master.Output(mesNo, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
+
     End Sub
     ''' <summary>
     ''' 自動提案ボタン押下時処理
@@ -801,6 +829,92 @@ Public Class OIT0004OilStockCreate
 
     End Sub
     ''' <summary>
+    ''' 在庫確定ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonFix_Click()
+        '******************************
+        '入力チェック（ポップアップ側）
+        '******************************
+        If WW_Check(Nothing, WF_ButtonClick.Value) = False Then
+            Return
+        End If
+        '******************************
+        '画面入力値の取得
+        '******************************
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+        Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        '******************************
+        '入力チェック（在庫表側）
+        '→在庫表の数値を保存するため更新時と同様のチェックを行う
+        '******************************
+        If WW_Check(dispValues, "WF_ButtonUPDATE") = False Then
+            Return
+        End If
+        Using sqlCon = CS0050SESSION.getConnection
+            sqlCon.Open()
+            Using sqlTran = sqlCon.BeginTransaction
+                Dim errNum As String = ""
+                '列車ロック情報更新
+                Dim procDate As Date = Date.Now
+                EntryTrainOperation(sqlCon, dispValues, errNum, procDate, sqlTran)
+                '在庫表テーブル更新
+                If EntryStockData(sqlCon, dispValues, errNum, procDate, sqlTran, updateFix:=True) = False Then
+                    Return
+                End If
+                If dispValues.HasMoveInsideItem Then
+                    If EntryStockData(sqlCon, dispValues.MiDispData, errNum, procDate, sqlTran, updateFix:=True) = False Then
+                        Return
+                    End If
+                End If
+                '提案表の値を格納
+                If EntryUkeireOilstock(sqlCon, dispValues, errNum, Date.Now, sqlTran) = False Then
+                    Return
+                End If
+                sqlTran.Commit()
+            End Using
+            If GetIsStockFixed(Me.txtFixDate.Text, dispValues, sqlCon) Then
+                Me.lblFixStatus.Text = DISP_FIXED
+            Else
+                Me.lblFixStatus.Text = DISP_NOT_FIXED
+            End If
+        End Using
+        '****************************************
+        'TODO メール送信処理
+        '****************************************
+        'このあたりにメール送信処理呼び出し
+
+        '****************************************
+        '画面にデータをバインド
+        '****************************************
+        'コンストラクタで生成したデータを画面に貼り付け
+        '1.提案リスト
+        If dispValues.ShowSuggestList = True Then
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
+        ElseIf dispValues.IsOtTrainMode AndAlso dispValues.SuggestList IsNot Nothing AndAlso dispValues.SuggestList.Count > 0 Then
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
+        Else
+            pnlSuggestList.Visible = False
+        End If
+        '2.比重リスト
+        repWeightList.DataSource = dispValues.OilTypeList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispValues.StockDateDisplay
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispValues.StockList
+        repStockOilTypeItem.DataBind()
+        dispValues.CalcStockSummary()
+        repStockSummary.DataSource = dispValues.SummaryStockList.StockItemListDisplay
+        repStockSummary.DataBind()
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+    ''' <summary>
     ''' 帳票出力用データ取得
     ''' </summary>
     ''' <param name="baseDate"></param>
@@ -955,6 +1069,13 @@ Public Class OIT0004OilStockCreate
                         Select Case WF_FIELD.Value
                             Case "txtReportFromDate"         '年月日
                                 Dim targetDate As String = txtReportFromDate.Text.Trim
+                                If targetDate = "" Then
+                                    targetDate = Now.ToString("yyyy/MM/dd")
+                                End If
+
+                                .WF_Calendar.Text = CDate(targetDate).ToString("yyyy/MM/dd")
+                            Case "txtFixDate"
+                                Dim targetDate As String = txtFixDate.Text.Trim
                                 If targetDate = "" Then
                                     targetDate = Now.ToString("yyyy/MM/dd")
                                 End If
@@ -1413,6 +1534,26 @@ Public Class OIT0004OilStockCreate
         sqlLtaStat.AppendLine("   AND OTM.CONSIGNEECODE  = @CONSIGNEE")
         sqlLtaStat.AppendLine("   AND OTM.DELFLG         = @DELFLG")
         sqlLtaStat.AppendLine("   AND DATEDIFF(day,OTM.ORDERFROMDATE, OTM.ORDERTODATE) + 1 < 365")
+        '軽油２期間取得SQL
+        Dim sqlKei2Stat As New StringBuilder
+        sqlKei2Stat.AppendLine("SELECT  format(isnull(OTM.ORDERFROMDATE,convert(date,'1900/1/1')),'yyyy/MM/dd') AS ORDERFROMDATE")
+        sqlKei2Stat.AppendLine("       ,format(isnull(OTM.ORDERTODATE,  convert(date,'9999/12/31')),'yyyy/MM/dd') AS ORDERTODATE")
+        sqlKei2Stat.AppendLine("       ,isnull(PRD.SEGMENTOILNAME,'') AS SEGMENTOILNAME")
+        sqlKei2Stat.AppendLine("       ,isnull(PRD.SEGMENTOILCODE,'') AS SEGMENTOILCODE")
+        sqlKei2Stat.AppendLine("  FROM      OIL.OIM0030_OILTERM OTM ")
+        sqlKei2Stat.AppendLine("  LEFT JOIN OIL.OIM0003_PRODUCT PRD")
+        sqlKei2Stat.AppendLine("         ON PRD.OFFICECODE     = @CAMPCODE")
+        sqlKei2Stat.AppendLine("        AND PRD.SHIPPERCODE    = @SHIPPERSCODE")
+        sqlKei2Stat.AppendLine("        AND PRD.OILCODE        = OTM.OILCODE")
+        sqlKei2Stat.AppendLine("        AND PRD.SEGMENTOILCODE = 'E'")
+        sqlKei2Stat.AppendLine("        AND PRD.DELFLG         = @DELFLG")
+        sqlKei2Stat.AppendLine(" WHERE OTM.OFFICECODE     = @CAMPCODE")
+        sqlKei2Stat.AppendLine("   AND OTM.SHIPPERCODE    = @SHIPPERSCODE")
+        sqlKei2Stat.AppendLine("   AND OTM.OILCODE        = '1401'")
+        sqlKei2Stat.AppendLine("   AND OTM.SEGMENTOILCODE = 'E'")
+        sqlKei2Stat.AppendLine("   AND OTM.CONSIGNEECODE  = @CONSIGNEE")
+        sqlKei2Stat.AppendLine("   AND OTM.DELFLG         = @DELFLG")
+
         'DBより取得を行い取得情報付与
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             Dim paramCampCode = sqlCmd.Parameters.Add("@CAMPCODE", SqlDbType.NVarChar)
@@ -1465,7 +1606,9 @@ Public Class OIT0004OilStockCreate
                     .OrderFromDate = orderFromDate,
                     .OrderToDate = orderToDate,
                     .ModifiedLtaSegmentFrom = "",
-                    .ModifiedLtaSegmentTo = ""
+                    .ModifiedLtaSegmentTo = "",
+                    .ModifiedKei2SegmentFrom = "",
+                    .ModifiedKei2SegmentTo = ""
                     }
 
                     retVal.Add(oilItm.OilCode, oilItm)
@@ -1524,7 +1667,27 @@ Public Class OIT0004OilStockCreate
                     End While
                 End Using
             End If
-
+            If shipper = "0122700010" AndAlso {"011203"}.Contains(salesOffice) AndAlso
+               retVal.ContainsKey("1401") Then
+                sqlCmd.CommandText = sqlKei2Stat.ToString
+                paramCampCode.Value = salesOffice 'Default
+                '書き換え対象の重油クラスを取得
+                Dim aOilItem = retVal("1401")
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        'ありえないが先頭レコードのみ取得
+                        Dim kei2From = Convert.ToString(sqlDr("ORDERFROMDATE"))
+                        Dim kei2To = Convert.ToString(sqlDr("ORDERTODATE"))
+                        If IsDate(kei2From) AndAlso IsDate(kei2To) Then
+                            aOilItem.ModifiedKei2SegmentFrom = kei2From
+                            aOilItem.ModifiedKei2SegmentTo = kei2To
+                            aOilItem.ModifiedKei2SegmentName = Convert.ToString(sqlDr("SEGMENTOILNAME"))
+                            aOilItem.ModifiedKei2SegmentCode = Convert.ToString(sqlDr("SEGMENTOILCODE"))
+                        End If
+                        Exit While
+                    End While
+                End Using
+            End If
 
             '帳票用の前年同月平均積高の取得
             If printMonth <> "" Then
@@ -2326,6 +2489,66 @@ Public Class OIT0004OilStockCreate
             End Using 'sqlDr
         End Using 'sqlCmd
         Return retVal
+    End Function
+    ''' <summary>
+    ''' 在庫確定情報を取得
+    ''' </summary>
+    ''' <param name="targetDate">対象日付</param>
+    ''' <param name="dispData">画面情報</param>
+    ''' <param name="sqlCon">DB接続</param>
+    ''' <returns></returns>
+    Private Function GetIsStockFixed(targetDate As String, dispData As DispDataClass, Optional sqlCon As SqlConnection = Nothing) As Boolean
+        Dim closeCon As Boolean = False
+        If sqlCon Is Nothing Then
+            closeCon = True
+        End If
+        '引数の対象日が日付ではない場合はそのまま終了
+        If IsDate(targetDate) = False Then
+            Return False
+        End If
+
+        Try
+            'SQL接続が引数になければ生成
+            If closeCon = True Then
+                sqlCon = CS0050SESSION.getConnection
+                sqlCon.Open()
+                SqlConnection.ClearPool(sqlCon)
+            End If
+
+            'レコードの存在有無で判定できるため抽出項目はなし
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT 1")
+            sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK OS with(nolock)")
+            sqlStat.AppendLine(" WHERE OS.STOCKYMD      = @STOCKYMD")
+            sqlStat.AppendLine("   AND OS.OFFICECODE    = @OFFICECODE")
+            sqlStat.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
+            sqlStat.AppendLine("   AND OS.CONSIGNEECODE = @CONSIGNEECODE")
+            sqlStat.AppendLine("   AND OS.FIXEDYMD      IS NOT NULL")
+            sqlStat.AppendLine("   AND OS.DELFLG        = @DELFLG")
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(targetDate)
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                    .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    Return sqlDr.HasRows
+                End Using 'sqlDr
+            End Using 'sqlCmd
+        Catch ex As Exception
+            Throw
+        Finally
+            If closeCon = True Then
+                Try
+                    sqlCon.Close()
+                    sqlCon = Nothing
+                    sqlCon.Dispose()
+                Catch ex As Exception
+                End Try
+            End If
+        End Try
     End Function
     ''' <summary>
     ''' 車数減少時に受注テーブルより削除するか情報を取得
@@ -3461,7 +3684,7 @@ Public Class OIT0004OilStockCreate
     ''' <remarks>データがあれば更新、なければ追加（OIT0001_OILSTOCKテーブル内での履歴登録は無し）
     ''' 一旦、新規登録後に油種マスタから削除された後の更新パターンは考慮しない
     ''' （このパターンは画面上は出ないが宙に浮いたDELFLGが生きたままのデータが残る想定）</remarks>
-    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
+    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing, Optional updateFix As Boolean = False) As Boolean
         Dim fieldList As New Dictionary(Of String, String)
         If {"302001", "301901"}.Contains(Master.USER_ORG) Then
             fieldList.Add("USER", "ENEOSUPDUSER")
@@ -3502,6 +3725,10 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,MFLG_MORSTOCK    = CASE WHEN MFLG_MORSTOCK    = '0' AND @MORSTOCK    <> MORSTOCK    AND MORSTOCK    <> 0 AND STOCKYMD <= CONVERT(datetime, CONVERT(char(8), GETDATE(), 112)) THEN '1' ELSE MFLG_MORSTOCK END")
         sqlStat.AppendLine("               ,MFLG_SHIPPINGVOL = CASE WHEN MFLG_SHIPPINGVOL = '0' AND @SHIPPINGVOL <> SHIPPINGVOL AND SHIPPINGVOL <> 0 THEN '1' ELSE MFLG_SHIPPINGVOL END")
 
+        If updateFix Then
+            sqlStat.AppendLine("               ,FIXEDYMD      = @UPDYMD")
+        End If
+
         sqlStat.AppendLine("               ,DELFLG      = @DELFLG")
         sqlStat.AppendFormat("               ,{0}      = @UPDYMD", fieldList("DATE")).AppendLine()
         sqlStat.AppendFormat("               ,{0}      = @UPDUSER", fieldList("USER")).AppendLine()
@@ -3534,7 +3761,9 @@ Public Class OIT0004OilStockCreate
 
         sqlStat.AppendLine("            ,MFLG_MORSTOCK")
         sqlStat.AppendLine("            ,MFLG_SHIPPINGVOL")
-
+        If updateFix Then
+            sqlStat.AppendLine("           ,FIXEDYMD")
+        End If
         sqlStat.AppendLine("            ,DELFLG")
         sqlStat.AppendLine("            ,INITYMD")
         sqlStat.AppendLine("            ,INITUSER")
@@ -3563,7 +3792,9 @@ Public Class OIT0004OilStockCreate
 
         sqlStat.AppendLine("            ,CASE WHEN @MORSTOCK <> 0 AND @STOCKYMD <= CONVERT(datetime, CONVERT(char(8), GETDATE(), 112)) THEN '1' ELSE '0' END")
         sqlStat.AppendLine("            ,CASE WHEN @SHIPPINGVOL <> 0 THEN '1' ELSE '0' END")
-
+        If updateFix Then
+            sqlStat.AppendLine("            ,@UPDYMD")
+        End If
         sqlStat.AppendLine("            ,@DELFLG")
         sqlStat.AppendLine("            ,@INITYMD")
         sqlStat.AppendLine("            ,@INITUSER")
@@ -5279,45 +5510,66 @@ Public Class OIT0004OilStockCreate
         Dim WW_CheckMES2 As String = ""
         'ダウンロードボタン押下時は年月のみチェック
         If callerButton = "WF_ButtonOkCommonPopUp" Then
-
-            '日付書式チェック
-            If Me.chkPrintENEOS.Checked = False Then
-                If Me.txtDownloadMonth.Text.Trim = "" Then
-                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
-                    AppendForcusObject(txtDownloadMonth.ClientID)
-                    WW_CheckMES1 = "年月入力エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                    Return False
-                End If
-                If IsDate(Me.txtDownloadMonth.Text.Trim & "/01") = False Then
-                    Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
-                    AppendForcusObject(txtDownloadMonth.ClientID)
-                    WW_CheckMES1 = "年月入力エラー。" & "(" & Me.txtDownloadMonth.Text.Trim & ")"
-                    WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                End If
-            Else
-                If Me.txtReportFromDate.Text.Trim <> "" Then
-                    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "REPORTDATE", Me.txtReportFromDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Me.hdnPopUpType.Value = "fix" Then
+                '確定日付チェック
+                If Me.txtFixDate.Text.Trim <> "" Then
+                    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "REPORTDATE", Me.txtFixDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
                     If Not isNormal(WW_CS0024FCHECKERR) Then
-                        Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="開始日", needsPopUp:=True)
-                        AppendForcusObject(Me.txtReportFromDate.ClientID)
+                        Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="在庫確定日", needsPopUp:=True)
+                        AppendForcusObject(Me.txtFixDate.ClientID)
                         WW_CheckMES1 = "開始日書式エラー。"
                         WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                         Return False
                     End If
                 Else
-                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="開始日", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="在庫確定日", needsPopUp:=True)
                     AppendForcusObject(txtDownloadMonth.ClientID)
-                    WW_CheckMES1 = "ENEOS時の開始日入力エラー。" & "(" & Me.txtReportFromDate.Text.Trim & ")"
+                    WW_CheckMES1 = "在庫確定日付入力エラー。" & "(" & Me.txtFixDate.Text.Trim & ")"
                     WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-
                     Return False
                 End If
-            End If
+            Else
+                '日付書式チェック
+                If Me.chkPrintENEOS.Checked = False Then
+                    If Me.txtDownloadMonth.Text.Trim = "" Then
+                        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
+                        AppendForcusObject(txtDownloadMonth.ClientID)
+                        WW_CheckMES1 = "年月入力エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                        Return False
+                    End If
+                    If IsDate(Me.txtDownloadMonth.Text.Trim & "/01") = False Then
+                        Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
+                        AppendForcusObject(txtDownloadMonth.ClientID)
+                        WW_CheckMES1 = "年月入力エラー。" & "(" & Me.txtDownloadMonth.Text.Trim & ")"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    End If
+                Else
+                    If Me.txtReportFromDate.Text.Trim <> "" Then
+                        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "REPORTDATE", Me.txtReportFromDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                        If Not isNormal(WW_CS0024FCHECKERR) Then
+                            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="開始日", needsPopUp:=True)
+                            AppendForcusObject(Me.txtReportFromDate.ClientID)
+                            WW_CheckMES1 = "開始日書式エラー。"
+                            WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                            Return False
+                        End If
+                    Else
+                        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="開始日", needsPopUp:=True)
+                        AppendForcusObject(txtDownloadMonth.ClientID)
+                        WW_CheckMES1 = "ENEOS時の開始日入力エラー。" & "(" & Me.txtReportFromDate.Text.Trim & ")"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+
+                        Return False
+                    End If 'End Me.txtReportFromDate.Text.Trim <> ""
+                End If 'End Me.chkPrintENEOS.Checked = False
+            End If 'End Me.chkPrintENEOS.Checked = False
 
 
             'If Me.txtReportToDate.Text.Trim <> "" Then
@@ -5500,6 +5752,8 @@ Public Class OIT0004OilStockCreate
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
+            Case "txtFixDate"
+
         End Select
 
         '○ メッセージ表示
@@ -5548,6 +5802,26 @@ Public Class OIT0004OilStockCreate
                     Catch ex As Exception
                     End Try
                     txtReportFromDate.Focus()
+                Case "txtFixDate"
+                    Dim WW_DATE As Date
+                    Try
+                        Me.lblFixStatus.Text = ""
+
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                            txtFixDate.Text = ""
+                        Else
+                            txtFixDate.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            Dim dispClass = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+                            If GetIsStockFixed(txtFixDate.Text, dispClass) Then
+                                Me.lblFixStatus.Text = DISP_FIXED
+                            Else
+                                Me.lblFixStatus.Text = DISP_NOT_FIXED
+                            End If
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    txtFixDate.Focus()
                 Case "txtReportToDate"             '年月日
                     'Dim WW_DATE As Date
                     'Try
@@ -6066,6 +6340,25 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property ModifiedSegmentName As String
+
+        ''' <summary>
+        ''' Segmentコード変更From
+        ''' </summary>
+        Public Property ModifiedKei2SegmentFrom As String
+        ''' <summary>
+        ''' Segmentコード変更To
+        ''' </summary>
+        Public Property ModifiedKei2SegmentTo As String
+        ''' <summary>
+        ''' 変更油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ModifiedKei2SegmentName As String
+        ''' <summary>
+        ''' 変更セグメントコード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ModifiedKei2SegmentCode As String
         ''' <summary>
         ''' 平均積高(帳票用：前年同月の輸送数量 ÷ 車数）
         ''' </summary>
@@ -6158,6 +6451,12 @@ Public Class OIT0004OilStockCreate
             retVal.ModifiedLtaSegmentFrom = Me.ModifiedLtaSegmentFrom
             retVal.ModifiedLtaSegmentTo = Me.ModifiedLtaSegmentTo
             retVal.ModifiedSegmentName = Me.ModifiedSegmentName
+
+            retVal.ModifiedKei2SegmentFrom = Me.ModifiedKei2SegmentFrom
+            retVal.ModifiedKei2SegmentTo = Me.ModifiedKei2SegmentTo
+            retVal.ModifiedKei2SegmentName = Me.ModifiedKei2SegmentName
+            retVal.ModifiedKei2SegmentCode = Me.ModifiedKei2SegmentCode
+
             Return retVal
         End Function
     End Class
@@ -8786,6 +9085,14 @@ Public Class OIT0004OilStockCreate
                 Me.OrderingType = "C"
                 Me.OrderingOilName = chkOilVal.OilInfo.ModifiedSegmentName
             End If
+
+            If chkOilVal.OilInfo.ModifiedKei2SegmentFrom <> "" AndAlso
+               chkOilVal.OilInfo.ModifiedKei2SegmentFrom <= chkOilVal.DayInfo.ItemDate.ToString("yyyy/MM/dd") AndAlso
+               chkOilVal.OilInfo.ModifiedKei2SegmentTo >= chkOilVal.DayInfo.ItemDate.ToString("yyyy/MM/dd") Then
+                Me.OrderingType = chkOilVal.OilInfo.ModifiedKei2SegmentCode
+                Me.OrderingOilName = chkOilVal.OilInfo.ModifiedKei2SegmentName
+            End If
+
             Me.CarsNumber = "1"
             Me.CarsAmount = "0"
             Me.ReturnDateTrain = ""

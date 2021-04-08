@@ -36,6 +36,16 @@ function InitDisplay() {
     }
     //油種表示非表示イベントバインド
     bindDipsOiltypeStockList();
+    // POPアップの設定
+    let flagObj = document.getElementById('hdnPopUpType');
+    if (flagObj !== null) {
+        if (flagObj.value === 'fix') {
+            setFixPopUp();
+        } else {
+            setPrintPopUp();
+        }
+    }
+
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     // 提案表、車両ロックのイベントバインド
     bindTrainLock();
@@ -48,7 +58,6 @@ function InitDisplay() {
     commonBindMonthPicker();
     //ENEOSチェックイベントバインド
     bindEneosCheckBox();
-
 
 }
 // 〇コンテンツ横スクロールイベントのバインド
@@ -719,5 +728,73 @@ function eneosCheckChange(chkId) {
         hdnShowPnlToDateObj.value = '1';
         hdnPnlMonthPickerObj.style.display = '';
         hdnPnlFromDateObj.style.display = 'none';
+    }
+}
+// 印刷設定ポップアップ表示
+function setPrintPopUp() {
+    let objPrintTitle = document.getElementById('popUpPrintTitle');
+    let objFixTitle = document.getElementById('popUpFixTitle');
+    let objPrintSettings = document.getElementById('popUpPrintSettings');
+    let objFixSettings = document.getElementById('popUpFixSettings');
+    let objExecButton = document.getElementById('WF_ButtonOkCommonPopUp');
+    let objExecCancel = document.getElementById('WF_ButtonCancelCommonPopUp');
+
+    if (objExecButton !== null) {
+        customPopUpOkButtonName = "ﾀﾞｳﾝﾛｰﾄﾞ";
+        objExecButton.value = 'ﾀﾞｳﾝﾛｰﾄﾞ';
+    }
+    if (objExecCancel !== null) {
+        objExecCancel.value = '閉じる';
+    }
+    let flagObj = document.getElementById('hdnPopUpType');
+    if (flagObj !== null) {
+        flagObj.value = 'print';
+    }
+
+    if (objPrintTitle !== null) {
+        objPrintTitle.style.display = "inline-Block";
+    }
+    if (objFixTitle !== null) {
+        objFixTitle.style.display = "none";
+    }
+    if (objPrintSettings !== null) {
+        objPrintSettings.style.display = "block";
+    }
+    if (objFixSettings !== null) {
+        objFixSettings.style.display = "none";
+    }
+
+}
+// 在庫確定ポップアップ表示
+function setFixPopUp() {
+    let objPrintTitle = document.getElementById('popUpPrintTitle');
+    let objFixTitle = document.getElementById('popUpFixTitle');
+    let objPrintSettings = document.getElementById('popUpPrintSettings');
+    let objFixSettings = document.getElementById('popUpFixSettings');
+    let flagObj = document.getElementById('hdnPopUpType');
+    let objExecButton = document.getElementById('WF_ButtonOkCommonPopUp');
+    let objExecCancel = document.getElementById('WF_ButtonCancelCommonPopUp');
+    
+    if (flagObj !== null) {
+        flagObj.value = 'fix';
+    }
+    if (objExecButton !== null) {
+        customPopUpOkButtonName = "はい";
+        objExecButton.value = 'はい';
+    }
+    if (objExecCancel !== null) {
+        objExecCancel.value = 'いいえ';
+    }
+    if (objPrintTitle !== null) {
+        objPrintTitle.style.display = "none";
+    }
+    if (objFixTitle !== null) {
+        objFixTitle.style.display = "inline-Block";
+    }
+    if (objPrintSettings !== null) {
+        objPrintSettings.style.display = "none";
+    }
+    if (objFixSettings !== null) {
+        objFixSettings.style.display = "block";
     }
 }

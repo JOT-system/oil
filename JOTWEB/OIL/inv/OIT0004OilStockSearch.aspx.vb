@@ -724,14 +724,20 @@ Public Class OIT0004OilStockSearch
     Public Sub GetLastUpdate()
         Try
             Dim valueHasNone = "―"
+            Dim valueNotFixed = "未"
+            Dim valueFixed = "済"
             divUpdateInfo.Visible = False
-            divConsigneeUpdateInfo.Visible = False
+            divConsigneeUpdateInfo10.Visible = False
+            divConsigneeUpdateInfo20.Visible = False
             '一旦初期化
             Me.WF_UpdateUser.Text = valueHasNone
             Me.WF_UpdateDtm.Text = valueHasNone
-            Me.WF_ConsigneeUser.Text = valueHasNone
-            Me.WF_ConsigneeUpdateDtm.Text = valueHasNone
-
+            Me.WF_ConsigneeUser10.Text = valueHasNone
+            Me.WF_ConsigneeUpdateDtm10.Text = valueHasNone
+            Me.WF_ConsigneeUser20.Text = valueHasNone
+            Me.WF_ConsigneeUpdateDtm20.Text = valueHasNone
+            Me.WF_ConsigneeFixStatus10.Text = valueNotFixed
+            Me.WF_ConsigneeFixStatus20.Text = valueNotFixed
             Dim officeCode As String = ""
             '取得出来ない条件の場合はスキップ
             If Me.TxtSalesOffice.Text.Trim = "" OrElse
@@ -745,8 +751,9 @@ Public Class OIT0004OilStockSearch
                 Return
             End If
             '通常更新情報と油槽所更新情報のフィールド設定
-            Dim fieldItems = {New With {.updUserField = "UPDUSER", .updUserObj = Me.WF_UpdateUser, .updDtmField = "UPDYMD", .updDtmObj = Me.WF_UpdateDtm},
-                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm}}
+            Dim fieldItems = {New With {.updUserField = "UPDUSER", .updUserObj = Me.WF_UpdateUser, .updDtmField = "UPDYMD", .updDtmObj = Me.WF_UpdateDtm, .consigneeCode = Me.WF_CONSIGNEE_CODE.Text, .getFixedData = False, .fixValObj = New Label},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser10, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm10, .consigneeCode = "10", .getFixedData = True, .fixValObj = Me.WF_ConsigneeFixStatus10},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser20, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm20, .consigneeCode = "20", .getFixedData = True, .fixValObj = Me.WF_ConsigneeFixStatus20}}
             For Each fieldItem In fieldItems
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendFormat("SELECT format(SQ.{0},'yyyy/MM/dd HH:mm') AS {0}", fieldItem.updDtmField).AppendLine()
@@ -779,18 +786,30 @@ Public Class OIT0004OilStockSearch
                 sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
                 sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
                 sqlStat.AppendFormat(" ORDER BY SQ.{0} DESC", fieldItem.updDtmField).AppendLine()
+
+                Dim sqlStatFixed = New StringBuilder
+                sqlStatFixed.AppendLine("SELECT 1")
+                sqlStatFixed.AppendLine("  FROM OIL.OIT0001_OILSTOCK OS with(nolock)")
+                sqlStatFixed.AppendLine(" WHERE OS.STOCKYMD      = @TODAY")
+                sqlStatFixed.AppendLine("   AND OS.OFFICECODE    = @OFFICECODE")
+                sqlStatFixed.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
+                sqlStatFixed.AppendLine("   AND OS.CONSIGNEECODE = @CONSIGNEECODE")
+                sqlStatFixed.AppendLine("   AND OS.FIXEDYMD      IS NOT NULL")
+                sqlStatFixed.AppendLine("   AND OS.DELFLG        = @DELFLG")
                 'DataBase接続文字
                 Using sqlCon = CS0050SESSION.getConnection,
-              sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
+                      sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
                     sqlCon.Open() 'DataBase接続(Open)
                     SqlConnection.ClearPool(sqlCon)
                     With sqlCmd.Parameters
                         .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
                         .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
                         .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
-                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
+                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = fieldItem.consigneeCode
                         .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                        .Add("@TODAY", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")
                     End With
+
                     Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
                         If sqlDr.HasRows Then
                             sqlDr.Read()
@@ -804,17 +823,32 @@ Public Class OIT0004OilStockSearch
                             fieldItem.updDtmObj.Text = updDtm
                         End If
                     End Using 'sqlDr
+
+                    If fieldItem.getFixedData Then
+                        sqlCmd.CommandText = sqlStatFixed.ToString
+                        Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                            If sqlDr.HasRows Then
+                                fieldItem.fixValObj.Text = valueFixed
+                            Else
+                                fieldItem.fixValObj.Text = valueNotFixed
+                            End If
+                        End Using 'sqlDr
+                    End If
                 End Using 'sqlCon, sqlCmd
 
             Next
 
-            If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            If {"302001"}.Contains(Master.USER_ORG) Then
                 '北信・甲府しか操作できない前提のため、他の油槽所を開放するなら要変更
-                divConsigneeUpdateInfo.Visible = True
+                divConsigneeUpdateInfo10.Visible = True
+            ElseIf {"301901"}.Contains(Master.USER_ORG) Then
+                divConsigneeUpdateInfo20.Visible = True
+
             Else
                 divUpdateInfo.Visible = True
                 If {"10", "20"}.Contains(Me.WF_CONSIGNEE_CODE.Text) Then
-                    divConsigneeUpdateInfo.Visible = True
+                    divConsigneeUpdateInfo10.Visible = True
+                    divConsigneeUpdateInfo20.Visible = True
                 End If
             End If
         Catch ex As Exception

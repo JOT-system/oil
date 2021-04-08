@@ -952,3 +952,22 @@ form.mieReadOnly #pnlSuggestList #divSuggestList > div.oilTypeColumn > div:nth-c
 form.mieReadOnly #pnlSuggestList #divSuggestList > div.dataColumn > div.values > div:nth-child(2) {
     display: none;
 }
+/* 確定ポップアップ関連 */
+#popUpPrintTitle, #popUpFixTitle,#popUpPrintSettings, #popUpFixSettings {
+    display: none;
+}
+
+#txtFixDate {
+    margin-top:10px;
+    width:120px;
+}
+.divFixDateArea {
+    width:100%;
+}
+#txtFixDate {
+    width: 150px !important;
+}
+#lblFixStatus {
+    color:blue;
+    font-weight:bold;
+}

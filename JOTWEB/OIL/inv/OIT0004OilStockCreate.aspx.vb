@@ -373,7 +373,9 @@ Public Class OIT0004OilStockCreate
             frvSuggest.DataSource = New Object() {dispDataObj}
             frvSuggest.DataBind()
         End If
-
+        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
+            Me.WF_ButtonORDERLIST.Visible = False
+        End If
         ''2.比重リスト
         'repWeightList.DataSource = dispDataObj.OilTypeList
         'repWeightList.DataBind()
@@ -1837,9 +1839,9 @@ Public Class OIT0004OilStockCreate
         Dim retVal = dispData
         Dim dispDateList = From dateItm In dispData.StockDate Where dateItm.Value.IsDispArea
         '検索値の設定
-        Dim dateFrom As String = dispDateList.First.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
+        Dim dateFrom As String = dispDateList.First.Value.ItemDate.AddDays(-CInt(Today.DayOfWeek) - 6).ToString("yyyy/MM/dd")
         'Dim dateTo As String = dispData.StockDate.Last.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
-        Dim dateTo As String = dispDateList.First.Value.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
+        Dim dateTo As String = CDate(dateFrom).AddDays(6).ToString("yyyy/MM/dd")
         Dim qDaysCount = From itm In dispDateList Where itm.Value.WeekNum <> "0" AndAlso itm.Value.ItemDate.ToString("yyyy/MM/dd") >= dateFrom AndAlso itm.Value.ItemDate.ToString("yyyy/MM/dd") <= dateTo
         Dim daysCount = 0
         Dim currentDate As String = dateFrom
@@ -1853,33 +1855,45 @@ Public Class OIT0004OilStockCreate
         If daysCount = 0 Then
             daysCount = 1
         End If
-        sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
-        sqlStr.AppendLine("     , DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO)  AS DAYSPAN")
-        'sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
-        sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / @DAYSCNT,0)  AS SHIPAVERAGE")
-        sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
-        sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
-        sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
-        sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
-        sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
-        sqlStr.AppendLine("   AND DATEPART(WEEKDAY,ODR.ACTUALLODDATE) <> 1")
-        sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
-        'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
-        '荷主取得条件(JOINTコード考慮)↓
-        sqlStr.AppendLine("   AND ((     DTL.SHIPPERSCODE   = @SHIPPERSCODE")
-        sqlStr.AppendLine("          AND (    ISNULL(DTL.JOINTCODE,'') = ''   ")
-        sqlStr.AppendLine("                OR DTL.JOINTCODE = DTL.SHIPPERSCODE ")
-        sqlStr.AppendLine("              ) ")
-        sqlStr.AppendLine("        ) OR  (     DTL.SHIPPERSCODE   <> @SHIPPERSCODE")
-        sqlStr.AppendLine("                AND DTL.JOINTCODE = @SHIPPERSCODE")
-        sqlStr.AppendLine("              )")
-        sqlStr.AppendLine("       )")
-        '荷主取得条件(JOINTコード考慮)↑
-        sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
-        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
+        'sqlStr.AppendLine("SELECT DTL.OILCODE")
+        'sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
+        'sqlStr.AppendLine("     , DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO)  AS DAYSPAN")
+        ''sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
+        'sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / @DAYSCNT,0)  AS SHIPAVERAGE")
+        'sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        'sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
+        'sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+        'sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+        'sqlStr.AppendLine("   AND DTL.OILCODE is not null")
+        'sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
+        'sqlStr.AppendLine("   AND DATEPART(WEEKDAY,ODR.ACTUALLODDATE) <> 1")
+        'sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        ''sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
+        ''荷主取得条件(JOINTコード考慮)↓
+        'sqlStr.AppendLine("   AND ((     DTL.SHIPPERSCODE   = @SHIPPERSCODE")
+        'sqlStr.AppendLine("          AND (    ISNULL(DTL.JOINTCODE,'') = ''   ")
+        'sqlStr.AppendLine("                OR DTL.JOINTCODE = DTL.SHIPPERSCODE ")
+        'sqlStr.AppendLine("              ) ")
+        'sqlStr.AppendLine("        ) OR  (     DTL.SHIPPERSCODE   <> @SHIPPERSCODE")
+        'sqlStr.AppendLine("                AND DTL.JOINTCODE = @SHIPPERSCODE")
+        'sqlStr.AppendLine("              )")
+        'sqlStr.AppendLine("       )")
+        ''荷主取得条件(JOINTコード考慮)↑
+        'sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        'sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
+        'sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
+
+        sqlStr.AppendLine("SELECT OS.OILCODE")
+        sqlStr.AppendLine("      ,ROUND(SUM(ISNULL(OS.SHIPPINGVOL,0)) /  @DAYSCNT,0)  AS SHIPAVERAGE")
+        sqlStr.AppendLine("      ,SUM(ISNULL(OS.SHIPPINGVOL, 0)) AS CARSAMOUNT")
+        sqlStr.AppendLine("  FROM OIL.OIT0001_OILSTOCK OS")
+        sqlStr.AppendLine(" WHERE OS.DELFLG        = @DELFLG")
+        sqlStr.AppendLine("   AND OS.STOCKYMD      BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
+        sqlStr.AppendLine("   AND OS.OFFICECODE    = @OFFICECODE")
+        sqlStr.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND OS.CONSIGNEECODE = @CONSIGNEECODE")
+        sqlStr.AppendLine(" GROUP BY OS.OILCODE")
+
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -1887,7 +1901,8 @@ Public Class OIT0004OilStockCreate
                 .Add("@ACTUALDATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
-                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                '.Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
                 .Add("@DAYSCNT", SqlDbType.Decimal).Value = daysCount
             End With
 

@@ -804,6 +804,9 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_010402]"
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「五井営業所」の場合、五井用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_011201]"
                     Else
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT]"
                     End If
@@ -812,6 +815,9 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR_010402]"
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「五井営業所」の場合、五井用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR_011201]"
                     Else
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR]"
                     End If
@@ -830,8 +836,9 @@ Public Class M00001MENU
                 PARA5.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
 
-                '営業所が「仙台新港営業所」以外の場合、営業所コードをパラメータに付与
-                If Not CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                '営業所が「仙台新港営業所」「五井営業所」以外の場合、営業所コードをパラメータに付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) AndAlso
+                    Not CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
                     PARA3.Value = ddlTtrOfficeNameList.SelectedValue
                 End If

@@ -2391,7 +2391,7 @@ Public Class OIT0003OTLinkageList
                                 orderInfT1.OTOilName = "計"
                                 orderInfT1.OTTankNo = Convert.ToString(iTotalCnt) + "両"
                                 If I_blnTYOHYO = False Then
-                                    orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                                    orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(ℓ)"
                                 Else
                                     orderInfT1.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
                                 End If
@@ -2440,7 +2440,7 @@ Public Class OIT0003OTLinkageList
                             orderInfT1.OTOilName = "計"
                             orderInfT1.OTTankNo = Convert.ToString(iTotalCnt) + "両"
                             If I_blnTYOHYO = False Then
-                                orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                                orderInfT1.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(ℓ)"
                             Else
                                 orderInfT1.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
                             End If
@@ -2486,7 +2486,7 @@ Public Class OIT0003OTLinkageList
                 orderInfT2.OTOilName = "計"
                 orderInfT2.OTTankNo = Convert.ToString(iTotalCnt) + "両"
                 If I_blnTYOHYO = False Then
-                    orderInfT2.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(kl)"
+                    orderInfT2.OTAmount = Replace(Convert.ToString(iTotalAmount), ".", "") + "(ℓ)"
                 Else
                     orderInfT2.OTAmount = Convert.ToString(iTotalAmount) + "(kl)"
                 End If

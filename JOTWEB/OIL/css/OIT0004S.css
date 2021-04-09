@@ -7,6 +7,9 @@
     border-radius: 5px;
     border-spacing:1px;
 }
+.consignee {
+    width: 480px;
+}
 .tblLastupdate td, .tblLastupdate th {
     border: 1px solid darkgray;
     padding:5px;
@@ -18,12 +21,16 @@ td.consigneeMark {
 .tblLastupdate th.userName {
     width: 150px;
 }
-
+.tblLastupdate th.update {
+    width: 150px;
+}
+.tblLastupdate th.fixed {
+    width: auto;
+}
 .tblLastupdate th:first-child {
     border-top-left-radius: 5px;
 }
 .tblLastupdate th:last-child {
-    width:150px;
     border-top-right-radius:5px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -40,6 +47,3 @@ td.consigneeMark {
 .tblLastupdate tr:last-child>td:last-child  {
     border-bottom-right-radius: 5px;
 }
-/*#divConsigneeUpdateInfo {
-    display:none !important;
-}*/

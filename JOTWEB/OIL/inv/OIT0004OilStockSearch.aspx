@@ -80,7 +80,7 @@
             <!-- 年月日 -->
             <div class="inputItem">
                 <a id="WF_STYMD_LABEL" class="requiredMark">年月日</a>
-                <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD')";>
+                <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');">
                     <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
                 </a>
             </div>
@@ -105,20 +105,48 @@
 
                 </a>
             </div>
-            <div class="inputItem"  id="divConsigneeUpdateInfo" runat="server" enableviewstate="true" visible="false">
-               <a id="WF_CONSIGNEE_UPDINFO_LABEL">油槽所更新情報</a>
-               <a class="ef" id="WF_CONSIGNEE_UPDINFO" >
-                    <table class="tblLastupdate">
+            <div class="inputItem"  id="divConsigneeUpdateInfo10" runat="server" enableviewstate="true" visible="false">
+               <a id="WF_CONSIGNEE_UPDINFO_LABEL10">北信油槽所更新情報</a>
+               <a class="ef" id="WF_CONSIGNEE_UPDINFO10" >
+                    <table class="tblLastupdate consignee code10">
                         <tr>
                             <th class="userName">更新者</th>
                             <th class="update">更新日時</th>
+                            <th class="fixed">在庫確定(<%=System.DateTime.Now.ToString("M月d日") %>)</th>
                         </tr>
                         <tr>
                             <td>
-                                <asp:Label ID="WF_ConsigneeUser" runat="server" Text="&nbsp;"></asp:Label>
+                                <asp:Label ID="WF_ConsigneeUser10" runat="server" Text="&nbsp;"></asp:Label>
                             </td>
                             <td>
-                                <asp:Label ID="WF_ConsigneeUpdateDtm" runat="server" Text="&nbsp;"></asp:Label>
+                                <asp:Label ID="WF_ConsigneeUpdateDtm10" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                            <td>
+                                 <asp:Label ID="WF_ConsigneeFixStatus10" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                        </tr>
+                    </table>
+               </a>
+
+            </div>
+            <div class="inputItem"  id="divConsigneeUpdateInfo20" runat="server" enableviewstate="true" visible="false">
+               <a id="WF_CONSIGNEE_UPDINFO_LABEL20">甲府油槽所更新情報</a>
+               <a class="ef" id="WF_CONSIGNEE_UPDINFO20" >
+                    <table class="tblLastupdate consignee code20">
+                        <tr>
+                            <th class="userName">更新者</th>
+                            <th class="update">更新日時</th>
+                            <th class="fixed">在庫確定(<%=System.DateTime.Now.ToString("M月d日") %>)</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:Label ID="WF_ConsigneeUser20" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                            <td>
+                                <asp:Label ID="WF_ConsigneeUpdateDtm20" runat="server" Text="&nbsp;"></asp:Label>
+                            </td>
+                            <td>
+                                 <asp:Label ID="WF_ConsigneeFixStatus20" runat="server" Text="&nbsp;"></asp:Label>
                             </td>
                         </tr>
                     </table>

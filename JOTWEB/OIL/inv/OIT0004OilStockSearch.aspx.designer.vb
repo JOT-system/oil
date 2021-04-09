@@ -140,31 +140,76 @@ Partial Public Class OIT0004OilStockSearch
     Protected WithEvents WF_UpdateDtm As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''divConsigneeUpdateInfo コントロール。
+    '''divConsigneeUpdateInfo10 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents divConsigneeUpdateInfo As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents divConsigneeUpdateInfo10 As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
-    '''WF_ConsigneeUser コントロール。
+    '''WF_ConsigneeUser10 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ConsigneeUser As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ConsigneeUser10 As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_ConsigneeUpdateDtm コントロール。
+    '''WF_ConsigneeUpdateDtm10 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ConsigneeUpdateDtm As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ConsigneeUpdateDtm10 As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ConsigneeFixStatus10 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeFixStatus10 As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''divConsigneeUpdateInfo20 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divConsigneeUpdateInfo20 As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_ConsigneeUser20 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeUser20 As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ConsigneeUpdateDtm20 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeUpdateDtm20 As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ConsigneeFixStatus20 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ConsigneeFixStatus20 As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。

@@ -68,6 +68,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
+    '''WF_ButtonFixedStock コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonFixedStock As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>
@@ -365,6 +374,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents hdnSuggestDateAddRemoveKey As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''hdnPopUpType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnPopUpType As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''divChkEneos コントロール。
     '''</summary>
     '''<remarks>
@@ -444,6 +462,33 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents chkConsigneeRepDoubleSpan As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
+    '''lblFixDateLabel コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblFixDateLabel As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtFixDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtFixDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''lblFixStatus コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblFixStatus As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''Master プロパティ。

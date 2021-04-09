@@ -626,22 +626,31 @@ Public Class M00001MENU
         Try
             '輸送実績表
             If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+
                 Dim tempName As String = CONST_TEMPNAME_TRANSPORT_RESULT
-                '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                     tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
+                ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    '営業所が根岸営業所の場合は、根岸テンプレートを使用
+                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_011402
                 End If
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       '輸送実績表
                         Me.GetTransportResultData)
 
+                    '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
-                        '帳票出力＆ファイルパス取得
+                        '仙台新港営業所
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_010402(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
+                    ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                        '根岸営業所
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_011402(
+                        CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
                     Else
-                        '帳票出力＆ファイルパス取得
+                        'その他
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
                     End If
@@ -795,6 +804,9 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_010402]"
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「五井営業所」の場合、五井用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_011201]"
                     Else
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT]"
                     End If
@@ -803,6 +815,9 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         '営業所が「仙台新港営業所」の場合、仙台用データ取得プロシージャを呼び出す
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR_010402]"
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                        '営業所が「五井営業所」の場合、五井用データ取得プロシージャを呼び出す
+                        SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR_011201]"
                     Else
                         SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT_ARR]"
                     End If
@@ -821,8 +836,9 @@ Public Class M00001MENU
                 PARA5.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
 
-                '営業所が「仙台新港営業所」以外の場合、営業所コードをパラメータに付与
-                If Not CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
+                '営業所が「仙台新港営業所」「五井営業所」以外の場合、営業所コードをパラメータに付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) AndAlso
+                    Not CONST_OFFICECODE_011201.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
                     PARA3.Value = ddlTtrOfficeNameList.SelectedValue
                 End If

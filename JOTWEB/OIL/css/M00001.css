@@ -203,7 +203,7 @@ div.parentMenu.menu2Link > .childMenu {
     /*left:245px;*/
     left:0;
     padding-left:245px;
-    z-index:2;
+    z-index:3;
     background-color:rgba(255,255,255,0.85);
     height:calc(100vh - 60px);
     width:calc(100vw - 245px);

@@ -21,7 +21,7 @@ Public Class OIS0001UserCreate
     ''' <summary>
     ''' ユーザ情報取得
     ''' </summary>
-    Private CS0051UserInfo As New CS0051UserInfo            'ユーザ情報取得
+    Private CS0051UserInfo As New CS0051UserInfo                     'ユーザ情報取得
 
     '○ 検索結果格納Table
     Private OIS0001tbl As DataTable                                  '一覧格納用テーブル
@@ -74,9 +74,9 @@ Public Class OIS0001UserCreate
                     Master.RecoverTable(OIS0001tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_UPDATE"                '表更新ボタン押下
+                        Case "WF_UPDATE"                '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
+                        Case "WF_CLEAR"                 '戻るボタン押下
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -92,6 +92,8 @@ Public Class OIS0001UserCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -799,6 +801,1208 @@ Public Class OIS0001UserCreate
     End Sub
 
     ''' <summary>
+    ''' ユーザIDマスタ登録更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新(ユーザマスタ)
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        COM.OIS0004_USER" _
+            & "    WHERE" _
+            & "        USERID       = @P001" _
+            & "        AND STYMD    = @P008 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE COM.OIS0004_USER" _
+            & "    SET" _
+            & "        DELFLG = @P000" _
+            & "        , STAFFNAMES = @P002" _
+            & "        , STAFFNAMEL = @P003" _
+            & "        , MAPID = @P004" _
+            & "        , ENDYMD = @P009" _
+            & "        , ORG = @P011" _
+            & "        , EMAIL = @P012" _
+            & "        , MENUROLE = @P013" _
+            & "        , MAPROLE = @P014" _
+            & "        , VIEWPROFID = @P015" _
+            & "        , RPRTPROFID = @P016" _
+            & "        , VARIANT = @P017" _
+            & "        , APPROVALID = @P018" _
+            & "        , OUTPUTID1 = @P019" _
+            & "        , ONOFF1 = @P020" _
+            & "        , SORTNO1 = @P021" _
+            & "        , OUTPUTID2 = @P022" _
+            & "        , ONOFF2 = @P023" _
+            & "        , SORTNO2 = @P024" _
+            & "        , OUTPUTID3 = @P025" _
+            & "        , ONOFF3 = @P026" _
+            & "        , SORTNO3 = @P027" _
+            & "        , OUTPUTID4 = @P028" _
+            & "        , ONOFF4 = @P029" _
+            & "        , SORTNO4 = @P030" _
+            & "        , OUTPUTID5 = @P031" _
+            & "        , ONOFF5 = @P032" _
+            & "        , SORTNO5 = @P033" _
+            & "        , OUTPUTID6 = @P034" _
+            & "        , ONOFF6 = @P035" _
+            & "        , SORTNO6 = @P036" _
+            & "        , OUTPUTID7 = @P037" _
+            & "        , ONOFF7 = @P038" _
+            & "        , SORTNO7 = @P039" _
+            & "        , OUTPUTID8 = @P040" _
+            & "        , ONOFF8 = @P041" _
+            & "        , SORTNO8 = @P042" _
+            & "        , OUTPUTID9 = @P043" _
+            & "        , ONOFF9 = @P044" _
+            & "        , SORTNO9 = @P045" _
+            & "        , OUTPUTID10 = @P046" _
+            & "        , ONOFF10 = @P047" _
+            & "        , SORTNO10 = @P048" _
+            & "        , OUTPUTID11 = @P049" _
+            & "        , ONOFF11 = @P050" _
+            & "        , SORTNO11 = @P051" _
+            & "        , OUTPUTID12 = @P052" _
+            & "        , ONOFF12 = @P053" _
+            & "        , SORTNO12 = @P054" _
+            & "        , OUTPUTID13 = @P055" _
+            & "        , ONOFF13 = @P056" _
+            & "        , SORTNO13 = @P057" _
+            & "        , OUTPUTID14 = @P058" _
+            & "        , ONOFF14 = @P059" _
+            & "        , SORTNO14 = @P060" _
+            & "        , OUTPUTID15 = @P061" _
+            & "        , ONOFF15 = @P062" _
+            & "        , SORTNO15 = @P063" _
+            & "        , OUTPUTID16 = @P064" _
+            & "        , ONOFF16 = @P065" _
+            & "        , SORTNO16 = @P066" _
+            & "        , OUTPUTID17 = @P067" _
+            & "        , ONOFF17 = @P068" _
+            & "        , SORTNO17 = @P069" _
+            & "        , OUTPUTID18 = @P070" _
+            & "        , ONOFF18 = @P071" _
+            & "        , SORTNO18 = @P072" _
+            & "        , OUTPUTID19 = @P073" _
+            & "        , ONOFF19 = @P074" _
+            & "        , SORTNO19 = @P075" _
+            & "        , OUTPUTID20 = @P076" _
+            & "        , ONOFF20 = @P077" _
+            & "        , SORTNO20 = @P078" _
+            & "        , OUTPUTID21 = @P079" _
+            & "        , ONOFF21 = @P080" _
+            & "        , SORTNO21 = @P081" _
+            & "        , OUTPUTID22 = @P082" _
+            & "        , ONOFF22 = @P083" _
+            & "        , SORTNO22 = @P084" _
+            & "        , OUTPUTID23 = @P085" _
+            & "        , ONOFF23 = @P086" _
+            & "        , SORTNO23 = @P087" _
+            & "        , OUTPUTID24 = @P088" _
+            & "        , ONOFF24 = @P089" _
+            & "        , SORTNO24 = @P090" _
+            & "        , OUTPUTID25 = @P091" _
+            & "        , ONOFF25 = @P092" _
+            & "        , SORTNO25 = @P093" _
+            & "        , UPDYMD = @P097" _
+            & "        , UPDUSER = @P098" _
+            & "        , UPDTERMID = @P099" _
+            & "        , RECEIVEYMD = @P100" _
+            & "    WHERE" _
+            & "        USERID       = @P001" _
+            & "        AND STYMD    = @P008 ;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO COM.OIS0004_USER" _
+            & "        (DELFLG" _
+            & "        , USERID" _
+            & "        , STAFFNAMES" _
+            & "        , STAFFNAMEL" _
+            & "        , MAPID" _
+            & "        , STYMD" _
+            & "        , ENDYMD" _
+            & "        , CAMPCODE" _
+            & "        , ORG" _
+            & "        , EMAIL" _
+            & "        , MENUROLE" _
+            & "        , MAPROLE" _
+            & "        , VIEWPROFID" _
+            & "        , RPRTPROFID" _
+            & "        , VARIANT" _
+            & "        , APPROVALID" _
+            & "        , OUTPUTID1" _
+            & "        , ONOFF1" _
+            & "        , SORTNO1" _
+            & "        , OUTPUTID2" _
+            & "        , ONOFF2" _
+            & "        , SORTNO2" _
+            & "        , OUTPUTID3" _
+            & "        , ONOFF3" _
+            & "        , SORTNO3" _
+            & "        , OUTPUTID4" _
+            & "        , ONOFF4" _
+            & "        , SORTNO4" _
+            & "        , OUTPUTID5" _
+            & "        , ONOFF5" _
+            & "        , SORTNO5" _
+            & "        , OUTPUTID6" _
+            & "        , ONOFF6" _
+            & "        , SORTNO6" _
+            & "        , OUTPUTID7" _
+            & "        , ONOFF7" _
+            & "        , SORTNO7" _
+            & "        , OUTPUTID8" _
+            & "        , ONOFF8" _
+            & "        , SORTNO8" _
+            & "        , OUTPUTID9" _
+            & "        , ONOFF9" _
+            & "        , SORTNO9" _
+            & "        , OUTPUTID10" _
+            & "        , ONOFF10" _
+            & "        , SORTNO10" _
+            & "        , OUTPUTID11" _
+            & "        , ONOFF11" _
+            & "        , SORTNO11" _
+            & "        , OUTPUTID12" _
+            & "        , ONOFF12" _
+            & "        , SORTNO12" _
+            & "        , OUTPUTID13" _
+            & "        , ONOFF13" _
+            & "        , SORTNO13" _
+            & "        , OUTPUTID14" _
+            & "        , ONOFF14" _
+            & "        , SORTNO14" _
+            & "        , OUTPUTID15" _
+            & "        , ONOFF15" _
+            & "        , SORTNO15" _
+            & "        , OUTPUTID16" _
+            & "        , ONOFF16" _
+            & "        , SORTNO16" _
+            & "        , OUTPUTID17" _
+            & "        , ONOFF17" _
+            & "        , SORTNO17" _
+            & "        , OUTPUTID18" _
+            & "        , ONOFF18" _
+            & "        , SORTNO18" _
+            & "        , OUTPUTID19" _
+            & "        , ONOFF19" _
+            & "        , SORTNO19" _
+            & "        , OUTPUTID20" _
+            & "        , ONOFF20" _
+            & "        , SORTNO20" _
+            & "        , OUTPUTID21" _
+            & "        , ONOFF21" _
+            & "        , SORTNO21" _
+            & "        , OUTPUTID22" _
+            & "        , ONOFF22" _
+            & "        , SORTNO22" _
+            & "        , OUTPUTID23" _
+            & "        , ONOFF23" _
+            & "        , SORTNO23" _
+            & "        , OUTPUTID24" _
+            & "        , ONOFF24" _
+            & "        , SORTNO24" _
+            & "        , OUTPUTID25" _
+            & "        , ONOFF25" _
+            & "        , SORTNO25" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        (@P000" _
+            & "        , @P001" _
+            & "        , @P002" _
+            & "        , @P003" _
+            & "        , @P004" _
+            & "        , @P008" _
+            & "        , @P009" _
+            & "        , @P010" _
+            & "        , @P011" _
+            & "        , @P012" _
+            & "        , @P013" _
+            & "        , @P014" _
+            & "        , @P015" _
+            & "        , @P016" _
+            & "        , @P017" _
+            & "        , @P018" _
+            & "        , @P019" _
+            & "        , @P020" _
+            & "        , @P021" _
+            & "        , @P022" _
+            & "        , @P023" _
+            & "        , @P024" _
+            & "        , @P025" _
+            & "        , @P026" _
+            & "        , @P027" _
+            & "        , @P028" _
+            & "        , @P029" _
+            & "        , @P030" _
+            & "        , @P031" _
+            & "        , @P032" _
+            & "        , @P033" _
+            & "        , @P034" _
+            & "        , @P035" _
+            & "        , @P036" _
+            & "        , @P037" _
+            & "        , @P038" _
+            & "        , @P039" _
+            & "        , @P040" _
+            & "        , @P041" _
+            & "        , @P042" _
+            & "        , @P043" _
+            & "        , @P044" _
+            & "        , @P045" _
+            & "        , @P046" _
+            & "        , @P047" _
+            & "        , @P048" _
+            & "        , @P049" _
+            & "        , @P050" _
+            & "        , @P051" _
+            & "        , @P052" _
+            & "        , @P053" _
+            & "        , @P054" _
+            & "        , @P055" _
+            & "        , @P056" _
+            & "        , @P057" _
+            & "        , @P058" _
+            & "        , @P059" _
+            & "        , @P060" _
+            & "        , @P061" _
+            & "        , @P062" _
+            & "        , @P063" _
+            & "        , @P064" _
+            & "        , @P065" _
+            & "        , @P066" _
+            & "        , @P067" _
+            & "        , @P068" _
+            & "        , @P069" _
+            & "        , @P070" _
+            & "        , @P071" _
+            & "        , @P072" _
+            & "        , @P073" _
+            & "        , @P074" _
+            & "        , @P075" _
+            & "        , @P076" _
+            & "        , @P077" _
+            & "        , @P078" _
+            & "        , @P079" _
+            & "        , @P080" _
+            & "        , @P081" _
+            & "        , @P082" _
+            & "        , @P083" _
+            & "        , @P084" _
+            & "        , @P085" _
+            & "        , @P086" _
+            & "        , @P087" _
+            & "        , @P088" _
+            & "        , @P089" _
+            & "        , @P090" _
+            & "        , @P091" _
+            & "        , @P092" _
+            & "        , @P093" _
+            & "        , @P094" _
+            & "        , @P095" _
+            & "        , @P096" _
+            & "        , @P097" _
+            & "        , @P098" _
+            & "        , @P099" _
+            & "        , @P100) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " Select" _
+            & "    DELFLG" _
+            & "        , USERID" _
+            & "        , STAFFNAMES" _
+            & "        , STAFFNAMEL" _
+            & "        , MAPID" _
+            & "        , STYMD" _
+            & "        , ENDYMD" _
+            & "        , CAMPCODE" _
+            & "        , ORG" _
+            & "        , EMAIL" _
+            & "        , MENUROLE" _
+            & "        , MAPROLE" _
+            & "        , VIEWPROFID" _
+            & "        , RPRTPROFID" _
+            & "        , VARIANT" _
+            & "        , APPROVALID" _
+            & "        , OUTPUTID1" _
+            & "        , ONOFF1" _
+            & "        , SORTNO1" _
+            & "        , OUTPUTID2" _
+            & "        , ONOFF2" _
+            & "        , SORTNO2" _
+            & "        , OUTPUTID3" _
+            & "        , ONOFF3" _
+            & "        , SORTNO3" _
+            & "        , OUTPUTID4" _
+            & "        , ONOFF4" _
+            & "        , SORTNO4" _
+            & "        , OUTPUTID5" _
+            & "        , ONOFF5" _
+            & "        , SORTNO5" _
+            & "        , OUTPUTID6" _
+            & "        , ONOFF6" _
+            & "        , SORTNO6" _
+            & "        , OUTPUTID7" _
+            & "        , ONOFF7" _
+            & "        , SORTNO7" _
+            & "        , OUTPUTID8" _
+            & "        , ONOFF8" _
+            & "        , SORTNO8" _
+            & "        , OUTPUTID9" _
+            & "        , ONOFF9" _
+            & "        , SORTNO9" _
+            & "        , OUTPUTID10" _
+            & "        , ONOFF10" _
+            & "        , SORTNO10" _
+            & "        , OUTPUTID11" _
+            & "        , ONOFF11" _
+            & "        , SORTNO11" _
+            & "        , OUTPUTID12" _
+            & "        , ONOFF12" _
+            & "        , SORTNO12" _
+            & "        , OUTPUTID13" _
+            & "        , ONOFF13" _
+            & "        , SORTNO13" _
+            & "        , OUTPUTID14" _
+            & "        , ONOFF14" _
+            & "        , SORTNO14" _
+            & "        , OUTPUTID15" _
+            & "        , ONOFF15" _
+            & "        , SORTNO15" _
+            & "        , OUTPUTID16" _
+            & "        , ONOFF16" _
+            & "        , SORTNO16" _
+            & "        , OUTPUTID17" _
+            & "        , ONOFF17" _
+            & "        , SORTNO17" _
+            & "        , OUTPUTID18" _
+            & "        , ONOFF18" _
+            & "        , SORTNO18" _
+            & "        , OUTPUTID19" _
+            & "        , ONOFF19" _
+            & "        , SORTNO19" _
+            & "        , OUTPUTID20" _
+            & "        , ONOFF20" _
+            & "        , SORTNO20" _
+            & "        , OUTPUTID21" _
+            & "        , ONOFF21" _
+            & "        , SORTNO21" _
+            & "        , OUTPUTID22" _
+            & "        , ONOFF22" _
+            & "        , SORTNO22" _
+            & "        , OUTPUTID23" _
+            & "        , ONOFF23" _
+            & "        , SORTNO23" _
+            & "        , OUTPUTID24" _
+            & "        , ONOFF24" _
+            & "        , SORTNO24" _
+            & "        , OUTPUTID25" _
+            & "        , ONOFF25" _
+            & "        , SORTNO25" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "    COM.OIS0004_USER" _
+            & " WHERE" _
+            & "        USERID       = @P001" _
+            & "        AND STYMD    = @P008"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA000 As SqlParameter = SQLcmd.Parameters.Add("@P000", SqlDbType.NVarChar, 1)         '削除フラグ
+                Dim PARA001 As SqlParameter = SQLcmd.Parameters.Add("@P001", SqlDbType.NVarChar, 20)        'ユーザID
+                Dim PARA002 As SqlParameter = SQLcmd.Parameters.Add("@P002", SqlDbType.NVarChar, 20)        '社員名（短）
+                Dim PARA003 As SqlParameter = SQLcmd.Parameters.Add("@P003", SqlDbType.NVarChar, 50)        '社員名（長）
+                Dim PARA004 As SqlParameter = SQLcmd.Parameters.Add("@P004", SqlDbType.NVarChar, 20)        '画面ＩＤ
+                'Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P005", SqlDbType.NVarChar, 200)        'パスワード
+                'Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P006", SqlDbType.Int)                  '誤り回数
+                'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P007", SqlDbType.Date)                 'パスワード有効期限
+                Dim PARA008 As SqlParameter = SQLcmd.Parameters.Add("@P008", SqlDbType.Date)                '開始年月日
+                Dim PARA009 As SqlParameter = SQLcmd.Parameters.Add("@P009", SqlDbType.Date)                '終了年月日
+                Dim PARA010 As SqlParameter = SQLcmd.Parameters.Add("@P010", SqlDbType.NVarChar, 2)         '会社コード
+                Dim PARA011 As SqlParameter = SQLcmd.Parameters.Add("@P011", SqlDbType.NVarChar, 6)         '組織コード
+                Dim PARA012 As SqlParameter = SQLcmd.Parameters.Add("@P012", SqlDbType.NVarChar, 128)       'メールアドレス
+                Dim PARA013 As SqlParameter = SQLcmd.Parameters.Add("@P013", SqlDbType.NVarChar, 20)        'メニュー表示制御ロール
+                Dim PARA014 As SqlParameter = SQLcmd.Parameters.Add("@P014", SqlDbType.NVarChar, 20)        '画面参照更新制御ロール
+                Dim PARA015 As SqlParameter = SQLcmd.Parameters.Add("@P015", SqlDbType.NVarChar, 20)        '画面表示項目制御ロール
+                Dim PARA016 As SqlParameter = SQLcmd.Parameters.Add("@P016", SqlDbType.NVarChar, 20)        'エクセル出力制御ロール
+                Dim PARA017 As SqlParameter = SQLcmd.Parameters.Add("@P017", SqlDbType.NVarChar, 20)        '画面初期値ロール
+                Dim PARA018 As SqlParameter = SQLcmd.Parameters.Add("@P018", SqlDbType.NVarChar, 20)        '承認権限ロール
+                Dim PARA019 As SqlParameter = SQLcmd.Parameters.Add("@P019", SqlDbType.NVarChar, 4)         '情報出力ID1
+                Dim PARA020 As SqlParameter = SQLcmd.Parameters.Add("@P020", SqlDbType.NVarChar, 1)         '表示フラグ1
+                Dim PARA021 As SqlParameter = SQLcmd.Parameters.Add("@P021", SqlDbType.Int)                 '表示順1
+                Dim PARA022 As SqlParameter = SQLcmd.Parameters.Add("@P022", SqlDbType.NVarChar, 4)         '情報出力ID2
+                Dim PARA023 As SqlParameter = SQLcmd.Parameters.Add("@P023", SqlDbType.NVarChar, 1)         '表示フラグ2
+                Dim PARA024 As SqlParameter = SQLcmd.Parameters.Add("@P024", SqlDbType.Int)                 '表示順2
+                Dim PARA025 As SqlParameter = SQLcmd.Parameters.Add("@P025", SqlDbType.NVarChar, 4)         '情報出力ID3
+                Dim PARA026 As SqlParameter = SQLcmd.Parameters.Add("@P026", SqlDbType.NVarChar, 1)         '表示フラグ3
+                Dim PARA027 As SqlParameter = SQLcmd.Parameters.Add("@P027", SqlDbType.Int)                 '表示順3
+                Dim PARA028 As SqlParameter = SQLcmd.Parameters.Add("@P028", SqlDbType.NVarChar, 4)         '情報出力ID4
+                Dim PARA029 As SqlParameter = SQLcmd.Parameters.Add("@P029", SqlDbType.NVarChar, 1)         '表示フラグ4
+                Dim PARA030 As SqlParameter = SQLcmd.Parameters.Add("@P030", SqlDbType.Int)                 '表示順4
+                Dim PARA031 As SqlParameter = SQLcmd.Parameters.Add("@P031", SqlDbType.NVarChar, 4)         '情報出力ID5
+                Dim PARA032 As SqlParameter = SQLcmd.Parameters.Add("@P032", SqlDbType.NVarChar, 1)         '表示フラグ5
+                Dim PARA033 As SqlParameter = SQLcmd.Parameters.Add("@P033", SqlDbType.Int)                 '表示順5
+                Dim PARA034 As SqlParameter = SQLcmd.Parameters.Add("@P034", SqlDbType.NVarChar, 4)         '情報出力ID6
+                Dim PARA035 As SqlParameter = SQLcmd.Parameters.Add("@P035", SqlDbType.NVarChar, 1)         '表示フラグ6
+                Dim PARA036 As SqlParameter = SQLcmd.Parameters.Add("@P036", SqlDbType.Int)                 '表示順6
+                Dim PARA037 As SqlParameter = SQLcmd.Parameters.Add("@P037", SqlDbType.NVarChar, 4)         '情報出力ID7
+                Dim PARA038 As SqlParameter = SQLcmd.Parameters.Add("@P038", SqlDbType.NVarChar, 1)         '表示フラグ7
+                Dim PARA039 As SqlParameter = SQLcmd.Parameters.Add("@P039", SqlDbType.Int)                 '表示順7
+                Dim PARA040 As SqlParameter = SQLcmd.Parameters.Add("@P040", SqlDbType.NVarChar, 4)         '情報出力ID8
+                Dim PARA041 As SqlParameter = SQLcmd.Parameters.Add("@P041", SqlDbType.NVarChar, 1)         '表示フラグ8
+                Dim PARA042 As SqlParameter = SQLcmd.Parameters.Add("@P042", SqlDbType.Int)                 '表示順8
+                Dim PARA043 As SqlParameter = SQLcmd.Parameters.Add("@P043", SqlDbType.NVarChar, 4)         '情報出力ID9
+                Dim PARA044 As SqlParameter = SQLcmd.Parameters.Add("@P044", SqlDbType.NVarChar, 1)         '表示フラグ9
+                Dim PARA045 As SqlParameter = SQLcmd.Parameters.Add("@P045", SqlDbType.Int)                 '表示順9
+                Dim PARA046 As SqlParameter = SQLcmd.Parameters.Add("@P046", SqlDbType.NVarChar, 4)         '情報出力ID10
+                Dim PARA047 As SqlParameter = SQLcmd.Parameters.Add("@P047", SqlDbType.NVarChar, 1)         '表示フラグ10
+                Dim PARA048 As SqlParameter = SQLcmd.Parameters.Add("@P048", SqlDbType.Int)                 '表示順10
+                Dim PARA049 As SqlParameter = SQLcmd.Parameters.Add("@P049", SqlDbType.NVarChar, 4)         '情報出力ID11
+                Dim PARA050 As SqlParameter = SQLcmd.Parameters.Add("@P050", SqlDbType.NVarChar, 1)         '表示フラグ11
+                Dim PARA051 As SqlParameter = SQLcmd.Parameters.Add("@P051", SqlDbType.Int)                 '表示順11
+                Dim PARA052 As SqlParameter = SQLcmd.Parameters.Add("@P052", SqlDbType.NVarChar, 4)         '情報出力ID12
+                Dim PARA053 As SqlParameter = SQLcmd.Parameters.Add("@P053", SqlDbType.NVarChar, 1)         '表示フラグ12
+                Dim PARA054 As SqlParameter = SQLcmd.Parameters.Add("@P054", SqlDbType.Int)                 '表示順12
+                Dim PARA055 As SqlParameter = SQLcmd.Parameters.Add("@P055", SqlDbType.NVarChar, 4)         '情報出力ID13
+                Dim PARA056 As SqlParameter = SQLcmd.Parameters.Add("@P056", SqlDbType.NVarChar, 1)         '表示フラグ13
+                Dim PARA057 As SqlParameter = SQLcmd.Parameters.Add("@P057", SqlDbType.Int)                 '表示順13
+                Dim PARA058 As SqlParameter = SQLcmd.Parameters.Add("@P058", SqlDbType.NVarChar, 4)         '情報出力ID14
+                Dim PARA059 As SqlParameter = SQLcmd.Parameters.Add("@P059", SqlDbType.NVarChar, 1)         '表示フラグ14
+                Dim PARA060 As SqlParameter = SQLcmd.Parameters.Add("@P060", SqlDbType.Int)                 '表示順14
+                Dim PARA061 As SqlParameter = SQLcmd.Parameters.Add("@P061", SqlDbType.NVarChar, 4)         '情報出力ID15
+                Dim PARA062 As SqlParameter = SQLcmd.Parameters.Add("@P062", SqlDbType.NVarChar, 1)         '表示フラグ15
+                Dim PARA063 As SqlParameter = SQLcmd.Parameters.Add("@P063", SqlDbType.Int)                 '表示順15
+                Dim PARA064 As SqlParameter = SQLcmd.Parameters.Add("@P064", SqlDbType.NVarChar, 4)         '情報出力ID16
+                Dim PARA065 As SqlParameter = SQLcmd.Parameters.Add("@P065", SqlDbType.NVarChar, 1)         '表示フラグ16
+                Dim PARA066 As SqlParameter = SQLcmd.Parameters.Add("@P066", SqlDbType.Int)                 '表示順16
+                Dim PARA067 As SqlParameter = SQLcmd.Parameters.Add("@P067", SqlDbType.NVarChar, 4)         '情報出力ID17
+                Dim PARA068 As SqlParameter = SQLcmd.Parameters.Add("@P068", SqlDbType.NVarChar, 1)         '表示フラグ17
+                Dim PARA069 As SqlParameter = SQLcmd.Parameters.Add("@P069", SqlDbType.Int)                 '表示順17
+                Dim PARA070 As SqlParameter = SQLcmd.Parameters.Add("@P070", SqlDbType.NVarChar, 4)         '情報出力ID18
+                Dim PARA071 As SqlParameter = SQLcmd.Parameters.Add("@P071", SqlDbType.NVarChar, 1)         '表示フラグ18
+                Dim PARA072 As SqlParameter = SQLcmd.Parameters.Add("@P072", SqlDbType.Int)                 '表示順18
+                Dim PARA073 As SqlParameter = SQLcmd.Parameters.Add("@P073", SqlDbType.NVarChar, 4)         '情報出力ID19
+                Dim PARA074 As SqlParameter = SQLcmd.Parameters.Add("@P074", SqlDbType.NVarChar, 1)         '表示フラグ19
+                Dim PARA075 As SqlParameter = SQLcmd.Parameters.Add("@P075", SqlDbType.Int)                 '表示順19
+                Dim PARA076 As SqlParameter = SQLcmd.Parameters.Add("@P076", SqlDbType.NVarChar, 4)         '情報出力ID20
+                Dim PARA077 As SqlParameter = SQLcmd.Parameters.Add("@P077", SqlDbType.NVarChar, 1)         '表示フラグ20
+                Dim PARA078 As SqlParameter = SQLcmd.Parameters.Add("@P078", SqlDbType.Int)                 '表示順20
+                Dim PARA079 As SqlParameter = SQLcmd.Parameters.Add("@P079", SqlDbType.NVarChar, 4)         '情報出力ID21
+                Dim PARA080 As SqlParameter = SQLcmd.Parameters.Add("@P080", SqlDbType.NVarChar, 1)         '表示フラグ21
+                Dim PARA081 As SqlParameter = SQLcmd.Parameters.Add("@P081", SqlDbType.Int)                 '表示順21
+                Dim PARA082 As SqlParameter = SQLcmd.Parameters.Add("@P082", SqlDbType.NVarChar, 4)         '情報出力ID22
+                Dim PARA083 As SqlParameter = SQLcmd.Parameters.Add("@P083", SqlDbType.NVarChar, 1)         '表示フラグ22
+                Dim PARA084 As SqlParameter = SQLcmd.Parameters.Add("@P084", SqlDbType.Int)                 '表示順22
+                Dim PARA085 As SqlParameter = SQLcmd.Parameters.Add("@P085", SqlDbType.NVarChar, 4)         '情報出力ID23
+                Dim PARA086 As SqlParameter = SQLcmd.Parameters.Add("@P086", SqlDbType.NVarChar, 1)         '表示フラグ23
+                Dim PARA087 As SqlParameter = SQLcmd.Parameters.Add("@P087", SqlDbType.Int)                 '表示順23
+                Dim PARA088 As SqlParameter = SQLcmd.Parameters.Add("@P088", SqlDbType.NVarChar, 4)         '情報出力ID24
+                Dim PARA089 As SqlParameter = SQLcmd.Parameters.Add("@P089", SqlDbType.NVarChar, 1)         '表示フラグ24
+                Dim PARA090 As SqlParameter = SQLcmd.Parameters.Add("@P090", SqlDbType.Int)                 '表示順24
+                Dim PARA091 As SqlParameter = SQLcmd.Parameters.Add("@P091", SqlDbType.NVarChar, 4)         '情報出力ID25
+                Dim PARA092 As SqlParameter = SQLcmd.Parameters.Add("@P092", SqlDbType.NVarChar, 1)         '表示フラグ25
+                Dim PARA093 As SqlParameter = SQLcmd.Parameters.Add("@P093", SqlDbType.Int)                 '表示順25
+                Dim PARA094 As SqlParameter = SQLcmd.Parameters.Add("@P094", SqlDbType.DateTime)            '登録年月日
+                Dim PARA095 As SqlParameter = SQLcmd.Parameters.Add("@P095", SqlDbType.NVarChar, 20)        '登録ユーザーＩＤ
+                Dim PARA096 As SqlParameter = SQLcmd.Parameters.Add("@P096", SqlDbType.NVarChar, 20)        '登録端末
+                Dim PARA097 As SqlParameter = SQLcmd.Parameters.Add("@P097", SqlDbType.DateTime)            '更新年月日
+                Dim PARA098 As SqlParameter = SQLcmd.Parameters.Add("@P098", SqlDbType.NVarChar, 20)        '更新ユーザーＩＤ
+                Dim PARA099 As SqlParameter = SQLcmd.Parameters.Add("@P099", SqlDbType.NVarChar, 20)        '更新端末
+                Dim PARA100 As SqlParameter = SQLcmd.Parameters.Add("@P100", SqlDbType.DateTime)            '集信日時
+
+                Dim JPARA000 As SqlParameter = SQLcmdJnl.Parameters.Add("@P000", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim JPARA001 As SqlParameter = SQLcmdJnl.Parameters.Add("@P001", SqlDbType.NVarChar, 20)    'ユーザID
+                Dim JPARA002 As SqlParameter = SQLcmdJnl.Parameters.Add("@P002", SqlDbType.NVarChar, 20)    '社員名（短）
+                Dim JPARA003 As SqlParameter = SQLcmdJnl.Parameters.Add("@P003", SqlDbType.NVarChar, 50)    '社員名（長）
+                Dim JPARA004 As SqlParameter = SQLcmdJnl.Parameters.Add("@P004", SqlDbType.NVarChar, 20)    '画面ＩＤ
+                'Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P005", SqlDbType.NVarChar, 200)    'パスワード
+                'Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P006", SqlDbType.Int)              '誤り回数
+                'Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P007", SqlDbType.Date)             'パスワード有効期限
+                Dim JPARA008 As SqlParameter = SQLcmdJnl.Parameters.Add("@P008", SqlDbType.Date)            '開始年月日
+                Dim JPARA009 As SqlParameter = SQLcmdJnl.Parameters.Add("@P009", SqlDbType.Date)            '終了年月日
+                Dim JPARA010 As SqlParameter = SQLcmdJnl.Parameters.Add("@P010", SqlDbType.NVarChar, 2)     '会社コード
+                Dim JPARA011 As SqlParameter = SQLcmdJnl.Parameters.Add("@P011", SqlDbType.NVarChar, 6)     '組織コード
+                Dim JPARA012 As SqlParameter = SQLcmdJnl.Parameters.Add("@P012", SqlDbType.NVarChar, 128)   'メールアドレス
+                Dim JPARA013 As SqlParameter = SQLcmdJnl.Parameters.Add("@P013", SqlDbType.NVarChar, 20)    'メニュー表示制御ロール
+                Dim JPARA014 As SqlParameter = SQLcmdJnl.Parameters.Add("@P014", SqlDbType.NVarChar, 20)    '画面参照更新制御ロール
+                Dim JPARA015 As SqlParameter = SQLcmdJnl.Parameters.Add("@P015", SqlDbType.NVarChar, 20)    '画面表示項目制御ロール
+                Dim JPARA016 As SqlParameter = SQLcmdJnl.Parameters.Add("@P016", SqlDbType.NVarChar, 20)    'エクセル出力制御ロール
+                Dim JPARA017 As SqlParameter = SQLcmdJnl.Parameters.Add("@P017", SqlDbType.NVarChar, 20)    '画面初期値ロール
+                Dim JPARA018 As SqlParameter = SQLcmdJnl.Parameters.Add("@P018", SqlDbType.NVarChar, 20)    '承認権限ロール
+                Dim JPARA019 As SqlParameter = SQLcmdJnl.Parameters.Add("@P019", SqlDbType.NVarChar, 4)     '情報出力ID1
+                Dim JPARA020 As SqlParameter = SQLcmdJnl.Parameters.Add("@P020", SqlDbType.NVarChar, 1)     '表示フラグ1
+                Dim JPARA021 As SqlParameter = SQLcmdJnl.Parameters.Add("@P021", SqlDbType.Int)             '表示順1
+                Dim JPARA022 As SqlParameter = SQLcmdJnl.Parameters.Add("@P022", SqlDbType.NVarChar, 4)     '情報出力ID2
+                Dim JPARA023 As SqlParameter = SQLcmdJnl.Parameters.Add("@P023", SqlDbType.NVarChar, 1)     '表示フラグ2
+                Dim JPARA024 As SqlParameter = SQLcmdJnl.Parameters.Add("@P024", SqlDbType.Int)             '表示順2
+                Dim JPARA025 As SqlParameter = SQLcmdJnl.Parameters.Add("@P025", SqlDbType.NVarChar, 4)     '情報出力ID3
+                Dim JPARA026 As SqlParameter = SQLcmdJnl.Parameters.Add("@P026", SqlDbType.NVarChar, 1)     '表示フラグ3
+                Dim JPARA027 As SqlParameter = SQLcmdJnl.Parameters.Add("@P027", SqlDbType.Int)             '表示順3
+                Dim JPARA028 As SqlParameter = SQLcmdJnl.Parameters.Add("@P028", SqlDbType.NVarChar, 4)     '情報出力ID4
+                Dim JPARA029 As SqlParameter = SQLcmdJnl.Parameters.Add("@P029", SqlDbType.NVarChar, 1)     '表示フラグ4
+                Dim JPARA030 As SqlParameter = SQLcmdJnl.Parameters.Add("@P030", SqlDbType.Int)             '表示順4
+                Dim JPARA031 As SqlParameter = SQLcmdJnl.Parameters.Add("@P031", SqlDbType.NVarChar, 4)     '情報出力ID5
+                Dim JPARA032 As SqlParameter = SQLcmdJnl.Parameters.Add("@P032", SqlDbType.NVarChar, 1)     '表示フラグ5
+                Dim JPARA033 As SqlParameter = SQLcmdJnl.Parameters.Add("@P033", SqlDbType.Int)             '表示順5
+                Dim JPARA034 As SqlParameter = SQLcmdJnl.Parameters.Add("@P034", SqlDbType.NVarChar, 4)     '情報出力ID6
+                Dim JPARA035 As SqlParameter = SQLcmdJnl.Parameters.Add("@P035", SqlDbType.NVarChar, 1)     '表示フラグ6
+                Dim JPARA036 As SqlParameter = SQLcmdJnl.Parameters.Add("@P036", SqlDbType.Int)             '表示順6
+                Dim JPARA037 As SqlParameter = SQLcmdJnl.Parameters.Add("@P037", SqlDbType.NVarChar, 4)     '情報出力ID7
+                Dim JPARA038 As SqlParameter = SQLcmdJnl.Parameters.Add("@P038", SqlDbType.NVarChar, 1)     '表示フラグ7
+                Dim JPARA039 As SqlParameter = SQLcmdJnl.Parameters.Add("@P039", SqlDbType.Int)             '表示順7
+                Dim JPARA040 As SqlParameter = SQLcmdJnl.Parameters.Add("@P040", SqlDbType.NVarChar, 4)     '情報出力ID8
+                Dim JPARA041 As SqlParameter = SQLcmdJnl.Parameters.Add("@P041", SqlDbType.NVarChar, 1)     '表示フラグ8
+                Dim JPARA042 As SqlParameter = SQLcmdJnl.Parameters.Add("@P042", SqlDbType.Int)             '表示順8
+                Dim JPARA043 As SqlParameter = SQLcmdJnl.Parameters.Add("@P043", SqlDbType.NVarChar, 4)     '情報出力ID9
+                Dim JPARA044 As SqlParameter = SQLcmdJnl.Parameters.Add("@P044", SqlDbType.NVarChar, 1)     '表示フラグ9
+                Dim JPARA045 As SqlParameter = SQLcmdJnl.Parameters.Add("@P045", SqlDbType.Int)             '表示順9
+                Dim JPARA046 As SqlParameter = SQLcmdJnl.Parameters.Add("@P046", SqlDbType.NVarChar, 4)     '情報出力ID10
+                Dim JPARA047 As SqlParameter = SQLcmdJnl.Parameters.Add("@P047", SqlDbType.NVarChar, 1)     '表示フラグ10
+                Dim JPARA048 As SqlParameter = SQLcmdJnl.Parameters.Add("@P048", SqlDbType.Int)             '表示順10
+                Dim JPARA049 As SqlParameter = SQLcmdJnl.Parameters.Add("@P049", SqlDbType.NVarChar, 4)     '情報出力ID11
+                Dim JPARA050 As SqlParameter = SQLcmdJnl.Parameters.Add("@P050", SqlDbType.NVarChar, 1)     '表示フラグ11
+                Dim JPARA051 As SqlParameter = SQLcmdJnl.Parameters.Add("@P051", SqlDbType.Int)             '表示順11
+                Dim JPARA052 As SqlParameter = SQLcmdJnl.Parameters.Add("@P052", SqlDbType.NVarChar, 4)     '情報出力ID12
+                Dim JPARA053 As SqlParameter = SQLcmdJnl.Parameters.Add("@P053", SqlDbType.NVarChar, 1)     '表示フラグ12
+                Dim JPARA054 As SqlParameter = SQLcmdJnl.Parameters.Add("@P054", SqlDbType.Int)             '表示順12
+                Dim JPARA055 As SqlParameter = SQLcmdJnl.Parameters.Add("@P055", SqlDbType.NVarChar, 4)     '情報出力ID13
+                Dim JPARA056 As SqlParameter = SQLcmdJnl.Parameters.Add("@P056", SqlDbType.NVarChar, 1)     '表示フラグ13
+                Dim JPARA057 As SqlParameter = SQLcmdJnl.Parameters.Add("@P057", SqlDbType.Int)             '表示順13
+                Dim JPARA058 As SqlParameter = SQLcmdJnl.Parameters.Add("@P058", SqlDbType.NVarChar, 4)     '情報出力ID14
+                Dim JPARA059 As SqlParameter = SQLcmdJnl.Parameters.Add("@P059", SqlDbType.NVarChar, 1)     '表示フラグ14
+                Dim JPARA060 As SqlParameter = SQLcmdJnl.Parameters.Add("@P060", SqlDbType.Int)             '表示順14
+                Dim JPARA061 As SqlParameter = SQLcmdJnl.Parameters.Add("@P061", SqlDbType.NVarChar, 4)     '情報出力ID15
+                Dim JPARA062 As SqlParameter = SQLcmdJnl.Parameters.Add("@P062", SqlDbType.NVarChar, 1)     '表示フラグ15
+                Dim JPARA063 As SqlParameter = SQLcmdJnl.Parameters.Add("@P063", SqlDbType.Int)             '表示順15
+                Dim JPARA064 As SqlParameter = SQLcmdJnl.Parameters.Add("@P064", SqlDbType.NVarChar, 4)     '情報出力ID16
+                Dim JPARA065 As SqlParameter = SQLcmdJnl.Parameters.Add("@P065", SqlDbType.NVarChar, 1)     '表示フラグ16
+                Dim JPARA066 As SqlParameter = SQLcmdJnl.Parameters.Add("@P066", SqlDbType.Int)             '表示順16
+                Dim JPARA067 As SqlParameter = SQLcmdJnl.Parameters.Add("@P067", SqlDbType.NVarChar, 4)     '情報出力ID17
+                Dim JPARA068 As SqlParameter = SQLcmdJnl.Parameters.Add("@P068", SqlDbType.NVarChar, 1)     '表示フラグ17
+                Dim JPARA069 As SqlParameter = SQLcmdJnl.Parameters.Add("@P069", SqlDbType.Int)             '表示順17
+                Dim JPARA070 As SqlParameter = SQLcmdJnl.Parameters.Add("@P070", SqlDbType.NVarChar, 4)     '情報出力ID18
+                Dim JPARA071 As SqlParameter = SQLcmdJnl.Parameters.Add("@P071", SqlDbType.NVarChar, 1)     '表示フラグ18
+                Dim JPARA072 As SqlParameter = SQLcmdJnl.Parameters.Add("@P072", SqlDbType.Int)             '表示順18
+                Dim JPARA073 As SqlParameter = SQLcmdJnl.Parameters.Add("@P073", SqlDbType.NVarChar, 4)     '情報出力ID19
+                Dim JPARA074 As SqlParameter = SQLcmdJnl.Parameters.Add("@P074", SqlDbType.NVarChar, 1)     '表示フラグ19
+                Dim JPARA075 As SqlParameter = SQLcmdJnl.Parameters.Add("@P075", SqlDbType.Int)             '表示順19
+                Dim JPARA076 As SqlParameter = SQLcmdJnl.Parameters.Add("@P076", SqlDbType.NVarChar, 4)     '情報出力ID20
+                Dim JPARA077 As SqlParameter = SQLcmdJnl.Parameters.Add("@P077", SqlDbType.NVarChar, 1)     '表示フラグ20
+                Dim JPARA078 As SqlParameter = SQLcmdJnl.Parameters.Add("@P078", SqlDbType.Int)             '表示順20
+                Dim JPARA079 As SqlParameter = SQLcmdJnl.Parameters.Add("@P079", SqlDbType.NVarChar, 4)     '情報出力ID21
+                Dim JPARA080 As SqlParameter = SQLcmdJnl.Parameters.Add("@P080", SqlDbType.NVarChar, 1)     '表示フラグ21
+                Dim JPARA081 As SqlParameter = SQLcmdJnl.Parameters.Add("@P081", SqlDbType.Int)             '表示順21
+                Dim JPARA082 As SqlParameter = SQLcmdJnl.Parameters.Add("@P082", SqlDbType.NVarChar, 4)     '情報出力ID22
+                Dim JPARA083 As SqlParameter = SQLcmdJnl.Parameters.Add("@P083", SqlDbType.NVarChar, 1)     '表示フラグ22
+                Dim JPARA084 As SqlParameter = SQLcmdJnl.Parameters.Add("@P084", SqlDbType.Int)             '表示順22
+                Dim JPARA085 As SqlParameter = SQLcmdJnl.Parameters.Add("@P085", SqlDbType.NVarChar, 4)     '情報出力ID23
+                Dim JPARA086 As SqlParameter = SQLcmdJnl.Parameters.Add("@P086", SqlDbType.NVarChar, 1)     '表示フラグ23
+                Dim JPARA087 As SqlParameter = SQLcmdJnl.Parameters.Add("@P087", SqlDbType.Int)             '表示順23
+                Dim JPARA088 As SqlParameter = SQLcmdJnl.Parameters.Add("@P088", SqlDbType.NVarChar, 4)     '情報出力ID24
+                Dim JPARA089 As SqlParameter = SQLcmdJnl.Parameters.Add("@P089", SqlDbType.NVarChar, 1)     '表示フラグ24
+                Dim JPARA090 As SqlParameter = SQLcmdJnl.Parameters.Add("@P090", SqlDbType.Int)             '表示順24
+                Dim JPARA091 As SqlParameter = SQLcmdJnl.Parameters.Add("@P091", SqlDbType.NVarChar, 4)     '情報出力ID25
+                Dim JPARA092 As SqlParameter = SQLcmdJnl.Parameters.Add("@P092", SqlDbType.NVarChar, 1)     '表示フラグ25
+                Dim JPARA093 As SqlParameter = SQLcmdJnl.Parameters.Add("@P093", SqlDbType.Int)             '表示順25
+                Dim JPARA094 As SqlParameter = SQLcmdJnl.Parameters.Add("@P094", SqlDbType.DateTime)        '登録年月日
+                Dim JPARA095 As SqlParameter = SQLcmdJnl.Parameters.Add("@P095", SqlDbType.NVarChar, 20)    '登録ユーザーＩＤ
+                Dim JPARA096 As SqlParameter = SQLcmdJnl.Parameters.Add("@P096", SqlDbType.NVarChar, 20)    '登録端末
+                Dim JPARA097 As SqlParameter = SQLcmdJnl.Parameters.Add("@P097", SqlDbType.DateTime)        '更新年月日
+                Dim JPARA098 As SqlParameter = SQLcmdJnl.Parameters.Add("@P098", SqlDbType.NVarChar, 20)    '更新ユーザーＩＤ
+                Dim JPARA099 As SqlParameter = SQLcmdJnl.Parameters.Add("@P099", SqlDbType.NVarChar, 20)    '更新端末
+                Dim JPARA100 As SqlParameter = SQLcmdJnl.Parameters.Add("@P100", SqlDbType.DateTime)        '集信日時
+
+                Dim OIS0001row As DataRow = OIS0001INPtbl.Rows(0)
+
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA000.Value = OIS0001row("DELFLG")
+                PARA001.Value = OIS0001row("USERID")
+                PARA002.Value = OIS0001row("STAFFNAMES")
+                PARA003.Value = OIS0001row("STAFFNAMEL")
+                PARA004.Value = OIS0001row("MAPID")
+                'PARA05.Value = OIS0001row("PASSWORD")
+                'If OIS0001row("MISSCNT") <> "" Then
+                '    PARA06.Value = OIS0001row("MISSCNT")
+                'Else
+                '    PARA06.Value = "0"
+                'End If
+                'If RTrim(OIS0001row("PASSENDYMD")) <> "" Then
+                '    PARA07.Value = RTrim(OIS0001row("PASSENDYMD"))
+                'Else
+                '    PARA07.Value = C_DEFAULT_YMD
+                'End If
+                If RTrim(OIS0001row("STYMD")) <> "" Then
+                    PARA008.Value = RTrim(OIS0001row("STYMD"))
+                Else
+                    PARA008.Value = C_DEFAULT_YMD
+                End If
+                If RTrim(OIS0001row("ENDYMD")) <> "" Then
+                    PARA009.Value = RTrim(OIS0001row("ENDYMD"))
+                Else
+                    PARA009.Value = C_DEFAULT_YMD
+                End If
+                PARA010.Value = OIS0001row("CAMPCODE")
+                PARA011.Value = OIS0001row("ORG")
+                PARA012.Value = OIS0001row("EMAIL")
+                PARA013.Value = OIS0001row("MENUROLE")
+                PARA014.Value = OIS0001row("MAPROLE")
+                PARA015.Value = OIS0001row("VIEWPROFID")
+                PARA016.Value = OIS0001row("RPRTPROFID")
+                PARA017.Value = OIS0001row("VARIANT")
+                PARA018.Value = OIS0001row("APPROVALID")
+                PARA019.Value = OIS0001row("OUTPUTID1")
+                PARA020.Value = OIS0001row("ONOFF1")
+                PARA021.Value = OIS0001row("SORTNO1")
+                PARA022.Value = OIS0001row("OUTPUTID2")
+                PARA023.Value = OIS0001row("ONOFF2")
+                PARA024.Value = OIS0001row("SORTNO2")
+                PARA025.Value = OIS0001row("OUTPUTID3")
+                PARA026.Value = OIS0001row("ONOFF3")
+                PARA027.Value = OIS0001row("SORTNO3")
+                PARA028.Value = OIS0001row("OUTPUTID4")
+                PARA029.Value = OIS0001row("ONOFF4")
+                PARA030.Value = OIS0001row("SORTNO4")
+                PARA031.Value = OIS0001row("OUTPUTID5")
+                PARA032.Value = OIS0001row("ONOFF5")
+                PARA033.Value = OIS0001row("SORTNO5")
+                PARA034.Value = OIS0001row("OUTPUTID6")
+                PARA035.Value = OIS0001row("ONOFF6")
+                PARA036.Value = OIS0001row("SORTNO6")
+                PARA037.Value = OIS0001row("OUTPUTID7")
+                PARA038.Value = OIS0001row("ONOFF7")
+                PARA039.Value = OIS0001row("SORTNO7")
+                PARA040.Value = OIS0001row("OUTPUTID8")
+                PARA041.Value = OIS0001row("ONOFF8")
+                PARA042.Value = OIS0001row("SORTNO8")
+                PARA043.Value = OIS0001row("OUTPUTID9")
+                PARA044.Value = OIS0001row("ONOFF9")
+                PARA045.Value = OIS0001row("SORTNO9")
+                PARA046.Value = OIS0001row("OUTPUTID10")
+                PARA047.Value = OIS0001row("ONOFF10")
+                PARA048.Value = OIS0001row("SORTNO10")
+                PARA049.Value = OIS0001row("OUTPUTID11")
+                PARA050.Value = OIS0001row("ONOFF11")
+                PARA051.Value = OIS0001row("SORTNO11")
+                PARA052.Value = OIS0001row("OUTPUTID12")
+                PARA053.Value = OIS0001row("ONOFF12")
+                PARA054.Value = OIS0001row("SORTNO12")
+                PARA055.Value = OIS0001row("OUTPUTID13")
+                PARA056.Value = OIS0001row("ONOFF13")
+                PARA057.Value = OIS0001row("SORTNO13")
+                PARA058.Value = OIS0001row("OUTPUTID14")
+                PARA059.Value = OIS0001row("ONOFF14")
+                PARA060.Value = OIS0001row("SORTNO14")
+                PARA061.Value = OIS0001row("OUTPUTID15")
+                PARA062.Value = OIS0001row("ONOFF15")
+                PARA063.Value = OIS0001row("SORTNO15")
+                PARA064.Value = OIS0001row("OUTPUTID16")
+                PARA065.Value = OIS0001row("ONOFF16")
+                PARA066.Value = OIS0001row("SORTNO16")
+                PARA067.Value = OIS0001row("OUTPUTID17")
+                PARA068.Value = OIS0001row("ONOFF17")
+                PARA069.Value = OIS0001row("SORTNO17")
+                PARA070.Value = OIS0001row("OUTPUTID18")
+                PARA071.Value = OIS0001row("ONOFF18")
+                PARA072.Value = OIS0001row("SORTNO18")
+                PARA073.Value = OIS0001row("OUTPUTID19")
+                PARA074.Value = OIS0001row("ONOFF19")
+                PARA075.Value = OIS0001row("SORTNO19")
+                PARA076.Value = OIS0001row("OUTPUTID20")
+                PARA077.Value = OIS0001row("ONOFF20")
+                PARA078.Value = OIS0001row("SORTNO20")
+                PARA079.Value = OIS0001row("OUTPUTID21")
+                PARA080.Value = OIS0001row("ONOFF21")
+                PARA081.Value = OIS0001row("SORTNO21")
+                PARA082.Value = OIS0001row("OUTPUTID22")
+                PARA083.Value = OIS0001row("ONOFF22")
+                PARA084.Value = OIS0001row("SORTNO22")
+                PARA085.Value = OIS0001row("OUTPUTID23")
+                PARA086.Value = OIS0001row("ONOFF23")
+                PARA087.Value = OIS0001row("SORTNO23")
+                PARA088.Value = OIS0001row("OUTPUTID24")
+                PARA089.Value = OIS0001row("ONOFF24")
+                PARA090.Value = OIS0001row("SORTNO24")
+                PARA091.Value = OIS0001row("OUTPUTID25")
+                PARA092.Value = OIS0001row("ONOFF25")
+                PARA093.Value = OIS0001row("SORTNO25")
+                PARA094.Value = WW_DATENOW
+                PARA095.Value = Master.USERID
+                PARA096.Value = Master.USERTERMID
+                PARA097.Value = WW_DATENOW
+                PARA098.Value = Master.USERID
+                PARA099.Value = Master.USERTERMID
+                PARA100.Value = C_DEFAULT_YMD
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                'OIS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA000.Value = OIS0001row("DELFLG")
+                JPARA001.Value = OIS0001row("USERID")
+                JPARA002.Value = OIS0001row("STAFFNAMES")
+                JPARA003.Value = OIS0001row("STAFFNAMEL")
+                JPARA004.Value = OIS0001row("MAPID")
+                'JPARA005.Value = OIS0001row("PASSWORD")
+                'If OIS0001row("MISSCNT") <> "" Then
+                '    JPARA006.Value = OIS0001row("MISSCNT")
+                'Else
+                '    JPARA006.Value = "0"
+                'End If
+                'If RTrim(OIS0001row("PASSENDYMD")) <> "" Then
+                '    JPARA070.Value = RTrim(OIS0001row("PASSENDYMD"))
+                'Else
+                '    JPARA007.Value = C_DEFAULT_YMD
+                'End If
+                If RTrim(OIS0001row("STYMD")) <> "" Then
+                    JPARA008.Value = RTrim(OIS0001row("STYMD"))
+                Else
+                    JPARA008.Value = C_DEFAULT_YMD
+                End If
+                If RTrim(OIS0001row("ENDYMD")) <> "" Then
+                    JPARA009.Value = RTrim(OIS0001row("ENDYMD"))
+                Else
+                    JPARA009.Value = C_DEFAULT_YMD
+                End If
+                JPARA010.Value = OIS0001row("CAMPCODE")
+                JPARA011.Value = OIS0001row("ORG")
+                JPARA012.Value = OIS0001row("EMAIL")
+                JPARA013.Value = OIS0001row("MENUROLE")
+                JPARA014.Value = OIS0001row("MAPROLE")
+                JPARA015.Value = OIS0001row("VIEWPROFID")
+                JPARA016.Value = OIS0001row("RPRTPROFID")
+                JPARA017.Value = OIS0001row("VARIANT")
+                JPARA018.Value = OIS0001row("APPROVALID")
+                JPARA019.Value = OIS0001row("OUTPUTID1")
+                JPARA020.Value = OIS0001row("ONOFF1")
+                JPARA021.Value = OIS0001row("SORTNO1")
+                JPARA022.Value = OIS0001row("OUTPUTID2")
+                JPARA023.Value = OIS0001row("ONOFF2")
+                JPARA024.Value = OIS0001row("SORTNO2")
+                JPARA025.Value = OIS0001row("OUTPUTID3")
+                JPARA026.Value = OIS0001row("ONOFF3")
+                JPARA027.Value = OIS0001row("SORTNO3")
+                JPARA028.Value = OIS0001row("OUTPUTID4")
+                JPARA029.Value = OIS0001row("ONOFF4")
+                JPARA030.Value = OIS0001row("SORTNO4")
+                JPARA031.Value = OIS0001row("OUTPUTID5")
+                JPARA032.Value = OIS0001row("ONOFF5")
+                JPARA033.Value = OIS0001row("SORTNO5")
+                JPARA034.Value = OIS0001row("OUTPUTID6")
+                JPARA035.Value = OIS0001row("ONOFF6")
+                JPARA036.Value = OIS0001row("SORTNO6")
+                JPARA037.Value = OIS0001row("OUTPUTID7")
+                JPARA038.Value = OIS0001row("ONOFF7")
+                JPARA039.Value = OIS0001row("SORTNO7")
+                JPARA040.Value = OIS0001row("OUTPUTID8")
+                JPARA041.Value = OIS0001row("ONOFF8")
+                JPARA042.Value = OIS0001row("SORTNO8")
+                JPARA043.Value = OIS0001row("OUTPUTID9")
+                JPARA044.Value = OIS0001row("ONOFF9")
+                JPARA045.Value = OIS0001row("SORTNO9")
+                JPARA046.Value = OIS0001row("OUTPUTID10")
+                JPARA047.Value = OIS0001row("ONOFF10")
+                JPARA048.Value = OIS0001row("SORTNO10")
+                JPARA049.Value = OIS0001row("OUTPUTID11")
+                JPARA050.Value = OIS0001row("ONOFF11")
+                JPARA051.Value = OIS0001row("SORTNO11")
+                JPARA052.Value = OIS0001row("OUTPUTID12")
+                JPARA053.Value = OIS0001row("ONOFF12")
+                JPARA054.Value = OIS0001row("SORTNO12")
+                JPARA055.Value = OIS0001row("OUTPUTID13")
+                JPARA056.Value = OIS0001row("ONOFF13")
+                JPARA057.Value = OIS0001row("SORTNO13")
+                JPARA058.Value = OIS0001row("OUTPUTID14")
+                JPARA059.Value = OIS0001row("ONOFF14")
+                JPARA060.Value = OIS0001row("SORTNO14")
+                JPARA061.Value = OIS0001row("OUTPUTID15")
+                JPARA062.Value = OIS0001row("ONOFF15")
+                JPARA063.Value = OIS0001row("SORTNO15")
+                JPARA064.Value = OIS0001row("OUTPUTID16")
+                JPARA065.Value = OIS0001row("ONOFF16")
+                JPARA066.Value = OIS0001row("SORTNO16")
+                JPARA067.Value = OIS0001row("OUTPUTID17")
+                JPARA068.Value = OIS0001row("ONOFF17")
+                JPARA069.Value = OIS0001row("SORTNO17")
+                JPARA070.Value = OIS0001row("OUTPUTID18")
+                JPARA071.Value = OIS0001row("ONOFF18")
+                JPARA072.Value = OIS0001row("SORTNO18")
+                JPARA073.Value = OIS0001row("OUTPUTID19")
+                JPARA074.Value = OIS0001row("ONOFF19")
+                JPARA075.Value = OIS0001row("SORTNO19")
+                JPARA076.Value = OIS0001row("OUTPUTID20")
+                JPARA077.Value = OIS0001row("ONOFF20")
+                JPARA078.Value = OIS0001row("SORTNO20")
+                JPARA079.Value = OIS0001row("OUTPUTID21")
+                JPARA080.Value = OIS0001row("ONOFF21")
+                JPARA081.Value = OIS0001row("SORTNO21")
+                JPARA082.Value = OIS0001row("OUTPUTID22")
+                JPARA083.Value = OIS0001row("ONOFF22")
+                JPARA084.Value = OIS0001row("SORTNO22")
+                JPARA085.Value = OIS0001row("OUTPUTID23")
+                JPARA086.Value = OIS0001row("ONOFF23")
+                JPARA087.Value = OIS0001row("SORTNO23")
+                JPARA088.Value = OIS0001row("OUTPUTID24")
+                JPARA089.Value = OIS0001row("ONOFF24")
+                JPARA090.Value = OIS0001row("SORTNO24")
+                JPARA091.Value = OIS0001row("OUTPUTID25")
+                JPARA092.Value = OIS0001row("ONOFF25")
+                JPARA093.Value = OIS0001row("SORTNO25")
+                JPARA094.Value = WW_DATENOW
+                JPARA095.Value = Master.USERID
+                JPARA096.Value = Master.USERTERMID
+                JPARA097.Value = WW_DATENOW
+                JPARA098.Value = Master.USERID
+                JPARA099.Value = Master.USERTERMID
+                JPARA100.Value = C_DEFAULT_YMD
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIS0001UPDtbl) Then
+                        OIS0001UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIS0001UPDtbl.Clear()
+                    OIS0001UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIS0001UPDrow As DataRow In OIS0001UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIS0001C"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIS0001UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0001C UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIS0001C UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+        '○ ＤＢ更新(ユーザパスワードマスタ)
+        SQLStr =
+            "OPEN SYMMETRIC KEY loginpasskey  DECRYPTION BY CERTIFICATE certjotoil;" _
+            & " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        COM.OIS0005_USERPASS" _
+            & "    WHERE" _
+            & "        USERID       = @P001 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE COM.OIS0005_USERPASS" _
+            & "    SET" _
+            & "        DELFLG = @P000" _
+            & "        , PASSWORD = EncryptByKey(Key_GUID('loginpasskey')  , @P005)" _
+            & "        , MISSCNT = @P006" _
+            & "        , PASSENDYMD = @P007" _
+            & "        , UPDYMD = @P097" _
+            & "        , UPDUSER = @P098" _
+            & "        , UPDTERMID = @P099" _
+            & "        , RECEIVEYMD = @P100" _
+            & "    WHERE" _
+            & "        USERID       = @P001" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO COM.OIS0005_USERPASS" _
+            & "        (DELFLG" _
+            & "        , USERID" _
+            & "        , PASSWORD" _
+            & "        , MISSCNT" _
+            & "        , PASSENDYMD" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        (@P000" _
+            & "        , @P001" _
+            & "        , EncryptByKey(Key_GUID('loginpasskey')  , @P005)" _
+            & "        , @P006" _
+            & "        , @P007" _
+            & "        , @P094" _
+            & "        , @P095" _
+            & "        , @P096" _
+            & "        , @P097" _
+            & "        , @P098" _
+            & "        , @P099" _
+            & "        , @P100) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        SQLJnl =
+              " Select" _
+            & "    DELFLG" _
+            & "        , USERID" _
+            & "        , PASSWORD" _
+            & "        , MISSCNT" _
+            & "        , PASSENDYMD" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "    COM.OIS0005_USERPASS" _
+            & " WHERE" _
+            & "        USERID       = @P001"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA000 As SqlParameter = SQLcmd.Parameters.Add("@P000", SqlDbType.NVarChar, 1)         '削除フラグ
+                Dim PARA001 As SqlParameter = SQLcmd.Parameters.Add("@P001", SqlDbType.NVarChar, 20)        'ユーザID
+                'Dim PARA002 As SqlParameter = SQLcmd.Parameters.Add("@P002", SqlDbType.NVarChar, 20)        '社員名（短）
+                'Dim PARA003 As SqlParameter = SQLcmd.Parameters.Add("@P003", SqlDbType.NVarChar, 50)        '社員名（長）
+                'Dim PARA004 As SqlParameter = SQLcmd.Parameters.Add("@P004", SqlDbType.NVarChar, 20)        '画面ＩＤ
+                Dim PARA005 As SqlParameter = SQLcmd.Parameters.Add("@P005", SqlDbType.NVarChar, 200)       'パスワード
+                Dim PARA006 As SqlParameter = SQLcmd.Parameters.Add("@P006", SqlDbType.Int)                 '誤り回数
+                Dim PARA007 As SqlParameter = SQLcmd.Parameters.Add("@P007", SqlDbType.Date)                'パスワード有効期限
+                'Dim PARA008 As SqlParameter = SQLcmd.Parameters.Add("@P008", SqlDbType.Date)                '開始年月日
+                'Dim PARA009 As SqlParameter = SQLcmd.Parameters.Add("@P009", SqlDbType.Date)                '終了年月日
+                'Dim PARA010 As SqlParameter = SQLcmd.Parameters.Add("@P010", SqlDbType.NVarChar, 2)         '会社コード
+                'Dim PARA011 As SqlParameter = SQLcmd.Parameters.Add("@P011", SqlDbType.NVarChar, 6)         '組織コード
+                'Dim PARA012 As SqlParameter = SQLcmd.Parameters.Add("@P012", SqlDbType.NVarChar, 128)       'メールアドレス
+                'Dim PARA013 As SqlParameter = SQLcmd.Parameters.Add("@P013", SqlDbType.NVarChar, 20)        'メニュー表示制御ロール
+                'Dim PARA014 As SqlParameter = SQLcmd.Parameters.Add("@P014", SqlDbType.NVarChar, 20)        '画面参照更新制御ロール
+                'Dim PARA015 As SqlParameter = SQLcmd.Parameters.Add("@P015", SqlDbType.NVarChar, 20)        '画面表示項目制御ロール
+                'Dim PARA016 As SqlParameter = SQLcmd.Parameters.Add("@P016", SqlDbType.NVarChar, 20)        'エクセル出力制御ロール
+                'Dim PARA017 As SqlParameter = SQLcmd.Parameters.Add("@P017", SqlDbType.NVarChar, 20)        '画面初期値ロール
+                'Dim PARA018 As SqlParameter = SQLcmd.Parameters.Add("@P018", SqlDbType.NVarChar, 20)        '承認権限ロール
+                Dim PARA094 As SqlParameter = SQLcmd.Parameters.Add("@P094", SqlDbType.DateTime)            '登録年月日
+                Dim PARA095 As SqlParameter = SQLcmd.Parameters.Add("@P095", SqlDbType.NVarChar, 20)        '登録ユーザーＩＤ
+                Dim PARA096 As SqlParameter = SQLcmd.Parameters.Add("@P096", SqlDbType.NVarChar, 20)        '登録端末
+                Dim PARA097 As SqlParameter = SQLcmd.Parameters.Add("@P097", SqlDbType.DateTime)            '更新年月日
+                Dim PARA098 As SqlParameter = SQLcmd.Parameters.Add("@P098", SqlDbType.NVarChar, 20)        '更新ユーザーＩＤ
+                Dim PARA099 As SqlParameter = SQLcmd.Parameters.Add("@P099", SqlDbType.NVarChar, 20)        '更新端末
+                Dim PARA100 As SqlParameter = SQLcmd.Parameters.Add("@P100", SqlDbType.DateTime)            '集信日時
+
+                Dim JPARA000 As SqlParameter = SQLcmdJnl.Parameters.Add("@P000", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim JPARA001 As SqlParameter = SQLcmdJnl.Parameters.Add("@P001", SqlDbType.NVarChar, 20)    'ユーザID
+                'Dim JPARA002 As SqlParameter = SQLcmdJnl.Parameters.Add("@P002", SqlDbType.NVarChar, 20)    '社員名（短）
+                'Dim JPARA003 As SqlParameter = SQLcmdJnl.Parameters.Add("@P003", SqlDbType.NVarChar, 50)    '社員名（長）
+                'Dim JPARA004 As SqlParameter = SQLcmdJnl.Parameters.Add("@P004", SqlDbType.NVarChar, 20)    '画面ＩＤ
+                Dim JPARA005 As SqlParameter = SQLcmdJnl.Parameters.Add("@P005", SqlDbType.NVarChar, 200)   'パスワード
+                Dim JPARA006 As SqlParameter = SQLcmdJnl.Parameters.Add("@P006", SqlDbType.Int)             '誤り回数
+                Dim JPARA007 As SqlParameter = SQLcmdJnl.Parameters.Add("@P007", SqlDbType.Date)            'パスワード有効期限
+                'Dim JPARA008 As SqlParameter = SQLcmdJnl.Parameters.Add("@P008", SqlDbType.Date)            '開始年月日
+                'Dim JPARA009 As SqlParameter = SQLcmdJnl.Parameters.Add("@P009", SqlDbType.Date)            '終了年月日
+                'Dim JPARA010 As SqlParameter = SQLcmdJnl.Parameters.Add("@P010", SqlDbType.NVarChar, 2)     '会社コード
+                'Dim JPARA011 As SqlParameter = SQLcmdJnl.Parameters.Add("@P011", SqlDbType.NVarChar, 6)     '組織コード
+                'Dim JPARA012 As SqlParameter = SQLcmdJnl.Parameters.Add("@P012", SqlDbType.NVarChar, 128)   'メールアドレス
+                'Dim JPARA013 As SqlParameter = SQLcmdJnl.Parameters.Add("@P013", SqlDbType.NVarChar, 20)    'メニュー表示制御ロール
+                'Dim JPARA014 As SqlParameter = SQLcmdJnl.Parameters.Add("@P014", SqlDbType.NVarChar, 20)    '画面参照更新制御ロール
+                'Dim JPARA015 As SqlParameter = SQLcmdJnl.Parameters.Add("@P015", SqlDbType.NVarChar, 20)    '画面表示項目制御ロール
+                'Dim JPARA016 As SqlParameter = SQLcmdJnl.Parameters.Add("@P016", SqlDbType.NVarChar, 20)    'エクセル出力制御ロール
+                'Dim JPARA017 As SqlParameter = SQLcmdJnl.Parameters.Add("@P017", SqlDbType.NVarChar, 20)    '画面初期値ロール
+                'Dim JPARA018 As SqlParameter = SQLcmdJnl.Parameters.Add("@P018", SqlDbType.NVarChar, 20)    '承認権限ロール
+                Dim JPARA094 As SqlParameter = SQLcmdJnl.Parameters.Add("@P094", SqlDbType.DateTime)        '登録年月日
+                Dim JPARA095 As SqlParameter = SQLcmdJnl.Parameters.Add("@P095", SqlDbType.NVarChar, 20)    '登録ユーザーＩＤ
+                Dim JPARA096 As SqlParameter = SQLcmdJnl.Parameters.Add("@P096", SqlDbType.NVarChar, 20)    '登録端末
+                Dim JPARA097 As SqlParameter = SQLcmdJnl.Parameters.Add("@P097", SqlDbType.DateTime)        '更新年月日
+                Dim JPARA098 As SqlParameter = SQLcmdJnl.Parameters.Add("@P098", SqlDbType.NVarChar, 20)    '更新ユーザーＩＤ
+                Dim JPARA099 As SqlParameter = SQLcmdJnl.Parameters.Add("@P099", SqlDbType.NVarChar, 20)    '更新端末
+                Dim JPARA100 As SqlParameter = SQLcmdJnl.Parameters.Add("@P100", SqlDbType.DateTime)        '集信日時
+
+                Dim OIS0001row As DataRow = OIS0001INPtbl.Rows(0)
+
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA000.Value = OIS0001row("DELFLG")
+                PARA001.Value = OIS0001row("USERID")
+                'PARA002.Value = OIS0001row("STAFFNAMES")
+                'PARA003.Value = OIS0001row("STAFFNAMEL")
+                'PARA004.Value = OIS0001row("MAPID")
+                PARA005.Value = OIS0001row("PASSWORD")
+                If OIS0001row("MISSCNT") <> "" Then
+                    PARA006.Value = OIS0001row("MISSCNT")
+                Else
+                    PARA006.Value = "0"
+                End If
+                If RTrim(OIS0001row("PASSENDYMD")) <> "" Then
+                    PARA007.Value = RTrim(OIS0001row("PASSENDYMD"))
+                Else
+                    PARA007.Value = C_DEFAULT_YMD
+                End If
+                'If RTrim(OIS0001row("STYMD")) <> "" Then
+                '    PARA008.Value = RTrim(OIS0001row("STYMD"))
+                'Else
+                '    PARA008.Value = C_DEFAULT_YMD
+                'End If
+                'If RTrim(OIS0001row("ENDYMD")) <> "" Then
+                '    PARA009.Value = RTrim(OIS0001row("ENDYMD"))
+                'Else
+                '    PARA009.Value = C_DEFAULT_YMD
+                'End If
+                'PARA010.Value = OIS0001row("CAMPCODE")
+                'PARA011.Value = OIS0001row("ORG")
+                'PARA012.Value = OIS0001row("EMAIL")
+                'PARA013.Value = OIS0001row("MENUROLE")
+                'PARA014.Value = OIS0001row("MAPROLE")
+                'PARA015.Value = OIS0001row("VIEWPROFID")
+                'PARA016.Value = OIS0001row("RPRTPROFID")
+                'PARA017.Value = OIS0001row("VARIANT")
+                'PARA018.Value = OIS0001row("APPROVALID")
+                PARA094.Value = WW_DATENOW
+                PARA095.Value = Master.USERID
+                PARA096.Value = Master.USERTERMID
+                PARA097.Value = WW_DATENOW
+                PARA098.Value = Master.USERID
+                PARA099.Value = Master.USERTERMID
+                PARA100.Value = C_DEFAULT_YMD
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA000.Value = OIS0001row("DELFLG")
+                JPARA001.Value = OIS0001row("USERID")
+                'JPARA002.Value = OIS0001row("STAFFNAMES")
+                'JPARA003.Value = OIS0001row("STAFFNAMEL")
+                'JPARA004.Value = OIS0001row("MAPID")
+                JPARA005.Value = OIS0001row("PASSWORD")
+                If OIS0001row("MISSCNT") <> "" Then
+                    JPARA006.Value = OIS0001row("MISSCNT")
+                Else
+                    JPARA006.Value = "0"
+                End If
+                If RTrim(OIS0001row("PASSENDYMD")) <> "" Then
+                    JPARA007.Value = RTrim(OIS0001row("PASSENDYMD"))
+                Else
+                    JPARA007.Value = C_DEFAULT_YMD
+                End If
+                'If RTrim(OIS0001row("STYMD")) <> "" Then
+                '    JPARA008.Value = RTrim(OIS0001row("STYMD"))
+                'Else
+                '    JPARA008.Value = C_DEFAULT_YMD
+                'End If
+                'If RTrim(OIS0001row("ENDYMD")) <> "" Then
+                '    JPARA009.Value = RTrim(OIS0001row("ENDYMD"))
+                'Else
+                '    JPARA009.Value = C_DEFAULT_YMD
+                'End If
+                'JPARA010.Value = OIS0001row("CAMPCODE")
+                'JPARA011.Value = OIS0001row("ORG")
+                'JPARA012.Value = OIS0001row("EMAIL")
+                'JPARA013.Value = OIS0001row("MENUROLE")
+                'JPARA014.Value = OIS0001row("MAPROLE")
+                'JPARA015.Value = OIS0001row("VIEWPROFID")
+                'JPARA016.Value = OIS0001row("RPRTPROFID")
+                'JPARA017.Value = OIS0001row("VARIANT")
+                'JPARA018.Value = OIS0001row("APPROVALID")
+                JPARA094.Value = WW_DATENOW
+                JPARA095.Value = Master.USERID
+                JPARA096.Value = Master.USERTERMID
+                JPARA097.Value = WW_DATENOW
+                JPARA098.Value = Master.USERID
+                JPARA099.Value = Master.USERTERMID
+                JPARA100.Value = C_DEFAULT_YMD
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIS0001UPDtbl) Then
+                        OIS0001UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIS0001UPDtbl.Clear()
+                    OIS0001UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIS0001UPDrow As DataRow In OIS0001UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIS0001C"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIS0001UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS000CL UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIS000CL UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    End Sub
+
+    ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -811,7 +2015,7 @@ Public Class OIS0001UserCreate
     ' ******************************************************************************
 
     ''' <summary>
-    ''' 詳細画面-表更新ボタン押下時処理
+    ''' 詳細画面-更新ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_UPDATE_Click()
@@ -831,6 +2035,11 @@ Public Class OIS0001UserCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIS0001tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
@@ -1118,12 +2327,142 @@ Public Class OIS0001UserCreate
 
     End Sub
 
+    ''' <summary>
+    ''' 詳細画面-戻るボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_CLEAR_Click()
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIS0001INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIS0001INProw As DataRow = OIS0001INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIS0001row As DataRow In OIS0001tbl.Rows
+            ' KEY項目が等しい時
+            If OIS0001row("USERID") = OIS0001INProw("USERID") AndAlso
+                OIS0001row("STYMD") = OIS0001INProw("STYMD") Then
+                ' KEY項目以外の項目の差異をチェック
+                If OIS0001row("DELFLG") = OIS0001INProw("DELFLG") AndAlso
+                    OIS0001row("STAFFNAMES") = OIS0001INProw("STAFFNAMES") AndAlso
+                    OIS0001row("STAFFNAMEL") = OIS0001INProw("STAFFNAMEL") AndAlso
+                    OIS0001row("MAPID") = OIS0001INProw("MAPID") AndAlso
+                    OIS0001row("PASSWORD") = OIS0001INProw("PASSWORD") AndAlso
+                    OIS0001row("MISSCNT") = OIS0001INProw("MISSCNT") AndAlso
+                    OIS0001row("PASSENDYMD") = OIS0001INProw("PASSENDYMD") AndAlso
+                    OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") AndAlso
+                    OIS0001row("CAMPCODE") = OIS0001INProw("CAMPCODE") AndAlso
+                    OIS0001row("ORG") = OIS0001INProw("ORG") AndAlso
+                    OIS0001row("EMAIL") = OIS0001INProw("EMAIL") AndAlso
+                    OIS0001row("MENUROLE") = OIS0001INProw("MENUROLE") AndAlso
+                    OIS0001row("MAPROLE") = OIS0001INProw("MAPROLE") AndAlso
+                    OIS0001row("VIEWPROFID") = OIS0001INProw("VIEWPROFID") AndAlso
+                    OIS0001row("RPRTPROFID") = OIS0001INProw("RPRTPROFID") AndAlso
+                    OIS0001row("VARIANT") = OIS0001INProw("VARIANT") AndAlso
+                    OIS0001row("APPROVALID") = OIS0001INProw("APPROVALID") AndAlso
+                    OIS0001row("OUTPUTID1") = OIS0001INProw("OUTPUTID1") AndAlso
+                    OIS0001row("ONOFF1") = OIS0001INProw("ONOFF1") AndAlso
+                    OIS0001row("SORTNO1") = OIS0001INProw("SORTNO1") AndAlso
+                    OIS0001row("OUTPUTID2") = OIS0001INProw("OUTPUTID2") AndAlso
+                    OIS0001row("ONOFF2") = OIS0001INProw("ONOFF2") AndAlso
+                    OIS0001row("SORTNO2") = OIS0001INProw("SORTNO2") AndAlso
+                    OIS0001row("OUTPUTID3") = OIS0001INProw("OUTPUTID3") AndAlso
+                    OIS0001row("ONOFF3") = OIS0001INProw("ONOFF3") AndAlso
+                    OIS0001row("SORTNO3") = OIS0001INProw("SORTNO3") AndAlso
+                    OIS0001row("OUTPUTID4") = OIS0001INProw("OUTPUTID4") AndAlso
+                    OIS0001row("ONOFF4") = OIS0001INProw("ONOFF4") AndAlso
+                    OIS0001row("SORTNO4") = OIS0001INProw("SORTNO4") AndAlso
+                    OIS0001row("OUTPUTID5") = OIS0001INProw("OUTPUTID5") AndAlso
+                    OIS0001row("ONOFF5") = OIS0001INProw("ONOFF5") AndAlso
+                    OIS0001row("SORTNO5") = OIS0001INProw("SORTNO5") AndAlso
+                    OIS0001row("OUTPUTID6") = OIS0001INProw("OUTPUTID6") AndAlso
+                    OIS0001row("ONOFF6") = OIS0001INProw("ONOFF6") AndAlso
+                    OIS0001row("SORTNO6") = OIS0001INProw("SORTNO6") AndAlso
+                    OIS0001row("OUTPUTID7") = OIS0001INProw("OUTPUTID7") AndAlso
+                    OIS0001row("ONOFF7") = OIS0001INProw("ONOFF7") AndAlso
+                    OIS0001row("SORTNO7") = OIS0001INProw("SORTNO7") AndAlso
+                    OIS0001row("OUTPUTID8") = OIS0001INProw("OUTPUTID8") AndAlso
+                    OIS0001row("ONOFF8") = OIS0001INProw("ONOFF8") AndAlso
+                    OIS0001row("SORTNO8") = OIS0001INProw("SORTNO8") AndAlso
+                    OIS0001row("OUTPUTID9") = OIS0001INProw("OUTPUTID9") AndAlso
+                    OIS0001row("ONOFF9") = OIS0001INProw("ONOFF9") AndAlso
+                    OIS0001row("SORTNO9") = OIS0001INProw("SORTNO9") AndAlso
+                    OIS0001row("OUTPUTID10") = OIS0001INProw("OUTPUTID10") AndAlso
+                    OIS0001row("ONOFF10") = OIS0001INProw("ONOFF10") AndAlso
+                    OIS0001row("SORTNO10") = OIS0001INProw("SORTNO10") AndAlso
+                    OIS0001row("OUTPUTID11") = OIS0001INProw("OUTPUTID11") AndAlso
+                    OIS0001row("ONOFF11") = OIS0001INProw("ONOFF11") AndAlso
+                    OIS0001row("SORTNO11") = OIS0001INProw("SORTNO11") AndAlso
+                    OIS0001row("OUTPUTID12") = OIS0001INProw("OUTPUTID12") AndAlso
+                    OIS0001row("ONOFF12") = OIS0001INProw("ONOFF12") AndAlso
+                    OIS0001row("SORTNO12") = OIS0001INProw("SORTNO12") AndAlso
+                    OIS0001row("OUTPUTID13") = OIS0001INProw("OUTPUTID13") AndAlso
+                    OIS0001row("ONOFF13") = OIS0001INProw("ONOFF13") AndAlso
+                    OIS0001row("SORTNO13") = OIS0001INProw("SORTNO13") AndAlso
+                    OIS0001row("OUTPUTID14") = OIS0001INProw("OUTPUTID14") AndAlso
+                    OIS0001row("ONOFF14") = OIS0001INProw("ONOFF14") AndAlso
+                    OIS0001row("SORTNO14") = OIS0001INProw("SORTNO14") AndAlso
+                    OIS0001row("OUTPUTID15") = OIS0001INProw("OUTPUTID15") AndAlso
+                    OIS0001row("ONOFF15") = OIS0001INProw("ONOFF15") AndAlso
+                    OIS0001row("SORTNO15") = OIS0001INProw("SORTNO15") AndAlso
+                    OIS0001row("OUTPUTID16") = OIS0001INProw("OUTPUTID16") AndAlso
+                    OIS0001row("ONOFF16") = OIS0001INProw("ONOFF16") AndAlso
+                    OIS0001row("SORTNO16") = OIS0001INProw("SORTNO16") AndAlso
+                    OIS0001row("OUTPUTID17") = OIS0001INProw("OUTPUTID17") AndAlso
+                    OIS0001row("ONOFF17") = OIS0001INProw("ONOFF17") AndAlso
+                    OIS0001row("SORTNO17") = OIS0001INProw("SORTNO17") AndAlso
+                    OIS0001row("OUTPUTID18") = OIS0001INProw("OUTPUTID18") AndAlso
+                    OIS0001row("ONOFF18") = OIS0001INProw("ONOFF18") AndAlso
+                    OIS0001row("SORTNO18") = OIS0001INProw("SORTNO18") AndAlso
+                    OIS0001row("OUTPUTID19") = OIS0001INProw("OUTPUTID19") AndAlso
+                    OIS0001row("ONOFF19") = OIS0001INProw("ONOFF19") AndAlso
+                    OIS0001row("SORTNO19") = OIS0001INProw("SORTNO19") AndAlso
+                    OIS0001row("OUTPUTID20") = OIS0001INProw("OUTPUTID20") AndAlso
+                    OIS0001row("ONOFF20") = OIS0001INProw("ONOFF20") AndAlso
+                    OIS0001row("SORTNO20") = OIS0001INProw("SORTNO20") AndAlso
+                    OIS0001row("OUTPUTID21") = OIS0001INProw("OUTPUTID21") AndAlso
+                    OIS0001row("ONOFF21") = OIS0001INProw("ONOFF21") AndAlso
+                    OIS0001row("SORTNO21") = OIS0001INProw("SORTNO21") AndAlso
+                    OIS0001row("OUTPUTID22") = OIS0001INProw("OUTPUTID22") AndAlso
+                    OIS0001row("ONOFF22") = OIS0001INProw("ONOFF22") AndAlso
+                    OIS0001row("SORTNO22") = OIS0001INProw("SORTNO22") AndAlso
+                    OIS0001row("OUTPUTID23") = OIS0001INProw("OUTPUTID23") AndAlso
+                    OIS0001row("ONOFF23") = OIS0001INProw("ONOFF23") AndAlso
+                    OIS0001row("SORTNO23") = OIS0001INProw("SORTNO23") AndAlso
+                    OIS0001row("OUTPUTID24") = OIS0001INProw("OUTPUTID24") AndAlso
+                    OIS0001row("ONOFF24") = OIS0001INProw("ONOFF24") AndAlso
+                    OIS0001row("SORTNO24") = OIS0001INProw("SORTNO24") AndAlso
+                    OIS0001row("OUTPUTID25") = OIS0001INProw("OUTPUTID25") AndAlso
+                    OIS0001row("ONOFF25") = OIS0001INProw("ONOFF25") AndAlso
+                    OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") Then
+                    ' 変更がない時は、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
 
     ''' <summary>
-    ''' 詳細画面-クリアボタン押下時処理
+    ''' 詳細画面-戻るボタン押下時、確認ダイアログOKボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_CLEAR_Click()
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -1325,7 +2664,6 @@ Public Class OIS0001UserCreate
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
@@ -1505,7 +2843,6 @@ Public Class OIS0001UserCreate
         End If
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドチェンジ時処理
@@ -1701,7 +3038,6 @@ Public Class OIS0001UserCreate
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
@@ -2271,7 +3607,6 @@ Public Class OIS0001UserCreate
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
     ''' </summary>
@@ -2300,7 +3635,6 @@ Public Class OIS0001UserCreate
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -2768,6 +4102,7 @@ Public Class OIS0001UserCreate
                 End If
 
                 '表示順n(バリデーションチェック）
+                Dim inputText As String = OIS0001INProw(fieldName_SORTNOn)
                 Master.CheckField(Master.USERCAMP, fieldName_SORTNOn, OIS0001INProw(fieldName_SORTNOn), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
                 If Not isNormal(WW_CS0024FCHECKERR) Then
                     WW_CheckMES1 = "・更新できないレコード(" & "表示順" & n.ToString() & "入力エラー)です。"
@@ -2776,6 +4111,13 @@ Public Class OIS0001UserCreate
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     Exit For
+                Else
+                    'CheckFieldで数値が前0埋めされてしまうので、数値が一致してれば元に戻す
+                    '(そうしないと既存レコードの比較がうまくいかない為)
+                    If Not inputText.Equals(OIS0001INProw(fieldName_SORTNOn)) AndAlso
+                        Long.Parse(inputText) = Long.Parse(OIS0001INProw(fieldName_SORTNOn)) Then
+                        OIS0001INProw(fieldName_SORTNOn) = inputText
+                    End If
                 End If
 
                 '重複チェック
@@ -2832,7 +4174,6 @@ Public Class OIS0001UserCreate
                     O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                 End If
             End If
-
 
             If WW_LINE_ERR = "" Then
                 If OIS0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
@@ -3004,7 +4345,6 @@ Public Class OIS0001UserCreate
 
     End Sub
 
-
     ''' <summary>
     ''' OIS0001tbl更新
     ''' </summary>
@@ -3037,11 +4377,12 @@ Public Class OIS0001UserCreate
 
             OIS0001INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIS0001row As DataRow In OIS0001tbl.Rows
+                ' KEY項目が等しい時
                 If OIS0001row("USERID") = OIS0001INProw("USERID") AndAlso
                     OIS0001row("STYMD") = OIS0001INProw("STYMD") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIS0001row("DELFLG") = OIS0001INProw("DELFLG") AndAlso
                         OIS0001row("STAFFNAMES") = OIS0001INProw("STAFFNAMES") AndAlso
                         OIS0001row("STAFFNAMEL") = OIS0001INProw("STAFFNAMEL") AndAlso
@@ -3134,12 +4475,11 @@ Public Class OIS0001UserCreate
                         OIS0001row("OUTPUTID25") = OIS0001INProw("OUTPUTID25") AndAlso
                         OIS0001row("ONOFF25") = OIS0001INProw("ONOFF25") AndAlso
                         OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") Then
-
+                        ' 変更がない時は「操作」の項目は空白にする
                         OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIS0001INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -3148,23 +4488,60 @@ Public Class OIS0001UserCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIS0001INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIS0001INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIS0001INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIS0001INProw As DataRow In OIS0001INPtbl.Rows
-            Select Case OIS0001INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIS0001INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIS0001INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIS0001INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIS0001INProw)
-            End Select
+            'Select Case OIS0001INProw("OPERATION")
+            '    Case CONST_UPDATE
+            '        TBL_UPDATE_SUB(OIS0001INProw)
+            '    Case CONST_INSERT
+            '        TBL_INSERT_SUB(OIS0001INProw)
+            '    Case CONST_PATTERNERR
+            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+            '        TBL_INSERT_SUB(OIS0001INProw)
+            '    Case C_LIST_OPERATION_CODE.ERRORED
+            '        TBL_ERR_SUB(OIS0001INProw)
+            'End Select
+            For Each OIS0001row As DataRow In OIS0001tbl.Rows
+
+                '同一レコードか判定
+                If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
+                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
+                    '画面入力テーブル項目設定
+                    OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
+                    OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIS0001INProw("UPDTIMSTP") = OIS0001row("UPDTIMSTP")
+                    OIS0001INProw("SELECT") = 0
+                    OIS0001INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIS0001row.ItemArray = OIS0001INProw.ItemArray
+                    Exit For
+                End If
+            Next
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -3218,7 +4595,6 @@ Public Class OIS0001UserCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -3245,6 +4621,7 @@ Public Class OIS0001UserCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得

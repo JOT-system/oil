@@ -1,12 +1,12 @@
 ﻿''************************************************************
 ' 組織マスタメンテ登録画面
 ' 作成日 2020/5/26
-' 更新日 2020/10/26
+' 更新日 2021/4/8
 ' 作成者 JOT杉山
-' 更新車 JOT杉山
+' 更新者 フテロ伊草
 '
-' 修正履歴:新規作成
-'         :
+' 修正履歴:2020/5/26 新規作成
+'         :2021/4/8     
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -165,6 +165,12 @@ Public Class OIM0002OrgList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -195,7 +201,6 @@ Public Class OIM0002OrgList
     ''' <remarks></remarks>
     Protected Sub GridViewInitialize()
 
-        '######### おためし ##########################
         '登録画面からの遷移の場合はテーブルから取得しない
         If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIM0002C Then
             '○ 画面表示データ取得
@@ -223,7 +228,7 @@ Public Class OIM0002OrgList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -412,7 +417,7 @@ Public Class OIM0002OrgList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -472,6 +477,9 @@ Public Class OIM0002OrgList
 
         '削除フラグ
         work.WF_SEL_SELECT.Text = "0"
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -593,7 +601,6 @@ Public Class OIM0002OrgList
         'Next
 
     End Sub
-
 
     ''' <summary>
     ''' 会社マスタ登録更新
@@ -777,7 +784,6 @@ Public Class OIM0002OrgList
 
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -836,7 +842,6 @@ Public Class OIM0002OrgList
 
     End Sub
 
-
     ''' <summary>
     ''' 終了ボタン押下時処理
     ''' </summary>
@@ -846,7 +851,6 @@ Public Class OIM0002OrgList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -880,7 +884,6 @@ Public Class OIM0002OrgList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -944,6 +947,9 @@ Public Class OIM0002OrgList
         '削除フラグ
         work.WF_SEL_SELECT.Text = OIM0002tbl.Rows(WW_LINECNT)("DELFLG")
 
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+
         '○ 状態をクリア
         For Each OIM0002row As DataRow In OIM0002tbl.Rows
             Select Case OIM0002row("OPERATION")
@@ -1001,7 +1007,6 @@ Public Class OIM0002OrgList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -1172,166 +1177,9 @@ Public Class OIM0002OrgList
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  詳細表示関連操作                                                      ***
     ' ******************************************************************************
-
-    '''' <summary>
-    '''' 詳細画面-表更新ボタン押下時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_UPDATE_Click()
-
-    '    '○ エラーレポート準備
-    '    rightview.SetErrorReport("")
-
-    '    '○ DetailBoxをINPtblへ退避
-    '    DetailBoxToOIM0002INPtbl(WW_ERR_SW)
-    '    If Not isNormal(WW_ERR_SW) Then
-    '        Exit Sub
-    '    End If
-
-    '    '○ 項目チェック
-    '    INPTableCheck(WW_ERR_SW)
-
-    '    '○ 入力値のテーブル反映
-    '    If isNormal(WW_ERR_SW) Then
-    '        OIM0002tbl_UPD()
-    '    End If
-
-    '    '○ 画面表示データ保存
-    '    Master.SaveTable(OIM0002tbl)
-
-    '    '○ 詳細画面初期化
-    '    If isNormal(WW_ERR_SW) Then
-    '        DetailBoxClear()
-    '    End If
-
-    '    '○ メッセージ表示
-    '    If WW_ERR_SW = "" Then
-    '        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
-    '    Else
-    '        If isNormal(WW_ERR_SW) Then
-    '            Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-    '        Else
-    '            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
-    '        End If
-
-
-    '    End If
-
-    '    '○画面切替設定
-    '    WF_BOXChange.Value = "headerbox"
-
-    'End Sub
-
-    '''' <summary>
-    '''' 詳細画面-テーブル退避
-    '''' </summary>
-    '''' <param name="O_RTN"></param>
-    '''' <remarks></remarks>
-    'Protected Sub DetailBoxToOIM0002INPtbl(ByRef O_RTN As String)
-
-    '    O_RTN = C_MESSAGE_NO.NORMAL
-
-    '    '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-    '    Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除
-
-    '    '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-    '    If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-    '        String.IsNullOrEmpty(WF_DELFLG.Text) Then
-    '        Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
-
-    '        CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
-    '        CS0011LOGWrite.INFPOSI = "non Detail"
-    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
-    '        CS0011LOGWrite.TEXT = "non Detail"
-    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-    '        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-
-    '        O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-    '        Exit Sub
-    '    End If
-
-    '    Master.CreateEmptyTable(OIM0002INPtbl)
-    '    Dim OIM0002INProw As DataRow = OIM0002INPtbl.NewRow
-
-    '    '○ 初期クリア
-    '    For Each OIM0002INPcol As DataColumn In OIM0002INPtbl.Columns
-    '        If IsDBNull(OIM0002INProw.Item(OIM0002INPcol)) OrElse IsNothing(OIM0002INProw.Item(OIM0002INPcol)) Then
-    '            Select Case OIM0002INPcol.ColumnName
-    '                Case "LINECNT"
-    '                    OIM0002INProw.Item(OIM0002INPcol) = 0
-    '                Case "OPERATION"
-    '                    OIM0002INProw.Item(OIM0002INPcol) = C_LIST_OPERATION_CODE.NODATA
-    '                Case "TIMSTP"
-    '                    OIM0002INProw.Item(OIM0002INPcol) = 0
-    '                Case "SELECT"
-    '                    OIM0002INProw.Item(OIM0002INPcol) = 1
-    '                Case "HIDDEN"
-    '                    OIM0002INProw.Item(OIM0002INPcol) = 0
-    '                Case Else
-    '                    OIM0002INProw.Item(OIM0002INPcol) = ""
-    '            End Select
-    '        End If
-    '    Next
-
-    '    'LINECNT
-    '    If WF_Sel_LINECNT.Text = "" Then
-    '        OIM0002INProw("LINECNT") = 0
-    '    Else
-    '        Try
-    '            Integer.TryParse(WF_Sel_LINECNT.Text, OIM0002INProw("LINECNT"))
-    '        Catch ex As Exception
-    '            OIM0002INProw("LINECNT") = 0
-    '        End Try
-    '    End If
-
-    '    OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-    '    OIM0002INProw("TIMSTP") = 0
-    '    OIM0002INProw("SELECT") = 1
-    '    OIM0002INProw("HIDDEN") = 0
-
-    '    'OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
-    '    'OIM0002INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text                '組織コード
-
-    '    OIM0002INProw("DELFLG") = WF_DELFLG.Text                     '削除
-
-    '    OIM0002INProw("CAMPCODE") = TxtCampCode.Text           '会社コード
-    '    OIM0002INProw("ORGCODE") = TxtOrgCode.Text                     '組織コード
-    '    OIM0002INProw("CAMPNAME") = TxtCampName.Text            '会社名称
-    '    OIM0002INProw("CAMPNAMEKANA") = TxtCampNameKana.Text   '会社名称カナ
-    '    OIM0002INProw("TypeName") = TxtTypeName.Text                 '会社種別名称
-    '    OIM0002INProw("TYPENAMEKANA") = TxtTypeNameKana.Text         '会社種別名称カナ
-
-    '    '○ チェック用テーブルに登録する
-    '    OIM0002INPtbl.Rows.Add(OIM0002INProw)
-
-    'End Sub
-
-
-    ''' <summary>
-    ''' 詳細画面-クリアボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_CLEAR_Click()
-
-        '○ 詳細画面初期化
-        DetailBoxClear()
-
-        '○ メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-        '○画面切替設定
-        WF_BOXChange.Value = "headerbox"
-
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-
-    End Sub
 
     ''' <summary>
     ''' 詳細画面初期化
@@ -1418,113 +1266,9 @@ Public Class OIM0002OrgList
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
     ' ******************************************************************************
-
-    '''' <summary>
-    '''' LeftBox選択時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_ButtonSel_Click()
-
-    '    Dim WW_SelectValue As String = ""
-    '    Dim WW_SelectText As String = ""
-
-    '    '○ 選択内容を取得
-    '    If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-    '        WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-    '        WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-    '        WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-    '    End If
-
-    '    '○ 選択内容を画面項目へセット
-    '    If WF_FIELD_REP.Value = "" Then
-    '        Select Case WF_FIELD.Value
-    '                '会社コード
-    '            Case "CAMPCODE"
-    '                TxtCampCode.Text = WW_SelectValue
-    '                LblCampCodeText.Text = WW_SelectText
-    '                TxtCampCode.Focus()
-
-    '                '組織コード
-    '            Case "ORGCODE"
-    '                TxtOrgCode.Text = WW_SelectValue
-    '                LblOrgCodeText.Text = WW_SelectText
-    '                TxtOrgCode.Focus()
-
-    '                '会社名称
-    '            Case "CAMPNAME"
-    '                TxtCampName.Text = WW_SelectValue
-    '                LblCampNameText.Text = WW_SelectText
-    '                TxtCampName.Focus()
-
-    '                '会社名称カナ
-    '            Case "CAMPNAMEKANA"
-    '                TxtCampNameKana.Text = WW_SelectValue
-    '                LblCampNameKanaText.Text = WW_SelectText
-    '                TxtCampNameKana.Focus()
-
-    '               '削除
-    '            Case "WF_DELFLG"
-    '                WF_DELFLG.Text = WW_SelectValue
-    '                WF_DELFLG_TEXT.Text = WW_SelectText
-    '                WF_DELFLG.Focus()
-
-    '        End Select
-    '    Else
-    '    End If
-
-    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-    '    WF_FIELD.Value = ""
-    '    WF_FIELD_REP.Value = ""
-    '    WF_LeftboxOpen.Value = ""
-    '    WF_RightboxOpen.Value = ""
-
-    'End Sub
-
-    '''' <summary>
-    '''' LeftBoxキャンセルボタン押下時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_ButtonCan_Click()
-
-    '    '○ フォーカスセット
-    '    If WF_FIELD_REP.Value = "" Then
-    '        Select Case WF_FIELD.Value
-    '                '会社コード
-    '            Case "CAMPCODE"
-    '                TxtCampCode.Focus()
-
-    '                '組織コード
-    '            Case "ORGCODE"
-    '                TxtOrgCode.Focus()
-
-    '                '会社名称
-    '            Case "CAMPNAME"
-    '                TxtCampName.Focus()
-
-    '                '会社名称カナ
-    '            Case "CAMPNAMEKANA"
-    '                TxtCampNameKana.Focus()
-
-    '            '削除
-    '            Case "WF_DELFLG"
-    '                WF_DELFLG.Focus()
-
-    '        End Select
-    '    Else
-    '    End If
-
-    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-    '    WF_FIELD.Value = ""
-    '    WF_FIELD_REP.Value = ""
-    '    WF_LeftboxOpen.Value = ""
-    '    WF_RightboxOpen.Value = ""
-
-    'End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -1554,7 +1298,6 @@ Public Class OIM0002OrgList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1711,6 +1454,7 @@ Public Class OIM0002OrgList
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
+
     ''' <summary>
     ''' 遷移先(登録画面)退避データ保存先の作成
     ''' </summary>
@@ -1849,7 +1593,6 @@ Public Class OIM0002OrgList
         OIM0002tbl.Rows.Add(OIM0002row)
 
     End Sub
-
 
     ''' <summary>
     ''' エラーデータの一覧登録時処理

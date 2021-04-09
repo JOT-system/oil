@@ -170,6 +170,12 @@ Public Class OIS0001UserList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -805,6 +811,9 @@ Public Class OIS0001UserList
 
         '削除
         work.WF_SEL_DELFLG.Text = "0"
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -2181,7 +2190,6 @@ Public Class OIS0001UserList
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -2240,7 +2248,6 @@ Public Class OIS0001UserList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -2250,7 +2257,6 @@ Public Class OIS0001UserList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -2284,7 +2290,6 @@ Public Class OIS0001UserList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -2597,6 +2602,9 @@ Public Class OIS0001UserList
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIS0001tbl.Rows(WW_LINECNT)("DELFLG")
 
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+
         '○ 状態をクリア
         For Each OIS0001row As DataRow In OIS0001tbl.Rows
             Select Case OIS0001row("OPERATION")
@@ -2653,7 +2661,6 @@ Public Class OIS0001UserList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -3364,7 +3371,6 @@ Public Class OIS0001UserList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***

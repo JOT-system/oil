@@ -520,6 +520,11 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.PAYMENT), '')                 AS PAYMENT" _
             & " , ISNULL(RTRIM(OIT0002.PAYMENTTAX), '')              AS PAYMENTTAX" _
             & " , ISNULL(RTRIM(OIT0002.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
+            & " , ISNULL(RTRIM(OIT0002.OTSENDSTATUS), '')            AS OTSENDSTATUS" _
+            & " , CASE" _
+            & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS OTSENDSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
@@ -543,6 +548,13 @@ Public Class OIT0003OrderList
             & "    AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
             & "    AND OIM0029.KEYCODE04 = OIT0002.TRAINNAME "
         '### 20210405 END   受注一覧のソート順対応 #########################################
+
+        '### 20210409 START OT発送日報送信状況順対応 #######################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_3 ON " _
+            & "        OIS0015_3.CLASS   = 'OTSENDSTATUS' " _
+            & "    AND OIS0015_3.KEYCODE = OIT0002.OTSENDSTATUS " _
+        '### 20210409 END   OT発送日報送信状況順対応 #######################################
 
         SQLStr &=
               " WHERE OIT0002.DELFLG     <> @P3" _

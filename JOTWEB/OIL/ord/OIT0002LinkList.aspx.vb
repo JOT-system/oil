@@ -3272,7 +3272,7 @@ Public Class OIT0002LinkList
             & "        , SHIPORDER             = @SHIPORDER            , TANKNO                  = @TANKNO" _
             & "        , DEPSTATION            = @DEPSTATION           , DEPSTATIONNAME          = @DEPSTATIONNAME" _
             & "        , ARRSTATION            = @ARRSTATION           , ARRSTATIONNAME          = @ARRSTATIONNAME" _
-            & "        , DELFLG                = @DELFLG" _
+            & "        , ACTUALDEPDATE         = @ACTUALDEPDATE        , DELFLG                  = @DELFLG" _
             & "        , UPDYMD                = @UPDYMD               , UPDUSER                 = @UPDUSER" _
             & "        , UPDTERMID             = @UPDTERMID            , RECEIVEYMD              = @RECEIVEYMD" _
             & "    WHERE" _
@@ -3453,7 +3453,12 @@ Public Class OIT0002LinkList
                     P_ARRSTATION.Value = OIT0002row("FORWARDINGARRSTATIONCODE") '着駅コード
                     P_ARRSTATIONNAME.Value = OIT0002row("FORWARDINGARRSTATION") '着駅名
 
-                    P_ACTUALDEPDATE.Value = DBNull.Value            '発日（実績）
+                    '発日（実績）
+                    If Convert.ToString(OIT0002row("LOADINGDEPDATE")) = "" Then
+                        P_ACTUALDEPDATE.Value = DBNull.Value
+                    Else
+                        P_ACTUALDEPDATE.Value = OIT0002row("LOADINGDEPDATE")
+                    End If
                     P_ACTUALARRDATE.Value = DBNull.Value            '積車着日（実績）
                     P_ACTUALACCDATE.Value = DBNull.Value            '受入日（実績）
                     P_ACTUALEMPARRDATE.Value = DBNull.Value         '空車着日（実績）
@@ -3565,6 +3570,9 @@ Public Class OIT0002LinkList
             & "        , DEPSTATION    = @DEPSTATION   , DEPSTATIONNAME = @DEPSTATIONNAME" _
             & "        , ARRSTATION    = @ARRSTATION   , ARRSTATIONNAME = @ARRSTATIONNAME" _
             & "        , OBJECTIVECODE = @OBJECTIVECODE" _
+            & "        , TOTALTANK     = @TOTALTANK    , TOTALREPAIR    = @TOTALREPAIR" _
+            & "        , TOTALMC       = @TOTALMC      , TOTALINSPECTION= @TOTALINSPECTION" _
+            & "        , TOTALALLINSPECTION = @TOTALALLINSPECTION, TOTALINDWELLING = @TOTALINDWELLING, TOTALMOVE=@TOTALMOVE" _
             & "        , UPDYMD        = @UPDYMD       , UPDUSER        = @UPDUSER" _
             & "        , UPDTERMID     = @UPDTERMID    , RECEIVEYMD     = @RECEIVEYMD" _
             & "    WHERE" _
@@ -3581,7 +3589,9 @@ Public Class OIT0002LinkList
             & "        , FAREFLG      , USEPROPRIETYFLG" _
             & "        , DEPDATE      , ARRDATE        , ACCDATE      , EMPARRDATE" _
             & "        , ACTUALDEPDATE, ACTUALARRDATE  , ACTUALACCDATE, ACTUALEMPARRDATE" _
-            & "        , TOTALTANK    , ORDERNO        , KEIJYOYMD" _
+            & "        , TOTALTANK    , TOTALREPAIR    , TOTALMC      , TOTALINSPECTION" _
+            & "        , TOTALALLINSPECTION, TOTALINDWELLING, TOTALMOVE" _
+            & "        , ORDERNO      , KEIJYOYMD" _
             & "        , SALSE        , SALSETAX       , TOTALSALSE" _
             & "        , PAYMENT      , PAYMENTTAX     , TOTALPAYMENT" _
             & "        , DELFLG       , INITYMD        , INITUSER     , INITTERMID" _
@@ -3597,7 +3607,9 @@ Public Class OIT0002LinkList
             & "        , @FAREFLG      , @USEPROPRIETYFLG" _
             & "        , @DEPDATE      , @ARRDATE        , @ACCDATE      , @EMPARRDATE" _
             & "        , @ACTUALDEPDATE, @ACTUALARRDATE  , @ACTUALACCDATE, @ACTUALEMPARRDATE" _
-            & "        , @TOTALTANK    , @ORDERNO        , @KEIJYOYMD" _
+            & "        , @TOTALTANK    , @TOTALREPAIR    , @TOTALMC      , @TOTALINSPECTION" _
+            & "        , @TOTALALLINSPECTION, @TOTALINDWELLING, @TOTALMOVE" _
+            & "        , @ORDERNO      , @KEIJYOYMD" _
             & "        , @SALSE        , @SALSETAX       , @TOTALSALSE" _
             & "        , @PAYMENT      , @PAYMENTTAX     , @TOTALPAYMENT" _
             & "        , @DELFLG       , @INITYMD        , @INITUSER     , @INITTERMID" _
@@ -3639,6 +3651,12 @@ Public Class OIT0002LinkList
             & "    , ACTUALACCDATE" _
             & "    , ACTUALEMPARRDATE" _
             & "    , TOTALTANK" _
+            & "    , TOTALREPAIR" _
+            & "    , TOTALMC" _
+            & "    , TOTALINSPECTION" _
+            & "    , TOTALALLINSPECTION" _
+            & "    , TOTALINDWELLING" _
+            & "    , TOTALMOVE" _
             & "    , ORDERNO" _
             & "    , KEIJYOYMD" _
             & "    , SALSE" _
@@ -3693,6 +3711,12 @@ Public Class OIT0002LinkList
                 Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", SqlDbType.Date)           '受入日（実績）
                 Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", SqlDbType.Date)     '空車着日（実績）
                 Dim P_TOTALTANK As SqlParameter = SQLcmd.Parameters.Add("@TOTALTANK", SqlDbType.Int)                    '合計車数
+                Dim P_TOTALREPAIR As SqlParameter = SQLcmd.Parameters.Add("@TOTALREPAIR", SqlDbType.Int)                '合計（修理）
+                Dim P_TOTALMC As SqlParameter = SQLcmd.Parameters.Add("@TOTALMC", SqlDbType.Int)                        '合計（ＭＣ）
+                Dim P_TOTALINSPECTION As SqlParameter = SQLcmd.Parameters.Add("@TOTALINSPECTION", SqlDbType.Int)        '合計（交検）
+                Dim P_TOTALALLINSPECTION As SqlParameter = SQLcmd.Parameters.Add("@TOTALALLINSPECTION", SqlDbType.Int)  '合計（全検）
+                Dim P_TOTALINDWELLING As SqlParameter = SQLcmd.Parameters.Add("@TOTALINDWELLING", SqlDbType.Int)        '合計（疎開留置）
+                Dim P_TOTALMOVE As SqlParameter = SQLcmd.Parameters.Add("@TOTALMOVE", SqlDbType.Int)                    '合計（移動）
                 Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)                   '受注№
                 Dim P_KEIJYOYMD As SqlParameter = SQLcmd.Parameters.Add("@KEIJYOYMD", SqlDbType.Date)                   '計上日
                 Dim P_SALSE As SqlParameter = SQLcmd.Parameters.Add("@SALSE", SqlDbType.Int)                            '売上金額
@@ -3814,7 +3838,22 @@ Public Class OIT0002LinkList
                     P_ACTUALARRDATE.Value = DBNull.Value                '積車着日（実績）
                     P_ACTUALACCDATE.Value = DBNull.Value                '受入日（実績）
                     P_ACTUALEMPARRDATE.Value = DBNull.Value             '空車着日（実績）
-                    P_TOTALTANK.Value = 0                               '合計車数
+
+                    '合計車数
+                    P_TOTALTANK.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>''").Count
+                    '合計（修理）
+                    P_TOTALREPAIR.Value = 0
+                    '合計（ＭＣ）
+                    P_TOTALMC.Value = 0
+                    '合計（交検）
+                    P_TOTALINSPECTION.Value = 0
+                    '合計（全検）
+                    P_TOTALALLINSPECTION.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(2) + "'").Count
+                    '合計（疎開留置）
+                    P_TOTALINDWELLING.Value = 0
+                    '合計（移動）
+                    P_TOTALMOVE.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(3) + "'").Count
+
                     P_ORDERNO.Value = ""                                '受注№
                     P_KEIJYOYMD.Value = DBNull.Value                    '計上日
                     P_SALSE.Value = 0                                   '売上金額

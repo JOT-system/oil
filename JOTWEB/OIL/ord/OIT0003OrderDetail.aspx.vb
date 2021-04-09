@@ -12064,6 +12064,11 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.PAYMENT), '')                 AS PAYMENT" _
             & " , ISNULL(RTRIM(OIT0002.PAYMENTTAX), '')              AS PAYMENTTAX" _
             & " , ISNULL(RTRIM(OIT0002.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
+            & " , ISNULL(RTRIM(OIT0002.OTSENDSTATUS), '')            AS OTSENDSTATUS" _
+            & " , CASE" _
+            & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS OTSENDSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
@@ -12078,8 +12083,25 @@ Public Class OIT0003OrderDetail
             & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
             & "        OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
             & "    AND OIM0007.TRAINNAME = OIT0002.TRAINNAME " _
-            & "    AND OIM0007.DEFAULTKBN = 'def' " _
-            & " WHERE OIT0002.LODDATE    >= @P2" _
+            & "    AND OIM0007.DEFAULTKBN = 'def' "
+
+        '### 20210405 START 受注一覧のソート順対応 #########################################
+        SQLStr &=
+              "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "        OIM0029.CLASS = 'ORDERLIST_SORT' " _
+            & "    AND OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "    AND OIM0029.KEYCODE04 = OIT0002.TRAINNAME "
+        '### 20210405 END   受注一覧のソート順対応 #########################################
+
+        '### 20210409 START OT発送日報送信状況順対応 #######################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_3 ON " _
+            & "        OIS0015_3.CLASS   = 'OTSENDSTATUS' " _
+            & "    AND OIS0015_3.KEYCODE = OIT0002.OTSENDSTATUS " _
+        '### 20210409 END   OT発送日報送信状況順対応 #######################################
+
+        SQLStr &=
+              " WHERE OIT0002.LODDATE    >= @P2" _
             & "   AND OIT0002.DELFLG     <> @P3"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
@@ -12109,9 +12131,18 @@ Public Class OIT0003OrderDetail
         End If
         '### 20201126 END   指摘票対応(No233)全体 ################################
 
+        '### 20210405 START 受注一覧のソート順対応 #########################################
         SQLStr &=
               " ORDER BY" _
-            & "    OIT0002.ORDERNO"
+            & "    OIT0002.OFFICECODE" _
+            & " ,  OIT0002.LODDATE" _
+            & " ,  OIM0029.KEYCODE05" _
+            & " ,  OIM0029.KEYCODE06" _
+            & " ,  OIT0002.ORDERNO"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0002.ORDERNO"
+        '### 20210405 END   受注一覧のソート順対応 #########################################
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

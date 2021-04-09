@@ -160,12 +160,6 @@ Public Class OIT0004OilStockCreate
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
-        '在庫確定ボタンの表示非表示制御
-        If {"302001", "301901"}.Contains(Master.USER_ORG) Then
-            Me.WF_ButtonFixedStock.Visible = True
-        Else
-            Me.WF_ButtonFixedStock.Visible = False
-        End If
         '○ 画面の値設定
         WW_MAPValueSet()
 
@@ -323,7 +317,18 @@ Public Class OIT0004OilStockCreate
             Else
                 leftview.WF_LeftListBox.Items.Add(New ListItem("ENEOS甲府油槽所", "20"))
             End If
+            Me.WF_ButtonFixedStock.Visible = False
+        Else
+            If dispDataObj.SalesOffice = "011402" AndAlso
+                dispDataObj.Shipper = "0005700010" AndAlso
+                {"10", "20"}.Contains(dispDataObj.Consignee) Then
+                Me.WF_ButtonFixedStock.Visible = True
+            Else
+
+                Me.WF_ButtonFixedStock.Visible = False
+            End If
         End If
+
         Dim consigneeTag As New StringBuilder
         consigneeTag.AppendLine("<select id='selHeadConsignee' onchange='changeConsignee(this);'>")
         Dim itemString As String = ""

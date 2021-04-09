@@ -831,6 +831,10 @@ Public Module Messages
         ''' ファイル送信成功
         ''' </summary>
         Public Const FILE_EXPORT_SUCCESSFUL As String = "20107"
+        ''' <summary>
+        ''' 受注データ存在
+        ''' </summary>
+        Public Const OIL_ORDER_FOUND_WAR As String = "20108"
 
 
 #End Region

@@ -2204,11 +2204,15 @@ Public Structure CS0023XLSUPLOAD
             '明細行の開始
             Dim jStart As Integer = 4
             '明細行の終了
-            Dim jEnd As Integer = 23
+            Dim jEnd As Integer = 53
             For i As Integer = 0 To jEnd
                 '★受注営業所が未設定の場合はSKIP
-                If Convert.ToString(dt.Rows(i)("OFFICENAME")) = "" Then Continue For
-
+                rng = oSheet.Range("C" + jStart.ToString())
+                If rng.Text.ToString() = "" Then
+                    ExcelMemoryRelease(rng)
+                    Continue For
+                End If
+                ExcelMemoryRelease(rng)
                 dt.Rows.Add(dt.NewRow())
 
                 '○NO.
@@ -2245,7 +2249,6 @@ Public Structure CS0023XLSUPLOAD
                         sCellOffice(2) = "塩浜"
                 End Select
                 dt.Rows(i)("OFFICECODE") = sCellOffice(0)
-                dt.Rows(i)("EMPTYTURNFLG") = "1"            '"1"(空回日報取込)
 
                 '○本線列車(名称)
                 rng = oSheet.Range("D" + jStart.ToString())
@@ -2304,6 +2307,24 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("TOTALTANK") = rng.Text.ToString()
                 ExcelMemoryRelease(rng)
 
+                '★未設定の項目の初期化
+                dt.Rows(i)("ORDERNO") = ""
+                dt.Rows(i)("TRAINNO") = ""
+                dt.Rows(i)("SHIPPERSCODE") = ""
+                dt.Rows(i)("SHIPPERSNAME") = ""
+                dt.Rows(i)("BASECODE") = ""
+                dt.Rows(i)("BASENAME") = ""
+                dt.Rows(i)("CONSIGNEECODE") = ""
+                dt.Rows(i)("CONSIGNEENAME") = ""
+                dt.Rows(i)("DEPSTATION") = ""
+                dt.Rows(i)("DEPSTATIONNAME") = ""
+                dt.Rows(i)("ARRSTATION") = ""
+                dt.Rows(i)("ARRSTATIONNAME") = ""
+                dt.Rows(i)("ARRDATE") = DBNull.Value
+                dt.Rows(i)("ACCDATE") = DBNull.Value
+                dt.Rows(i)("EMPARRDATE") = DBNull.Value
+                dt.Rows(i)("DELFLG") = "0"
+
                 jStart += 1
             Next
 
@@ -2328,9 +2349,22 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("TRAINNAME", Type.GetType("System.String"))
         dt.Columns.Add("OFFICECODE", Type.GetType("System.String"))
         dt.Columns.Add("OFFICENAME", Type.GetType("System.String"))
-        dt.Columns.Add("EMPTYTURNFLG", Type.GetType("System.String"))
+        dt.Columns.Add("ORDERTYPE", Type.GetType("System.String"))
+        dt.Columns.Add("SHIPPERSCODE", Type.GetType("System.String"))
+        dt.Columns.Add("SHIPPERSNAME", Type.GetType("System.String"))
+        dt.Columns.Add("BASECODE", Type.GetType("System.String"))
+        dt.Columns.Add("BASENAME", Type.GetType("System.String"))
+        dt.Columns.Add("CONSIGNEECODE", Type.GetType("System.String"))
+        dt.Columns.Add("CONSIGNEENAME", Type.GetType("System.String"))
+        dt.Columns.Add("DEPSTATION", Type.GetType("System.String"))
+        dt.Columns.Add("DEPSTATIONNAME", Type.GetType("System.String"))
+        dt.Columns.Add("ARRSTATION", Type.GetType("System.String"))
+        dt.Columns.Add("ARRSTATIONNAME", Type.GetType("System.String"))
         dt.Columns.Add("LODDATE", Type.GetType("System.String"))
         dt.Columns.Add("DEPDATE", Type.GetType("System.String"))
+        dt.Columns.Add("ARRDATE", Type.GetType("System.String"))
+        dt.Columns.Add("ACCDATE", Type.GetType("System.String"))
+        dt.Columns.Add("EMPARRDATE", Type.GetType("System.String"))
         dt.Columns.Add("RTANK", Type.GetType("System.String"))
         dt.Columns.Add("HTANK", Type.GetType("System.String"))
         dt.Columns.Add("TTANK", Type.GetType("System.String"))
@@ -2342,7 +2376,7 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("LTANK", Type.GetType("System.String"))
         dt.Columns.Add("ATANK", Type.GetType("System.String"))
         dt.Columns.Add("TOTALTANK", Type.GetType("System.String"))
-
+        dt.Columns.Add("DELFLG", Type.GetType("System.String"))
     End Sub
 #End Region
 

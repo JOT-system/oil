@@ -512,6 +512,7 @@
       <DependentUpon>OIT0009TransportAnalysis.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="OIL\com\CmnParts.vb" />
     <Compile Include="OIL\com\CsvCreate.vb" />
     <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\com\M00001MP0002CustomReport.vb" />

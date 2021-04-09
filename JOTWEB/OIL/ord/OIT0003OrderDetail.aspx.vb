@@ -20450,7 +20450,7 @@ Public Class OIT0003OrderDetail
         '　A004:２石最大チェック(DGO, DGO-3)
         Dim chkCosmoOilCode As String() = {"A001", "A002", "A003", "A004"}
         'コスモ千葉タンク件数用
-        Dim chkCosmoOilCnt As String() = {"7", "13", "11", "8"}
+        Dim chkCosmoOilCnt As String() = {"7", "13", "11", "7"}
 
         '○全体(合計)を変更
         Dim strTotal As String = "合計"
@@ -20462,123 +20462,130 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
-        '○油種の件数取得
-        Dim OilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
-            '★油種毎に車数をカウント
-            Select Case Convert.ToString(OIT0003row("CHECKOILCODE"))
-                'ハイオク
-                Case BaseDllConst.CONST_HTank
-                    OilCnt(0) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'レギュラー
-                Case BaseDllConst.CONST_RTank
-                    OilCnt(1) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                '灯油
-                Case BaseDllConst.CONST_TTank
-                    OilCnt(2) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                '軽油
-                Case BaseDllConst.CONST_KTank1
-                    OilCnt(3) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                '３号軽油
-                Case BaseDllConst.CONST_K3Tank1
-                    OilCnt(4) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'ＬＳＡ－５
-                Case BaseDllConst.CONST_ATank
-                    OilCnt(5) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'ＡＦＯ－ＳＰ
-                Case BaseDllConst.CONST_ATank2
-                    OilCnt(6) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'ＡＦＯブレンド山岳
-                Case BaseDllConst.CONST_ATank3
-                    OilCnt(7) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'ＬＳＡ－１
-                Case BaseDllConst.CONST_LTank1
-                    OilCnt(8) += Integer.Parse(OIT0003row("TANKCOUNT"))
-                'ＬＳＡ－ブレンド
-                Case BaseDllConst.CONST_LTank2
-                    OilCnt(9) += Integer.Parse(OIT0003row("TANKCOUNT"))
-            End Select
+        Dim chkLine As String = ""
+        Dim cpOIT0003WKtbl As DataTable = OIT0003WKtbl.Copy()
+        For Each OIT0003chkrow As DataRow In cpOIT0003WKtbl.Rows
+            If chkLine <> "" AndAlso chkLine = OIT0003chkrow("LINE") Then Continue For
+            chkLine = OIT0003chkrow("LINE")
+
+            '○油種の件数取得
+            Dim OilCnt As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Select("LINE='" + OIT0003chkrow("LINE") + "'")
+                '★油種毎に車数をカウント
+                Select Case Convert.ToString(OIT0003row("CHECKOILCODE"))
+                    'ハイオク
+                    Case BaseDllConst.CONST_HTank
+                        OilCnt(0) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'レギュラー
+                    Case BaseDllConst.CONST_RTank
+                        OilCnt(1) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    '灯油
+                    Case BaseDllConst.CONST_TTank
+                        OilCnt(2) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    '軽油
+                    Case BaseDllConst.CONST_KTank1
+                        OilCnt(3) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    '３号軽油
+                    Case BaseDllConst.CONST_K3Tank1
+                        OilCnt(4) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'ＬＳＡ－５
+                    Case BaseDllConst.CONST_ATank
+                        OilCnt(5) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'ＡＦＯ－ＳＰ
+                    Case BaseDllConst.CONST_ATank2
+                        OilCnt(6) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'ＡＦＯブレンド山岳
+                    Case BaseDllConst.CONST_ATank3
+                        OilCnt(7) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'ＬＳＡ－１
+                    Case BaseDllConst.CONST_LTank1
+                        OilCnt(8) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                    'ＬＳＡ－ブレンド
+                    Case BaseDllConst.CONST_LTank2
+                        OilCnt(9) += Integer.Parse(OIT0003row("TANKCOUNT"))
+                End Select
+            Next
+
+            '○１石・２石・３石別最大チェック(HG, RG)
+            Dim rowHgRgShipLimit As DataRow = OIT0003WKtbl.NewRow
+            'rowDgoShipLimit("LINECNT") = ""
+            rowHgRgShipLimit("NO") = "3"
+            rowHgRgShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+            rowHgRgShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+            rowHgRgShipLimit("LINE") = OIT0003chkrow("LINE")
+            'rowHgRgShipLimit("BIGOILCODE") = ""
+            rowHgRgShipLimit("CHECKOILCODE") = chkCosmoOilCode(0)
+            'rowHgRgShipLimit("SEGMENTOILCODE") = ""
+            rowHgRgShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(HG, RG)"
+            rowHgRgShipLimit("TANKCOUNT") = OilCnt(0) + OilCnt(1)
+            'rowHgRgShipLimit("CHK_BIGOILCODE") = ""
+            rowHgRgShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(0)
+            rowHgRgShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(0)
+            rowHgRgShipLimit("JUDGE") = "0"
+
+            '積込可能車数チェックデータに追加
+            OIT0003WKtbl.Rows.Add(rowHgRgShipLimit)
+
+            '○１石・２石・３石別最大チェック(WK, DGO, DGO-3)
+            Dim rowWkDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
+            'rowDgoShipLimit("LINECNT") = ""
+            rowWkDgoShipLimit("NO") = "4"
+            rowWkDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+            rowWkDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+            rowWkDgoShipLimit("LINE") = OIT0003chkrow("LINE")
+            'rowWkDgoShipLimit("BIGOILCODE") = ""
+            rowWkDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(1)
+            'rowWkDgoShipLimit("SEGMENTOILCODE") = ""
+            rowWkDgoShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(WK, DGO, DGO-3)"
+            rowWkDgoShipLimit("TANKCOUNT") = OilCnt(2) + OilCnt(3) + OilCnt(4)
+            'rowWkDgoShipLimit("CHK_BIGOILCODE") = ""
+            rowWkDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(1)
+            rowWkDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(1)
+            rowWkDgoShipLimit("JUDGE") = "0"
+
+            '積込可能車数チェックデータに追加
+            OIT0003WKtbl.Rows.Add(rowWkDgoShipLimit)
+
+            '○２石最大チェック(WK, DGO)
+            Dim rowWkDgoShip2Limit As DataRow = OIT0003WKtbl.NewRow
+            'rowDgoShipLimit("LINECNT") = ""
+            rowWkDgoShip2Limit("NO") = "5"
+            rowWkDgoShip2Limit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+            rowWkDgoShip2Limit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+            rowWkDgoShip2Limit("LINE") = OIT0003chkrow("LINE")
+            'rowWkDgoShip2Limit("BIGOILCODE") = ""
+            rowWkDgoShip2Limit("CHECKOILCODE") = chkCosmoOilCode(2)
+            'rowWkDgoShip2Limit("SEGMENTOILCODE") = ""
+            rowWkDgoShip2Limit("CHECKOILNAME") = "２石最大チェック(WK, DGO)"
+            rowWkDgoShip2Limit("TANKCOUNT") = OilCnt(2) + OilCnt(3)
+            'rowWkDgoShip2Limit("CHK_BIGOILCODE") = ""
+            rowWkDgoShip2Limit("CHK_CHECKOILCODE") = chkCosmoOilCode(2)
+            rowWkDgoShip2Limit("CHK_TANKCOUNT") = chkCosmoOilCnt(2)
+            rowWkDgoShip2Limit("JUDGE") = "0"
+
+            '積込可能車数チェックデータに追加
+            OIT0003WKtbl.Rows.Add(rowWkDgoShip2Limit)
+
+            '○２石最大チェック(DGO)
+            Dim rowDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
+            'rowDgoShipLimit("LINECNT") = ""
+            rowDgoShipLimit("NO") = "6"
+            rowDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
+            rowDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
+            rowDgoShipLimit("LINE") = OIT0003chkrow("LINE")
+            'rowDgoShipLimit("BIGOILCODE") = ""
+            rowDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(3)
+            'rowDgoShipLimit("SEGMENTOILCODE") = ""
+            rowDgoShipLimit("CHECKOILNAME") = "２石最大チェック(DGO, DGO-3)"
+            rowDgoShipLimit("TANKCOUNT") = OilCnt(3) + OilCnt(4)
+            'rowDgoShipLimit("CHK_BIGOILCODE") = ""
+            rowDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(3)
+            rowDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(3)
+            rowDgoShipLimit("JUDGE") = "0"
+
+            '積込可能車数チェックデータに追加
+            OIT0003WKtbl.Rows.Add(rowDgoShipLimit)
         Next
-
-        '○１石・２石・３石別最大チェック(HG, RG)
-        Dim rowHgRgShipLimit As DataRow = OIT0003WKtbl.NewRow
-        'rowDgoShipLimit("LINECNT") = ""
-        rowHgRgShipLimit("NO") = "3"
-        rowHgRgShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
-        rowHgRgShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
-        'rowHgRgShipLimit("LINE") = ""
-        'rowHgRgShipLimit("BIGOILCODE") = ""
-        rowHgRgShipLimit("CHECKOILCODE") = chkCosmoOilCode(0)
-        'rowHgRgShipLimit("SEGMENTOILCODE") = ""
-        rowHgRgShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(HG, RG)"
-        rowHgRgShipLimit("TANKCOUNT") = OilCnt(0) + OilCnt(1)
-        'rowHgRgShipLimit("CHK_BIGOILCODE") = ""
-        rowHgRgShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(0)
-        rowHgRgShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(0)
-        rowHgRgShipLimit("JUDGE") = "0"
-
-        '積込可能車数チェックデータに追加
-        OIT0003WKtbl.Rows.Add(rowHgRgShipLimit)
-
-        '○１石・２石・３石別最大チェック(WK, DGO, DGO-3)
-        Dim rowWkDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
-        'rowDgoShipLimit("LINECNT") = ""
-        rowWkDgoShipLimit("NO") = "4"
-        rowWkDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
-        rowWkDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
-        'rowWkDgoShipLimit("LINE") = ""
-        'rowWkDgoShipLimit("BIGOILCODE") = ""
-        rowWkDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(1)
-        'rowWkDgoShipLimit("SEGMENTOILCODE") = ""
-        rowWkDgoShipLimit("CHECKOILNAME") = "１石・２石・３石別最大(WK, DGO, DGO-3)"
-        rowWkDgoShipLimit("TANKCOUNT") = OilCnt(2) + OilCnt(3) + OilCnt(4)
-        'rowWkDgoShipLimit("CHK_BIGOILCODE") = ""
-        rowWkDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(1)
-        rowWkDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(1)
-        rowWkDgoShipLimit("JUDGE") = "0"
-
-        '積込可能車数チェックデータに追加
-        OIT0003WKtbl.Rows.Add(rowWkDgoShipLimit)
-
-        '○２石最大チェック(WK, DGO)
-        Dim rowWkDgoShip2Limit As DataRow = OIT0003WKtbl.NewRow
-        'rowDgoShipLimit("LINECNT") = ""
-        rowWkDgoShip2Limit("NO") = "5"
-        rowWkDgoShip2Limit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
-        rowWkDgoShip2Limit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
-        'rowWkDgoShip2Limit("LINE") = ""
-        'rowWkDgoShip2Limit("BIGOILCODE") = ""
-        rowWkDgoShip2Limit("CHECKOILCODE") = chkCosmoOilCode(2)
-        'rowWkDgoShip2Limit("SEGMENTOILCODE") = ""
-        rowWkDgoShip2Limit("CHECKOILNAME") = "２石最大チェック(WK, DGO)"
-        rowWkDgoShip2Limit("TANKCOUNT") = OilCnt(2) + OilCnt(3)
-        'rowWkDgoShip2Limit("CHK_BIGOILCODE") = ""
-        rowWkDgoShip2Limit("CHK_CHECKOILCODE") = chkCosmoOilCode(2)
-        rowWkDgoShip2Limit("CHK_TANKCOUNT") = chkCosmoOilCnt(2)
-        rowWkDgoShip2Limit("JUDGE") = "0"
-
-        '積込可能車数チェックデータに追加
-        OIT0003WKtbl.Rows.Add(rowWkDgoShip2Limit)
-
-        '○２石最大チェック(DGO)
-        Dim rowDgoShipLimit As DataRow = OIT0003WKtbl.NewRow
-        'rowDgoShipLimit("LINECNT") = ""
-        rowDgoShipLimit("NO") = "6"
-        rowDgoShipLimit("PLANTCODE") = OIT0003WKtbl.Rows(0)("PLANTCODE")
-        rowDgoShipLimit("PLANTNAME") = OIT0003WKtbl.Rows(0)("PLANTNAME")
-        'rowDgoShipLimit("LINE") = ""
-        'rowDgoShipLimit("BIGOILCODE") = ""
-        rowDgoShipLimit("CHECKOILCODE") = chkCosmoOilCode(3)
-        'rowDgoShipLimit("SEGMENTOILCODE") = ""
-        rowDgoShipLimit("CHECKOILNAME") = "２石最大チェック(DGO, DGO-3)"
-        rowDgoShipLimit("TANKCOUNT") = OilCnt(3) + OilCnt(4)
-        'rowDgoShipLimit("CHK_BIGOILCODE") = ""
-        rowDgoShipLimit("CHK_CHECKOILCODE") = chkCosmoOilCode(3)
-        rowDgoShipLimit("CHK_TANKCOUNT") = chkCosmoOilCnt(3)
-        rowDgoShipLimit("JUDGE") = "0"
-
-        '積込可能車数チェックデータに追加
-        OIT0003WKtbl.Rows.Add(rowDgoShipLimit)
 
         '○車数オーバーがないかチェック
         For Each OIT0003Jderow As DataRow In OIT0003WKtbl.Rows

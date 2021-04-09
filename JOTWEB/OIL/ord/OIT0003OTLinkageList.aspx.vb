@@ -2400,7 +2400,12 @@ Public Class OIT0003OTLinkageList
                                 iTotalAmount = 0
                             End If
                             orderInf.OTOfficeName = Convert.ToString(sortedDr("OTDAILYCONSIGNEEN"))
-                            orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
+                            If Convert.ToString(sortedDr("LODDATE")).Substring(0, 6) = Convert.ToString(sortedDr("DEPDATE")).Substring(0, 6) Then
+                                orderInf.OTSendYMD = Convert.ToString(sortedDr("DEPDATE"))
+                            Else
+                                orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
+                            End If
+                            'orderInf.OTSendYMD = Convert.ToString(sortedDr("LODDATE"))
                             orderInf.OTTrainNo = Convert.ToString(sortedDr("TRAINNO"))
                             orderInf.OTShipOrder = Convert.ToString(sortedDr("SHIPORDER"))
                             orderInf.OTDepStationName = Convert.ToString(sortedDr("OTDAILYDEPSTATIONN"))
@@ -2449,7 +2454,12 @@ Public Class OIT0003OTLinkageList
                             iTotalAmount = 0
                         End If
                         orderInf.OTOfficeName = Convert.ToString(OIT0003row("OTDAILYCONSIGNEEN"))
-                        orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
+                        If Convert.ToString(OIT0003row("LODDATE")).Substring(0, 6) = Convert.ToString(OIT0003row("DEPDATE")).Substring(0, 6) Then
+                            orderInf.OTSendYMD = Convert.ToString(OIT0003row("DEPDATE"))
+                        Else
+                            orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
+                        End If
+                        'orderInf.OTSendYMD = Convert.ToString(OIT0003row("LODDATE"))
                         orderInf.OTTrainNo = Convert.ToString(OIT0003row("TRAINNO"))
                         orderInf.OTShipOrder = Convert.ToString(OIT0003row("SHIPORDER"))
                         orderInf.OTDepStationName = Convert.ToString(OIT0003row("OTDAILYDEPSTATIONN"))

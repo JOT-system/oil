@@ -838,14 +838,14 @@ Public Class OIT0004OilStockSearch
 
             Next
 
+            divUpdateInfo.Visible = True
             If {"302001"}.Contains(Master.USER_ORG) Then
                 '北信・甲府しか操作できない前提のため、他の油槽所を開放するなら要変更
                 divConsigneeUpdateInfo10.Visible = True
             ElseIf {"301901"}.Contains(Master.USER_ORG) Then
                 divConsigneeUpdateInfo20.Visible = True
-
             Else
-                divUpdateInfo.Visible = True
+
                 If {"10", "20"}.Contains(Me.WF_CONSIGNEE_CODE.Text) Then
                     divConsigneeUpdateInfo10.Visible = True
                     divConsigneeUpdateInfo20.Visible = True

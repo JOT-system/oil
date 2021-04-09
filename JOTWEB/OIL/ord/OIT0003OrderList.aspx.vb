@@ -4858,6 +4858,16 @@ Public Class OIT0003OrderList
                     & "  , OIT0003.SHIPPERSCODE" _
                     & "  , OIM0024.PRIORITYNO"
 
+            Case BaseDllConst.CONST_OFFICECODE_010402
+                '★仙台新港営業所の場合
+                SQLStrAri &=
+                      " ORDER BY" _
+                    & "    OIT0002.TRAINNO" _
+                    & "  , STACKING" _
+                    & "  , OIT0003.SHIPPERSCODE" _
+                    & "  , OIM0024.PRIORITYNO" _
+                    & "  , TANKNUMBER"
+
             Case Else
                 '★上記以外の営業所
                 '### 20201209 START OT積込指示書(翌月発送対応) #########################

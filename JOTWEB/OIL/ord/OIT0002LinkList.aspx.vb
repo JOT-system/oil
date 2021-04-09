@@ -4548,9 +4548,6 @@ Public Class OIT0002LinkList
             & "        , DEPSTATION      = @DEPSTATION   , DEPSTATIONNAME = @DEPSTATIONNAME" _
             & "        , ARRSTATION      = @ARRSTATION   , ARRSTATIONNAME = @ARRSTATIONNAME" _
             & "        , ORDERINFO       = @ORDERINFO    , STACKINGFLG    = @STACKINGFLG" _
-            & "        , LODDATE         = @LODDATE      , DEPDATE        = @DEPDATE" _
-            & "        , ARRDATE         = @ARRDATE      , ACCDATE        = @ACCDATE" _
-            & "        , EMPARRDATE      = @EMPARRDATE" _
             & "        , BTRAINNO        = @BTRAINNO     , BTRAINNAME     = @BTRAINNAME" _
             & "        , UPDYMD          = @UPDYMD       , UPDUSER        = @UPDUSER" _
             & "        , UPDTERMID       = @UPDTERMID    , RECEIVEYMD     = @RECEIVEYMD" _
@@ -4603,6 +4600,9 @@ Public Class OIT0002LinkList
             & "        , @UPDYMD       , @UPDUSER      , @UPDTERMID      , @RECEIVEYMD) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
+        '& "        , LODDATE         = @LODDATE      , DEPDATE        = @DEPDATE" _
+        '& "        , ARRDATE         = @ARRDATE      , ACCDATE        = @ACCDATE" _
+        '& "        , EMPARRDATE      = @EMPARRDATE" _
 
         '○ 更新ジャーナル出力
         Dim SQLJnl As String =

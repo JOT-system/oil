@@ -1,12 +1,12 @@
 ﻿''************************************************************
 ' 組織マスタメンテ登録画面
 ' 作成日 2020/05/26
-' 更新日 2021/04/08
+' 更新日 2021/04/09
 ' 作成者 JOT杉山
-' 更新者 フテロ伊草
+' 更新者 JOT伊草
 '
 ' 修正履歴:2020/05/26 新規作成
-'         :2021/04/08 1)表更新→更新、クリア→戻る、に名称変更
+'         :2021/04/09 1)表更新→更新、クリア→戻る、に名称変更
 '                     2)戻るボタン押下時、確認ダイアログ表示→
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)更新ボタン押下時、この画面でDB更新→
@@ -32,10 +32,6 @@ Public Class OIM0002OrgCreate
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
-
-    'Private Const CONST_PATTERN1 As String = "1"                    'モデル距離パターン　届先のみ
-    'Private Const CONST_PATTERN2 As String = "2"                    'モデル距離パターン　届先、出荷場所
-    'Private Const CONST_PATTERN3 As String = "3"                    'モデル距離パターン　出荷場所
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -310,7 +306,7 @@ Public Class OIM0002OrgCreate
     End Sub
 
     ''' <summary>
-    ''' 会社マスタ登録更新
+    ''' 組織マスタ登録更新
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
@@ -1267,7 +1263,8 @@ Public Class OIM0002OrgCreate
                         OIM0002row("NAME") = OIM0002INProw("NAME") AndAlso
                         OIM0002row("NAMES") = OIM0002INProw("NAMES") AndAlso
                         OIM0002row("NAMEKANA") = OIM0002INProw("NAMEKANA") AndAlso
-                        OIM0002row("NAMEKANAS") = OIM0002INProw("NAMEKANAS") Then
+                        OIM0002row("NAMEKANAS") = OIM0002INProw("NAMEKANAS") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0002row("OPERATION")) Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else

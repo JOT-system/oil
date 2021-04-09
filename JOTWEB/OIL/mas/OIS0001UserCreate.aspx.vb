@@ -1,12 +1,17 @@
 ﻿''************************************************************
 ' ユーザIDマスタメンテ登録画面
 ' 作成日 2019/11/14
-' 更新日 2019/11/14
+' 更新日 2021/04/09
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新車 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/14 新規作成
+'         :2021/04/09 
+'         :2021/04/09 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -4474,7 +4479,8 @@ Public Class OIS0001UserCreate
                         OIS0001row("SORTNO24") = OIS0001INProw("SORTNO24") AndAlso
                         OIS0001row("OUTPUTID25") = OIS0001INProw("OUTPUTID25") AndAlso
                         OIS0001row("ONOFF25") = OIS0001INProw("ONOFF25") AndAlso
-                        OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") Then
+                        OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIS0001row("OPERATION")) Then
                         ' 変更がない時は「操作」の項目は空白にする
                         OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else

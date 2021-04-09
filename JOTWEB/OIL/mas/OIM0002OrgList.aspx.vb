@@ -1,12 +1,13 @@
 ﻿''************************************************************
 ' 組織マスタメンテ登録画面
-' 作成日 2020/5/26
-' 更新日 2021/4/8
+' 作成日 2020/05/26
+' 更新日 2021/04/09
 ' 作成者 JOT杉山
-' 更新者 フテロ伊草
+' 更新者 JOT伊草
 '
-' 修正履歴:2020/5/26 新規作成
-'         :2021/4/8     
+' 修正履歴:2020/05/26 新規作成
+'         :2021/04/09 登録・更新画面にて更新メッセージが設定された場合
+'         :           画面下部に更新メッセージを表示するように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -1083,13 +1084,8 @@ Public Class OIM0002OrgList
                 For Each OIM0002row As DataRow In OIM0002tbl.Rows
                     If XLSTBLrow("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
                         XLSTBLrow("ORGCODE") = OIM0002row("ORGCODE") AndAlso
-                        XLSTBLrow("STYMD") = OIM0002row("STYMD") AndAlso
-                        XLSTBLrow("ENDYMD") = OIM0002row("ENDYMD") AndAlso
-                        XLSTBLrow("NAME") = OIM0002row("NAME") AndAlso
-                        XLSTBLrow("NAMES") = OIM0002row("NAMES") AndAlso
-                        XLSTBLrow("NAMEKANA") = OIM0002row("NAMEKANA") AndAlso
-                        XLSTBLrow("NAMEKANAS") = OIM0002row("NAMEKANAS") Then
-
+                        XLSTBLrow("STYMD") = OIM0002row("STYMD") Then
+                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         OIM0002INProw.ItemArray = OIM0002row.ItemArray
                         Exit For
                     End If

@@ -1,12 +1,13 @@
 ﻿''************************************************************
 ' ユーザIDマスタメンテ一覧画面
 ' 作成日 2019/11/14
-' 更新日 2019/11/14
+' 更新日 2021/04/09
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新車 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/14 新規作成
+'         :2021/04/09 登録・更新画面にて更新メッセージが設定された場合
+'         :           画面下部に更新メッセージを表示するように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -2735,94 +2736,8 @@ Public Class OIS0001UserList
                 WW_COLUMNS.IndexOf("STYMD") >= 0 Then
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
                     If XLSTBLrow("USERID") = OIS0001row("USERID") AndAlso
-                        XLSTBLrow("STAFFNAMES") = OIS0001row("STAFFNAMES") AndAlso
-                        XLSTBLrow("STAFFNAMEL") = OIS0001row("STAFFNAMEL") AndAlso
-                        XLSTBLrow("STYMD") = OIS0001row("STYMD") AndAlso
-                        XLSTBLrow("ENDYMD") = OIS0001row("ENDYMD") AndAlso
-                        XLSTBLrow("CAMPCODE") = OIS0001row("CAMPCODE") AndAlso
-                        XLSTBLrow("ORG") = OIS0001row("ORG") AndAlso
-                        XLSTBLrow("EMAIL") = OIS0001row("EMAIL") AndAlso
-                        XLSTBLrow("MENUROLE") = OIS0001row("MENUROLE") AndAlso
-                        XLSTBLrow("MAPROLE") = OIS0001row("MAPROLE") AndAlso
-                        XLSTBLrow("VIEWPROFID") = OIS0001row("VIEWPROFID") AndAlso
-                        XLSTBLrow("RPRTPROFID") = OIS0001row("RPRTPROFID") AndAlso
-                        XLSTBLrow("VARIANT") = OIS0001row("VARIANT") AndAlso
-                        XLSTBLrow("OUTPUTID1") = OIS0001row("OUTPUTID1") AndAlso
-                        XLSTBLrow("ONOFF1") = OIS0001row("ONOFF1") AndAlso
-                        XLSTBLrow("SORTNO1") = OIS0001row("SORTNO1") AndAlso
-                        XLSTBLrow("OUTPUTID2") = OIS0001row("OUTPUTID2") AndAlso
-                        XLSTBLrow("ONOFF2") = OIS0001row("ONOFF2") AndAlso
-                        XLSTBLrow("SORTNO2") = OIS0001row("SORTNO2") AndAlso
-                        XLSTBLrow("OUTPUTID3") = OIS0001row("OUTPUTID3") AndAlso
-                        XLSTBLrow("ONOFF3") = OIS0001row("ONOFF3") AndAlso
-                        XLSTBLrow("SORTNO3") = OIS0001row("SORTNO3") AndAlso
-                        XLSTBLrow("OUTPUTID4") = OIS0001row("OUTPUTID4") AndAlso
-                        XLSTBLrow("ONOFF4") = OIS0001row("ONOFF4") AndAlso
-                        XLSTBLrow("SORTNO4") = OIS0001row("SORTNO4") AndAlso
-                        XLSTBLrow("OUTPUTID5") = OIS0001row("OUTPUTID5") AndAlso
-                        XLSTBLrow("ONOFF5") = OIS0001row("ONOFF5") AndAlso
-                        XLSTBLrow("SORTNO5") = OIS0001row("SORTNO5") AndAlso
-                        XLSTBLrow("OUTPUTID6") = OIS0001row("OUTPUTID6") AndAlso
-                        XLSTBLrow("ONOFF6") = OIS0001row("ONOFF6") AndAlso
-                        XLSTBLrow("SORTNO6") = OIS0001row("SORTNO6") AndAlso
-                        XLSTBLrow("OUTPUTID7") = OIS0001row("OUTPUTID7") AndAlso
-                        XLSTBLrow("ONOFF7") = OIS0001row("ONOFF7") AndAlso
-                        XLSTBLrow("SORTNO7") = OIS0001row("SORTNO7") AndAlso
-                        XLSTBLrow("OUTPUTID8") = OIS0001row("OUTPUTID8") AndAlso
-                        XLSTBLrow("ONOFF8") = OIS0001row("ONOFF8") AndAlso
-                        XLSTBLrow("SORTNO8") = OIS0001row("SORTNO8") AndAlso
-                        XLSTBLrow("OUTPUTID9") = OIS0001row("OUTPUTID9") AndAlso
-                        XLSTBLrow("ONOFF9") = OIS0001row("ONOFF9") AndAlso
-                        XLSTBLrow("SORTNO9") = OIS0001row("SORTNO9") AndAlso
-                        XLSTBLrow("OUTPUTID10") = OIS0001row("OUTPUTID10") AndAlso
-                        XLSTBLrow("ONOFF10") = OIS0001row("ONOFF10") AndAlso
-                        XLSTBLrow("SORTNO10") = OIS0001row("SORTNO10") AndAlso
-                        XLSTBLrow("OUTPUTID11") = OIS0001row("OUTPUTID11") AndAlso
-                        XLSTBLrow("ONOFF11") = OIS0001row("ONOFF11") AndAlso
-                        XLSTBLrow("SORTNO11") = OIS0001row("SORTNO11") AndAlso
-                        XLSTBLrow("OUTPUTID12") = OIS0001row("OUTPUTID12") AndAlso
-                        XLSTBLrow("ONOFF12") = OIS0001row("ONOFF12") AndAlso
-                        XLSTBLrow("SORTNO12") = OIS0001row("SORTNO12") AndAlso
-                        XLSTBLrow("OUTPUTID13") = OIS0001row("OUTPUTID13") AndAlso
-                        XLSTBLrow("ONOFF13") = OIS0001row("ONOFF13") AndAlso
-                        XLSTBLrow("SORTNO13") = OIS0001row("SORTNO13") AndAlso
-                        XLSTBLrow("OUTPUTID14") = OIS0001row("OUTPUTID14") AndAlso
-                        XLSTBLrow("ONOFF14") = OIS0001row("ONOFF14") AndAlso
-                        XLSTBLrow("SORTNO14") = OIS0001row("SORTNO14") AndAlso
-                        XLSTBLrow("OUTPUTID15") = OIS0001row("OUTPUTID15") AndAlso
-                        XLSTBLrow("ONOFF15") = OIS0001row("ONOFF15") AndAlso
-                        XLSTBLrow("SORTNO15") = OIS0001row("SORTNO15") AndAlso
-                        XLSTBLrow("OUTPUTID16") = OIS0001row("OUTPUTID16") AndAlso
-                        XLSTBLrow("ONOFF16") = OIS0001row("ONOFF16") AndAlso
-                        XLSTBLrow("SORTNO16") = OIS0001row("SORTNO16") AndAlso
-                        XLSTBLrow("OUTPUTID17") = OIS0001row("OUTPUTID17") AndAlso
-                        XLSTBLrow("ONOFF17") = OIS0001row("ONOFF17") AndAlso
-                        XLSTBLrow("SORTNO17") = OIS0001row("SORTNO17") AndAlso
-                        XLSTBLrow("OUTPUTID18") = OIS0001row("OUTPUTID18") AndAlso
-                        XLSTBLrow("ONOFF18") = OIS0001row("ONOFF18") AndAlso
-                        XLSTBLrow("SORTNO18") = OIS0001row("SORTNO18") AndAlso
-                        XLSTBLrow("OUTPUTID19") = OIS0001row("OUTPUTID19") AndAlso
-                        XLSTBLrow("ONOFF19") = OIS0001row("ONOFF19") AndAlso
-                        XLSTBLrow("SORTNO19") = OIS0001row("SORTNO19") AndAlso
-                        XLSTBLrow("OUTPUTID20") = OIS0001row("OUTPUTID20") AndAlso
-                        XLSTBLrow("ONOFF20") = OIS0001row("ONOFF20") AndAlso
-                        XLSTBLrow("SORTNO20") = OIS0001row("SORTNO20") AndAlso
-                        XLSTBLrow("OUTPUTID21") = OIS0001row("OUTPUTID21") AndAlso
-                        XLSTBLrow("ONOFF21") = OIS0001row("ONOFF21") AndAlso
-                        XLSTBLrow("SORTNO21") = OIS0001row("SORTNO21") AndAlso
-                        XLSTBLrow("OUTPUTID22") = OIS0001row("OUTPUTID22") AndAlso
-                        XLSTBLrow("ONOFF22") = OIS0001row("ONOFF22") AndAlso
-                        XLSTBLrow("SORTNO22") = OIS0001row("SORTNO22") AndAlso
-                        XLSTBLrow("OUTPUTID23") = OIS0001row("OUTPUTID23") AndAlso
-                        XLSTBLrow("ONOFF23") = OIS0001row("ONOFF23") AndAlso
-                        XLSTBLrow("SORTNO23") = OIS0001row("SORTNO23") AndAlso
-                        XLSTBLrow("OUTPUTID24") = OIS0001row("OUTPUTID24") AndAlso
-                        XLSTBLrow("ONOFF24") = OIS0001row("ONOFF24") AndAlso
-                        XLSTBLrow("SORTNO24") = OIS0001row("SORTNO24") AndAlso
-                        XLSTBLrow("OUTPUTID25") = OIS0001row("OUTPUTID25") AndAlso
-                        XLSTBLrow("ONOFF25") = OIS0001row("ONOFF25") AndAlso
-                        XLSTBLrow("SORTNO25") = OIS0001row("SORTNO25") AndAlso
-                        XLSTBLrow("APPROVALID") = OIS0001row("APPROVALID") Then
+                        XLSTBLrow("STYMD") = OIS0001row("STYMD") Then
+                        OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         OIS0001INProw.ItemArray = OIS0001row.ItemArray
                         Exit For
                     End If

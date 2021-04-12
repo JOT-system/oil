@@ -520,6 +520,7 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.PAYMENT), '')                 AS PAYMENT" _
             & " , ISNULL(RTRIM(OIT0002.PAYMENTTAX), '')              AS PAYMENTTAX" _
             & " , ISNULL(RTRIM(OIT0002.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
+            & " , ISNULL(RTRIM(OIM0007.OTFLG), '')                   AS OTFLG" _
             & " , ISNULL(RTRIM(OIT0002.OTSENDSTATUS), '')            AS OTSENDSTATUS" _
             & " , CASE" _
             & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
@@ -1101,6 +1102,12 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = ""
+        '発送日報送信状況フラグ
+        work.WF_SEL_OTSENDSTATUS_FLG.Text = ""
+        '発送日報送信状況(名)
+        work.WF_SEL_OTSENDSTATUSNM.Text = ""
+        '発送日報送信状況(コード)
+        work.WF_SEL_OTSENDSTATUS.Text = ""
         '空回日報可否フラグ(0：未作成, 1:作成)
         work.WF_SEL_EMPTYTURNFLG.Text = "0"
         '積置可否フラグ(１：積置あり, ２：積置なし)
@@ -1577,6 +1584,12 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME"), "<[^>]*?>", "")
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
+        '発送日報送信状況フラグ
+        work.WF_SEL_OTSENDSTATUS_FLG.Text = OIT0003tbl.Rows(WW_LINECNT)("OTFLG")
+        '発送日報送信状況(名)
+        work.WF_SEL_OTSENDSTATUSNM.Text = OIT0003tbl.Rows(WW_LINECNT)("OTSENDSTATUSNAME")
+        '発送日報送信状況(コード)
+        work.WF_SEL_OTSENDSTATUS.Text = OIT0003tbl.Rows(WW_LINECNT)("OTSENDSTATUS")
         '空回日報可否フラグ
         work.WF_SEL_EMPTYTURNFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("EMPTYTURNFLG")
         '積置可否フラグ

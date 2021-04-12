@@ -7423,6 +7423,25 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonBULK_Click()
 
+        'OT発送日報対象の営業所(列車)でまだ送信していない場合
+        If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+
+            '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+            '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                   OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            Else
+                '★OT発送日報が送信されていない場合は、警告メッセージを表示
+                Master.Output(C_MESSAGE_NO.OIL_OTFILE_NOTSEND_WAR, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
+        End If
+
         '実績日付すべてを一括設定する旨をメッセージにて確認
         Master.Output(C_MESSAGE_NO.OIL_ACTUALDATE_BULKSET_MSG,
                       C_MESSAGE_TYPE.QUES,
@@ -12064,6 +12083,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.PAYMENT), '')                 AS PAYMENT" _
             & " , ISNULL(RTRIM(OIT0002.PAYMENTTAX), '')              AS PAYMENTTAX" _
             & " , ISNULL(RTRIM(OIT0002.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
+            & " , ISNULL(RTRIM(OIM0007.OTFLG), '')                   AS OTFLG" _
             & " , ISNULL(RTRIM(OIT0002.OTSENDSTATUS), '')            AS OTSENDSTATUS" _
             & " , CASE" _
             & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
@@ -15551,16 +15571,55 @@ Public Class OIT0003OrderDetail
 
             '★使用受注フラグの有無で決定
             If Me.WW_USEORDERFLG = False Then
-                '(実績)積込日
-                Me.TxtActualLoadingDate.Enabled = True
-                '(実績)発日
-                Me.TxtActualDepDate.Enabled = True
-                '(実績)積車着日
-                Me.TxtActualArrDate.Enabled = True
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = True
-                '(実績)空車着日
-                Me.TxtActualEmparrDate.Enabled = True
+                ''(実績)積込日
+                'Me.TxtActualLoadingDate.Enabled = True
+                ''(実績)発日
+                'Me.TxtActualDepDate.Enabled = True
+                ''(実績)積車着日
+                'Me.TxtActualArrDate.Enabled = True
+                ''(実績)受入日
+                'Me.TxtActualAccDate.Enabled = True
+                ''(実績)空車着日
+                'Me.TxtActualEmparrDate.Enabled = True
+
+                'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                    AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                    '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                    '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+
+                        '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                        '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                    ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                           OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+                        '★　(実績)日付を入力させない制御をする。
+                    Else
+                        '(実績)積込日
+                        Me.TxtActualLoadingDate.Enabled = False
+                        '(実績)発日
+                        Me.TxtActualDepDate.Enabled = False
+                        '(実績)積車着日
+                        Me.TxtActualArrDate.Enabled = False
+                        '(実績)受入日
+                        Me.TxtActualAccDate.Enabled = False
+                        '(実績)空車着日
+                        Me.TxtActualEmparrDate.Enabled = False
+                    End If
+                Else
+                    '(実績)積込日
+                    Me.TxtActualLoadingDate.Enabled = True
+                    '(実績)発日
+                    Me.TxtActualDepDate.Enabled = True
+                    '(実績)積車着日
+                    Me.TxtActualArrDate.Enabled = True
+                    '(実績)受入日
+                    Me.TxtActualAccDate.Enabled = True
+                    '(実績)空車着日
+                    Me.TxtActualEmparrDate.Enabled = True
+                End If
             Else
                 '(実績)積込日
                 Me.TxtActualLoadingDate.Enabled = False
@@ -15682,7 +15741,6 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
         End If
-
     End Sub
 
     ''' <summary>
@@ -22199,7 +22257,14 @@ Public Class OIT0003OrderDetail
                         ElseIf chkStackingOrderNo <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                            If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            Else
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
                         End If
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                         AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
@@ -22724,7 +22789,14 @@ Public Class OIT0003OrderDetail
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     Else
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                        If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        End If
                                     End If
                                 End If
 
@@ -22740,7 +22812,14 @@ Public Class OIT0003OrderDetail
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     Else
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                        If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        End If
                                     End If
                                 End If
 
@@ -22758,7 +22837,14 @@ Public Class OIT0003OrderDetail
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     Else
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                        If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        End If
                                     End If
                                 End If
 
@@ -22776,7 +22862,14 @@ Public Class OIT0003OrderDetail
                                     If Me.WW_USEORDERFLG = True Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     Else
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                        If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        End If
                                     End If
                                 End If
 
@@ -22898,7 +22991,28 @@ Public Class OIT0003OrderDetail
                                     If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                    If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                                        '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                            '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                                            '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                               OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        End If
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
                                 '★(実績)発日
@@ -22908,7 +23022,28 @@ Public Class OIT0003OrderDetail
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                    If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                                        '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                            '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                                            '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                               OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        End If
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性
@@ -22920,7 +23055,28 @@ Public Class OIT0003OrderDetail
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                    If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                                        '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                            '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                                            '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                               OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        End If
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性
@@ -22934,7 +23090,28 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     loopdr("ACTUALACCDATE") = ""
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                    If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                                        '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                            '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                                            '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                               OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        End If
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性
@@ -22948,7 +23125,29 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                     loopdr("ACTUALEMPARRDATE") = ""
                                 Else
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    'OT発送日報対象の営業所(列車)でまだ送信していない場合
+                                    If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
+                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
+                                        '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                            '★★★★★　甲子営業所、袖ヶ浦営業所については 5月よりOT発送日報送信を稼働するため　★★★★★
+                                            '★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
+                                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                                               OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                            '★OT発送日報が送信済の場合は、入力を許可
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                        Else
+                                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        End If
+                                    Else
+                                        '★OT発送日報が送信済の場合は、入力を許可
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
                                 ''積込可否フラグ(チェックボックス)を非活性

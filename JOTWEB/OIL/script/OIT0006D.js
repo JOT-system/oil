@@ -217,6 +217,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "KAISOUTYPENAME") {
             document.getElementById('WF_LeftMViewChange').value = 58;
         }
+        else if (fieldNM === "DEPSTATIONNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 51;
+        }
         else if (fieldNM === "ARRSTATIONNAME") {
             document.getElementById('WF_LeftMViewChange').value = 51;
         }

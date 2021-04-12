@@ -104,7 +104,20 @@ Public Class OIT0005TankLocList
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then
             Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
             work.WF_MAIN_OFFICECODE.Text = ""
-            WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE", "", WW_GetValue)
+            If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
+                '★受注着駅到着後状況
+                work.WF_COND_DETAILTYPE.Text = "9"
+                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+                WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE", "", WW_GetValue)
+            ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
+                '★回送後状況
+                work.WF_COND_DETAILTYPE.Text = "10"
+                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+                WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE_KAISOU", "", WW_GetValue)
+            Else
+                Exit Sub
+            End If
+
             For i = 0 To WW_GetValue.Length - 1
                 If WW_GetValue(i) = "" Then Continue For
 
@@ -115,17 +128,17 @@ Public Class OIT0005TankLocList
                 End If
             Next
 
-            If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
-                '★受注着駅到着後状況
-                work.WF_COND_DETAILTYPE.Text = "9"
-                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
-            ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
-                '★回送後状況
-                work.WF_COND_DETAILTYPE.Text = "10"
-                work.WF_COND_DETAILTYPENAME.Text = "その他状況"
-            Else
-                Exit Sub
-            End If
+            'If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
+            '    '★受注着駅到着後状況
+            '    work.WF_COND_DETAILTYPE.Text = "9"
+            '    work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+            'ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
+            '    '★回送後状況
+            '    work.WF_COND_DETAILTYPE.Text = "10"
+            '    work.WF_COND_DETAILTYPENAME.Text = "その他状況"
+            'Else
+            '    Exit Sub
+            'End If
 
             work.WF_MAIN_VIEWTABLE.Text = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
             work.WF_MAIN_VIEWSORT.Text = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)

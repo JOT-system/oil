@@ -306,7 +306,7 @@ Public Class OIT0006OutOfServiceList
             & " , ISNULL(RTRIM(OIT0006.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
             & " , ISNULL(RTRIM(OIT0006.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0006_KAISOU OIT0006 " _
-            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
+            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE_KAISOU VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1 " _
             & "    AND VIW0003.OFFICECODE = OIT0006.OFFICECODE " _
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_1 ON " _

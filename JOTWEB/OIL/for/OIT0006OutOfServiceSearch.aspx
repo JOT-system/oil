@@ -50,7 +50,7 @@
             <!-- 営業所 -->
             <div class="inputItem">
                 <a id="WF_OFFICECODE_LABEL">営業所</a>
-                <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
+                <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE_KAISOU%>);" onchange="TextBox_change('TxtSalesOffice');">
                     <asp:TextBox ID="TxtSalesOffice" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
                 </a>
                 <a id="WF_OFFICECODE_TEXT" >

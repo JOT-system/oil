@@ -1884,10 +1884,10 @@ Public Class OIT0006OutOfServiceDetail
             '    If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
 #End Region
 
-            'タブ「タンク車割当」 ⇒　(一覧)回送パターン, (一覧)タンク車№    , (一覧)着駅
+            'タブ「タンク車割当」 ⇒　(一覧)回送パターン, (一覧)タンク車№    , (一覧)発駅, (一覧)着駅
             '                         (一覧)交検日
             '                   　    (一覧)(実績)発送日  , (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)返送日
-            Case "KAISOUTYPENAME", "TANKNO", "ARRSTATIONNAME",
+            Case "KAISOUTYPENAME", "TANKNO", "DEPSTATIONNAME", "ARRSTATIONNAME",
                  "JRINSPECTIONDATE",
                  "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"
                 '○ LINECNT取得
@@ -1963,6 +1963,11 @@ Public Class OIT0006OutOfServiceDetail
 
                             'タンク車№に紐づく情報を取得・設定
                             WW_TANKNUMBER_FIND(updHeader, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
+                            '(一覧)発駅
+                        ElseIf WF_FIELD.Value = "DEPSTATIONNAME" Then
+                            updHeader.Item("DEPSTATION") = WW_SelectValue
+                            updHeader.Item(WF_FIELD.Value) = WW_SelectText
 
                             '(一覧)着駅
                         ElseIf WF_FIELD.Value = "ARRSTATIONNAME" Then
@@ -4049,7 +4054,7 @@ Public Class OIT0006OutOfServiceDetail
             & " , ISNULL(RTRIM(OIT0006.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
             & " , ISNULL(RTRIM(OIT0006.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0006_KAISOU OIT0006 " _
-            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
+            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE_KAISOU VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1 " _
             & "    AND VIW0003.OFFICECODE = OIT0006.OFFICECODE " _
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_1 ON " _
@@ -5980,6 +5985,14 @@ Public Class OIT0006OutOfServiceDetail
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "DEPSTATIONNAME") Then
+                        If Me.TxtKaisouOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010401 _
+                            OrElse Me.TxtKaisouOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011401 _
+                            OrElse Me.TxtKaisouOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012301 Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
@@ -6041,6 +6054,7 @@ Public Class OIT0006OutOfServiceDetail
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "KAISOUTYPENAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "DEPSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -6105,6 +6119,7 @@ Public Class OIT0006OutOfServiceDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "KAISOUTYPENAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "DEPSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -7510,9 +7525,10 @@ Public Class OIT0006OutOfServiceDetail
         '### 20200701 START((全体)No96対応) ######################################
         '★指定したタンク車№が所属営業所以外の場合
         If WW_GetValue(13) <> Me.TxtKaisouOrderOfficeCode.Text Then
-            If Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
+            If Me.TxtKaisouOrderNo.Text = "" OrElse Me.TxtKaisouOrderNo.Text <> WW_GetValue(12) Then
                 '### 20200819 START 管轄支店コード(11001(OT本社))対応 ####################
-                If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 Then
+                If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 _
+                    AndAlso WW_GetValue(14) <> Me.TxtKaisouOrderOfficeCode.Text Then
                     OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
                     CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
                     Exit Sub

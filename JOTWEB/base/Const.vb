@@ -1231,13 +1231,29 @@ Public Module BaseDllConst
     Public Const CONST_REPORTNAME_TRANSPORT_COST_DETAIL As String = "輸送費明細"
     Public Const CONST_TEMPNAME_TRANSPORT_COST_DETAIL As String = "OIT0008M_TRASPORT_COST_DETAIL.xlsx"
 
-    'タンク車輸送実績表
-    Public Const CONST_REPORTNAME_TANK_TRANSPORT_RESULT As String = "タンク車輸送実績表"
+    'タンク車運賃実績表(列車別)
+    Public Const CONST_REPORTNAME_TANK_TRANSPORT_RESULT As String = "タンク車運賃実績表"
     Public Const CONST_TEMPNAME_TANK_TRANSPORT_RESULT As String = "OIT0008M_TANK_TRASPORT_RESULT.xlsx"
+
+    'タンク車運賃実績表(列車別・仙台)
+    Public Const CONST_TEMPNAME_TANK_TRANSPORT_RESULT_010402 As String = "OIT0008M_TANK_TRASPORT_RESULT_010402.xlsx"
+
+    'タンク車運賃実績表(着駅別)
+    Public Const CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR As String = "タンク車運賃実績表（着駅別）"
+    Public Const CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR As String = "OIT0008M_TANK_TRASPORT_RESULT_ARR.xlsx"
+
+    'タンク車運賃実績表(着駅別・仙台)
+    Public Const CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR_010402 As String = "OIT0008M_TANK_TRASPORT_RESULT_ARR_010402.xlsx"
 
     '輸送実績表
     Public Const CONST_REPORTNAME_TRANSPORT_RESULT As String = "輸送実績表"
     Public Const CONST_TEMPNAME_TRANSPORT_RESULT As String = "OIT0008M_TRASPORT_RESULT.xlsx"
+
+    '輸送実績表（仙台）
+    Public Const CONST_TEMPNAME_TRANSPORT_RESULT_010402 As String = "OIT0008M_TRASPORT_RESULT_010402.xlsx"
+
+    '輸送実績表（根岸）
+    Public Const CONST_TEMPNAME_TRANSPORT_RESULT_011402 As String = "OIT0008M_TRASPORT_RESULT_011402.xlsx"
 
 #End Region
 

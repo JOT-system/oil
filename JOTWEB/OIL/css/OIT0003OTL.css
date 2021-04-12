@@ -289,22 +289,25 @@ a.ef input {
     width:50px;
 }
 .tblUpdOTList td.shipOrder {
-    width:150px;
+    width:70px;
 }
 .tblUpdOTList td.depStation {
     width:65px;
+}
+.tblUpdOTList td.arrStation {
+    width:100px;
 }
 .tblUpdOTList td.shippersName {
     width:65px;
 }
 .tblUpdOTList td.oilName {
-    width:65px;
+    width:80px;
 }
 .tblUpdOTList td.tankNo {
     width:65px;
 }
 .tblUpdOTList td.amount {
-    width:65px;
+    width:90px;
 }
 
 .tblUpdOTList th {

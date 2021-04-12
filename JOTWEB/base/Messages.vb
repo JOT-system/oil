@@ -364,6 +364,16 @@ Public Module Messages
         ''' </summary>
         Public Const FTP_EXPORT_SUCCESSFUL As String = "11007"
 
+        ''' <summary>
+        ''' 登録・更新画面での「戻る」ボタン押下時確認メッセージ
+        ''' </summary>
+        Public Const UPDATE_CANCEL_CONFIRM As String = "12001"
+
+        ''' <summary>
+        ''' 登録・更新画面での「更新」ボタン押下時の変更なしエラー
+        ''' </summary>
+        Public Const NO_CHANGE_UPDATE As String = "12002"
+
 #Region "石油向け"
         ''' <summary>
         ''' 削除フラグ未存在
@@ -823,6 +833,18 @@ Public Module Messages
         ''' OT空回日報連携データ不一致
         ''' </summary>
         Public Const OIL_EMPTYTURNDAIRYDATA_UNMATCH_ERROR As String = "20105"
+        ''' <summary>
+        ''' 受注タンク車未割当エラー
+        ''' </summary>
+        Public Const OIL_ORDERTANK_MIWARIATE_ERROR As String = "20106"
+        ''' <summary>
+        ''' ファイル送信成功
+        ''' </summary>
+        Public Const FILE_EXPORT_SUCCESSFUL As String = "20107"
+        ''' <summary>
+        ''' 受注データ存在
+        ''' </summary>
+        Public Const OIL_ORDER_FOUND_WAR As String = "20108"
 
 
 #End Region

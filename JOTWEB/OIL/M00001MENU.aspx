@@ -133,6 +133,32 @@
                                         </div>
                                     </div>
                                 </asp:Panel>
+                                <!-- タンク車運賃実績表出力 -->
+                                <asp:Panel ID="TankTransportResultCondPane" runat="server" Visible="false">
+                                    <!-- 対象期間 -->
+                                    <div style="display:inline-block; width: 100%;">
+                                        期間
+                                        <div class="termInputArea">
+                                            <span ondblclick="Field_DBclick('txtTtrStYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                                <asp:TextBox ID="txtTtrStYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                            </span>
+                                            ～
+                                            <span ondblclick="Field_DBclick('txtTtrEdYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                                <asp:TextBox ID="txtTtrEdYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                            </span>
+                                        </div>
+                                        営業所
+                                        <div class="officeSelectArea">
+                                            <asp:HiddenField ID="ddlTtrOfficeNameList_LaIdx" runat="server" Value="" />
+                                            <asp:DropDownList ID="ddlTtrOfficeNameList" runat="server" CssClass="ddlClass"></asp:DropDownList>
+                                        </div>
+                                        種別
+                                        <div class="typeSelectArea">
+                                            <asp:HiddenField ID="ddlTtrTypeList_LaIdx" runat="server" Value="" />
+                                            <asp:DropDownList ID="ddlTtrTypeList" runat="server" CssClass="ddlClass"></asp:DropDownList>
+                                        </div>
+                                    </div>
+                                </asp:Panel>
                             </div>
                         </asp:Panel>
                     </div>

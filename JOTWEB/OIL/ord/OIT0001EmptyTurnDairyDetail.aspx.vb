@@ -1068,6 +1068,13 @@ Public Class OIT0001EmptyTurnDairyDetail
             For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_LTank1 + "'")
                 WW_OilTermSearch(OIT0001row)
             Next
+
+            '○袖ヶ浦営業所の場合
+        ElseIf work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★油種の出荷期間に合致した「軽油」の種類へ変換
+            For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_KTank1 + "'")
+                WW_OilTermSearch(OIT0001row)
+            Next
         End If
 
         ''〇 1件以上の登録があった場合
@@ -3867,6 +3874,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     'OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0001row("ORDERINFO") = ""
                     OIT0001row("ORDERINFONAME") = WW_GetValue(3) + "(格上)"
                     'OIT0001row("ORDERINFONAME") = "前回揮発油(確認)"
                 End If
@@ -3905,6 +3913,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End Select
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), OIT0001row("ORDERINFONAME"), WW_DUMMY)
                 Else
+                    OIT0001row("ORDERINFO") = ""
                     OIT0001row("ORDERINFONAME") = WW_GetValue(3) + "(格下)"
                 End If
 
@@ -5735,7 +5744,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 7)  '空車着駅コード(変更後)
                 Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '空車着駅名(変更後)
                 Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 3)  '受注情報
                 Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.NVarChar, 1)  '空回日報可否フラグ
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
@@ -6201,7 +6210,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 1)   '格上可否フラグ
                 '### 20201208 START 指摘票No248対応 ############################################################
                 Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar, 1)   'テスト積み可否フラグ
-                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 3)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード
@@ -7908,6 +7917,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Else
                     WW_JRINSPECTIONFLG = "3"
                 End If
+            ElseIf work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '### 20210402 START 袖ヶ浦営業所対応 ###############################################
+                If WW_JRINSPECTIONCNT <= 1 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 2 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   袖ヶ浦営業所対応 ###############################################
             Else
                 If WW_JRINSPECTIONCNT <= 3 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7961,6 +7980,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
+            ElseIf work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '### 20210402 START 袖ヶ浦営業所対応 ###############################################
+                If WW_JRALLINSPECTIONCNT <= 1 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 2 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   袖ヶ浦営業所対応 ###############################################
             Else
                 If WW_JRALLINSPECTIONCNT <= 3 Then
                     WW_JRALLINSPECTIONFLG = "1"

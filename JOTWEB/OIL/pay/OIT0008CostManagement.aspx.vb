@@ -92,8 +92,8 @@ Public Class OIT0008CostManagement
                             WF_ButtonUPDATE_Click()
                         Case "WF_Button_DLTransportCostsDetail" ' 「輸送費明細」ボタン押下
                             WF_Button_DLTransportCostsDetail_Click()
-                        Case "WF_Button_DLTankTransportResult" ' 「タンク車輸送実績表」ボタン押下
-                            WF_Button_DLTankTransportResult_Click()
+                            'Case "WF_Button_DLTankTransportResult" ' 「タンク車輸送実績表」ボタン押下
+                            '    WF_Button_DLTankTransportResult_Click()
                             'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
                             '    WF_ButtonPrint_Click()
 
@@ -169,7 +169,7 @@ Public Class OIT0008CostManagement
         '荷主コード
         work.WF_SEL_SHIPPERSCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
         '荷主名
-        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), Label).Text
+        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), TextBox).Text
         '請求先コード
         work.WF_SEL_INVOICECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
         '請求先名
@@ -235,12 +235,20 @@ Public Class OIT0008CostManagement
         '今回表示する計上年月を保持
         work.WF_SEL_LAST_KEIJYO_YM.Text = WW_KEIJYO_YM
 
+        '初期化フラグが立っている場合はメモ欄初期化
+        If InitFlg Then
+            InitMemo()
+        End If
+
         '初期表示計上年月よりも表示計上年月が小さい場合、編集不可とする
         If CDate(work.WF_SEL_INIT_KEIJYO_YM.Text).CompareTo(CDate(work.WF_SEL_LAST_KEIJYO_YM.Text)) > 0 Then
             WW_EDITABLEFLG = False
         Else
             WW_EDITABLEFLG = True
         End If
+
+        'メモ欄
+        WF_MEMO.Enabled = WW_EDITABLEFLG
 
         'ボタン
         WF_ALLSELECT.Enabled = WW_EDITABLEFLG
@@ -257,6 +265,7 @@ Public Class OIT0008CostManagement
 
             '初期化フラグが立っている場合は初期化
             If InitFlg Then
+
                 '費用管理ワークテーブル群の初期化
                 InitTempTable(SQLcon)
 
@@ -527,7 +536,7 @@ Public Class OIT0008CostManagement
             addRow("SHIPPERSCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
 
             '荷主名(SHIPPERSNAME)
-            addRow("SHIPPERSNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), Label).Text
+            addRow("SHIPPERSNAME") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), TextBox).Text
 
             '数量(QUANTITY)
             Dim quantity As Decimal = 0
@@ -568,14 +577,19 @@ Public Class OIT0008CostManagement
             OIT0008INPtbl.Rows.Add(addRow)
         Next
 
-        '更新対象がなければ処理終了
-        If OIT0008INPtbl.Rows.Count = 0 Then Exit Sub
-
         '画面表示データをワークテーブルへ反映
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()
 
-            UpdateTempTable(SQLcon)
+            '更新対象がなければ、一時テーブルの更新は行わない
+            If Not OIT0008INPtbl.Rows.Count = 0 Then
+                UpdateTempTable(SQLcon)
+            End If
+
+            'メモ欄が編集可能なら更新
+            If WF_MEMO.Enabled = True Then
+                UpdateMemoTable(SQLcon)
+            End If
         End Using
 
     End Sub
@@ -800,6 +814,66 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
+    ''' 費用管理メモテーブルの更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    Protected Sub UpdateMemoTable(ByRef SQLcon As SqlConnection)
+
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" MERGE [oil].OIT0021_COSTMEMO AS T0021")
+        SQLStrBldr.AppendLine(" USING (")
+        SQLStrBldr.AppendLine("     SELECT")
+        SQLStrBldr.AppendLine("         @P01 AS OFFICECODE")
+        SQLStrBldr.AppendLine("         , @P02 AS KEIJYOYM")
+        SQLStrBldr.AppendLine("         , @P03 AS MEMO")
+        SQLStrBldr.AppendLine(" ) AS WKROW")
+        SQLStrBldr.AppendLine("     ON  T0021.OFFICECODE = WKROW.OFFICECODE")
+        SQLStrBldr.AppendLine("     AND T0021.KEIJYOYM   = WKROW.KEIJYOYM")
+        SQLStrBldr.AppendLine(" WHEN MATCHED")
+        SQLStrBldr.AppendLine("         THEN UPDATE")
+        SQLStrBldr.AppendLine("             SET")
+        SQLStrBldr.AppendLine("                 T0021.MEMO = WKROW.MEMO")
+        SQLStrBldr.AppendLine(" WHEN NOT MATCHED BY TARGET")
+        SQLStrBldr.AppendLine("         THEN INSERT (")
+        SQLStrBldr.AppendLine("                  OFFICECODE")
+        SQLStrBldr.AppendLine("                  , KEIJYOYM")
+        SQLStrBldr.AppendLine("                  , MEMO")
+        SQLStrBldr.AppendLine("              ) VALUES (")
+        SQLStrBldr.AppendLine("                  WKROW.OFFICECODE")
+        SQLStrBldr.AppendLine("                  , WKROW.KEIJYOYM")
+        SQLStrBldr.AppendLine("                  , WKROW.MEMO")
+        SQLStrBldr.AppendLine("              );")
+
+        Try
+            Using MergeCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim PARA3 As SqlParameter = MergeCmd.Parameters.Add("@P03", SqlDbType.NVarChar, -1)
+
+                '費用管理メモテーブルの更新
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                PARA3.Value = WF_MEMO.Text
+
+                MergeCmd.CommandTimeout = 300
+                MergeCmd.ExecuteNonQuery()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M OIT0021_COSTMEMO MERGE")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M OIT0021_COSTMEMO MERGE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' 初期化処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -991,6 +1065,67 @@ Public Class OIT0008CostManagement
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0008 SELECT OIT0019_KEIJYOYM"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' メモ欄初期化
+    ''' </summary>
+    Protected Sub InitMemo()
+
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT")
+        SQLStrBldr.AppendLine("     MEMO")
+        SQLStrBldr.AppendLine(" FROM")
+        SQLStrBldr.AppendLine("     [oil].OIT0021_COSTMEMO")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     OFFICECODE = @P01")
+        SQLStrBldr.AppendLine(" AND KEIJYOYM   = @P02")
+
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.DateTime)
+
+                    PARA1.Value = WW_OFFICECODE
+                    Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                    PARA2.Value = WK_DATE
+
+                    'SQL実行
+                    Dim WK_TBL As DataTable = New DataTable()
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            WK_TBL.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        WK_TBL.Load(SQLdr)
+                    End Using
+
+                    'メモを設定
+                    If WK_TBL.Rows.Count > 0 Then
+                        WF_MEMO.Text = WK_TBL.Rows(0)("MEMO")
+                    Else
+                        WF_MEMO.Text = ""
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008 SELECT OIT0021_COSTMEMO")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008 SELECT OIT0021_COSTMEMO"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1877,10 +2012,7 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine(" AND TMP0008.INVOICECODE        IS NOT NULL")
         InsBldr.AppendLine(" AND TMP0008.PAYEECODE          IS NOT NULL")
         InsBldr.AppendLine(" AND (TMP0008.INVOICECODE <> '' OR TMP0008.PAYEECODE <> '')")
-        InsBldr.AppendLine(" AND (TMP0008.SHIPPERSCODE      IS NOT NULL AND")
-        InsBldr.AppendLine("         (TMP0008.CALCACCOUNT = '1' AND TMP0008.SHIPPERSCODE <> '') OR")
-        InsBldr.AppendLine("         (TMP0008.CALCACCOUNT = '2' AND TMP0008.SHIPPERSCODE =  '')")
-        InsBldr.AppendLine(" )")
+        InsBldr.AppendLine(" AND TMP0008.SHIPPERSCODE      IS NOT NULL")
         InsBldr.AppendLine(" ORDER BY")
         InsBldr.AppendLine("     TMP0008.LINE")
 
@@ -2060,7 +2192,7 @@ Public Class OIT0008CostManagement
         Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TANK_TRASPORT_RESULT.xlsx", TMP0009tbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData_TankTansportResult(WK_STYMD, WK_EDYMD)
+                url = repCbj.CreateExcelPrintData_TankTansportResult(WK_STYMD, WK_EDYMD, 1)
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT TANK_TRASPORT_RESULT")
                 Exit Sub
@@ -2072,6 +2204,7 @@ Public Class OIT0008CostManagement
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -2131,6 +2264,7 @@ Public Class OIT0008CostManagement
         'ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_PDFPrint();", True)
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -2309,6 +2443,10 @@ Public Class OIT0008CostManagement
                         .ActiveCalendar()
                     Case Else
                         Dim prmData As New Hashtable
+                        '荷主
+                        If WF_FIELD.Value.Contains("WF_COSTLISTTBL_SHIPPERSNAME") Then
+                            prmData = work.CreateFIXParam(Master.USER_ORG, "SHIPPERSMASTER")
+                        End If
                         '勘定科目コード/セグメント/セグメント枝番
                         If WF_FIELD.Value.Contains("WF_COSTLISTTBL_ACCOUNTCODE") Then
                             prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
@@ -2529,6 +2667,20 @@ Public Class OIT0008CostManagement
                 Dim WK_TextBox As TextBox = Nothing
                 Dim WK_Label As Label = Nothing
                 Dim WK_Hidden As HiddenField = Nothing
+
+                '荷主
+                If WF_FIELD.Value.Contains("WF_COSTLISTTBL_SHIPPERSNAME") Then
+                    Integer.TryParse(WF_FIELD.Value.Substring(WF_FIELD.Value.Length - 3), rowIdx)
+
+                    '荷主名
+                    WK_TextBox = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), TextBox)
+                    WK_TextBox.Text = WW_SelectText
+
+                    '荷主コード
+                    WK_Hidden = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField)
+                    WK_Hidden.Value = WW_SelectValue
+
+                End If
 
                 '勘定科目コード/セグメント/セグメント枝番
                 If WF_FIELD.Value.Contains("WF_COSTLISTTBL_ACCOUNTCODE") Then

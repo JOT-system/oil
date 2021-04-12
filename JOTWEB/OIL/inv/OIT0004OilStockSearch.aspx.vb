@@ -134,11 +134,6 @@ Public Class OIT0004OilStockSearch
 
                 If TxtSalesOffice.Text <> "" Then
                     GetDefRelateValues(TxtSalesOffice.Text, shipperCode, consigneeCode)
-                    If Master.USER_ORG = "302001" Then
-                        consigneeCode = "10"
-                    ElseIf Master.USER_ORG = "301901" Then
-                        consigneeCode = "20"
-                    End If
                 End If
 
             End If
@@ -375,9 +370,10 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
-
+        Me.WF_CAMPCODE.Text = Master.USERCAMP
+        work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
         '○ 前画面遷移
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 
@@ -701,6 +697,13 @@ Public Class OIT0004OilStockSearch
                         shippersCode = Convert.ToString(sqlDr("SHIPPERSCODE"))
                         consigneeCode = Convert.ToString(sqlDr("CONSIGNEECODE"))
                     End If
+
+                    If Master.USER_ORG = "302001" Then
+                        consigneeCode = "10"
+                    ElseIf Master.USER_ORG = "301901" Then
+                        consigneeCode = "20"
+                    End If
+
                 End Using 'sqlDr
             End Using 'sqlCon, sqlCmd
 
@@ -720,10 +723,21 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     Public Sub GetLastUpdate()
         Try
+            Dim valueHasNone = "―"
+            Dim valueNotFixed = "未"
+            Dim valueFixed = "済"
+            divUpdateInfo.Visible = False
+            divConsigneeUpdateInfo10.Visible = False
+            divConsigneeUpdateInfo20.Visible = False
             '一旦初期化
-            Me.WF_UpdateUser.Text = "&nbsp;"
-            Me.WF_UpdateDtm.Text = "&nbsp;"
-
+            Me.WF_UpdateUser.Text = valueHasNone
+            Me.WF_UpdateDtm.Text = valueHasNone
+            Me.WF_ConsigneeUser10.Text = valueHasNone
+            Me.WF_ConsigneeUpdateDtm10.Text = valueHasNone
+            Me.WF_ConsigneeUser20.Text = valueHasNone
+            Me.WF_ConsigneeUpdateDtm20.Text = valueHasNone
+            Me.WF_ConsigneeFixStatus10.Text = valueNotFixed
+            Me.WF_ConsigneeFixStatus20.Text = valueNotFixed
             Dim officeCode As String = ""
             '取得出来ない条件の場合はスキップ
             If Me.TxtSalesOffice.Text.Trim = "" OrElse
@@ -736,59 +750,107 @@ Public Class OIT0004OilStockSearch
                IsDate(Me.WF_STYMD_CODE.Text) = False Then
                 Return
             End If
+            '通常更新情報と油槽所更新情報のフィールド設定
+            Dim fieldItems = {New With {.updUserField = "UPDUSER", .updUserObj = Me.WF_UpdateUser, .updDtmField = "UPDYMD", .updDtmObj = Me.WF_UpdateDtm, .consigneeCode = Me.WF_CONSIGNEE_CODE.Text, .getFixedData = False, .fixValObj = New Label},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser10, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm10, .consigneeCode = "10", .getFixedData = True, .fixValObj = Me.WF_ConsigneeFixStatus10},
+                             New With {.updUserField = "ENEOSUPDUSER", .updUserObj = Me.WF_ConsigneeUser20, .updDtmField = "ENEOSUPDYMD", .updDtmObj = Me.WF_ConsigneeUpdateDtm20, .consigneeCode = "20", .getFixedData = True, .fixValObj = Me.WF_ConsigneeFixStatus20}}
+            For Each fieldItem In fieldItems
+                Dim sqlStat As New StringBuilder
+                sqlStat.AppendFormat("SELECT format(SQ.{0},'yyyy/MM/dd HH:mm') AS {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,isnull(UM.STAFFNAMEL, SQ.{0})     AS {0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("FROM (")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" UNION ALL")
+                sqlStat.AppendFormat("SELECT {0}", fieldItem.updDtmField).AppendLine()
+                sqlStat.AppendFormat("      ,{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
+                sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
+                'sqlStat.AppendLine(" WHERE 1=1")
+                sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
+                sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
+                sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
+                sqlStat.AppendFormat("   AND {0}       <> 'BATCH'", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
+                sqlStat.AppendLine(" ) SQ")
+                sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
+                sqlStat.AppendFormat("   ON UM.USERID = SQ.{0}", fieldItem.updUserField).AppendLine()
+                sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
+                sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
+                sqlStat.AppendFormat(" ORDER BY SQ.{0} DESC", fieldItem.updDtmField).AppendLine()
 
-            Dim sqlStat As New StringBuilder
-            sqlStat.AppendLine("Select format(SQ.UPDYMD,'yyyy/MM/dd HH:mm') AS UPDYMD")
-            sqlStat.AppendLine("      ,isnull(UM.STAFFNAMEL, SQ.UPDUSER)    AS UPDUSER")
-            sqlStat.AppendLine("FROM (")
-            sqlStat.AppendLine("SELECT UPDYMD")
-            sqlStat.AppendLine("      ,UPDUSER")
-            sqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
-            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
-            'sqlStat.AppendLine(" WHERE 1=1")
-            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
-            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
-            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
-            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
-            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
-            sqlStat.AppendLine(" UNION ALL")
-            sqlStat.AppendLine("SELECT UPDYMD")
-            sqlStat.AppendLine("      ,UPDUSER")
-            sqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
-            sqlStat.AppendLine(" WHERE STOCKYMD       between @STOCKYMD and DATEADD(DAY, 30, @STOCKYMD)")
-            'sqlStat.AppendLine(" WHERE 1=1")
-            sqlStat.AppendLine("   AND OFFICECODE     = @OFFICECODE")
-            sqlStat.AppendLine("   AND SHIPPERSCODE   = @SHIPPERSCODE")
-            sqlStat.AppendLine("   AND CONSIGNEECODE  = @CONSIGNEECODE")
-            sqlStat.AppendLine("   AND UPDUSER       <> 'BATCH'")
-            sqlStat.AppendLine("   AND DELFLG         = @DELFLG")
-            sqlStat.AppendLine(" ) SQ")
-            sqlStat.AppendLine(" LEFT JOIN com.OIS0004_USER UM WITH(nolock)")
-            sqlStat.AppendLine("   ON UM.USERID = SQ.UPDUSER")
-            sqlStat.AppendLine("  AND @STOCKYMD between UM.STYMD and UM.ENDYMD")
-            sqlStat.AppendLine("  AND DELFLG    = @DELFLG")
-            sqlStat.AppendLine(" ORDER BY SQ.UPDYMD DESC")
-            'DataBase接続文字
-            Using sqlCon = CS0050SESSION.getConnection,
-              sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
-                sqlCon.Open() 'DataBase接続(Open)
-                SqlConnection.ClearPool(sqlCon)
-                With sqlCmd.Parameters
-                    .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
-                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
-                    .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
-                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = Me.WF_CONSIGNEE_CODE.Text
-                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                End With
-                Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
-                    If sqlDr.HasRows Then
-                        sqlDr.Read()
-                        Me.WF_UpdateUser.Text = Convert.ToString(sqlDr("UPDUSER"))
-                        Me.WF_UpdateDtm.Text = Convert.ToString(sqlDr("UPDYMD"))
+                Dim sqlStatFixed = New StringBuilder
+                sqlStatFixed.AppendLine("SELECT 1")
+                sqlStatFixed.AppendLine("  FROM OIL.OIT0001_OILSTOCK OS with(nolock)")
+                sqlStatFixed.AppendLine(" WHERE OS.STOCKYMD      = @TODAY")
+                sqlStatFixed.AppendLine("   AND OS.OFFICECODE    = @OFFICECODE")
+                sqlStatFixed.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
+                sqlStatFixed.AppendLine("   AND OS.CONSIGNEECODE = @CONSIGNEECODE")
+                sqlStatFixed.AppendLine("   AND OS.FIXEDYMD      IS NOT NULL")
+                sqlStatFixed.AppendLine("   AND OS.DELFLG        = @DELFLG")
+                'DataBase接続文字
+                Using sqlCon = CS0050SESSION.getConnection,
+                      sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
+                    sqlCon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(sqlCon)
+                    With sqlCmd.Parameters
+                        .Add("@STOCKYMD", SqlDbType.Date).Value = CDate(Me.WF_STYMD_CODE.Text)
+                        .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.TxtSalesOffice.Text
+                        .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
+                        .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = fieldItem.consigneeCode
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                        .Add("@TODAY", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")
+                    End With
+
+                    Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                        If sqlDr.HasRows Then
+                            sqlDr.Read()
+                            Dim userName As String = Convert.ToString(sqlDr(fieldItem.updUserField))
+                            Dim updDtm As String = Convert.ToString(sqlDr(fieldItem.updDtmField))
+                            If userName = "" Then
+                                userName = "―"
+                                updDtm = "―"
+                            End If
+                            fieldItem.updUserObj.Text = userName
+                            fieldItem.updDtmObj.Text = updDtm
+                        End If
+                    End Using 'sqlDr
+
+                    If fieldItem.getFixedData Then
+                        sqlCmd.CommandText = sqlStatFixed.ToString
+                        Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                            If sqlDr.HasRows Then
+                                fieldItem.fixValObj.Text = valueFixed
+                            Else
+                                fieldItem.fixValObj.Text = valueNotFixed
+                            End If
+                        End Using 'sqlDr
                     End If
-                End Using 'sqlDr
-            End Using 'sqlCon, sqlCmd
+                End Using 'sqlCon, sqlCmd
 
+            Next
+
+            divUpdateInfo.Visible = True
+            If {"302001"}.Contains(Master.USER_ORG) Then
+                '北信・甲府しか操作できない前提のため、他の油槽所を開放するなら要変更
+                divConsigneeUpdateInfo10.Visible = True
+            ElseIf {"301901"}.Contains(Master.USER_ORG) Then
+                divConsigneeUpdateInfo20.Visible = True
+            Else
+
+                If {"10", "20"}.Contains(Me.WF_CONSIGNEE_CODE.Text) Then
+                    divConsigneeUpdateInfo10.Visible = True
+                    divConsigneeUpdateInfo20.Visible = True
+                End If
+            End If
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004S LASTUPDATE_SELECT")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名

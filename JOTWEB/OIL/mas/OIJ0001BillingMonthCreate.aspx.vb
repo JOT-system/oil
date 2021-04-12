@@ -163,14 +163,17 @@ Public Class OIJ0001BillingMonthCreate
             Dim SQLCmn2Str As String = ""
             Dim SQLAct1Str As String = ""
             Dim SQLAct2Str As String = ""
+            Dim frmKeijyoYMD As String = Me.TxtKeijyoYM.Text + "/01"
+            Dim toKeijyoYMD As String = GetEndDate(Me.TxtKeijyoYM.Text).ToString("yyyy/MM/dd")
             Dim SQLStr As String =
-                    String.Format(" DELETE FROM OIL.OIT0013_ORDERDETAILBILLINGMTH WHERE BILLINGMONTH='{0}'; ", Me.TxtKeijyoYM.Text)
+                    String.Format(" DELETE FROM OIL.OIT0013_ORDERDETAILBILLING WHERE KEIJYOYMD BETWEEN '{0}' AND '{1}'; ", frmKeijyoYMD, toKeijyoYMD)
+            'String.Format(" DELETE FROM OIL.OIT0013_ORDERDETAILBILLINGMTH WHERE BILLINGMONTH='{0}'; ", Me.TxtKeijyoYM.Text)
 
             '○INSERT分(投入用TBL)
             SQLStr &=
-                  " INSERT INTO oil.OIT0013_ORDERDETAILBILLINGMTH " _
+                  " INSERT INTO oil.OIT0013_ORDERDETAILBILLING " _
                 & " (" _
-                & "   BILLINGMONTH, BILLINGNO, ORDERNO, DETAILNO, PATCODE, PATNAME" _
+                & "   BILLINGNO, ORDERNO, DETAILNO, PATCODE, PATNAME" _
                 & " , ACCOUNTCODE, ACCOUNTNAME, SEGMENTCODE, SEGMENTNAME, BREAKDOWNCODE, BREAKDOWN" _
                 & " , SHIPPERSCODE, SHIPPERSNAME, BASECODE, BASENAME, OFFICECODE, OFFICENAME" _
                 & " , DEPSTATION, DEPSTATIONNAME, ARRSTATION, ARRSTATIONNAME, CONSIGNEECODE, CONSIGNEENAME" _
@@ -186,8 +189,7 @@ Public Class OIJ0001BillingMonthCreate
             '★共通1SQL
             SQLCmn1Str =
                   " SELECT" _
-                & "    FORMAT(CONVERT(DATE,OIT0003.ACTUALLODDATE),'yyyy/MM') AS BILLINGMONTH" _
-                & "  , ISNULL(OIT0002.BILLINGNO, '') AS BILLINGNO" _
+                & "    ISNULL(OIT0002.BILLINGNO, '') AS BILLINGNO" _
                 & "  , ISNULL(RTRIM(OIT0002.ORDERNO), '') AS ORDERNO" _
                 & "  , ISNULL(RTRIM(OIT0003.DETAILNO), '') AS DETAILNO" _
                 & "  , ISNULL(RTRIM(VIW0012.PATCODE), '') AS PATCODE" _
@@ -274,6 +276,7 @@ Public Class OIJ0001BillingMonthCreate
                 & String.Format("  , '{0}' AS UPDUSER", Master.USERID) _
                 & String.Format("  , '{0}' AS UPDTERMID", Master.USERTERMID) _
                 & String.Format("  , '{0}' AS RECEIVEYMD", C_DEFAULT_YMD)
+            '& "    FORMAT(CONVERT(DATE,OIT0003.ACTUALLODDATE),'yyyy/MM') AS BILLINGMONTH" _
 
             SQLCmn1Str &=
                   " FROM" _
@@ -529,4 +532,14 @@ Public Class OIJ0001BillingMonthCreate
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 指定日付の月の末日を取得する
+    ''' </summary>
+    ''' <param name="d"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function GetEndDate(ByVal d As DateTime) As DateTime
+        '月初の翌月の1日前を返す
+        Return d.AddDays(-(d.Day - 1)).AddMonths(1).AddDays(-1)
+    End Function
 End Class

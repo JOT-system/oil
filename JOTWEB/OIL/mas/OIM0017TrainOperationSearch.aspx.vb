@@ -301,7 +301,12 @@ Public Class OIM0017TrainOperationSearch
                         End If
                         ' JOT列車番号
                         If WF_FIELD.Value = WF_TRAINNO.ID Then
-                            prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text)
+                            If String.IsNullOrEmpty(WF_OFFICECODE.Text) Then
+                                '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                                prmData = work.CreateTrainNoParam(Master.USER_ORG)
+                            Else
+                                prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text)
+                            End If
                         End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -470,7 +475,12 @@ Public Class OIM0017TrainOperationSearch
                     prmData = work.CreateOfficeCodeParam(Master.USER_ORG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TRAINNO"      ' JOT列車番号
-                    prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text, I_VALUE)
+                    If String.IsNullOrEmpty(WF_OFFICECODE.Text) Then
+                        '管轄受注営業所コード未設定の場合、所属組織コードで検索する
+                        prmData = work.CreateTrainNoParam(Master.USER_ORG, I_VALUE)
+                    Else
+                        prmData = work.CreateTrainNoParam(WF_OFFICECODE.Text, I_VALUE)
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

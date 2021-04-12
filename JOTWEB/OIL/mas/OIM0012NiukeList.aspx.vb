@@ -1376,18 +1376,19 @@ Public Class OIM0012NiukeList
 
             OIM0012INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存データとの内容を比較
             For Each OIM0012row As DataRow In OIM0012tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0012row("CONSIGNEECODE") = OIM0012INProw("CONSIGNEECODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0012row("CONSIGNEENAME") = OIM0012row("CONSIGNEENAME") AndAlso
-                        OIM0012row("STOCKFLG") = OIM0012row("STOCKFLG") AndAlso
-                        OIM0012row("DELFLG") = OIM0012INProw("DELFLG") AndAlso
-                        OIM0012INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    ' KEY項目以外の項目の差異をチェック
+                    If OIM0012row("CONSIGNEENAME") = OIM0012INProw("CONSIGNEENAME") AndAlso
+                        OIM0012row("STOCKFLG") = OIM0012INProw("STOCKFLG") AndAlso
+                        OIM0012row("DELFLG") = OIM0012INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0012INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0012INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

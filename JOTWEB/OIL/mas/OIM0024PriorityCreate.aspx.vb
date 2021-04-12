@@ -989,20 +989,21 @@ Public Class OIM0024PriorityCreate
 
             OIM0024INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0024row As DataRow In OIM0024tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0024row("OFFICECODE") = OIM0024INProw("OFFICECODE") AndAlso
                     OIM0024row("OILCODE") = OIM0024INProw("OILCODE") AndAlso
                     OIM0024row("SEGMENTOILCODE") = OIM0024INProw("SEGMENTOILCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0024row("DELFLG") = OIM0024INProw("DELFLG") AndAlso
                         OIM0024row("PRIORITYNO") = OIM0024INProw("PRIORITYNO") AndAlso
-                        OIM0024row("STARTPOINT") = OIM0024INProw("STARTPOINT") AndAlso
-                        OIM0024INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0024row("STARTPOINT") = OIM0024INProw("STARTPOINT") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0024INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0024INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For

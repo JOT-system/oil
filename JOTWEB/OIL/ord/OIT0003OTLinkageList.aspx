@@ -135,9 +135,10 @@
                 <asp:HiddenField ID="hdnOTLinkageSendChkConfirmIsActive" runat="server" Value="" />
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <span>表示されている内容で発送日報を送信しますよろしいですか？</span>
+                        <span>表示されている内容で発送日報を送信します。</span>
                     </div>
                     <div class="rightSide">
+                        <input type="button" id="WF_ButtonOTLinkageDownLoad" class="btn-sticky" value="ダウンロード"   onclick="ButtonClick('WF_ButtonOTLinkageDownLoad');" />
                         <input type="button" id="WF_ButtonOTLinkageSend" class="btn-sticky" value="送信"   onclick="ButtonClick('WF_ButtonReserveOTLinkageSend');" />
                         <input type="button" id="btnCloseOTLinkageSendConfirm" class="btn-sticky" value="閉じる"  onclick="closeOTLinkageSendConfirm();" />
                     </div>
@@ -149,28 +150,30 @@
                                 <table class="tblUpdOTList">
                                     <tr>
                                         <th class="headerLine1 officeName">OT営業所</th>
+                                        <th class="headerLine1 shippersName">荷主</th>
                                         <th class="headerLine1 sendYMD">発送年月日</th>
                                         <th class="headerLine1 trainNo">列車№</th>
-                                        <th class="headerLine1 shipOrder">連結順位</th>
-                                        <th class="headerLine1 depStation">発駅</th>
-                                        <th class="headerLine1 shippersName">荷主</th>
+                                        <%--<th class="headerLine1 depStation">発駅</th>--%>
+                                        <th class="headerLine1 arrStation">着駅</th>
                                         <th class="headerLine1 oilName">油種</th>
                                         <th class="headerLine1 tankNo">車号</th>
                                         <th class="headerLine1 amount">数量</th>
+                                        <th class="headerLine1 shipOrder">連結順位</th>
                                     </tr>
 
                         </HeaderTemplate>
                         <ItemTemplate>
                             <tr class='delFalg<%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).DeleteFlag %>'>
                                 <td class="officeName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTOfficeName %></td>
+                                <td class="shippersName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShippersName %></td>
                                 <td class="sendYMD"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTSendYMD   %></td>
                                 <td class="trainNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTTrainNo  %></td>
-                                <td class="shipOrder"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShipOrder  %></td>
-                                <td class="depStation"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTDepStationName  %></td>
-                                <td class="shippersName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShippersName %></td>
+                                <%--<td class="depStation"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTDepStationName  %></td>--%>
+                                <td class="arrStation"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTArrStationName  %></td>
                                 <td class="oilName"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTOilName %></td>
                                 <td class="tankNo"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTTankNo %></td>
                                 <td class="amount"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTAmount %></td>
+                                <td class="shipOrder"><%#DirectCast(DirectCast(Container, RepeaterItem).DataItem, OutputOrdedrInfo).OTShipOrder  %></td>
                             </tr>
                         </ItemTemplate>
                         <FooterTemplate>

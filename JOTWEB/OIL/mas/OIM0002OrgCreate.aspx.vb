@@ -1,12 +1,16 @@
 ﻿''************************************************************
 ' 組織マスタメンテ登録画面
 ' 作成日 2020/05/26
-' 更新日 2020/05/26
+' 更新日 2021/04/09
 ' 作成者 JOT杉山
-' 更新車 JOT杉山
+' 更新者 JOT伊草
 '
-' 修正履歴:新規作成
-'         :
+' 修正履歴:2020/05/26 新規作成
+'         :2021/04/09 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -28,10 +32,6 @@ Public Class OIM0002OrgCreate
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
-
-    'Private Const CONST_PATTERN1 As String = "1"                    'モデル距離パターン　届先のみ
-    'Private Const CONST_PATTERN2 As String = "2"                    'モデル距離パターン　届先、出荷場所
-    'Private Const CONST_PATTERN3 As String = "3"                    'モデル距離パターン　出荷場所
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -87,6 +87,8 @@ Public Class OIM0002OrgCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
 
                 End If
@@ -159,9 +161,6 @@ Public Class OIM0002OrgCreate
 
         '○ 画面の値設定
         WW_MAPValueSet()
-
-        '○ GridView初期設定
-        '        GridViewInitialize()
 
     End Sub
 
@@ -306,6 +305,182 @@ Public Class OIM0002OrgCreate
 
     End Sub
 
+    ''' <summary>
+    ''' 組織マスタ登録更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0002_ORG" _
+            & "    WHERE" _
+            & "        CAMPCODE           = @P1" _
+            & "        AND ORGCODE        = @P2 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0002_ORG" _
+            & "    SET" _
+            & "          STYMD            = @P3  , ENDYMD          = @P4" _
+            & "        , NAME             = @P5  , NAMES           = @P6" _
+            & "        , NAMEKANA         = @P7  , NAMEKANAS       = @P8" _
+            & "        , DELFLG           = @P9" _
+            & "        , UPDYMD           = @P13 , UPDUSER         = @P14 , UPDTERMID = @P15" _
+            & "        , RECEIVEYMD       = @P16" _
+            & "    WHERE" _
+            & "        CAMPCODE           = @P1" _
+            & "        AND ORGCODE        = @P2 ;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0002_ORG" _
+            & "        ( CAMPCODE   , ORGCODE " _
+            & "        , STYMD      , ENDYMD       , NAME          , NAMES" _
+            & "        , NAMEKANA   , NAMEKANAS    ,  DELFLG" _
+            & "        , INITYMD    , INITUSER     , INITTERMID" _
+            & "        , UPDYMD     , UPDUSER      , UPDTERMID" _
+            & "        , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        ( @P1  , @P2" _
+            & "        , @P3  , @P4 , @P5  , @P6" _
+            & "        , @P7  , @P8 , @P9" _
+            & "        , @P10 , @P11 ,@P12" _
+            & "        , @P13 , @P14, @P15" _
+            & "        , @P16) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " SELECT" _
+            & "    CAMPCODE" _
+            & "    , ORGCODE" _
+            & "    , STYMD" _
+            & "    , ENDYMD" _
+            & "    , NAME" _
+            & "    , NAMES" _
+            & "    , NAMEKANA" _
+            & "    , NAMEKANAS" _
+            & "    , DELFLG" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP AS bigint) AS TIMSTP" _
+            & " FROM" _
+            & "    OIL.OIM0002_ORG" _
+            & " WHERE" _
+            & "        CAMPCODE      = @P1" _
+            & "        AND ORGCODE       = @P2"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 2)            '会社コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 6)            '組織コード
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.DateTime)               '開始年月日
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.DateTime)               '終了年月日
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 200)          '組織名称
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 100)          '組織名称（短）
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 100)          '組織名称カナ
+                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 100)          '組織名称カナ（短）
+                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 1)            '削除フラグ
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.DateTime)             '登録年月日
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)         '登録ユーザーID
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 20)         '登録端末
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.DateTime)             '更新年月日
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 20)         '更新ユーザーID
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)         '更新端末
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.DateTime)             '集信日時
+
+                Dim JPARA1 As SqlParameter = SQLcmdJnl.Parameters.Add("@P1", SqlDbType.NVarChar, 2)        '会社コード
+                Dim JPARA2 As SqlParameter = SQLcmdJnl.Parameters.Add("@P2", SqlDbType.NVarChar, 6)        '組織コード
+
+                Dim OIM0002row As DataRow = OIM0002INPtbl.Rows(0)
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA1.Value = OIM0002row("CAMPCODE")
+                PARA2.Value = OIM0002row("ORGCODE")
+                PARA3.Value = OIM0002row("STYMD")
+                PARA4.Value = OIM0002row("ENDYMD")
+                PARA5.Value = OIM0002row("NAME")
+                PARA6.Value = OIM0002row("NAMES")
+                PARA7.Value = OIM0002row("NAMEKANA")
+                PARA8.Value = OIM0002row("NAMEKANAS")
+                PARA9.Value = OIM0002row("DELFLG")
+                PARA10.Value = WW_DATENOW
+                PARA11.Value = Master.USERID
+                PARA12.Value = Master.USERTERMID
+                PARA13.Value = WW_DATENOW
+                PARA14.Value = Master.USERID
+                PARA15.Value = Master.USERTERMID
+                PARA16.Value = C_DEFAULT_YMD
+
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIM0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA1.Value = OIM0002row("CAMPCODE")
+                JPARA2.Value = OIM0002row("ORGCODE")
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0002UPDtbl) Then
+                        OIM0002UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0002UPDtbl.Clear()
+                    OIM0002UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0002UPDrow As DataRow In OIM0002UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0002C"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIM0002UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0002C UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0002C UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
     ' ******************************************************************************
     ' ***  詳細表示関連操作                                                      ***
     ' ******************************************************************************
@@ -331,15 +506,15 @@ Public Class OIM0002OrgCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0002tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
         Master.SaveTable(OIM0002tbl, work.WF_SEL_INPTBL.Text)
-
-        ''○ 詳細画面初期化
-        'If isNormal(WW_ERR_SW) Then
-        '    DetailBoxClear()
-        'End If
 
         '○ メッセージ表示
         If WW_ERR_SW = "" Then
@@ -357,10 +532,6 @@ Public Class OIM0002OrgCreate
             End If
         End If
 
-        '○画面切替設定
-        'WF_BOXChange.Value = "headerbox"
-
-        '############# おためし #############
         If isNormal(WW_ERR_SW) Then
             '前ページ遷移
             Master.TransitionPrevPage()
@@ -440,13 +611,13 @@ Public Class OIM0002OrgCreate
 
         OIM0002INProw("CAMPCODE") = Me.TxtCampCode.Text                  '会社コード
         OIM0002INProw("ORGCODE") = Me.TxtOrgCode.Text                    '組織コード
-        OIM0002INProw("STYMD") = Me.TxtStYmd.Text                         '開始年月日
-        OIM0002INProw("ENDYMD") = Me.TxtEndYmd.Text                       '組織コード
+        OIM0002INProw("STYMD") = Me.TxtStYmd.Text                        '開始年月日
+        OIM0002INProw("ENDYMD") = Me.TxtEndYmd.Text                      '組織コード
         OIM0002INProw("NAME") = Me.TxtOrgName.Text                       '組織名称
-        OIM0002INProw("NAMES") = Me.TxtOrgNameS.Text                      '組織名称（短）
-        OIM0002INProw("NAMEKANA") = Me.TxtOrgNameKana.Text                '組織名称カナ
-        OIM0002INProw("NAMEKANAS") = Me.TxtOrgNameKanaS.Text              '組織名称カナ（短）
-        OIM0002INProw("DELFLG") = Me.TxtDelFlg.Text                       '削除
+        OIM0002INProw("NAMES") = Me.TxtOrgNameS.Text                     '組織名称（短）
+        OIM0002INProw("NAMEKANA") = Me.TxtOrgNameKana.Text               '組織名称カナ
+        OIM0002INProw("NAMEKANAS") = Me.TxtOrgNameKanaS.Text             '組織名称カナ（短）
+        OIM0002INProw("DELFLG") = Me.TxtDelFlg.Text                      '削除
 
         '○ 名称取得
         '会社名
@@ -457,21 +628,63 @@ Public Class OIM0002OrgCreate
 
     End Sub
 
+    ''' <summary>
+    ''' 詳細画面-戻るボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0002INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIM0002INProw As DataRow = OIM0002INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIM0002row As DataRow In OIM0002tbl.Rows
+            ' KEY項目が等しい時
+            If OIM0002row("CAMPCODE") = OIM0002INProw("CAMPCODE") AndAlso
+                OIM0002row("ORGCODE") = OIM0002INProw("ORGCODE") AndAlso
+                OIM0002row("STYMD") = OIM0002INProw("STYMD") Then
+                ' KEY項目以外の項目の差異をチェック
+                If OIM0002row("DELFLG") = OIM0002INProw("DELFLG") AndAlso
+                    OIM0002row("ENDYMD") = OIM0002INProw("ENDYMD") AndAlso
+                    OIM0002row("NAME") = OIM0002INProw("NAME") AndAlso
+                    OIM0002row("NAMES") = OIM0002INProw("NAMES") AndAlso
+                    OIM0002row("NAMEKANA") = OIM0002INProw("NAMEKANA") AndAlso
+                    OIM0002row("NAMEKANAS") = OIM0002INProw("NAMEKANAS") Then
+                    '変更がない場合、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
 
     ''' <summary>
-    ''' 詳細画面-クリアボタン押下時処理
+    ''' 詳細画面-戻るボタン押下時、確認ダイアログOKボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_CLEAR_Click()
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
 
         '○ メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-        ''○画面切替設定
-        'WF_BOXChange.Value = "headerbox"
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
@@ -527,7 +740,6 @@ Public Class OIM0002OrgCreate
         Label1.Text = ""                    '削除名称
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -738,7 +950,6 @@ Public Class OIM0002OrgCreate
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
     ''' </summary>
@@ -767,7 +978,6 @@ Public Class OIM0002OrgCreate
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -977,6 +1187,7 @@ Public Class OIM0002OrgCreate
         End Try
 
     End Sub
+
     ''' <summary>
     ''' エラーレポート編集
     ''' </summary>
@@ -1007,7 +1218,6 @@ Public Class OIM0002OrgCreate
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
-
 
     ''' <summary>
     ''' OIM0002tbl更新
@@ -1041,17 +1251,25 @@ Public Class OIM0002OrgCreate
 
             OIM0002INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0002row As DataRow In OIM0002tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0002row("CAMPCODE") = OIM0002INProw("CAMPCODE") AndAlso
-                    OIM0002row("ORGCODE") = OIM0002INProw("ORGCODE") Then
-                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    OIM0002row("ORGCODE") = OIM0002INProw("ORGCODE") AndAlso
+                    OIM0002row("STYMD") = OIM0002INProw("STYMD") Then
+                    ' KEY項目以外の項目の差異をチェック
                     If OIM0002row("DELFLG") = OIM0002INProw("DELFLG") AndAlso
-                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0002row("ENDYMD") = OIM0002INProw("ENDYMD") AndAlso
+                        OIM0002row("NAME") = OIM0002INProw("NAME") AndAlso
+                        OIM0002row("NAMES") = OIM0002INProw("NAMES") AndAlso
+                        OIM0002row("NAMEKANA") = OIM0002INProw("NAMEKANA") AndAlso
+                        OIM0002row("NAMEKANAS") = OIM0002INProw("NAMEKANAS") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0002row("OPERATION")) Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0002INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1060,23 +1278,61 @@ Public Class OIM0002OrgCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIM0002INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIM0002INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIM0002INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIM0002INProw As DataRow In OIM0002INPtbl.Rows
-            Select Case OIM0002INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0002INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0002INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0002INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0002INProw)
-            End Select
+            'Select Case OIM0002INProw("OPERATION")
+            '    Case CONST_UPDATE
+            '        TBL_UPDATE_SUB(OIM0002INProw)
+            '    Case CONST_INSERT
+            '        TBL_INSERT_SUB(OIM0002INProw)
+            '    Case CONST_PATTERNERR
+            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+            '        TBL_INSERT_SUB(OIM0002INProw)
+            '    Case C_LIST_OPERATION_CODE.ERRORED
+            '        TBL_ERR_SUB(OIM0002INProw)
+            'End Select
+            For Each OIM0002row As DataRow In OIM0002tbl.Rows
+
+                '同一レコードか判定
+                If OIM0002INProw("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
+                    OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") AndAlso
+                    OIM0002INProw("STYMD") = OIM0002row("STYMD") Then
+                    '画面入力テーブル項目設定
+                    OIM0002INProw("LINECNT") = OIM0002row("LINECNT")
+                    OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIM0002INProw("TIMSTP") = OIM0002row("TIMSTP")
+                    OIM0002INProw("SELECT") = 0
+                    OIM0002INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIM0002row.ItemArray = OIM0002INProw.ItemArray
+                    Exit For
+                End If
+            Next
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -1088,7 +1344,8 @@ Public Class OIM0002OrgCreate
 
             '同一レコードか判定
             If OIM0002INProw("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
-                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") Then
+                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") AndAlso
+                OIM0002INProw("STYMD") = OIM0002row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0002INProw("LINECNT") = OIM0002row("LINECNT")
                 OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -1131,7 +1388,6 @@ Public Class OIM0002OrgCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -1143,7 +1399,8 @@ Public Class OIM0002OrgCreate
 
             '同一レコードか判定
             If OIM0002INProw("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
-               OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") Then
+                OIM0002INProw("ORGCODE") = OIM0002row("ORGCODE") AndAlso
+                OIM0002INProw("STYMD") = OIM0002row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIM0002INProw("LINECNT") = OIM0002row("LINECNT")
                 OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -1158,6 +1415,7 @@ Public Class OIM0002OrgCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得

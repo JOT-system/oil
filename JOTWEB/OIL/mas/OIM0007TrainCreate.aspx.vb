@@ -354,25 +354,36 @@ Public Class OIM0007TrainCreate
             andFlg = True
         End If
 
-        ' 発駅コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_TSUMI2.Text) Then
+        ' OT列車番号
+        If Not String.IsNullOrEmpty(work.WF_SEL_OTTRAINNO.Text) Then
             If andFlg Then
                 SQLStrBldr.AppendLine("     AND ")
             Else
                 SQLStrBldr.AppendLine(" WHERE ")
             End If
-            SQLStrBldr.AppendLine("     OIM0007.DEPSTATION = @P4 ")
+            SQLStrBldr.AppendLine("     OIM0007.OTTRAINNO = @P4 ")
+            andFlg = True
+        End If
+
+        ' 発駅コード
+        If Not String.IsNullOrEmpty(work.WF_SEL_DEPSTATION.Text) Then
+            If andFlg Then
+                SQLStrBldr.AppendLine("     AND ")
+            Else
+                SQLStrBldr.AppendLine(" WHERE ")
+            End If
+            SQLStrBldr.AppendLine("     OIM0007.DEPSTATION = @P5 ")
             andFlg = True
         End If
 
         ' 着駅コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_TSUMI2.Text) Then
+        If Not String.IsNullOrEmpty(work.WF_SEL_ARRSTATION.Text) Then
             If andFlg Then
                 SQLStrBldr.AppendLine("     AND ")
             Else
                 SQLStrBldr.AppendLine(" WHERE ")
             End If
-            SQLStrBldr.AppendLine("     OIM0007.ARRSTATION = @P5 ")
+            SQLStrBldr.AppendLine("     OIM0007.ARRSTATION = @P6 ")
             andFlg = True
         End If
 
@@ -382,6 +393,7 @@ Public Class OIM0007TrainCreate
         SQLStrBldr.AppendLine("     OIM0007.OFFICECODE ")
         SQLStrBldr.AppendLine("     , OIM0007.TRAINNO ")
         SQLStrBldr.AppendLine("     , OIM0007.TSUMI ")
+        SQLStrBldr.AppendLine("     , OIM0007.OTTRAINNO ")
         SQLStrBldr.AppendLine("     , OIM0007.DEPSTATION ")
         SQLStrBldr.AppendLine("     , OIM0007.ARRSTATION ")
 
@@ -390,14 +402,16 @@ Public Class OIM0007TrainCreate
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 管轄受注営業所
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 4)     ' 本線列車番号
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)     ' 積置フラグ
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)     ' 発駅コード
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 7)     ' 着駅コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)     ' OT列車番号
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 7)     ' 発駅コード
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 7)     ' 着駅コード
 
-                PARA1.Value = work.WF_SEL_OFFICECODE.Text
-                PARA2.Value = work.WF_SEL_TRAINNO.Text
-                PARA3.Value = work.WF_SEL_TSUMI.Text
-                PARA4.Value = work.WF_SEL_DEPSTATION.Text
-                PARA5.Value = work.WF_SEL_ARRSTATION.Text
+                PARA1.Value = work.WF_SEL_OFFICECODE2.Text
+                PARA2.Value = work.WF_SEL_TRAINNO2.Text
+                PARA3.Value = work.WF_SEL_TSUMI2.Text
+                PARA4.Value = work.WF_SEL_OTTRAINNO.Text
+                PARA5.Value = work.WF_SEL_DEPSTATION.Text
+                PARA6.Value = work.WF_SEL_ARRSTATION.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -481,22 +495,26 @@ Public Class OIM0007TrainCreate
         SQLStrBldr.AppendLine("     AND ")
         SQLStrBldr.AppendLine("     OIM0007.TSUMI = @P3 ")
         SQLStrBldr.AppendLine("     AND ")
-        SQLStrBldr.AppendLine("     OIM0007.DEPSTATION = @P4 ")
+        SQLStrBldr.AppendLine("     OIM0007.OTTRAINNO = @P4 ")
         SQLStrBldr.AppendLine("     AND ")
-        SQLStrBldr.AppendLine("     OIM0007.ARRSTATION = @P5 ")
+        SQLStrBldr.AppendLine("     OIM0007.DEPSTATION = @P5 ")
+        SQLStrBldr.AppendLine("     AND ")
+        SQLStrBldr.AppendLine("     OIM0007.ARRSTATION = @P6 ")
 
         Try
             Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 管轄受注営業所
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 4)     ' 本線列車番号
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)     ' 積置フラグ
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)     ' 発駅コード
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 7)     ' 着駅コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)     ' OT列車番号
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 7)     ' 発駅コード
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 7)     ' 着駅コード
                 PARA1.Value = WF_OFFICECODE.Text
                 PARA2.Value = WF_TRAINNO.Text
                 PARA3.Value = WF_TSUMI.Text
-                PARA4.Value = WF_DEPSTATION.Text
-                PARA5.Value = WF_ARRSTATION.Text
+                PARA4.Value = WF_OTTRAINNO.Text
+                PARA5.Value = WF_DEPSTATION.Text
+                PARA6.Value = WF_ARRSTATION.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -1222,7 +1240,7 @@ Public Class OIM0007TrainCreate
             ' OT列車番号（バリデーションチェック）
             WW_TEXT = OIM0007INProw("OTTRAINNO")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OTTRAINNO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
+            If Not isNormal(WW_CS0024FCHECKERR) OrElse OIM0007INProw("OTTRAINNO") Is DBNull.Value Then
                 WW_CheckMES1 = "・更新できないレコード(OT列車番号エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0007INProw)
@@ -1579,6 +1597,7 @@ Public Class OIM0007TrainCreate
             If OIM0007INProw("OFFICECODE") = work.WF_SEL_OFFICECODE2.Text AndAlso
                 OIM0007INProw("TRAINNO") = work.WF_SEL_TRAINNO2.Text AndAlso
                 OIM0007INProw("TSUMI") = work.WF_SEL_TSUMI2.Text AndAlso
+                OIM0007INProw("OTTRAINNO") = work.WF_SEL_OTTRAINNO.Text AndAlso
                 OIM0007INProw("DEPSTATION") = work.WF_SEL_DEPSTATION.Text AndAlso
                 OIM0007INProw("ARRSTATION") = work.WF_SEL_ARRSTATION.Text Then
 
@@ -1738,16 +1757,17 @@ Public Class OIM0007TrainCreate
 
             OIM0007INProw.Item("OPERATION") = CONST_INSERT
 
-            'KEY項目が等しい時
+            ' 既存レコードとの比較
             For Each OIM0007row As DataRow In OIM0007tbl.Rows
+                ' KEY項目が等しい時
                 If OIM0007row("OFFICECODE") = OIM0007INProw("OFFICECODE") AndAlso
                     OIM0007row("TRAINNO") = OIM0007INProw("TRAINNO") AndAlso
                     OIM0007row("TSUMI") = OIM0007INProw("TSUMI") AndAlso
+                    OIM0007row("OTTRAINNO") = OIM0007INProw("OTTRAINNO") AndAlso
                     OIM0007row("DEPSTATION") = OIM0007INProw("DEPSTATION") AndAlso
                     OIM0007row("ARRSTATION") = OIM0007INProw("ARRSTATION") Then
-                    ' KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    ' KEY項目以外の項目に変更があるかチェック
                     If OIM0007row("TRAINNAME") = OIM0007INProw("TRAINNAME") AndAlso
-                        OIM0007row("OTTRAINNO") = OIM0007INProw("OTTRAINNO") AndAlso
                         OIM0007row("OTFLG") = OIM0007INProw("OTFLG") AndAlso
                         OIM0007row("JRTRAINNO1") = OIM0007INProw("JRTRAINNO1") AndAlso
                         OIM0007row("MAXTANK1") = OIM0007INProw("MAXTANK1") AndAlso
@@ -1768,12 +1788,12 @@ Public Class OIM0007TrainCreate
                         OIM0007row("RUN") = OIM0007INProw("RUN") AndAlso
                         OIM0007row("ZAIKOSORT") = OIM0007INProw("ZAIKOSORT") AndAlso
                         OIM0007row("BIKOU") = OIM0007INProw("BIKOU") AndAlso
-                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") AndAlso
-                        OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") Then
+                        ' 変更がないときは「操作」の項目は空白にする
+                        OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
-                        ' KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        ' 変更がある時は「操作」の項目を「更新」に設定する
                         OIM0007INProw("OPERATION") = CONST_UPDATE
-                        Exit For
                     End If
 
                     Exit For
@@ -1812,6 +1832,7 @@ Public Class OIM0007TrainCreate
             If OIM0007INProw("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
                 OIM0007INProw("TRAINNO") = OIM0007row("TRAINNO") AndAlso
                 OIM0007INProw("TSUMI") = OIM0007row("TSUMI") AndAlso
+                OIM0007INProw("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
                 OIM0007INProw("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
                 OIM0007INProw("ARRSTATION") = OIM0007row("ARRSTATION") Then
                 '画面入力テーブル項目設定
@@ -1869,6 +1890,7 @@ Public Class OIM0007TrainCreate
             If OIM0007INProw("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
                 OIM0007INProw("TRAINNO") = OIM0007row("TRAINNO") AndAlso
                 OIM0007INProw("TSUMI") = OIM0007row("TSUMI") AndAlso
+                OIM0007INProw("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
                 OIM0007INProw("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
                 OIM0007INProw("ARRSTATION") = OIM0007row("ARRSTATION") Then
                 '画面入力テーブル項目設定

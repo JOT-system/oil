@@ -74,7 +74,6 @@
                     <asp:Button ID="WF_DELETEROW" runat="server" CssClass="btn-sticky" Text="行削除" OnClientClick="ButtonClick('WF_ButtonDELETEROW');"></asp:Button>
                     <asp:Button ID="WF_ADDROW" runat="server" CssClass="btn-sticky" Text="行追加" OnClientClick="ButtonClick('WF_ButtonADDROW');"></asp:Button>
                     <asp:Button ID="WF_DL_TRASPORTCOSTSDETAIL" runat="server" CssClass="btn-sticky" Text="輸送費明細" OnClientClick="ButtonClick('WF_Button_DLTransportCostsDetail');"></asp:Button>
-                    <asp:Button ID="WF_DL_TANKTRASPORTRESULT" runat="server" CssClass="btn-sticky" Text="タンク車輸送実績表" OnClientClick="ButtonClick('WF_Button_DLTankTransportResult');"></asp:Button>
                 </div>
                 <div class="rightSide">
                     <asp:Button ID="WF_UPDATE" runat="server" CssClass="btn-sticky" Text="保存する" OnClientClick="ButtonClick('WF_ButtonUPDATE');"></asp:Button>
@@ -111,7 +110,9 @@
                             <HeaderTemplate>荷主</HeaderTemplate>
                             <ItemTemplate>
                                 <!-- 荷受人名 -->
-                                <asp:Label ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSNAME") %>' />
+                                <span ondblclick="Field_DBclick('WF_COSTLISTTBL_SHIPPERSNAME<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST %>)">
+                                    <asp:TextBox ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" CssClass='<%# GetAccountCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' ReadOnly="true" Text='<%# Bind("SHIPPERSNAME")%>' />
+                                </span>
                                 <!-- 荷受人コード -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSCODE") %>' />
                             </ItemTemplate>

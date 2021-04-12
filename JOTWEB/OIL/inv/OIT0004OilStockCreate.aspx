@@ -35,13 +35,14 @@
                     <input type="button" id="WF_ButtonORDERLIST"      runat="server" class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
                     <input type="button" id="WF_ButtonINPUTCLEAR"     runat="server" class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
                     <input type="button" id="WF_ButtonGETEMPTURN"     runat="server" class="btn-sticky" value="空回日報取込" onclick="ButtonClick('WF_ButtonGETEMPTURN');" />
+                    <input type="button" id="WF_ButtonFixedStock"     runat="server" class="btn-sticky" value="オーダー確定"     onclick="setFixPopUp();commonShowCustomPopup();" />
                 </div>
 
                 <div class="rightSide">
                     <input type="button" id="WF_ButtonRECULC"        class="btn-sticky" value="在庫表再計算"     onclick="ButtonClick('WF_ButtonRECULC');" />
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="在庫表保存"     onclick="ButtonClick('WF_ButtonUPDATE');" />
 
-                    <input type="button" id="WF_ButtonReport"           class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />
+                    <input type="button" id="WF_ButtonReport"           class="btn-sticky" value="帳票" onclick="setPrintPopUp();commonShowCustomPopup();" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   visible="false" onclick="ButtonClick('WF_ButtonFIRST');"></div>
                     <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
@@ -547,45 +548,64 @@
 </asp:Content>
 <%--ポップアップタイトルバーの文字--%>
 <asp:Content ID="ctCostumPopUpTitle" ContentPlaceHolderID ="contentsPopUpTitle" runat="server">
-    帳票設定
+    <span id="popUpPrintTitle">帳票設定</span>
+    <span id="popUpFixTitle">オーダー確定</span>
 </asp:Content>
 <%--ポップアップタイトルバーの内容--%>
 <asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
-    <div id="divChkEneos" runat="server">
-        <div class="grc0001Wrapper">
-            <ul>
-                <li>
-                    <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
-                </li>
-                <li>
-                    <asp:CheckBox ID="chkPrintConsigneeRep" runat="server" Text="油槽所在庫" /> 
-                </li>
-            </ul>
+    <asp:HiddenField ID="hdnPopUpType" runat="server" Value="print" />
+    <div id="popUpPrintSettings">
+        <div id="divChkEneos" runat="server">
+            <div class="grc0001Wrapper">
+                <ul>
+                    <li>
+                        <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
+                    </li>
+                    <li>
+                        <asp:CheckBox ID="chkPrintConsigneeRep" runat="server" Text="油槽所在庫" /> 
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <span id="spnDownloadMonth" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %> >
+                <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+                <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
+                <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+            </span>
+        </div>
+        <div>
+            <span id="spnFromDate" <%= If(hdnShowPnlToDate.Value = "1", "style='display:none;'", "") %>>
+                <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
+                <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                    <asp:CheckBox ID="chkConsigneeRepDoubleSpan" runat="server" text="12日分" />
+                </a>
+            </span>
+        </div>
+    <%--    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
+            <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+            <span id="spnToDate">
+                <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
+                <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                </a>
+            </span>
+        </div>--%>
+    </div>
+    <div id="popUpFixSettings" class="">
+        <div>
+            <span>以下の日付のオーダー確定をします。よろしいですか？</span>
+        </div>
+        <div class="divFixDateArea">
+            <span >
+                <asp:Label ID="lblFixDateLabel" runat="server" Text="オーダー確定日"></asp:Label>
+                <a class="ef" id="aFixDate" ondblclick="Field_DBclick('txtFixDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('txtFixDate');">
+                    <asp:TextBox ID="txtFixDate" runat="server" CssClass="calendarIcon" Text=""></asp:TextBox>
+                </a>
+                <asp:Label ID="lblFixStatus" runat="server" Text=""></asp:Label>
+            </span>
+
         </div>
     </div>
-    <div>
-        <span id="spnDownloadMonth" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %> >
-            <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
-            <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
-            <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
-        </span>
-    </div>
-    <div>
-        <span id="spnFromDate" <%= If(hdnShowPnlToDate.Value = "1", "style='display:none;'", "") %>>
-            <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
-            <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
-                <asp:CheckBox ID="chkConsigneeRepDoubleSpan" runat="server" text="12日分" />
-            </a>
-        </span>
-    </div>
-<%--    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
-        <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
-        <span id="spnToDate">
-            <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
-            <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
-            </a>
-        </span>
-    </div>--%>
 </asp:Content>

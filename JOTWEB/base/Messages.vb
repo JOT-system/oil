@@ -364,6 +364,16 @@ Public Module Messages
         ''' </summary>
         Public Const FTP_EXPORT_SUCCESSFUL As String = "11007"
 
+        ''' <summary>
+        ''' 登録・更新画面での「戻る」ボタン押下時確認メッセージ
+        ''' </summary>
+        Public Const UPDATE_CANCEL_CONFIRM As String = "12001"
+
+        ''' <summary>
+        ''' 登録・更新画面での「更新」ボタン押下時の変更なしエラー
+        ''' </summary>
+        Public Const NO_CHANGE_UPDATE As String = "12002"
+
 #Region "石油向け"
         ''' <summary>
         ''' 削除フラグ未存在

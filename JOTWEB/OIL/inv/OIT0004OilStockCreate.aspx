@@ -35,7 +35,7 @@
                     <input type="button" id="WF_ButtonORDERLIST"      runat="server" class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
                     <input type="button" id="WF_ButtonINPUTCLEAR"     runat="server" class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
                     <input type="button" id="WF_ButtonGETEMPTURN"     runat="server" class="btn-sticky" value="空回日報取込" onclick="ButtonClick('WF_ButtonGETEMPTURN');" />
-                    <input type="button" id="WF_ButtonFixedStock"     runat="server" class="btn-sticky" value="在庫確定"     onclick="setFixPopUp();commonShowCustomPopup();" />
+                    <input type="button" id="WF_ButtonFixedStock"     runat="server" class="btn-sticky" value="オーダー確定"     onclick="setFixPopUp();commonShowCustomPopup();" />
                 </div>
 
                 <div class="rightSide">
@@ -549,7 +549,7 @@
 <%--ポップアップタイトルバーの文字--%>
 <asp:Content ID="ctCostumPopUpTitle" ContentPlaceHolderID ="contentsPopUpTitle" runat="server">
     <span id="popUpPrintTitle">帳票設定</span>
-    <span id="popUpFixTitle">在庫確定</span>
+    <span id="popUpFixTitle">オーダー確定</span>
 </asp:Content>
 <%--ポップアップタイトルバーの内容--%>
 <asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
@@ -595,11 +595,11 @@
     </div>
     <div id="popUpFixSettings" class="">
         <div>
-            <span>以下の日付の在庫確定をします。よろしいですか？</span>
+            <span>以下の日付のオーダー確定をします。よろしいですか？</span>
         </div>
         <div class="divFixDateArea">
             <span >
-                <asp:Label ID="lblFixDateLabel" runat="server" Text="在庫確定日"></asp:Label>
+                <asp:Label ID="lblFixDateLabel" runat="server" Text="オーダー確定日"></asp:Label>
                 <a class="ef" id="aFixDate" ondblclick="Field_DBclick('txtFixDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('txtFixDate');">
                     <asp:TextBox ID="txtFixDate" runat="server" CssClass="calendarIcon" Text=""></asp:TextBox>
                 </a>

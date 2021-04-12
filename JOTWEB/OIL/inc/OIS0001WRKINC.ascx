@@ -111,4 +111,5 @@
     <asp:TextBox ID="WF_SEL_TIMESTAMP" runat="server"></asp:TextBox>    <!-- タイムスタンプ -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>       <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_USER_CAMPCODE" runat="server"></asp:TextBox>     <!-- ユーザー会社コード -->
+    <asp:TextBox ID="WF_SEL_DETAIL_UPDATE_MESSAGE" runat="server"></asp:TextBox>    <!-- 詳細画面更新 -->
 </div>

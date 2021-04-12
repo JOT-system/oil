@@ -37,7 +37,7 @@
                     </p>
                     <div class="Operation" >
                         <span>
-                        <input type="button" id="OK" value="LOGIN"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK'); " />
+                        <input type="button" id="OK" value="ログイン"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK'); " />
                         </span>
                     </div>
                     <p class="LINE_3">

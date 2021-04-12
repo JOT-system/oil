@@ -156,12 +156,27 @@ function InitDisplay() {
                     document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "";
                 }
 
+                //非活性(先返し全選択ボタン)
+                document.getElementById("WF_ButtonFIRSTRETURN_TAB3").disabled = "disabled";
+
             }
             else {
                 //活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
                 //非活性(訂正更新ボタン)
                 document.getElementById("WF_ButtonCORRECTION_TAB3").disabled = "disabled";
+
+                //### 20210412 START 根岸営業所対応(竜王81列車) ##############################
+                //〇 先返し全選択ボタン活性／非活性
+                if (document.getElementById('WF_FIRSTRETURNFLG').value === "0") {
+                    //非活性(先返し全選択ボタン)
+                    document.getElementById("WF_ButtonFIRSTRETURN_TAB3").disabled = "disabled";
+                }
+                else {
+                    //活性(先返し全選択ボタン)
+                    document.getElementById("WF_ButtonFIRSTRETURN_TAB3").disabled = "";
+                }
+                //### 20210412 END   根岸営業所対応(竜王81列車) ##############################
             }
         }
         ////〇タブ４

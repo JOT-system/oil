@@ -845,6 +845,10 @@ Public Module Messages
         ''' 受注データ存在
         ''' </summary>
         Public Const OIL_ORDER_FOUND_WAR As String = "20108"
+        ''' <summary>
+        ''' OT発送日報未送信
+        ''' </summary>
+        Public Const OIL_OTFILE_NOTSEND_WAR As String = "20109"
 
 
 #End Region

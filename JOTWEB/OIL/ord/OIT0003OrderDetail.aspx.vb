@@ -215,6 +215,8 @@ Public Class OIT0003OrderDetail
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCANCEL_TAB1"           '解除ボタン押下
                             WF_ButtonCANCEL_Click()
+                        Case "WF_ButtonFIRSTRETURN_TAB3"      '先返し全選択ボタン押下
+                            WF_ButtonFIRSTRETURN_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -569,9 +571,20 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "0"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(非活性)
+                '◯実績日訂正フラグ(活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
+
+                '### 20210412 START 根岸営業所対応(竜王81列車) ##############################
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 _
+                    AndAlso Me.TxtTrainNo.Text = "81" Then
+                    '○先返し全選択フラグ(活性)
+                    Me.WF_FIRSTRETURNFLG.Value = "1"
+                Else
+                    '○先返し全選択フラグ(非活性)
+                    Me.WF_FIRSTRETURNFLG.Value = "0"
+                End If
+                '### 20210412 END   根岸営業所対応(竜王81列車) ##############################
 
                 '◯受注進行ステータスが320:受注確定以降のステータスに変更された場合
             ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
@@ -591,9 +604,13 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(非活性)
+                '◯実績日訂正フラグ(活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
+                '### 20210412 START 根岸営業所対応(竜王81列車) ##############################
+                '○先返し全選択フラグ(非活性)
+                Me.WF_FIRSTRETURNFLG.Value = "0"
+                '### 20210412 END   根岸営業所対応(竜王81列車) ##############################
 
                 '◯受注進行ステータスが500:輸送完了以降のステータスに変更された場合
             ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
@@ -616,13 +633,17 @@ Public Class OIT0003OrderDetail
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
                 If work.WF_SEL_CORRECTIONDATEFLG.Text = "0" Then
-                    '◯実績日訂正フラグ(活性)
+                    '◯実績日訂正フラグ(非活性)
                     WF_CORRECTIONDATEFLG.Value = "0"
                 Else
-                    '◯実績日訂正フラグ(非活性)
+                    '◯実績日訂正フラグ(活性)
                     WF_CORRECTIONDATEFLG.Value = "1"
                 End If
                 '### 20201210 END   指摘票対応(No246) #######################################
+                '### 20210412 START 根岸営業所対応(竜王81列車) ##############################
+                '○先返し全選択フラグ(非活性)
+                Me.WF_FIRSTRETURNFLG.Value = "0"
+                '### 20210412 END   根岸営業所対応(竜王81列車) ##############################
 
             Else
                 '★臨海鉄道対応(臨海鉄道でない営業所)
@@ -643,7 +664,7 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(非活性)
+                '◯実績日訂正フラグ(活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
 
@@ -1106,6 +1127,11 @@ Public Class OIT0003OrderDetail
         '### 20201225 START 指摘票対応(No291) #######################################
         work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
         '### 20201225 END   指摘票対応(No291) #######################################
+
+        '### 20210412 START 根岸営業所対応(竜王81列車) ##############################
+        '先返し全選択フラグの初期化
+        Me.WF_FIRSTRETURNFLG.Value = "0"
+        '### 20210412 END   根岸営業所対応(竜王81列車) ##############################
 
     End Sub
 
@@ -6772,6 +6798,7 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+#Region "解除ボタン"
     ''' <summary>
     ''' 解除ボタン押下時処理
     ''' </summary>
@@ -6832,6 +6859,56 @@ Public Class OIT0003OrderDetail
         WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
 
     End Sub
+#End Region
+
+#Region "先返し全選択ボタン"
+    ''' <summary>
+    ''' 先返し全選択ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonFIRSTRETURN_Click()
+        '〇 選択されたタブ一覧の各更新ボタン押下時の制御
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            'タブ「タンク車割当」
+            'WF_ButtonFIRSTRETURN_TAB1()
+
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            'タブ「入換・積込指示」
+            'WF_ButtonFIRSTRETURN_TAB2()
+
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            'タブ「タンク車明細」
+            WF_ButtonFIRSTRETURN_TAB3()
+
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            'タブ「費用入力」
+            'WF_ButtonFIRSTRETURN_TAB4()
+
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' 先返し全選択ボタン押下時処理(タブ「タンク車明細」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonFIRSTRETURN_TAB3()
+
+        '先返し(チェックボックス)を全選択
+        For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+            If OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on" Then
+                '★後返し(チェックボックス)にチェック有の場合
+                '　先返し(チェックボックス)にはチェックを未許可とする。
+                OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = ""
+            Else
+                OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on"
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+    End Sub
+#End Region
 
 #Region "明細情報ダウンロード"
     ''' <summary>

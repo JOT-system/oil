@@ -621,6 +621,9 @@
                 <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
+                        <%-- 20210412 START 根岸営業所対応(竜王81列車) --%>
+                        <input type="button" id="WF_ButtonFIRSTRETURN_TAB3" class="btn-sticky" value="先返し全選択" onclick="ButtonClick('WF_ButtonFIRSTRETURN_TAB3');" />
+                        <%-- 20210412 END   根岸営業所対応(竜王81列車) --%>
 <%-- 20200219_タンク車明細での明細の追加・削除などは想定しないため削除
                         <input type="button" id="WF_ButtonALLSELECT_TAB3" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB3');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED_TAB3" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB3');" />
@@ -718,6 +721,10 @@
         <input id="WF_RESULTFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
+        <%-- 20210412 START 根岸営業所対応(竜王81列車) --%>
+        <!-- 先返しフラグ -->
+        <input id="WF_FIRSTRETURNFLG" runat="server" value="" type="text" />
+        <%-- 20210412 END   根岸営業所対応(竜王81列車) --%>
         <!-- 使用受注オーダー可否フラグ -->
         <input id="WF_USEORDERFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->

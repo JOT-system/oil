@@ -380,6 +380,7 @@ Public Class OIT0004OilStockCreate
         End If
         If {"302001", "301901"}.Contains(Master.USER_ORG) Then
             Me.WF_ButtonORDERLIST.Visible = False
+            Me.WF_ButtonGETEMPTURN.Visible = False
         End If
         ''2.比重リスト
         'repWeightList.DataSource = dispDataObj.OilTypeList
@@ -858,6 +859,7 @@ Public Class OIT0004OilStockCreate
         If WW_Check(dispValues, "WF_ButtonUPDATE") = False Then
             Return
         End If
+        Dim fixDate As String = Me.txtFixDate.Text
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             Using sqlTran = sqlCon.BeginTransaction
@@ -866,11 +868,11 @@ Public Class OIT0004OilStockCreate
                 Dim procDate As Date = Date.Now
                 EntryTrainOperation(sqlCon, dispValues, errNum, procDate, sqlTran)
                 '在庫表テーブル更新
-                If EntryStockData(sqlCon, dispValues, errNum, procDate, sqlTran, updateFix:=True) = False Then
+                If EntryStockData(sqlCon, dispValues, errNum, procDate, sqlTran, updateFix:=True, fixDate:=fixDate) = False Then
                     Return
                 End If
                 If dispValues.HasMoveInsideItem Then
-                    If EntryStockData(sqlCon, dispValues.MiDispData, errNum, procDate, sqlTran, updateFix:=True) = False Then
+                    If EntryStockData(sqlCon, dispValues.MiDispData, errNum, procDate, sqlTran, updateFix:=True, fixDate:=fixDate) = False Then
                         Return
                     End If
                 End If
@@ -3704,7 +3706,7 @@ Public Class OIT0004OilStockCreate
     ''' <remarks>データがあれば更新、なければ追加（OIT0001_OILSTOCKテーブル内での履歴登録は無し）
     ''' 一旦、新規登録後に油種マスタから削除された後の更新パターンは考慮しない
     ''' （このパターンは画面上は出ないが宙に浮いたDELFLGが生きたままのデータが残る想定）</remarks>
-    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing, Optional updateFix As Boolean = False) As Boolean
+    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing, Optional updateFix As Boolean = False, Optional fixDate As String = "") As Boolean
         Dim fieldList As New Dictionary(Of String, String)
         If {"302001", "301901"}.Contains(Master.USER_ORG) Then
             fieldList.Add("USER", "ENEOSUPDUSER")
@@ -3746,7 +3748,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("               ,MFLG_SHIPPINGVOL = CASE WHEN MFLG_SHIPPINGVOL = '0' AND @SHIPPINGVOL <> SHIPPINGVOL AND SHIPPINGVOL <> 0 THEN '1' ELSE MFLG_SHIPPINGVOL END")
 
         If updateFix Then
-            sqlStat.AppendLine("               ,FIXEDYMD      = @UPDYMD")
+            sqlStat.AppendLine("               ,FIXEDYMD      = CASE WHEN @FIXDATE=@STOCKYMD THEN @UPDYMD ELSE FIXEDYMD END")
         End If
 
         sqlStat.AppendLine("               ,DELFLG      = @DELFLG")
@@ -3813,7 +3815,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,CASE WHEN @MORSTOCK <> 0 AND @STOCKYMD <= CONVERT(datetime, CONVERT(char(8), GETDATE(), 112)) THEN '1' ELSE '0' END")
         sqlStat.AppendLine("            ,CASE WHEN @SHIPPINGVOL <> 0 THEN '1' ELSE '0' END")
         If updateFix Then
-            sqlStat.AppendLine("            ,@UPDYMD")
+            sqlStat.AppendLine("            ,CASE WHEN @FIXDATE=@STOCKYMD THEN @UPDYMD ELSE NULL END")
         End If
         sqlStat.AppendLine("            ,@DELFLG")
         sqlStat.AppendLine("            ,@INITYMD")
@@ -3883,6 +3885,10 @@ Public Class OIT0004OilStockCreate
                 .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
                 .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
                 .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
+                If updateFix Then
+                    .Add("@FIXDATE", SqlDbType.Date).Value = fixDate
+                End If
+
             End With
             '変動パラメータ
             Dim paramStockYmd = sqlCmd.Parameters.Add("@STOCKYMD", SqlDbType.Date)

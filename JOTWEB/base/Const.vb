@@ -1252,9 +1252,6 @@ Public Module BaseDllConst
     '輸送実績表（仙台）
     Public Const CONST_TEMPNAME_TRANSPORT_RESULT_010402 As String = "OIT0008M_TRASPORT_RESULT_010402.xlsx"
 
-    '輸送実績表（根岸）
-    Public Const CONST_TEMPNAME_TRANSPORT_RESULT_011402 As String = "OIT0008M_TRASPORT_RESULT_011402.xlsx"
-
 #End Region
 
 End Module 'End BaseDllConst

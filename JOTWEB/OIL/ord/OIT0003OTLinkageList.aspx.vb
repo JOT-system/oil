@@ -3201,12 +3201,17 @@ Public Class OIT0003OTLinkageList
         'sqlStat.AppendLine("            ELSE '000000'")
         'sqlStat.AppendLine("             END")
         'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
-        sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        'sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
+        'sqlStat.AppendLine("             END")
+        'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER = '143645' THEN '043645'")
+        sqlStat.AppendLine("            WHEN TNK.LOAD = 44")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
         sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
         sqlStat.AppendLine("             END")
         sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
-
         sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
         sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
         sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
@@ -3273,6 +3278,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
         sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
         sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DEFAULTKBN  = 'def'")
         sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
         '列車マスタ結合ここまで↑
         '積込予約マスタ結合ここから↓

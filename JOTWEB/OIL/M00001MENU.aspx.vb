@@ -631,9 +631,6 @@ Public Class M00001MENU
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                     tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
-                ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
-                    '営業所が根岸営業所の場合は、根岸テンプレートを使用
-                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_011402
                 End If
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
@@ -644,10 +641,6 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                         '仙台新港営業所
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_010402(
-                        CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
-                    ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
-                        '根岸営業所
-                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_011402(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
                     Else
                         'その他

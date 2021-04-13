@@ -3273,6 +3273,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
         sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
         sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DEFAULTKBN  = 'def'")
         sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
         '列車マスタ結合ここまで↑
         '積込予約マスタ結合ここから↓

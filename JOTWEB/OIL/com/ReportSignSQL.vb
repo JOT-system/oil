@@ -37,6 +37,7 @@
             & " , OIT0003.ACTUALARRDATE                          AS ACTUALARRDATE" _
             & " , OIT0003.ACTUALACCDATE                          AS ACTUALACCDATE" _
             & " , OIT0003.ACTUALEMPARRDATE                       AS ACTUALEMPARRDATE" _
+            & " , OIT0003.UPGRADEFLG                             AS UPGRADEFLG " _
             & " , OIT0003.OTTRANSPORTFLG                         AS OTTRANSPORTFLG " _
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIT0003.TANKNO                                 AS TANKNO" _

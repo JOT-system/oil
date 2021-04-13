@@ -808,15 +808,26 @@ Public Class OIT0001CustomReport : Implements IDisposable
             '### 20200917 END   指摘票対応(No138)全体 ###################################################
             '### 20201008 START 指摘票対応(No157)全体 ###################################################
             '◯ 記事
+            Dim Remark As String = ""
             I_rngDetailArea = Me.ExcelWorkSheet.Range("R" + I_column.ToString())
             'I_rngDetailArea = Me.ExcelWorkSheet.Range("N" + I_column.ToString())
             '### 20201218 START 指摘票対応(No276)全体 ###################################################
             If Convert.ToString(PrintDatarow("SECONDCONSIGNEECODE")) = BaseDllConst.CONST_CONSIGNEECODE_54 Then
-                I_rngDetailArea.Value = "構内取り"
+                'I_rngDetailArea.Value = "構内取り"
+                Remark = "構内取り"
             Else
-                I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+                'I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+                Remark = Convert.ToString(PrintDatarow("KUUKAICONSIGNEENAME"))
             End If
-            '### 20201218 START 指摘票対応(No276)全体 ###################################################
+            '### 20210413 START 格上げ・格下げ追加対応 ##################################################
+            If Convert.ToString(PrintDatarow("UPGRADEFLG")) = "1" Then
+                Remark &= "「格上げ」"
+            ElseIf Convert.ToString(PrintDatarow("UPGRADEFLG")) = "0" Then
+                Remark &= "「格下げ」"
+            End If
+            I_rngDetailArea.Value = Remark
+            '### 20210413 END   格上げ・格下げ追加対応 ##################################################
+            '### 20201218 END   指摘票対応(No276)全体 ###################################################
             ExcelMemoryRelease(I_rngDetailArea)
             '### 20201008 END   指摘票対応(No157)全体 ###################################################
         Else

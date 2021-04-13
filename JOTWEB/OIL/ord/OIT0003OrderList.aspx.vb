@@ -5332,10 +5332,10 @@ Public Class OIT0003OrderList
                 Dim PARAADDOTH01 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARAADDOTH02 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARAADDOTH03 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
-                Dim PARAADDOTH04 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 5)  'OT輸送可否フラグ
+                Dim PARAADDOTH04 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 'Dim PARAADDOTH05 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
-                Dim PARAADDOTH06 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '受注進行ステータス
-                Dim PARAADDOTH07 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 5)  'OT輸送可否フラグ
+                Dim PARAADDOTH06 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARAADDOTH07 As SqlParameter = SQLADDOTHcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 PARAADDOTH01.Value = BaseDllConst.CONST_OFFICECODE_011201
                 PARAADDOTH02.Value = C_DELETE_FLG.DELETE
                 PARAADDOTH06.Value = BaseDllConst.CONST_ORDERSTATUS_900
@@ -5359,7 +5359,7 @@ Public Class OIT0003OrderList
                 Dim PARAADD03 As SqlParameter = SQLADDcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARAADD04 As SqlParameter = SQLADDcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 Dim PARAADD05 As SqlParameter = SQLADDcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
-                Dim PARAADD06 As SqlParameter = SQLADDcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '受注進行ステータス
+                Dim PARAADD06 As SqlParameter = SQLADDcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARAADD07 As SqlParameter = SQLADDcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
                 PARAADD01.Value = BaseDllConst.CONST_OFFICECODE_011201
                 PARAADD02.Value = C_DELETE_FLG.DELETE

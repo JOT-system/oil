@@ -12206,6 +12206,14 @@ Public Class OIT0003OrderDetail
         If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
         End If
+        '積込日To('20210413(条件追加：(予定)積込日To))
+        If Not String.IsNullOrEmpty(work.WF_SEL_DATE_TO.Text) Then
+            SQLStr &= String.Format("    AND OIT0002.LODDATE <= '{0}'", work.WF_SEL_DATE_TO.Text)
+        End If
+        '発日('20200225(条件追加：(予定)発日))
+        If Not String.IsNullOrEmpty(work.WF_SEL_SEARCH_DEPDATE.Text) Then
+            SQLStr &= String.Format("    AND OIT0002.DEPDATE >= '{0}'", work.WF_SEL_SEARCH_DEPDATE.Text)
+        End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
             SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)

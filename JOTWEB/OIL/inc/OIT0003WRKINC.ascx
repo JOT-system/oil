@@ -13,8 +13,10 @@
     <asp:TextBox ID="WF_SEL_SALESOFFICECODE" runat="server"></asp:TextBox>
     <!-- 営業所名 -->
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
-    <!-- 年月日 -->
+    <!-- 年月日From -->
     <asp:TextBox ID="WF_SEL_DATE" runat="server"></asp:TextBox>
+    <!-- 年月日To -->
+    <asp:TextBox ID="WF_SEL_DATE_TO" runat="server"></asp:TextBox>
     <!-- 発日 -->
     <asp:TextBox ID="WF_SEL_SEARCH_DEPDATE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->

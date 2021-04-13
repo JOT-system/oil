@@ -77,6 +77,15 @@ Partial Public Class OIT0003OrderSearch
     Protected WithEvents TxtDateStart As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtDateEnd コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtDateEnd As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtDepDateStart コントロール。
     '''</summary>
     '''<remarks>

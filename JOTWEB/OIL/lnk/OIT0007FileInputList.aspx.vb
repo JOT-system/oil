@@ -1542,7 +1542,13 @@ Public Class OIT0007FileInputList
         'sqlStat.AppendLine("            ELSE '000000'")
         'sqlStat.AppendLine("             END")
         'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
-        sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        'sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
+        'sqlStat.AppendLine("             END")
+        'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER = '143645' THEN '043645'")
+        sqlStat.AppendLine("            WHEN TNK.LOAD = 44")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
         sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
         sqlStat.AppendLine("             END")

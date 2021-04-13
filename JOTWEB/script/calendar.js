@@ -104,36 +104,38 @@ function carenda(num,calId) {
     // 月を英語表記にする
     var usmonth;
     if (month === 1) {
-        usmonth = "January"
+        usmonth = "1月"
     } else if (month === 2) {
-        usmonth = "February"
+        usmonth = "2月"
     } else if (month === 3) {
-        usmonth = "March"
+        usmonth = "3月"
     } else if (month === 4) {
-        usmonth = "April"
+        usmonth = "4月"
     } else if (month === 5) {
-        usmonth = "May"
+        usmonth = "5月"
     } else if (month === 6) {
-        usmonth = "June"
+        usmonth = "6月"
     } else if (month === 7) {
-        usmonth = "July"
+        usmonth = "7月"
     } else if (month === 8) {
-        usmonth = "August"
+        usmonth = "8月"
     } else if (month === 9) {
-        usmonth = "September"
+        usmonth = "9月"
     } else if (month === 10) {
-        usmonth = "October"
+        usmonth = "10月"
     } else if (month === 11) {
-        usmonth = "November"
+        usmonth = "11月"
     } else if (month === 12) {
-        usmonth = "Decembar"
+        usmonth = "12月"
     }
 
     editMsg = "";
  //   editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:white' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:white'><b stylr='font-size:x-large'>" + year + "年" + month + "月</b></td><td style='cursor:pointer;background:white' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
-    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(1)'><b style='font-size:1em;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38);border-radius:15px'><b stylr='font-size:1em'>" + usmonth + "&nbsp" + year + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(2)'><b style='font-size:1em'>&gt;&gt;</b></td></tr>\n";
+//    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(1)'><b style='font-size:1em;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38);border-radius:15px'><b stylr='font-size:1em'>" + usmonth + "&nbsp" + year + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(2)'><b style='font-size:1em'>&gt;&gt;</b></td></tr>\n";
+    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(1)'><b style='font-size:1em;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38);border-radius:15px'><b stylr='font-size:1em'>" + year + "年" + "&nbsp" + usmonth + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(2)'><b style='font-size:1em'>&gt;&gt;</b></td></tr>\n";
 
-    editMsg += "<tr>" + defTD("Su", "#383838", kabe_sun) + defTD("Mo", "#383838", kabe_mon) + defTD("Tu", "#383838", kabe_tue) + defTD("We", "black", kabe_wed) + defTD("Th", "#383838", kabe_thu) + defTD("Fr", "#383838", kabe_fri) + defTD("Sa", "#383838", kabe_sat) + "</tr>\n";
+//    editMsg += "<tr>" + defTD("Su", "#383838", kabe_sun) + defTD("Mo", "#383838", kabe_mon) + defTD("Tu", "#383838", kabe_tue) + defTD("We", "black", kabe_wed) + defTD("Th", "#383838", kabe_thu) + defTD("Fr", "#383838", kabe_fri) + defTD("Sa", "#383838", kabe_sat) + "</tr>\n";
+    editMsg += "<tr>" + defTD("日", "#383838", kabe_sun) + defTD("月", "#383838", kabe_mon) + defTD("火", "#383838", kabe_tue) + defTD("水", "black", kabe_wed) + defTD("木", "#383838", kabe_thu) + defTD("金", "#383838", kabe_fri) + defTD("土", "#383838", kabe_sat) + "</tr>\n";
     editMsg += "<tr>";
 
 

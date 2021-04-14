@@ -855,6 +855,10 @@ Public Module Messages
         ''' OT発送日報未送信
         ''' </summary>
         Public Const OIL_OTFILE_NOTSEND_WAR As String = "20109"
+        ''' <summary>
+        ''' FREEメッセージ
+        ''' </summary>
+        Public Const OIL_FREE_MESSAGE As String = "20110"
 
 
 #End Region

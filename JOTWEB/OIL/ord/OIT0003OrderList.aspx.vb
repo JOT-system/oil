@@ -1877,6 +1877,12 @@ Public Class OIT0003OrderList
             End If
         End Using
 
+        Dim Msg As String = ""
+        Dim lodDate As Date = OIT0003EXLODRALLtbl.Rows(0)("LODDATE")
+        Msg = lodDate.ToString("MM月dd日")
+        Msg &= String.Format("車号データ {0}件取込完了", OIT0003EXLODRALLtbl.Rows.Count)
+        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.INF, I_PARA01:=Msg, needsPopUp:=True)
+
     End Sub
 
     ''' <summary>

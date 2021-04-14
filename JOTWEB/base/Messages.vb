@@ -374,6 +374,12 @@ Public Module Messages
         ''' </summary>
         Public Const NO_CHANGE_UPDATE As String = "12002"
 
+        ''' <summary>
+        ''' 帳票出力でのデータ未存在エラー
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Const NO_REPORT_DATA_EXISTS_ERROR As String = "12003"
+
 #Region "石油向け"
         ''' <summary>
         ''' 削除フラグ未存在

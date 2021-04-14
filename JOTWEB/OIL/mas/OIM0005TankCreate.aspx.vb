@@ -472,7 +472,6 @@ Public Class OIM0005TankCreate
 
     End Sub
 
-
     ''' <summary>
     ''' タンク車マスタ登録更新
     ''' </summary>
@@ -1328,16 +1327,6 @@ Public Class OIM0005TankCreate
             CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
             Exit Sub
         End Try
-
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-    End Sub
-
-    ''' <summary>
-    ''' 一覧画面-マウスホイール時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_Grid_Scroll()
 
     End Sub
 

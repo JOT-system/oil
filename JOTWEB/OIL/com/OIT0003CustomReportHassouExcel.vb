@@ -389,9 +389,34 @@ Public Class OIT0003CustomReportHassouExcel : Implements IDisposable
                 ' TODO: マネージド状態を破棄します (マネージド オブジェクト)。
             End If
 
-            ' TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、下の Finalize() をオーバーライドします。
-            ' TODO: 大きなフィールドを null に設定します。
         End If
+        'Excel 作業シートオブジェクトの解放
+        ExcelMemoryRelease(ExcelTempSheet)
+        'Excel Sheetオブジェクトの解放
+        ExcelMemoryRelease(ExcelWorkSheet)
+        'Excel Sheetコレクションの解放
+        ExcelMemoryRelease(ExcelWorkSheets)
+        'Excel Bookオブジェクトを閉じる
+        If ExcelBookObj IsNot Nothing Then
+            Try
+                'ExcelBookObj.Close(Excel.XlSaveAction.xlDoNotSaveChanges)
+                ExcelBookObj.Close(False)
+            Catch ex As Exception
+            End Try
+        End If
+
+        ExcelMemoryRelease(ExcelBookObj)
+        'Excel Bookコレクションの解放
+        ExcelMemoryRelease(ExcelBooksObj)
+        'Excel Appの終了
+        If ExcelAppObj IsNot Nothing Then
+            Try
+                ExcelAppObj.Quit()
+            Catch ex As Exception
+            End Try
+        End If
+        ExcelMemoryRelease(ExcelAppObj)
+        ExcelProcEnd()
         disposedValue = True
     End Sub
 

@@ -1630,48 +1630,6 @@ Public Class OIM0005TankList
                 Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Date)              '取得年月日
                 Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Date)              '車籍編入年月日
                 Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 2)       '取得先C
-                'Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)     '形式
-                'Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.NVarChar, 10)     '形式カナ
-                'Dim JPARA26 As SqlParameter = SQLcmdJnl.Parameters.Add("@P26", SqlDbType.Float, 4, 1)      '荷重
-                'Dim JPARA27 As SqlParameter = SQLcmdJnl.Parameters.Add("@P27", SqlDbType.NVarChar, 2)      '荷重単位
-                'Dim JPARA28 As SqlParameter = SQLcmdJnl.Parameters.Add("@P28", SqlDbType.Float, 4, 1)      '容積
-                'Dim JPARA29 As SqlParameter = SQLcmdJnl.Parameters.Add("@P29", SqlDbType.NVarChar, 2)      '容積単位
-                'Dim JPARA30 As SqlParameter = SQLcmdJnl.Parameters.Add("@P30", SqlDbType.NVarChar, 20)            '原籍所有者
-                'Dim JPARA31 As SqlParameter = SQLcmdJnl.Parameters.Add("@P31", SqlDbType.NVarChar, 20)            '名義所有者
-                'Dim JPARA32 As SqlParameter = SQLcmdJnl.Parameters.Add("@P32", SqlDbType.NVarChar, 20)            'リース先
-                'Dim JPARA33 As SqlParameter = SQLcmdJnl.Parameters.Add("@P33", SqlDbType.NVarChar, 20)            'リース区分
-                'Dim JPARA34 As SqlParameter = SQLcmdJnl.Parameters.Add("@P34", SqlDbType.NVarChar, 20)            '第三者使用者
-                'Dim JPARA35 As SqlParameter = SQLcmdJnl.Parameters.Add("@P35", SqlDbType.NVarChar, 20)            '原常備駅
-                'Dim JPARA36 As SqlParameter = SQLcmdJnl.Parameters.Add("@P36", SqlDbType.NVarChar, 20)            '臨時常備駅
-                'Dim JPARA37 As SqlParameter = SQLcmdJnl.Parameters.Add("@P37", SqlDbType.NVarChar, 20)            '原専用種別
-                'Dim JPARA38 As SqlParameter = SQLcmdJnl.Parameters.Add("@P38", SqlDbType.NVarChar, 20)            '臨時専用種別
-                'Dim JPARA39 As SqlParameter = SQLcmdJnl.Parameters.Add("@P39", SqlDbType.NVarChar, 20)            '運用場所
-                'Dim JPARA40 As SqlParameter = SQLcmdJnl.Parameters.Add("@P40", SqlDbType.NVarChar, 20)            '塗色
-                'Dim JPARA41 As SqlParameter = SQLcmdJnl.Parameters.Add("@P41", SqlDbType.NVarChar, 20)            '予備1
-                'Dim JPARA42 As SqlParameter = SQLcmdJnl.Parameters.Add("@P42", SqlDbType.NVarChar, 20)            '予備2
-                'Dim JPARA43 As SqlParameter = SQLcmdJnl.Parameters.Add("@P43", SqlDbType.Date)            '次回指定年月日
-                'Dim JPARA44 As SqlParameter = SQLcmdJnl.Parameters.Add("@P44", SqlDbType.Date)            '次回全検年月日(JR) 
-                'Dim JPARA45 As SqlParameter = SQLcmdJnl.Parameters.Add("@P45", SqlDbType.Int)            '現在経年
-                'Dim JPARA46 As SqlParameter = SQLcmdJnl.Parameters.Add("@P46", SqlDbType.Int)            '次回全検時経年
-                'Dim JPARA47 As SqlParameter = SQLcmdJnl.Parameters.Add("@P47", SqlDbType.Date)            '次回交検年月日(JR）
-                'Dim JPARA48 As SqlParameter = SQLcmdJnl.Parameters.Add("@P48", SqlDbType.Date)            '次回交検年月日
-                'Dim JPARA49 As SqlParameter = SQLcmdJnl.Parameters.Add("@P49", SqlDbType.Date)            '次回指定年月日(JR)
-                'Dim JPARA50 As SqlParameter = SQLcmdJnl.Parameters.Add("@P50", SqlDbType.NVarChar, 20)            'JR車番
-                'Dim JPARA51 As SqlParameter = SQLcmdJnl.Parameters.Add("@P51", SqlDbType.NVarChar, 20)            '旧JOT車番
-                'Dim JPARA52 As SqlParameter = SQLcmdJnl.Parameters.Add("@P52", SqlDbType.NVarChar, 20)            'OT車番
-                'Dim JPARA53 As SqlParameter = SQLcmdJnl.Parameters.Add("@P53", SqlDbType.NVarChar, 20)            'JXTG車番
-                'Dim JPARA54 As SqlParameter = SQLcmdJnl.Parameters.Add("@P54", SqlDbType.NVarChar, 20)            'コスモ車番
-                'Dim JPARA55 As SqlParameter = SQLcmdJnl.Parameters.Add("@P55", SqlDbType.NVarChar, 20)            '富士石油車番
-                'Dim JPARA56 As SqlParameter = SQLcmdJnl.Parameters.Add("@P56", SqlDbType.NVarChar, 20)            '出光昭シ車番
-                'Dim JPARA57 As SqlParameter = SQLcmdJnl.Parameters.Add("@P57", SqlDbType.NVarChar, 20)            '予備
-                'Dim JPARA65 As SqlParameter = SQLcmdJnl.Parameters.Add("@P65", SqlDbType.NVarChar, 1)            '利用フラグ
-                'Dim JPARA58 As SqlParameter = SQLcmdJnl.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
-                'Dim JPARA59 As SqlParameter = SQLcmdJnl.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
-                'Dim JPARA60 As SqlParameter = SQLcmdJnl.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末
-                'Dim JPARA61 As SqlParameter = SQLcmdJnl.Parameters.Add("@P61", SqlDbType.DateTime)            '更新年月日
-                'Dim JPARA62 As SqlParameter = SQLcmdJnl.Parameters.Add("@P62", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
-                'Dim JPARA63 As SqlParameter = SQLcmdJnl.Parameters.Add("@P63", SqlDbType.NVarChar, 20)            '更新端末
-                'Dim JPARA64 As SqlParameter = SQLcmdJnl.Parameters.Add("@P64", SqlDbType.DateTime)            '集信日時
 
                 For Each OIM0005row As DataRow In OIM0005tbl.Rows
                     If Trim(OIM0005row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -1939,76 +1897,6 @@ Public Class OIM0005TankList
                             JPARA22.Value = DBNull.Value
                         End If
                         JPARA23.Value = OIM0005row("OBTAINEDCODE")
-                        'JPARA24.Value = OIM0005row("MODEL")
-                        'JPARA25.Value = OIM0005row("MODELKANA")
-                        'JPARA26.Value = OIM0005row("LOAD")
-                        'JPARA27.Value = OIM0005row("LOADUNIT")
-                        'JPARA28.Value = OIM0005row("VOLUME")
-                        'JPARA29.Value = OIM0005row("VOLUMEUNIT")
-                        'JPARA30.Value = OIM0005row("ORIGINOWNERNAME")
-                        'JPARA31.Value = OIM0005row("OWNERNAME")
-                        'JPARA32.Value = OIM0005row("LEASENAME")
-                        'JPARA33.Value = OIM0005row("LEASECLASSNEMAE")
-                        'JPARA34.Value = OIM0005row("USERNAME")
-                        'JPARA35.Value = OIM0005row("CURRENTSTATIONNAME")
-                        'JPARA36.Value = OIM0005row("EXTRADINARYSTATIONNAME")
-                        'JPARA37.Value = OIM0005row("DEDICATETYPENAME")
-                        'JPARA38.Value = OIM0005row("EXTRADINARYTYPENAME")
-                        'JPARA39.Value = OIM0005row("OPERATIONBASENAME")
-                        'JPARA40.Value = OIM0005row("COLORNAME")
-                        'JPARA41.Value = OIM0005row("RESERVE1")
-                        'JPARA42.Value = OIM0005row("RESERVE2")
-                        'If RTrim(OIM0005row("SPECIFIEDDATE")) <> "" Then
-                        '    JPARA43.Value = OIM0005row("SPECIFIEDDATE")
-                        'Else
-                        '    JPARA43.Value = C_DEFAULT_YMD
-                        'End If
-                        'If OIM0005row("JRALLINSPECTIONDATE") <> "" Then
-                        '    JPARA44.Value = OIM0005row("JRALLINSPECTIONDATE")
-                        'Else
-                        '    JPARA44.Value = C_DEFAULT_YMD
-                        'End If
-                        'If OIM0005row("PROGRESSYEAR") <> "" Then
-                        '    JPARA45.Value = OIM0005row("PROGRESSYEAR")
-                        'Else
-                        '    JPARA45.Value = "0"
-                        'End If
-                        'If OIM0005row("NEXTPROGRESSYEAR") <> "" Then
-                        '    JPARA46.Value = OIM0005row("NEXTPROGRESSYEAR")
-                        'Else
-                        '    JPARA46.Value = "0"
-                        'End If
-                        'If OIM0005row("JRINSPECTIONDATE") <> "" Then
-                        '    JPARA47.Value = OIM0005row("JRINSPECTIONDATE")
-                        'Else
-                        '    JPARA47.Value = C_DEFAULT_YMD
-                        'End If
-                        'If OIM0005row("INSPECTIONDATE") <> "" Then
-                        '    JPARA48.Value = OIM0005row("INSPECTIONDATE")
-                        'Else
-                        '    JPARA48.Value = C_DEFAULT_YMD
-                        'End If
-                        'If OIM0005row("JRSPECIFIEDDATE") <> "" Then
-                        '    JPARA49.Value = OIM0005row("JRSPECIFIEDDATE")
-                        'Else
-                        '    JPARA49.Value = C_DEFAULT_YMD
-                        'End If
-                        'JPARA50.Value = OIM0005row("JRTANKNUMBER")
-                        'JPARA51.Value = OIM0005row("OLDTANKNUMBER")
-                        'JPARA52.Value = OIM0005row("OTTANKNUMBER")
-                        'JPARA53.Value = OIM0005row("JXTGTANKNUMBER1")
-                        'JPARA54.Value = OIM0005row("COSMOTANKNUMBER")
-                        'JPARA55.Value = OIM0005row("FUJITANKNUMBER")
-                        'JPARA56.Value = OIM0005row("SHELLTANKNUMBER")
-                        'JPARA57.Value = OIM0005row("RESERVE3")
-                        'JPARA65.Value = OIM0005row("USEDFLG")
-                        'JPARA58.Value = WW_DATENOW
-                        'JPARA59.Value = Master.USERID
-                        'JPARA60.Value = Master.USERTERMID
-                        'JPARA61.Value = WW_DATENOW
-                        'JPARA62.Value = Master.USERID
-                        'JPARA63.Value = Master.USERTERMID
-                        'JPARA64.Value = C_DEFAULT_YMD
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
                             If IsNothing(OIM0005UPDtbl) Then
@@ -2680,11 +2568,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''原籍所有者
-            'If WW_COLUMNS.IndexOf("ORIGINOWNERNAME") >= 0 Then
-            '    OIM0005INProw("ORIGINOWNERNAME") = XLSTBLrow("ORIGINOWNERNAME")
-            'End If
-
             '名義所有者C
             If WW_COLUMNS.IndexOf("OWNERCODE") >= 0 Then
                 OIM0005INProw("OWNERCODE") = XLSTBLrow("OWNERCODE")
@@ -2699,11 +2582,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("OWNERNAME") = ""
                 End If
             End If
-
-            ''名義所有者
-            'If WW_COLUMNS.IndexOf("OWNERNAME") >= 0 Then
-            '    OIM0005INProw("OWNERNAME") = XLSTBLrow("OWNERNAME")
-            'End If
 
             'リース先C
             If WW_COLUMNS.IndexOf("LEASECODE") >= 0 Then
@@ -2720,11 +2598,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''リース先
-            'If WW_COLUMNS.IndexOf("LEASENAME") >= 0 Then
-            '    OIM0005INProw("LEASENAME") = XLSTBLrow("LEASENAME")
-            'End If
-
             'リース区分C
             If WW_COLUMNS.IndexOf("LEASECLASS") >= 0 Then
                 OIM0005INProw("LEASECLASS") = XLSTBLrow("LEASECLASS")
@@ -2740,11 +2613,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''リース区分
-            'If WW_COLUMNS.IndexOf("LEASECLASSNEMAE") >= 0 Then
-            '    OIM0005INProw("LEASECLASSNEMAE") = XLSTBLrow("LEASECLASSNEMAE")
-            'End If
-
             '自動延長
             If WW_COLUMNS.IndexOf("AUTOEXTENTION") >= 0 Then
                 OIM0005INProw("AUTOEXTENTION") = XLSTBLrow("AUTOEXTENTION")
@@ -2759,11 +2627,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("AUTOEXTENTIONNAME") = ""
                 End If
             End If
-
-            ''自動延長名
-            'If WW_COLUMNS.IndexOf("AUTOEXTENTIONNAME") >= 0 Then
-            '    OIM0005INProw("AUTOEXTENTIONNAME") = XLSTBLrow("AUTOEXTENTIONNAME")
-            'End If
 
             'リース開始年月日
             If WW_COLUMNS.IndexOf("LEASESTYMD") >= 0 Then
@@ -2790,11 +2653,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''第三者使用者
-            'If WW_COLUMNS.IndexOf("USERNAME") >= 0 Then
-            '    OIM0005INProw("USERNAME") = XLSTBLrow("USERNAME")
-            'End If
-
             '原常備駅C
             If WW_COLUMNS.IndexOf("CURRENTSTATIONCODE") >= 0 Then
                 OIM0005INProw("CURRENTSTATIONCODE") = XLSTBLrow("CURRENTSTATIONCODE")
@@ -2809,11 +2667,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("CURRENTSTATIONNAME") = ""
                 End If
             End If
-
-            ''原常備駅
-            'If WW_COLUMNS.IndexOf("CURRENTSTATIONNAME") >= 0 Then
-            '    OIM0005INProw("CURRENTSTATIONNAME") = XLSTBLrow("CURRENTSTATIONNAME")
-            'End If
 
             '臨時常備駅C
             If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONCODE") >= 0 Then
@@ -2830,11 +2683,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("EXTRADINARYSTATIONNAME") = ""
                 End If
             End If
-
-            ''臨時常備駅
-            'If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONNAME") >= 0 Then
-            '    OIM0005INProw("EXTRADINARYSTATIONNAME") = XLSTBLrow("EXTRADINARYSTATIONNAME")
-            'End If
 
             '第三者使用期限
             If WW_COLUMNS.IndexOf("USERLIMIT") >= 0 Then
@@ -2862,11 +2710,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''原専用種別
-            'If WW_COLUMNS.IndexOf("DEDICATETYPENAME") >= 0 Then
-            '    OIM0005INProw("DEDICATETYPENAME") = XLSTBLrow("DEDICATETYPENAME")
-            'End If
-
             '臨時専用種別C
             If WW_COLUMNS.IndexOf("EXTRADINARYTYPECODE") >= 0 Then
                 OIM0005INProw("EXTRADINARYTYPECODE") = XLSTBLrow("EXTRADINARYTYPECODE")
@@ -2882,11 +2725,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("EXTRADINARYTYPECODE") = ""
                 End If
             End If
-
-            ''臨時専用種別
-            'If WW_COLUMNS.IndexOf("EXTRADINARYTYPENAME") >= 0 Then
-            '    OIM0005INProw("EXTRADINARYTYPENAME") = XLSTBLrow("EXTRADINARYTYPENAME")
-            'End If
 
             '臨時専用期限
             If WW_COLUMNS.IndexOf("EXTRADINARYLIMIT") >= 0 Then
@@ -2909,11 +2747,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''油種大分類名
-            'If WW_COLUMNS.IndexOf("BIGOILNAME") >= 0 Then
-            '    OIM0005INProw("BIGOILNAME") = XLSTBLrow("BIGOILNAME")
-            'End If
-
             '運用基地C
             If WW_COLUMNS.IndexOf("OPERATIONBASECODE") >= 0 Then
                 OIM0005INProw("OPERATIONBASECODE") = XLSTBLrow("OPERATIONBASECODE")
@@ -2929,11 +2762,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("OPERATIONBASENAME") = ""
                 End If
             End If
-
-            ''運用場所
-            'If WW_COLUMNS.IndexOf("OPERATIONBASENAME") >= 0 Then
-            '    OIM0005INProw("OPERATIONBASENAME") = XLSTBLrow("OPERATIONBASENAME")
-            'End If
 
             '塗色C
             If WW_COLUMNS.IndexOf("COLORCODE") >= 0 Then
@@ -2951,11 +2779,6 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            ''塗色
-            'If WW_COLUMNS.IndexOf("COLORNAME") >= 0 Then
-            '    OIM0005INProw("COLORNAME") = XLSTBLrow("COLORNAME")
-            'End If
-
             'マークコード
             If WW_COLUMNS.IndexOf("MARKCODE") >= 0 Then
                 OIM0005INProw("MARKCODE") = XLSTBLrow("MARKCODE")
@@ -2971,11 +2794,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("MARKNAME") = ""
                 End If
             End If
-
-            ''マーク名
-            'If WW_COLUMNS.IndexOf("MARKNAME") >= 0 Then
-            '    OIM0005INProw("MARKNAME") = XLSTBLrow("MARKNAME")
-            'End If
 
             'JXTG仙台タグコード
             If WW_COLUMNS.IndexOf("JXTGTAGCODE1") >= 0 Then
@@ -3002,11 +2820,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("JXTGTAGNAME2") = ""
                 End If
             End If
-
-            ''JXTG千葉タグ名
-            'If WW_COLUMNS.IndexOf("JXTGTAGNAME2") >= 0 Then
-            '    OIM0005INProw("JXTGTAGNAME2") = XLSTBLrow("JXTGTAGNAME2")
-            'End If
 
             'JXTG川崎タグコード
             If WW_COLUMNS.IndexOf("JXTGTAGCODE3") >= 0 Then
@@ -3043,11 +2856,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("IDSSTAGNAME") = ""
                 End If
             End If
-
-            ''出光昭シタグ名
-            'If WW_COLUMNS.IndexOf("IDSSTAGNAME") >= 0 Then
-            '    OIM0005INProw("IDSSTAGNAME") = XLSTBLrow("IDSSTAGNAME")
-            'End If
 
             'コスモタグコード
             If WW_COLUMNS.IndexOf("COSMOTAGCODE") >= 0 Then
@@ -3129,11 +2937,6 @@ Public Class OIM0005TankList
                     OIM0005INProw("OBTAINEDNAME") = ""
                 End If
             End If
-
-            ''取得先名
-            'If WW_COLUMNS.IndexOf("OBTAINEDNAME") >= 0 Then
-            '    OIM0005INProw("OBTAINEDNAME") = XLSTBLrow("OBTAINEDNAME")
-            'End If
 
             '現在経年
             If WW_COLUMNS.IndexOf("PROGRESSYEAR") >= 0 Then
@@ -3223,6 +3026,13 @@ Public Class OIM0005TankList
             '利用フラグ
             If WW_COLUMNS.IndexOf("USEDFLG") >= 0 Then
                 OIM0005INProw("USEDFLG") = XLSTBLrow("USEDFLG")
+
+                '利用フラグ名
+                If Not String.IsNullOrEmpty(OIM0005INProw("USEDFLG")) Then
+                    CODENAME_get("USEDFLG", OIM0005INProw("USEDFLG"), OIM0005INProw("USEDFLGNAME"), WW_DUMMY)
+                Else
+                    OIM0005INProw("USEDFLGNAME") = ""
+                End If
             End If
 
             '削除フラグ

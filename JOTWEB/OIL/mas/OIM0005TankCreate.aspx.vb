@@ -11,6 +11,8 @@
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)更新ボタン押下時、この画面でDB更新→
 '                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/04/14 DB更新後に一覧画面に戻る場合に
+'                     コード名称が表示されなくなるバグを修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -26,9 +28,6 @@ Public Class OIM0005TankCreate
     Private OIM0005tbl As DataTable                                 '一覧格納用テーブル
     Private OIM0005INPtbl As DataTable                              'チェック用テーブル
     Private OIM0005UPDtbl As DataTable                              '更新用テーブル
-
-    'Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    'Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -4558,6 +4557,134 @@ Public Class OIM0005TankCreate
 
                     '項目テーブル項目設定
                     OIM0005row.ItemArray = OIM0005INProw.ItemArray
+
+                    '〇名称設定
+                    '原籍所有者
+                    If Not String.IsNullOrEmpty(OIM0005row("ORIGINOWNERCODE")) Then
+                        CODENAME_get("ORIGINOWNERCODE",
+                                    OIM0005row("ORIGINOWNERCODE"),
+                                    OIM0005row("ORIGINOWNERNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '名義所有者
+                    If Not String.IsNullOrEmpty(OIM0005row("OWNERCODE")) Then
+                        CODENAME_get("ORIGINOWNERCODE",
+                                    OIM0005row("OWNERCODE"),
+                                    OIM0005row("OWNERNAME"),
+                                    WW_DUMMY)
+                    End If
+                    'リース先
+                    If Not String.IsNullOrEmpty(OIM0005row("LEASECLASS")) Then
+                        CODENAME_get("CAMPCODE",
+                                    OIM0005row("LEASECODE"),
+                                    OIM0005row("LEASENAME"),
+                                    WW_DUMMY)
+                    End If
+                    'リース区分
+                    If Not String.IsNullOrEmpty(OIM0005row("LEASECLASS")) Then
+                        CODENAME_get("LEASECLASS",
+                                    OIM0005row("LEASECLASS"),
+                                    OIM0005row("LEASECLASSNEMAE"),
+                                    WW_DUMMY)
+                    End If
+                    '自動延長名
+                    If Not String.IsNullOrEmpty(OIM0005row("AUTOEXTENTION")) Then
+                        CODENAME_get("AUTOEXTENTION",
+                                    OIM0005row("AUTOEXTENTION"),
+                                    OIM0005row("AUTOEXTENTIONNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '第三者使用者
+                    If Not String.IsNullOrEmpty(OIM0005row("USERCODE")) Then
+                        CODENAME_get("USERCODE",
+                                    OIM0005row("USERCODE"),
+                                    OIM0005row("USERNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '原常備駅
+                    If Not String.IsNullOrEmpty(OIM0005row("CURRENTSTATIONCODE")) Then
+                        CODENAME_get("STATIONPATTERN",
+                                    OIM0005row("CURRENTSTATIONCODE"),
+                                    OIM0005row("CURRENTSTATIONNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '臨時常備駅
+                    If Not String.IsNullOrEmpty(OIM0005row("EXTRADINARYSTATIONCODE")) Then
+                        CODENAME_get("STATIONPATTERN",
+                                    OIM0005row("EXTRADINARYSTATIONCODE"),
+                                    OIM0005row("EXTRADINARYSTATIONNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '原専用種別
+                    If Not String.IsNullOrEmpty(OIM0005row("DEDICATETYPECODE")) Then
+                        CODENAME_get("DEDICATETYPECODE",
+                                    OIM0005row("DEDICATETYPECODE"),
+                                    OIM0005row("DEDICATETYPENAME"),
+                                    WW_DUMMY)
+                    End If
+                    '臨時専用種別
+                    If Not String.IsNullOrEmpty(OIM0005row("EXTRADINARYTYPECODE")) Then
+                        CODENAME_get("EXTRADINARYTYPECODE",
+                                    OIM0005row("EXTRADINARYTYPECODE"),
+                                    OIM0005row("EXTRADINARYTYPENAME"),
+                                    WW_DUMMY)
+                    End If
+                    '油種大分類名
+                    If Not String.IsNullOrEmpty(OIM0005row("BIGOILCODE")) Then
+                        CODENAME_get("BIGOILCODE",
+                                    OIM0005row("BIGOILCODE"),
+                                    OIM0005row("BIGOILNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '運用場所
+                    If Not String.IsNullOrEmpty(OIM0005row("OPERATIONBASECODE")) Then
+                        CODENAME_get("BASE",
+                                    OIM0005row("OPERATIONBASECODE"),
+                                    OIM0005row("OPERATIONBASENAME"),
+                                    WW_DUMMY)
+                    End If
+                    '塗色
+                    If Not String.IsNullOrEmpty(OIM0005row("COLORCODE")) Then
+                        CODENAME_get("COLORCODE",
+                                    OIM0005row("COLORCODE"),
+                                    OIM0005row("COLORNAME"),
+                                    WW_DUMMY)
+                    End If
+                    'マーク名
+                    If Not String.IsNullOrEmpty(OIM0005row("MARKCODE")) Then
+                        CODENAME_get("MARKCODE",
+                                    OIM0005row("MARKCODE"),
+                                    OIM0005row("MARKNAME"),
+                                    WW_DUMMY)
+                    End If
+                    'JXTG千葉タグ名
+                    If Not String.IsNullOrEmpty(OIM0005row("JXTGTAGCODE2")) Then
+                        CODENAME_get("TAGCODE",
+                                    OIM0005row("JXTGTAGCODE2"),
+                                    OIM0005row("JXTGTAGNAME2"),
+                                    WW_DUMMY)
+                    End If
+                    '出光昭シタグ名
+                    If Not String.IsNullOrEmpty(OIM0005row("IDSSTAGCODE")) Then
+                        CODENAME_get("TAGCODE",
+                                    OIM0005row("IDSSTAGCODE"),
+                                    OIM0005row("IDSSTAGNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '取得先名
+                    If Not String.IsNullOrEmpty(OIM0005row("OBTAINEDCODE")) Then
+                        CODENAME_get("OBTAINEDCODE",
+                                    OIM0005row("OBTAINEDCODE"),
+                                    OIM0005row("OBTAINEDNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '利用フラグ
+                    If Not String.IsNullOrEmpty(OIM0005row("USEDFLG")) Then
+                        CODENAME_get("USEDFLG",
+                                    OIM0005row("USEDFLG"),
+                                    OIM0005row("USEDFLGNAME"),
+                                    WW_DUMMY)
+                    End If
                     Exit For
                 End If
             Next

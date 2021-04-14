@@ -1,12 +1,16 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ登録画面
 ' 作成日 2019/11/08
-' 更新日 2019/11/08
+' 更新日 2021/04/13
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/08 新規作成
+'         :2021/04/13 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -19,12 +23,12 @@ Public Class OIM0005TankCreate
     Inherits Page
 
     '○ 検索結果格納Table
-    Private OIM0005tbl As DataTable                                  '一覧格納用テーブル
-    Private OIM0005INPtbl As DataTable                               'チェック用テーブル
-    Private OIM0005UPDtbl As DataTable                               '更新用テーブル
+    Private OIM0005tbl As DataTable                                 '一覧格納用テーブル
+    Private OIM0005INPtbl As DataTable                              'チェック用テーブル
+    Private OIM0005UPDtbl As DataTable                              '更新用テーブル
 
-    Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
+    'Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
+    'Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -80,6 +84,8 @@ Public Class OIM0005TankCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -466,6 +472,867 @@ Public Class OIM0005TankCreate
 
     End Sub
 
+
+    ''' <summary>
+    ''' タンク車マスタ登録更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0005_TANK" _
+            & "    WHERE" _
+            & "        TANKNUMBER       = @P01 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0005_TANK" _
+            & "    SET" _
+            & "        DELFLG = @P00" _
+            & "        , ORIGINOWNERCODE = @P02" _
+            & "        , OWNERCODE = @P03" _
+            & "        , LEASECODE = @P04" _
+            & "        , LEASECLASS = @P05" _
+            & "        , AUTOEXTENTION = @P06" _
+            & "        , LEASESTYMD = @P07" _
+            & "        , LEASEENDYMD = @P08" _
+            & "        , USERCODE = @P09" _
+            & "        , CURRENTSTATIONCODE = @P10" _
+            & "        , EXTRADINARYSTATIONCODE = @P11" _
+            & "        , USERLIMIT = @P12" _
+            & "        , LIMITTEXTRADIARYSTATION = @P13" _
+            & "        , DEDICATETYPECODE = @P14" _
+            & "        , EXTRADINARYTYPECODE = @P15" _
+            & "        , EXTRADINARYLIMIT = @P16" _
+            & "        , OPERATIONBASECODE = @P17" _
+            & "        , COLORCODE = @P18" _
+            & "        , MARKCODE = @P19" _
+            & "        , MARKNAME = @P20" _
+            & "        , GETDATE = @P21" _
+            & "        , TRANSFERDATE = @P22" _
+            & "        , OBTAINEDCODE = @P23" _
+            & "        , MODEL = @P24" _
+            & "        , MODELKANA = @P25" _
+            & "        , LOAD = @P26" _
+            & "        , LOADUNIT = @P27" _
+            & "        , VOLUME = @P28" _
+            & "        , VOLUMEUNIT = @P29" _
+            & "        , ORIGINOWNERNAME = @P30" _
+            & "        , OWNERNAME = @P31" _
+            & "        , LEASENAME = @P32" _
+            & "        , LEASECLASSNEMAE = @P33" _
+            & "        , USERNAME = @P34" _
+            & "        , CURRENTSTATIONNAME = @P35" _
+            & "        , EXTRADINARYSTATIONNAME = @P36" _
+            & "        , DEDICATETYPENAME = @P37" _
+            & "        , EXTRADINARYTYPENAME = @P38" _
+            & "        , OPERATIONBASENAME = @P39" _
+            & "        , COLORNAME = @P40" _
+            & "        , RESERVE1 = @P41" _
+            & "        , RESERVE2 = @P42" _
+            & "        , SPECIFIEDDATE = @P43" _
+            & "        , JRALLINSPECTIONDATE = @P44" _
+            & "        , PROGRESSYEAR = @P45" _
+            & "        , NEXTPROGRESSYEAR = @P46" _
+            & "        , JRINSPECTIONDATE = @P47" _
+            & "        , INSPECTIONDATE = @P48" _
+            & "        , JRSPECIFIEDDATE = @P49" _
+            & "        , JRTANKNUMBER = @P50" _
+            & "        , OLDTANKNUMBER = @P51" _
+            & "        , OTTANKNUMBER = @P52" _
+            & "        , JXTGTANKNUMBER1 = @P53" _
+            & "        , COSMOTANKNUMBER = @P54" _
+            & "        , FUJITANKNUMBER = @P55" _
+            & "        , SHELLTANKNUMBER = @P56" _
+            & "        , RESERVE3 = @P57" _
+            & "        , USEDFLG = @P65" _
+            & "        , UPDYMD = @P61" _
+            & "        , UPDUSER = @P62" _
+            & "        , UPDTERMID = @P63" _
+            & "        , RECEIVEYMD = @P64" _
+            & "        , MYWEIGHT = @P66" _
+            & "        , AUTOEXTENTIONNAME = @P67" _
+            & "        , BIGOILCODE = @P68" _
+            & "        , BIGOILNAME = @P69" _
+            & "        , JXTGTAGCODE1 = @P70" _
+            & "        , JXTGTAGNAME1 = @P71" _
+            & "        , JXTGTAGCODE2 = @P72" _
+            & "        , JXTGTAGNAME2 = @P73" _
+            & "        , JXTGTAGCODE3 = @P74" _
+            & "        , JXTGTAGNAME3 = @P75" _
+            & "        , JXTGTAGCODE4 = @P76" _
+            & "        , JXTGTAGNAME4 = @P77" _
+            & "        , IDSSTAGCODE = @P78" _
+            & "        , IDSSTAGNAME = @P79" _
+            & "        , COSMOTAGCODE = @P80" _
+            & "        , COSMOTAGNAME = @P81" _
+            & "        , ALLINSPECTIONDATE = @P82" _
+            & "        , PREINSPECTIONDATE = @P83" _
+            & "        , OBTAINEDNAME = @P84" _
+            & "        , EXCLUDEDATE = @P85" _
+            & "        , RETIRMENTDATE = @P86" _
+            & "        , JRTANKTYPE = @P87" _
+            & "        , JXTGTANKNUMBER2 = @P88" _
+            & "        , JXTGTANKNUMBER3 = @P89" _
+            & "        , JXTGTANKNUMBER4 = @P90" _
+            & "        , SAPSHELLTANKNUMBER = @P91" _
+            & "        , LENGTH = @P92" _
+            & "        , TANKLENGTH = @P93" _
+            & "        , MAXCALIBER = @P94" _
+            & "        , MINCALIBER = @P95" _
+            & "        , LENGTHFLG = @P96" _
+            & "    WHERE" _
+            & "        TANKNUMBER       = @P01 ;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0005_TANK" _
+            & "        (DELFLG" _
+            & "        , TANKNUMBER" _
+            & "        , ORIGINOWNERCODE" _
+            & "        , OWNERCODE" _
+            & "        , LEASECODE" _
+            & "        , LEASECLASS" _
+            & "        , AUTOEXTENTION" _
+            & "        , LEASESTYMD" _
+            & "        , LEASEENDYMD" _
+            & "        , USERCODE" _
+            & "        , CURRENTSTATIONCODE" _
+            & "        , EXTRADINARYSTATIONCODE" _
+            & "        , USERLIMIT" _
+            & "        , LIMITTEXTRADIARYSTATION" _
+            & "        , DEDICATETYPECODE" _
+            & "        , EXTRADINARYTYPECODE" _
+            & "        , EXTRADINARYLIMIT" _
+            & "        , OPERATIONBASECODE" _
+            & "        , COLORCODE" _
+            & "        , MARKCODE" _
+            & "        , MARKNAME" _
+            & "        , GETDATE" _
+            & "        , TRANSFERDATE" _
+            & "        , OBTAINEDCODE" _
+            & "        , MODEL" _
+            & "        , MODELKANA" _
+            & "        , LOAD" _
+            & "        , LOADUNIT" _
+            & "        , VOLUME" _
+            & "        , VOLUMEUNIT" _
+            & "        , ORIGINOWNERNAME" _
+            & "        , OWNERNAME" _
+            & "        , LEASENAME" _
+            & "        , LEASECLASSNEMAE" _
+            & "        , USERNAME" _
+            & "        , CURRENTSTATIONNAME" _
+            & "        , EXTRADINARYSTATIONNAME" _
+            & "        , DEDICATETYPENAME" _
+            & "        , EXTRADINARYTYPENAME" _
+            & "        , OPERATIONBASENAME" _
+            & "        , COLORNAME" _
+            & "        , RESERVE1" _
+            & "        , RESERVE2" _
+            & "        , SPECIFIEDDATE" _
+            & "        , JRALLINSPECTIONDATE" _
+            & "        , PROGRESSYEAR" _
+            & "        , NEXTPROGRESSYEAR" _
+            & "        , JRINSPECTIONDATE" _
+            & "        , INSPECTIONDATE" _
+            & "        , JRSPECIFIEDDATE" _
+            & "        , JRTANKNUMBER" _
+            & "        , OLDTANKNUMBER" _
+            & "        , OTTANKNUMBER" _
+            & "        , JXTGTANKNUMBER1" _
+            & "        , COSMOTANKNUMBER" _
+            & "        , FUJITANKNUMBER" _
+            & "        , SHELLTANKNUMBER" _
+            & "        , RESERVE3" _
+            & "        , USEDFLG" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD" _
+            & "        , MYWEIGHT" _
+            & "        , AUTOEXTENTIONNAME" _
+            & "        , BIGOILCODE" _
+            & "        , BIGOILNAME" _
+            & "        , JXTGTAGCODE1" _
+            & "        , JXTGTAGNAME1" _
+            & "        , JXTGTAGCODE2" _
+            & "        , JXTGTAGNAME2" _
+            & "        , JXTGTAGCODE3" _
+            & "        , JXTGTAGNAME3" _
+            & "        , JXTGTAGCODE4" _
+            & "        , JXTGTAGNAME4" _
+            & "        , IDSSTAGCODE" _
+            & "        , IDSSTAGNAME" _
+            & "        , COSMOTAGCODE" _
+            & "        , COSMOTAGNAME" _
+            & "        , ALLINSPECTIONDATE" _
+            & "        , PREINSPECTIONDATE" _
+            & "        , OBTAINEDNAME" _
+            & "        , EXCLUDEDATE" _
+            & "        , RETIRMENTDATE" _
+            & "        , JRTANKTYPE" _
+            & "        , JXTGTANKNUMBER2" _
+            & "        , JXTGTANKNUMBER3" _
+            & "        , JXTGTANKNUMBER4" _
+            & "        , SAPSHELLTANKNUMBER" _
+            & "        , LENGTH" _
+            & "        , TANKLENGTH" _
+            & "        , MAXCALIBER" _
+            & "        , MINCALIBER" _
+            & "        , LENGTHFLG)" _
+            & "    VALUES" _
+            & "        (@P00" _
+            & "        , @P01" _
+            & "        , @P02" _
+            & "        , @P03" _
+            & "        , @P04" _
+            & "        , @P05" _
+            & "        , @P06" _
+            & "        , @P07" _
+            & "        , @P08" _
+            & "        , @P09" _
+            & "        , @P10" _
+            & "        , @P11" _
+            & "        , @P12" _
+            & "        , @P13" _
+            & "        , @P14" _
+            & "        , @P15" _
+            & "        , @P16" _
+            & "        , @P17" _
+            & "        , @P18" _
+            & "        , @P19" _
+            & "        , @P20" _
+            & "        , @P21" _
+            & "        , @P22" _
+            & "        , @P23" _
+            & "        , @P24" _
+            & "        , @P25" _
+            & "        , @P26" _
+            & "        , @P27" _
+            & "        , @P28" _
+            & "        , @P29" _
+            & "        , @P30" _
+            & "        , @P31" _
+            & "        , @P32" _
+            & "        , @P33" _
+            & "        , @P34" _
+            & "        , @P35" _
+            & "        , @P36" _
+            & "        , @P37" _
+            & "        , @P38" _
+            & "        , @P39" _
+            & "        , @P40" _
+            & "        , @P41" _
+            & "        , @P42" _
+            & "        , @P43" _
+            & "        , @P44" _
+            & "        , @P45" _
+            & "        , @P46" _
+            & "        , @P47" _
+            & "        , @P48" _
+            & "        , @P49" _
+            & "        , @P50" _
+            & "        , @P51" _
+            & "        , @P52" _
+            & "        , @P53" _
+            & "        , @P54" _
+            & "        , @P55" _
+            & "        , @P56" _
+            & "        , @P57" _
+            & "        , @P65" _
+            & "        , @P58" _
+            & "        , @P59" _
+            & "        , @P60" _
+            & "        , @P61" _
+            & "        , @P62" _
+            & "        , @P63" _
+            & "        , @P64" _
+            & "        , @P66" _
+            & "        , @P67" _
+            & "        , @P68" _
+            & "        , @P69" _
+            & "        , @P70" _
+            & "        , @P71" _
+            & "        , @P72" _
+            & "        , @P73" _
+            & "        , @P74" _
+            & "        , @P75" _
+            & "        , @P76" _
+            & "        , @P77" _
+            & "        , @P78" _
+            & "        , @P79" _
+            & "        , @P80" _
+            & "        , @P81" _
+            & "        , @P82" _
+            & "        , @P83" _
+            & "        , @P84" _
+            & "        , @P85" _
+            & "        , @P86" _
+            & "        , @P87" _
+            & "        , @P88" _
+            & "        , @P89" _
+            & "        , @P90" _
+            & "        , @P91" _
+            & "        , @P92" _
+            & "        , @P93" _
+            & "        , @P94" _
+            & "        , @P95" _
+            & "        , @P96) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " Select" _
+            & "    DELFLG" _
+            & "    , TANKNUMBER" _
+            & "    , ORIGINOWNERCODE" _
+            & "    , OWNERCODE" _
+            & "    , LEASECODE" _
+            & "    , LEASECLASS" _
+            & "    , AUTOEXTENTION" _
+            & "    , LEASESTYMD" _
+            & "    , LEASEENDYMD" _
+            & "    , USERCODE" _
+            & "    , CURRENTSTATIONCODE" _
+            & "    , EXTRADINARYSTATIONCODE" _
+            & "    , USERLIMIT" _
+            & "    , LIMITTEXTRADIARYSTATION" _
+            & "    , DEDICATETYPECODE" _
+            & "    , EXTRADINARYTYPECODE" _
+            & "    , EXTRADINARYLIMIT" _
+            & "    , OPERATIONBASECODE" _
+            & "    , COLORCODE" _
+            & "    , MARKCODE" _
+            & "    , MARKNAME" _
+            & "    , GETDATE" _
+            & "    , TRANSFERDATE" _
+            & "    , OBTAINEDCODE" _
+            & "    , MODEL" _
+            & "    , MODELKANA" _
+            & "    , LOAD" _
+            & "    , LOADUNIT" _
+            & "    , VOLUME" _
+            & "    , VOLUMEUNIT" _
+            & "    , ORIGINOWNERNAME" _
+            & "    , OWNERNAME" _
+            & "    , LEASENAME" _
+            & "    , LEASECLASSNEMAE" _
+            & "    , USERNAME" _
+            & "    , CURRENTSTATIONNAME" _
+            & "    , EXTRADINARYSTATIONNAME" _
+            & "    , DEDICATETYPENAME" _
+            & "    , EXTRADINARYTYPENAME" _
+            & "    , OPERATIONBASENAME" _
+            & "    , COLORNAME" _
+            & "    , RESERVE1" _
+            & "    , RESERVE2" _
+            & "    , SPECIFIEDDATE" _
+            & "    , JRALLINSPECTIONDATE" _
+            & "    , PROGRESSYEAR" _
+            & "    , NEXTPROGRESSYEAR" _
+            & "    , JRINSPECTIONDATE" _
+            & "    , INSPECTIONDATE" _
+            & "    , JRSPECIFIEDDATE" _
+            & "    , JRTANKNUMBER" _
+            & "    , OLDTANKNUMBER" _
+            & "    , OTTANKNUMBER" _
+            & "    , JXTGTANKNUMBER1" _
+            & "    , COSMOTANKNUMBER" _
+            & "    , FUJITANKNUMBER" _
+            & "    , SHELLTANKNUMBER" _
+            & "    , RESERVE3" _
+            & "    , USEDFLG" _
+            & "    , MYWEIGHT" _
+            & "    , LENGTH" _
+            & "    , TANKLENGTH" _
+            & "    , MAXCALIBER" _
+            & "    , MINCALIBER" _
+            & "    , LENGTHFLG" _
+            & "    , AUTOEXTENTIONNAME" _
+            & "    , BIGOILCODE" _
+            & "    , BIGOILNAME" _
+            & "    , JXTGTAGCODE1" _
+            & "    , JXTGTAGNAME1" _
+            & "    , JXTGTAGCODE2" _
+            & "    , JXTGTAGNAME2" _
+            & "    , JXTGTAGCODE3" _
+            & "    , JXTGTAGNAME3" _
+            & "    , JXTGTAGCODE4" _
+            & "    , JXTGTAGNAME4" _
+            & "    , IDSSTAGCODE" _
+            & "    , IDSSTAGNAME" _
+            & "    , COSMOTAGCODE" _
+            & "    , COSMOTAGNAME" _
+            & "    , ALLINSPECTIONDATE" _
+            & "    , PREINSPECTIONDATE" _
+            & "    , OBTAINEDNAME" _
+            & "    , EXCLUDEDATE" _
+            & "    , RETIRMENTDATE" _
+            & "    , JRTANKTYPE" _
+            & "    , JXTGTANKNUMBER2" _
+            & "    , JXTGTANKNUMBER3" _
+            & "    , JXTGTANKNUMBER4" _
+            & "    , SAPSHELLTANKNUMBER" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "    OIL.OIM0005_TANK" _
+            & " WHERE" _
+            & "        TANKNUMBER = @P01"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 8)           'JOT車番
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)          '原籍所有者C
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)          '名義所有者C
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)          'リース先C
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)          'リース区分C
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)           '自動延長
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Date)                  'リース開始年月日
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.Date)                  'リース満了年月日
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)          '第三者使用者C
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)          '原常備駅C
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)          '臨時常備駅C
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Date)                  '第三者使用期限
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Date)                  '臨時常備駅期限
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 20)          '原専用種別C
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)          '臨時専用種別C
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.Date)                  '臨時専用期限
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)          '運用基地C
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 20)          '塗色C
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 1)           'マークコード
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 20)          'マーク名
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Date)                  '取得年月日
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Date)                  '車籍編入年月日
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 2)           '取得先C
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 20)          '形式
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.NVarChar, 10)          '形式カナ
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Float, 4, 1)           '荷重
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 2)           '荷重単位
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.Float, 4, 1)           '容積
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 2)           '容積単位
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          '原籍所有者
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 20)          '名義所有者
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)          'リース先
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          'リース区分
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)          '第三者使用者
+                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 20)          '原常備駅
+                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)          '臨時常備駅
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 20)          '原専用種別
+                Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar, 20)          '臨時専用種別
+                Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 20)          '運用場所
+                Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 20)          '塗色
+                Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar, 20)          '予備1
+                Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar, 20)          '予備2
+                Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.Date)                  '次回指定年月日
+                Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.Date)                  '次回全検年月日(JR) 
+                Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.Int)                   '現在経年
+                Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.Int)                   '次回全検時経年
+                Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.Date)                  '次回交検年月日(JR）
+                Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.Date)                  '次回交検年月日
+                Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.Date)                  '次回指定年月日(JR)
+                Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 20)          'JR車番
+                Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.NVarChar, 20)          '旧JOT車番
+                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 20)          'OT車番
+                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar, 20)          'JXTG仙台車番
+                Dim PARA54 As SqlParameter = SQLcmd.Parameters.Add("@P54", SqlDbType.NVarChar, 20)          'コスモ車番
+                Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.NVarChar, 20)          '富士石油車番
+                Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.NVarChar, 20)          '出光昭シ車番
+                Dim PARA57 As SqlParameter = SQLcmd.Parameters.Add("@P57", SqlDbType.NVarChar, 20)          '予備
+                Dim PARA65 As SqlParameter = SQLcmd.Parameters.Add("@P65", SqlDbType.NVarChar, 1)           '利用フラグ
+                Dim PARA58 As SqlParameter = SQLcmd.Parameters.Add("@P58", SqlDbType.DateTime)              '登録年月日
+                Dim PARA59 As SqlParameter = SQLcmd.Parameters.Add("@P59", SqlDbType.NVarChar, 20)          '登録ユーザーＩＤ
+                Dim PARA60 As SqlParameter = SQLcmd.Parameters.Add("@P60", SqlDbType.NVarChar, 20)          '登録端末
+                Dim PARA61 As SqlParameter = SQLcmd.Parameters.Add("@P61", SqlDbType.DateTime)              '更新年月日
+                Dim PARA62 As SqlParameter = SQLcmd.Parameters.Add("@P62", SqlDbType.NVarChar, 20)          '更新ユーザーＩＤ
+                Dim PARA63 As SqlParameter = SQLcmd.Parameters.Add("@P63", SqlDbType.NVarChar, 20)          '更新端末
+                Dim PARA64 As SqlParameter = SQLcmd.Parameters.Add("@P64", SqlDbType.DateTime)              '集信日時
+                Dim PARA66 As SqlParameter = SQLcmd.Parameters.Add("@P66", SqlDbType.Float, 4, 1)           '自重
+                Dim PARA67 As SqlParameter = SQLcmd.Parameters.Add("@P67", SqlDbType.NVarChar, 20)          '自動延長名
+                Dim PARA68 As SqlParameter = SQLcmd.Parameters.Add("@P68", SqlDbType.NVarChar, 1)           '油種大分類コード
+                Dim PARA69 As SqlParameter = SQLcmd.Parameters.Add("@P69", SqlDbType.NVarChar, 10)          '油種大分類名
+                Dim PARA70 As SqlParameter = SQLcmd.Parameters.Add("@P70", SqlDbType.NVarChar, 20)          'JXTG仙台タグコード
+                Dim PARA71 As SqlParameter = SQLcmd.Parameters.Add("@P71", SqlDbType.NVarChar, 20)          'JXTG仙台タグ名
+                Dim PARA72 As SqlParameter = SQLcmd.Parameters.Add("@P72", SqlDbType.NVarChar, 20)          'JXTG千葉タグコード
+                Dim PARA73 As SqlParameter = SQLcmd.Parameters.Add("@P73", SqlDbType.NVarChar, 20)          'JXTG千葉タグ名
+                Dim PARA74 As SqlParameter = SQLcmd.Parameters.Add("@P74", SqlDbType.NVarChar, 20)          'JXTG川崎タグコード
+                Dim PARA75 As SqlParameter = SQLcmd.Parameters.Add("@P75", SqlDbType.NVarChar, 20)          'JXTG川崎タグ名
+                Dim PARA76 As SqlParameter = SQLcmd.Parameters.Add("@P76", SqlDbType.NVarChar, 20)          'JXTG根岸タグコード
+                Dim PARA77 As SqlParameter = SQLcmd.Parameters.Add("@P77", SqlDbType.NVarChar, 20)          'JXTG根岸タグ名
+                Dim PARA78 As SqlParameter = SQLcmd.Parameters.Add("@P78", SqlDbType.NVarChar, 20)          '出光昭和シェルタグコード
+                Dim PARA79 As SqlParameter = SQLcmd.Parameters.Add("@P79", SqlDbType.NVarChar, 20)          '出光昭和シェルタグ名
+                Dim PARA80 As SqlParameter = SQLcmd.Parameters.Add("@P80", SqlDbType.NVarChar, 20)          'コスモタグコード
+                Dim PARA81 As SqlParameter = SQLcmd.Parameters.Add("@P81", SqlDbType.NVarChar, 20)          'コスモタグ名
+                Dim PARA82 As SqlParameter = SQLcmd.Parameters.Add("@P82", SqlDbType.Date)                  '次回全件年月日
+                Dim PARA83 As SqlParameter = SQLcmd.Parameters.Add("@P83", SqlDbType.Date)                  '前回全件年月日
+                Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.Date)                  '取得年月日
+                Dim PARA85 As SqlParameter = SQLcmd.Parameters.Add("@P85", SqlDbType.Date)                  '車籍除外年月日
+                Dim PARA86 As SqlParameter = SQLcmd.Parameters.Add("@P86", SqlDbType.Date)                  '資産除却年月日
+                Dim PARA87 As SqlParameter = SQLcmd.Parameters.Add("@P87", SqlDbType.NVarChar, 20)          'JR車種コード
+                Dim PARA88 As SqlParameter = SQLcmd.Parameters.Add("@P88", SqlDbType.NVarChar, 20)          'JXTG千葉車番
+                Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20)          'JXTG川崎車番
+                Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.NVarChar, 20)          'JXTG根岸車番
+                Dim PARA91 As SqlParameter = SQLcmd.Parameters.Add("@P91", SqlDbType.NVarChar, 20)          '出光昭シSAP車番
+                Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.Int)                   'タンク車長
+                Dim PARA93 As SqlParameter = SQLcmd.Parameters.Add("@P93", SqlDbType.Int)                   'タンク車体長
+                Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.Int)                   '最大口径
+                Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.Int)                   '最大口径
+                Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)           '長さフラグ
+
+                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       'JOT車番
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 20)      '原籍所有者C
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 20)      '名義所有者C
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 20)      'リース先C
+                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 20)      'リース区分C
+                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 1)       '自動延長
+                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.Date)              'リース開始年月日
+                Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.Date)              'リース満了年月日
+                Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.NVarChar, 20)      '第三者使用者C
+                Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 20)      '原常備駅C
+                Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.NVarChar, 20)      '臨時常備駅C
+                Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.Date)              '第三者使用期限
+                Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.Date)              '臨時常備駅期限
+                Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 20)      '原専用種別C
+                Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.NVarChar, 20)      '臨時専用種別C
+                Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.Date)              '臨時専用期限
+                Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.NVarChar, 20)      '運用基地C
+                Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.NVarChar, 20)      '塗色C
+                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.NVarChar, 1)       'マークコード
+                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.NVarChar, 20)      'マーク名
+                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Date)              '取得年月日
+                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Date)              '車籍編入年月日
+                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 2)       '取得先C
+
+                Dim OIM0005row As DataRow = OIM0005INPtbl.Rows(0)
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA00.Value = OIM0005row("DELFLG")
+                PARA01.Value = OIM0005row("TANKNUMBER")
+                PARA02.Value = OIM0005row("ORIGINOWNERCODE")
+                PARA03.Value = OIM0005row("OWNERCODE")
+                PARA04.Value = OIM0005row("LEASECODE")
+                PARA05.Value = OIM0005row("LEASECLASS")
+                PARA06.Value = OIM0005row("AUTOEXTENTION")
+                If OIM0005row("LEASESTYMD") <> "" Then
+                    PARA07.Value = OIM0005row("LEASESTYMD")
+                Else
+                    PARA07.Value = DBNull.Value
+                End If
+                If OIM0005row("LEASEENDYMD") <> "" Then
+                    PARA08.Value = OIM0005row("LEASEENDYMD")
+                Else
+                    PARA08.Value = DBNull.Value
+                End If
+                PARA09.Value = OIM0005row("USERCODE")
+                PARA10.Value = OIM0005row("CURRENTSTATIONCODE")
+                PARA11.Value = OIM0005row("EXTRADINARYSTATIONCODE")
+                If OIM0005row("USERLIMIT") <> "" Then
+                    PARA12.Value = OIM0005row("USERLIMIT")
+                Else
+                    PARA12.Value = DBNull.Value
+                End If
+                If OIM0005row("LIMITTEXTRADIARYSTATION") <> "" Then
+                    PARA13.Value = OIM0005row("LIMITTEXTRADIARYSTATION")
+                Else
+                    PARA13.Value = DBNull.Value
+                End If
+                PARA14.Value = OIM0005row("DEDICATETYPECODE")
+                PARA15.Value = OIM0005row("EXTRADINARYTYPECODE")
+                If OIM0005row("EXTRADINARYLIMIT") <> "" Then
+                    PARA16.Value = OIM0005row("EXTRADINARYLIMIT")
+                Else
+                    PARA16.Value = DBNull.Value
+                End If
+                PARA17.Value = OIM0005row("OPERATIONBASECODE")
+                PARA18.Value = OIM0005row("COLORCODE")
+                PARA19.Value = OIM0005row("MARKCODE")
+                PARA20.Value = OIM0005row("MARKNAME")
+                If OIM0005row("ALLINSPECTIONDATE") <> "" Then
+                    PARA21.Value = OIM0005row("ALLINSPECTIONDATE")
+                Else
+                    PARA21.Value = DBNull.Value
+                End If
+                If OIM0005row("TRANSFERDATE") <> "" Then
+                    PARA22.Value = OIM0005row("TRANSFERDATE")
+                Else
+                    PARA22.Value = DBNull.Value
+                End If
+                PARA23.Value = OIM0005row("OBTAINEDCODE")
+                PARA24.Value = OIM0005row("MODEL")
+                PARA25.Value = OIM0005row("MODELKANA")
+                If OIM0005row("LOAD") <> "" Then
+                    PARA26.Value = OIM0005row("LOAD")
+                Else
+                    PARA26.Value = "0.0"
+                End If
+                PARA27.Value = OIM0005row("LOADUNIT")
+                If OIM0005row("VOLUME") <> "" Then
+                    PARA28.Value = OIM0005row("VOLUME")
+                Else
+                    PARA28.Value = "0.0"
+                End If
+                PARA29.Value = OIM0005row("VOLUMEUNIT")
+                PARA30.Value = OIM0005row("ORIGINOWNERNAME")
+                PARA31.Value = OIM0005row("OWNERNAME")
+                PARA32.Value = OIM0005row("LEASENAME")
+                PARA33.Value = OIM0005row("LEASECLASSNEMAE")
+                PARA34.Value = OIM0005row("USERNAME")
+                PARA35.Value = OIM0005row("CURRENTSTATIONNAME")
+                PARA36.Value = OIM0005row("EXTRADINARYSTATIONNAME")
+                PARA37.Value = OIM0005row("DEDICATETYPENAME")
+                PARA38.Value = OIM0005row("EXTRADINARYTYPENAME")
+                PARA39.Value = OIM0005row("OPERATIONBASENAME")
+                PARA40.Value = OIM0005row("COLORNAME")
+                PARA41.Value = OIM0005row("RESERVE1")
+                PARA42.Value = OIM0005row("RESERVE2")
+                If RTrim(OIM0005row("SPECIFIEDDATE")) <> "" Then
+                    PARA43.Value = OIM0005row("SPECIFIEDDATE")
+                Else
+                    PARA43.Value = DBNull.Value
+                End If
+                If OIM0005row("JRALLINSPECTIONDATE") <> "" Then
+                    PARA44.Value = OIM0005row("JRALLINSPECTIONDATE")
+                Else
+                    PARA44.Value = DBNull.Value
+                End If
+                If OIM0005row("PROGRESSYEAR") <> "" Then
+                    PARA45.Value = OIM0005row("PROGRESSYEAR")
+                Else
+                    PARA45.Value = "0"
+                End If
+                If OIM0005row("NEXTPROGRESSYEAR") <> "" Then
+                    PARA46.Value = OIM0005row("NEXTPROGRESSYEAR")
+                Else
+                    PARA46.Value = "0"
+                End If
+                If OIM0005row("JRINSPECTIONDATE") <> "" Then
+                    PARA47.Value = OIM0005row("JRINSPECTIONDATE")
+                Else
+                    PARA47.Value = DBNull.Value
+                End If
+                If OIM0005row("INSPECTIONDATE") <> "" Then
+                    PARA48.Value = OIM0005row("INSPECTIONDATE")
+                Else
+                    PARA48.Value = DBNull.Value
+                End If
+                If OIM0005row("JRSPECIFIEDDATE") <> "" Then
+                    PARA49.Value = OIM0005row("JRSPECIFIEDDATE")
+                Else
+                    PARA49.Value = DBNull.Value
+                End If
+                PARA50.Value = OIM0005row("JRTANKNUMBER")
+                PARA51.Value = OIM0005row("OLDTANKNUMBER")
+                PARA52.Value = OIM0005row("OTTANKNUMBER")
+                PARA53.Value = OIM0005row("JXTGTANKNUMBER1")
+                PARA54.Value = OIM0005row("COSMOTANKNUMBER")
+                PARA55.Value = OIM0005row("FUJITANKNUMBER")
+                PARA56.Value = OIM0005row("SHELLTANKNUMBER")
+                PARA57.Value = OIM0005row("RESERVE3")
+                PARA65.Value = OIM0005row("USEDFLG")
+                PARA58.Value = WW_DATENOW
+                PARA59.Value = Master.USERID
+                PARA60.Value = Master.USERTERMID
+                PARA61.Value = WW_DATENOW
+                PARA62.Value = Master.USERID
+                PARA63.Value = Master.USERTERMID
+                PARA64.Value = C_DEFAULT_YMD
+                If OIM0005row("MYWEIGHT") <> "" Then
+                    PARA66.Value = OIM0005row("MYWEIGHT")
+                Else
+                    PARA66.Value = "0.0"
+                End If
+                PARA67.Value = OIM0005row("AUTOEXTENTIONNAME")
+                PARA68.Value = OIM0005row("BIGOILCODE")
+                PARA69.Value = OIM0005row("BIGOILNAME")
+                PARA70.Value = OIM0005row("JXTGTAGCODE1")
+                PARA71.Value = OIM0005row("JXTGTAGNAME1")
+                PARA72.Value = OIM0005row("JXTGTAGCODE2")
+                PARA73.Value = OIM0005row("JXTGTAGNAME2")
+                PARA74.Value = OIM0005row("JXTGTAGCODE3")
+                PARA75.Value = OIM0005row("JXTGTAGNAME3")
+                PARA76.Value = OIM0005row("JXTGTAGCODE4")
+                PARA77.Value = OIM0005row("JXTGTAGNAME4")
+                PARA78.Value = OIM0005row("IDSSTAGCODE")
+                PARA79.Value = OIM0005row("IDSSTAGNAME")
+                PARA80.Value = OIM0005row("COSMOTAGCODE")
+                PARA81.Value = OIM0005row("COSMOTAGNAME")
+                If OIM0005row("ALLINSPECTIONDATE") <> "" Then
+                    PARA82.Value = OIM0005row("ALLINSPECTIONDATE")
+                Else
+                    PARA82.Value = DBNull.Value
+                End If
+                If OIM0005row("PREINSPECTIONDATE") <> "" Then
+                    PARA83.Value = OIM0005row("PREINSPECTIONDATE")
+                Else
+                    PARA83.Value = DBNull.Value
+                End If
+                If OIM0005row("GETDATE") <> "" Then
+                    PARA84.Value = OIM0005row("GETDATE")
+                Else
+                    PARA84.Value = DBNull.Value
+                End If
+                If OIM0005row("EXCLUDEDATE") <> "" Then
+                    PARA85.Value = OIM0005row("EXCLUDEDATE")
+                Else
+                    PARA85.Value = DBNull.Value
+                End If
+                If OIM0005row("RETIRMENTDATE") <> "" Then
+                    PARA86.Value = OIM0005row("RETIRMENTDATE")
+                Else
+                    PARA86.Value = DBNull.Value
+                End If
+                PARA87.Value = OIM0005row("JRTANKTYPE")
+                PARA88.Value = OIM0005row("JXTGTANKNUMBER2")
+                PARA89.Value = OIM0005row("JXTGTANKNUMBER3")
+                PARA90.Value = OIM0005row("JXTGTANKNUMBER4")
+                PARA91.Value = OIM0005row("SAPSHELLTANKNUMBER")
+                If OIM0005row("LENGTH") <> "" Then
+                    PARA92.Value = OIM0005row("LENGTH")
+                Else
+                    PARA92.Value = "0"
+                End If
+                If OIM0005row("TANKLENGTH") <> "" Then
+                    PARA93.Value = OIM0005row("TANKLENGTH")
+                Else
+                    PARA93.Value = "0"
+                End If
+                If OIM0005row("MAXCALIBER") <> "" Then
+                    PARA94.Value = OIM0005row("MAXCALIBER")
+                Else
+                    PARA94.Value = "0"
+                End If
+                If OIM0005row("MINCALIBER") <> "" Then
+                    PARA95.Value = OIM0005row("MINCALIBER")
+                Else
+                    PARA95.Value = "0"
+                End If
+                PARA96.Value = OIM0005row("LENGTHFLG")
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA00.Value = OIM0005row("DELFLG")
+                JPARA01.Value = OIM0005row("TANKNUMBER")
+                JPARA02.Value = OIM0005row("ORIGINOWNERCODE")
+                JPARA03.Value = OIM0005row("OWNERCODE")
+                JPARA04.Value = OIM0005row("LEASECODE")
+                JPARA05.Value = OIM0005row("LEASECLASS")
+                JPARA06.Value = OIM0005row("AUTOEXTENTION")
+                If OIM0005row("LEASESTYMD") <> "" Then
+                    JPARA07.Value = OIM0005row("LEASESTYMD")
+                Else
+                    JPARA07.Value = DBNull.Value
+                End If
+                If OIM0005row("LEASEENDYMD") <> "" Then
+                    JPARA08.Value = OIM0005row("LEASEENDYMD")
+                Else
+                    JPARA08.Value = DBNull.Value
+                End If
+                JPARA09.Value = OIM0005row("USERCODE")
+                JPARA10.Value = OIM0005row("CURRENTSTATIONCODE")
+                JPARA11.Value = OIM0005row("EXTRADINARYSTATIONCODE")
+                If OIM0005row("USERLIMIT") <> "" Then
+                    JPARA12.Value = OIM0005row("USERLIMIT")
+                Else
+                    JPARA12.Value = DBNull.Value
+                End If
+                If OIM0005row("LIMITTEXTRADIARYSTATION") <> "" Then
+                    JPARA13.Value = OIM0005row("LIMITTEXTRADIARYSTATION")
+                Else
+                    JPARA13.Value = DBNull.Value
+                End If
+                JPARA14.Value = OIM0005row("DEDICATETYPECODE")
+                JPARA15.Value = OIM0005row("EXTRADINARYTYPECODE")
+                If OIM0005row("EXTRADINARYLIMIT") <> "" Then
+                    JPARA16.Value = OIM0005row("EXTRADINARYLIMIT")
+                Else
+                    JPARA16.Value = DBNull.Value
+                End If
+                JPARA17.Value = OIM0005row("OPERATIONBASECODE")
+                JPARA18.Value = OIM0005row("COLORCODE")
+                JPARA19.Value = OIM0005row("MARKCODE")
+                JPARA20.Value = OIM0005row("MARKNAME")
+                If OIM0005row("ALLINSPECTIONDATE") <> "" Then
+                    JPARA21.Value = OIM0005row("ALLINSPECTIONDATE")
+                Else
+                    JPARA21.Value = DBNull.Value
+                End If
+                If OIM0005row("TRANSFERDATE") <> "" Then
+                    JPARA22.Value = OIM0005row("TRANSFERDATE")
+                Else
+                    JPARA22.Value = DBNull.Value
+                End If
+                JPARA23.Value = OIM0005row("OBTAINEDCODE")
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0005UPDtbl) Then
+                        OIM0005UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0005UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0005UPDtbl.Clear()
+                    OIM0005UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0005UPDrow As DataRow In OIM0005UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0005L"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIM0005UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0005L UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
     ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
@@ -499,6 +1366,11 @@ Public Class OIM0005TankCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0005tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
@@ -689,12 +1561,141 @@ Public Class OIM0005TankCreate
 
     End Sub
 
-
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0005INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIM0005INProw As DataRow = OIM0005INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIM0005row As DataRow In OIM0005tbl.Rows
+            ' KEY項目が等しい時
+            If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
+                ' KEY項目以外の項目の差異をチェック
+                If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
+                    OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
+                    OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
+                    OIM0005row("LOAD") = OIM0005INProw("LOAD") AndAlso
+                    OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
+                    OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
+                    OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
+                    OIM0005row("MYWEIGHT") = OIM0005INProw("MYWEIGHT") AndAlso
+                    OIM0005row("LENGTH") = OIM0005INProw("LENGTH") AndAlso
+                    OIM0005row("TANKLENGTH") = OIM0005INProw("TANKLENGTH") AndAlso
+                    OIM0005row("MAXCALIBER") = OIM0005INProw("MAXCALIBER") AndAlso
+                    OIM0005row("MINCALIBER") = OIM0005INProw("MINCALIBER") AndAlso
+                    OIM0005row("LENGTHFLG") = OIM0005INProw("LENGTHFLG") AndAlso
+                    OIM0005row("ORIGINOWNERCODE") = OIM0005INProw("ORIGINOWNERCODE") AndAlso
+                    OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
+                    OIM0005row("OWNERCODE") = OIM0005INProw("OWNERCODE") AndAlso
+                    OIM0005row("OWNERNAME") = OIM0005INProw("OWNERNAME") AndAlso
+                    OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
+                    OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
+                    OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
+                    OIM0005row("LEASECLASSNEMAE") = OIM0005INProw("LEASECLASSNEMAE") AndAlso
+                    OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
+                    OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
+                    OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
+                    OIM0005row("LEASEENDYMD") = OIM0005INProw("LEASEENDYMD") AndAlso
+                    OIM0005row("USERCODE") = OIM0005INProw("USERCODE") AndAlso
+                    OIM0005row("USERNAME") = OIM0005INProw("USERNAME") AndAlso
+                    OIM0005row("CURRENTSTATIONCODE") = OIM0005INProw("CURRENTSTATIONCODE") AndAlso
+                    OIM0005row("CURRENTSTATIONNAME") = OIM0005INProw("CURRENTSTATIONNAME") AndAlso
+                    OIM0005row("EXTRADINARYSTATIONCODE") = OIM0005INProw("EXTRADINARYSTATIONCODE") AndAlso
+                    OIM0005row("EXTRADINARYSTATIONNAME") = OIM0005INProw("EXTRADINARYSTATIONNAME") AndAlso
+                    OIM0005row("USERLIMIT") = OIM0005INProw("USERLIMIT") AndAlso
+                    OIM0005row("LIMITTEXTRADIARYSTATION") = OIM0005INProw("LIMITTEXTRADIARYSTATION") AndAlso
+                    OIM0005row("DEDICATETYPECODE") = OIM0005INProw("DEDICATETYPECODE") AndAlso
+                    OIM0005row("DEDICATETYPENAME") = OIM0005INProw("DEDICATETYPENAME") AndAlso
+                    OIM0005row("EXTRADINARYTYPECODE") = OIM0005INProw("EXTRADINARYTYPECODE") AndAlso
+                    OIM0005row("EXTRADINARYTYPENAME") = OIM0005INProw("EXTRADINARYTYPENAME") AndAlso
+                    OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
+                    OIM0005row("BIGOILCODE") = OIM0005INProw("BIGOILCODE") AndAlso
+                    OIM0005row("BIGOILNAME") = OIM0005INProw("BIGOILNAME") AndAlso
+                    OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
+                    OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
+                    OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
+                    OIM0005row("COLORNAME") = OIM0005INProw("COLORNAME") AndAlso
+                    OIM0005row("MARKCODE") = OIM0005INProw("MARKCODE") AndAlso
+                    OIM0005row("MARKNAME") = OIM0005INProw("MARKNAME") AndAlso
+                    OIM0005row("JXTGTAGCODE1") = OIM0005INProw("JXTGTAGCODE1") AndAlso
+                    OIM0005row("JXTGTAGNAME1") = OIM0005INProw("JXTGTAGNAME1") AndAlso
+                    OIM0005row("JXTGTAGCODE2") = OIM0005INProw("JXTGTAGCODE2") AndAlso
+                    OIM0005row("JXTGTAGNAME2") = OIM0005INProw("JXTGTAGNAME2") AndAlso
+                    OIM0005row("JXTGTAGCODE3") = OIM0005INProw("JXTGTAGCODE3") AndAlso
+                    OIM0005row("JXTGTAGNAME3") = OIM0005INProw("JXTGTAGNAME3") AndAlso
+                    OIM0005row("JXTGTAGCODE4") = OIM0005INProw("JXTGTAGCODE4") AndAlso
+                    OIM0005row("JXTGTAGNAME4") = OIM0005INProw("JXTGTAGNAME4") AndAlso
+                    OIM0005row("IDSSTAGCODE") = OIM0005INProw("IDSSTAGCODE") AndAlso
+                    OIM0005row("IDSSTAGNAME") = OIM0005INProw("IDSSTAGNAME") AndAlso
+                    OIM0005row("COSMOTAGCODE") = OIM0005INProw("COSMOTAGCODE") AndAlso
+                    OIM0005row("COSMOTAGNAME") = OIM0005INProw("COSMOTAGNAME") AndAlso
+                    OIM0005row("RESERVE1") = OIM0005INProw("RESERVE1") AndAlso
+                    OIM0005row("RESERVE2") = OIM0005INProw("RESERVE2") AndAlso
+                    OIM0005row("JRINSPECTIONDATE") = OIM0005INProw("JRINSPECTIONDATE") AndAlso
+                    OIM0005row("INSPECTIONDATE") = OIM0005INProw("INSPECTIONDATE") AndAlso
+                    OIM0005row("JRSPECIFIEDDATE") = OIM0005INProw("JRSPECIFIEDDATE") AndAlso
+                    OIM0005row("SPECIFIEDDATE") = OIM0005INProw("SPECIFIEDDATE") AndAlso
+                    OIM0005row("JRALLINSPECTIONDATE") = OIM0005INProw("JRALLINSPECTIONDATE") AndAlso
+                    OIM0005row("ALLINSPECTIONDATE") = OIM0005INProw("ALLINSPECTIONDATE") AndAlso
+                    OIM0005row("PREINSPECTIONDATE") = OIM0005INProw("PREINSPECTIONDATE") AndAlso
+                    OIM0005row("GETDATE") = OIM0005INProw("GETDATE") AndAlso
+                    OIM0005row("TRANSFERDATE") = OIM0005INProw("TRANSFERDATE") AndAlso
+                    OIM0005row("OBTAINEDCODE") = OIM0005INProw("OBTAINEDCODE") AndAlso
+                    OIM0005row("OBTAINEDNAME") = OIM0005INProw("OBTAINEDNAME") AndAlso
+                    OIM0005row("PROGRESSYEAR") = OIM0005INProw("PROGRESSYEAR") AndAlso
+                    OIM0005row("NEXTPROGRESSYEAR") = OIM0005INProw("NEXTPROGRESSYEAR") AndAlso
+                    OIM0005row("EXCLUDEDATE") = OIM0005INProw("EXCLUDEDATE") AndAlso
+                    OIM0005row("RETIRMENTDATE") = OIM0005INProw("RETIRMENTDATE") AndAlso
+                    OIM0005row("JRTANKNUMBER") = OIM0005INProw("JRTANKNUMBER") AndAlso
+                    OIM0005row("JRTANKTYPE") = OIM0005INProw("JRTANKTYPE") AndAlso
+                    OIM0005row("OLDTANKNUMBER") = OIM0005INProw("OLDTANKNUMBER") AndAlso
+                    OIM0005row("OTTANKNUMBER") = OIM0005INProw("OTTANKNUMBER") AndAlso
+                    OIM0005row("JXTGTANKNUMBER1") = OIM0005INProw("JXTGTANKNUMBER1") AndAlso
+                    OIM0005row("JXTGTANKNUMBER2") = OIM0005INProw("JXTGTANKNUMBER2") AndAlso
+                    OIM0005row("JXTGTANKNUMBER3") = OIM0005INProw("JXTGTANKNUMBER3") AndAlso
+                    OIM0005row("JXTGTANKNUMBER4") = OIM0005INProw("JXTGTANKNUMBER4") AndAlso
+                    OIM0005row("COSMOTANKNUMBER") = OIM0005INProw("COSMOTANKNUMBER") AndAlso
+                    OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
+                    OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
+                    OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
+                    OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
+                    OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
+                    OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                    ' 変更がないときは、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面-クリアボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -839,7 +1840,6 @@ Public Class OIM0005TankCreate
         WF_DELFLG.Text = ""                         '削除フラグ
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -1156,7 +2156,6 @@ Public Class OIM0005TankCreate
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
@@ -1655,7 +2654,6 @@ Public Class OIM0005TankCreate
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
     ''' </summary>
@@ -1684,7 +2682,6 @@ Public Class OIM0005TankCreate
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -3386,7 +4383,6 @@ Public Class OIM0005TankCreate
 
     End Sub
 
-
     ''' <summary>
     ''' OIM0005tbl更新
     ''' </summary>
@@ -3513,7 +4509,8 @@ Public Class OIM0005TankCreate
                         OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                         OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0005row("OPERATION")) Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
@@ -3527,23 +4524,59 @@ Public Class OIM0005TankCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIM0005INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIM0005INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIM0005INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIM0005INProw As DataRow In OIM0005INPtbl.Rows
-            Select Case OIM0005INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0005INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0005INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0005INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0005INProw)
-            End Select
+            'Select Case OIM0005INProw("OPERATION")
+            '    Case CONST_UPDATE
+            '        TBL_UPDATE_SUB(OIM0005INProw)
+            '    Case CONST_INSERT
+            '        TBL_INSERT_SUB(OIM0005INProw)
+            '    Case CONST_PATTERNERR
+            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+            '        TBL_INSERT_SUB(OIM0005INProw)
+            '    Case C_LIST_OPERATION_CODE.ERRORED
+            '        TBL_ERR_SUB(OIM0005INProw)
+            'End Select
+            For Each OIM0005row As DataRow In OIM0005tbl.Rows
+
+                '同一レコードか判定
+                If OIM0005INProw("TANKNUMBER") = OIM0005row("TANKNUMBER") Then
+                    '画面入力テーブル項目設定
+                    OIM0005INProw("LINECNT") = OIM0005row("LINECNT")
+                    OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIM0005INProw("UPDTIMSTP") = OIM0005row("UPDTIMSTP")
+                    OIM0005INProw("SELECT") = 0
+                    OIM0005INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIM0005row.ItemArray = OIM0005INProw.ItemArray
+                    Exit For
+                End If
+            Next
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -3596,7 +4629,6 @@ Public Class OIM0005TankCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -3622,6 +4654,7 @@ Public Class OIM0005TankCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得

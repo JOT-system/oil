@@ -1,12 +1,14 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ一覧画面
 ' 作成日 2019/11/08
-' 更新日 2019/11/08
+' 更新日 2021/04/13
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/08 新規作成
+'         :2021/04/13 1)項目「利用者フラグ」を区分値→名称で表示するように変更
+'         :           2)登録・更新画面にて更新メッセージが設定された場合
+'         :             画面下部に更新メッセージを表示するように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -19,9 +21,9 @@ Public Class OIM0005TankList
     Inherits Page
 
     '○ 検索結果格納Table
-    Private OIM0005tbl As DataTable                                  '一覧格納用テーブル
-    Private OIM0005INPtbl As DataTable                               'チェック用テーブル
-    Private OIM0005UPDtbl As DataTable                               '更新用テーブル
+    Private OIM0005tbl As DataTable                                 '一覧格納用テーブル
+    Private OIM0005INPtbl As DataTable                              'チェック用テーブル
+    Private OIM0005UPDtbl As DataTable                              '更新用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -175,6 +177,12 @@ Public Class OIM0005TankList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -259,7 +267,7 @@ Public Class OIM0005TankList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -426,6 +434,7 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.SAPSHELLTANKNUMBER), '')                AS SAPSHELLTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')                          AS RESERVE3 " _
             & " , ISNULL(RTRIM(OIM0005.USEDFLG), '')                           AS USEDFLG " _
+            & " , ''                                                           AS USEDFLGNAME " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
             & " WHERE OIM0005.DELFLG <> @P3 "
 
@@ -445,35 +454,14 @@ Public Class OIM0005TankList
             SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
         End If
 
-        'If work.WF_SEL_TANKNUMBER.Text = "" And
-        '    work.WF_SEL_MODEL.Text = "" Then
-        '    SQLStr &=
-        '      " WHERE OIM0005.DELFLG      <> @P3"
-        'ElseIf work.WF_SEL_TANKNUMBER.Text <> "" And
-        '    work.WF_SEL_MODEL.Text <> "" Then
-        '    SQLStr &=
-        '      " WHERE OIM0005.TANKNUMBER = @P1" _
-        '    & "   AND OIM0005.MODEL = @P2" _
-        '    & "   AND OIM0005.DELFLG      <> @P3"
-        'Else
-        '    SQLStr &=
-        '      " WHERE (OIM0005.TANKNUMBER = @P1" _
-        '    & "   OR OIM0005.MODEL = @P2)" _
-        '    & "   AND OIM0005.DELFLG      <> @P3"
-        'End If
-
         SQLStr &=
               " ORDER BY" _
             & "    RIGHT('0000000000' + CAST(OIM0005.TANKNUMBER AS NVARCHAR), 10)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
-                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
 
-                'PARA1.Value = work.WF_SEL_TANKNUMBER.Text
-                'PARA2.Value = work.WF_SEL_MODEL.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -490,6 +478,10 @@ Public Class OIM0005TankList
                 For Each OIM0005row As DataRow In OIM0005tbl.Rows
                     i += 1
                     OIM0005row("LINECNT") = i        'LINECNT
+
+                    '利用フラグ
+                    CODENAME_get("USEDFLG", OIM0005row("USEDFLG"), OIM0005row("USEDFLGNAME"), WW_DUMMY)
+
                 Next
             End Using
         Catch ex As Exception
@@ -572,7 +564,7 @@ Public Class OIM0005TankList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -717,7 +709,6 @@ Public Class OIM0005TankList
         WF_RightboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' 追加ボタン押下時処理
@@ -1001,6 +992,9 @@ Public Class OIM0005TankList
         '削除
         work.WF_SEL_DELFLG.Text = "0"
 
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
 
@@ -1086,7 +1080,6 @@ Public Class OIM0005TankList
         Dim WW_CheckMES2 As String = ""
 
     End Sub
-
 
     ''' <summary>
     ''' タンク車マスタ登録更新
@@ -2066,7 +2059,6 @@ Public Class OIM0005TankList
 
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -2125,7 +2117,6 @@ Public Class OIM0005TankList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -2135,7 +2126,6 @@ Public Class OIM0005TankList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -2169,7 +2159,6 @@ Public Class OIM0005TankList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -2470,6 +2459,9 @@ Public Class OIM0005TankList
         '出光昭シSAP車番
         work.WF_SEL_SAPSHELLTANKNUMBER.Text = OIM0005tbl.Rows(WW_LINECNT)("SAPSHELLTANKNUMBER")
 
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+
         '○ 状態をクリア
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
             Select Case OIM0005row("OPERATION")
@@ -2526,7 +2518,6 @@ Public Class OIM0005TankList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -2601,6 +2592,8 @@ Public Class OIM0005TankList
                 For Each OIM0005row As DataRow In OIM0005tbl.Rows
                     If XLSTBLrow("TANKNUMBER") = OIM0005row("TANKNUMBER") Then
                         OIM0005INProw.ItemArray = OIM0005row.ItemArray
+                        '更新種別は初期化する
+                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
@@ -2675,52 +2668,102 @@ Public Class OIM0005TankList
             '原籍所有者C
             If WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 Then
                 OIM0005INProw("ORIGINOWNERCODE") = XLSTBLrow("ORIGINOWNERCODE")
+
+                '原籍所有者
+                If Not String.IsNullOrEmpty(OIM0005INProw("ORIGINOWNERCODE")) Then
+                    CODENAME_get("ORIGINOWNERCODE",
+                        OIM0005INProw("ORIGINOWNERCODE"),
+                        OIM0005INProw("ORIGINOWNERNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("ORIGINOWNERNAME") = ""
+                End If
             End If
 
-            '原籍所有者
-            If WW_COLUMNS.IndexOf("ORIGINOWNERNAME") >= 0 Then
-                OIM0005INProw("ORIGINOWNERNAME") = XLSTBLrow("ORIGINOWNERNAME")
-            End If
+            ''原籍所有者
+            'If WW_COLUMNS.IndexOf("ORIGINOWNERNAME") >= 0 Then
+            '    OIM0005INProw("ORIGINOWNERNAME") = XLSTBLrow("ORIGINOWNERNAME")
+            'End If
 
             '名義所有者C
             If WW_COLUMNS.IndexOf("OWNERCODE") >= 0 Then
                 OIM0005INProw("OWNERCODE") = XLSTBLrow("OWNERCODE")
+
+                '名義所有者
+                If Not String.IsNullOrEmpty(OIM0005INProw("OWNERCODE")) Then
+                    CODENAME_get("ORIGINOWNERCODE",
+                        OIM0005INProw("OWNERCODE"),
+                        OIM0005INProw("OWNERNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("OWNERNAME") = ""
+                End If
             End If
 
-            '名義所有者
-            If WW_COLUMNS.IndexOf("OWNERNAME") >= 0 Then
-                OIM0005INProw("OWNERNAME") = XLSTBLrow("OWNERNAME")
-            End If
+            ''名義所有者
+            'If WW_COLUMNS.IndexOf("OWNERNAME") >= 0 Then
+            '    OIM0005INProw("OWNERNAME") = XLSTBLrow("OWNERNAME")
+            'End If
 
             'リース先C
             If WW_COLUMNS.IndexOf("LEASECODE") >= 0 Then
                 OIM0005INProw("LEASECODE") = XLSTBLrow("LEASECODE")
+
+                'リース先
+                If Not String.IsNullOrEmpty(OIM0005INProw("LEASECLASS")) Then
+                    CODENAME_get("CAMPCODE",
+                        OIM0005INProw("LEASECODE"),
+                        OIM0005INProw("LEASENAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("LEASENAME") = ""
+                End If
             End If
 
-            'リース先
-            If WW_COLUMNS.IndexOf("LEASENAME") >= 0 Then
-                OIM0005INProw("LEASENAME") = XLSTBLrow("LEASENAME")
-            End If
+            ''リース先
+            'If WW_COLUMNS.IndexOf("LEASENAME") >= 0 Then
+            '    OIM0005INProw("LEASENAME") = XLSTBLrow("LEASENAME")
+            'End If
 
             'リース区分C
             If WW_COLUMNS.IndexOf("LEASECLASS") >= 0 Then
                 OIM0005INProw("LEASECLASS") = XLSTBLrow("LEASECLASS")
+
+                'リース区分
+                If Not String.IsNullOrEmpty(OIM0005INProw("LEASECLASS")) Then
+                    CODENAME_get("LEASECLASS",
+                        OIM0005INProw("LEASECLASS"),
+                        OIM0005INProw("LEASECLASSNEMAE"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("LEASECLASSNEMAE") = ""
+                End If
             End If
 
-            'リース区分
-            If WW_COLUMNS.IndexOf("LEASECLASSNEMAE") >= 0 Then
-                OIM0005INProw("LEASECLASSNEMAE") = XLSTBLrow("LEASECLASSNEMAE")
-            End If
+            ''リース区分
+            'If WW_COLUMNS.IndexOf("LEASECLASSNEMAE") >= 0 Then
+            '    OIM0005INProw("LEASECLASSNEMAE") = XLSTBLrow("LEASECLASSNEMAE")
+            'End If
 
             '自動延長
             If WW_COLUMNS.IndexOf("AUTOEXTENTION") >= 0 Then
                 OIM0005INProw("AUTOEXTENTION") = XLSTBLrow("AUTOEXTENTION")
+
+                '自動延長名
+                If Not String.IsNullOrEmpty(OIM0005INProw("AUTOEXTENTION")) Then
+                    CODENAME_get("AUTOEXTENTION",
+                        OIM0005INProw("AUTOEXTENTION"),
+                        OIM0005INProw("AUTOEXTENTIONNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("AUTOEXTENTIONNAME") = ""
+                End If
             End If
 
-            '自動延長名
-            If WW_COLUMNS.IndexOf("AUTOEXTENTIONNAME") >= 0 Then
-                OIM0005INProw("AUTOEXTENTIONNAME") = XLSTBLrow("AUTOEXTENTIONNAME")
-            End If
+            ''自動延長名
+            'If WW_COLUMNS.IndexOf("AUTOEXTENTIONNAME") >= 0 Then
+            '    OIM0005INProw("AUTOEXTENTIONNAME") = XLSTBLrow("AUTOEXTENTIONNAME")
+            'End If
 
             'リース開始年月日
             If WW_COLUMNS.IndexOf("LEASESTYMD") >= 0 Then
@@ -2735,32 +2778,63 @@ Public Class OIM0005TankList
             '第三者使用者C
             If WW_COLUMNS.IndexOf("USERCODE") >= 0 Then
                 OIM0005INProw("USERCODE") = XLSTBLrow("USERCODE")
+
+                '第三者使用者
+                If Not String.IsNullOrEmpty(OIM0005INProw("USERCODE")) Then
+                    CODENAME_get("USERCODE",
+                        OIM0005INProw("USERCODE"),
+                        OIM0005INProw("USERNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("USERNAME") = ""
+                End If
             End If
 
-            '第三者使用者
-            If WW_COLUMNS.IndexOf("USERNAME") >= 0 Then
-                OIM0005INProw("USERNAME") = XLSTBLrow("USERNAME")
-            End If
+            ''第三者使用者
+            'If WW_COLUMNS.IndexOf("USERNAME") >= 0 Then
+            '    OIM0005INProw("USERNAME") = XLSTBLrow("USERNAME")
+            'End If
 
             '原常備駅C
             If WW_COLUMNS.IndexOf("CURRENTSTATIONCODE") >= 0 Then
                 OIM0005INProw("CURRENTSTATIONCODE") = XLSTBLrow("CURRENTSTATIONCODE")
+
+                '原常備駅
+                If Not String.IsNullOrEmpty(OIM0005INProw("CURRENTSTATIONCODE")) Then
+                    CODENAME_get("STATIONPATTERN",
+                        OIM0005INProw("CURRENTSTATIONCODE"),
+                        OIM0005INProw("CURRENTSTATIONNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("CURRENTSTATIONNAME") = ""
+                End If
             End If
 
-            '原常備駅
-            If WW_COLUMNS.IndexOf("CURRENTSTATIONNAME") >= 0 Then
-                OIM0005INProw("CURRENTSTATIONNAME") = XLSTBLrow("CURRENTSTATIONNAME")
-            End If
+            ''原常備駅
+            'If WW_COLUMNS.IndexOf("CURRENTSTATIONNAME") >= 0 Then
+            '    OIM0005INProw("CURRENTSTATIONNAME") = XLSTBLrow("CURRENTSTATIONNAME")
+            'End If
 
             '臨時常備駅C
             If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONCODE") >= 0 Then
                 OIM0005INProw("EXTRADINARYSTATIONCODE") = XLSTBLrow("EXTRADINARYSTATIONCODE")
+
+                '臨時常備駅
+                If Not String.IsNullOrEmpty(OIM0005INProw("EXTRADINARYSTATIONCODE")) Then
+                    CODENAME_get(
+                        "STATIONPATTERN",
+                        OIM0005INProw("EXTRADINARYSTATIONCODE"),
+                        OIM0005INProw("EXTRADINARYSTATIONNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("EXTRADINARYSTATIONNAME") = ""
+                End If
             End If
 
-            '臨時常備駅
-            If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONNAME") >= 0 Then
-                OIM0005INProw("EXTRADINARYSTATIONNAME") = XLSTBLrow("EXTRADINARYSTATIONNAME")
-            End If
+            ''臨時常備駅
+            'If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONNAME") >= 0 Then
+            '    OIM0005INProw("EXTRADINARYSTATIONNAME") = XLSTBLrow("EXTRADINARYSTATIONNAME")
+            'End If
 
             '第三者使用期限
             If WW_COLUMNS.IndexOf("USERLIMIT") >= 0 Then
@@ -2775,22 +2849,44 @@ Public Class OIM0005TankList
             '原専用種別C
             If WW_COLUMNS.IndexOf("DEDICATETYPECODE") >= 0 Then
                 OIM0005INProw("DEDICATETYPECODE") = XLSTBLrow("DEDICATETYPECODE")
+
+                '原専用種別
+                If Not String.IsNullOrEmpty(OIM0005INProw("DEDICATETYPECODE")) Then
+                    CODENAME_get(
+                        "DEDICATETYPECODE",
+                        OIM0005INProw("DEDICATETYPECODE"),
+                        OIM0005INProw("DEDICATETYPENAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("DEDICATETYPENAME") = ""
+                End If
             End If
 
-            '原専用種別
-            If WW_COLUMNS.IndexOf("DEDICATETYPENAME") >= 0 Then
-                OIM0005INProw("DEDICATETYPENAME") = XLSTBLrow("DEDICATETYPENAME")
-            End If
+            ''原専用種別
+            'If WW_COLUMNS.IndexOf("DEDICATETYPENAME") >= 0 Then
+            '    OIM0005INProw("DEDICATETYPENAME") = XLSTBLrow("DEDICATETYPENAME")
+            'End If
 
             '臨時専用種別C
             If WW_COLUMNS.IndexOf("EXTRADINARYTYPECODE") >= 0 Then
                 OIM0005INProw("EXTRADINARYTYPECODE") = XLSTBLrow("EXTRADINARYTYPECODE")
+
+                '臨時専用種別
+                If Not String.IsNullOrEmpty(OIM0005INProw("EXTRADINARYTYPECODE")) Then
+                    CODENAME_get(
+                        "EXTRADINARYTYPECODE",
+                        OIM0005INProw("EXTRADINARYTYPECODE"),
+                        OIM0005INProw("EXTRADINARYTYPENAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("EXTRADINARYTYPECODE") = ""
+                End If
             End If
 
-            '臨時専用種別
-            If WW_COLUMNS.IndexOf("EXTRADINARYTYPENAME") >= 0 Then
-                OIM0005INProw("EXTRADINARYTYPENAME") = XLSTBLrow("EXTRADINARYTYPENAME")
-            End If
+            ''臨時専用種別
+            'If WW_COLUMNS.IndexOf("EXTRADINARYTYPENAME") >= 0 Then
+            '    OIM0005INProw("EXTRADINARYTYPENAME") = XLSTBLrow("EXTRADINARYTYPENAME")
+            'End If
 
             '臨時専用期限
             If WW_COLUMNS.IndexOf("EXTRADINARYLIMIT") >= 0 Then
@@ -2800,42 +2896,86 @@ Public Class OIM0005TankList
             '油種大分類コード
             If WW_COLUMNS.IndexOf("BIGOILCODE") >= 0 Then
                 OIM0005INProw("BIGOILCODE") = XLSTBLrow("BIGOILCODE")
+
+                '油種大分類名
+                If Not String.IsNullOrEmpty(OIM0005INProw("BIGOILCODE")) Then
+                    CODENAME_get(
+                        "BIGOILCODE",
+                        OIM0005INProw("BIGOILCODE"),
+                        OIM0005INProw("BIGOILNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("BIGOILNAME") = ""
+                End If
             End If
 
-            '油種大分類名
-            If WW_COLUMNS.IndexOf("BIGOILNAME") >= 0 Then
-                OIM0005INProw("BIGOILNAME") = XLSTBLrow("BIGOILNAME")
-            End If
+            ''油種大分類名
+            'If WW_COLUMNS.IndexOf("BIGOILNAME") >= 0 Then
+            '    OIM0005INProw("BIGOILNAME") = XLSTBLrow("BIGOILNAME")
+            'End If
 
             '運用基地C
             If WW_COLUMNS.IndexOf("OPERATIONBASECODE") >= 0 Then
                 OIM0005INProw("OPERATIONBASECODE") = XLSTBLrow("OPERATIONBASECODE")
+
+                '運用場所
+                If Not String.IsNullOrEmpty(OIM0005INProw("OPERATIONBASECODE")) Then
+                    CODENAME_get(
+                        "BASE",
+                        OIM0005INProw("OPERATIONBASECODE"),
+                        OIM0005INProw("OPERATIONBASENAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("OPERATIONBASENAME") = ""
+                End If
             End If
 
-            '運用場所
-            If WW_COLUMNS.IndexOf("OPERATIONBASENAME") >= 0 Then
-                OIM0005INProw("OPERATIONBASENAME") = XLSTBLrow("OPERATIONBASENAME")
-            End If
+            ''運用場所
+            'If WW_COLUMNS.IndexOf("OPERATIONBASENAME") >= 0 Then
+            '    OIM0005INProw("OPERATIONBASENAME") = XLSTBLrow("OPERATIONBASENAME")
+            'End If
 
             '塗色C
             If WW_COLUMNS.IndexOf("COLORCODE") >= 0 Then
                 OIM0005INProw("COLORCODE") = XLSTBLrow("COLORCODE")
+
+                '塗色
+                If Not String.IsNullOrEmpty(OIM0005INProw("COLORCODE")) Then
+                    CODENAME_get(
+                        "COLORCODE",
+                        OIM0005INProw("COLORCODE"),
+                        OIM0005INProw("COLORNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("COLORNAME") = ""
+                End If
             End If
 
-            '塗色
-            If WW_COLUMNS.IndexOf("COLORNAME") >= 0 Then
-                OIM0005INProw("COLORNAME") = XLSTBLrow("COLORNAME")
-            End If
+            ''塗色
+            'If WW_COLUMNS.IndexOf("COLORNAME") >= 0 Then
+            '    OIM0005INProw("COLORNAME") = XLSTBLrow("COLORNAME")
+            'End If
 
             'マークコード
             If WW_COLUMNS.IndexOf("MARKCODE") >= 0 Then
                 OIM0005INProw("MARKCODE") = XLSTBLrow("MARKCODE")
+
+                'マーク名
+                If Not String.IsNullOrEmpty(OIM0005INProw("MARKCODE")) Then
+                    CODENAME_get(
+                        "MARKCODE",
+                        OIM0005INProw("MARKCODE"),
+                        OIM0005INProw("MARKNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("MARKNAME") = ""
+                End If
             End If
 
-            'マーク名
-            If WW_COLUMNS.IndexOf("MARKNAME") >= 0 Then
-                OIM0005INProw("MARKNAME") = XLSTBLrow("MARKNAME")
-            End If
+            ''マーク名
+            'If WW_COLUMNS.IndexOf("MARKNAME") >= 0 Then
+            '    OIM0005INProw("MARKNAME") = XLSTBLrow("MARKNAME")
+            'End If
 
             'JXTG仙台タグコード
             If WW_COLUMNS.IndexOf("JXTGTAGCODE1") >= 0 Then
@@ -2850,12 +2990,23 @@ Public Class OIM0005TankList
             'JXTG千葉タグコード
             If WW_COLUMNS.IndexOf("JXTGTAGCODE2") >= 0 Then
                 OIM0005INProw("JXTGTAGCODE2") = XLSTBLrow("JXTGTAGCODE2")
+
+                'JXTG千葉タグ名
+                If Not String.IsNullOrEmpty(OIM0005INProw("JXTGTAGCODE2")) Then
+                    CODENAME_get(
+                        "TAGCODE",
+                        OIM0005INProw("JXTGTAGCODE2"),
+                        OIM0005INProw("JXTGTAGNAME2"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("JXTGTAGNAME2") = ""
+                End If
             End If
 
-            'JXTG千葉タグ名
-            If WW_COLUMNS.IndexOf("JXTGTAGNAME2") >= 0 Then
-                OIM0005INProw("JXTGTAGNAME2") = XLSTBLrow("JXTGTAGNAME2")
-            End If
+            ''JXTG千葉タグ名
+            'If WW_COLUMNS.IndexOf("JXTGTAGNAME2") >= 0 Then
+            '    OIM0005INProw("JXTGTAGNAME2") = XLSTBLrow("JXTGTAGNAME2")
+            'End If
 
             'JXTG川崎タグコード
             If WW_COLUMNS.IndexOf("JXTGTAGCODE3") >= 0 Then
@@ -2880,12 +3031,23 @@ Public Class OIM0005TankList
             '出光昭シタグコード
             If WW_COLUMNS.IndexOf("IDSSTAGCODE") >= 0 Then
                 OIM0005INProw("IDSSTAGCODE") = XLSTBLrow("IDSSTAGCODE")
+
+                '出光昭シタグ名
+                If Not String.IsNullOrEmpty(OIM0005INProw("IDSSTAGCODE")) Then
+                    CODENAME_get(
+                        "TAGCODE",
+                        OIM0005INProw("IDSSTAGCODE"),
+                        OIM0005INProw("IDSSTAGNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("IDSSTAGNAME") = ""
+                End If
             End If
 
-            '出光昭シタグ名
-            If WW_COLUMNS.IndexOf("IDSSTAGNAME") >= 0 Then
-                OIM0005INProw("IDSSTAGNAME") = XLSTBLrow("IDSSTAGNAME")
-            End If
+            ''出光昭シタグ名
+            'If WW_COLUMNS.IndexOf("IDSSTAGNAME") >= 0 Then
+            '    OIM0005INProw("IDSSTAGNAME") = XLSTBLrow("IDSSTAGNAME")
+            'End If
 
             'コスモタグコード
             If WW_COLUMNS.IndexOf("COSMOTAGCODE") >= 0 Then
@@ -2955,12 +3117,23 @@ Public Class OIM0005TankList
             '取得先C
             If WW_COLUMNS.IndexOf("OBTAINEDCODE") >= 0 Then
                 OIM0005INProw("OBTAINEDCODE") = XLSTBLrow("OBTAINEDCODE")
+
+                '取得先名
+                If Not String.IsNullOrEmpty(OIM0005INProw("OBTAINEDCODE")) Then
+                    CODENAME_get(
+                        "OBTAINEDCODE",
+                        OIM0005INProw("OBTAINEDCODE"),
+                        OIM0005INProw("OBTAINEDNAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("OBTAINEDNAME") = ""
+                End If
             End If
 
-            '取得先名
-            If WW_COLUMNS.IndexOf("OBTAINEDNAME") >= 0 Then
-                OIM0005INProw("OBTAINEDNAME") = XLSTBLrow("OBTAINEDNAME")
-            End If
+            ''取得先名
+            'If WW_COLUMNS.IndexOf("OBTAINEDNAME") >= 0 Then
+            '    OIM0005INProw("OBTAINEDNAME") = XLSTBLrow("OBTAINEDNAME")
+            'End If
 
             '現在経年
             If WW_COLUMNS.IndexOf("PROGRESSYEAR") >= 0 Then
@@ -3148,7 +3321,6 @@ Public Class OIM0005TankList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***

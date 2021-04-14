@@ -183,7 +183,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MINCALIBER As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LENGTHFLG2 コントロール。
     '''</summary>
@@ -192,7 +192,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LENGTHFLG2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORIGINOWNERCODE コントロール。
     '''</summary>
@@ -966,4 +966,13 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_DETAIL_UPDATE_MESSAGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DETAIL_UPDATE_MESSAGE As Global.System.Web.UI.WebControls.TextBox
 End Class

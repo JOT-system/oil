@@ -627,15 +627,25 @@ Public Class M00001MENU
             '輸送実績表
             If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
 
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TRANSPORT_RESULT
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                     tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
                 End If
+
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       '輸送実績表
-                        Me.GetTransportResultData)
+                        dt)                             '出力データテーブル
 
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
@@ -655,16 +665,26 @@ Public Class M00001MENU
 
             'タンク車輸送実績表
             If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT
                 '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                 If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_010402
                 End If
 
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTankTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       'タンク車輸送実績表
-                        Me.GetTankTransportResultData)
+                        dt)                             '出力データテーブル
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         'タンク車運賃実績表-列車別-仙台
@@ -685,16 +705,26 @@ Public Class M00001MENU
 
             'タンク車輸送実績表（着駅別）
             If CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR.Equals(ddlReportNameList.SelectedItem.Text) Then
+
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR
                 '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                 If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR_010402
                 End If
 
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTankTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       'タンク車輸送実績表（着駅別）
-                        Me.GetTankTransportResultData)
+                        dt)                             '出力データテーブル
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult_Arr_010402(

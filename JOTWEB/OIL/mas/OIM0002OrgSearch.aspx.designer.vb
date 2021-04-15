@@ -14,42 +14,6 @@ Option Explicit On
 Partial Public Class OIM0002OrgSearch
     
     '''<summary>
-    '''TxtCampCodeMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtCampCodeMy As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''txtCampNameMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtCampNameMy As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtOrgCodeMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtOrgCodeMy As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''txtOrgNameMy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtOrgNameMy As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''TxtCampCode コントロール。
     '''</summary>
     '''<remarks>

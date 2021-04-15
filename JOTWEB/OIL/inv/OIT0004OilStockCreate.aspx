@@ -542,6 +542,9 @@
             <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
             <!-- 提案表の日付追加・削除ボタン押下元情報保持 -->
             <asp:HiddenField ID="hdnSuggestDateAddRemoveKey" runat="server" value="" EnableViewState ="false" />
+            <!-- スクロール位置の保持 -->
+            <asp:HiddenField ID="hdnThisScrollLeft" runat="server" Value="" />
+            <asp:HiddenField ID="hdnThisScrollTop" runat="server" Value="" />
             <!-- 権限 -->
         </div>
  

@@ -30,7 +30,16 @@ Partial Public Class OIS0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE2 As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_CAMPCODE3 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CAMPCODE3 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_ORG コントロール。
     '''</summary>
@@ -993,7 +1002,7 @@ Partial Public Class OIS0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_USER_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DETAIL_UPDATE_MESSAGE コントロール。
     '''</summary>

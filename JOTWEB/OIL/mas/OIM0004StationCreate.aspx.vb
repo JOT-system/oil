@@ -1,7 +1,7 @@
 ﻿''************************************************************
 ' 貨物駅マスタメンテ登録画面
 ' 作成日 2019/10/29
-' 更新日 2021/04/09
+' 更新日 2021/04/15
 ' 作成者 JOT森川
 ' 更新者 JOT伊草
 '
@@ -11,6 +11,7 @@
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)更新ボタン押下時、この画面でDB更新→
 '                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/04/15 新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -1142,17 +1143,9 @@ Public Class OIM0004StationCreate
 
         '○ 変更有無判定　&　入力値反映
         For Each OIM0004INProw As DataRow In OIM0004INPtbl.Rows
-            'Select Case OIM0004INProw("OPERATION")
-            '    Case CONST_UPDATE
-            '        TBL_UPDATE_SUB(OIM0004INProw)
-            '    Case CONST_INSERT
-            '        TBL_INSERT_SUB(OIM0004INProw)
-            '    Case CONST_PATTERNERR
-            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-            '        TBL_INSERT_SUB(OIM0004INProw)
-            '    Case C_LIST_OPERATION_CODE.ERRORED
-            '        TBL_ERR_SUB(OIM0004INProw)
-            'End Select
+            '発見フラグ
+            Dim isFound As Boolean = False
+
             For Each OIM0004row As DataRow In OIM0004tbl.Rows
 
                 '同一レコードか判定
@@ -1167,9 +1160,27 @@ Public Class OIM0004StationCreate
 
                     '項目テーブル項目設定
                     OIM0004row.ItemArray = OIM0004INProw.ItemArray
+
+                    '発見フラグON
+                    isFound = True
                     Exit For
                 End If
             Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIM0004tbl.NewRow
+                nrow.ItemArray = OIM0004INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIM0004tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("TIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                OIM0004tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub

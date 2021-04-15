@@ -12,6 +12,8 @@
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)更新ボタン押下時、この画面でDB更新→
 '                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/04/15 1)表示順nが未入力の場合にエラーとなるバグに対応
+'                     2)新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -4119,9 +4121,13 @@ Public Class OIS0001UserCreate
                 Else
                     'CheckFieldで数値が前0埋めされてしまうので、数値が一致してれば元に戻す
                     '(そうしないと既存レコードの比較がうまくいかない為)
-                    If Not inputText.Equals(OIS0001INProw(fieldName_SORTNOn)) AndAlso
-                        Long.Parse(inputText) = Long.Parse(OIS0001INProw(fieldName_SORTNOn)) Then
-                        OIS0001INProw(fieldName_SORTNOn) = inputText
+                    If String.IsNullOrEmpty(inputText) Then
+                        OIS0001INProw(fieldName_SORTNOn) = 0
+                    Else
+                        If Not inputText.Equals(OIS0001INProw(fieldName_SORTNOn)) AndAlso
+                            Long.Parse(inputText) = Long.Parse(OIS0001INProw(fieldName_SORTNOn)) Then
+                            OIS0001INProw(fieldName_SORTNOn) = inputText
+                        End If
                     End If
                 End If
 
@@ -4515,22 +4521,14 @@ Public Class OIS0001UserCreate
 
         '○ 変更有無判定　&　入力値反映
         For Each OIS0001INProw As DataRow In OIS0001INPtbl.Rows
-            'Select Case OIS0001INProw("OPERATION")
-            '    Case CONST_UPDATE
-            '        TBL_UPDATE_SUB(OIS0001INProw)
-            '    Case CONST_INSERT
-            '        TBL_INSERT_SUB(OIS0001INProw)
-            '    Case CONST_PATTERNERR
-            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-            '        TBL_INSERT_SUB(OIS0001INProw)
-            '    Case C_LIST_OPERATION_CODE.ERRORED
-            '        TBL_ERR_SUB(OIS0001INProw)
-            'End Select
+            '発見フラグ
+            Dim isFound As Boolean = False
+
             For Each OIS0001row As DataRow In OIS0001tbl.Rows
 
                 '同一レコードか判定
                 If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
-                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
+                    OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
                     '画面入力テーブル項目設定
                     OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
                     OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
@@ -4540,9 +4538,27 @@ Public Class OIS0001UserCreate
 
                     '項目テーブル項目設定
                     OIS0001row.ItemArray = OIS0001INProw.ItemArray
+
+                    '発見フラグON
+                    isFound = True
                     Exit For
                 End If
             Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIS0001tbl.NewRow
+                nrow.ItemArray = OIS0001INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIS0001tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("UPDTIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                OIS0001tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub

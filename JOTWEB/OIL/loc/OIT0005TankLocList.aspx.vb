@@ -18,6 +18,11 @@ Public Class OIT0005TankLocList
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
 
+    Private WW_DETAILTYPE09 As String = "9"
+    Private WW_DETAILTYPE10 As String = "10"
+    Private WW_DETAILTYPE09_FILTER() As String = {"未卸中", "交検中", "留置中"}
+    Private WW_DETAILTYPE10_FILTER() As String = {"修理", "ＭＣ", "交検", "全検", "留置"}
+
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
@@ -106,12 +111,12 @@ Public Class OIT0005TankLocList
             work.WF_MAIN_OFFICECODE.Text = ""
             If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
                 '★受注着駅到着後状況
-                work.WF_COND_DETAILTYPE.Text = "9"
+                work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE09
                 work.WF_COND_DETAILTYPENAME.Text = "その他状況"
                 WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE", "", WW_GetValue)
             ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
                 '★回送後状況
-                work.WF_COND_DETAILTYPE.Text = "10"
+                work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE10
                 work.WF_COND_DETAILTYPENAME.Text = "その他状況"
                 WW_FixvalueMasterSearch(Master.USER_ORG, "SALESOFFICE_KAISOU", "", WW_GetValue)
             Else
@@ -127,18 +132,6 @@ Public Class OIT0005TankLocList
                     work.WF_MAIN_OFFICECODE.Text &= ",'" + WW_GetValue(i) + "'"
                 End If
             Next
-
-            'If Master.MAPID = OIT0005WRKINC.MAPIDL + "ORDMAIN" Then
-            '    '★受注着駅到着後状況
-            '    work.WF_COND_DETAILTYPE.Text = "9"
-            '    work.WF_COND_DETAILTYPENAME.Text = "その他状況"
-            'ElseIf Master.MAPID = OIT0005WRKINC.MAPIDL + "OOSMAIN" Then
-            '    '★回送後状況
-            '    work.WF_COND_DETAILTYPE.Text = "10"
-            '    work.WF_COND_DETAILTYPENAME.Text = "その他状況"
-            'Else
-            '    Exit Sub
-            'End If
 
             work.WF_MAIN_VIEWTABLE.Text = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
             work.WF_MAIN_VIEWSORT.Text = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)
@@ -202,21 +195,21 @@ Public Class OIT0005TankLocList
         '生成したデータを画面に貼り付け
         '*************************
         GridViewInitialize()
-        '**********************************************
-        '絞り込みタブを設定
-        '**********************************************
-        Me.chklGroupFilter.DataSource = OIT0005WRKINC.DispDataClass.GetDetailInsideNames(work.WF_COND_DETAILTYPE.Text)
-        Me.chklGroupFilter.DataValueField = "Key"
-        Me.chklGroupFilter.DataTextField = "Value"
-        Me.chklGroupFilter.DataBind()
-        Dim rowCnt As Integer = 0
-        Dim fieldName As String = ""
-        For Each chkGrp In Me.chklGroupFilter.Items.Cast(Of ListItem)
-            chkGrp.Selected = True
-            fieldName = String.Format("ISCOUNT{0}GROUP", chkGrp.Value)
-            rowCnt = (From dr As DataRow In Me.OIT0005tbl Where dr(fieldName).Equals("1")).Count
-            chkGrp.Text = chkGrp.Text & "(" & rowCnt.ToString("#,##0両") & ")"
-        Next chkGrp
+        ''**********************************************
+        ''絞り込みタブを設定
+        ''**********************************************
+        'Me.chklGroupFilter.DataSource = OIT0005WRKINC.DispDataClass.GetDetailInsideNames(work.WF_COND_DETAILTYPE.Text)
+        'Me.chklGroupFilter.DataValueField = "Key"
+        'Me.chklGroupFilter.DataTextField = "Value"
+        'Me.chklGroupFilter.DataBind()
+        'Dim rowCnt As Integer = 0
+        'Dim fieldName As String = ""
+        'For Each chkGrp In Me.chklGroupFilter.Items.Cast(Of ListItem)
+        '    chkGrp.Selected = True
+        '    fieldName = String.Format("ISCOUNT{0}GROUP", chkGrp.Value)
+        '    rowCnt = (From dr As DataRow In Me.OIT0005tbl Where dr(fieldName).Equals("1")).Count
+        '    chkGrp.Text = chkGrp.Text & "(" & rowCnt.ToString("#,##0両") & ")"
+        'Next chkGrp
 
     End Sub
     ''' <summary>
@@ -234,7 +227,7 @@ Public Class OIT0005TankLocList
         End Using
 
         '○受注着駅到着後状況の場合
-        If work.WF_COND_DETAILTYPE.Text = "9" Then
+        If work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE09 Then
             '○未卸以外の場合
             For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION <> '" + BaseDllConst.CONST_TANKSITUATION_20 + "'")
                 '★返送日が入力されている場合はSKIP
@@ -244,16 +237,16 @@ Public Class OIT0005TankLocList
             Next
 
             '○回送後状況の場合
-        ElseIf work.WF_COND_DETAILTYPE.Text = "10" Then
+        ElseIf work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE10 Then
             '○交検の場合
-            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_13 + "'")
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_13 + "'" + " OR " + "TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_03 + "'")
                 '★返送日が入力されている場合はSKIP
                 If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) <> "" Then Continue For
                 '★交検日の入力を促すようにするため空白にする。
                 OIT0005row("JRINSPECTIONDATE") = ""
             Next
             '○全検の場合
-            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_14 + "'")
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_14 + "'" + " OR " + "TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_04 + "'")
                 '★返送日が入力されている場合はSKIP
                 If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) <> "" Then Continue For
                 '★全検日の入力を促すようにするため空白にする。
@@ -264,18 +257,74 @@ Public Class OIT0005TankLocList
         '○ 画面表示データ保存
         Master.SaveTable(OIT0005tbl)
 
+        '**********************************************
+        '絞り込みタブを設定
+        '**********************************************
+        Me.chklGroupFilter.DataSource = OIT0005WRKINC.DispDataClass.GetDetailInsideNames(work.WF_COND_DETAILTYPE.Text)
+        Me.chklGroupFilter.DataValueField = "Key"
+        Me.chklGroupFilter.DataTextField = "Value"
+        Me.chklGroupFilter.DataBind()
+        Dim rowCnt As Integer = 0
+        Dim fieldName As String = ""
+        For Each chkGrp In Me.chklGroupFilter.Items.Cast(Of ListItem)
+            Select Case work.WF_COND_DETAILTYPE.Text
+                '○受注着駅到着後状況の場合
+                Case "9"
+                    '○タンク車状況
+                    Select Case chkGrp.Text
+                        '★留置中は未チェック
+                        Case WW_DETAILTYPE09_FILTER(2)
+                            chkGrp.Selected = False
+                        Case Else
+                            chkGrp.Selected = True
+                    End Select
+                Case Else
+                    chkGrp.Selected = True
+            End Select
+
+            fieldName = String.Format("ISCOUNT{0}GROUP", chkGrp.Value)
+            rowCnt = (From dr As DataRow In Me.OIT0005tbl Where dr(fieldName).Equals("1")).Count
+            chkGrp.Text = chkGrp.Text & "(" & rowCnt.ToString("#,##0両") & ")"
+        Next chkGrp
+
+        '○ 表示対象行カウント(絞り込み対象)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+        Dim qFilterQue = (From chklItm In Me.chklGroupFilter.Items.Cast(Of ListItem) Where chklItm.Selected Select chklItm.Value)
+        Dim filterKeyValues As List(Of String)
+        If qFilterQue.Any Then
+            filterKeyValues = qFilterQue.ToList
+        Else
+            filterKeyValues = New List(Of String)
+        End If
+        Dim fieldName1 As String = "ISCOUNT{0}GROUP"
+        For Each OIT0005row As DataRow In OIT0005tbl.Rows
+            OIT0005row("HIDDEN") = "1"
+            For Each filterKeyValue In filterKeyValues
+                If Convert.ToString(OIT0005row(String.Format(fieldName1, filterKeyValue))).Equals("1") Then
+                    OIT0005row("HIDDEN") = "0"
+                End If
+            Next
+
+            If Convert.ToString(OIT0005row("HIDDEN")) = "0" Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0005row("SELECT") = WW_DataCNT
+            End If
+        Next
+
         '〇 一覧の件数を取得
         'Me.WF_ListCNT.Text = "件数：" + OIT0005tbl.Rows.Count.ToString()
 
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIT0005tbl)
 
-        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        TBLview.RowFilter = "HIDDEN = 0 and LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        'TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
         '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
-        If work.WF_COND_DETAILTYPE.Text = "9" _
-           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
+        If work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE09 _
+           OrElse work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE10 Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -867,7 +916,7 @@ Public Class OIT0005TankLocList
         '明細更新ボタン押下時
         If Me.WW_UPBUTTONFLG = "1" Then
             '○受注着駅到着後状況の場合
-            If work.WF_COND_DETAILTYPE.Text = "9" Then
+            If work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE09 Then
                 '○未卸以外の場合
                 For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION <> '" + BaseDllConst.CONST_TANKSITUATION_20 + "'")
                     '★返送日が入力されている場合はSKIP
@@ -877,7 +926,7 @@ Public Class OIT0005TankLocList
                 Next
 
                 '○回送後状況の場合
-            ElseIf work.WF_COND_DETAILTYPE.Text = "10" Then
+            ElseIf work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE10 Then
                 '○交検の場合
                 For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_13 + "'")
                     '★返送日が入力されている場合はSKIP
@@ -951,8 +1000,8 @@ Public Class OIT0005TankLocList
         '○ 一覧作成
         '★その他状況(受注(未卸中・交検中・留置中))の場合は表示内容を変更
         '★　　　　　 回送(修理・ＭＣ・交検・全検・留置・移動)
-        If work.WF_COND_DETAILTYPE.Text = "9" _
-           OrElse work.WF_COND_DETAILTYPE.Text = "10" Then
+        If work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE09 _
+           OrElse work.WF_COND_DETAILTYPE.Text = Me.WW_DETAILTYPE10 Then
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text + "9"
         Else
             CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -1890,7 +1939,8 @@ Public Class OIT0005TankLocList
                     chkObjREP = DirectCast(cellObj.FindControl(chkObjREPId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjREP IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_11 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_11 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_05) Then
                         '修理フラグ(チェックボックス)を非活性
                         chkObjREP.Enabled = False
                         Exit For
@@ -1903,8 +1953,8 @@ Public Class OIT0005TankLocList
                     chkObjMC = DirectCast(cellObj.FindControl(chkObjMCId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjMC IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 Then
-
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_07) Then
                         'ＭＣフラグ(チェックボックス)を非活性
                         chkObjMC.Enabled = False
                         Exit For
@@ -1917,7 +1967,8 @@ Public Class OIT0005TankLocList
                     chkObjINS = DirectCast(cellObj.FindControl(chkObjINSId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjINS IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_03) Then
                         '交検フラグ(チェックボックス)を非活性
                         chkObjINS.Enabled = False
                         Exit For
@@ -1930,7 +1981,8 @@ Public Class OIT0005TankLocList
                     chkObjAINS = DirectCast(cellObj.FindControl(chkObjAINSId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjAINS IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_04) Then
                         '全検フラグ(チェックボックス)を非活性
                         chkObjAINS.Enabled = False
                         Exit For
@@ -1943,7 +1995,8 @@ Public Class OIT0005TankLocList
                     chkObjIND = DirectCast(cellObj.FindControl(chkObjINDId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjIND IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_06) Then
                         '留置フラグ(チェックボックス)を非活性
                         chkObjIND.Enabled = False
                         Exit For
@@ -1967,7 +2020,8 @@ Public Class OIT0005TankLocList
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") Then
                         '★交検の設定
-                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 _
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_03) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
@@ -1975,7 +2029,8 @@ Public Class OIT0005TankLocList
                         End If
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRALLINSPECTIONDATE") Then
                         '★全検の設定
-                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else

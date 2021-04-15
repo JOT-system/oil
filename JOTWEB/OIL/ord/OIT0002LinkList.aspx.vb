@@ -71,7 +71,8 @@ Public Class OIT0002LinkList
                                             "回送(修理)",
                                             "回送(ＭＣ)",
                                             "回送(交検)",
-                                            "回送(疎開留置)"}       '指示内容
+                                            "回送(疎開留置)",
+                                            "回送(移動)"}          '指示内容
     Private WW_OTTRANSPORT As String = "OT輸送"                     'OT輸送
 
     Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全検-他社負担(五井、甲子、袖ヶ浦)
@@ -1962,8 +1963,8 @@ Public Class OIT0002LinkList
                                         I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),
                                         I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_04)
 
-                '○回送(その他)
-                Case WW_OBJECTIVENAME(3)
+                '○回送(その他)(移動)
+                Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                     '(タンク車所在TBL)の内容を更新
                     '引数１：タンク車状態　⇒　変更なし
                     '引数２：積車区分　　　⇒　変更なし
@@ -3178,8 +3179,8 @@ Public Class OIT0002LinkList
 
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME<>''", "OBJECTIVENAME, LOADINGTRAINNO, LOADINGDEPDATE")
                     '★タンク車指示が「回送(全検)」「回送(その他)」以外の場合はSKIP
-                    If OIT0002EXLUProw("OBJECTIVENAME") <> WW_OBJECTIVENAME(2) _
-                        AndAlso OIT0002EXLUProw("OBJECTIVENAME") <> WW_OBJECTIVENAME(3) Then Continue For
+                    If OIT0002EXLUProw("OBJECTIVENAME") = WW_OBJECTIVENAME(0) _
+                        OrElse OIT0002EXLUProw("OBJECTIVENAME") = WW_OBJECTIVENAME(1) Then Continue For
                     '★本線列車Noが未設定の場合もSKIP
                     If OIT0002EXLUProw("LOADINGTRAINNO").ToString() = "" Then Continue For
 
@@ -3473,7 +3474,7 @@ Public Class OIT0002LinkList
                         Case WW_OBJECTIVENAME(2)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_23
                         '○回送(その他)
-                        Case WW_OBJECTIVENAME(3)
+                        Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_25
                     End Select
 
@@ -3550,8 +3551,8 @@ Public Class OIT0002LinkList
                                 Case BaseDllConst.CONST_OFFICECODE_011203
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(2)
                             End Select
-                        '○回送(その他)
-                        Case WW_OBJECTIVENAME(3)
+                        '○回送(その他)(移動)
+                        Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             '★移動-JOT負担発払(F120*60)を設定
                             Select Case OIT0002row("OFFICECODE")
                                 '○五井営業所
@@ -3943,8 +3944,8 @@ Public Class OIT0002LinkList
                                 Case BaseDllConst.CONST_OFFICECODE_011203
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(2)
                             End Select
-                        '○回送(その他)
-                        Case WW_OBJECTIVENAME(3)
+                        '○回送(その他)(移動)
+                        Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             '★移動-JOT負担発払(F120*60)を設定
                             Select Case OIT0002row("OFFICECODE")
                                 '○五井営業所
@@ -3992,8 +3993,8 @@ Public Class OIT0002LinkList
                         '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_23
-                        '○回送(その他)
-                        Case WW_OBJECTIVENAME(3)
+                        '○回送(その他)(移動)
+                        Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_25
                     End Select
 
@@ -4044,7 +4045,7 @@ Public Class OIT0002LinkList
                     '合計（疎開留置）
                     P_TOTALINDWELLING.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(7) + "'").Count
                     '合計（移動）
-                    P_TOTALMOVE.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(3) + "'").Count
+                    P_TOTALMOVE.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND (OBJECTIVENAME='" + WW_OBJECTIVENAME(3) + "' OR " + "OBJECTIVENAME='" + WW_OBJECTIVENAME(8) + "')").Count
 
                     P_ORDERNO.Value = ""                                '受注№
                     P_KEIJYOYMD.Value = DBNull.Value                    '計上日

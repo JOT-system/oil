@@ -1,14 +1,17 @@
 ﻿''************************************************************
 ' 列車マスタメンテ登録・更新画面
 ' 作成日 2020/09/04
-' 更新日 2021/04/14
+' 更新日 2021/04/15
 ' 作成者 JOT常井
 ' 更新者 JOT伊草
 '
 ' 修正履歴:2020/09/04 新規作成
-'         :2021/04/14 1)項目「利用者フラグ」を区分値→名称で表示するように変更
-'         :           2)登録・更新画面にて更新メッセージが設定された場合
-'         :             画面下部に更新メッセージを表示するように修正
+'         :2021/04/14 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/04/15 新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -2055,17 +2058,9 @@ Public Class OIM0007TrainCreate
 
         '○ 変更有無判定　&　入力値反映
         For Each OIM0007INProw As DataRow In OIM0007INPtbl.Rows
-            'Select Case OIM0007INProw("OPERATION")
-            '    Case CONST_UPDATE
-            '        TBL_UPDATE_SUB(OIM0007INProw)
-            '    Case CONST_INSERT
-            '        TBL_INSERT_SUB(OIM0007INProw)
-            '    Case CONST_PATTERNERR
-            '        '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-            '        TBL_INSERT_SUB(OIM0007INProw)
-            '    Case C_LIST_OPERATION_CODE.ERRORED
-            '        TBL_ERR_SUB(OIM0007INProw)
-            'End Select
+            '発見フラグ
+            Dim isFound As Boolean = False
+
             For Each OIM0007row As DataRow In OIM0007tbl.Rows
 
                 '同一レコードか判定
@@ -2127,9 +2122,68 @@ Public Class OIM0007TrainCreate
                         CODENAME_get("RUN", OIM0007row("RUN"), OIM0007row("RUNNAME"), WW_DUMMY)
                     End If
 
+                    '発見フラグON
+                    isFound = True
                     Exit For
                 End If
             Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIM0007tbl.NewRow
+                nrow.ItemArray = OIM0007INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIM0007tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("UPDTIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                '〇名称設定
+                '管轄営業所(名)
+                If Not String.IsNullOrEmpty(nrow("OFFICECODE")) Then
+                    CODENAME_get("OFFICECODE", nrow("OFFICECODE"), nrow("OFFICENAME"), WW_DUMMY)
+                End If
+                '積置フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("TSUMI")) Then
+                    CODENAME_get("TSUMI", nrow("TSUMI"), nrow("TSUMINAME"), WW_DUMMY)
+                End If
+                'OT発送日報送信フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("OTFLG")) Then
+                    CODENAME_get("OTFLG", nrow("OTFLG"), nrow("OTFLGNAME"), WW_DUMMY)
+                End If
+                '発駅(名)
+                If Not String.IsNullOrEmpty(nrow("DEPSTATION")) Then
+                    CODENAME_get("STATION", nrow("DEPSTATION"), nrow("DEPSTATIONNAME"), WW_DUMMY)
+                End If
+                '着駅(名)
+                If Not String.IsNullOrEmpty(nrow("ARRSTATION")) Then
+                    CODENAME_get("STATION", nrow("ARRSTATION"), nrow("ARRSTATIONNAME"), WW_DUMMY)
+                End If
+                '列車区分(名)
+                If Not String.IsNullOrEmpty(nrow("TRAINCLASS")) Then
+                    CODENAME_get("TRAINCLASS", nrow("TRAINCLASS"), nrow("TRAINCLASSNAME"), WW_DUMMY)
+                End If
+                '高速列車区分(名)
+                If Not String.IsNullOrEmpty(nrow("SPEEDCLASS")) Then
+                    CODENAME_get("SPEEDCLASS", nrow("SPEEDCLASS"), nrow("SPEEDCLASSNAME"), WW_DUMMY)
+                End If
+                '発送順区分(名)
+                If Not String.IsNullOrEmpty(nrow("SHIPORDERCLASS")) Then
+                    CODENAME_get("SHIPORDERCLASS", nrow("SHIPORDERCLASS"), nrow("SHIPORDERCLASSNAME"), WW_DUMMY)
+                End If
+                '当日利用日数(名)
+                If Not String.IsNullOrEmpty(nrow("USEDAYS")) Then
+                    CODENAME_get("USEDAYS", nrow("USEDAYS"), nrow("USEDAYSNAME"), WW_DUMMY)
+                End If
+                '稼働フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("RUN")) Then
+                    CODENAME_get("RUN", nrow("RUN"), nrow("RUNNAME"), WW_DUMMY)
+                End If
+
+                OIM0007tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub

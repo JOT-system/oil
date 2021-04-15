@@ -1128,7 +1128,6 @@ Public Class OIM0007TrainList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -1138,7 +1137,6 @@ Public Class OIM0007TrainList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -1172,7 +1170,6 @@ Public Class OIM0007TrainList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -1343,7 +1340,6 @@ Public Class OIM0007TrainList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理

@@ -2567,7 +2567,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     If OIT0001Reprow("RETURNDATETRAINNO").ToString() <> "" Then
                         '返送列車
-                        CODENAME_get("CTRAINNUMBER", OIT0001Reprow("RETURNDATETRAINNO").ToString(), OIT0001Reprow("RETURNDATETRAIN").ToString(), WW_DUMMY)
+                        CODENAME_get("CTRAINNUMBER", OIT0001Reprow("RETURNDATETRAINNO").ToString(), OIT0001Reprow("RETURNDATETRAIN"), WW_DUMMY)
                         If OIT0001Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0001Reprow("RETURNDATETRAIN") = OIT0001Reprow("RETURNDATETRAINNO")
                     End If
 
@@ -3519,7 +3519,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim updHeader = OIT0001tbl.AsEnumerable.
                     FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
                 updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
-                CODENAME_get("ORDERINFO", Convert.ToString(updHeader.Item("ORDERINFO")), Convert.ToString(updHeader.Item("ORDERINFONAME")), WW_DUMMY)
+                CODENAME_get("ORDERINFO", Convert.ToString(updHeader.Item("ORDERINFO")), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
 
                 '○ 画面表示データ保存
                 Master.SaveTable(OIT0001tbl)

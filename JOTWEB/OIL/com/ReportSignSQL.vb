@@ -323,6 +323,7 @@
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(8) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _
@@ -332,6 +333,7 @@
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(8) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _
@@ -341,6 +343,7 @@
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(8) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
             & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _

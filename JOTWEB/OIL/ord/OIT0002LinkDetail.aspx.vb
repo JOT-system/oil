@@ -61,7 +61,8 @@ Public Class OIT0002LinkDetail
                                             "回送(修理)",
                                             "回送(ＭＣ)",
                                             "回送(交検)",
-                                            "回送(疎開留置)"}       '指示内容
+                                            "回送(疎開留置)",
+                                            "回送(移動)"}          '指示内容
 
     Private WW_OTTRANSPORT As String = "OT輸送"                     'OT輸送
 

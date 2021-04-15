@@ -246,14 +246,14 @@ Public Class OIT0005TankLocList
             '○回送後状況の場合
         ElseIf work.WF_COND_DETAILTYPE.Text = "10" Then
             '○交検の場合
-            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_13 + "'")
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_13 + "'" + " OR " + "TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_03 + "'")
                 '★返送日が入力されている場合はSKIP
                 If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) <> "" Then Continue For
                 '★交検日の入力を促すようにするため空白にする。
                 OIT0005row("JRINSPECTIONDATE") = ""
             Next
             '○全検の場合
-            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_14 + "'")
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_14 + "'" + " OR " + "TANKSITUATION = '" + BaseDllConst.CONST_TANKSITUATION_04 + "'")
                 '★返送日が入力されている場合はSKIP
                 If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) <> "" Then Continue For
                 '★全検日の入力を促すようにするため空白にする。
@@ -1890,7 +1890,8 @@ Public Class OIT0005TankLocList
                     chkObjREP = DirectCast(cellObj.FindControl(chkObjREPId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjREP IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_11 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_11 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_05) Then
                         '修理フラグ(チェックボックス)を非活性
                         chkObjREP.Enabled = False
                         Exit For
@@ -1903,8 +1904,8 @@ Public Class OIT0005TankLocList
                     chkObjMC = DirectCast(cellObj.FindControl(chkObjMCId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjMC IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 Then
-
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_12 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_07) Then
                         'ＭＣフラグ(チェックボックス)を非活性
                         chkObjMC.Enabled = False
                         Exit For
@@ -1917,7 +1918,8 @@ Public Class OIT0005TankLocList
                     chkObjINS = DirectCast(cellObj.FindControl(chkObjINSId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjINS IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_13 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_03) Then
                         '交検フラグ(チェックボックス)を非活性
                         chkObjINS.Enabled = False
                         Exit For
@@ -1930,7 +1932,8 @@ Public Class OIT0005TankLocList
                     chkObjAINS = DirectCast(cellObj.FindControl(chkObjAINSId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjAINS IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_14 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_04) Then
                         '全検フラグ(チェックボックス)を非活性
                         chkObjAINS.Enabled = False
                         Exit For
@@ -1943,7 +1946,8 @@ Public Class OIT0005TankLocList
                     chkObjIND = DirectCast(cellObj.FindControl(chkObjINDId), CheckBox)
                     'コントロールが見つかったら脱出
                     If chkObjIND IsNot Nothing _
-                        AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 Then
+                        AndAlso (loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_15 _
+                                 AndAlso loopdr("TANKSITUATION").ToString() <> BaseDllConst.CONST_TANKSITUATION_06) Then
                         '留置フラグ(チェックボックス)を非活性
                         chkObjIND.Enabled = False
                         Exit For
@@ -1967,7 +1971,8 @@ Public Class OIT0005TankLocList
                 For Each cellObj As TableCell In rowitem.Controls
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") Then
                         '★交検の設定
-                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 _
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_03) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
@@ -1975,7 +1980,8 @@ Public Class OIT0005TankLocList
                         End If
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRALLINSPECTIONDATE") Then
                         '★全検の設定
-                        If Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else

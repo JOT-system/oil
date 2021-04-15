@@ -322,17 +322,29 @@
             & " , OIT0011.LOADINGKTRAINNO                        AS LOADINGKTRAINNO" _
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
-            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "' THEN OIT0011.LOADINGTRAINNO" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(7) & "' THEN OIT0011.LOADINGTRAINNO" _
             & "   ELSE OIT0011.LOADINGOTTRAINNO" _
             & "   END                                            AS ORDERTRAINNO " _
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
-            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "' THEN OIT0011.LOADINGLODDATE" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(7) & "' THEN OIT0011.LOADINGLODDATE" _
             & "   ELSE FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')" _
             & "   END                                            AS ORDERLODDATE " _
             & " , CASE " _
             & "   WHEN OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(2) & "'" _
-            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "' THEN OIT0011.LOADINGDEPDATE" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(3) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(4) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(5) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(6) & "'" _
+            & "        OR OIT0011.OBJECTIVENAME = '" & I_ObjectiveName(7) & "' THEN OIT0011.LOADINGDEPDATE" _
             & "   ELSE FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')" _
             & "   END                                            AS ORDERDEPDATE " _
             & " , OIT0011.FORWARDINGARRSTATION                   AS FORWARDINGARRSTATION" _

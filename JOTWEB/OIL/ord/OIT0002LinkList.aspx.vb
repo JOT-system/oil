@@ -67,11 +67,19 @@ Public Class OIT0002LinkList
     Private WW_OBJECTIVENAME() As String = {"残車",
                                             "交検",
                                             "回送(全検)",
-                                            "回送(その他)"}         '指示内容
+                                            "回送(その他)",
+                                            "回送(修理)",
+                                            "回送(ＭＣ)",
+                                            "回送(交検)",
+                                            "回送(疎開留置)"}       '指示内容
     Private WW_OTTRANSPORT As String = "OT輸送"                     'OT輸送
 
-    Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全件-他社負担(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全検-他社負担(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_IDOU() As String = {"F120160", "F120260", "F120360"}      '移動-JOT負担発払(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_SYURI() As String = {"F120110", "F120210", "F120310"}     '修理-JOT負担発払(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_MC() As String = {"F120120", "F120220", "F120320"}        'ＭＣ-JOT負担発払(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_KOUKEN() As String = {"F120130", "F120230", "F120330"}    '交検-他社負担(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_RYUCHI() As String = {"F120150", "F120250", "F120350"}    '留置-JOT負担発払(五井、甲子、袖ヶ浦)
 
     '○ 名義所有者コード
     Private WW_OWNERCODE01() As String = {"01", "日本石油輸送"}
@@ -1894,6 +1902,54 @@ Public Class OIT0002LinkList
         '★(回送用)タンク車所在更新
         For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME <> ''")
             Select Case Convert.ToString(OIT0002ExlUProw("OBJECTIVENAME"))
+                '○回送(修理)
+                Case WW_OBJECTIVENAME(4)
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：所在地　　　　⇒　変更あり(ポラリス(回送先(着駅)))
+                    '引数４：タンク車状況　⇒　変更あり("5"(回送中(修理)))
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002ExlUProw("TRUCKNO"),
+                                        I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_05)
+
+                '○回送(ＭＣ)
+                Case WW_OBJECTIVENAME(5)
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：所在地　　　　⇒　変更あり(ポラリス(回送先(着駅)))
+                    '引数４：タンク車状況　⇒　変更あり("7"(回送中(修理)))
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002ExlUProw("TRUCKNO"),
+                                        I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_07)
+
+                '○回送(交検)
+                Case WW_OBJECTIVENAME(6)
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：所在地　　　　⇒　変更あり(ポラリス(回送先(着駅)))
+                    '引数４：タンク車状況　⇒　変更あり("3"(回送中(交検)))
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002ExlUProw("TRUCKNO"),
+                                        I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_03)
+
+                '○回送(疎開留置)
+                Case WW_OBJECTIVENAME(7)
+                    '(タンク車所在TBL)の内容を更新
+                    '引数１：タンク車状態　⇒　変更なし
+                    '引数２：積車区分　　　⇒　変更なし
+                    '引数３：所在地　　　　⇒　変更あり(ポラリス(回送先(着駅)))
+                    '引数４：タンク車状況　⇒　変更あり("6"(回送中(疎開留置)))
+                    WW_UpdateTankShozai(Nothing, Nothing,
+                                        I_TANKNO:=OIT0002ExlUProw("TRUCKNO"),
+                                        I_LOCATION:=OIT0002ExlUProw("FORWARDINGARRSTATIONCODE"),
+                                        I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_06)
+
                 '○回送(全検)
                 Case WW_OBJECTIVENAME(2)
                     '(タンク車所在TBL)の内容を更新
@@ -3401,7 +3457,19 @@ Public Class OIT0002LinkList
                     '★目的
                     'P_OBJECTIVECODE.Value = ""                      '目的
                     Select Case OIT0002row("OBJECTIVENAME")
-                        '○回送(全件)
+                        '○回送(修理)
+                        Case WW_OBJECTIVENAME(4)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_20
+                        '○回送(ＭＣ)
+                        Case WW_OBJECTIVENAME(5)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_21
+                        '○回送(交検)
+                        Case WW_OBJECTIVENAME(6)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_22
+                        '○回送(疎開留置)
+                        Case WW_OBJECTIVENAME(7)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_24
+                        '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_23
                         '○回送(その他)
@@ -3412,9 +3480,65 @@ Public Class OIT0002LinkList
                     '★回送パターン(目的、及び営業所別で設定)
                     'P_KAISOUTYPE.Value = ""                         '回送パターン
                     Select Case OIT0002row("OBJECTIVENAME")
-                        '○回送(全件)
+                        '○回送(修理)
+                        Case WW_OBJECTIVENAME(4)
+                            '★修理-他社負担(F120*10)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(2)
+                            End Select
+                        '○回送(ＭＣ)
+                        Case WW_OBJECTIVENAME(5)
+                            '★ＭＣ-JOT負担発払(F120*20)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(2)
+                            End Select
+                        '○回送(交検)
+                        Case WW_OBJECTIVENAME(6)
+                            '★交検-他社負担(F120*30)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(2)
+                            End Select
+                        '○回送(疎開留置)
+                        Case WW_OBJECTIVENAME(7)
+                            '★疎開留置-他社負担(F120*50)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(2)
+                            End Select
+                        '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
-                            '★全件-他社負担(F120*40)を設定
+                            '★全検-他社負担(F120*40)を設定
                             Select Case OIT0002row("OFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
@@ -3749,9 +3873,65 @@ Public Class OIT0002LinkList
                     P_KAISOUNO.Value = OIT0002row("KAISOUNO")                   '回送№
                     '★回送パターン(目的、及び営業所別で設定)
                     Select Case OIT0002row("OBJECTIVENAME")
-                        '○回送(全件)
+                        '○回送(修理)
+                        Case WW_OBJECTIVENAME(4)
+                            '★修理-他社負担(F120*10)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(2)
+                            End Select
+                        '○回送(ＭＣ)
+                        Case WW_OBJECTIVENAME(5)
+                            '★ＭＣ-JOT負担発払(F120*20)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(2)
+                            End Select
+                        '○回送(交検)
+                        Case WW_OBJECTIVENAME(6)
+                            '★交検-他社負担(F120*30)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(2)
+                            End Select
+                        '○回送(疎開留置)
+                        Case WW_OBJECTIVENAME(7)
+                            '★疎開留置-他社負担(F120*50)を設定
+                            Select Case OIT0002row("OFFICECODE")
+                                '○五井営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011201
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(0)
+                                '○甲子営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011202
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(1)
+                                '○袖ヶ浦営業所
+                                Case BaseDllConst.CONST_OFFICECODE_011203
+                                    P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(2)
+                            End Select
+                        '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
-                            '★全件-他社負担(F120*40)を設定
+                            '★全検-他社負担(F120*40)を設定
                             Select Case OIT0002row("OFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
@@ -3797,7 +3977,19 @@ Public Class OIT0002LinkList
 
                     '★目的
                     Select Case OIT0002row("OBJECTIVENAME")
-                        '○回送(全件)
+                        '○回送(修理)
+                        Case WW_OBJECTIVENAME(4)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_20
+                        '○回送(ＭＣ)
+                        Case WW_OBJECTIVENAME(5)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_21
+                        '○回送(交検)
+                        Case WW_OBJECTIVENAME(6)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_22
+                        '○回送(疎開留置)
+                        Case WW_OBJECTIVENAME(7)
+                            P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_24
+                        '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
                             P_OBJECTIVECODE.Value = BaseDllConst.CONST_OBJECTCODE_23
                         '○回送(その他)
@@ -3842,15 +4034,15 @@ Public Class OIT0002LinkList
                     '合計車数
                     P_TOTALTANK.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>''").Count
                     '合計（修理）
-                    P_TOTALREPAIR.Value = 0
+                    P_TOTALREPAIR.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(4) + "'").Count
                     '合計（ＭＣ）
-                    P_TOTALMC.Value = 0
+                    P_TOTALMC.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(5) + "'").Count
                     '合計（交検）
-                    P_TOTALINSPECTION.Value = 0
+                    P_TOTALINSPECTION.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(6) + "'").Count
                     '合計（全検）
                     P_TOTALALLINSPECTION.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(2) + "'").Count
                     '合計（疎開留置）
-                    P_TOTALINDWELLING.Value = 0
+                    P_TOTALINDWELLING.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(7) + "'").Count
                     '合計（移動）
                     P_TOTALMOVE.Value = OIT0002EXLUPtbl.Select("KAISOUNO<>'' AND OBJECTIVENAME='" + WW_OBJECTIVENAME(3) + "'").Count
 

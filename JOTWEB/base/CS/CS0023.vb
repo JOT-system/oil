@@ -1162,8 +1162,18 @@ Public Structure CS0023XLSUPLOAD
                 dtrow("TRAINNO_DETAIL") = xlsTrainNo
 
                 '列車番号（変換）
+                '### 20210414 START 日数が設定されている場合を考慮(日数を削除) ###############################
+                Dim chkTrainNo As String = Convert.ToString(xlsTrainNo)
+                If chkTrainNo <> "" Then
+                    For z As Integer = 31 To 1 Step -1
+                        chkTrainNo = Replace(chkTrainNo, z.ToString() + "日", "")
+                    Next
+                End If
+                '### 20210414 END   日数が設定されている場合を考慮(日数を削除) ###############################
+
                 Dim trainNo As Integer
-                If Integer.TryParse(Strings.StrConv(regNotNum.Replace(xlsTrainNo, ""), VbStrConv.Narrow), trainNo) Then
+                'If Integer.TryParse(Strings.StrConv(regNotNum.Replace(xlsTrainNo, ""), VbStrConv.Narrow), trainNo) Then
+                If Integer.TryParse(Strings.StrConv(regNotNum.Replace(chkTrainNo, ""), VbStrConv.Narrow), trainNo) Then
                     dtrow("TRAINNO") = trainNo.ToString()
                 End If
 

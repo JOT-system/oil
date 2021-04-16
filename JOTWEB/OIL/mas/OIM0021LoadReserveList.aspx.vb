@@ -1,13 +1,25 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 積込予約マスタメンテ一覧画面
+' 作成日 2021/01/25
+' 更新日 2021/04/16
+' 作成者 JOT伊草
+' 更新者 JOT伊草
+'
+' 修正履歴:2021/01/25 新規作成
+'         :2021/04/16 1)「管轄営業所」「油種」をコード→名称で表示するように変更
+'         :           2)登録・更新画面にて更新メッセージが設定された場合
+'         :             画面下部に更新メッセージを表示するように修正
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIM0021LoadReserveList
     Inherits Page
 
     '○ 検索結果格納Table
-    Private OIM0021tbl As DataTable                                  '一覧格納用テーブル
-    Private OIM0021INPtbl As DataTable                               'チェック用テーブル
-    Private OIM0021UPDtbl As DataTable                               '更新用テーブル
+    Private OIM0021tbl As DataTable                                 '一覧格納用テーブル
+    Private OIM0021INPtbl As DataTable                              'チェック用テーブル
+    Private OIM0021UPDtbl As DataTable                              '更新用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -151,6 +163,12 @@ Public Class OIM0021LoadReserveList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -202,7 +220,7 @@ Public Class OIM0021LoadReserveList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -249,11 +267,13 @@ Public Class OIM0021LoadReserveList
             & " , 0                                                            AS HIDDEN " _
             & " , ISNULL(RTRIM(OIM0021.DELFLG), '')                            AS DELFLG " _
             & " , ISNULL(RTRIM(OFFICECODE), '')                                AS OFFICECODE " _
+            & " , ''                                                           AS OFFICENAME " _
             & " , ISNULL(FORMAT(FROMYMD, 'yyyy/MM/dd'), '')                    AS FROMYMD " _
             & " , ISNULL(FORMAT(TOYMD, 'yyyy/MM/dd'), '')                      AS TOYMD " _
             & " , ISNULL(RTRIM(MODEL), '')                                     AS MODEL " _
             & " , ISNULL(RTRIM(LOAD), '')                                      AS LOAD " _
             & " , ISNULL(RTRIM(OIM0021.OILCODE), '')                           AS OILCODE " _
+            & " , ''                                                           AS OILNAME " _
             & " , ISNULL(RTRIM(OIM0021.SEGMENTOILCODE), '')                    AS SEGMENTOILCODE " _
             & " , ISNULL(RTRIM(RESERVEDQUANTITY), '')                          AS RESERVEDQUANTITY " _
             & " FROM OIL.OIM0021_LOADRESERVE OIM0021 " _
@@ -276,11 +296,6 @@ Public Class OIM0021LoadReserveList
         If Not String.IsNullOrEmpty(work.WF_SEL_TOYMD.Text) Then
             SQLStr &= "    AND OIM0021.TOYMD          >= @P4"
         End If
-
-        ''荷重
-        'If Not String.IsNullOrEmpty(work.WF_SEL_LOAD.Text) Then
-        '    SQLStr &= "    AND OIM0021.LOAD           = @P5"
-        'End If
 
         '油種コード
         If Not String.IsNullOrEmpty(work.WF_SEL_OILCODE.Text) Then
@@ -325,12 +340,6 @@ Public Class OIM0021LoadReserveList
                     PARA4.Value = work.WF_SEL_TOYMD.Text
                 End If
 
-                ''荷重
-                'If Not String.IsNullOrEmpty(work.WF_SEL_LOAD.Text) Then
-                '    Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Float)
-                '    PARA5.Value = Convert.ToDouble(work.WF_SEL_LOAD.Text)
-                'End If
-
                 '油種コード
                 If Not String.IsNullOrEmpty(work.WF_SEL_OILCODE.Text) Then
                     Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 10)
@@ -357,6 +366,12 @@ Public Class OIM0021LoadReserveList
                 For Each OIM0021row As DataRow In OIM0021tbl.Rows
                     i += 1
                     OIM0021row("LINECNT") = i        'LINECNT
+
+                    '〇名称設定
+                    '管轄営業所
+                    CODENAME_get("OFFICECODE", OIM0021row("OFFICECODE"), OIM0021row("OFFICENAME"), WW_DUMMY)
+                    '油種
+                    CODENAME_get("OILCODE", OIM0021row("OILCODE"), OIM0021row("OILNAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -434,7 +449,7 @@ Public Class OIM0021LoadReserveList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -487,6 +502,9 @@ Public Class OIM0021LoadReserveList
 
         '削除
         work.WF_SEL_DELFLG.Text = "0"
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -573,7 +591,6 @@ Public Class OIM0021LoadReserveList
         Dim WW_CheckMES2 As String = ""
 
     End Sub
-
 
     ''' <summary>
     ''' 積込予約マスタ登録更新
@@ -792,7 +809,6 @@ Public Class OIM0021LoadReserveList
 
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -851,7 +867,6 @@ Public Class OIM0021LoadReserveList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -861,7 +876,6 @@ Public Class OIM0021LoadReserveList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -895,7 +909,6 @@ Public Class OIM0021LoadReserveList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -949,6 +962,9 @@ Public Class OIM0021LoadReserveList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIM0021tbl.Rows(WW_LINECNT)("DELFLG")
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○ 状態をクリア
         For Each OIM0021row As DataRow In OIM0021tbl.Rows
@@ -1006,7 +1022,6 @@ Public Class OIM0021LoadReserveList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -1082,13 +1097,17 @@ Public Class OIM0021LoadReserveList
                 WW_COLUMNS.IndexOf("LOAD") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("OILCODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("SEGMENTOILCODE") >= 0 Then
+                'キー項目が一致する場合
                 For Each OIM0021row As DataRow In OIM0021tbl.Rows
                     If XLSTBLrow("OFFICECODE") = OIM0021row("OFFICECODE") AndAlso
                         XLSTBLrow("FROMYMD") = OIM0021row("FROMYMD") AndAlso
                         XLSTBLrow("LOAD") = OIM0021row("LOAD") AndAlso
                         XLSTBLrow("OILCODE") = OIM0021row("OILCODE") AndAlso
                         XLSTBLrow("SEGMENTOILCODE") = OIM0021row("SEGMENTOILCODE") Then
+                        '変更元情報を入力レコードにコピーする
                         OIM0021INProw.ItemArray = OIM0021row.ItemArray
+                        '更新種別は初期化する
+                        OIM0021INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
@@ -1145,6 +1164,12 @@ Public Class OIM0021LoadReserveList
             Else
                 OIM0021INProw("DELFLG") = "0"
             End If
+
+            '〇名称設定
+            '管轄営業所
+            CODENAME_get("OFFICECODE", OIM0021INProw("OFFICECODE"), OIM0021INProw("OFFICENAME"), WW_DUMMY)
+            '油種
+            CODENAME_get("OILCODE", OIM0021INProw("OILCODE"), OIM0021INProw("OILNAME"), WW_DUMMY)
 
             OIM0021INPtbl.Rows.Add(OIM0021INProw)
         Next
@@ -1235,7 +1260,6 @@ Public Class OIM0021LoadReserveList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1332,8 +1356,9 @@ Public Class OIM0021LoadReserveList
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・更新できないレコード(適用開始年月日エラー)です。"
                     WW_CheckMES2 = WW_CS0024FCHECKERR
-                    O_RTN = "ERR"
-                    Exit Sub
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0021INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.DATE_FORMAT_ERROR
                 Else
                     OIM0021INProw("FROMYMD") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
                 End If
@@ -1354,8 +1379,9 @@ Public Class OIM0021LoadReserveList
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・更新できないレコード(適用終了年月日エラー)です。"
                     WW_CheckMES2 = WW_CS0024FCHECKERR
-                    O_RTN = "ERR"
-                    Exit Sub
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0021INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.DATE_FORMAT_ERROR
                 Else
                     OIM0021INProw("TOYMD") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
                 End If

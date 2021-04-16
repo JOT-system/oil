@@ -6994,7 +6994,8 @@ Public Class OIT0004OilStockCreate
                     '軽油の場合は受注対象期間外は合計に含めない
                     '　３号期間内なら３号を含める
                     If isControl3go AndAlso {"1404"}.Contains(oilTypeItem.OilInfo.OilCode) Then
-                        If ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                        If Not (ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") _
+                            AndAlso ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd")) Then
                             Continue For
                         End If
                         If ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
@@ -7003,10 +7004,8 @@ Public Class OIT0004OilStockCreate
                     End If
                     '　３号の期間内で在れば軽油は含めない
                     If isControl3go AndAlso {"1401"}.Contains(oilTypeItem.OilInfo.OilCode) Then
-                        If Not ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
-                            Continue For
-                        End If
-                        If Not ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                        If (ordDate3goFrom <= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd") _
+                            AndAlso ordDate3goTo >= daysItem.Value.DaysItem.ItemDate.ToString("yyyy/MM/dd")) Then
                             Continue For
                         End If
                     End If

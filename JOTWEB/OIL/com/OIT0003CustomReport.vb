@@ -609,6 +609,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 If PrintDatarow("INSPECTION").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("INSPECTION").ToString + "』"
                 End If
+                '★留置
+                If PrintDatarow("DETENTION").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("DETENTION").ToString + "』"
+                End If
                 '★格上
                 If PrintDatarow("UPGRADE").ToString <> "" Then
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "』"

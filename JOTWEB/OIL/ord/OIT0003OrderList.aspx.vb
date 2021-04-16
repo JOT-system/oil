@@ -4642,6 +4642,11 @@ Public Class OIT0003OrderList
             & "	      ELSE '' " _
             & "   END                                            AS INSPECTION " _
             & "	, CASE " _
+            & "   WHEN OIT0003.DETENTIONFLG ='1' " _
+            & "	      THEN '荷卸後休車' " _
+            & "	      ELSE '' " _
+            & "   END                                            AS DETENTION " _
+            & "	, CASE " _
             & "   WHEN OIM0003_LASTOIL.MIDDLEOILCODE ='2' AND OIM0003_OIL.MIDDLEOILCODE = '1' " _
             & "	      THEN '格上' " _
             & "	      ELSE '' " _

@@ -209,7 +209,9 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
         Try
             '起点年月日の設定、他の日付はExcel数式で+1日・・・と設定しているので不要
             rngDateStart = Me.ExcelWorkSheet.Range("RNG_FIRSTDATE")
-            rngDateStart.Value = Me.HokushinData.StockDate.Values.First.ItemDate
+            Dim firstDate = Me.HokushinData.StockDate.Values.First.ItemDate.AddDays(10)
+
+            rngDateStart.Value = firstDate
             For Each printObj In {Me.HokushinData, Me.KouhuData}
                 If printObj.Consignee <> "10" Then
                     rngPrefix = "K"
@@ -222,6 +224,7 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                 Dim pasteColHeader(0, 4) As Object
                 Dim pasteColUkeire(0, 2) As Object
                 For Each oilItm In printObj.StockList.Values
+
                     If rowSettings.ContainsKey(oilItm.OilInfo.OilCode) = False Then
                         Continue For
                     End If
@@ -236,7 +239,8 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                     pasteColHeader(0, 2) = oilItm.Stock80  '80%在庫
                     pasteColHeader(0, 3) = oilItm.LastShipmentAve
                     '初日は朝在庫設定
-                    pasteColHeader(0, 4) = oilItm.StockItemList.Values.First.MorningStockWithoutDS
+                    Dim firstVal = From itm In oilItm.StockItemList.Values Where itm.DaysItem.ItemDate = firstDate
+                    pasteColHeader(0, 4) = firstVal.First.MorningStockWithoutDS
                     rngResize.Value = pasteColHeader
 
                     ExcelMemoryRelease(rngResize)
@@ -244,6 +248,12 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                     '日付毎のループ
                     Dim loopcnt = 0
                     For Each daysItm In oilItm.StockItemList.Values
+                        If Not daysItm.DaysItem.ItemDate >= firstDate Then
+                            Continue For
+                        End If
+                        If Not daysItm.DaysItem.ItemDate <= firstDate.AddDays(4) Then
+                            Continue For
+                        End If
                         '受入数量（３カラム分の設定）
                         rngOffset = rngTargetRow.Offset(ColumnOffset:=7 + (7 * loopcnt))
                         rngResize = rngOffset.Resize(ColumnSize:=3)

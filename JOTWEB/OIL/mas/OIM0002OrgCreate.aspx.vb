@@ -11,7 +11,9 @@
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)更新ボタン押下時、この画面でDB更新→
 '                       一覧画面の表示データに更新後の内容反映して戻るように修正
-'         :2021/04/15 新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
+'         :2021/04/15 1)新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
+'                     2)検索画面で'01'以外の会社コードを入力した場合に
+'                       登録・更新画面に遷移できなくなるバグを修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -142,8 +144,6 @@ Public Class OIM0002OrgCreate
         Master.dispHelp = False
         '○D&D有無設定
         Master.eventDrop = True
-        '○Grid情報保存先のファイル名
-        'Master.CreateXMLSaveFile()
 
         '○初期値設定
         WF_FIELD.Value = ""
@@ -156,7 +156,7 @@ Public Class OIM0002OrgCreate
         '右Boxへの値設定
         rightview.MAPID = Master.MAPID
         rightview.MAPVARI = Master.MAPvariant
-        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
 
@@ -177,13 +177,7 @@ Public Class OIM0002OrgCreate
             Master.CreateXMLSaveFile()
         End If
 
-        '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
-
-        '会社コード、運用部署、会社コード2・組織コード2・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtCampCodeMy.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtOrgCodeMy.Attributes("onkeyPress") = "CheckNum()"
+        '会社コード、組織コード・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtCampCode.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtOrgCode.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
@@ -191,26 +185,15 @@ Public Class OIM0002OrgCreate
         Me.TxtStYmd.Attributes("onkeyPress") = "CheckCalendar()"
         Me.TxtEndYmd.Attributes("onkeyPress") = "CheckCalendar()"
 
-        '会社コード
-        TxtCampCodeMy.Text = work.WF_SEL_CAMPCODE.Text
-
-        '運用部署
-        TxtOrgCodeMy.Text = work.WF_SEL_ORGCODE.Text
-
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        '会社コード2
-        '2020/06/16杉山修正
-        'TxtCampCode.Text = work.WF_SEL_CAMPCODE2.Text
+        '会社コード
         TxtCampCode.Text = work.WF_SEL_CAMPCODE_L.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, Label2.Text, WW_RTN_SW)
 
-        '組織コード2
-        '2020/06/16杉山修正
-        'TxtOrgCode.Text = work.WF_SEL_ORGCODE2.Text
+        '組織コード
         TxtOrgCode.Text = work.WF_SEL_ORGCODE_L.Text
-        'CODENAME_get("ORGCODE", TxtOrgCode.Text, Label3.Text, WW_DUMMY)
 
         '組織名称
         TxtOrgName.Text = work.WF_SEL_ORGNAME.Text
@@ -478,8 +461,6 @@ Public Class OIM0002OrgCreate
             Exit Sub
         End Try
 
-        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
     End Sub
 
     ' ******************************************************************************
@@ -535,7 +516,7 @@ Public Class OIM0002OrgCreate
 
         If isNormal(WW_ERR_SW) Then
             '前ページ遷移
-            Master.TransitionPrevPage()
+            Master.TransitionPrevPage(Master.USERCAMP)
         End If
 
     End Sub
@@ -606,9 +587,6 @@ Public Class OIM0002OrgCreate
         OIM0002INProw("TIMSTP") = 0
         OIM0002INProw("SELECT") = 1
         OIM0002INProw("HIDDEN") = 0
-
-        'OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text           '会社コード
-        'OIM0002INProw("UORG") = work.WF_SEL_ORGCODE.Text                '運用部署
 
         OIM0002INProw("CAMPCODE") = Me.TxtCampCode.Text                  '会社コード
         OIM0002INProw("ORGCODE") = Me.TxtOrgCode.Text                    '組織コード
@@ -692,7 +670,7 @@ Public Class OIM0002OrgCreate
         WF_FIELD_REP.Value = ""
         WF_LeftboxOpen.Value = ""
 
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 
@@ -1453,12 +1431,12 @@ Public Class OIM0002OrgCreate
                     prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "UORG"             '運用部署
-                    prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
                 Case "ORGCODE"             '運用部署
-                    prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE2.Text)
+                    Dim wkCampCode As String = TxtCampCode.Text
+                    If String.IsNullOrEmpty(wkCampCode) Then
+                        wkCampCode = work.WF_SEL_CAMPCODE_L.Text
+                    End If
+                    prmData = work.CreateORGParam2(wkCampCode)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除

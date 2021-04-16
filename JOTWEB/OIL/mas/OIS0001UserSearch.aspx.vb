@@ -1,12 +1,13 @@
 ﻿''************************************************************
 ' ユーザIDマスタメンテ検索画面
 ' 作成日 2019/11/14
-' 更新日 2019/11/14
+' 更新日 2021/04/15
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/14 新規作成
+'         :2021/04/15 検索画面で会社コードを'01'以外にしてメニューまで戻った場合に
+'                     メニュー画面の左側ボタンが消失するバグに対応
 ''************************************************************
 Imports JOTWEB.GRIS0005LeftBox
 
@@ -115,7 +116,7 @@ Public Class OIS0001UserSearch
             Master.GetFirstValue(Master.USERCAMP, "ORG", WF_ORG_CODE.Text)                 '組織コード
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIS0001L Then   '実行画面からの遷移
             '画面項目設定処理
-            WF_CAMPCODE_CODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
+            WF_CAMPCODE_CODE.Text = work.WF_SEL_CAMPCODE2.Text       '会社コード
             WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
             WF_ENDYMD_CODE.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
             WF_ORG_CODE.Text = work.WF_SEL_ORG.Text                  '組織コード
@@ -168,7 +169,7 @@ Public Class OIS0001UserSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE_CODE.Text        '会社コード
+        work.WF_SEL_CAMPCODE2.Text = WF_CAMPCODE_CODE.Text       '会社コード
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text              '有効年月日(From)
         work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text            '有効年月日(To)
         work.WF_SEL_ORG.Text = WF_ORG_CODE.Text                  '組織コード
@@ -358,7 +359,6 @@ Public Class OIS0001UserSearch
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
@@ -417,7 +417,6 @@ Public Class OIS0001UserSearch
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドチェンジ時処理
     ''' </summary>
@@ -440,7 +439,6 @@ Public Class OIS0001UserSearch
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
@@ -509,7 +507,6 @@ Public Class OIS0001UserSearch
 
     End Sub
 
-
     ''' <summary>
     ''' LeftBoxキャンセルボタン押下時処理
     ''' </summary>
@@ -535,7 +532,6 @@ Public Class OIS0001UserSearch
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxダブルクリック時処理
     ''' </summary>
@@ -556,7 +552,6 @@ Public Class OIS0001UserSearch
 
     End Sub
 
-
     ''' <summary>
     ''' ヘルプ表示
     ''' </summary>
@@ -566,7 +561,6 @@ Public Class OIS0001UserSearch
         Master.ShowHelp()
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***

@@ -23,20 +23,6 @@
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <!-- ↓ これも使ってないなら消す！ ↓ --> 
-                        <!-- 会社コード -->
-                        <a style="display:none;">
-                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
-                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        </a>
-
-                        <!-- 組織コード -->
-                        <a style="display:none;">
-                            <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
-                            <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        </a>
-                        <!-- ↑ これも使ってないなら消す！ ↑ --> 
-
                         <!-- 一覧件数 -->
                         <asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
                     </div>

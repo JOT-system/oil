@@ -29,10 +29,11 @@ function InitDisplay() {
     hideSuggestAccdaysDropDownItem();
     //油種表示非表示設定復元
     let hdnChgConsigneeFirstLoadObj = document.getElementById('hdnChgConsigneeFirstLoad');
-
+    let needsScrollRecover = true;
     if (IsPostBack === '0' || hdnChgConsigneeFirstLoadObj.value === '1') {
         hdnChgConsigneeFirstLoadObj.value = '0';
         loadOiltypeSelected();
+        needsScrollRecover = false;
     }
     //油種表示非表示イベントバインド
     bindDipsOiltypeStockList();
@@ -58,7 +59,21 @@ function InitDisplay() {
     commonBindMonthPicker();
     //ENEOSチェックイベントバインド
     bindEneosCheckBox();
-
+    //スクロール復元
+    if (needsScrollRecover === true) {
+        recoverScrollPosition();
+        let headerBox = document.getElementById('headerbox');
+        let buttonBox = document.querySelector('.actionButtonBox');
+        if (headerBox === null) {
+            return;
+        }
+        if (buttonBox === null) {
+            return;
+        }
+        resizeButtonBox(headerBox, buttonBox);
+    } else {
+        saveScrollPositionClear();
+    }
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -72,6 +87,7 @@ function bindContentHorizonalScroll() {
     }
     headerBox.addEventListener('scroll', (function (headerBox, buttonBox) {
         return function () {
+            saveScrollPosition(headerBox);
             resizeButtonBox(headerBox, buttonBox);
         };
     })(headerBox, buttonBox), false);
@@ -100,6 +116,52 @@ function resizeButtonBox(headerBox, buttonBox) {
         rightSideObj.style.marginLeft = 0;
     }
     
+}
+// 〇スクロール位置保存
+function saveScrollPosition(headerBox) {
+    if (headerBox === null) {
+        return;
+    }
+    let scrollTopObj = document.getElementById('hdnThisScrollLeft');
+    let scrollLeftObj = document.getElementById('hdnThisScrollTop');
+    if (scrollTopObj === null) {
+        return;
+    }
+    if (scrollLeftObj === null) {
+        return;
+    }
+    scrollTopObj.value = headerBox.scrollTop;
+    scrollLeftObj.value = headerBox.scrollLeft;
+}
+// 〇スクロール位置復元
+function recoverScrollPosition() {
+    let headerBox = document.getElementById('headerbox');
+    if (headerBox === null) {
+        return;
+    }
+    let scrollTopObj = document.getElementById('hdnThisScrollLeft');
+    let scrollLeftObj = document.getElementById('hdnThisScrollTop');
+    if (scrollTopObj === null) {
+        return;
+    }
+    if (scrollLeftObj === null) {
+        return;
+    }
+    headerBox.scrollTop = scrollTopObj.value;
+    headerBox.scrollLeft = scrollLeftObj.value;
+}
+// 〇スクロール位置初期化
+function saveScrollPositionClear() {
+    let scrollTopObj = document.getElementById('hdnThisScrollLeft');
+    let scrollLeftObj = document.getElementById('hdnThisScrollTop');
+    if (scrollTopObj === null) {
+        return;
+    }
+    if (scrollLeftObj === null) {
+        return;
+    }
+    scrollTopObj.value = '';
+    scrollLeftObj.value = '';
 }
 // 〇提案数の合計計算イベントバインド(暫定関数)
 function bindSuggestSummary(suggestColumnDivList) {

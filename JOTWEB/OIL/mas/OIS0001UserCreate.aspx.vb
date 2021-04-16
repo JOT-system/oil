@@ -14,6 +14,8 @@
 '                       一覧画面の表示データに更新後の内容反映して戻るように修正
 '         :2021/04/15 1)表示順nが未入力の場合にエラーとなるバグに対応
 '                     2)新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
+'                     3)検索画面で会社コードを'01'以外にしてメニューまで戻った場合に
+'                       メニュー画面の左側ボタンが消失するバグに対応
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -220,7 +222,7 @@ Public Class OIS0001UserCreate
         WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
 
         '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE3.Text
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
 
         '組織コード
@@ -705,7 +707,7 @@ Public Class OIS0001UserCreate
                 End If
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
-                PARA1.Value = work.WF_SEL_CAMPCODE.Text
+                PARA1.Value = work.WF_SEL_CAMPCODE2.Text
                 PARA4.Value = work.WF_SEL_STYMD.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
@@ -4683,7 +4685,7 @@ Public Class OIS0001UserCreate
                             AUTHORITYALL_FLG = "2"
                         End If
                     End If
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE2.Text, AUTHORITYALL_FLG)
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE3.Text, AUTHORITYALL_FLG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール

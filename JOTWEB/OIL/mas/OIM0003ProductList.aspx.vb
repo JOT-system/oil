@@ -227,7 +227,7 @@ Public Class OIM0003ProductList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True

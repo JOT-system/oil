@@ -161,6 +161,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Dim rngPageteBase As Excel.Range = Nothing
         Dim rngPasteOffset As Excel.Range = Nothing
         Dim rngValueSet As Excel.Range = Nothing
+        Dim rngLorryValue As Excel.Range = Nothing
         Dim rngFooter As Excel.Range = Nothing
         Dim rngFooterRow As Excel.Range = Nothing
         Dim fntColor As Excel.Font = Nothing
@@ -255,16 +256,18 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngValueSet)
 
                 rngValueSet = DirectCast(rngPasteOffset(3, 5), Excel.Range)
+                rngLorryValue = DirectCast(rngPasteOffset(10, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
                     '軽油
-                    formulaReceve = formulaReceve & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
+                    formulaReceve = formulaReceve & " + IF({0}=0," & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False) & ",0)"
                 ElseIf flag3go AndAlso stkItm.OilInfo.OilCode = "1404" Then
                     '3号
-                    formulaReceve = formulaReceve & " + IF({0}=1," & rngValueSet.Address(False, False) & ",0)"
+                    formulaReceve = formulaReceve & " + IF({0}=1," & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False) & ",0)"
                 Else
-                    formulaReceve = formulaReceve & "+" & rngValueSet.Address(False, False)
+                    formulaReceve = formulaReceve & "+" & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False)
                 End If
                 ExcelMemoryRelease(rngValueSet)
+                ExcelMemoryRelease(rngLorryValue)
 
                 rngValueSet = DirectCast(rngPasteOffset(4, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then

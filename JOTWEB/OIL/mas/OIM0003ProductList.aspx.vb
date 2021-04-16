@@ -1,4 +1,22 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 品種マスタメンテ一覧画面
+' 作成日 2020/11/09
+' 更新日 2021/04/16
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/11/09 新規作成
+'         :2021/01/25 品種マスタ登録・更新画面で品種出荷期間マスタ項目追加に伴い
+'                     登録・更新画面にて更新メッセージが設定された場合、
+'                     画面下部に更新メッセージを表示するように修正
+'         :2021/01/26 検索画面にて営業所コードが選択されない場合に
+'                     営業所コードの範囲をユーザーの所属組織で絞り込むように修正
+'         :2021/02/04 品種出荷期間マスタ項目の表示追加・DB更新対応
+'         :2021/04/16 1)項目「営業所」「荷主」「基地」「在庫管理対象フラグ」を
+'                       コード値→名称で表示するように変更
+'                     2)項目「品種出荷期間N.荷受人コード」を非表示とするように変更
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -329,8 +347,11 @@ Public Class OIM0003ProductList
         SQLStrBldr.AppendLine("     , 1                                                         AS [SELECT]")
         SQLStrBldr.AppendLine("     , 0                                                         AS HIDDEN")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.OFFICECODE), '')                     AS OFFICECODE")
+        SQLStrBldr.AppendLine("     , ''                                                        AS OFFICENAME")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.SHIPPERCODE), '')                    AS SHIPPERCODE")
+        SQLStrBldr.AppendLine("     , ''                                                        AS SHIPPERNAME")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.PLANTCODE), '')                      AS PLANTCODE")
+        SQLStrBldr.AppendLine("     , ''                                                        AS PLANTNAME")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')                     AS BIGOILCODE")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.BIGOILNAME), '')                     AS BIGOILNAME")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.BIGOILKANA), '')                     AS BIGOILKANA")
@@ -349,6 +370,7 @@ Public Class OIM0003ProductList
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '')                   AS CHECKOILCODE")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '')                   AS CHECKOILNAME")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.STOCKFLG), '')                       AS STOCKFLG")
+        SQLStrBldr.AppendLine("     , ''                                                        AS STOCKFLGNAME")
         SQLStrBldr.AppendLine("     , ISNULL(FORMAT(OIM0003.ORDERFROMDATE, 'yyyy/MM/dd'), '')   AS ORDERFROMDATE")
         SQLStrBldr.AppendLine("     , ISNULL(FORMAT(OIM0003.ORDERTODATE, 'yyyy/MM/dd'), '')     AS ORDERTODATE")
         SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0003.DELFLG), '')                         AS DELFLG")
@@ -793,6 +815,16 @@ Public Class OIM0003ProductList
                 For Each OIM0003row As DataRow In OIM0003tbl.Rows
                     i += 1
                     OIM0003row("LINECNT") = i        'LINECNT
+
+                    '〇 名称設定
+                    '営業所
+                    CODENAME_get("OFFICECODE", OIM0003row("OFFICECODE"), OIM0003row("OFFICENAME"), WW_DUMMY)
+                    '荷主
+                    CODENAME_get("SHIPPERCODE", OIM0003row("SHIPPERCODE"), OIM0003row("SHIPPERNAME"), WW_DUMMY)
+                    '基地
+                    CODENAME_get("PLANTCODE", OIM0003row("PLANTCODE"), OIM0003row("PLANTNAME"), WW_DUMMY)
+                    '在庫管理対象フラグ
+                    CODENAME_get("STOCKFLG", OIM0003row("STOCKFLG"), OIM0003row("STOCKFLGNAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -870,7 +902,7 @@ Public Class OIM0003ProductList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -1025,6 +1057,8 @@ Public Class OIM0003ProductList
         work.WF_SEL_OILTERM_ORDERFROMDATE_11.Text = ""
         work.WF_SEL_OILTERM_ORDERTODATE_11.Text = ""
         work.WF_SEL_OILTERM_DELFLG_11.Text = ""
+
+        work.WF_SEL_DBUPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -1751,7 +1785,6 @@ Public Class OIM0003ProductList
 
     End Sub
 
-
     ''' <summary>
     ''' 終了ボタン押下時処理
     ''' </summary>
@@ -1761,7 +1794,6 @@ Public Class OIM0003ProductList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -1795,7 +1827,6 @@ Public Class OIM0003ProductList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -2057,6 +2088,8 @@ Public Class OIM0003ProductList
         '品種出荷期間11.削除フラグ
         work.WF_SEL_OILTERM_DELFLG_11.Text = OIM0003tbl.Rows(WW_LINECNT)("OILTERM_DELFLG_11")
 
+        work.WF_SEL_DBUPDATE_MESSAGE.Text = ""
+
         '○ 状態をクリア
         For Each OIM0003row As DataRow In OIM0003tbl.Rows
             Select Case OIM0003row("OPERATION")
@@ -2110,7 +2143,6 @@ Public Class OIM0003ProductList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -2192,8 +2224,10 @@ Public Class OIM0003ProductList
                         XLSTBLrow("PLANTCODE") = OIM0003row("PLANTCODE") AndAlso
                         XLSTBLrow("OILCODE") = OIM0003row("OILCODE") AndAlso
                         XLSTBLrow("SEGMENTOILCODE") = OIM0003row("SEGMENTOILCODE") Then
-
+                        '変更元情報を入力レコードにコピーする
                         OIM0003INProw.ItemArray = OIM0003row.ItemArray
+                        '更新種別は初期化する
+                        OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
@@ -2327,10 +2361,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_01") = XLSTBLrow("OILTERM_CONSIGNEECODE_01")
             End If
 
-            '品種出荷期間01.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_01") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_01") = XLSTBLrow("OILTERM_CONSIGNEENAME_01")
-            End If
+            ''品種出荷期間01.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_01") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_01") = XLSTBLrow("OILTERM_CONSIGNEENAME_01")
+            'End If
 
             '品種出荷期間01.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_01") >= 0 Then
@@ -2352,10 +2386,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_02") = XLSTBLrow("OILTERM_CONSIGNEECODE_02")
             End If
 
-            '品種出荷期間02.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_02") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_02") = XLSTBLrow("OILTERM_CONSIGNEENAME_02")
-            End If
+            ''品種出荷期間02.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_02") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_02") = XLSTBLrow("OILTERM_CONSIGNEENAME_02")
+            'End If
 
             '品種出荷期間02.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_02") >= 0 Then
@@ -2377,10 +2411,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_03") = XLSTBLrow("OILTERM_CONSIGNEECODE_03")
             End If
 
-            '品種出荷期間03.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_03") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_03") = XLSTBLrow("OILTERM_CONSIGNEENAME_03")
-            End If
+            ''品種出荷期間03.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_03") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_03") = XLSTBLrow("OILTERM_CONSIGNEENAME_03")
+            'End If
 
             '品種出荷期間03.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_03") >= 0 Then
@@ -2397,10 +2431,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_DELFLG_03") = XLSTBLrow("OILTERM_DELFLG_03")
             End If
 
-            '品種出荷期間04.荷受人コード
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEECODE_04") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEECODE_04") = XLSTBLrow("OILTERM_CONSIGNEECODE_04")
-            End If
+            ''品種出荷期間04.荷受人コード
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEECODE_04") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEECODE_04") = XLSTBLrow("OILTERM_CONSIGNEECODE_04")
+            'End If
 
             '品種出荷期間04.荷受人名
             If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_04") >= 0 Then
@@ -2427,10 +2461,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_05") = XLSTBLrow("OILTERM_CONSIGNEECODE_05")
             End If
 
-            '品種出荷期間05.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_05") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_05") = XLSTBLrow("OILTERM_CONSIGNEENAME_05")
-            End If
+            ''品種出荷期間05.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_05") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_05") = XLSTBLrow("OILTERM_CONSIGNEENAME_05")
+            'End If
 
             '品種出荷期間05.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_05") >= 0 Then
@@ -2452,10 +2486,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_06") = XLSTBLrow("OILTERM_CONSIGNEECODE_06")
             End If
 
-            '品種出荷期間06.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_06") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_06") = XLSTBLrow("OILTERM_CONSIGNEENAME_06")
-            End If
+            ''品種出荷期間06.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_06") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_06") = XLSTBLrow("OILTERM_CONSIGNEENAME_06")
+            'End If
 
             '品種出荷期間06.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_06") >= 0 Then
@@ -2477,10 +2511,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_07") = XLSTBLrow("OILTERM_CONSIGNEECODE_07")
             End If
 
-            '品種出荷期間07.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_07") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_07") = XLSTBLrow("OILTERM_CONSIGNEENAME_07")
-            End If
+            ''品種出荷期間07.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_07") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_07") = XLSTBLrow("OILTERM_CONSIGNEENAME_07")
+            'End If
 
             '品種出荷期間07.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_07") >= 0 Then
@@ -2502,10 +2536,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_08") = XLSTBLrow("OILTERM_CONSIGNEECODE_08")
             End If
 
-            '品種出荷期間08.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_08") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_08") = XLSTBLrow("OILTERM_CONSIGNEENAME_08")
-            End If
+            ''品種出荷期間08.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_08") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_08") = XLSTBLrow("OILTERM_CONSIGNEENAME_08")
+            'End If
 
             '品種出荷期間08.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_08") >= 0 Then
@@ -2527,10 +2561,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_09") = XLSTBLrow("OILTERM_CONSIGNEECODE_09")
             End If
 
-            '品種出荷期間09.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_09") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_09") = XLSTBLrow("OILTERM_CONSIGNEENAME_09")
-            End If
+            ''品種出荷期間09.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_09") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_09") = XLSTBLrow("OILTERM_CONSIGNEENAME_09")
+            'End If
 
             '品種出荷期間09.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_09") >= 0 Then
@@ -2552,10 +2586,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_10") = XLSTBLrow("OILTERM_CONSIGNEECODE_10")
             End If
 
-            '品種出荷期間10.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_10") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_10") = XLSTBLrow("OILTERM_CONSIGNEENAME_10")
-            End If
+            ''品種出荷期間10.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_10") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_10") = XLSTBLrow("OILTERM_CONSIGNEENAME_10")
+            'End If
 
             '品種出荷期間10.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_10") >= 0 Then
@@ -2577,10 +2611,10 @@ Public Class OIM0003ProductList
                 OIM0003INProw("OILTERM_CONSIGNEECODE_11") = XLSTBLrow("OILTERM_CONSIGNEECODE_11")
             End If
 
-            '品種出荷期間11.荷受人名
-            If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_11") >= 0 Then
-                OIM0003INProw("OILTERM_CONSIGNEENAME_11") = XLSTBLrow("OILTERM_CONSIGNEENAME_11")
-            End If
+            ''品種出荷期間11.荷受人名
+            'If WW_COLUMNS.IndexOf("OILTERM_CONSIGNEENAME_11") >= 0 Then
+            '    OIM0003INProw("OILTERM_CONSIGNEENAME_11") = XLSTBLrow("OILTERM_CONSIGNEENAME_11")
+            'End If
 
             '品種出荷期間11.受注登録可能期間FROM
             If WW_COLUMNS.IndexOf("OILTERM_ORDERFROMDATE_11") >= 0 Then
@@ -2596,6 +2630,28 @@ Public Class OIM0003ProductList
             If WW_COLUMNS.IndexOf("OILTERM_DELFLG_11") >= 0 Then
                 OIM0003INProw("OILTERM_DELFLG_11") = XLSTBLrow("OILTERM_DELFLG_11")
             End If
+
+            '〇 名称設定
+            '営業所
+            CODENAME_get("OFFICECODE", OIM0003INProw("OFFICECODE"), OIM0003INProw("OFFICENAME"), WW_DUMMY)
+            '荷主
+            CODENAME_get("SHIPPERCODE", OIM0003INProw("SHIPPERCODE"), OIM0003INProw("SHIPPERNAME"), WW_DUMMY)
+            '基地
+            CODENAME_get("PLANTCODE", OIM0003INProw("PLANTCODE"), OIM0003INProw("PLANTNAME"), WW_DUMMY)
+            '在庫管理対象フラグ
+            CODENAME_get("STOCKFLG", OIM0003INProw("STOCKFLG"), OIM0003INProw("STOCKFLGNAME"), WW_DUMMY)
+            '品種出荷期間01～11.荷受人
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_01"), OIM0003INProw("OILTERM_CONSIGNEENAME_01"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_02"), OIM0003INProw("OILTERM_CONSIGNEENAME_02"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_03"), OIM0003INProw("OILTERM_CONSIGNEENAME_03"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_04"), OIM0003INProw("OILTERM_CONSIGNEENAME_04"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_05"), OIM0003INProw("OILTERM_CONSIGNEENAME_05"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_06"), OIM0003INProw("OILTERM_CONSIGNEENAME_06"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_07"), OIM0003INProw("OILTERM_CONSIGNEENAME_07"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_08"), OIM0003INProw("OILTERM_CONSIGNEENAME_08"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_09"), OIM0003INProw("OILTERM_CONSIGNEENAME_09"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_10"), OIM0003INProw("OILTERM_CONSIGNEENAME_10"), WW_DUMMY)
+            CODENAME_get("CONSIGNEEMASTER", OIM0003INProw("OILTERM_CONSIGNEECODE_11"), OIM0003INProw("OILTERM_CONSIGNEENAME_11"), WW_DUMMY)
 
             OIM0003INPtbl.Rows.Add(OIM0003INProw)
         Next
@@ -2686,7 +2742,6 @@ Public Class OIM0003ProductList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -3631,7 +3686,6 @@ Public Class OIM0003ProductList
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -3715,6 +3769,10 @@ Public Class OIM0003ProductList
                     '削除フラグ
                     prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "CONSIGNEEMASTER"
+                    '荷受人名
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "CONSIGNEEMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

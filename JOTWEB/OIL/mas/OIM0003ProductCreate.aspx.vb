@@ -1,4 +1,23 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 品種マスタメンテ登録・更新画面
+' 作成日 2020/11/09
+' 更新日 2021/04/16
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/11/09 新規作成
+'         :2021/01/25 1)品種出荷期間マスタ項目を追加
+'                     2)表更新→DB更新に名称変更
+'                     3)DB更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/02/04 一覧画面での品種出荷期間マスタ項目追加・DB更新に伴い
+'                     品種出荷期間マスタ項目も一覧画面とやり取りするように修正 
+'         :2021/04/16 1)DB更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)新規登録を行って一覧画面に戻った際に、追加したデータが表示されないバグに対応
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -18,9 +37,6 @@ Public Class OIM0003ProductCreate
     Private OIM0030tbl As DataTable                                 '品種出荷期間テーブル
     Private OIM0030INPtbl As DataTable                              '品種出荷期間更新チェック用テーブル
     Private OIM0030UPDtbl As DataTable                              '品種出荷期間更新用テーブル
-
-    Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -77,6 +93,8 @@ Public Class OIM0003ProductCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
 
                 End If
@@ -147,8 +165,6 @@ Public Class OIM0003ProductCreate
         Master.dispHelp = False
         '○D&D有無設定
         Master.eventDrop = True
-        '○Grid情報保存先のファイル名
-        'Master.CreateXMLSaveFile()
 
         '○初期値設定
         WF_FIELD.Value = ""
@@ -203,71 +219,54 @@ Public Class OIM0003ProductCreate
 
         '油種大分類コード
         WF_BIGOILCODE.Text = work.WF_SEL_BIGOILCODE2.Text
-        'CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_DUMMY)
 
         '油種大分類名
         WF_BIGOILNAME.Text = work.WF_SEL_BIGOILNAME.Text
-        'CODENAME_get("BIGOILNAME", WF_BIGOILNAME.Text, WF_BIGOILNAME_TEXT.Text, WW_DUMMY)
 
         '油種大分類名カナ
         WF_BIGOILKANA.Text = work.WF_SEL_BIGOILKANA.Text
-        'CODENAME_get("BIGOILKANA", WF_BIGOILKANA.Text, WF_BIGOILKANA_TEXT.Text, WW_DUMMY)
 
         '油種中分類コード
         WF_MIDDLEOILCODE.Text = work.WF_SEL_MIDDLEOILCODE2.Text
-        'CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_DUMMY)
 
         '油種中分類名
         WF_MIDDLEOILNAME.Text = work.WF_SEL_MIDDLEOILNAME.Text
-        'CODENAME_get("MIDDLEOILNAME", WF_MIDDLEOILNAME.Text, WF_MIDDLEOILNAME_TEXT.Text, WW_DUMMY)
 
         '油種中分類名カナ
         WF_MIDDLEOILKANA.Text = work.WF_SEL_MIDDLEOILKANA.Text
-        'CODENAME_get("MIDDLEOILKANA", WF_MIDDLEOILKANA.Text, WF_MIDDLEOILKANA_TEXT.Text, WW_DUMMY)
 
         '油種コード
         WF_OILCODE.Text = work.WF_SEL_OILCODE2.Text
-        'CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_DUMMY)
 
         '油種名
         WF_OILNAME.Text = work.WF_SEL_OILNAME.Text
-        'CODENAME_get("OILNAME", WF_OILNAME.Text, WF_OILNAME_TEXT.Text, WW_DUMMY)
 
         '油種名カナ
         WF_OILKANA.Text = work.WF_SEL_OILKANA.Text
-        'CODENAME_get("OILKANA", WF_OILKANA.Text, WF_OILKANA_TEXT.Text, WW_DUMMY)
 
         '油種細分コード
         WF_SEGMENTOILCODE.Text = work.WF_SEL_SEGMENTOILCODE.Text
-        'CODENAME_get("SEGMENTOILCODE", WF_SEGMENTOILCODE.Text, WF_SEGMENTOILCODE_TEXT.Text, WW_DUMMY)
 
         '油種名（細分）
         WF_SEGMENTOILNAME.Text = work.WF_SEL_SEGMENTOILNAME.Text
-        'CODENAME_get("SEGMENTOILNAME", WF_SEGMENTOILNAME.Text, WF_SEGMENTOILNAME_TEXT.Text, WW_DUMMY)
 
         'OT油種コード
         WF_OTOILCODE.Text = work.WF_SEL_OTOILCODE.Text
-        'CODENAME_get("OTOILCODE", WF_OTOILCODE.Text, WF_OTOILCODE_TEXT.Text, WW_DUMMY)
 
         'OT油種名
         WF_OTOILNAME.Text = work.WF_SEL_OTOILNAME.Text
-        'CODENAME_get("OTOILNAME", WF_OTOILNAME.Text, WF_OTOILNAME_TEXT.Text, WW_DUMMY)
 
         '荷主油種コード
         WF_SHIPPEROILCODE.Text = work.WF_SEL_SHIPPEROILCODE.Text
-        'CODENAME_get("SHIPPEROILCODE", WF_SHIPPEROILCODE.Text, WF_SHIPPEROILCODE_TEXT.Text, WW_DUMMY)
 
         '荷主油種名
         WF_SHIPPEROILNAME.Text = work.WF_SEL_SHIPPEROILNAME.Text
-        'CODENAME_get("SHIPPEROILNAME", WF_SHIPPEROILNAME.Text, WF_SHIPPEROILNAME_TEXT.Text, WW_DUMMY)
 
         '積込チェック用油種コード
         WF_CHECKOILCODE.Text = work.WF_SEL_CHECKOILCODE.Text
-        'CODENAME_get("CHECKOILCODE", WF_CHECKOILCODE.Text, WF_CHECKOILCODE_TEXT.Text, WW_DUMMY)
 
         '積込チェック用油種名
         WF_CHECKOILNAME.Text = work.WF_SEL_CHECKOILNAME.Text
-        'CODENAME_get("CHECKOILNAME", WF_CHECKOILNAME.Text, WF_CHECKOILNAME_TEXT.Text, WW_DUMMY)
 
         '在庫管理対象フラグ
         WF_STOCKFLG.Text = work.WF_SEL_STOCKFLG.Text
@@ -590,6 +589,11 @@ Public Class OIM0003ProductCreate
 
         '〇 DB更新
         If isNormal(WW_ERR_SW) Then
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If Not isInputChange() Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
 
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 'DataBase接続
@@ -626,10 +630,6 @@ Public Class OIM0003ProductCreate
             End If
         End If
 
-        '○画面切替設定
-        'WF_BOXChange.Value = "headerbox"
-
-        '############# おためし #############
         If isNormal(WW_ERR_SW) Then
             '前ページ遷移
             Master.TransitionPrevPage()
@@ -795,6 +795,30 @@ Public Class OIM0003ProductCreate
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0003INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        '変更チェック
+        If isInputChange() Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面-クリアボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -2493,7 +2517,6 @@ Public Class OIM0003ProductCreate
 
     End Sub
 
-
     ''' <summary>
     ''' OIM0003tbl更新
     ''' </summary>
@@ -2651,11 +2674,22 @@ Public Class OIM0003ProductCreate
                 OIM0003INProw("LINECNT") = OIM0003row("LINECNT")
                 OIM0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 OIM0003INProw("TIMSTP") = OIM0003row("TIMSTP")
-                OIM0003INProw("SELECT") = 1
+                OIM0003INProw("SELECT") = 0
                 OIM0003INProw("HIDDEN") = 0
 
                 'テーブル項目設定
                 OIM0003row.ItemArray = OIM0003INProw.ItemArray
+
+                '〇 名称設定
+                '営業所
+                CODENAME_get("OFFICECODE", OIM0003row("OFFICECODE"), OIM0003row("OFFICENAME"), WW_DUMMY)
+                '荷主
+                CODENAME_get("SHIPPERCODE", OIM0003row("SHIPPERCODE"), OIM0003row("SHIPPERNAME"), WW_DUMMY)
+                '基地
+                CODENAME_get("PLANTCODE", OIM0003row("PLANTCODE"), OIM0003row("PLANTNAME"), WW_DUMMY)
+                '在庫管理対象フラグ
+                CODENAME_get("STOCKFLG", OIM0003row("STOCKFLG"), OIM0003row("STOCKFLGNAME"), WW_DUMMY)
+
                 '品種出荷期間マスタ項目設定
                 CopyOIM0030RowToOIM0003Row(OIM0003row)
 
@@ -2667,14 +2701,27 @@ Public Class OIM0003ProductCreate
         If Not WK_FOUNDFLG Then
 
             Dim OIM0003row As DataRow = OIM0003tbl.NewRow
-            OIM0003row("LINECNT") = OIM0003tbl.Rows.Count + 1   '末尾に追加
-            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-            OIM0003row("TIMSTP") = "0"
-            OIM0003row("SELECT") = 1
-            OIM0003row("HIDDEN") = 0
 
             'テーブル項目設定
             OIM0003row.ItemArray = OIM0003INProw.ItemArray
+
+            '画面入力テーブル項目設定
+            OIM0003row("LINECNT") = OIM0003tbl.Rows.Count + 1   '末尾に追加
+            OIM0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            OIM0003row("TIMSTP") = "0"
+            OIM0003row("SELECT") = 0
+            OIM0003row("HIDDEN") = 0
+
+            '〇 名称設定
+            '営業所
+            CODENAME_get("OFFICECODE", OIM0003row("OFFICECODE"), OIM0003row("OFFICENAME"), WW_DUMMY)
+            '荷主
+            CODENAME_get("SHIPPERCODE", OIM0003row("SHIPPERCODE"), OIM0003row("SHIPPERNAME"), WW_DUMMY)
+            '基地
+            CODENAME_get("PLANTCODE", OIM0003row("PLANTCODE"), OIM0003row("PLANTNAME"), WW_DUMMY)
+            '在庫管理対象フラグ
+            CODENAME_get("STOCKFLG", OIM0003row("STOCKFLG"), OIM0003row("STOCKFLGNAME"), WW_DUMMY)
+
             '品種出荷期間マスタ項目設定
             CopyOIM0030RowToOIM0003Row(OIM0003row)
 
@@ -2833,5 +2880,71 @@ Public Class OIM0003ProductCreate
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' 入力データ変更確認
+    ''' </summary>
+    Private Function isInputChange() As Boolean
+
+        '変更フラグ
+        Dim inputChangeFlg = True
+
+        Dim OIM0003INProw As DataRow = OIM0003INPtbl.Rows(0)
+
+        For Each OIM0003row As DataRow In OIM0003tbl.Rows
+            '同一レコードか判定
+            If OIM0003INProw("OFFICECODE") = OIM0003row("OFFICECODE") AndAlso
+                OIM0003INProw("SHIPPERCODE") = OIM0003row("SHIPPERCODE") AndAlso
+                OIM0003INProw("PLANTCODE") = OIM0003row("PLANTCODE") AndAlso
+                OIM0003INProw("OILCODE") = OIM0003row("OILCODE") AndAlso
+                OIM0003INProw("SEGMENTOILCODE") = OIM0003row("SEGMENTOILCODE") Then
+                'キー以外の内容が同一の場合、変更フラグをOFFにする
+                If OIM0003row("BIGOILCODE") = OIM0003INProw("BIGOILCODE") AndAlso
+                    OIM0003row("BIGOILNAME") = OIM0003INProw("BIGOILNAME") AndAlso
+                    OIM0003row("BIGOILKANA") = OIM0003INProw("BIGOILKANA") AndAlso
+                    OIM0003row("MIDDLEOILCODE") = OIM0003INProw("MIDDLEOILCODE") AndAlso
+                    OIM0003row("MIDDLEOILNAME") = OIM0003INProw("MIDDLEOILNAME") AndAlso
+                    OIM0003row("MIDDLEOILKANA") = OIM0003INProw("MIDDLEOILKANA") AndAlso
+                    OIM0003row("OILNAME") = OIM0003INProw("OILNAME") AndAlso
+                    OIM0003row("OILKANA") = OIM0003INProw("OILKANA") AndAlso
+                    OIM0003row("SEGMENTOILNAME") = OIM0003INProw("SEGMENTOILNAME") AndAlso
+                    OIM0003row("OTOILCODE") = OIM0003INProw("OTOILCODE") AndAlso
+                    OIM0003row("OTOILNAME") = OIM0003INProw("OTOILNAME") AndAlso
+                    OIM0003row("SHIPPEROILCODE") = OIM0003INProw("SHIPPEROILCODE") AndAlso
+                    OIM0003row("SHIPPEROILNAME") = OIM0003INProw("SHIPPEROILNAME") AndAlso
+                    OIM0003row("CHECKOILCODE") = OIM0003INProw("CHECKOILCODE") AndAlso
+                    OIM0003row("CHECKOILNAME") = OIM0003INProw("CHECKOILNAME") AndAlso
+                    OIM0003row("STOCKFLG") = OIM0003INProw("STOCKFLG") AndAlso
+                    OIM0003row("ORDERFROMDATE") = OIM0003INProw("ORDERFROMDATE") AndAlso
+                    OIM0003row("ORDERTODATE") = OIM0003INProw("ORDERTODATE") AndAlso
+                    OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
+                    Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0003row("OPERATION")) Then
+
+                    '品種出荷期間マスタの内容を比較
+                    Dim changeflg As Boolean = False
+                    For i As Integer = 0 To OIM0030INPtbl.Rows.Count - 1
+                        Dim strIdx = String.Format("{0:00}", i + 1)
+                        If Not (
+                            OIM0003row("OILTERM_CONSIGNEECODE_" + strIdx) = OIM0030INPtbl.Rows(i)("CONSIGNEECODE") AndAlso
+                            OIM0003row("OILTERM_CONSIGNEENAME_" + strIdx) = OIM0030INPtbl.Rows(i)("CONSIGNEENAME") AndAlso
+                            OIM0003row("OILTERM_ORDERFROMDATE_" + strIdx) = OIM0030INPtbl.Rows(i)("ORDERFROMDATE") AndAlso
+                            OIM0003row("OILTERM_ORDERTODATE_" + strIdx) = OIM0030INPtbl.Rows(i)("ORDERTODATE") AndAlso
+                            OIM0003row("OILTERM_DELFLG_" + strIdx) = OIM0030INPtbl.Rows(i)("DELFLG")
+                        ) Then
+                            changeflg = True
+                            Exit For
+                        End If
+                    Next
+
+                    inputChangeFlg = changeflg
+
+                    Exit For
+                End If
+
+            End If
+        Next
+
+        Return inputChangeFlg
+    End Function
 
 End Class

@@ -1,4 +1,14 @@
-﻿Imports JOTWEB.GRIS0005LeftBox
+﻿''************************************************************
+' 品種マスタメンテ検索画面
+' 作成日 2020/11/09
+' 更新日 2021/01/26
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/11/09 新規作成
+'         :2021/01/26 営業所コード選択範囲について修正
+''************************************************************
+Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
 ''' 品種マスタ登録（検索）
@@ -143,7 +153,6 @@ Public Class OIM0003ProductSearch
         CODENAME_get("OILCODE", WF_OILCODE.Text, WF_OILCODE_TEXT.Text, WW_RTN_SW)                           '油種コード
 
     End Sub
-
 
     ''' <summary>
     ''' 検索ボタン押下時処理
@@ -350,7 +359,6 @@ Public Class OIM0003ProductSearch
 
     End Sub
 
-
     ''' <summary>
     ''' 終了ボタン押下時処理
     ''' </summary>
@@ -361,7 +369,6 @@ Public Class OIM0003ProductSearch
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -408,7 +415,6 @@ Public Class OIM0003ProductSearch
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドチェンジ時処理
     ''' </summary>
@@ -445,7 +451,6 @@ Public Class OIM0003ProductSearch
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
@@ -507,7 +512,6 @@ Public Class OIM0003ProductSearch
 
     End Sub
 
-
     ''' <summary>
     ''' LeftBoxキャンセルボタン押下時処理
     ''' </summary>
@@ -542,7 +546,6 @@ Public Class OIM0003ProductSearch
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxダブルクリック時処理
     ''' </summary>
@@ -563,7 +566,6 @@ Public Class OIM0003ProductSearch
 
     End Sub
 
-
     ''' <summary>
     ''' ヘルプ表示
     ''' </summary>
@@ -573,7 +575,6 @@ Public Class OIM0003ProductSearch
         Master.ShowHelp()
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -636,4 +637,5 @@ Public Class OIM0003ProductSearch
         End Try
 
     End Sub
+
 End Class

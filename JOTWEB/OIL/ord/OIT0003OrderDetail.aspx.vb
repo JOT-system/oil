@@ -7502,7 +7502,7 @@ Public Class OIT0003OrderDetail
 
         'OT発送日報対象の営業所(列車)でまだ送信していない場合
         If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+            AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
 
             '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
             '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
@@ -7550,7 +7550,7 @@ Public Class OIT0003OrderDetail
         '◯一覧
         '★(予定)積込日に入力された日付を、(一覧)積込日に反映させる。
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
-            If OIT0003tab3row("ACTUALLODDATE") <> "" Then Continue For
+            If Convert.ToString(OIT0003tab3row("ACTUALLODDATE")) <> "" Then Continue For
             OIT0003tab3row("ACTUALLODDATE") = Me.TxtLoadingDate.Text
         Next
 
@@ -7567,7 +7567,7 @@ Public Class OIT0003OrderDetail
         '★(予定)受入日に入力された日付を、(一覧)受入日に反映させる。
         For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
             '★未卸可否フラグがチェックされている場合は、(一覧)受入日には設定しない。
-            If OIT0003tab3row("WHOLESALEFLG") = "on" Then Continue For
+            If Convert.ToString(OIT0003tab3row("WHOLESALEFLG")) = "on" Then Continue For
             OIT0003tab3row("ACTUALACCDATE") = Me.TxtAccDate.Text
         Next
 
@@ -7576,9 +7576,9 @@ Public Class OIT0003OrderDetail
             '★未卸可否フラグがチェックされている場合,
             '　または交検可否フラグがチェックされている場合、
             '　または留置可否フラグがチェックされている場合は、(一覧)空車着日には設定しない。
-            If OIT0003tab3row("WHOLESALEFLG") = "on" _
-                OrElse OIT0003tab3row("INSPECTIONFLG") = "on" _
-                OrElse OIT0003tab3row("DETENTIONFLG") = "on" Then Continue For
+            If Convert.ToString(OIT0003tab3row("WHOLESALEFLG")) = "on" _
+                OrElse Convert.ToString(OIT0003tab3row("INSPECTIONFLG")) = "on" _
+                OrElse Convert.ToString(OIT0003tab3row("DETENTIONFLG")) = "on" Then Continue For
             OIT0003tab3row("ACTUALEMPARRDATE") = Me.TxtEmparrDate.Text
         Next
 
@@ -15669,7 +15669,7 @@ Public Class OIT0003OrderDetail
 
                 'OT発送日報対象の営業所(列車)でまだ送信していない場合
                 If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                    AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                    AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                     '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                     '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                     If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -18102,6 +18102,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualLoadingDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALLODDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_91
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)積込日が入力済みで(一覧(実績))積込日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)発日 と　(一覧)発日を比較
@@ -18120,6 +18130,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualDepDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALDEPDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_92
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)発日が入力済みで(一覧(実績))発日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)積車着日 と　(一覧)積車着日を比較
@@ -18138,6 +18158,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualArrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALARRDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_93
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)積車着日が入力済みで(一覧(実績))積車着日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)受入日 と　(一覧)受入日を比較
@@ -18156,6 +18186,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualAccDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_94
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)受入日が入力済みで(一覧(実績))受入日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)空車着日 と　(一覧)空車着日を比較
@@ -18174,6 +18214,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualEmparrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_95
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)空車着日が入力済みで(一覧(実績))空車着日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
         Next
 
@@ -18184,8 +18234,11 @@ Public Class OIT0003OrderDetail
         If O_RTN = "ERR" Then
             Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)日付 > (一覧)日付", needsPopUp:=True)
             Exit Sub
+        ElseIf O_RTN = "ERR2" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)日付 ≠ (一覧)日付", needsPopUp:=True)
+            O_RTN = "ERR"
+            Exit Sub
         End If
-
 
     End Sub
 
@@ -21121,6 +21174,9 @@ Public Class OIT0003OrderDetail
         '発送順区分
         work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
 
+        '発送日報送信状況フラグ
+        work.WF_SEL_OTSENDSTATUS_FLG.Text = WW_GetValue(15)
+
         '発駅
         Me.TxtDepstationCode.Text = WW_GetValue(1)
         work.WF_SEL_DEPARTURESTATION.Text = Me.TxtDepstationCode.Text
@@ -22348,7 +22404,7 @@ Public Class OIT0003OrderDetail
                             'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             'OT発送日報対象の営業所(列車)でまだ送信していない場合
                             If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             Else
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -22880,7 +22936,7 @@ Public Class OIT0003OrderDetail
                                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                         'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                         If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                         Else
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -22903,7 +22959,7 @@ Public Class OIT0003OrderDetail
                                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                         'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                         If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                         Else
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -22928,7 +22984,7 @@ Public Class OIT0003OrderDetail
                                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                         'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                         If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                         Else
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -22953,7 +23009,7 @@ Public Class OIT0003OrderDetail
                                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                         'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                         If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                            AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                            AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                         Else
                                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -23081,7 +23137,7 @@ Public Class OIT0003OrderDetail
                                 Else
                                     'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                     If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                         '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                                         '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -23112,7 +23168,7 @@ Public Class OIT0003OrderDetail
                                 Else
                                     'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                     If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                         '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                                         '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -23145,7 +23201,7 @@ Public Class OIT0003OrderDetail
                                 Else
                                     'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                     If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                         '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                                         '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -23180,7 +23236,7 @@ Public Class OIT0003OrderDetail
                                 Else
                                     'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                     If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                         '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                                         '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
@@ -23215,7 +23271,7 @@ Public Class OIT0003OrderDetail
                                 Else
                                     'OT発送日報対象の営業所(列車)でまだ送信していない場合
                                     If work.WF_SEL_OTSENDSTATUS_FLG.Text = "1" _
-                                        AndAlso work.WF_SEL_OTSENDSTATUS.Text = "0" Then
+                                        AndAlso (work.WF_SEL_OTSENDSTATUS.Text = "0" OrElse work.WF_SEL_OTSENDSTATUS.Text = "") Then
                                         '　　★★★★★　五井営業所、四日市営業所については10月よりOT発送日報送信を稼働するため　★★★★★
                                         '　　★★★★★　それまでは制御をいれない　　　　　　　　　　　　　　　　　　　　　　　　★★★★★
                                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _

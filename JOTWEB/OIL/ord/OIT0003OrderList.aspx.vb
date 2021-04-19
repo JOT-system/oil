@@ -8307,12 +8307,12 @@ Public Class OIT0003OrderList
             PARA13.Value = Master.USERTERMID
             PARA14.Value = C_DEFAULT_YMD
 
-            If I_TANKNO = "" Then
-                '(一覧)で設定しているタンク車をKEYに更新
-                For Each OIT0003row As DataRow In OIT0003tbl.Rows
-                    PARA01.Value = OIT0003row("TANKNO")
-                    SQLcmd.ExecuteNonQuery()
-                Next
+            If String.IsNullOrEmpty(I_TANKNO) Then
+                ''(一覧)で設定しているタンク車をKEYに更新
+                'For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                '    PARA01.Value = OIT0003row("TANKNO")
+                '    SQLcmd.ExecuteNonQuery()
+                'Next
             Else
                 '指定されたタンク車№をKEYに更新
                 PARA01.Value = I_TANKNO

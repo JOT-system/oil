@@ -18186,7 +18186,8 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
-            ElseIf Me.TxtActualAccDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" Then
+            ElseIf Me.TxtActualAccDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" _
+                AndAlso convert.ToString(OIT0003tab3row("WHOLESALEFLG")) = "" Then
                 '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
                 OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_94
                 CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
@@ -18214,7 +18215,10 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
-            ElseIf Me.TxtActualEmparrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) = "" Then
+            ElseIf Me.TxtActualEmparrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) = "" _
+                AndAlso convert.ToString(OIT0003tab3row("WHOLESALEFLG")) = "" _
+                AndAlso convert.ToString(OIT0003tab3row("INSPECTIONFLG")) = "" _
+                AndAlso convert.ToString(OIT0003tab3row("DETENTIONFLG")) = "" Then
                 '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
                 OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_95
                 CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)

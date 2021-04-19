@@ -1,4 +1,13 @@
-﻿Imports JOTWEB.GRIS0005LeftBox
+﻿''************************************************************
+' 積込予約マスタメンテ検索画面
+' 作成日 2021/01/25
+' 更新日 
+' 作成者 JOT伊草
+' 更新者 
+'
+' 修正履歴:2021/01/25 新規作成
+''************************************************************
+Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIM0021LoadReserveSearch
     Inherits Page
@@ -77,7 +86,8 @@ Public Class OIM0021LoadReserveSearch
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then      'メニューからの画面遷移
+
             '画面間の情報クリア
             work.Initialize()
 
@@ -85,21 +95,19 @@ Public Class OIM0021LoadReserveSearch
             Master.GetFirstValue(work.WF_SEL_OFFICECODE.Text, "OFFICECODE", WF_OFFICECODE.Text)             '管轄営業所
             Master.GetFirstValue(work.WF_SEL_FROMYMD.Text, "FROMYMD", WF_FROMYMD.Text)                      '適用開始年月日
             Master.GetFirstValue(work.WF_SEL_TOYMD.Text, "TOYMD", WF_TOYMD.Text)                            '適用終了年月日
-            'Master.GetFirstValue(work.WF_SEL_LOAD.Text, "LOAD", WF_LOAD.Text)                               '荷重
             Master.GetFirstValue(work.WF_SEL_OILCODE.Text, "OILCODE", WF_OILCODE.Text)                      '油種コード
             Master.GetFirstValue(work.WF_SEL_SEGMENTOILCODE.Text, "SEGMENTOILCODE", WF_SEGMENTOILCODE.Text) '油種細分コード
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0021L Then   '実行画面からの遷移
-            '画面項目設定処理
-            WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text                                                '管轄営業所
-            WF_FROMYMD.Text = work.WF_SEL_FROMYMD.Text                                                      '適用開始年月日
-            WF_TOYMD.Text = work.WF_SEL_TOYMD.Text                                                          '適用終了年月日
-            'WF_LOAD.Text = work.WF_SEL_LOAD.Text                                                            '荷重
-            WF_OILCODE.Text = work.WF_SEL_OILCODE.Text                                                      '油種コード
-            WF_SEGMENTOILCODE.Text = work.WF_SEL_SEGMENTOILCODE.Text                                        '油種細分コード
-        End If
 
-        ''入力制限(数値0～9、.)
-        'WF_LOAD.Attributes("onkeyPress") = "CheckNumDot()"
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0021L Then '実行画面からの遷移
+
+            '画面項目設定処理
+            WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text            '管轄営業所
+            WF_FROMYMD.Text = work.WF_SEL_FROMYMD.Text                  '適用開始年月日
+            WF_TOYMD.Text = work.WF_SEL_TOYMD.Text                      '適用終了年月日
+            WF_OILCODE.Text = work.WF_SEL_OILCODE.Text                  '油種コード
+            WF_SEGMENTOILCODE.Text = work.WF_SEL_SEGMENTOILCODE.Text    '油種細分コード
+
+        End If
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0021WRKINC.MAPIDS
@@ -121,7 +129,6 @@ Public Class OIM0021LoadReserveSearch
 
     End Sub
 
-
     ''' <summary>
     ''' 実行ボタン押下時処理
     ''' </summary>
@@ -132,7 +139,6 @@ Public Class OIM0021LoadReserveSearch
         Master.EraseCharToIgnore(WF_OFFICECODE.Text)        '管轄営業所
         Master.EraseCharToIgnore(WF_FROMYMD.Text)           '適用開始年月日     
         Master.EraseCharToIgnore(WF_TOYMD.Text)             '適用終了年月日     
-        'Master.EraseCharToIgnore(WF_LOAD.Text)              '荷重
         Master.EraseCharToIgnore(WF_OILCODE.Text)           '油種コード
         Master.EraseCharToIgnore(WF_SEGMENTOILCODE.Text)    '油種細分コード
 
@@ -146,7 +152,6 @@ Public Class OIM0021LoadReserveSearch
         work.WF_SEL_OFFICECODE.Text = WF_OFFICECODE.Text            '管轄営業所
         work.WF_SEL_FROMYMD.Text = WF_FROMYMD.Text                  '適用開始年月日
         work.WF_SEL_TOYMD.Text = WF_TOYMD.Text                      '適用終了年月日
-        'work.WF_SEL_LOAD.Text = WF_LOAD.Text                        '荷重
         work.WF_SEL_OILCODE.Text = WF_OILCODE.Text                  '油種コード
         work.WF_SEL_SEGMENTOILCODE.Text = WF_SEGMENTOILCODE.Text    '油種細分コード
 
@@ -246,20 +251,6 @@ Public Class OIM0021LoadReserveSearch
             O_RTN = "ERR"
             Exit Sub
         End If
-
-        ''荷重
-        'WW_TEXT = WF_LOAD.Text
-        'Master.CheckField(Master.USERCAMP, "LOAD", WF_LOAD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    If String.IsNullOrEmpty(WW_TEXT) Then
-        '        WF_LOAD.Text = ""
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "荷重", needsPopUp:=True)
-        '    WF_LOAD.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
 
         '油種コード
         WW_TEXT = WF_OILCODE.Text
@@ -455,7 +446,6 @@ Public Class OIM0021LoadReserveSearch
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
     ' ******************************************************************************
@@ -542,7 +532,6 @@ Public Class OIM0021LoadReserveSearch
         WF_LeftboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' LeftBoxキャンセルボタン押下時処理

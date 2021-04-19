@@ -1985,7 +1985,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                         If "9999999".Equals(prow("ARRSTATION").ToString()) Then
                             baseTotalFlg = True
                             '〇明細部4テンプレートセルコピー
-                            srcRange = ExcelTempSheet.Cells.Range("K13:BT13")
+                            srcRange = ExcelTempSheet.Cells.Range("K13:BZ13")
                             destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
                             srcRange.Copy(destRange)
                             ExcelMemoryRelease(srcRange)
@@ -1994,7 +1994,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             EditTansportResult_DetailArea(eridx, prow, 4)
                         Else
                             '〇明細部1テンプレートセルコピー
-                            srcRange = ExcelTempSheet.Cells.Range("K7:BT7")
+                            srcRange = ExcelTempSheet.Cells.Range("K7:BZ7")
                             destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
                             srcRange.Copy(destRange)
                             ExcelMemoryRelease(srcRange)
@@ -2004,7 +2004,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                         End If
                     ElseIf Not "9999".Equals(prow("OILCODE").ToString()) Then
                         '〇明細部2テンプレートセルコピー
-                        srcRange = ExcelTempSheet.Cells.Range("K9:BT9")
+                        srcRange = ExcelTempSheet.Cells.Range("K9:BZ9")
                         destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
                         srcRange.Copy(destRange)
                         ExcelMemoryRelease(srcRange)
@@ -2016,7 +2016,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             "8888".Equals(prow("OILCODE").ToString()) Then
                             '白油から黒油へ切り替わる場合
                             '又は出力レコードが「白(黒)油計」の場合は、明細行の上に罫線を引く
-                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BI{0}", eridx))
+                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BO{0}", eridx))
                             destRange.Borders(Excel.XlBordersIndex.xlEdgeTop).LineStyle = Excel.XlLineStyle.xlContinuous
 
                             '出力レコードが「白(黒)油計」の場合
@@ -2032,7 +2032,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                         EditTansportResult_DetailArea(eridx, prow, 2)
                     Else
                         '〇明細部3テンプレートセルコピー
-                        srcRange = ExcelTempSheet.Cells.Range("K11:BT11")
+                        srcRange = ExcelTempSheet.Cells.Range("K11:BZ11")
                         destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
                         srcRange.Copy(destRange)
                         ExcelMemoryRelease(srcRange)
@@ -2040,7 +2040,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
                         '基地計の「計」の場合、背景色を塗りつぶしなしにする
                         If "9999999".Equals(prow("ARRSTATION").ToString()) Then
-                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BI{0}", eridx))
+                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BO{0}", eridx))
                             destRange.Interior.ColorIndex = 0
                             ExcelMemoryRelease(destRange)
                         End If
@@ -2122,12 +2122,12 @@ Public Class OIT0008CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngHeaderArea)
 
             '◯ 出力期間
-            rngHeaderArea = Me.ExcelWorkSheet.Range("S" + idx.ToString())
+            rngHeaderArea = Me.ExcelWorkSheet.Range("W" + idx.ToString())
             rngHeaderArea.Value = String.Format("{0} ～ {1}", stYmd.ToString("yyyy年 MM月 dd日"), edYmd.ToString("yyyy年 MM月 dd日"))
             ExcelMemoryRelease(rngHeaderArea)
 
             '◯ 営業所
-            rngHeaderArea = Me.ExcelWorkSheet.Range("AZ" + idx.ToString())
+            rngHeaderArea = Me.ExcelWorkSheet.Range("BG" + idx.ToString())
             rngHeaderArea.Value = row("OFFICENAME")
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -2209,12 +2209,12 @@ Public Class OIT0008CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 標記屯(累計)
-            rngDetailArea = Me.ExcelWorkSheet.Range("AX" + idx.ToString())
+            rngDetailArea = Me.ExcelWorkSheet.Range("AZ" + idx.ToString())
             rngDetailArea.Value = row("MONTHLY_LOAD")
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 数量(累計)
-            rngDetailArea = Me.ExcelWorkSheet.Range("BC" + idx.ToString())
+            rngDetailArea = Me.ExcelWorkSheet.Range("BG" + idx.ToString())
             rngDetailArea.Value = row("MONTHLY_CARSAMOUNT")
             ExcelMemoryRelease(rngDetailArea)
 
@@ -2250,7 +2250,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
         putDetailCnt = 0
 
         '〇ヘッダーテンプレートセルコピー
-        srcRange = ExcelTempSheet.Cells.Range("K1:BT6")
+        srcRange = ExcelTempSheet.Cells.Range("K1:BZ6")
         destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
         srcRange.Copy(destRange)
         ExcelMemoryRelease(srcRange)

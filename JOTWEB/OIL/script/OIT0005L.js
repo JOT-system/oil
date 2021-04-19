@@ -205,3 +205,14 @@ function ListField_Dbclick(pnlList, Line, fieldNM) {
         document.forms[0].submit();
     }
 }
+
+// ○一覧用処理（チェンジイベント）
+function ListField_Change(pnlList, Line, fieldNM) {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        document.getElementById('WF_GridDBclick').value = Line;
+        document.getElementById('WF_FIELD').value = fieldNM;
+        document.getElementById('WF_ButtonClick').value = "WF_ListChange";
+        document.forms[0].submit();
+    }
+}

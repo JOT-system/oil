@@ -71,6 +71,8 @@ Public Class OIT0005TankLocList
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_ListChange"                  'リスト変更
+                            WF_ListChange()
                         Case "WF_ComDeleteIconClick"          'リスト削除
                             WF_ListDelete()
                     End Select
@@ -509,6 +511,50 @@ Public Class OIT0005TankLocList
         Master.TransitionPrevPage()
 
     End Sub
+
+#Region "リスト変更時処理"
+    ''' <summary>
+    ''' リスト変更時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListChange()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0005tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) CInt(x.Item("LINECNT")) = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '〇 一覧の件数取得
+        Dim intListCnt As Integer = OIT0005tbl.Rows.Count
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            Case "JRALLINSPECTIONDATE"      '(一覧)全検日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_ListValue, WW_DATE)
+                    If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                        updHeader.Item(WF_FIELD.Value) = ""
+                    Else
+                        updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0005tbl)
+
+    End Sub
+#End Region
+
 #Region "リスト削除時処理"
     ''' <summary>
     ''' リスト削除時処理
@@ -1504,6 +1550,21 @@ Public Class OIT0005TankLocList
                               needsPopUp:=True)
             Exit Sub
         End If
+        '　全検実施に伴い交検も変更があるため、交検の入力チェックもあわせて実施する
+        For Each OIT0005row As DataRow In OIT0005tbl.Select("TANKSITUATION='" + BaseDllConst.CONST_TANKSITUATION_14 + "'")
+            '★返送日が設定されているが、次回交検日が未入力の場合エラー
+            If Convert.ToString(OIT0005row("ORDER_ACTUALEMPARRDATE")) <> "" _
+                AndAlso Convert.ToString(OIT0005row("JRINSPECTIONDATE")) = "" Then
+                OIT0005row("ORDERINFONAME") = "未交検"
+                O_RTN = "ERR"
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
+                              "次回交検日が未入力です。",
+                              needsPopUp:=True)
+            Exit Sub
+        End If
 
         Dim iresult As Integer
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -2024,6 +2085,11 @@ Public Class OIT0005TankLocList
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_03) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            '★全検の設定
+                        ElseIf (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
+                            AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         End If
@@ -2032,7 +2098,7 @@ Public Class OIT0005TankLocList
                         If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         End If

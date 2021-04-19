@@ -18102,6 +18102,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualLoadingDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALLODDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_91
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)積込日が入力済みで(一覧(実績))積込日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)発日 と　(一覧)発日を比較
@@ -18120,6 +18130,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualDepDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALDEPDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_92
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)発日が入力済みで(一覧(実績))発日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)積車着日 と　(一覧)積車着日を比較
@@ -18138,6 +18158,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualArrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALARRDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_93
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)積車着日が入力済みで(一覧(実績))積車着日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)受入日 と　(一覧)受入日を比較
@@ -18156,6 +18186,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualAccDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_94
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)受入日が入力済みで(一覧(実績))受入日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
 
             '〇 (実績)空車着日 と　(一覧)空車着日を比較
@@ -18174,6 +18214,16 @@ Public Class OIT0003OrderDetail
                     OIT0003tab3row("ORDERINFO") = ""
                     OIT0003tab3row("ORDERINFONAME") = ""
                 End If
+            ElseIf Me.TxtActualEmparrDate.Text <> "" AndAlso convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) = "" Then
+                '★基本的に(ヘッダー)日付が設定済みで、(一覧)日付が未入力になるケースはないが念のため制御
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_95
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "(実績)空車着日が入力済みで(一覧(実績))空車着日が未入力のためエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR2"
+                Continue For
             End If
         Next
 
@@ -18184,8 +18234,11 @@ Public Class OIT0003OrderDetail
         If O_RTN = "ERR" Then
             Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)日付 > (一覧)日付", needsPopUp:=True)
             Exit Sub
+        ElseIf O_RTN = "ERR2" Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)日付 ≠ (一覧)日付", needsPopUp:=True)
+            O_RTN = "ERR"
+            Exit Sub
         End If
-
 
     End Sub
 

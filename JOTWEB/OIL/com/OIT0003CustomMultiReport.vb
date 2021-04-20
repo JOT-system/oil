@@ -1350,6 +1350,8 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 GroupBy(Function(r) New With {
                     Key .officeCode = r("OFFICECODE").ToString(),
                     Key .orderNo = r("ORDERNO").ToString(),
+                    Key .arrstation = r("ARRSTATION").ToString(),
+                    Key .arrstationName = r("ARRSTATIONNAME").ToString(),
                     Key .trainNo = r("TRAINNO").ToString(),
                     Key .lodDate = r("LODDATE").ToString(),
                     Key .depDate = r("DEPDATE").ToString()
@@ -1357,6 +1359,8 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 Select(Function(g) New With {
                     g.Key.officeCode,
                     g.Key.orderNo,
+                    g.Key.arrstation,
+                    g.Key.arrstationName,
                     g.Key.trainNo,
                     g.Key.lodDate,
                     g.Key.depDate,
@@ -1406,7 +1410,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                         End If
 
                         '◯ヘッダーの設定
-                        EditHeaderArea(pageIndex, query.Item(queryIndex).trainNo, query.Item(queryIndex).lodDate, query.Item(queryIndex).depDate)
+                        EditHeaderArea(pageIndex, query.Item(queryIndex).arrstationName, query.Item(queryIndex).trainNo, query.Item(queryIndex).lodDate, query.Item(queryIndex).depDate)
 
                         '◯明細の設定
                         EditDetailArea(pageIndex, query.Item(queryIndex).rows, query.Item(queryIndex).officeCode)
@@ -1426,7 +1430,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 End If
 
                 '◯ヘッダーの設定
-                EditHeaderArea(1, trainNo, lodDate, depDate)
+                EditHeaderArea(1, "", trainNo, lodDate, depDate)
             End If
 
             '○出力シートのみ残す
@@ -1464,24 +1468,29 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
+    Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal arrstationName As String, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
         Dim rowIndex As Integer = 3 + ((pageIndex - 1) * PAGE_ROWS_COUNT)
         Try
 
-            '列車番号
+            '着駅
             rngHeaderArea = Me.ExcelWorkSheet.Range("B" & rowIndex)
+            rngHeaderArea.Value = arrstationName
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '列車番号
+            rngHeaderArea = Me.ExcelWorkSheet.Range("D" & rowIndex)
             rngHeaderArea.Value = trainNo
             ExcelMemoryRelease(rngHeaderArea)
 
             '積込予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("D" & rowIndex)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("F" & rowIndex)
             rngHeaderArea.Value = lodDate
             ExcelMemoryRelease(rngHeaderArea)
 
             '発予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("F" & rowIndex)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("H" & rowIndex)
             rngHeaderArea.Value = depDate
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -1568,107 +1577,107 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 ExcelMemoryRelease(rngDetailArea)
 
                 '発送順
-                rngDetailArea = Me.ExcelWorkSheet.Range("B" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + rIdx)
                 rngDetailArea.Value = r.row("SHIPORDER")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '車番
-                rngDetailArea = Me.ExcelWorkSheet.Range("C" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + rIdx)
                 rngDetailArea.Value = r.row("TANKNO")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '油種
-                rngDetailArea = Me.ExcelWorkSheet.Range("D" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + rIdx)
                 rngDetailArea.Value = r.row("OILNAME")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '数量
-                rngDetailArea = Me.ExcelWorkSheet.Range("F" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + rIdx)
                 rngDetailArea.Value = r.row("CARSAMOUNT")
                 ExcelMemoryRelease(rngDetailArea)
 
                 'ジョイント
-                rngDetailArea = Me.ExcelWorkSheet.Range("G" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + rIdx)
                 rngDetailArea.Value = r.row("JOINT")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '構内取
-                rngDetailArea = Me.ExcelWorkSheet.Range("H" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + rIdx)
                 rngDetailArea.Value = r.row("SECONDCONSIGNEENAME")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積置
-                rngDetailArea = Me.ExcelWorkSheet.Range("I" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + rIdx)
                 rngDetailArea.Value = r.row("STACKINGFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '先返し
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + rIdx)
                 rngDetailArea.Value = r.row("FIRSTRETURNFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '後返し
-                rngDetailArea = Me.ExcelWorkSheet.Range("K" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + rIdx)
                 rngDetailArea.Value = r.row("AFTERRETURNFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 'OT輸送
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + rIdx)
                 rngDetailArea.Value = r.row("OTTRANSPORTFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '格上げ
-                rngDetailArea = Me.ExcelWorkSheet.Range("M" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("O" + rIdx)
                 rngDetailArea.Value = r.row("UPGRADEFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '格下げ
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("P" + rIdx)
                 rngDetailArea.Value = r.row("DOWNGRADEFLG")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積込日(実)
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + rIdx)
                 rngDetailArea.Value = r.row("ACTUALLODDATE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '発日(実)
-                rngDetailArea = Me.ExcelWorkSheet.Range("P" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("R" + rIdx)
                 rngDetailArea.Value = r.row("ACTUALDEPDATE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積車着日(実)
-                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + rIdx)
                 rngDetailArea.Value = r.row("ACTUALARRDATE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '受入日(実)
-                rngDetailArea = Me.ExcelWorkSheet.Range("R" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("T" + rIdx)
                 rngDetailArea.Value = r.row("ACTUALACCDATE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '空車着日日(実)
-                rngDetailArea = Me.ExcelWorkSheet.Range("S" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("U" + rIdx)
                 rngDetailArea.Value = r.row("ACTUALEMPARRDATE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積込入線列車
-                rngDetailArea = Me.ExcelWorkSheet.Range("T" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("V" + rIdx)
                 rngDetailArea.Value = r.row("LOADINGIRILINETRAINNO")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '積込入線順
-                rngDetailArea = Me.ExcelWorkSheet.Range("U" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("W" + rIdx)
                 rngDetailArea.Value = r.row("LOADINGIRILINEORDER")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '回線
-                rngDetailArea = Me.ExcelWorkSheet.Range("V" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("X" + rIdx)
                 rngDetailArea.Value = r.row("LINE")
                 ExcelMemoryRelease(rngDetailArea)
 
                 '充填ポイント
-                rngDetailArea = Me.ExcelWorkSheet.Range("W" + rIdx)
+                rngDetailArea = Me.ExcelWorkSheet.Range("Y" + rIdx)
                 rngDetailArea.Value = r.row("FILLINGPOINT")
                 ExcelMemoryRelease(rngDetailArea)
 
@@ -1708,142 +1717,142 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
         '共通
         '積込日(実)、発日(実)、積車着日(実)、受入日(実)、空車着日日(実)、積込入線列車、積込入線順
-        funcHiddenColumn("O:S", True)
+        funcHiddenColumn("Q:U", True)
 
         '営業所別
         Select Case officeCode
             Case BaseDllConst.CONST_OFFICECODE_010402
                 '○仙台
                 'ジョイント
-                funcHiddenColumn("G:G", False)
-                '構内取
-                funcHiddenColumn("H:H", True)
-                '積置
                 funcHiddenColumn("I:I", False)
-                '先返し
+                '構内取
                 funcHiddenColumn("J:J", True)
-                '後返し
-                funcHiddenColumn("K:K", True)
-                'OT輸送
+                '積置
+                funcHiddenColumn("K:K", False)
+                '先返し
                 funcHiddenColumn("L:L", True)
+                '後返し
+                funcHiddenColumn("M:M", True)
+                'OT輸送
+                funcHiddenColumn("N:N", True)
                 '積込入線列車
-                funcHiddenColumn("T:T", True)
-                '積込入線順
-                funcHiddenColumn("U:U", True)
-                '回線
                 funcHiddenColumn("V:V", True)
-                '充填ポイント
+                '積込入線順
                 funcHiddenColumn("W:W", True)
+                '回線
+                funcHiddenColumn("X:X", True)
+                '充填ポイント
+                funcHiddenColumn("Y:Y", True)
             Case BaseDllConst.CONST_OFFICECODE_011201
                 '○五井
                 'ジョイント
-                funcHiddenColumn("G:G", True)
-                '構内取
-                funcHiddenColumn("H:H", True)
-                '積置
                 funcHiddenColumn("I:I", True)
-                '先返し
+                '構内取
                 funcHiddenColumn("J:J", True)
-                '後返し
+                '積置
                 funcHiddenColumn("K:K", True)
+                '先返し
+                funcHiddenColumn("L:L", True)
+                '後返し
+                funcHiddenColumn("M:M", True)
                 'OT輸送
-                funcHiddenColumn("L:L", False)
+                funcHiddenColumn("N:N", False)
                 '積込入線列車
-                funcHiddenColumn("T:T", True)
+                funcHiddenColumn("V:V", True)
                 '積込入線順
-                funcHiddenColumn("U:U", True)
+                funcHiddenColumn("W:W", True)
                 '回線
-                funcHiddenColumn("V:V", False)
+                funcHiddenColumn("X:X", False)
                 '充填ポイント
-                funcHiddenColumn("W:W", False)
+                funcHiddenColumn("Y:Y", False)
             Case BaseDllConst.CONST_OFFICECODE_011202
                 '○甲子
                 'ジョイント
-                funcHiddenColumn("G:G", True)
-                '構内取
-                funcHiddenColumn("H:H", True)
-                '積置
                 funcHiddenColumn("I:I", True)
-                '先返し
+                '構内取
                 funcHiddenColumn("J:J", True)
-                '後返し
+                '積置
                 funcHiddenColumn("K:K", True)
-                'OT輸送
+                '先返し
                 funcHiddenColumn("L:L", True)
+                '後返し
+                funcHiddenColumn("M:M", True)
+                'OT輸送
+                funcHiddenColumn("N:N", True)
                 '積込入線列車
-                funcHiddenColumn("T:T", True)
+                funcHiddenColumn("V:V", True)
                 '積込入線順
-                funcHiddenColumn("U:U", True)
+                funcHiddenColumn("W:W", True)
                 '回線
-                funcHiddenColumn("V:V", False)
+                funcHiddenColumn("X:X", False)
                 '充填ポイント
-                funcHiddenColumn("W:W", False)
+                funcHiddenColumn("Y:Y", False)
             Case BaseDllConst.CONST_OFFICECODE_011203
                 '○袖ヶ浦
                 'ジョイント
-                funcHiddenColumn("G:G", True)
-                '構内取
-                funcHiddenColumn("H:H", False)
-                '積置
                 funcHiddenColumn("I:I", True)
-                '先返し
-                funcHiddenColumn("J:J", True)
-                '後返し
+                '構内取
+                funcHiddenColumn("J:J", False)
+                '積置
                 funcHiddenColumn("K:K", True)
-                'OT輸送
+                '先返し
                 funcHiddenColumn("L:L", True)
+                '後返し
+                funcHiddenColumn("M:M", True)
+                'OT輸送
+                funcHiddenColumn("N:N", True)
                 '積込入線列車
-                funcHiddenColumn("T:T", False)
+                funcHiddenColumn("V:V", False)
                 '積込入線順
-                funcHiddenColumn("U:U", False)
+                funcHiddenColumn("W:W", False)
                 '回線
-                funcHiddenColumn("V:V", True)
+                funcHiddenColumn("X:X", True)
                 '充填ポイント
-                funcHiddenColumn("W:W", True)
+                funcHiddenColumn("Y:Y", True)
             Case BaseDllConst.CONST_OFFICECODE_011402
                 '○根岸
                 'ジョイント
-                funcHiddenColumn("G:G", True)
+                funcHiddenColumn("I:I", True)
                 '構内取
-                funcHiddenColumn("H:H", True)
+                funcHiddenColumn("J:J", True)
                 '積置
-                funcHiddenColumn("I:I", False)
-                '先返し
-                funcHiddenColumn("J:J", False)
-                '後返し
                 funcHiddenColumn("K:K", False)
+                '先返し
+                funcHiddenColumn("L:L", False)
+                '後返し
+                funcHiddenColumn("M:M", False)
                 'OT輸送
-                funcHiddenColumn("L:L", True)
+                funcHiddenColumn("N:N", True)
                 '積込入線列車
-                funcHiddenColumn("T:T", True)
-                '積込入線順
-                funcHiddenColumn("U:U", True)
-                '回線
                 funcHiddenColumn("V:V", True)
-                '充填ポイント
+                '積込入線順
                 funcHiddenColumn("W:W", True)
+                '回線
+                funcHiddenColumn("X:X", True)
+                '充填ポイント
+                funcHiddenColumn("Y:Y", True)
             Case Else
                 '○その他
                 'ジョイント
-                funcHiddenColumn("G:G", True)
-                '構内取
-                funcHiddenColumn("H:H", True)
-                '積置
                 funcHiddenColumn("I:I", True)
-                '先返し
+                '構内取
                 funcHiddenColumn("J:J", True)
-                '後返し
+                '積置
                 funcHiddenColumn("K:K", True)
-                'OT輸送
+                '先返し
                 funcHiddenColumn("L:L", True)
+                '後返し
+                funcHiddenColumn("M:M", True)
+                'OT輸送
+                funcHiddenColumn("N:N", True)
                 '積込入線列車
-                funcHiddenColumn("T:T", True)
-                '積込入線順
-                funcHiddenColumn("U:U", True)
-                '回線
                 funcHiddenColumn("V:V", True)
-                '充填ポイント
+                '積込入線順
                 funcHiddenColumn("W:W", True)
+                '回線
+                funcHiddenColumn("X:X", True)
+                '充填ポイント
+                funcHiddenColumn("Y:Y", True)
         End Select
     End Sub
 

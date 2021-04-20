@@ -7693,7 +7693,7 @@ Public Class OIT0003OrderList
                                           ByVal officeCode As String,
                                           ByVal lodDate As String,
                                           ByVal trainNo As String,
-                                          ByVal trainNoCvt As String)
+                                          ByRef trainNoCvt As String)
 
         If IsNothing(OIT0003Reporttbl) Then
             OIT0003Reporttbl = New DataTable

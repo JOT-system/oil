@@ -44,6 +44,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
     '1ページ辺りの明細数
     Private Const TRANSPORT_RESULT_1PAGE_DETAIL_COUNT As Integer = 48
 
+    Private Const TRANSPORT_RESULT_1PAGE_DETAIL_COUNT_011201 As Integer = 53
+
     ''' <summary>
     ''' 雛形ファイルパス
     ''' </summary>
@@ -125,7 +127,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     Me.ExcelWorkSheets(CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf CONST_TEMPNAME_TRANSPORT_RESULT.Equals(excelFileName) OrElse
-                CONST_TEMPNAME_TRANSPORT_RESULT_010402.Equals(excelFileName) Then
+                CONST_TEMPNAME_TRANSPORT_RESULT_010402.Equals(excelFileName) OrElse
+                CONST_TEMPNAME_TRANSPORT_RESULT_011201.Equals(excelFileName) Then
                 '輸送実績表
                 Me.ExcelWorkSheet = DirectCast(
                     Me.ExcelWorkSheets(CONST_REPORTNAME_TRANSPORT_RESULT), Excel.Worksheet)
@@ -1935,7 +1938,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
 #End Region
 
-#Region "ダウンロード(輸送実績表-仙台以外)"
+#Region "ダウンロード(輸送実績表-仙台・五井以外)"
     ''' <summary>
     ''' テンプレートを元に帳票を作成しダウンロード(輸送実績表)URLを生成する
     ''' </summary>
@@ -2099,7 +2102,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
     End Function
 
     ''' <summary>
-    ''' 帳票のヘッダー設定(輸送実績表-仙台以外)
+    ''' 帳票のヘッダー設定(輸送実績表-仙台・五井以外)
     ''' </summary>
     Private Sub EditTansportResult_HeaderArea(ByRef idx As Integer, ByVal row As DataRow, ByVal stYmd As Date, ByVal edYmd As Date)
         Dim rngHeaderArea As Excel.Range = Nothing
@@ -2228,41 +2231,271 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
     End Sub
 
+#End Region
+
+#Region "ダウンロード(輸送実績表-五井)"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(輸送実績表)URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintData_TansportResult_011201(
+        ByVal stYmd As Date,
+        ByVal edYmd As Date
+    ) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+
+        Try
+            Dim eridx As Integer = 1                'EXCEL行INDEX
+            Dim pageDetailCnt As Integer = 0        '1ページ明細数
+            Dim lastOTTRANSPORTFLG As String = ""   '最終OT輸送フラグ
+
+            For idx As Integer = 0 To PrintData.Rows.Count - 1 Step 0
+
+                Dim writeDetailCnt As Integer = 0           '出力明細数                   
+                Dim srcRange As Excel.Range = Nothing
+                Dim destRange As Excel.Range = Nothing
+
+                '出力する明細行数のカウント
+                For ridx As Integer = idx To PrintData.Rows.Count - 1 Step 1
+                    Dim nextrow As DataRow = PrintData.Rows(ridx)
+                    writeDetailCnt += 1
+                    If "9999".Equals(nextrow("OILCODE").ToString()) Then
+                        Exit For
+                    End If
+                Next
+
+                '◎ヘッダー部出力処理
+                If idx = 0 Then
+                    '〇ヘッダー出力(五井)
+                    EditTansportResult_HeaderArea_011201(eridx, PrintData.Rows(idx), stYmd, edYmd)
+                ElseIf Not lastOTTRANSPORTFLG.Equals(PrintData.Rows(idx)("OTTRANSPORTFLG").ToString()) Then
+                    '〇改頁処理(五井)
+                    ChangeTansportResultPage_011201(eridx, pageDetailCnt)
+                    '〇ヘッダー出力(五井)
+                    EditTansportResult_HeaderArea_011201(eridx, PrintData.Rows(idx), stYmd, edYmd)
+                End If
+
+                '◎明細部出力
+                Dim mergeStIdx As Integer = eridx
+                Dim baseTotalFlg As Boolean = False
+                Dim lastBigOilCode As String = ""
+
+                For i As Integer = 0 To writeDetailCnt - 1
+                    '出力行
+                    Dim prow As DataRow = PrintData.Rows(idx + i)
+                    If i = 0 Then
+                        If "9999999".Equals(prow("ARRSTATION").ToString()) Then
+                            baseTotalFlg = True
+                            '〇明細部4テンプレートセルコピー
+                            srcRange = ExcelTempSheet.Cells.Range("K14:BZ14")
+                            destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                            srcRange.Copy(destRange)
+                            ExcelMemoryRelease(srcRange)
+                            ExcelMemoryRelease(destRange)
+                            '〇明細出力
+                            EditTansportResult_DetailArea(eridx, prow, 4)
+                        Else
+                            '〇明細部1テンプレートセルコピー
+                            srcRange = ExcelTempSheet.Cells.Range("K8:BZ8")
+                            destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                            srcRange.Copy(destRange)
+                            ExcelMemoryRelease(srcRange)
+                            ExcelMemoryRelease(destRange)
+                            '〇明細出力
+                            EditTansportResult_DetailArea(eridx, prow)
+                        End If
+                    ElseIf Not "9999".Equals(prow("OILCODE").ToString()) Then
+                        '〇明細部2テンプレートセルコピー
+                        srcRange = ExcelTempSheet.Cells.Range("K10:BZ10")
+                        destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                        srcRange.Copy(destRange)
+                        ExcelMemoryRelease(srcRange)
+                        ExcelMemoryRelease(destRange)
+
+                        '〇罫線
+                        If ("W".Equals(lastBigOilCode) AndAlso
+                            "B".Equals(prow("BIGOILCODE").ToString())) OrElse
+                            "8888".Equals(prow("OILCODE").ToString()) Then
+                            '白油から黒油へ切り替わる場合
+                            '又は出力レコードが「白(黒)油計」の場合は、明細行の上に罫線を引く
+                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BO{0}", eridx))
+                            destRange.Borders(Excel.XlBordersIndex.xlEdgeTop).LineStyle = Excel.XlLineStyle.xlContinuous
+
+                            '出力レコードが「白(黒)油計」の場合
+                            If "8888".Equals(prow("OILCODE").ToString()) Then
+                                '背景色を(255, 255, 153)に設定
+                                destRange.Interior.Color = RGB(255, 255, 153)
+                            End If
+
+                            ExcelMemoryRelease(destRange)
+                        End If
+
+                        '〇明細出力
+                        EditTansportResult_DetailArea(eridx, prow, 2)
+                    Else
+                        '〇明細部3テンプレートセルコピー
+                        srcRange = ExcelTempSheet.Cells.Range("K12:BZ12")
+                        destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
+                        srcRange.Copy(destRange)
+                        ExcelMemoryRelease(srcRange)
+                        ExcelMemoryRelease(destRange)
+
+                        '基地計の「計」の場合、背景色を塗りつぶしなしにする
+                        If "9999999".Equals(prow("ARRSTATION").ToString()) Then
+                            destRange = ExcelWorkSheet.Range(String.Format("V{0}:BO{0}", eridx))
+                            destRange.Interior.ColorIndex = 0
+                            ExcelMemoryRelease(destRange)
+                        End If
+
+                        '〇明細出力
+                        EditTansportResult_DetailArea(eridx, prow, 3)
+                    End If
+                    lastBigOilCode = prow("BIGOILCODE").ToString()
+                Next
+
+                '◎明細部のセル結合
+                If baseTotalFlg Then
+                    '〇基地計の結合
+                    srcRange = ExcelWorkSheet.Range(String.Format("B{0}:U{1}", mergeStIdx, mergeStIdx + writeDetailCnt - 1))
+                    srcRange.MergeCells = True
+                    srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
+                    srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    ExcelMemoryRelease(srcRange)
+                Else
+                    '〇着駅の結合
+                    srcRange = ExcelWorkSheet.Range(String.Format("B{0}:J{1}", mergeStIdx, mergeStIdx + writeDetailCnt - 1))
+                    srcRange.MergeCells = True
+                    srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
+                    srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    ExcelMemoryRelease(srcRange)
+                    '〇荷受人の結合
+                    srcRange = ExcelWorkSheet.Range(String.Format("K{0}:U{1}", mergeStIdx, mergeStIdx + writeDetailCnt - 1))
+                    srcRange.MergeCells = True
+                    srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
+                    srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    ExcelMemoryRelease(srcRange)
+                End If
+
+                '最終OT輸送フラグを保存
+                lastOTTRANSPORTFLG = PrintData.Rows(idx)("OTTRANSPORTFLG").ToString()
+                '読み込み済み行数を加算
+                idx += writeDetailCnt
+                'ページ明細数を加算
+                pageDetailCnt += writeDetailCnt
+            Next
+
+            ExcelTempSheet.Delete() '雛形シート削除
+            ExcelMemoryRelease(ExcelTempSheet)
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(輸送実績表-五井)
+    ''' </summary>
+    Private Sub EditTansportResult_HeaderArea_011201(ByRef idx As Integer, ByVal row As DataRow, ByVal stYmd As Date, ByVal edYmd As Date)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            '行加算
+            idx += 2
+
+            '◯ 出荷場所
+            rngHeaderArea = Me.ExcelWorkSheet.Range("I" + idx.ToString())
+            rngHeaderArea.Value = row("BASENAME")
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '◯ 出力期間
+            rngHeaderArea = Me.ExcelWorkSheet.Range("W" + idx.ToString())
+            rngHeaderArea.Value = String.Format("{0} ～ {1}", stYmd.ToString("yyyy年 MM月 dd日"), edYmd.ToString("yyyy年 MM月 dd日"))
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '行加算
+            idx += 1
+
+            '◯ 荷主
+            rngHeaderArea = Me.ExcelWorkSheet.Range("I" + idx.ToString())
+            rngHeaderArea.Value = row("SHIPPERSNAME")
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '◯ 輸送形態
+            rngHeaderArea = Me.ExcelWorkSheet.Range("W" + idx.ToString())
+            If "0".Equals(row("OTTRANSPORTFLG").ToString()) Then
+                rngHeaderArea.Value = "全輸送計"
+            ElseIf "1".Equals(row("OTTRANSPORTFLG").ToString()) Then
+                rngHeaderArea.Value = "ＯＴ輸送"
+            Else
+                rngHeaderArea.Value = "請負輸送"
+            End If
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '◯ 営業所
+            rngHeaderArea = Me.ExcelWorkSheet.Range("BG" + idx.ToString())
+            rngHeaderArea.Value = row("OFFICENAME")
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '行加算
+            idx += 4
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
     '''' <summary>
-    '''' 輸送実績表(仙台以外)改ページ処理
+    '''' 輸送実績表(五井)改ページ処理
     '''' </summary>
     '''' <param name="eridx">EXCEL行インデックス</param>
-    Private Sub ChangeTansportResultPage(ByRef eridx As Integer, ByRef putDetailCnt As Integer)
+    Private Sub ChangeTansportResultPage_011201(ByRef eridx As Integer, ByRef putDetailCnt As Integer)
 
         Dim srcRange As Excel.Range = Nothing
         Dim destRange As Excel.Range = Nothing
 
         '〇改ページ処理
-        For i As Integer = putDetailCnt To TRANSPORT_RESULT_1PAGE_DETAIL_COUNT - 1
+        For i As Integer = putDetailCnt To TRANSPORT_RESULT_1PAGE_DETAIL_COUNT_011201 - 1
             eridx += 1  '1ページ辺りの明細行数の上限に達するまで行を進める
         Next
         '〇フッター行高さ調整
         srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx, eridx))
-        srcRange.RowHeight = 9.75
+        srcRange.RowHeight = 7.5
         ExcelMemoryRelease(srcRange)
         eridx += 1
         '〇出力済み明細数を初期化する
         putDetailCnt = 0
 
         '〇ヘッダーテンプレートセルコピー
-        srcRange = ExcelTempSheet.Cells.Range("K1:BZ6")
+        srcRange = ExcelTempSheet.Cells.Range("K1:BZ7")
         destRange = ExcelWorkSheet.Range("A" + eridx.ToString())
         srcRange.Copy(destRange)
         ExcelMemoryRelease(srcRange)
         ExcelMemoryRelease(destRange)
         '〇ヘッダー行高さ調整
-        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx, eridx + 2))
+        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx, eridx + 3))
         srcRange.RowHeight = 15
         ExcelMemoryRelease(srcRange)
-        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx + 3, eridx + 3))
+        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx + 4, eridx + 4))
         srcRange.RowHeight = 6
         ExcelMemoryRelease(srcRange)
-        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx + 4, eridx + 5))
+        srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", eridx + 5, eridx + 6))
         srcRange.RowHeight = 15
         ExcelMemoryRelease(srcRange)
     End Sub

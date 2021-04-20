@@ -522,27 +522,27 @@ Public Class OIT0003OTLinkageList
             & "  , OIT0002.LODDATE"
 
         '### 20210331 START 仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
-        ''★積置フラグ有り用SQL
-        'SQLStrAri &=
-        '      SQLStrCmn _
-        '    & "  , OIT0003.ACTUALLODDATE" _
-        '    & " ORDER BY" _
-        '    & "    OFFICECODE" _
-        '    & "  , TRAINNO" _
-        '    & "  , LODDATE"
-        ''◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
-        'SQLStrNashi &=
-        '      " UNION ALL" _
-        '    & SQLStrAri
-        SQLStrNashi &=
-              " ORDER BY" _
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & "  , OIT0003.ACTUALLODDATE" _
+            & " ORDER BY" _
             & "    OFFICECODE" _
             & "  , TRAINNO" _
             & "  , LODDATE"
+        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        SQLStrNashi &=
+              " UNION ALL" _
+            & SQLStrAri
+        'SQLStrNashi &=
+        '      " ORDER BY" _
+        '    & "    OFFICECODE" _
+        '    & "  , TRAINNO" _
+        '    & "  , LODDATE"
         '### 20210331 END   仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
 
         Try
-            Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
+            Dim targetDate As String = Format(Now.AddDays(0), "yyyy/MM/dd")
             Dim today As String = Now.ToString("yyyy/MM/dd")
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
@@ -614,7 +614,8 @@ Public Class OIT0003OTLinkageList
                     End If
                     'OT発送日報出力可否(受注進行ステータス <> 100(受注受付))
                     If Convert.ToString(OIT0003row("DEPDATE")) >= today _
-                        AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                        AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                        AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" Then
                         OIT0003row("CAN_OTSEND_ORST") = "1"
                     Else
                         OIT0003row("CAN_OTSEND_ORST") = "0"

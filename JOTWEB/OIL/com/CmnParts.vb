@@ -152,6 +152,71 @@ Public Class CmnParts
         Next
     End Sub
     ''' <summary>
+    ''' 回送パターン自動設定用データ取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Public Sub GetKaisouTypeInfo(ByVal SQLcon As SqlConnection, ByVal I_OFFICECODE As String, ByRef dt As DataTable)
+
+        If IsNothing(dt) Then
+            dt = New DataTable
+        End If
+
+        If dt.Columns.Count <> 0 Then
+            dt.Columns.Clear()
+        End If
+
+        dt.Clear()
+
+        '○ 取得SQL
+        '     条件指定に従い該当データを変換マスタテーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   OIM0029.KEYCODE01               AS OFFICECODE" _
+            & " , OIM0029.KEYCODE02               AS OFFICENAME" _
+            & " , OIM0029.KEYCODE03               AS OBJECTIVECODE" _
+            & " , OIM0029.KEYCODE04               AS DEFAULTKBN" _
+            & " , OIM0029.KEYCODE05               AS PATCODE" _
+            & " , OIM0029.KEYCODE06               AS PATNAME" _
+            & " , OIM0029.VALUE01                 AS TRAINNO" _
+            & " , OIM0029.VALUE02                 AS TRAINNAME" _
+            & " , OIM0029.VALUE03                 AS DEPSTATION" _
+            & " , OIM0029.VALUE04                 AS DEPSTATIONNAME" _
+            & " , OIM0029.VALUE05                 AS ARRSTATION" _
+            & " , OIM0029.VALUE06                 AS ARRSTATIONNAME" _
+            & " , OIM0029.VALUE07                 AS DEPDAYS" _
+            & " , OIM0029.VALUE08                 AS ARRDAYS" _
+            & " , OIM0029.VALUE09                 AS DEPSTATIONRTNDAYS" _
+            & " , OIM0029.VALUE10                 AS TGHSTATION" _
+            & " , OIM0029.VALUE11                 AS TGHSTATIONNAME" _
+            & " FROM OIL.OIM0029_CONVERT OIM0029 " _
+            & " WHERE OIM0029.CLASS = 'KAISOU_PATTERNMASTER' "
+        '& " AND OIM0029.KEYCODE04 = 'def' "
+
+        '回送営業所コード
+        SQLStr &= String.Format(" AND OIM0029.KEYCODE01 = '{0}' ", I_OFFICECODE)
+
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIM0029.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    dt.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+    ''' <summary>
     ''' 品種出荷期間検索処理
     ''' </summary>
     Public Sub OilTermSearch(ByVal I_OFFICECOE As String, ByVal I_CONSIGNEECODE As String, ByVal I_LODDATE As String, ByRef dtrow As DataRow)

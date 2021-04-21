@@ -35,7 +35,8 @@ Public Class OIT0002LinkList
     Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0002NEWORDERNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
-    Private OIT0003NEWKAISOUNOtbl As DataTable                       '取得用(新規回送No取得用)テーブル
+    Private OIT0002NEWKAISOUNOtbl As DataTable                      '取得用(新規回送No取得用)テーブル
+    Private OIT0002KAISOUPTNtbl As DataTable                        '取得用(回送パターン取得用)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -56,6 +57,7 @@ Public Class OIT0002LinkList
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 貨車連結順序表(浜五井, 甲子, 北袖)
     Private WW_ARRSTATIONCODE() As String = {"434103",
@@ -77,7 +79,7 @@ Public Class OIT0002LinkList
 
     Private WW_KAISOUTYPE_ZENKEN() As String = {"F120140", "F120240", "F120340"}    '全検-他社負担(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_IDOU() As String = {"F120160", "F120260", "F120360"}      '移動-JOT負担発払(五井、甲子、袖ヶ浦)
-    Private WW_KAISOUTYPE_SYURI() As String = {"F120110", "F120210", "F120310"}     '修理-JOT負担発払(五井、甲子、袖ヶ浦)
+    Private WW_KAISOUTYPE_SYURI() As String = {"F120111", "F120211", "F120311"}     '修理-JOT負担発払(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_MC() As String = {"F120120", "F120220", "F120320"}        'ＭＣ-JOT負担発払(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_KOUKEN() As String = {"F120130", "F120230", "F120330"}    '交検-他社負担(五井、甲子、袖ヶ浦)
     Private WW_KAISOUTYPE_RYUCHI() As String = {"F120150", "F120250", "F120350"}    '留置-JOT負担発払(五井、甲子、袖ヶ浦)
@@ -1789,6 +1791,14 @@ Public Class OIT0002LinkList
                 WW_UpdateORDER(SQLcon)
             End Using
 
+            '### 20210420 START 指摘票対応(No416)全体 ##################
+            '★回送パターン取得
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                CMNPTS.GetKaisouTypeInfo(SQLcon, OIT0002EXLUPtbl.Rows(0)("OFFICECODE"), OIT0002KAISOUPTNtbl)
+            End Using
+            '### 20210420 END   指摘票対応(No416)全体 ##################
             '### 20201116 START 指摘票対応(No190)全体 ##################
             '★回送No取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1965,6 +1975,11 @@ Public Class OIT0002LinkList
 
                 '○回送(その他)(移動)
                 Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
+                    '★回送配置換先が未設定の場合
+                    If Convert.ToString(OIT0002ExlUProw("FORWARDINGCONFIGURECODE")) = "" Then
+                        '回送営業所を設定
+                        OIT0002ExlUProw("FORWARDINGCONFIGURECODE") = OIT0002ExlUProw("OFFICECODE")
+                    End If
                     '(タンク車所在TBL)の内容を更新
                     '引数１：タンク車状態　⇒　変更なし
                     '引数２：積車区分　　　⇒　変更なし
@@ -3480,10 +3495,11 @@ Public Class OIT0002LinkList
 
                     '★回送パターン(目的、及び営業所別で設定)
                     'P_KAISOUTYPE.Value = ""                         '回送パターン
+                    Dim kaisouType As String = ""
                     Select Case OIT0002row("OBJECTIVENAME")
                         '○回送(修理)
                         Case WW_OBJECTIVENAME(4)
-                            '★修理-他社負担(F120*10)を設定
+                            '★修理-他社負担(F120*11)を設定
                             Select Case OIT0002row("OFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
@@ -3566,6 +3582,7 @@ Public Class OIT0002LinkList
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(2)
                             End Select
                     End Select
+                    kaisouType = Convert.ToString(P_KAISOUTYPE.Value)
 
                     P_SHIPORDER.Value = ""                          '発送順
                     P_TANKNO.Value = OIT0002row("TRUCKNO")          'タンク車№
@@ -3601,6 +3618,26 @@ Public Class OIT0002LinkList
                     P_UPDUSER.Value = Master.USERID                 '更新ユーザーID
                     P_UPDTERMID.Value = Master.USERTERMID           '更新端末
                     P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    '★自動設定用データを反映
+                    For Each OIT0006GETrow As DataRow In OIT0002KAISOUPTNtbl.Select("PATCODE='" + kaisouType + "' AND DEFAULTKBN='def'")
+                        '着駅コード
+                        If Convert.ToString(OIT0002row("FORWARDINGARRSTATIONCODE")) = "" Then
+                            P_ARRSTATION.Value = OIT0006GETrow("ARRSTATION")
+                            OIT0002row("FORWARDINGARRSTATIONCODE") = OIT0006GETrow("ARRSTATION")
+                        End If
+                        '着駅名
+                        If Convert.ToString(OIT0002row("FORWARDINGARRSTATION")) = "" Then
+                            P_ARRSTATIONNAME.Value = OIT0006GETrow("ARRSTATIONNAME")
+                            OIT0002row("FORWARDINGARRSTATION") = OIT0006GETrow("ARRSTATIONNAME")
+                        End If
+                        '発日（実績）
+                        Try
+                            If Convert.ToString(OIT0002row("LOADINGDEPDATE")) = "" Then P_ARRSTATION.Value = Now.AddDays(Integer.Parse(OIT0006GETrow("DEPDAYS"))).ToString("yyyy/MM/dd")
+                        Catch ex As Exception
+                            P_ACTUALDEPDATE.Value = DBNull.Value
+                        End Try
+                    Next
 
                     SQLcmd.CommandTimeout = 300
                     SQLcmd.ExecuteNonQuery()
@@ -7112,15 +7149,15 @@ Public Class OIT0002LinkList
     ''' <remarks></remarks>
     Protected Sub WW_GetNewKaisouNo(ByVal SQLcon As SqlConnection, ByRef O_ORDERNO As String)
 
-        If IsNothing(OIT0003NEWKAISOUNOtbl) Then
-            OIT0003NEWKAISOUNOtbl = New DataTable
+        If IsNothing(OIT0002NEWKAISOUNOtbl) Then
+            OIT0002NEWKAISOUNOtbl = New DataTable
         End If
 
-        If OIT0003NEWKAISOUNOtbl.Columns.Count <> 0 Then
-            OIT0003NEWKAISOUNOtbl.Columns.Clear()
+        If OIT0002NEWKAISOUNOtbl.Columns.Count <> 0 Then
+            OIT0002NEWKAISOUNOtbl.Columns.Clear()
         End If
 
-        OIT0003NEWKAISOUNOtbl.Clear()
+        OIT0002NEWKAISOUNOtbl.Clear()
 
         '○ 検索SQL
         '     条件指定に従い該当データを受注テーブルから取得する
@@ -7133,14 +7170,14 @@ Public Class OIT0002LinkList
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003NEWKAISOUNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0002NEWKAISOUNOtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0003NEWKAISOUNOtbl.Load(SQLdr)
+                    OIT0002NEWKAISOUNOtbl.Load(SQLdr)
                 End Using
 
-                O_ORDERNO = OIT0003NEWKAISOUNOtbl.Rows(0)("KAISOUNO")
+                O_ORDERNO = OIT0002NEWKAISOUNOtbl.Rows(0)("KAISOUNO")
 
             End Using
         Catch ex As Exception

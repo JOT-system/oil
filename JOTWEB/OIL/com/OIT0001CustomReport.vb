@@ -771,6 +771,17 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 I_rngDetailArea.Value = "3ケ"
                 ExcelMemoryRelease(I_rngDetailArea)
             End If
+            '### 20210421 START 格上げ・格下げ対応(タンク車の右へ表示) ##################################
+            I_rngDetailArea = Me.ExcelWorkSheet.Range("H" + I_column.ToString())
+            If Convert.ToString(PrintDatarow("UPGRADEFLG")) = "1" Then
+                I_rngDetailArea.Value = "※格上げ"
+            ElseIf Convert.ToString(PrintDatarow("UPGRADEFLG")) = "0" Then
+                I_rngDetailArea.Value = "※格下げ"
+            Else
+                I_rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(I_rngDetailArea)
+            '### 20210421 END   格上げ・格下げ対応(タンク車の右へ表示) ##################################
             '◯ 前回油種(OT油種)
             I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
             If Convert.ToString(PrintDatarow("LASTOTOILNAME")) = "軽油3" Then
@@ -819,14 +830,14 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 'I_rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
                 Remark = Convert.ToString(PrintDatarow("KUUKAICONSIGNEENAME"))
             End If
-            '### 20210413 START 格上げ・格下げ追加対応 ##################################################
-            If Convert.ToString(PrintDatarow("UPGRADEFLG")) = "1" Then
-                Remark &= "「格上げ」"
-            ElseIf Convert.ToString(PrintDatarow("UPGRADEFLG")) = "0" Then
-                Remark &= "「格下げ」"
-            End If
-            I_rngDetailArea.Value = Remark
-            '### 20210413 END   格上げ・格下げ追加対応 ##################################################
+            ''### 20210413 START 格上げ・格下げ追加対応 ##################################################
+            'If Convert.ToString(PrintDatarow("UPGRADEFLG")) = "1" Then
+            '    Remark &= "「格上げ」"
+            'ElseIf Convert.ToString(PrintDatarow("UPGRADEFLG")) = "0" Then
+            '    Remark &= "「格下げ」"
+            'End If
+            'I_rngDetailArea.Value = Remark
+            ''### 20210413 END   格上げ・格下げ追加対応 ##################################################
             '### 20201218 END   指摘票対応(No276)全体 ###################################################
             ExcelMemoryRelease(I_rngDetailArea)
             '### 20201008 END   指摘票対応(No157)全体 ###################################################

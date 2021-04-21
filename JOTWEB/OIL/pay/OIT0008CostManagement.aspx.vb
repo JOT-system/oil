@@ -550,7 +550,7 @@ Public Class OIT0008CostManagement
 
             '税金(TAX)
             Dim tax As Decimal = 0
-            addRow("TAX") = Math.Floor(amount * 0.1)
+            addRow("TAX") = Math.Round(amount * 0.1)
 
             '請求先コード(INVOICECODE)
             addRow("INVOICECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
@@ -1676,8 +1676,8 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine("                ELSE ''")
         InsBldr.AppendLine("           END) AS SHIPPERSNAME")
         InsBldr.AppendLine("         , SUM(CARSAMOUNT) AS QUANTITY")
-        InsBldr.AppendLine("         , SUM(FLOOR(AMOUNT)) AS AMOUNT")
-        InsBldr.AppendLine("         , SUM(FLOOR(TAX)) AS TAX")
+        InsBldr.AppendLine("         , SUM(ROUND(AMOUNT, 0)) AS AMOUNT")
+        InsBldr.AppendLine("         , SUM(ROUND(TAX, 0)) AS TAX")
         InsBldr.AppendLine("         , INVOICECODE")
         InsBldr.AppendLine("         , INVOICENAME")
         InsBldr.AppendLine("         , INVOICEDEPTNAME")
@@ -2118,83 +2118,6 @@ Public Class OIT0008CostManagement
                 url = repCbj.CreateExcelPrintData_TransportCostDetail(Date.Parse(WW_KEIJYO_YM + "/01"))
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT TRASPORT_COST_DETAIL")
-                Exit Sub
-            End Try
-            '○ 別画面でExcelを表示
-            WF_PrintURL.Value = url
-            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-        End Using
-
-    End Sub
-
-    ''' <summary>
-    ''' タンク車輸送実績表ダウンロードボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_Button_DLTankTransportResult_Click()
-
-        Dim WK_STYMD As DateTime = New DateTime(Now.Year, Now.Month, 1)
-        Dim WK_EDYMD As DateTime = Now
-
-        If IsNothing(TMP0009tbl) Then
-            TMP0009tbl = New DataTable
-        End If
-
-        If TMP0009tbl.Columns.Count <> 0 Then
-            TMP0009tbl.Columns.Clear()
-        End If
-
-        TMP0009tbl.Clear()
-
-        Try
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                Using SQLcmd As New SqlCommand
-                    SQLcmd.Connection = SQLcon
-                    SQLcmd.CommandType = CommandType.StoredProcedure
-                    SQLcmd.CommandText = "[oil].[GET_TANK_TRANSPORT_RESULT2]"
-                    SQLcmd.Parameters.Clear()
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@STYMD", SqlDbType.Date)             ' 累計開始日
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@EDYMD", SqlDbType.Date)             ' 累計終了日
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
-                    Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
-
-                    PARA1.Value = WK_STYMD
-                    PARA2.Value = WK_EDYMD
-                    PARA3.Value = work.WF_SEL_LAST_OFFICECODE.Text
-                    PARA4.Direction = ParameterDirection.Output
-                    RV.Direction = ParameterDirection.ReturnValue
-
-                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                        TMP0009tbl.Load(SQLdr)
-                    End Using
-
-                End Using
-
-            End Using
-
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC GET_TANK_TRANSPORT_RESULT2")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0008M EXEC GET_TANK_TRANSPORT_RESULT2"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
-
-            Exit Sub
-        End Try
-
-        '帳票出力
-        Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TANK_TRASPORT_RESULT.xlsx", TMP0009tbl)
-            Dim url As String
-            Try
-                url = repCbj.CreateExcelPrintData_TankTansportResult(WK_STYMD, WK_EDYMD, 1)
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT TANK_TRASPORT_RESULT")
                 Exit Sub
             End Try
             '○ 別画面でExcelを表示

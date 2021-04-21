@@ -19741,6 +19741,7 @@ Public Class OIT0003OrderDetail
             & "        AND VIW0006_BASE.JRTRAINNO3 <> ''" _
             & "        AND VIW0006_BASE.LODDATE = VIW0006_JR3.LODDATE" _
             & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR3.DEPDATE" _
+            & "        AND VIW0006_BASE.OFFICECODE = VIW0006_JR3.OFFICECODE" _
             & " ) VIW0006_JR3 " _
             & " GROUP BY " _
             & "   VIW0006_JR3.JRTRAINNO3" _
@@ -19772,6 +19773,7 @@ Public Class OIT0003OrderDetail
             & "        AND VIW0006_BASE.JRTRAINNO2 <> ''" _
             & "        AND VIW0006_BASE.LODDATE = VIW0006_JR2.LODDATE" _
             & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR2.DEPDATE" _
+            & "        AND VIW0006_BASE.OFFICECODE = VIW0006_JR2.OFFICECODE" _
             & " ) VIW0006_JR2 " _
             & " GROUP BY " _
             & "   VIW0006_JR2.JRTRAINNO2" _
@@ -19803,6 +19805,7 @@ Public Class OIT0003OrderDetail
             & "        AND VIW0006_BASE.JRTRAINNO1 <> ''" _
             & "        AND VIW0006_BASE.LODDATE = VIW0006_JR1.LODDATE" _
             & "        AND VIW0006_BASE.DEPDATE = VIW0006_JR1.DEPDATE" _
+            & "        AND VIW0006_BASE.OFFICECODE = VIW0006_JR1.OFFICECODE" _
             & " ) VIW0006_JR1 " _
             & " GROUP BY " _
             & "   VIW0006_JR1.JRTRAINNO1" _

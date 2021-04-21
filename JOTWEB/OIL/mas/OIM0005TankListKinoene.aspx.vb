@@ -65,7 +65,9 @@ Public Class OIM0005TankListKinoene
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonUPDATE"          'DB更新ボタン押下
                             WF_ButtonUPDATE_Click()
-                        Case "WF_ButtonCSV"             'ダウンロードボタン押下
+                        Case "WF_ButtonLIST"            '一覧ダウンロードボタン押下
+                            WF_ButtonDownload_Click()
+                        Case "WF_ButtonCSV"             'CSVダウンロードボタン押下
                             WF_ButtonPrint_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
@@ -943,9 +945,32 @@ Public Class OIM0005TankListKinoene
 
     End Sub
 
+    ''' <summary>
+    ''' 一覧ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDownload_Click()
+
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Dim officeCode As String = BaseDllConst.CONST_OFFICECODE_011202
+        Using repCbj = New OIM0005CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIM0005tbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData(officeCode)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+    End Sub
 
     ''' <summary>
-    ''' ﾀﾞｳﾝﾛｰﾄﾞボタン押下時処理
+    ''' CSVﾀﾞｳﾝﾛｰﾄﾞボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonPrint_Click()

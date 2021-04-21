@@ -29,7 +29,8 @@
                     <div class="rightSide">
                         <!-- ボタン -->
                         <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"   onclick="ButtonClick('WF_ButtonUPDATE');" />
-                        <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                        <input type="button" id="WF_ButtonLIST"   class="btn-sticky" value="一覧ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonLIST');" />
+                        <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="CSVﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                         <input type="button" id="WF_ButtonEND"    class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                         <div                 id="WF_ButtonFIRST"  class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>
                         <div                 id="WF_ButtonLAST"   class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>

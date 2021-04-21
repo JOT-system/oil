@@ -91,41 +91,25 @@ Public Class OIM0002OrgSearch
     Protected Sub WW_MAPValueSet()
 
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU _
-            OrElse Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
+            OrElse Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then  'メニューからの画面遷移
             '〇画面間の情報クリア
             work.Initialize()
 
-            '〇初期変数設定処理
-            'ログインユーザー情報をWRKINCにセット
-
-
-            TxtCampCodeMy.Text = Master.USERCAMP             '会社コード
-            TxtOrgCodeMy.Text = Master.USER_ORG              '組織コード
-
-            work.WF_SEL_CAMPCODE.Text = Master.USERCAMP             '会社コード
-            work.WF_SEL_ORGCODE.Text = Master.USER_ORG              '組織コード
-
             '画面の入力項目にセット
             '会社コード
-            'Master.GetFirstValue(work.WF_SEL_CAMPCODE2.Text, "CAMPCODE2", TxtCampCode.Text)
             TxtCampCode.Text = ""
             '組織コード
-            'Master.GetFirstValue(work.WF_SEL_ORGCODE2.Text, "ORGCODE2", TxtOrgCode.Text)
             TxtOrgCode.Text = ""
             'ステータス選択
             RdBSearch1.Checked = True
             RdBSearch2.Checked = False
 
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0002L Then   '実行画面からの遷移
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0002L Then   '一覧画面からの遷移
             '〇画面項目設定処理
             '会社コード
-            TxtCampCodeMy.Text = work.WF_SEL_CAMPCODE.Text
-            '運用部署
-            TxtOrgCodeMy.Text = work.WF_SEL_ORGCODE.Text
-            '会社コード2
-            TxtCampCode.Text = work.WF_SEL_CAMPCODE2.Text
-            '組織コード2
-            TxtOrgCode.Text = work.WF_SEL_ORGCODE2.Text
+            TxtCampCode.Text = work.WF_SEL_CAMPCODE_S.Text
+            '組織コード
+            TxtOrgCode.Text = work.WF_SEL_ORGCODE_S.Text
             'ステータス選択
             If work.WF_SEL_SELECT.Text = 0 Then
                 RdBSearch1.Checked = True
@@ -161,7 +145,6 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-
     ''' <summary>
     ''' 検索ボタン押下時処理
     ''' </summary>
@@ -170,13 +153,8 @@ Public Class OIM0002OrgSearch
 
         '○ 入力文字置き換え(使用禁止文字排除)
         '会社コード
-        Master.EraseCharToIgnore(TxtCampCodeMy.Text)
-        '運用部署
-        Master.EraseCharToIgnore(TxtOrgCodeMy.Text)
-
-        '会社コード2
         Master.EraseCharToIgnore(TxtCampCode.Text)
-        '組織コード2
+        '組織コード
         Master.EraseCharToIgnore(TxtOrgCode.Text)
 
         '○ チェック処理
@@ -187,9 +165,9 @@ Public Class OIM0002OrgSearch
 
         '○ 条件選択画面の入力値退避
         '会社コード
-        work.WF_SEL_CAMPCODE2.Text = TxtCampCode.Text
+        work.WF_SEL_CAMPCODE_S.Text = TxtCampCode.Text
         '組織コード
-        work.WF_SEL_ORGCODE2.Text = TxtOrgCode.Text
+        work.WF_SEL_ORGCODE_S.Text = TxtOrgCode.Text
 
         '検索条件
         If RdBSearch1.Checked = True Then
@@ -201,13 +179,13 @@ Public Class OIM0002OrgSearch
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
-            Master.VIEWID = rightview.GetViewId(TxtCampCodeMy.Text)
+            Master.VIEWID = rightview.GetViewId(Master.USERCAMP)
         End If
 
         Master.CheckParmissionCode(TxtCampCode.Text)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
             '画面遷移
-            Master.TransitionPage()
+            Master.TransitionPage(Master.USERCAMP)
         End If
 
     End Sub
@@ -226,49 +204,7 @@ Public Class OIM0002OrgSearch
 
         '○ 単項目チェック
         '会社コード
-        Master.CheckField(TxtCampCodeMy.Text, "CAMPCODE", TxtCampCodeMy.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("CAMPCODE", TxtCampCodeMy.Text, txtCampNameMy.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & TxtCampCodeMy.Text)
-                TxtCampCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtCampCodeMy.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '運用部署
-        WW_TEXT = TxtOrgCodeMy.Text
-        Master.CheckField(TxtCampCodeMy.Text, "ORGCODE", TxtOrgCodeMy.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                TxtOrgCodeMy.Text = ""
-            Else
-                '存在チェック
-                CODENAME_get("UORG", TxtOrgCodeMy.Text, txtOrgNameMy.Text, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & TxtOrgCodeMy.Text)
-                    TxtOrgCodeMy.Focus()
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            TxtOrgCodeMy.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '会社コード２
-        Master.CheckField(TxtCampCodeMy.Text, "CAMPCODE2", TxtCampCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(Master.USERCAMP, "CAMPCODE2", TxtCampCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
             CODENAME_get("CAMPCODE", TxtCampCode.Text, txtCampName.Text, WW_RTN_SW)
@@ -285,9 +221,9 @@ Public Class OIM0002OrgSearch
             Exit Sub
         End If
 
-        '組織コード２
+        '組織コード(検索用)
         WW_TEXT = TxtOrgCode.Text
-        Master.CheckField(TxtCampCodeMy.Text, "ORGCODE2", TxtOrgCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(Master.USERCAMP, "ORGCODE2", TxtOrgCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             If WW_TEXT = "" Then
                 TxtOrgCode.Text = ""
@@ -313,7 +249,6 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-
     ''' <summary>
     ''' 終了ボタン押下時処理
     ''' </summary>
@@ -321,10 +256,9 @@ Public Class OIM0002OrgSearch
     Protected Sub WF_ButtonEND_Click()
 
         '○ 前画面遷移
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -365,7 +299,6 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドチェンジ時処理
     ''' </summary>
@@ -396,7 +329,6 @@ Public Class OIM0002OrgSearch
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
@@ -438,7 +370,6 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-
     ''' <summary>
     ''' LeftBoxキャンセルボタン押下時処理
     ''' </summary>
@@ -458,7 +389,6 @@ Public Class OIM0002OrgSearch
         WF_LeftboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' RightBoxダブルクリック時処理
@@ -480,7 +410,6 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-
     ''' <summary>
     ''' ヘルプ表示
     ''' </summary>
@@ -490,7 +419,6 @@ Public Class OIM0002OrgSearch
         Master.ShowHelp()
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -515,22 +443,12 @@ Public Class OIM0002OrgSearch
         End If
 
         Dim prmData As New Hashtable
-        'prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCode.Text
 
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "UORG"             '組織コード
-                    Dim AUTHORITYALL_FLG As String = "0"
-                    If TxtCampCode.Text = "" Then '会社コードが空の場合
-                        AUTHORITYALL_FLG = "1"
-                    Else '会社コードに入力済みの場合
-                        AUTHORITYALL_FLG = "2"
-                    End If
-                    prmData = work.CreateORGParam(TxtCampCodeMy.Text, AUTHORITYALL_FLG)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORGCODE"             '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"
                     If TxtCampCode.Text = "" Then '会社コードが空の場合
@@ -548,7 +466,4 @@ Public Class OIM0002OrgSearch
 
     End Sub
 
-    Protected Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RdBSearch1.CheckedChanged
-
-    End Sub
 End Class

@@ -522,27 +522,27 @@ Public Class OIT0003OTLinkageList
             & "  , OIT0002.LODDATE"
 
         '### 20210331 START 仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
-        ''★積置フラグ有り用SQL
-        'SQLStrAri &=
-        '      SQLStrCmn _
-        '    & "  , OIT0003.ACTUALLODDATE" _
-        '    & " ORDER BY" _
-        '    & "    OFFICECODE" _
-        '    & "  , TRAINNO" _
-        '    & "  , LODDATE"
-        ''◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
-        'SQLStrNashi &=
-        '      " UNION ALL" _
-        '    & SQLStrAri
-        SQLStrNashi &=
-              " ORDER BY" _
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & "  , OIT0003.ACTUALLODDATE" _
+            & " ORDER BY" _
             & "    OFFICECODE" _
             & "  , TRAINNO" _
             & "  , LODDATE"
+        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        SQLStrNashi &=
+              " UNION ALL" _
+            & SQLStrAri
+        'SQLStrNashi &=
+        '      " ORDER BY" _
+        '    & "    OFFICECODE" _
+        '    & "  , TRAINNO" _
+        '    & "  , LODDATE"
         '### 20210331 END   仙台対応(前積日付を意識しないように変更(1つのオーダーで表示)) #####################
 
         Try
-            Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
+            Dim targetDate As String = Format(Now.AddDays(0), "yyyy/MM/dd")
             Dim today As String = Now.ToString("yyyy/MM/dd")
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
@@ -614,7 +614,8 @@ Public Class OIT0003OTLinkageList
                     End If
                     'OT発送日報出力可否(受注進行ステータス <> 100(受注受付))
                     If Convert.ToString(OIT0003row("DEPDATE")) >= today _
-                        AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                        AndAlso Convert.ToString(OIT0003row("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 _
+                        AndAlso Convert.ToString(OIT0003row("DELETEORDER")) <> "1" Then
                         OIT0003row("CAN_OTSEND_ORST") = "1"
                     Else
                         OIT0003row("CAN_OTSEND_ORST") = "0"
@@ -3201,12 +3202,17 @@ Public Class OIT0003OTLinkageList
         'sqlStat.AppendLine("            ELSE '000000'")
         'sqlStat.AppendLine("             END")
         'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
-        sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("     , CASE WHEN TNK.LOAD = 44")
+        'sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
+        'sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
+        'sqlStat.AppendLine("             END")
+        'sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
+        sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER = '143645' THEN '043645'")
+        sqlStat.AppendLine("            WHEN TNK.LOAD = 44")
         sqlStat.AppendLine("                 THEN RIGHT('000000' + STUFF(TNK.TANKNUMBER, 3, 1 ,''),6)")
         sqlStat.AppendLine("            ELSE RIGHT('000000' + ISNULL(TNK.TANKNUMBER,''),6)")
         sqlStat.AppendLine("             END")
         sqlStat.AppendLine("            AS SEQ_TANKNO") 'シーケンス業者コード
-
         sqlStat.AppendLine("     , CASE WHEN TNK.TANKNUMBER IS NULL THEN '0' ELSE '1' END AS SEQ_KAIJI") 'シーケンスファイル回次
         sqlStat.AppendLine("     , '00000' AS SEQ_DEN_NO") 'シーケンス伝票№
         sqlStat.AppendLine("     , '0'     AS SEQ_DEN_MEI_NO") 'シーケンス伝票明細№
@@ -3273,6 +3279,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   And TRA.TSUMI       = CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE 'N' END")
         sqlStat.AppendLine("   AND TRA.DEPSTATION  = ODR.DEPSTATION")
         sqlStat.AppendLine("   AND TRA.ARRSTATION  = ODR.ARRSTATION")
+        sqlStat.AppendLine("   AND TRA.DEFAULTKBN  = 'def'")
         sqlStat.AppendLine("   AND TRA.DELFLG      = @DELFLG")
         '列車マスタ結合ここまで↑
         '積込予約マスタ結合ここから↓

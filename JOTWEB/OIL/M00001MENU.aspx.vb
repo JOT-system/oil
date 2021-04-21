@@ -627,27 +627,37 @@ Public Class M00001MENU
             '輸送実績表
             If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
 
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TRANSPORT_RESULT
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                     tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
-                ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
-                    '営業所が根岸営業所の場合は、根岸テンプレートを使用
-                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_011402
+                ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    '営業所が五井営業所の場合は、五井テンプレートを使用
+                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_011201
                 End If
+
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       '輸送実績表
-                        Me.GetTransportResultData)
+                        dt)                             '出力データテーブル
 
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                         '仙台新港営業所
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_010402(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
-                    ElseIf CONST_OFFICECODE_011402.Equals(ddlTrOfficeNameList.SelectedValue) Then
-                        '根岸営業所
-                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_011402(
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                        '五井営業所
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_011201(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
                     Else
                         'その他
@@ -662,16 +672,26 @@ Public Class M00001MENU
 
             'タンク車輸送実績表
             If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(ddlReportNameList.SelectedItem.Text) Then
+
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT
                 '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                 If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_010402
                 End If
 
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTankTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       'タンク車輸送実績表
-                        Me.GetTankTransportResultData)
+                        dt)                             '出力データテーブル
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         'タンク車運賃実績表-列車別-仙台
@@ -692,16 +712,26 @@ Public Class M00001MENU
 
             'タンク車輸送実績表（着駅別）
             If CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR.Equals(ddlReportNameList.SelectedItem.Text) Then
+
+                'テンプレート名
                 Dim tempName As String = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR
                 '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                 If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                     tempName = CONST_TEMPNAME_TANK_TRANSPORT_RESULT_ARR_010402
                 End If
 
+                '出力データ取得
+                Dim dt As DataTable = Me.GetTankTransportResultData
+                'データ0件時
+                If dt.Rows.Count = 0 Then
+                    Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績")
+                    Exit Sub
+                End If
+
                 Using clsPrint As New OIT0008CustomReport(
                         CONST_MAPID_COST_MANAGEMENT,    '費用管理
                         tempName,                       'タンク車輸送実績表（着駅別）
-                        Me.GetTankTransportResultData)
+                        dt)                             '出力データテーブル
                     '帳票出力＆ファイルパス取得
                     If CONST_OFFICECODE_010402.Equals(ddlTtrOfficeNameList.SelectedValue) Then
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TankTansportResult_Arr_010402(
@@ -747,9 +777,11 @@ Public Class M00001MENU
                 SQLcmd.Connection = SQLcon
                 SQLcmd.CommandType = CommandType.StoredProcedure
 
-                '営業所が仙台の場合は、仙台用のプロシージャを指定
+                '営業所が仙台の場合は仙台用、五井の場合は五井用、それ以外は共通のプロシージャを指定
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT_010402]"
+                ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT_011201]"
                 Else
                     SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT]"
                 End If
@@ -765,8 +797,9 @@ Public Class M00001MENU
                 PARA4.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
 
-                '営業所が仙台以外の場合は、営業所を引数に付与
-                If Not CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                '営業所が仙台、五井以外の場合は、営業所を引数に付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) AndAlso
+                   Not CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
                     PARA3.Value = ddlTrOfficeNameList.SelectedValue
                 End If

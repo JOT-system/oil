@@ -1,5 +1,5 @@
 ﻿''************************************************************
-' 組織マスタメンテ登録画面
+' 組織マスタメンテ一覧画面
 ' 作成日 2020/05/26
 ' 更新日 2021/04/09
 ' 作成者 JOT杉山
@@ -7,13 +7,15 @@
 '
 ' 修正履歴:2020/05/26 新規作成
 '         :2021/04/09 登録・更新画面にて更新メッセージが設定された場合
-'         :           画面下部に更新メッセージを表示するように修正
+'                     画面下部に更新メッセージを表示するように修正
+'         :2021/04/15 検索画面で'01'以外の会社コードを入力した場合に
+'                     登録・更新画面に遷移できなくなるバグを修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' 組織マスタ登録（実行）
+''' 組織マスタメンテ一覧（実行）
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIM0002OrgList
@@ -184,15 +186,9 @@ Public Class OIM0002OrgList
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0002S Then
             'Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
-
-            '######### おためし ##########################
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0002C Then
             Master.RecoverTable(OIM0002tbl, work.WF_SEL_INPTBL.Text)
         End If
-        '20200615杉山テスト的に修正　2に変更
-        '○ 名称設定処理
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE2.Text, work.WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("ORGCODE", work.WF_SEL_ORGCODE2.Text, work.WF_SEL_ORGNAME.Text, WW_DUMMY)                '組織コード
 
     End Sub
 
@@ -223,7 +219,7 @@ Public Class OIM0002OrgList
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
@@ -290,18 +286,13 @@ Public Class OIM0002OrgList
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '会社コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE2.Text) Then
-            SQLStr &= String.Format("    AND OIM0002.CAMPCODE Like '{0}'", work.WF_SEL_CAMPCODE2.Text)
+        If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE_S.Text) Then
+            SQLStr &= String.Format("    AND OIM0002.CAMPCODE Like '{0}'", work.WF_SEL_CAMPCODE_S.Text)
         End If
         '組織コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE2.Text) Then
-            'SQLStr &= String.Format("    AND OIM0002.ORGCODE = '{0}'", work.WF_SEL_ORGCODE.Text)
-            SQLStr &= String.Format("    AND OIM0002.ORGCODE like '{0}'", work.WF_SEL_ORGCODE2.Text)
+        If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE_S.Text) Then
+            SQLStr &= String.Format("    AND OIM0002.ORGCODE like '{0}'", work.WF_SEL_ORGCODE_S.Text)
         End If
-        '検索条件
-        'If Not String.IsNullOrEmpty(work.WF_SEL_SELECT.Text) Then
-        '    SQLStr &= String.Format("    AND OIM0002.DELFLG like '{0}'", work.WF_SEL_SELECT.Text)
-        'End If
 
         SQLStr &=
               " ORDER BY" _
@@ -310,15 +301,8 @@ Public Class OIM0002OrgList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 4)        '会社コード
-                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 3)        '組織コード
-                'Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)
 
-                'PARA1.Value = work.WF_SEL_CAMPCODE.Text + "%"
-                'PARA1.Value = work.WF_SEL_CAMPCODE.Text
-                'PARA2.Value = work.WF_SEL_ORGCODE.Text
-                'PARA3.Value = C_DELETE_FLG.DELETE
                 PARA1.Value = work.WF_SEL_SELECT.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -336,11 +320,8 @@ Public Class OIM0002OrgList
                     i += 1
                     OIM0002row("LINECNT") = i        'LINECNT
 
-                    '発着駅フラグ
-                    'CODENAME_get("DEPARRSTATIONFLG", OIM0002row("DEPARRSTATIONFLG"), OIM0002row("DEPARRSTATIONNAME"), WW_DUMMY)
-                    '会社コード
+                    '会社名
                     CODENAME_get("CAMPCODE", OIM0002row("CAMPCODE"), OIM0002row("CAMPNAME"), WW_DUMMY)
-
                 Next
             End Using
         Catch ex As Exception
@@ -443,31 +424,24 @@ Public Class OIM0002OrgList
     Protected Sub WF_ButtonINSERT_Click()
 
         '選択行
-        'WF_Sel_LINECNT.Text = ""
         work.WF_SEL_LINECNT.Text = ""
 
         '会社コード
-        'TxtCampCode.Text = ""
-        work.WF_SEL_CAMPCODE2.Text = ""
+        work.WF_SEL_CAMPCODE_L.Text = ""
 
         '組織コード
-        'TxtOrgCode.Text = ""
-        work.WF_SEL_ORGCODE2.Text = ""
+        work.WF_SEL_ORGCODE_L.Text = ""
 
         '組織名
-        'TxtCampName.Text = ""
         work.WF_SEL_ORGNAME.Text = ""
 
         '組織名（短）
-        'TxtCampNameKana.Text = ""
         work.WF_SEL_ORGNAMES.Text = ""
 
         '組織名カナ
-        'TxtTypeName.Text = ""
         work.WF_SEL_ORGNAMEKANA.Text = ""
 
         '組織名カナ（短）
-        'TxtTypeNameKana.Text = ""
         work.WF_SEL_ORGNAMEKANAS.Text = ""
 
         '開始年月日
@@ -497,7 +471,7 @@ Public Class OIM0002OrgList
         Master.SaveTable(OIM0002tbl, work.WF_SEL_INPTBL.Text)
 
         '○ 次ページ遷移
-        Master.TransitionPage()
+        Master.TransitionPage(Master.USERCAMP)
 
     End Sub
 
@@ -706,7 +680,7 @@ Public Class OIM0002OrgList
                     If Trim(OIM0002row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                         Trim(OIM0002row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
                         Trim(OIM0002row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
-                        '                        Trim(OIM0002row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING Then
+
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
@@ -849,7 +823,7 @@ Public Class OIM0002OrgList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
 
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 
@@ -910,33 +884,24 @@ Public Class OIM0002OrgList
         End Try
 
         '選択行
-        'WF_Sel_LINECNT.Text = OIM0002tbl.Rows(WW_LINECNT)("LINECNT")
         work.WF_SEL_LINECNT.Text = OIM0002tbl.Rows(WW_LINECNT)("LINECNT")
 
         '会社コード
-        'TxtCampCode.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
-        '2020/06/16杉山修正
-        'work.WF_SEL_CAMPCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
         work.WF_SEL_CAMPCODE_L.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
+
         '組織コード
-        'TxtOrgCode.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
-        'work.WF_SEL_ORGCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
-        '2020/06/16杉山修正
         work.WF_SEL_ORGCODE_L.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
+
         '組織名
-        'TxtCampName.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPNAME")
         work.WF_SEL_ORGNAME.Text = OIM0002tbl.Rows(WW_LINECNT)("NAME")
 
         '組織名（短）
-        'TxtCampNameKana.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPNAMEKANA")
         work.WF_SEL_ORGNAMES.Text = OIM0002tbl.Rows(WW_LINECNT)("NAMES")
 
         '組織名カナ
-        'TxtTypeName.Text = OIM0002tbl.Rows(WW_LINECNT)("TYPENAME")
         work.WF_SEL_ORGNAMEKANA.Text = OIM0002tbl.Rows(WW_LINECNT)("NAMEKANA")
 
         '組織名カナ（短）
-        'TxtTypeNameKana.Text = OIM0002tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
         work.WF_SEL_ORGNAMEKANAS.Text = OIM0002tbl.Rows(WW_LINECNT)("NAMEKANAS")
 
         '開始年月日
@@ -997,7 +962,7 @@ Public Class OIM0002OrgList
         Master.SaveTable(OIM0002tbl, work.WF_SEL_INPTBL.Text)
 
         '登録画面ページへ遷移
-        Master.TransitionPage()
+        Master.TransitionPage(Master.USERCAMP)
 
     End Sub
 
@@ -1085,22 +1050,21 @@ Public Class OIM0002OrgList
                     If XLSTBLrow("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
                         XLSTBLrow("ORGCODE") = OIM0002row("ORGCODE") AndAlso
                         XLSTBLrow("STYMD") = OIM0002row("STYMD") Then
-                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
                         OIM0002INProw.ItemArray = OIM0002row.ItemArray
+
+                        OIM0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
             End If
-            ''○ 項目セット
-            ''会社コード
-            'OIM0002INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
 
-            ''組織コード
-            'OIM0002INProw.Item("ORGCODE") = work.WF_SEL_ORGCODE.Text
-
+            '○ 項目セット
             '会社コード
             If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
                 OIM0002INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
+                '会社名
+                CODENAME_get("CAMPCODE", OIM0002INProw("CAMPCODE"), OIM0002INProw("CAMPNAME"), WW_DUMMY)
             End If
 
             '組織コード
@@ -1210,55 +1174,6 @@ Public Class OIM0002OrgList
 
         '○ 画面表示データ保存
         Master.SaveTable(OIM0002tbl)
-
-        'WF_Sel_LINECNT.Text = ""            'LINECNT
-        'TxtCampCode.Text = ""            '会社コード
-        'TxtOrgCode.Text = ""                 '組織コード
-        'TxtCampName.Text = ""            '会社名称
-        'TxtCampNameKana.Text = ""        '会社名称カナ
-        'TxtTypeName.Text = ""               '会社種別名称
-        'TxtTypeNameKana.Text = ""           '会社種別名称カナ
-        'WF_DELFLG.Text = ""                 '削除
-        'WF_DELFLG_TEXT.Text = ""            '削除名称
-
-    End Sub
-
-
-    ''' <summary>
-    ''' フィールドダブルクリック時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_FIELD_DBClick()
-
-        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
-            Try
-                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
-            Catch ex As Exception
-                Exit Sub
-            End Try
-
-            Dim WW_FIELD As String = ""
-            If WF_FIELD_REP.Value = "" Then
-                WW_FIELD = WF_FIELD.Value
-            Else
-                WW_FIELD = WF_FIELD_REP.Value
-            End If
-
-            With leftview
-                '会社コード
-                Dim prmData As New Hashtable
-
-                'フィールドによってパラメーターを変える
-                Select Case WW_FIELD
-                    Case "WF_DELFLG"
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
-                End Select
-
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
-            End With
-        End If
 
     End Sub
 
@@ -1642,23 +1557,14 @@ Public Class OIM0002OrgList
                 Case "CAMPCODE"         '会社コード
                     prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "UORG"             '運用部署
-                    Dim AUTHORITYALL_FLG As String = "0"
-                    If work.WF_SEL_CAMPCODE.Text = "" Then '会社コードが空の場合
-                        AUTHORITYALL_FLG = "1"
-                    Else '会社コードに入力済みの場合
-                        AUTHORITYALL_FLG = "2"
-                    End If
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, AUTHORITYALL_FLG)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORGCODE"             '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"
-                    If work.WF_SEL_CAMPCODE2.Text = "" Then '会社コードが空の場合
+                    If work.WF_SEL_CAMPCODE_S.Text = "" Then '会社コードが空の場合
                         AUTHORITYALL_FLG = "1"
                     Else '会社コードに入力済みの場合
                         AUTHORITYALL_FLG = "2"
                     End If
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE2.Text, AUTHORITYALL_FLG)
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE_S.Text, AUTHORITYALL_FLG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

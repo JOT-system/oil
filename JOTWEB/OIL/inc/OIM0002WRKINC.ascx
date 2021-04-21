@@ -2,18 +2,19 @@
 
 <!-- Work レイアウト -->
 <div hidden="hidden">
+    <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
+
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>
     <!-- 会社コード -->
-    <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
-    <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>
-    <asp:TextBox ID="WF_SEL_CAMPCODE_L" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_CAMPCODE_S" runat="server"></asp:TextBox>   <!-- 検索画面⇔一覧画面遷移用 -->
+    <asp:TextBox ID="WF_SEL_CAMPCODE_L" runat="server"></asp:TextBox>   <!-- 一覧画面⇔登録画面遷移用 -->
     <!-- 会社名称 -->
     <asp:TextBox ID="WF_SEL_CAMPNAME" runat="server"></asp:TextBox>
     <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_ORGCODE" runat="server"></asp:TextBox>
-    <asp:TextBox ID="WF_SEL_ORGCODE2" runat="server"></asp:TextBox>
-    <asp:TextBox ID="WF_SEL_ORGCODE_L" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_ORGCODE_S" runat="server"></asp:TextBox>    <!-- 検索画面⇔一覧画面遷移用 -->
+    <asp:TextBox ID="WF_SEL_ORGCODE_L" runat="server"></asp:TextBox>    <!-- 一覧画面⇔登録画面遷移用 -->
     <!-- 組織名 -->
     <asp:TextBox ID="WF_SEL_ORGNAME" runat="server"></asp:TextBox>
     <!-- 組織名（短） -->

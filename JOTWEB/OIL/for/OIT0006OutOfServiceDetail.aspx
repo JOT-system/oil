@@ -93,7 +93,7 @@
                 <!-- ■　回送登録営業所　■ -->
                 <span class="left">
                     <a id="WF_OFFICECODE_LABEL" class="requiredMark">回送営業所</a>
-                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtKaisouOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtKaisouOrderOffice');">
+                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtKaisouOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE_KAISOU%>);" onchange="TextBox_change('TxtKaisouOrderOffice');">
                         <asp:TextBox ID="TxtKaisouOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
                         <asp:TextBox ID="TxtKaisouOrderOfficeCode" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                     </a>

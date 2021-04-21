@@ -374,6 +374,12 @@ Public Module Messages
         ''' </summary>
         Public Const NO_CHANGE_UPDATE As String = "12002"
 
+        ''' <summary>
+        ''' 帳票出力でのデータ未存在エラー
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Const NO_REPORT_DATA_EXISTS_ERROR As String = "12003"
+
 #Region "石油向け"
         ''' <summary>
         ''' 削除フラグ未存在
@@ -845,6 +851,14 @@ Public Module Messages
         ''' 受注データ存在
         ''' </summary>
         Public Const OIL_ORDER_FOUND_WAR As String = "20108"
+        ''' <summary>
+        ''' OT発送日報未送信
+        ''' </summary>
+        Public Const OIL_OTFILE_NOTSEND_WAR As String = "20109"
+        ''' <summary>
+        ''' FREEメッセージ
+        ''' </summary>
+        Public Const OIL_FREE_MESSAGE As String = "20110"
 
 
 #End Region

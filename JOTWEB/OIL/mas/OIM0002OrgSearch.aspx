@@ -31,28 +31,6 @@
         <!-- ○ 変動項目 ○ -->
         <div class="inputBox">
             <!-- 会社コード -->
-            <div class="inputItem" style="display:none">
-                <a id="LblCampCodeMy" class="requiredMark">会社コード</a>
-                <a class="ef" id="WF_CAMPCODE_MY" ondblclick="Field_DBclick('WF_CAMPCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE_MY');">
-                    <asp:TextBox ID="TxtCampCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
-                </a>
-                <a id="WF_CAMPNAME_MY">
-                    <asp:Label ID="txtCampNameMy" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </div>
-
-            <!-- 運用部署 -->
-            <div class="inputItem" style="display:none">
-                <a id="LblOrgCodeMy" class="requiredMark">運用部署</a>
-                <a class="ef" id="WF_ORGCODE_MY" style="display:none" ondblclick="Field_DBclick('WF_ORGCODE_MY', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE_MY');">
-                    <asp:TextBox ID="TxtOrgCodeMy" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
-                </a>TxtCampCode
-                <a id="WF_ORGNAME_MY" style="display:none">
-                    <asp:Label ID="txtOrgNameMy" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </div>
-
-            <!-- 会社コード2 -->
             <div class="inputItem">
                 <a id="LblCampCode">会社コード</a><br/>&nbsp;
                     <a class="ef" id="WF_CAMPCODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
@@ -63,7 +41,7 @@
                 </a>
             </div>
 
-            <!-- 組織コード2 -->
+            <!-- 組織コード -->
             <div class="inputItem">
                 <a id="LblOrgCode" >組織コード</a><br/>&nbsp;
                     <a class="ef" id="WF_ORGCODE" ondblclick="Field_DBclick('WF_ORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE');">

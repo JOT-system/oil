@@ -1,4 +1,16 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 油槽所諸元マスタメンテナンス一覧
+' 作成日 2020/11/18
+' 更新日 2021/04/15
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/11/18 新規作成
+'         :2021/04/15 1)項目「荷受人」「荷主」「油種」をコード→名称で表示するように変更
+'         :           2)登録・更新画面にて更新メッセージが設定された場合
+'         :             画面下部に更新メッセージを表示するように修正
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -155,6 +167,12 @@ Public Class OIM0015SyogenList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -206,7 +224,7 @@ Public Class OIM0015SyogenList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -253,10 +271,13 @@ Public Class OIM0015SyogenList
             & " , 0                                                         AS HIDDEN " _
             & " , ISNULL(RTRIM(OIM0015.DELFLG), '')                         AS DELFLG " _
             & " , ISNULL(RTRIM(OIM0015.CONSIGNEECODE), '')                  AS CONSIGNEECODE " _
+            & " , ''                                                        AS CONSIGNEENAME " _
             & " , ISNULL(RTRIM(OIM0015.SHIPPERSCODE), '')                   AS SHIPPERSCODE " _
+            & " , ''                                                        AS SHIPPERSNAME " _
             & " , ISNULL(RTRIM(OIM0015.FROMMD), '')                         AS FROMMD " _
             & " , ISNULL(RTRIM(OIM0015.TOMD), '')                           AS TOMD " _
             & " , ISNULL(RTRIM(OIM0015.OILCODE), '')                        AS OILCODE " _
+            & " , ''                                                        AS OILNAME " _
             & " , ISNULL(RTRIM(OIM0015.TANKCAP), '')                        AS TANKCAP " _
             & " , ISNULL(RTRIM(OIM0015.TARGETCAPRATE), '')                  AS TARGETCAPRATE " _
             & " , ISNULL(RTRIM(OIM0015.DS), '')                             AS DS " _
@@ -317,6 +338,13 @@ Public Class OIM0015SyogenList
                 For Each OIM0015row As DataRow In OIM0015tbl.Rows
                     i += 1
                     OIM0015row("LINECNT") = i        'LINECNT
+                    '〇名称設定
+                    '荷受人
+                    CODENAME_get("CONSIGNEECODE", OIM0015row("CONSIGNEECODE"), OIM0015row("CONSIGNEENAME"), WW_DUMMY)
+                    '荷主
+                    CODENAME_get("SHIPPERSCODE", OIM0015row("SHIPPERSCODE"), OIM0015row("SHIPPERSNAME"), WW_DUMMY)
+                    '油種
+                    CODENAME_get("OILCODE", OIM0015row("OILCODE"), OIM0015row("OILNAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -394,7 +422,7 @@ Public Class OIM0015SyogenList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -447,6 +475,9 @@ Public Class OIM0015SyogenList
 
         '削除
         work.WF_SEL_DELFLG.Text = "0"
+
+        ' 詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -534,9 +565,8 @@ Public Class OIM0015SyogenList
 
     End Sub
 
-
     ''' <summary>
-    ''' 荷受人マスタ登録更新
+    ''' 油槽所諸元マスタ登録更新
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
@@ -751,7 +781,6 @@ Public Class OIM0015SyogenList
 
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -810,7 +839,6 @@ Public Class OIM0015SyogenList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -820,7 +848,6 @@ Public Class OIM0015SyogenList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -854,7 +881,6 @@ Public Class OIM0015SyogenList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -908,6 +934,9 @@ Public Class OIM0015SyogenList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIM0015tbl.Rows(WW_LINECNT)("DELFLG")
+
+        ' 詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○ 状態をクリア
         For Each OIM0015row As DataRow In OIM0015tbl.Rows
@@ -965,7 +994,6 @@ Public Class OIM0015SyogenList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -1041,6 +1069,7 @@ Public Class OIM0015SyogenList
                 WW_COLUMNS.IndexOf("OILCODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
                 For Each OIM0015row As DataRow In OIM0015tbl.Rows
+                    'キー項目が一致する場合
                     If XLSTBLrow("CONSIGNEECODE") = OIM0015row("CONSIGNEECODE") AndAlso
                         XLSTBLrow("SHIPPERSCODE") = OIM0015row("SHIPPERSCODE") AndAlso
                         XLSTBLrow("FROMMD") = OIM0015row("FROMMD") AndAlso
@@ -1050,7 +1079,10 @@ Public Class OIM0015SyogenList
                         XLSTBLrow("TARGETCAPRATE") = OIM0015row("TARGETCAPRATE") AndAlso
                         XLSTBLrow("DS") = OIM0015row("DS") AndAlso
                         XLSTBLrow("DELFLG") = OIM0015row("DELFLG") Then
+                        '変更元情報を入力レコードにコピーする
                         OIM0015INProw.ItemArray = OIM0015row.ItemArray
+                        '更新種別は初期化する
+                        OIM0015INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
@@ -1060,11 +1092,15 @@ Public Class OIM0015SyogenList
             '荷受人コード
             If WW_COLUMNS.IndexOf("CONSIGNEECODE") >= 0 Then
                 OIM0015INProw("CONSIGNEECODE") = XLSTBLrow("CONSIGNEECODE")
+                '荷受人
+                CODENAME_get("CONSIGNEECODE", OIM0015INProw("CONSIGNEECODE"), OIM0015INProw("CONSIGNEENAME"), WW_DUMMY)
             End If
 
             '荷主コード
             If WW_COLUMNS.IndexOf("SHIPPERSCODE") >= 0 Then
                 OIM0015INProw("SHIPPERSCODE") = XLSTBLrow("SHIPPERSCODE")
+                '荷主
+                CODENAME_get("SHIPPERSCODE", OIM0015INProw("SHIPPERSCODE"), OIM0015INProw("SHIPPERSNAME"), WW_DUMMY)
             End If
 
             '開始月日
@@ -1080,6 +1116,8 @@ Public Class OIM0015SyogenList
             '油種コード
             If WW_COLUMNS.IndexOf("OILCODE") >= 0 Then
                 OIM0015INProw("OILCODE") = XLSTBLrow("OILCODE")
+                '油種
+                CODENAME_get("OILCODE", OIM0015INProw("OILCODE"), OIM0015INProw("OILNAME"), WW_DUMMY)
             End If
 
             'タンク容量
@@ -1199,7 +1237,6 @@ Public Class OIM0015SyogenList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1472,10 +1509,13 @@ Public Class OIM0015SyogenList
 
         If Not IsNothing(OIM0015row) Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> 荷受人コード =" & OIM0015row("CONSIGNEECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷受人 =" & OIM0015row("CONSIGNEENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主コード =" & OIM0015row("SHIPPERSCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷主 =" & OIM0015row("SHIPPERSNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 開始月日 =" & OIM0015row("FROMMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 終了月日 =" & OIM0015row("TOMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種コード =" & OIM0015row("OILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種 =" & OIM0015row("OILNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク容量 =" & OIM0015row("TANKCAP") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 目標在庫率 =" & OIM0015row("TARGETCAPRATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> Ｄ／Ｓ =" & OIM0015row("DS") & " , "

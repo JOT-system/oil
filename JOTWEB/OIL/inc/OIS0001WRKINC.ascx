@@ -4,6 +4,7 @@
 <div hidden="hidden">
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>     <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>    <!-- 会社コード2 -->
+    <asp:TextBox ID="WF_SEL_CAMPCODE3" runat="server"></asp:TextBox>    <!-- 会社コード3 -->
     <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>          <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_ORG2" runat="server"></asp:TextBox>         <!-- 組織コード2 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>        <!-- 開始年月日 -->

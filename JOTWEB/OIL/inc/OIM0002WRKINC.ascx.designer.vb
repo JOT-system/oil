@@ -14,15 +14,6 @@ Option Explicit On
 Partial Public Class OIM0002WRKINC
     
     '''<summary>
-    '''WF_SEL_LINECNT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>
@@ -32,14 +23,23 @@ Partial Public Class OIM0002WRKINC
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_CAMPCODE2 コントロール。
+    '''WF_SEL_LINECNT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CAMPCODE2 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_CAMPCODE_S コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CAMPCODE_S As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_CAMPCODE_L コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE_L As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_CAMPNAME コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_ORGCODE コントロール。
     '''</summary>
@@ -66,16 +66,16 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORGCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
-    '''WF_SEL_ORGCODE2 コントロール。
+    '''WF_SEL_ORGCODE_S コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORGCODE2 As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_ORGCODE_S As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_ORGCODE_L コントロール。
     '''</summary>
@@ -156,7 +156,7 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DETAIL_UPDATE_MESSAGE コントロール。
     '''</summary>

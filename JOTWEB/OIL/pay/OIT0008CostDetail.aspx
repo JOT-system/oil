@@ -28,8 +28,8 @@
                     </div>
                     <div class="rightSide">
                     <!-- ボタン -->
-                        <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
-                        <input type="button" id="WF_ButtonPrint"  class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPrint');" />
+<%--                        <input type="button" id="WF_ButtonCSV"    class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />--%>
+<%--                        <input type="button" id="WF_ButtonPrint"  class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPrint');" />--%>
                         <input type="button" id="WF_ButtonEND"    class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     </div>
                 </div> <!-- End class=actionButtonBox -->

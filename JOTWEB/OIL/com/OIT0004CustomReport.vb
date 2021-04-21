@@ -161,6 +161,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Dim rngPageteBase As Excel.Range = Nothing
         Dim rngPasteOffset As Excel.Range = Nothing
         Dim rngValueSet As Excel.Range = Nothing
+        Dim rngLorryValue As Excel.Range = Nothing
         Dim rngFooter As Excel.Range = Nothing
         Dim rngFooterRow As Excel.Range = Nothing
         Dim fntColor As Excel.Font = Nothing
@@ -255,16 +256,18 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngValueSet)
 
                 rngValueSet = DirectCast(rngPasteOffset(3, 5), Excel.Range)
+                rngLorryValue = DirectCast(rngPasteOffset(10, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
                     '軽油
-                    formulaReceve = formulaReceve & " + IF({0}=0," & rngValueSet.Address(False, False) & ",0)"
+                    formulaReceve = formulaReceve & " + IF({0}=0," & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False) & ",0)"
                 ElseIf flag3go AndAlso stkItm.OilInfo.OilCode = "1404" Then
                     '3号
-                    formulaReceve = formulaReceve & " + IF({0}=1," & rngValueSet.Address(False, False) & ",0)"
+                    formulaReceve = formulaReceve & " + IF({0}=1," & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False) & ",0)"
                 Else
-                    formulaReceve = formulaReceve & "+" & rngValueSet.Address(False, False)
+                    formulaReceve = formulaReceve & "+" & rngValueSet.Address(False, False) & " + " & rngLorryValue.Address(False, False)
                 End If
                 ExcelMemoryRelease(rngValueSet)
+                ExcelMemoryRelease(rngLorryValue)
 
                 rngValueSet = DirectCast(rngPasteOffset(4, 5), Excel.Range)
                 If flag3go AndAlso stkItm.OilInfo.OilCode = "1401" Then
@@ -757,7 +760,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
             If flag3go AndAlso Me.PrintData.OilTypeList.ContainsKey("1404") Then
                 Dim oil3GoFrom As String = Me.PrintData.OilTypeList("1404").OrderFromDate
                 Dim oil3GoTo As String = Me.PrintData.OilTypeList("1404").OrderToDate
-                Dim flag3GoArray = (From dayItm In Me.PrintData.StockDate.Values Select If(dayItm.ItemDate.ToString("yyyy/MM/dd") >= oil3GoFrom AndAlso dayItm.ItemDate.ToString("yyyy/MM/dd") <= oil3GoTo, "1", "0"))
+                Dim flag3GoArray = (From dayItm In Me.PrintData.StockDate.Values Select If(dayItm.ItemDate.ToString("yyyy/MM/dd") >= oil3GoFrom AndAlso dayItm.ItemDate.ToString("yyyy/MM/dd") <= oil3GoTo, CInt("1"), CInt("0")))
                 rngDateSet = Me.ExcelWorkSheet.Range(address3GoFlag)
                 Dim rng3GodaySet As Excel.Range = Nothing
                 rng3GodaySet = rngDateSet.Resize(ColumnSize:=Me.PrintData.StockDate.Count)

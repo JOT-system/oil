@@ -13,8 +13,10 @@
     <asp:TextBox ID="WF_SEL_SALESOFFICECODE" runat="server"></asp:TextBox>
     <!-- 営業所名 -->
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
-    <!-- 年月日 -->
+    <!-- 年月日From -->
     <asp:TextBox ID="WF_SEL_DATE" runat="server"></asp:TextBox>
+    <!-- 年月日To -->
+    <asp:TextBox ID="WF_SEL_DATE_TO" runat="server"></asp:TextBox>
     <!-- 発日 -->
     <asp:TextBox ID="WF_SEL_SEARCH_DEPDATE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->
@@ -47,6 +49,12 @@
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
     <!-- 情報(名) -->
     <asp:TextBox ID="WF_SEL_INFORMATIONNM" runat="server"></asp:TextBox>
+    <!-- OT発送日報送信フラグ -->
+    <asp:TextBox ID="WF_SEL_OTSENDSTATUS_FLG" runat="server"></asp:TextBox>
+    <!-- OT発送日報送信状況(コード) -->
+    <asp:TextBox ID="WF_SEL_OTSENDSTATUS" runat="server"></asp:TextBox>
+    <!-- OT発送日報送信状況(名) -->
+    <asp:TextBox ID="WF_SEL_OTSENDSTATUSNM" runat="server"></asp:TextBox>
     <!-- 空回日報可否フラグ -->
     <asp:TextBox ID="WF_SEL_EMPTYTURNFLG" runat="server"></asp:TextBox>
     <!-- 積置可否フラグ -->

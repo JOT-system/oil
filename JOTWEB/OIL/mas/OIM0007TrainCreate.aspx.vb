@@ -1,4 +1,19 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 列車マスタメンテ登録・更新画面
+' 作成日 2020/09/04
+' 更新日 2021/04/15
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/09/04 新規作成
+'         :2021/04/14 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :2021/04/15 新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -53,9 +68,9 @@ Public Class OIM0007TrainCreate
                     Master.RecoverTable(OIM0007tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_UPDATE"                '表更新ボタン押下
+                        Case "WF_UPDATE"                '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
+                        Case "WF_CLEAR"                 '戻るボタン押下
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -71,6 +86,8 @@ Public Class OIM0007TrainCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -122,8 +139,6 @@ Public Class OIM0007TrainCreate
         Master.dispHelp = False
         '○D&D有無設定
         Master.eventDrop = True
-        '○Grid情報保存先のファイル名
-        'Master.CreateXMLSaveFile()
 
         '○初期値設定
         WF_FIELD.Value = ""
@@ -261,190 +276,6 @@ Public Class OIM0007TrainCreate
     End Sub
 
     ''' <summary>
-    ''' 画面表示データ取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <remarks></remarks>
-    Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
-
-        If IsNothing(OIM0007tbl) Then
-            OIM0007tbl = New DataTable
-        End If
-
-        If OIM0007tbl.Columns.Count <> 0 Then
-            OIM0007tbl.Columns.Clear()
-        End If
-
-        OIM0007tbl.Clear()
-
-        '○ 検索SQL
-        '　検索説明
-        '     条件指定に従い該当データを列車マスタから取得する
-        Dim SQLStrBldr As New StringBuilder
-        SQLStrBldr.AppendLine(" SELECT ")
-        SQLStrBldr.AppendLine("       0                                               AS LINECNT ")          ' 行番号
-        SQLStrBldr.AppendLine("     , ''                                              AS OPERATION ")        ' 編集
-        SQLStrBldr.AppendLine("     , CAST(OIM0007.UPDTIMSTP AS bigint)               AS UPDTIMSTP ")        ' タイムスタンプ
-        SQLStrBldr.AppendLine("     , 1                                               AS 'SELECT' ")         ' 選択
-        SQLStrBldr.AppendLine("     , 0                                               AS HIDDEN ")           ' 非表示
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.OFFICECODE), '')           AS OFFICECODE ")       ' 管轄受注営業所
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.TRAINNO), '')              AS TRAINNO ")          ' 本線列車番号
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.TRAINNAME), '')            AS TRAINNAME ")        ' 本線列車番号名
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.TSUMI), '')                AS TSUMI ")            ' 積置フラグ
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.OTTRAINNO), '')            AS OTTRAINNO ")        ' OT列車番号
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.OTFLG), '')                AS OTFLG ")            ' OT発送日報送信フラグ
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.DEPSTATION), '')           AS DEPSTATION ")       ' 発駅コード
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.ARRSTATION), '')           AS ARRSTATION ")       ' 着駅コード
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.JRTRAINNO1), '')           AS JRTRAINNO1 ")       ' JR発列車番号
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.MAXTANK1), '')             AS MAXTANK1 ")         ' JR発列車牽引車数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.JRTRAINNO2), '')           AS JRTRAINNO2 ")       ' JR中継列車番号
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.MAXTANK2), '')             AS MAXTANK2 ")         ' JR中継列車牽引車数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.JRTRAINNO3), '')           AS JRTRAINNO3 ")       ' JR最終列車番号
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.MAXTANK3), '')             AS MAXTANK3 ")         ' JR最終列車牽引車数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.TRAINCLASS), '')           AS TRAINCLASS ")       ' 列車区分
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.SPEEDCLASS), '')           AS SPEEDCLASS ")       ' 高速列車区分
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.SHIPORDERCLASS), '')       AS SHIPORDERCLASS ")   ' 発送順区分
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.DEPDAYS), '')              AS DEPDAYS ")          ' 発日日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.MARGEDAYS), '')            AS MARGEDAYS ")        ' 特継日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.ARRDAYS), '')              AS ARRDAYS ")          ' 積車着日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.ACCDAYS), '')              AS ACCDAYS ")          ' 受入日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.EMPARRDAYS), '')           AS EMPARRDAYS ")       ' 空車着日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.USEDAYS), '')              AS USEDAYS ")          ' 当日利用日数
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.FEEKBN), '')               AS FEEKBN ")           ' 料金マスタ区分
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.RUN), '')                  AS RUN ")              ' 稼働フラグ
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.ZAIKOSORT), '')            AS ZAIKOSORT ")        ' 在庫管理表表示ソート区分
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.BIKOU), '')                AS BIKOU ")            ' 備考
-        SQLStrBldr.AppendLine("     , ISNULL(RTRIM(OIM0007.DELFLG), '')               AS DELFLG ")           ' 削除フラグ
-        SQLStrBldr.AppendLine(" FROM ")
-        SQLStrBldr.AppendLine("     [oil].OIM0007_TRAIN OIM0007 ")
-
-        '○ 条件指定
-        Dim andFlg As Boolean = False
-
-        ' 管轄受注営業所
-        If Not String.IsNullOrEmpty(work.WF_SEL_OFFICECODE2.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.OFFICECODE = @P1 ")
-            andFlg = True
-        End If
-
-        ' 本線列車番号
-        If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNO2.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.TRAINNO = @P2 ")
-            andFlg = True
-        End If
-
-        ' 積置フラグ
-        If Not String.IsNullOrEmpty(work.WF_SEL_TSUMI2.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.TSUMI = @P3 ")
-            andFlg = True
-        End If
-
-        ' OT列車番号
-        If Not String.IsNullOrEmpty(work.WF_SEL_OTTRAINNO.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.OTTRAINNO = @P4 ")
-            andFlg = True
-        End If
-
-        ' 発駅コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_DEPSTATION.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.DEPSTATION = @P5 ")
-            andFlg = True
-        End If
-
-        ' 着駅コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ARRSTATION.Text) Then
-            If andFlg Then
-                SQLStrBldr.AppendLine("     AND ")
-            Else
-                SQLStrBldr.AppendLine(" WHERE ")
-            End If
-            SQLStrBldr.AppendLine("     OIM0007.ARRSTATION = @P6 ")
-            andFlg = True
-        End If
-
-
-        '○ ソート
-        SQLStrBldr.AppendLine(" ORDER BY ")
-        SQLStrBldr.AppendLine("     OIM0007.OFFICECODE ")
-        SQLStrBldr.AppendLine("     , OIM0007.TRAINNO ")
-        SQLStrBldr.AppendLine("     , OIM0007.TSUMI ")
-        SQLStrBldr.AppendLine("     , OIM0007.OTTRAINNO ")
-        SQLStrBldr.AppendLine("     , OIM0007.DEPSTATION ")
-        SQLStrBldr.AppendLine("     , OIM0007.ARRSTATION ")
-
-        Try
-            Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)     ' 管轄受注営業所
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 4)     ' 本線列車番号
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)     ' 積置フラグ
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)     ' OT列車番号
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 7)     ' 発駅コード
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 7)     ' 着駅コード
-
-                PARA1.Value = work.WF_SEL_OFFICECODE2.Text
-                PARA2.Value = work.WF_SEL_TRAINNO2.Text
-                PARA3.Value = work.WF_SEL_TSUMI2.Text
-                PARA4.Value = work.WF_SEL_OTTRAINNO.Text
-                PARA5.Value = work.WF_SEL_DEPSTATION.Text
-                PARA6.Value = work.WF_SEL_ARRSTATION.Text
-
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIM0007tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-
-                    '○ テーブル検索結果をテーブル格納
-                    OIM0007tbl.Load(SQLdr)
-                End Using
-
-                Dim i As Integer = 0
-                For Each OIM0007row As DataRow In OIM0007tbl.Rows
-                    i += 1
-                    OIM0007row("LINECNT") = i        ' LINECNT
-                Next
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0007C")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0007C Select"
-
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
-        End Try
-
-    End Sub
-
-    ''' <summary>
     ''' 一意制約チェック
     ''' </summary>
     ''' <remarks></remarks>
@@ -554,10 +385,347 @@ Public Class OIM0007TrainCreate
     End Sub
 
     ''' <summary>
-    ''' 一覧画面-マウスホイール時処理
+    ''' 列車マスタ登録更新
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub WF_Grid_Scroll()
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" DECLARE @hensuu AS bigint; ")
+        SQLStrBldr.AppendLine("    SET @hensuu = 0; ")
+        SQLStrBldr.AppendLine(" DECLARE hensuu CURSOR FOR ")
+        SQLStrBldr.AppendLine("    SELECT ")
+        SQLStrBldr.AppendLine("        CAST(UPDTIMSTP AS bigint) AS hensuu ")
+        SQLStrBldr.AppendLine("    FROM ")
+        SQLStrBldr.AppendLine("        OIL.OIM0007_TRAIN ")
+        SQLStrBldr.AppendLine("    WHERE ")
+        SQLStrBldr.AppendLine("        OFFICECODE = @P00 ")
+        SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        TRAINNO = @P01 ")
+        SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        TSUMI = @P03 ")
+        SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        OTTRAINNO = @P04 ")
+        SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        DEPSTATION = @P06 ")
+        SQLStrBldr.AppendLine("        AND ")
+        SQLStrBldr.AppendLine("        ARRSTATION = @P07; ")
+        SQLStrBldr.AppendLine(" OPEN hensuu; ")
+        SQLStrBldr.AppendLine(" FETCH NEXT FROM hensuu INTO @hensuu; ")
+        SQLStrBldr.AppendLine(" IF (@@FETCH_STATUS = 0) ")
+        SQLStrBldr.AppendLine("     UPDATE OIL.OIM0007_TRAIN ")
+        SQLStrBldr.AppendLine("     SET ")
+        SQLStrBldr.AppendLine("         TRAINNAME = @P02 ")
+        SQLStrBldr.AppendLine("         , OTFLG = @P05 ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO1 = @P08 ")
+        SQLStrBldr.AppendLine("         , MAXTANK1 = @P09 ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO2 = @P10 ")
+        SQLStrBldr.AppendLine("         , MAXTANK2 = @P11 ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO3 = @P12 ")
+        SQLStrBldr.AppendLine("         , MAXTANK3 = @P13 ")
+        SQLStrBldr.AppendLine("         , TRAINCLASS = @P14 ")
+        SQLStrBldr.AppendLine("         , SPEEDCLASS = @P15 ")
+        SQLStrBldr.AppendLine("         , SHIPORDERCLASS = @P16 ")
+        SQLStrBldr.AppendLine("         , DEPDAYS = @P17 ")
+        SQLStrBldr.AppendLine("         , MARGEDAYS = @P18 ")
+        SQLStrBldr.AppendLine("         , ARRDAYS = @P19 ")
+        SQLStrBldr.AppendLine("         , ACCDAYS = @P20 ")
+        SQLStrBldr.AppendLine("         , EMPARRDAYS = @P21 ")
+        SQLStrBldr.AppendLine("         , USEDAYS = @P22 ")
+        SQLStrBldr.AppendLine("         , FEEKBN = @P23 ")
+        SQLStrBldr.AppendLine("         , RUN = @P24 ")
+        SQLStrBldr.AppendLine("         , ZAIKOSORT = @P25 ")
+        SQLStrBldr.AppendLine("         , BIKOU = @P26 ")
+        SQLStrBldr.AppendLine("         , DELFLG = @P27 ")
+        SQLStrBldr.AppendLine("         , UPDYMD = @P31 ")
+        SQLStrBldr.AppendLine("         , UPDUSER = @P32 ")
+        SQLStrBldr.AppendLine("         , UPDTERMID = @P33 ")
+        SQLStrBldr.AppendLine("         , RECEIVEYMD = @P34 ")
+        SQLStrBldr.AppendLine("     WHERE ")
+        SQLStrBldr.AppendLine("         OFFICECODE = @P00 ")
+        SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         TRAINNO = @P01 ")
+        SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         TSUMI = @P03 ")
+        SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         OTTRAINNO = @P04 ")
+        SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         DEPSTATION = @P06 ")
+        SQLStrBldr.AppendLine("         AND ")
+        SQLStrBldr.AppendLine("         ARRSTATION = @P07; ")
+        SQLStrBldr.AppendLine("  IF (@@FETCH_STATUS <> 0) ")
+        SQLStrBldr.AppendLine("     INSERT INTO OIL.OIM0007_TRAIN( ")
+        SQLStrBldr.AppendLine("         OFFICECODE ")
+        SQLStrBldr.AppendLine("         , TRAINNO ")
+        SQLStrBldr.AppendLine("         , TRAINNAME ")
+        SQLStrBldr.AppendLine("         , TSUMI ")
+        SQLStrBldr.AppendLine("         , OTTRAINNO ")
+        SQLStrBldr.AppendLine("         , OTFLG ")
+        SQLStrBldr.AppendLine("         , DEPSTATION ")
+        SQLStrBldr.AppendLine("         , ARRSTATION ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO1 ")
+        SQLStrBldr.AppendLine("         , MAXTANK1 ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO2 ")
+        SQLStrBldr.AppendLine("         , MAXTANK2 ")
+        SQLStrBldr.AppendLine("         , JRTRAINNO3 ")
+        SQLStrBldr.AppendLine("         , MAXTANK3 ")
+        SQLStrBldr.AppendLine("         , TRAINCLASS ")
+        SQLStrBldr.AppendLine("         , SPEEDCLASS ")
+        SQLStrBldr.AppendLine("         , SHIPORDERCLASS ")
+        SQLStrBldr.AppendLine("         , DEPDAYS ")
+        SQLStrBldr.AppendLine("         , MARGEDAYS ")
+        SQLStrBldr.AppendLine("         , ARRDAYS ")
+        SQLStrBldr.AppendLine("         , ACCDAYS ")
+        SQLStrBldr.AppendLine("         , EMPARRDAYS ")
+        SQLStrBldr.AppendLine("         , USEDAYS ")
+        SQLStrBldr.AppendLine("         , FEEKBN ")
+        SQLStrBldr.AppendLine("         , RUN ")
+        SQLStrBldr.AppendLine("         , ZAIKOSORT ")
+        SQLStrBldr.AppendLine("         , BIKOU ")
+        SQLStrBldr.AppendLine("         , DELFLG ")
+        SQLStrBldr.AppendLine("         , INITYMD ")
+        SQLStrBldr.AppendLine("         , INITUSER ")
+        SQLStrBldr.AppendLine("         , INITTERMID ")
+        SQLStrBldr.AppendLine("         , UPDYMD ")
+        SQLStrBldr.AppendLine("         , UPDUSER ")
+        SQLStrBldr.AppendLine("         , UPDTERMID ")
+        SQLStrBldr.AppendLine("         , RECEIVEYMD) ")
+        SQLStrBldr.AppendLine("     VALUES ")
+        SQLStrBldr.AppendLine("         (@P00 ")
+        SQLStrBldr.AppendLine("         , @P01 ")
+        SQLStrBldr.AppendLine("         , @P02 ")
+        SQLStrBldr.AppendLine("         , @P03 ")
+        SQLStrBldr.AppendLine("         , @P04 ")
+        SQLStrBldr.AppendLine("         , @P05 ")
+        SQLStrBldr.AppendLine("         , @P06 ")
+        SQLStrBldr.AppendLine("         , @P07 ")
+        SQLStrBldr.AppendLine("         , @P08 ")
+        SQLStrBldr.AppendLine("         , @P09 ")
+        SQLStrBldr.AppendLine("         , @P10 ")
+        SQLStrBldr.AppendLine("         , @P11 ")
+        SQLStrBldr.AppendLine("         , @P12 ")
+        SQLStrBldr.AppendLine("         , @P13 ")
+        SQLStrBldr.AppendLine("         , @P14 ")
+        SQLStrBldr.AppendLine("         , @P15 ")
+        SQLStrBldr.AppendLine("         , @P16 ")
+        SQLStrBldr.AppendLine("         , @P17 ")
+        SQLStrBldr.AppendLine("         , @P18 ")
+        SQLStrBldr.AppendLine("         , @P19 ")
+        SQLStrBldr.AppendLine("         , @P20 ")
+        SQLStrBldr.AppendLine("         , @P21 ")
+        SQLStrBldr.AppendLine("         , @P22 ")
+        SQLStrBldr.AppendLine("         , @P23 ")
+        SQLStrBldr.AppendLine("         , @P24 ")
+        SQLStrBldr.AppendLine("         , @P25 ")
+        SQLStrBldr.AppendLine("         , @P26 ")
+        SQLStrBldr.AppendLine("         , @P27 ")
+        SQLStrBldr.AppendLine("         , @P28 ")
+        SQLStrBldr.AppendLine("         , @P29 ")
+        SQLStrBldr.AppendLine("         , @P30 ")
+        SQLStrBldr.AppendLine("         , @P31 ")
+        SQLStrBldr.AppendLine("         , @P32 ")
+        SQLStrBldr.AppendLine("         , @P33 ")
+        SQLStrBldr.AppendLine("         , @P34); ")
+        SQLStrBldr.AppendLine("  CLOSE hensuu; ")
+        SQLStrBldr.AppendLine("  DEALLOCATE hensuu; ")
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnlBldr As New StringBuilder
+        SQLJnlBldr.AppendLine(" SELECT ")
+        SQLJnlBldr.AppendLine("    OFFICECODE ")
+        SQLJnlBldr.AppendLine("    , TRAINNO ")
+        SQLJnlBldr.AppendLine("    , TRAINNAME ")
+        SQLJnlBldr.AppendLine("    , TSUMI ")
+        SQLJnlBldr.AppendLine("    , OTTRAINNO ")
+        SQLJnlBldr.AppendLine("    , OTFLG ")
+        SQLJnlBldr.AppendLine("    , DEPSTATION ")
+        SQLJnlBldr.AppendLine("    , ARRSTATION ")
+        SQLJnlBldr.AppendLine("    , JRTRAINNO1 ")
+        SQLJnlBldr.AppendLine("    , MAXTANK1 ")
+        SQLJnlBldr.AppendLine("    , JRTRAINNO2 ")
+        SQLJnlBldr.AppendLine("    , MAXTANK2 ")
+        SQLJnlBldr.AppendLine("    , JRTRAINNO3 ")
+        SQLJnlBldr.AppendLine("    , MAXTANK3 ")
+        SQLJnlBldr.AppendLine("    , TRAINCLASS ")
+        SQLJnlBldr.AppendLine("    , SPEEDCLASS ")
+        SQLJnlBldr.AppendLine("    , SHIPORDERCLASS ")
+        SQLJnlBldr.AppendLine("    , DEPDAYS ")
+        SQLJnlBldr.AppendLine("    , MARGEDAYS ")
+        SQLJnlBldr.AppendLine("    , ARRDAYS ")
+        SQLJnlBldr.AppendLine("    , ACCDAYS ")
+        SQLJnlBldr.AppendLine("    , EMPARRDAYS ")
+        SQLJnlBldr.AppendLine("    , USEDAYS ")
+        SQLJnlBldr.AppendLine("    , FEEKBN ")
+        SQLJnlBldr.AppendLine("    , RUN ")
+        SQLJnlBldr.AppendLine("    , ZAIKOSORT ")
+        SQLJnlBldr.AppendLine("    , BIKOU ")
+        SQLJnlBldr.AppendLine("    , DELFLG ")
+        SQLJnlBldr.AppendLine("    , INITYMD ")
+        SQLJnlBldr.AppendLine("    , INITUSER ")
+        SQLJnlBldr.AppendLine("    , INITTERMID ")
+        SQLJnlBldr.AppendLine("    , UPDYMD ")
+        SQLJnlBldr.AppendLine("    , UPDUSER ")
+        SQLJnlBldr.AppendLine("    , UPDTERMID ")
+        SQLJnlBldr.AppendLine("    , RECEIVEYMD ")
+        SQLJnlBldr.AppendLine("    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP ")
+        SQLJnlBldr.AppendLine(" FROM ")
+        SQLJnlBldr.AppendLine("    OIL.OIM0007_TRAIN ")
+        SQLJnlBldr.AppendLine(" WHERE ")
+        SQLJnlBldr.AppendLine("        OFFICECODE = @P00 ")
+        SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        TRAINNO = @P01 ")
+        SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        TSUMI = @P03 ")
+        SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        OTTRAINNO = @P04 ")
+        SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        DEPSTATION = @P06 ")
+        SQLJnlBldr.AppendLine("        AND ")
+        SQLJnlBldr.AppendLine("        ARRSTATION = @P07 ")
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon), SQLcmdJnl As New SqlCommand(SQLJnlBldr.ToString(), SQLcon)
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 6)           ' 管轄受注営業所
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 4)           ' 本線列車番号
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)          ' 本線列車番号名
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)           ' 積置フラグ
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)           ' OT列車番号
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)           ' OT発送日報送信フラグ
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 7)           ' 発駅コード
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)           ' 着駅コード
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 4)           ' JR発列車番号
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)                   ' JR発列車牽引車数
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4)           ' JR中継列車番号
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)                   ' JR中継列車牽引車数
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4)           ' JR最終列車番号
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Int)                   ' JR最終列車牽引車数
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 1)           ' 列車区分
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 1)           ' 高速列車区分
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 1)           ' 発送順区分
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.Int)                   ' 発日日数
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.Int)                   ' 特継日数
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.Int)                   ' 積車着日数
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.Int)                   ' 受入日数
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Int)                   ' 空車着日数
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Int)                   ' 当日利用日数
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)           ' 料金マスタ区分
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 1)           ' 稼働フラグ
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)                   ' 在庫管理表表示ソート区分
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 200)         ' 備考
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 1)           ' 削除フラグ
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.DateTime)              ' 登録年月日
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 20)          ' 登録ユーザーＩＤ
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          ' 登録端末
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime)              ' 更新年月日
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)          ' 更新ユーザーＩＤ
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          ' 更新端末
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.DateTime)              ' 集信日時
+
+
+                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 6)       ' 管轄受注営業所
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 4)       ' 本線列車番号
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 1)       ' 積置フラグ
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 4)       ' OT列車番号
+                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 7)       ' 発駅コード
+                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 7)       ' 着駅コード
+
+                Dim OIM0007row As DataRow = OIM0007INPtbl.Rows(0)
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA00.Value = OIM0007row("OFFICECODE")
+                PARA01.Value = OIM0007row("TRAINNO")
+                PARA02.Value = OIM0007row("TRAINNAME")
+                PARA03.Value = OIM0007row("TSUMI")
+                PARA04.Value = OIM0007row("OTTRAINNO")
+                PARA05.Value = OIM0007row("OTFLG")
+                PARA06.Value = OIM0007row("DEPSTATION")
+                PARA07.Value = OIM0007row("ARRSTATION")
+                PARA08.Value = OIM0007row("JRTRAINNO1")
+                PARA09.Value = If(String.IsNullOrEmpty(OIM0007row("MAXTANK1")), SqlTypes.SqlInt32.Null, OIM0007row("MAXTANK1"))
+                PARA10.Value = OIM0007row("JRTRAINNO2")
+                PARA11.Value = If(String.IsNullOrEmpty(OIM0007row("MAXTANK2")), SqlTypes.SqlInt32.Null, OIM0007row("MAXTANK2"))
+                PARA12.Value = OIM0007row("JRTRAINNO3")
+                PARA13.Value = If(String.IsNullOrEmpty(OIM0007row("MAXTANK3")), SqlTypes.SqlInt32.Null, OIM0007row("MAXTANK3"))
+                PARA14.Value = OIM0007row("TRAINCLASS")
+                PARA15.Value = OIM0007row("SPEEDCLASS")
+                PARA16.Value = OIM0007row("SHIPORDERCLASS")
+                PARA17.Value = If(String.IsNullOrEmpty(OIM0007row("DEPDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("DEPDAYS"))
+                PARA18.Value = If(String.IsNullOrEmpty(OIM0007row("MARGEDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("MARGEDAYS"))
+                PARA19.Value = If(String.IsNullOrEmpty(OIM0007row("ARRDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("ARRDAYS"))
+                PARA20.Value = If(String.IsNullOrEmpty(OIM0007row("ACCDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("ACCDAYS"))
+                PARA21.Value = If(String.IsNullOrEmpty(OIM0007row("EMPARRDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("EMPARRDAYS"))
+                PARA22.Value = If(String.IsNullOrEmpty(OIM0007row("USEDAYS")), SqlTypes.SqlInt32.Null, OIM0007row("USEDAYS"))
+                PARA23.Value = OIM0007row("FEEKBN")
+                PARA24.Value = OIM0007row("RUN")
+                PARA25.Value = If(String.IsNullOrEmpty(OIM0007row("ZAIKOSORT")), SqlTypes.SqlInt32.Null, OIM0007row("ZAIKOSORT"))
+                PARA26.Value = OIM0007row("BIKOU")
+                PARA27.Value = OIM0007row("DELFLG")
+                PARA28.Value = WW_DATENOW
+                PARA29.Value = Master.USERID
+                PARA30.Value = Master.USERTERMID
+                PARA31.Value = WW_DATENOW
+                PARA32.Value = Master.USERID
+                PARA33.Value = Master.USERTERMID
+                PARA34.Value = C_DEFAULT_YMD
+
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIM0007row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                ' 更新ジャーナル出力
+                JPARA00.Value = OIM0007row("OFFICECODE")
+                JPARA01.Value = OIM0007row("TRAINNO")
+                JPARA03.Value = OIM0007row("TSUMI")
+                JPARA04.Value = OIM0007row("OTTRAINNO")
+                JPARA06.Value = OIM0007row("DEPSTATION")
+                JPARA07.Value = OIM0007row("ARRSTATION")
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0007UPDtbl) Then
+                        OIM0007UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0007UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0007UPDtbl.Clear()
+                    OIM0007UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0007UPDrow As DataRow In OIM0007UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0007L"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIM0007UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     ' SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         ' ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0007L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0007L UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -586,6 +754,11 @@ Public Class OIM0007TrainCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0007tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
@@ -714,12 +887,78 @@ Public Class OIM0007TrainCreate
 
     End Sub
 
-
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0007INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIM0007INProw As DataRow = OIM0007INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIM0007row As DataRow In OIM0007tbl.Rows
+            ' KEY項目が等しい時
+            If OIM0007row("OFFICECODE") = OIM0007INProw("OFFICECODE") AndAlso
+                OIM0007row("TRAINNO") = OIM0007INProw("TRAINNO") AndAlso
+                OIM0007row("TSUMI") = OIM0007INProw("TSUMI") AndAlso
+                OIM0007row("OTTRAINNO") = OIM0007INProw("OTTRAINNO") AndAlso
+                OIM0007row("DEPSTATION") = OIM0007INProw("DEPSTATION") AndAlso
+                OIM0007row("ARRSTATION") = OIM0007INProw("ARRSTATION") Then
+                ' KEY項目以外の項目に変更があるかチェック
+                If OIM0007row("TRAINNAME") = OIM0007INProw("TRAINNAME") AndAlso
+                    OIM0007row("OTFLG") = OIM0007INProw("OTFLG") AndAlso
+                    OIM0007row("JRTRAINNO1") = OIM0007INProw("JRTRAINNO1") AndAlso
+                    OIM0007row("MAXTANK1") = OIM0007INProw("MAXTANK1") AndAlso
+                    OIM0007row("JRTRAINNO2") = OIM0007INProw("JRTRAINNO2") AndAlso
+                    OIM0007row("MAXTANK2") = OIM0007INProw("MAXTANK2") AndAlso
+                    OIM0007row("JRTRAINNO3") = OIM0007INProw("JRTRAINNO3") AndAlso
+                    OIM0007row("MAXTANK3") = OIM0007INProw("MAXTANK3") AndAlso
+                    OIM0007row("TRAINCLASS") = OIM0007INProw("TRAINCLASS") AndAlso
+                    OIM0007row("SPEEDCLASS") = OIM0007INProw("SPEEDCLASS") AndAlso
+                    OIM0007row("SHIPORDERCLASS") = OIM0007INProw("SHIPORDERCLASS") AndAlso
+                    OIM0007row("DEPDAYS") = OIM0007INProw("DEPDAYS") AndAlso
+                    OIM0007row("MARGEDAYS") = OIM0007INProw("MARGEDAYS") AndAlso
+                    OIM0007row("ARRDAYS") = OIM0007INProw("ARRDAYS") AndAlso
+                    OIM0007row("ACCDAYS") = OIM0007INProw("ACCDAYS") AndAlso
+                    OIM0007row("EMPARRDAYS") = OIM0007INProw("EMPARRDAYS") AndAlso
+                    OIM0007row("USEDAYS") = OIM0007INProw("USEDAYS") AndAlso
+                    OIM0007row("FEEKBN") = OIM0007INProw("FEEKBN") AndAlso
+                    OIM0007row("RUN") = OIM0007INProw("RUN") AndAlso
+                    OIM0007row("ZAIKOSORT") = OIM0007INProw("ZAIKOSORT") AndAlso
+                    OIM0007row("BIKOU") = OIM0007INProw("BIKOU") AndAlso
+                    OIM0007row("DELFLG") = OIM0007INProw("DELFLG") Then
+                    ' 変更がないときは、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面-クリアボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -802,7 +1041,6 @@ Public Class OIM0007TrainCreate
         WF_DELFLG.Text = ""                 ' 削除フラグ
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -951,7 +1189,6 @@ Public Class OIM0007TrainCreate
 
     End Sub
 
-
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
     ' ******************************************************************************
@@ -1097,7 +1334,6 @@ Public Class OIM0007TrainCreate
 
     End Sub
 
-
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
     ''' </summary>
@@ -1126,7 +1362,6 @@ Public Class OIM0007TrainCreate
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1724,7 +1959,6 @@ Public Class OIM0007TrainCreate
 
     End Sub
 
-
     ''' <summary>
     ''' OIM0007tbl更新
     ''' </summary>
@@ -1788,7 +2022,8 @@ Public Class OIM0007TrainCreate
                         OIM0007row("RUN") = OIM0007INProw("RUN") AndAlso
                         OIM0007row("ZAIKOSORT") = OIM0007INProw("ZAIKOSORT") AndAlso
                         OIM0007row("BIKOU") = OIM0007INProw("BIKOU") AndAlso
-                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") Then
+                        OIM0007row("DELFLG") = OIM0007INProw("DELFLG") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0007row("OPERATION")) Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
@@ -1802,23 +2037,158 @@ Public Class OIM0007TrainCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIM0007INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIM0007INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIM0007INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIM0007INProw As DataRow In OIM0007INPtbl.Rows
-            Select Case OIM0007INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0007INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0007INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0007INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0007INProw)
-            End Select
+            '発見フラグ
+            Dim isFound As Boolean = False
+
+            For Each OIM0007row As DataRow In OIM0007tbl.Rows
+
+                '同一レコードか判定
+                If OIM0007INProw("OFFICECODE") = OIM0007row("OFFICECODE") AndAlso
+                    OIM0007INProw("TRAINNO") = OIM0007row("TRAINNO") AndAlso
+                    OIM0007INProw("TSUMI") = OIM0007row("TSUMI") AndAlso
+                    OIM0007INProw("OTTRAINNO") = OIM0007row("OTTRAINNO") AndAlso
+                    OIM0007INProw("DEPSTATION") = OIM0007row("DEPSTATION") AndAlso
+                    OIM0007INProw("ARRSTATION") = OIM0007row("ARRSTATION") Then
+                    '画面入力テーブル項目設定
+                    OIM0007INProw("LINECNT") = OIM0007row("LINECNT")
+                    OIM0007INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIM0007INProw("UPDTIMSTP") = OIM0007row("UPDTIMSTP")
+                    OIM0007INProw("SELECT") = 0
+                    OIM0007INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIM0007row.ItemArray = OIM0007INProw.ItemArray
+
+                    '〇名称設定
+                    '管轄営業所(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("OFFICECODE")) Then
+                        CODENAME_get("OFFICECODE", OIM0007row("OFFICECODE"), OIM0007row("OFFICENAME"), WW_DUMMY)
+                    End If
+                    '積置フラグ(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("TSUMI")) Then
+                        CODENAME_get("TSUMI", OIM0007row("TSUMI"), OIM0007row("TSUMINAME"), WW_DUMMY)
+                    End If
+                    'OT発送日報送信フラグ(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("OTFLG")) Then
+                        CODENAME_get("OTFLG", OIM0007row("OTFLG"), OIM0007row("OTFLGNAME"), WW_DUMMY)
+                    End If
+                    '発駅(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("DEPSTATION")) Then
+                        CODENAME_get("STATION", OIM0007row("DEPSTATION"), OIM0007row("DEPSTATIONNAME"), WW_DUMMY)
+                    End If
+                    '着駅(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("ARRSTATION")) Then
+                        CODENAME_get("STATION", OIM0007row("ARRSTATION"), OIM0007row("ARRSTATIONNAME"), WW_DUMMY)
+                    End If
+                    '列車区分(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("TRAINCLASS")) Then
+                        CODENAME_get("TRAINCLASS", OIM0007row("TRAINCLASS"), OIM0007row("TRAINCLASSNAME"), WW_DUMMY)
+                    End If
+                    '高速列車区分(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("SPEEDCLASS")) Then
+                        CODENAME_get("SPEEDCLASS", OIM0007row("SPEEDCLASS"), OIM0007row("SPEEDCLASSNAME"), WW_DUMMY)
+                    End If
+                    '発送順区分(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("SHIPORDERCLASS")) Then
+                        CODENAME_get("SHIPORDERCLASS", OIM0007row("SHIPORDERCLASS"), OIM0007row("SHIPORDERCLASSNAME"), WW_DUMMY)
+                    End If
+                    '当日利用日数(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("USEDAYS")) Then
+                        CODENAME_get("USEDAYS", OIM0007row("USEDAYS"), OIM0007row("USEDAYSNAME"), WW_DUMMY)
+                    End If
+                    '稼働フラグ(名)
+                    If Not String.IsNullOrEmpty(OIM0007row("RUN")) Then
+                        CODENAME_get("RUN", OIM0007row("RUN"), OIM0007row("RUNNAME"), WW_DUMMY)
+                    End If
+
+                    '発見フラグON
+                    isFound = True
+                    Exit For
+                End If
+            Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIM0007tbl.NewRow
+                nrow.ItemArray = OIM0007INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIM0007tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("UPDTIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                '〇名称設定
+                '管轄営業所(名)
+                If Not String.IsNullOrEmpty(nrow("OFFICECODE")) Then
+                    CODENAME_get("OFFICECODE", nrow("OFFICECODE"), nrow("OFFICENAME"), WW_DUMMY)
+                End If
+                '積置フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("TSUMI")) Then
+                    CODENAME_get("TSUMI", nrow("TSUMI"), nrow("TSUMINAME"), WW_DUMMY)
+                End If
+                'OT発送日報送信フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("OTFLG")) Then
+                    CODENAME_get("OTFLG", nrow("OTFLG"), nrow("OTFLGNAME"), WW_DUMMY)
+                End If
+                '発駅(名)
+                If Not String.IsNullOrEmpty(nrow("DEPSTATION")) Then
+                    CODENAME_get("STATION", nrow("DEPSTATION"), nrow("DEPSTATIONNAME"), WW_DUMMY)
+                End If
+                '着駅(名)
+                If Not String.IsNullOrEmpty(nrow("ARRSTATION")) Then
+                    CODENAME_get("STATION", nrow("ARRSTATION"), nrow("ARRSTATIONNAME"), WW_DUMMY)
+                End If
+                '列車区分(名)
+                If Not String.IsNullOrEmpty(nrow("TRAINCLASS")) Then
+                    CODENAME_get("TRAINCLASS", nrow("TRAINCLASS"), nrow("TRAINCLASSNAME"), WW_DUMMY)
+                End If
+                '高速列車区分(名)
+                If Not String.IsNullOrEmpty(nrow("SPEEDCLASS")) Then
+                    CODENAME_get("SPEEDCLASS", nrow("SPEEDCLASS"), nrow("SPEEDCLASSNAME"), WW_DUMMY)
+                End If
+                '発送順区分(名)
+                If Not String.IsNullOrEmpty(nrow("SHIPORDERCLASS")) Then
+                    CODENAME_get("SHIPORDERCLASS", nrow("SHIPORDERCLASS"), nrow("SHIPORDERCLASSNAME"), WW_DUMMY)
+                End If
+                '当日利用日数(名)
+                If Not String.IsNullOrEmpty(nrow("USEDAYS")) Then
+                    CODENAME_get("USEDAYS", nrow("USEDAYS"), nrow("USEDAYSNAME"), WW_DUMMY)
+                End If
+                '稼働フラグ(名)
+                If Not String.IsNullOrEmpty(nrow("RUN")) Then
+                    CODENAME_get("RUN", nrow("RUN"), nrow("RUNNAME"), WW_DUMMY)
+                End If
+
+                OIM0007tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -1876,7 +2246,6 @@ Public Class OIM0007TrainCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -1907,6 +2276,7 @@ Public Class OIM0007TrainCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得

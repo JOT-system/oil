@@ -374,6 +374,24 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents hdnSuggestDateAddRemoveKey As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''hdnThisScrollLeft コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnThisScrollLeft As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnThisScrollTop コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnThisScrollTop As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''hdnPopUpType コントロール。
     '''</summary>
     '''<remarks>

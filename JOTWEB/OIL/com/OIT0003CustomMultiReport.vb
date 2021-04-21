@@ -1339,7 +1339,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
     End Sub
 
-    Public Function CreatePrintData(Optional ByVal arrStationName As String = Nothing, Optional ByVal trainNo As String = Nothing, Optional ByVal lodDate As String = Nothing, Optional ByVal depDate As String = Nothing) As String
+    Public Function CreatePrintData(Optional ByVal trainNo As String = Nothing, Optional ByVal lodDate As String = Nothing, Optional ByVal depDate As String = Nothing) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
@@ -1350,7 +1350,8 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 GroupBy(Function(r) New With {
                     Key .officeCode = r("OFFICECODE").ToString(),
                     Key .orderNo = r("ORDERNO").ToString(),
-                    Key .arrStationName = r("ARRSTATIONNAME").ToString(),
+                    Key .arrstation = r("ARRSTATION").ToString(),
+                    Key .arrstationName = r("ARRSTATIONNAME").ToString(),
                     Key .trainNo = r("TRAINNO").ToString(),
                     Key .lodDate = r("LODDATE").ToString(),
                     Key .depDate = r("DEPDATE").ToString()
@@ -1358,7 +1359,8 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 Select(Function(g) New With {
                     g.Key.officeCode,
                     g.Key.orderNo,
-                    g.Key.arrStationName,
+                    g.Key.arrstation,
+                    g.Key.arrstationName,
                     g.Key.trainNo,
                     g.Key.lodDate,
                     g.Key.depDate,
@@ -1408,7 +1410,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                         End If
 
                         '◯ヘッダーの設定
-                        EditHeaderArea(pageIndex, query.Item(queryIndex).arrStationName, query.Item(queryIndex).trainNo, query.Item(queryIndex).lodDate, query.Item(queryIndex).depDate)
+                        EditHeaderArea(pageIndex, query.Item(queryIndex).arrstationName, query.Item(queryIndex).trainNo, query.Item(queryIndex).lodDate, query.Item(queryIndex).depDate)
 
                         '◯明細の設定
                         EditDetailArea(pageIndex, query.Item(queryIndex).rows, query.Item(queryIndex).officeCode)
@@ -1428,7 +1430,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 End If
 
                 '◯ヘッダーの設定
-                EditHeaderArea(1, arrStationName, trainNo, lodDate, depDate)
+                EditHeaderArea(1, "", trainNo, lodDate, depDate)
             End If
 
             '○出力シートのみ残す
@@ -1466,7 +1468,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
     ''' <summary>
     ''' ヘッダー部の設定
     ''' </summary>
-    Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal arrStationName As String, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
+    Private Sub EditHeaderArea(ByVal pageIndex As Integer, ByVal arrstationName As String, ByVal trainNo As String, ByVal lodDate As String, ByVal depDate As String)
 
         Dim rngHeaderArea As Excel.Range = Nothing
         Dim rowIndex As Integer = 3 + ((pageIndex - 1) * PAGE_ROWS_COUNT)
@@ -1474,21 +1476,21 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
             '着駅
             rngHeaderArea = Me.ExcelWorkSheet.Range("B" & rowIndex)
-            rngHeaderArea.Value = arrStationName
+            rngHeaderArea.Value = arrstationName
             ExcelMemoryRelease(rngHeaderArea)
 
             '列車番号
-            rngHeaderArea = Me.ExcelWorkSheet.Range("E" & rowIndex)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("D" & rowIndex)
             rngHeaderArea.Value = trainNo
             ExcelMemoryRelease(rngHeaderArea)
 
             '積込予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("G" & rowIndex)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("F" & rowIndex)
             rngHeaderArea.Value = lodDate
             ExcelMemoryRelease(rngHeaderArea)
 
             '発予定日
-            rngHeaderArea = Me.ExcelWorkSheet.Range("I" & rowIndex)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("H" & rowIndex)
             rngHeaderArea.Value = depDate
             ExcelMemoryRelease(rngHeaderArea)
 
@@ -1679,16 +1681,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 rngDetailArea.Value = r.row("FILLINGPOINT")
                 ExcelMemoryRelease(rngDetailArea)
 
-                '出線列車
-                rngDetailArea = Me.ExcelWorkSheet.Range("Z" + rIdx)
-                rngDetailArea.Value = ""
-                ExcelMemoryRelease(rngDetailArea)
-
-                '出線順
-                rngDetailArea = Me.ExcelWorkSheet.Range("AA" + rIdx)
-                rngDetailArea.Value = ""
-                ExcelMemoryRelease(rngDetailArea)
-
             Next
         Catch ex As Exception
             Throw
@@ -1725,7 +1717,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
         '共通
         '積込日(実)、発日(実)、積車着日(実)、受入日(実)、空車着日日(実)、積込入線列車、積込入線順
-        funcHiddenColumn("Q:W", True)
+        funcHiddenColumn("Q:U", True)
 
         '営業所別
         Select Case officeCode
@@ -1751,10 +1743,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", True)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", True)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
             Case BaseDllConst.CONST_OFFICECODE_011201
                 '○五井
                 'ジョイント
@@ -1777,10 +1765,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", False)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", False)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
             Case BaseDllConst.CONST_OFFICECODE_011202
                 '○甲子
                 'ジョイント
@@ -1803,10 +1787,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", False)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", False)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
             Case BaseDllConst.CONST_OFFICECODE_011203
                 '○袖ヶ浦
                 'ジョイント
@@ -1829,10 +1809,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", True)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", True)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
             Case BaseDllConst.CONST_OFFICECODE_011402
                 '○根岸
                 'ジョイント
@@ -1855,10 +1831,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", True)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", True)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
             Case Else
                 '○その他
                 'ジョイント
@@ -1881,10 +1853,6 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 funcHiddenColumn("X:X", True)
                 '充填ポイント
                 funcHiddenColumn("Y:Y", True)
-                '出線列車
-                funcHiddenColumn("Z:Z", True)
-                '出線順
-                funcHiddenColumn("AA:AA", True)
         End Select
     End Sub
 

@@ -24,8 +24,8 @@
                     <div class="leftSide">
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="表更新" onclick="ButtonClick('WF_UPDATE');" />
-                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="クリア" onclick="ButtonClick('WF_CLEAR');" />
+                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="更新" onclick="ButtonClick('WF_UPDATE');" />
+                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="戻る" onclick="ButtonClick('WF_CLEAR');" />
                     </div>
                 </div>
             </div>

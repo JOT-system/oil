@@ -2740,15 +2740,15 @@ Public Class OIT0006OutOfServiceDetail
                 '返送日が現時点で未設定の場合(未来日設定としてカウントする。)
                 iFutureCnt += 1
             End If
-            '目的(移動)の回送パターンがすべて着日が設定済みの場合
-            If OIT0006tbl.Select("OBJECTIVECODE='25' AND ISNULL(ACTUALARRDATE,'')=''").Count = 0 Then
-                '★着日が未来日日付かチェック
-                For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
-                    If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
-                        iFutureCnt += 1
-                    End If
-                Next
-            End If
+            ''目的(移動)の回送パターンがすべて着日が設定済みの場合
+            'If OIT0006tbl.Select("OBJECTIVECODE='25' AND ISNULL(ACTUALARRDATE,'')=''").Count = 0 Then
+            '    '★着日が未来日日付かチェック
+            '    For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
+            '        If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+            '            iFutureCnt += 1
+            '        End If
+            '    Next
+            'End If
 
             '★未来日日付で存在しない場合
             If iFutureCnt = 0 Then
@@ -6604,7 +6604,7 @@ Public Class OIT0006OutOfServiceDetail
                 & "    ,   UPDTERMID       = @UPDTERMID " _
                 & "    ,   RECEIVEYMD      = @RECEIVEYMD  " _
                 & "  WHERE TANKNUMBER      = @TANKNUMBER  " _
-                & "    AND (ISNULL(USEORDERNO,'')     = '' OR USEORDERNO = @USEORDERNO) " _
+                & String.Format("    AND (ISNULL(USEORDERNO,'')     = '' OR USEORDERNO = '{0}') ", Me.TxtKaisouOrderNo.Text) _
                 & "    AND DELFLG         <> @DELFLG; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -6726,87 +6726,87 @@ Public Class OIT0006OutOfServiceDetail
 
                             '★★ポップアップ「OK」ボタン押下時
                         ElseIf Me.WW_IDO_TANKNO_FLG = "1" Then
-                            '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                            If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
-                                '○所属営業所コード
-                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                                '○所在地コード(着駅)
-                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                                ''○所在地コード(発駅)
-                                'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
-                                '○タンク車状態コード
-                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
-                                '○タンク車状況コード
-                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
-                                '○使用受注№
-                                P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
+                            ''   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
+                            'If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                            '    '○所属営業所コード
+                            '    P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                            '    '○所在地コード(着駅)
+                            '    P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                            '    ''○所在地コード(発駅)
+                            '    'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                            '    '○タンク車状態コード
+                            '    P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
+                            '    '○タンク車状況コード
+                            '    P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
+                            '    '○使用受注№
+                            '    P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
 
-                                '★着日が設定
-                            Else
-                                '○所属営業所コード(※各駅の所属営業所を設定)
-                                Select Case OIT0006row("ARRSTATION")
+                            '    '★着日が設定
+                            'Else
+                            '○所属営業所コード(※各駅の所属営業所を設定)
+                            Select Case OIT0006row("ARRSTATION")
                                 '仙台北港
-                                    Case BaseDllConst.CONST_STATION_243202
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_010402
+                                Case BaseDllConst.CONST_STATION_243202
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_010402
                                 '浜五井
-                                    Case BaseDllConst.CONST_STATION_434103
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011201
+                                Case BaseDllConst.CONST_STATION_434103
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011201
                                 '甲子
-                                    Case BaseDllConst.CONST_STATION_434105
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011202
+                                Case BaseDllConst.CONST_STATION_434105
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011202
                                 '北袖
-                                    Case BaseDllConst.CONST_STATION_434108
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011203
+                                Case BaseDllConst.CONST_STATION_434108
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011203
                                 '根岸
-                                    Case BaseDllConst.CONST_STATION_4532
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011402
+                                Case BaseDllConst.CONST_STATION_4532
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_011402
                                 '四日市
-                                    Case BaseDllConst.CONST_STATION_5510
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012401
+                                Case BaseDllConst.CONST_STATION_5510
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012401
                                 '塩浜
-                                    Case BaseDllConst.CONST_STATION_5512
-                                        P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012402
-                                End Select
-                                '○所在地コード(着駅)
-                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                                '○タンク車状態コード
-                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
-                                '○タンク車状況コード
-                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
-                                '○使用受注№
-                                P_USEORDERNO.Value = ""
-                            End If
+                                Case BaseDllConst.CONST_STATION_5512
+                                    P_OFFICECODE.Value = BaseDllConst.CONST_OFFICECODE_012402
+                            End Select
+                            '○所在地コード(着駅)
+                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                            '○タンク車状態コード
+                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                            '○タンク車状況コード
+                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
+                            '○使用受注№
+                            P_USEORDERNO.Value = ""
+                            'End If
 
                             '★★ポップアップ「NG」ボタン押下時
                         ElseIf Me.WW_IDO_TANKNO_FLG = "2" Then
-                            '   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                            If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
-                                '○所属営業所コード
-                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                                '○所在地コード(着駅)
-                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                                ''○所在地コード(発駅)
-                                'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
-                                '○タンク車状態コード
-                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
-                                '○タンク車状況コード
-                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
-                                '○使用受注№
-                                P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
+                            ''   ★着日が未来日設定の場合(※当日になったらバッチにて更新)
+                            'If OIT0006row("ACTUALARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                            '    '○所属営業所コード
+                            '    P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                            '    '○所在地コード(着駅)
+                            '    P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                            '    ''○所在地コード(発駅)
+                            '    'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                            '    '○タンク車状態コード
+                            '    P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_01
+                            '    '○タンク車状況コード
+                            '    P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_08
+                            '    '○使用受注№
+                            '    P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
 
-                                '★着日が設定
-                            Else
-                                '○所属営業所コード(NGなので所在地はそのまま)
-                                P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                                '○所在地コード(着駅)
-                                P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                                '○タンク車状態コード
-                                P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
-                                '○タンク車状況コード
-                                P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
-                                '○使用受注№
-                                P_USEORDERNO.Value = ""
-                            End If
+                            '    '★着日が設定
+                            'Else
+                            '○所属営業所コード(NGなので所在地はそのまま)
+                            P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                            '○所在地コード(着駅)
+                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                            '○タンク車状態コード
+                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                            '○タンク車状況コード
+                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
+                            '○使用受注№
+                            P_USEORDERNO.Value = ""
+                            'End If
 
                             ''### 所在更新しない ###########################################
                             'Continue For
@@ -6815,33 +6815,35 @@ Public Class OIT0006OutOfServiceDetail
 
                         '上記以外の着駅
                     Case Else
-                        '    ★着日が未来日設定の場合(※当日になったらバッチにて更新)
-                        If Convert.ToString(OIT0006row("ACTUALARRDATE")) > Now.AddDays(0).ToString("yyyy/MM/dd") Then
-                            '○所属営業所コード
-                            P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                            '○所在地コード(着駅)
-                            P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
-                            '○タンク車状態コード
-                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
-                            '○タンク車状況コード
-                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_15
-                            '○使用受注№
-                            P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
+                        ''    ★着日が未来日設定の場合(※当日になったらバッチにて更新)
+                        'If Convert.ToString(OIT0006row("ACTUALARRDATE")) > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        '    '○所属営業所コード
+                        '    P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                        '    '○所在地コード(着駅)
+                        '    P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                        '    '○タンク車状態コード
+                        '    P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                        '    '○タンク車状況コード
+                        '    P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_15
+                        '    '○使用受注№
+                        '    P_USEORDERNO.Value = Me.TxtKaisouOrderNo.Text
 
-                            '★着日が設定
-                        Else
-                            '○所属営業所コード
-                            P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
-                            '○所在地コード(発駅)
-                            P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
-                            '○タンク車状態コード
-                            P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
-                            '○タンク車状況コード
-                            P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
-                            '○使用受注№
-                            P_USEORDERNO.Value = ""
+                        '    '★着日が設定
+                        'Else
+                        '○所属営業所コード
+                        P_OFFICECODE.Value = Me.TxtKaisouOrderOfficeCode.Text
+                        '○所在地コード(着駅)
+                        P_LOCATIONCODE.Value = OIT0006row("ARRSTATION")
+                        ''○所在地コード(発駅)
+                        'P_LOCATIONCODE.Value = OIT0006row("DEPSTATION")
+                        '○タンク車状態コード
+                        P_TANKSTATUS.Value = BaseDllConst.CONST_TANKSTATUS_03
+                        '○タンク車状況コード
+                        P_TANKSITUATION.Value = BaseDllConst.CONST_TANKSITUATION_01
+                        '○使用受注№
+                        P_USEORDERNO.Value = ""
 
-                        End If
+                        'End If
                 End Select
 
                 '空車着日

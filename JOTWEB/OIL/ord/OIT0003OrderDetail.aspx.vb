@@ -3101,14 +3101,14 @@ Public Class OIT0003OrderDetail
 
                     '金額
                     dclApplyChargeSUM = Decimal.Parse(OIT0003tab4row("APPLYCHARGESUM").ToString().Replace("￥", ""))
-                    OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Truncate(dclApplyChargeSUM))  '切り捨て
+                    'OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Truncate(dclApplyChargeSUM))  '切り捨て
                     'OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Ceiling(dclApplyChargeSUM))   '切り上げ
-                    'OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Round(dclApplyChargeSUM))     '四捨五入
+                    OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Round(dclApplyChargeSUM))     '四捨五入
                     '消費税
                     dclConsumptionTAX = Decimal.Parse(OIT0003tab4row("CONSUMPTIONTAX").ToString().Replace("￥", ""))
-                    OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Truncate(dclConsumptionTAX))  '切り捨て
+                    'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Truncate(dclConsumptionTAX))  '切り捨て
                     'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Ceiling(dclConsumptionTAX))   '切り上げ
-                    'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Round(dclConsumptionTAX))     '四捨五入
+                    OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Round(dclConsumptionTAX))     '四捨五入
 
                 Next
 
@@ -11505,6 +11505,8 @@ Public Class OIT0003OrderDetail
                 'Dim JP_TANKNO As SqlParameter = SQLcmdJnl.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)                  'タンク車№
 
                 Dim WW_DATENOW As DateTime = Date.Now
+                Dim dclApplyChargeSUM As Decimal = 0
+                Dim dclConsumptionTAX As Decimal = 0
                 For Each OIT0003INPtab4row As DataRow In OIT0003INPtbl_tab4.Rows
                     P_BILLINGNO.Value = work.WF_SEL_BILLINGNO.Text
                     P_ORDERNO.Value = OIT0003INPtab4row("ORDERNO")
@@ -11568,15 +11570,23 @@ Public Class OIT0003OrderDetail
                     '### 20210202 START 指摘票対応(No337)全体 ################################
                     Select Case OIT0003INPtab4row("CALCKBN")
                         Case "1"
-                            P_AMOUNT.Value = OIT0003INPtab4row("CARSNUMBER") * OIT0003INPtab4row("APPLYCHARGE")
-                            P_TAX.Value = OIT0003INPtab4row("CARSNUMBER") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            dclApplyChargeSUM = OIT0003INPtab4row("CARSNUMBER") * OIT0003INPtab4row("APPLYCHARGE")
+                            dclConsumptionTAX = OIT0003INPtab4row("CARSNUMBER") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            'P_AMOUNT.Value = OIT0003INPtab4row("CARSNUMBER") * OIT0003INPtab4row("APPLYCHARGE")
+                            'P_TAX.Value = OIT0003INPtab4row("CARSNUMBER") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
                         Case "2"
-                            P_AMOUNT.Value = OIT0003INPtab4row("CARSAMOUNT") * OIT0003INPtab4row("APPLYCHARGE")
-                            P_TAX.Value = OIT0003INPtab4row("CARSAMOUNT") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            dclApplyChargeSUM = OIT0003INPtab4row("CARSAMOUNT") * OIT0003INPtab4row("APPLYCHARGE")
+                            dclConsumptionTAX = OIT0003INPtab4row("CARSAMOUNT") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            'P_AMOUNT.Value = OIT0003INPtab4row("CARSAMOUNT") * OIT0003INPtab4row("APPLYCHARGE")
+                            'P_TAX.Value = OIT0003INPtab4row("CARSAMOUNT") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
                         Case "3"
-                            P_AMOUNT.Value = OIT0003INPtab4row("LOAD") * OIT0003INPtab4row("APPLYCHARGE")
-                            P_TAX.Value = OIT0003INPtab4row("LOAD") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            dclApplyChargeSUM = OIT0003INPtab4row("LOAD") * OIT0003INPtab4row("APPLYCHARGE")
+                            dclConsumptionTAX = OIT0003INPtab4row("LOAD") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
+                            'P_AMOUNT.Value = OIT0003INPtab4row("LOAD") * OIT0003INPtab4row("APPLYCHARGE")
+                            'P_TAX.Value = OIT0003INPtab4row("LOAD") * (OIT0003INPtab4row("APPLYCHARGE") * work.WF_SEL_CONSUMPTIONTAX.Text)
                     End Select
+                    P_AMOUNT.Value = Math.Round(dclApplyChargeSUM)      '四捨五入
+                    P_TAX.Value = Math.Round(dclConsumptionTAX)         '四捨五入
                     P_CONSUMPTIONTAX.Value = work.WF_SEL_CONSUMPTIONTAX.Text
                     '### 20210202 END   指摘票対応(No337)全体 ################################
                     P_INVOICECODE.Value = OIT0003INPtab4row("INVOICECODE")

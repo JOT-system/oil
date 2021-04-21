@@ -869,6 +869,8 @@ Public Class OIT0003OrderList
               " SELECT " _
             & "     ISNULL(RTRIM(OIT0002.ORDERNO), '')                      AS ORDERNO " _
             & "   , ISNULL(RTRIM(OIT0003.DETAILNO), '')                     AS DETAILNO " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                   AS OFFICECODE " _
             & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                      AS TRAINNO " _
             & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')       AS LODDATE " _
@@ -7693,7 +7695,7 @@ Public Class OIT0003OrderList
                                           ByVal officeCode As String,
                                           ByVal lodDate As String,
                                           ByVal trainNo As String,
-                                          ByVal trainNoCvt As String)
+                                          ByRef trainNoCvt As String)
 
         If IsNothing(OIT0003Reporttbl) Then
             OIT0003Reporttbl = New DataTable

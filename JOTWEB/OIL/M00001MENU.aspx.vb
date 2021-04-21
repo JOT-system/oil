@@ -632,6 +632,9 @@ Public Class M00001MENU
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     '営業所が仙台新港営業所の場合は、仙台テンプレートを使用
                     tempName = CONST_TEMPNAME_TRANSPORT_RESULT_010402
+                ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    '営業所が五井営業所の場合は、五井テンプレートを使用
+                    tempName = CONST_TEMPNAME_TRANSPORT_RESULT_011201
                 End If
 
                 '出力データ取得
@@ -651,6 +654,10 @@ Public Class M00001MENU
                     If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                         '仙台新港営業所
                         WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_010402(
+                        CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
+                    ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                        '五井営業所
+                        WF_PrintURL.Value = clsPrint.CreateExcelPrintData_TansportResult_011201(
                         CDate(txtTrStYmd.Text), CDate(txtTrEdYmd.Text))
                     Else
                         'その他
@@ -770,9 +777,11 @@ Public Class M00001MENU
                 SQLcmd.Connection = SQLcon
                 SQLcmd.CommandType = CommandType.StoredProcedure
 
-                '営業所が仙台の場合は、仙台用のプロシージャを指定
+                '営業所が仙台の場合は仙台用、五井の場合は五井用、それ以外は共通のプロシージャを指定
                 If CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT_010402]"
+                ElseIf CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                    SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT_011201]"
                 Else
                     SQLcmd.CommandText = "[oil].[GET_TRANSPORT_RESULT]"
                 End If
@@ -788,8 +797,9 @@ Public Class M00001MENU
                 PARA4.Direction = ParameterDirection.Output
                 RV.Direction = ParameterDirection.ReturnValue
 
-                '営業所が仙台以外の場合は、営業所を引数に付与
-                If Not CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) Then
+                '営業所が仙台、五井以外の場合は、営業所を引数に付与
+                If Not CONST_OFFICECODE_010402.Equals(ddlTrOfficeNameList.SelectedValue) AndAlso
+                   Not CONST_OFFICECODE_011201.Equals(ddlTrOfficeNameList.SelectedValue) Then
                     Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.VarChar, 6)  ' 営業所コード
                     PARA3.Value = ddlTrOfficeNameList.SelectedValue
                 End If

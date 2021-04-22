@@ -519,6 +519,7 @@
     <Compile Include="OIL\com\M00001MP0009ActualTraction.vb" />
     <Compile Include="OIL\com\OIM0005CustomReport.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0005CustomReport.vb" />
     <Compile Include="OIL\com\OIT0002CustomReport.vb" />
     <Compile Include="OIL\com\OIT0002CustomReportOLD.vb" />
     <Compile Include="OIL\com\OIT0003CustomMultiReport.vb" />

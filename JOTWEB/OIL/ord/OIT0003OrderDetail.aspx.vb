@@ -6974,6 +6974,8 @@ Public Class OIT0003OrderDetail
             & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
             & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                      AS TRAINNO " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')       AS LODDATE " _
             & "   , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')       AS DEPDATE " _
             & "   , ISNULL(RTRIM(OIT0003.SHIPORDER), '')                    AS SHIPORDER " _

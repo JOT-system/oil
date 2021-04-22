@@ -894,13 +894,11 @@ Public Class OIT0003OrderList
         Dim selectedOrderNoInStat As String = String.Join(",", (From odrNo In selectedOrderNo Select "'" & odrNo & "'"))
 
         '○ 取得SQL
-        '　 説明　：　出荷予定表(計画枠)取得用SQL
+        '　 説明　：　受注明細ダウンロード取得用SQL
         Dim SQLStr As String =
               " SELECT " _
             & "     ISNULL(RTRIM(OIT0002.ORDERNO), '')                      AS ORDERNO " _
             & "   , ISNULL(RTRIM(OIT0003.DETAILNO), '')                     AS DETAILNO " _
-            & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
-            & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                   AS OFFICECODE " _
             & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                      AS TRAINNO " _
             & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _

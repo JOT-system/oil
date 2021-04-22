@@ -1071,6 +1071,10 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             '○袖ヶ浦営業所の場合
         ElseIf work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+            For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                WW_OilTermSearch(OIT0001row)
+            Next
             '★油種の出荷期間に合致した「軽油」の種類へ変換
             For Each OIT0001row As DataRow In OIT0001tbl.Select("OILCODE='" + BaseDllConst.CONST_KTank1 + "'")
                 WW_OilTermSearch(OIT0001row)

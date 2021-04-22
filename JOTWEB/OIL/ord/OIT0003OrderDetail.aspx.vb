@@ -4019,6 +4019,10 @@ Public Class OIT0003OrderDetail
 
             '○袖ヶ浦営業所の場合
         ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+            For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                WW_OilTermSearch(OIT0003row)
+            Next
             '★油種の出荷期間に合致した「軽油」の種類へ変換
             For Each OIT0003row As DataRow In OIT0003tbl.Select("OILCODE='" + BaseDllConst.CONST_KTank1 + "'")
                 WW_OilTermSearch(OIT0003row)
@@ -6970,6 +6974,8 @@ Public Class OIT0003OrderDetail
             & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
             & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(RTRIM(OIT0002.TRAINNO), '')                      AS TRAINNO " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                   AS ARRSTATION " _
+            & "   , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')               AS ARRSTATIONNAME " _
             & "   , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')       AS LODDATE " _
             & "   , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')       AS DEPDATE " _
             & "   , ISNULL(RTRIM(OIT0003.SHIPORDER), '')                    AS SHIPORDER " _
@@ -7822,7 +7828,7 @@ Public Class OIT0003OrderDetail
             ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
                     OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
                     OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井江営業所・甲子営業所対応 #########################################
+                '### 20210421 五井営業所・甲子営業所対応 ###########################################
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRINSPECTIONCNT <= 1 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7887,7 +7893,7 @@ Public Class OIT0003OrderDetail
             ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
                     OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
                     OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井江営業所・甲子営業所対応 #########################################
+                '### 20210421 五井営業所・甲子営業所対応 ###########################################
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRALLINSPECTIONCNT <= 1 Then
                     WW_JRALLINSPECTIONFLG = "1"
@@ -9325,7 +9331,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 7)  '空車着駅コード(変更後)
                 Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '空車着駅名(変更後)
                 Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 3)  '受注情報
                 Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.NVarChar, 1)  '空回日報可否フラグ
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
@@ -9844,7 +9850,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar)      'OT輸送可否フラグ
                 Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.NVarChar)      '格上可否フラグ
                 Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.NVarChar)      'テスト積み可否フラグ
-                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 2)   '受注情報
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 3)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード

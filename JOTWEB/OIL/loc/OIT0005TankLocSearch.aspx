@@ -17,6 +17,7 @@
         <div class="actionButtonBox">
             <div class="leftSide"></div>
             <div class="rightSide">
+                <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="交検一覧ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonKoukenList');" />
                 <input type="button" id="WF_ButtonDO"  class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonDO');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
@@ -78,5 +79,6 @@
         <input id="WF_RightboxOpen" runat="server" value="" type="text" />          <!-- Rightbox 開閉 -->
         <input id="WF_LeftMViewChange" runat="server" value="" type="text" />       <!-- LeftBox Mview切替 -->
         <input id="WF_ButtonClick" runat="server" value="" type="text" />           <!-- ボタン押下 -->
+        <input id="WF_PrintURL" runat="server" value="" type="text" />              <!-- Textbox Print URL -->
     </div>
 </asp:Content>

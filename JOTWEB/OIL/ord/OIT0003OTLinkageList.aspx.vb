@@ -431,6 +431,39 @@ Public Class OIT0003OTLinkageList
         '受注ステータス
         SQLStrCmn &= " , CASE WHEN (OIT0002.DELFLG='1' OR OIT0002.ORDERSTATUS = @P08) THEN '1' ELSE '0' END AS DELETEORDER "
         SQLStrCmn &= " , CASE WHEN ISNULL(OIT0002.RESERVEDSTATUS,'0')='' THEN '0' ELSE OIT0002.RESERVEDSTATUS END AS RESERVEDSTATUS "
+        SQLStrCmn &= " , CASE WHEN ISNULL(OIT0002.TAKUSOUSTATUS,'0')='' THEN '0' ELSE OIT0002.TAKUSOUSTATUS END AS TAKUSOUSTATUS "
+
+        '### 20210421 START OT発送日報送信状況順対応 #######################################
+        SQLStrCmn &=
+              " , ISNULL(RTRIM(OIM0007.OTFLG), '')                   AS OTFLG" _
+            & " , ISNULL(RTRIM(OIT0002.OTSENDSTATUS), '')            AS OTSENDSTATUS" _
+            & " , CASE" _
+            & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS OTSENDSTATUSNAME"
+        '### 20210421 END   OT発送日報送信状況順対応 #######################################
+        '### 20210421 START 出荷予約対応 ###################################################
+        SQLStrCmn &=
+              " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011402) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS RESERVEDSTATUSNAME"
+        '### 20210421 END   出荷予約対応 ###################################################
+        '### 20210421 START 託送状対応 #####################################################
+        SQLStrCmn &=
+              " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012402) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS TAKUSOUSTATUSNAME"
+        '### 20210421 END   託送状対応 #####################################################
 
         '★積置フラグ無し用SQL
         SQLStrNashi &=
@@ -459,9 +492,34 @@ Public Class OIT0003OTLinkageList
             & "  AND OIS0015.KEYCODE = OIT0003.STACKINGFLG " _
             & "  INNER JOIN oil.VIW0003_OFFICECHANGE VIW0003 ON " _
             & "      VIW0003.ORGCODE    = @P05 " _
-            & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE " _
-            & " WHERE 1 = 1" _
+            & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE "
+
+        '### 20210421 START OT発送日報送信状況順対応 #######################################
+        SQLStrCmn &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_3 ON " _
+            & "        OIS0015_3.CLASS   = 'OTSENDSTATUS' " _
+            & "    AND OIS0015_3.KEYCODE = OIT0002.OTSENDSTATUS " _
+            & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
+            & "      OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
+            & "  AND OIM0007.TRAINNAME  = OIT0002.TRAINNAME " _
+            & "  AND OIM0007.DEFAULTKBN = 'def' "
         '& "   AND OIT0002.ORDERSTATUS BETWEEN @P03 AND @P06 " _
+        '### 20210421 END   OT発送日報送信状況順対応 #######################################
+        '### 20210421 START 出荷予約対応 ###################################################
+        SQLStrCmn &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_4 ON " _
+            & "        OIS0015_4.CLASS   = 'RESERVEDSTATUS' " _
+            & "    AND OIS0015_4.KEYCODE = OIT0002.RESERVEDSTATUS " _
+        '### 20210421 END   出荷予約対応 ###################################################
+        '### 20210421 START 託送状対応 #####################################################
+        SQLStrCmn &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_5 ON " _
+            & "        OIS0015_5.CLASS   = 'TAKUSOUSTATUS' " _
+            & "    AND OIS0015_5.KEYCODE = ISNULL(OIT0002.TAKUSOUSTATUS,'0') " _
+        '### 20210421 END   託送状対応 #####################################################
+
+        SQLStrCmn &=
+              " WHERE 1 = 1" _
 
         '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         'SQLStrNashi &=
@@ -516,6 +574,24 @@ Public Class OIT0003OTLinkageList
             & "  , CASE WHEN ISNULL(OIT0002.RESERVEDSTATUS,'0')='' THEN '0' ELSE OIT0002.RESERVEDSTATUS END " _
             & "  , OIT0002.ORDERSTATUS " _
             & "  , OIT0002.DELFLG "
+
+        '### 20210421 START OT発送日報送信状況順対応 #######################################
+        SQLStrCmn &=
+              "  , OIM0007.OTFLG " _
+            & "  , OIT0002.OTSENDSTATUS " _
+            & "  , OIS0015_3.VALUE1 "
+        '### 20210421 END   OT発送日報送信状況順対応 #######################################
+        '### 20210421 START 出荷予約対応 ###################################################
+        SQLStrCmn &=
+              "  , OIT0002.RESERVEDSTATUS " _
+            & "  , OIS0015_4.VALUE1 "
+        '### 20210421 END   出荷予約対応 ###################################################
+        '### 20210421 START 託送状対応 #####################################################
+        SQLStrCmn &=
+              "  , OIT0002.TAKUSOUSTATUS " _
+            & "  , OIS0015_5.VALUE1 "
+        '### 20210421 END   託送状対応 #####################################################
+
         '★積置フラグ無し用SQL
         SQLStrNashi &=
               SQLStrCmn _

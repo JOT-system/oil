@@ -151,7 +151,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData_TransportCostDetail(ByVal KEIJYO_YM As Date) As String
         Dim rngWrite As Excel.Range = Nothing
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".pdf"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
@@ -528,7 +529,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
             '保存処理実行
             Dim saveExcelLock As New Object
             SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
-                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+                'Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+                Me.ExcelBookObj.ExportAsFixedFormat(
+                    Type:=0,
+                    Filename:=tmpFilePath,
+                    Quality:=0,
+                    IncludeDocProperties:=True,
+                    IgnorePrintAreas:=False,
+                    OpenAfterPublish:=False)
             End SyncLock
             Me.ExcelBookObj.Close(False)
 

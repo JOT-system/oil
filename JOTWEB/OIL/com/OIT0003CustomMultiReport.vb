@@ -1386,6 +1386,8 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                 ThenBy(Function(p) p.depDate).
                 ToList()
 
+            Dim putPageCnt As Integer = 0
+
             If query.Any() Then
 
                 Dim preOfficeCode As String = ""
@@ -1416,6 +1418,7 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
                         EditDetailArea(pageIndex, query.Item(queryIndex).rows, query.Item(queryIndex).officeCode)
 
                         queryIndex += 1
+                        putPageCnt += 1
                     Next
 
                 Loop While queryIndex < query.Count()
@@ -1431,6 +1434,13 @@ Public Class OrderDetail : Inherits OIT0003CustomMultiReportBase
 
                 '◯ヘッダーの設定
                 EditHeaderArea(1, "", trainNo, lodDate, depDate)
+
+                putPageCnt += 1
+            End If
+
+            '〇印刷範囲設定(出力ページ数2以上の場合)
+            If putPageCnt > 1 Then
+                ExcelWorkSheet.PageSetup.PrintArea = String.Format("$A$1:$AA${0}", putPageCnt * 29)
             End If
 
             '○出力シートのみ残す

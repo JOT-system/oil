@@ -605,6 +605,7 @@ Public Class OIT0003OTLinkageList
             & " ORDER BY" _
             & "    OFFICECODE" _
             & "  , TRAINNO" _
+            & "  , DEPDATE" _
             & "  , LODDATE"
         '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
         SQLStrNashi &=
@@ -727,6 +728,38 @@ Public Class OIT0003OTLinkageList
                     ''担当営業所
                     'CODENAME_get("SALESOFFICE", OIT0003row("OFFICECODE"), OIT0003row("OFFICENAME"), WW_DUMMY)
                 Next
+
+                '○仙台新港営業所対応
+                If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Dim svOrderNo As String = ""
+                    '★前積みと重複した場合は非表示にする。
+                    For Each OIT0003row As DataRow In OIT0003tbl.Select(Nothing, "ORDERNO, LODDATE DESC")
+                        If svOrderNo <> "" And svOrderNo = Convert.ToString(OIT0003row("ORDERNO")) Then
+                            OIT0003row("DELETEORDER") = "1"
+                        End If
+                        svOrderNo = Convert.ToString(OIT0003row("ORDERNO"))
+                    Next
+
+                    '★非表示した前積み分の油種数を合算する
+                    Dim cpDt As DataTable = OIT0003tbl.Copy()
+                    For Each cpDtrow As DataRow In cpDt.Select("DELETEORDER='1'")
+                        For Each OIT0003row As DataRow In OIT0003tbl.Select("DELETEORDER='0'")
+                            If Convert.ToString(OIT0003row("ORDERNO")) = Convert.ToString(cpDtrow("ORDERNO")) Then
+                                OIT0003row("TOTALTANK") = Integer.Parse(Convert.ToString(OIT0003row("TOTALTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("TOTALTANK")))
+                                OIT0003row("HTANK") = Integer.Parse(Convert.ToString(OIT0003row("HTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("HTANK")))
+                                OIT0003row("RTANK") = Integer.Parse(Convert.ToString(OIT0003row("RTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("RTANK")))
+                                OIT0003row("TTANK") = Integer.Parse(Convert.ToString(OIT0003row("TTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("TTANK")))
+                                OIT0003row("MTTANK") = Integer.Parse(Convert.ToString(OIT0003row("MTTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("MTTANK")))
+                                OIT0003row("KTANK") = Integer.Parse(Convert.ToString(OIT0003row("KTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("KTANK")))
+                                OIT0003row("K3TANK") = Integer.Parse(Convert.ToString(OIT0003row("K3TANK"))) + Integer.Parse(Convert.ToString(cpDtrow("K3TANK")))
+                                OIT0003row("K5TANK") = Integer.Parse(Convert.ToString(OIT0003row("K5TANK"))) + Integer.Parse(Convert.ToString(cpDtrow("K5TANK")))
+                                OIT0003row("K10TANK") = Integer.Parse(Convert.ToString(OIT0003row("K10TANK"))) + Integer.Parse(Convert.ToString(cpDtrow("K10TANK")))
+                                OIT0003row("LTANK") = Integer.Parse(Convert.ToString(OIT0003row("LTANK"))) + Integer.Parse(Convert.ToString(cpDtrow("LTANK")))
+                                OIT0003row("ATANK") = Integer.Parse(Convert.ToString(OIT0003row("ATANK"))) + Integer.Parse(Convert.ToString(cpDtrow("ATANK")))
+                            End If
+                        Next
+                    Next
+                End If
 
             End Using
 

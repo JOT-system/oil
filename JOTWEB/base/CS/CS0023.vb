@@ -1028,15 +1028,15 @@ Public Structure CS0023XLSUPLOAD
         Dim sCellTitleYMDYoko() As String = {"F", "G", "H", "I", "J", "K"}
         Dim sCellTitleYMD() As String = {"", "", "", "", "", "", "", "", ""}
         Dim sCellTitleYMDL As String = ""
-        Dim sCellTitlePointYoko() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
-        Dim sCellTitleLine() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        Dim sCellTitleArrstation() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        Dim sCellTitleTrainNo() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitlePointYoko() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE", "AG", "AI"}
+        Dim sCellTitleLine() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleArrstation() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim sCellTitleTrainNo() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         '### ヘッダー情報取得用 END   #################################################################################
 
         '### 明細情報取得用 START #####################################################################################
-        Dim sCellDetailYoko1() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE"}
-        Dim sCellDetailYoko2() As String = {"F", "H", "J", "L", "N", "P", "R", "T", "V", "X", "Z", "AB", "AD", "AF"}
+        Dim sCellDetailYoko1() As String = {"E", "G", "I", "K", "M", "O", "Q", "S", "U", "W", "Y", "AA", "AC", "AE", "AG", "AI"}
+        Dim sCellDetailYoko2() As String = {"F", "H", "J", "L", "N", "P", "R", "T", "V", "X", "Z", "AB", "AD", "AF", "AH", "AJ"}
         '### 明細情報取得用 END   #####################################################################################
 
         Try

@@ -7823,10 +7823,7 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRINSPECTIONFLG = "3"
                 End If
-            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井営業所・甲子営業所対応 ###########################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRINSPECTIONCNT <= 1 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7836,6 +7833,22 @@ Public Class OIT0003OrderDetail
                     WW_JRINSPECTIONFLG = "3"
                 End If
                 '### 20210402 END   袖ヶ浦営業所対応 ###############################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                '### 20210421 START 五井営業所・甲子営業所対応 #####################################
+                If WW_JRINSPECTIONCNT <= 1 Then
+                    '★OTリース車の場合は警告とする
+                    If WW_GetValue(14) = BaseDllConst.CONST_BRANCHCODE_110001 Then
+                        WW_JRINSPECTIONFLG = "2"
+                    Else
+                        WW_JRINSPECTIONFLG = "1"
+                    End If
+                ElseIf WW_JRINSPECTIONCNT >= 2 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   五井営業所・甲子営業所対応 #####################################
             Else
                 If WW_JRINSPECTIONCNT <= 3 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7888,10 +7901,7 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
-            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井営業所・甲子営業所対応 ###########################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRALLINSPECTIONCNT <= 1 Then
                     WW_JRALLINSPECTIONFLG = "1"
@@ -7901,6 +7911,22 @@ Public Class OIT0003OrderDetail
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
                 '### 20210402 END   袖ヶ浦営業所対応 ###############################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                '### 20210421 START 五井営業所・甲子営業所対応 #####################################
+                If WW_JRALLINSPECTIONCNT <= 1 Then
+                    '★OTリース車の場合は警告とする
+                    If WW_GetValue(14) = BaseDllConst.CONST_BRANCHCODE_110001 Then
+                        WW_JRALLINSPECTIONFLG = "2"
+                    Else
+                        WW_JRALLINSPECTIONFLG = "1"
+                    End If
+                ElseIf WW_JRALLINSPECTIONCNT >= 2 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                '### 20210421 END   五井営業所・甲子営業所対応 #####################################
             Else
                 If WW_JRALLINSPECTIONCNT <= 3 Then
                     WW_JRALLINSPECTIONFLG = "1"

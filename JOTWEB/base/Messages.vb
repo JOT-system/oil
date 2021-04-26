@@ -859,7 +859,10 @@ Public Module Messages
         ''' FREEメッセージ
         ''' </summary>
         Public Const OIL_FREE_MESSAGE As String = "20110"
-
+        ''' <summary>
+        ''' 回送登録(交検一括反映時)の更新確認メッセージ
+        ''' </summary>
+        Public Const OIL_KAISOU_INSPECTION_DATESET_MSG As String = "20111"
 
 #End Region
 

@@ -137,6 +137,9 @@ Public Class OIT0006OutOfServiceDetail
                             WW_TAB1_SW = "2"
                             Me.WW_UPBUTTONFLG = "3"
                             WF_ButtonUPDATE_Click()
+                        Case "WF_ButtonINSPECTION_TAB1",
+                             "btnInspectionConfirmOk"         '交検日一括反映ボタン押下
+                            WF_ButtonINSPECTION_Click(WF_ButtonClick.Value)
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -410,6 +413,9 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtKaisouOrderOfficeCode.Text = work.WF_SEL_SALESOFFICECODE.Text
 
         End If
+
+        '■交検日一括反映用(入力テキスト)
+        Me.TxtBulkInspection.Text = Now.AddDays(85).ToString("yyyy/MM/dd")
 
 #Region "### 20200106 新画面に整理後、不要と判断(廃止) #########################################################"
         ''■本線列車
@@ -1352,6 +1358,9 @@ Public Class OIT0006OutOfServiceDetail
                         '(実績)返送日
                         Case "TxtActualEmparrDate"
                             .WF_Calendar.Text = Me.TxtActualEmparrDate.Text
+                        '交検日(一括反映用)
+                        Case "TxtBulkInspection"
+                            .WF_Calendar.Text = Me.TxtBulkInspection.Text
                         Case Else
                             .WF_Calendar.Text = Now.AddDays(0).ToString("yyyy/MM/dd")
                     End Select
@@ -2901,6 +2910,43 @@ Public Class OIT0006OutOfServiceDetail
 #End Region
 
     ''' <summary>
+    ''' 交検日一括反映ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSPECTION_Click(ByVal chkFieldName As String)
+        '○一覧未作成の場合は処理終了
+        If OIT0006tbl.Rows.Count = 0 Then Exit Sub
+
+        '○交検日入力対象が1件も存在しない場合は処理終了
+        If OIT0006tbl.Select("TANKNO<>''").Count = 0 Then Exit Sub
+
+        Select Case chkFieldName
+            Case "WF_ButtonINSPECTION_TAB1"
+                Master.Output(C_MESSAGE_NO.OIL_KAISOU_INSPECTION_DATESET_MSG,
+                              C_MESSAGE_TYPE.QUES,
+                              needsPopUp:=True,
+                              IsConfirm:=True,
+                              YesButtonId:="btnInspectionConfirmOk")
+            Case "btnInspectionConfirmOk"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(Me.TxtBulkInspection.Text, WW_DATE)
+                    For Each OIT0006row As DataRow In OIT0006tbl.Select("TANKNO<>''")
+
+                        'タンク車マスタの交検日を更新
+                        WW_UpdateTankMaster(OIT0006row("TANKNO"), I_JRINSPECTIONDATE:=Me.TxtBulkInspection.Text)
+                        'タンク車№に紐づく情報を取得・設定
+                        WW_TANKNUMBER_FIND(OIT0006row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0006tbl)
+                Catch ex As Exception
+                End Try
+        End Select
+    End Sub
+
+    ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -3072,6 +3118,23 @@ Public Class OIT0006OutOfServiceDetail
                 'タンク車№に紐づく情報を取得・設定
                 WW_TANKNUMBER_FIND(updHeader, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
 
+            Case "JRINSPECTIONDATE"      '(一覧)交検日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_ListValue, WW_DATE)
+                    If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                        updHeader.Item(WF_FIELD.Value) = ""
+                    Else
+                        updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM/dd")
+                    End If
+
+                    'タンク車マスタの交検日を更新
+                    WW_UpdateTankMaster(updHeader.Item("TANKNO"), I_JRINSPECTIONDATE:=Convert.ToString(updHeader.Item(WF_FIELD.Value)))
+                    'タンク車№に紐づく情報を取得・設定
+                    WW_TANKNUMBER_FIND(updHeader, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+
+                Catch ex As Exception
+                End Try
         End Select
 
         '○ 画面表示データ保存
@@ -6003,7 +6066,8 @@ Public Class OIT0006OutOfServiceDetail
                            OrElse Convert.ToString(loopdr("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_108 Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         End If
                     End If
                     '(実績)返送日
@@ -6063,7 +6127,8 @@ Public Class OIT0006OutOfServiceDetail
                             '交検日
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
                                 If loopdr("OBJECTIVECODE") = BaseDllConst.CONST_OBJECTCODE_22 Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                                    'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 Else
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 End If

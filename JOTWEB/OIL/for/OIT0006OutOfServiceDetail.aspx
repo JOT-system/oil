@@ -318,7 +318,8 @@
                         <input type="button" id="WF_ButtonLINE_LIFTED_TAB1" class="btn-sticky" value="行削除"  onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB1');" />
                         <input type="button" id="WF_ButtonLINE_ADD_TAB1" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
                     </div>
-                    <div class="detail_tab" style="display:none">
+                    <div class="detail_tab"">
+                    <%--<div class="detail_tab" style="display:none">--%>
                         <a class="ef" id="WF_BULKINSPECTION" ondblclick="Field_DBclick('TxtBulkInspection', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                             <asp:TextBox ID="TxtBulkInspection" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" Text="2021/4/23" onblur="MsgClear();"></asp:TextBox>
                         </a>

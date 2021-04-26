@@ -1872,7 +1872,8 @@ Public Class OIT0005TankLocList
         For Each rowitem As TableRow In tblObj.Rows
             '★未卸・交検・留置(チェックボックス)の制御
             If OIT0005tbl.Rows.Count <> 0 Then
-                loopdr = OIT0005tbl.Rows(rowIdx)
+                loopdr = OIT0005tbl.Select("HIDDEN<>'1'")(rowIdx)
+                'loopdr = OIT0005tbl.Rows(rowIdx)
                 chkObjWHId = chkObjIdWOWHcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjWH = Nothing
                 chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))

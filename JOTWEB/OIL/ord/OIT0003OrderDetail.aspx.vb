@@ -1487,13 +1487,13 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA02.Value = C_DELETE_FLG.DELETE
 
                 'tmp作成用
-                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARATMP02 As SqlParameter = SQLTMPcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARATMP02.Value = C_DELETE_FLG.DELETE
@@ -1880,7 +1880,7 @@ Public Class OIT0003OrderDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
                   SQLRTraincmd As New SqlCommand(SQLRTrainStr, SQLcon)
                 Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.Int)          '明細数(新規作成)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 6)  'タンク車割当状況(割当)
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  'タンク車割当状況(不可)
@@ -1915,7 +1915,7 @@ Public Class OIT0003OrderDetail
 
                 'tmp作成用
                 Dim PARATMP00 As SqlParameter = SQLTMPcmd.Parameters.Add("@P00", SqlDbType.Int)          '明細数(新規作成)
-                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARATMP02 As SqlParameter = SQLTMPcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARATMP03 As SqlParameter = SQLTMPcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 6)  'タンク車割当状況(割当)
                 Dim PARATMP04 As SqlParameter = SQLTMPcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  'タンク車割当状況(不可)
@@ -1963,7 +1963,7 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 '列車(臨海)別の件数取得用
-                Dim PARARTRAIN01 As SqlParameter = SQLRTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARARTRAIN01 As SqlParameter = SQLRTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARARTRAIN02 As SqlParameter = SQLRTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARARTRAIN01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARARTRAIN02.Value = C_DELETE_FLG.DELETE
@@ -2350,7 +2350,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  'タンク車割当状況(残車)
@@ -2509,7 +2509,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA02.Value = C_DELETE_FLG.DELETE
@@ -2798,7 +2798,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 'Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20) '赤丸
                 'Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20) '黄丸
@@ -2957,8 +2957,8 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Decimal) '消費税
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)  '支払請求№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Decimal)   '消費税
 
                 PARA01.Value = work.WF_SEL_BILLINGNO.Text
                 PARA02.Value = work.WF_SEL_CONSUMPTIONTAX.Text
@@ -3077,7 +3077,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '支払請求№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
 
                 PARA01.Value = work.WF_SEL_BILLINGNO.Text
@@ -5515,7 +5515,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdNum As New SqlCommand(SQLStrNum, SQLcon)
-                Dim PARANUM1 As SqlParameter = SQLcmdNum.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARANUM1 As SqlParameter = SQLcmdNum.Parameters.Add("@P01", SqlDbType.NVarChar) '受注№
                 PARANUM1.Value = work.WF_SEL_ORDERNUMBER.Text
 
                 Using SQLdrNum As SqlDataReader = SQLcmdNum.ExecuteReader()
@@ -5529,7 +5529,7 @@ Public Class OIT0003OrderDetail
                     OIT0003WKtbl.Load(SQLdrNum)
                 End Using
 
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 3)  '受注明細№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10) '荷主コード
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 40) '荷主名
@@ -5691,8 +5691,8 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '支払請求№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar)     '受注№
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 6)  '営業所コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20) '営業所名
 
@@ -7080,7 +7080,7 @@ Public Class OIT0003OrderDetail
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)    '削除フラグ
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)  'オーダーNo
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)      'オーダーNo
                 PARA01.Value = BaseDllConst.C_DELETE_FLG.ALIVE
                 PARA02.Value = Me.TxtOrderNo.Text
 
@@ -9357,7 +9357,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA93 As SqlParameter = SQLcmd.Parameters.Add("@P93", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '受注登録日
@@ -9439,7 +9439,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA73 As SqlParameter = SQLcmd.Parameters.Add("@P73", SqlDbType.Int)          '変更後_車数（その他９）
                 Dim PARA74 As SqlParameter = SQLcmd.Parameters.Add("@P74", SqlDbType.Int)          '変更後_車数（その他１０）
                 Dim PARA75 As SqlParameter = SQLcmd.Parameters.Add("@P75", SqlDbType.Int)          '変更後_合計車数
-                Dim PARA76 As SqlParameter = SQLcmd.Parameters.Add("@P76", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim PARA76 As SqlParameter = SQLcmd.Parameters.Add("@P76", SqlDbType.NVarChar)     '貨車連結順序表№
                 Dim PARA91 As SqlParameter = SQLcmd.Parameters.Add("@P91", SqlDbType.Date)         '計上日
                 Dim PARA77 As SqlParameter = SQLcmd.Parameters.Add("@P77", SqlDbType.Int)          '売上金額
                 Dim PARA78 As SqlParameter = SQLcmd.Parameters.Add("@P78", SqlDbType.Int)          '売上消費税額
@@ -9460,7 +9460,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20) '更新端末
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar) '受注№
 
                 '★新規受注NO取得処理(登録する直前に取得)
                 If work.WF_SEL_ORDERNUMBER.Text = "" Then
@@ -9877,13 +9877,13 @@ Public Class OIT0003OrderDetail
                   SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
 
                 '★削除作成用
-                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar) '受注№
                 PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
 
                 '　削除実行
                 SQLTMPcmd.ExecuteNonQuery()
 
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
                 Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 2)   '発送順
                 Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '貨物駅入線順
@@ -10253,12 +10253,12 @@ Public Class OIT0003OrderDetail
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
 
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '利用可能日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'ステータス
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '情報
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 11) '前回オーダー№
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)     '前回オーダー№
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 6)  '登録営業所コード
@@ -10285,7 +10285,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 20) '更新端末
                 Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.DateTime)     '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar) '貨車連結順序表№
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
 
                 Dim WW_DATENOW As DateTime = Date.Now
@@ -10551,7 +10551,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLUpcmd As New SqlCommand(SQLUpStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
 
@@ -10560,7 +10560,7 @@ Public Class OIT0003OrderDetail
                 'PARA2.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 
-                Dim PARAUP01 As SqlParameter = SQLUpcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARAUP01 As SqlParameter = SQLUpcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARAUP02 As SqlParameter = SQLUpcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARAUP03 As SqlParameter = SQLUpcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARAUP11 As SqlParameter = SQLUpcmd.Parameters.Add("@P11", SqlDbType.Int)          '車数（ハイオク）
@@ -11462,15 +11462,15 @@ Public Class OIT0003OrderDetail
                   SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
 
                 '★削除作成用
-                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar) '支払請求№
                 PARATMP01.Value = work.WF_SEL_BILLINGNO.Text
 
                 '　削除実行
                 SQLTMPcmd.ExecuteNonQuery()
 
                 '★追加・更新用
-                Dim P_BILLINGNO As SqlParameter = SQLcmd.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar, 11)           '支払請求№
-                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)               '受注№
+                Dim P_BILLINGNO As SqlParameter = SQLcmd.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar)               '支払請求№
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)                   '受注№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)              '受注明細№
                 Dim P_PATCODE As SqlParameter = SQLcmd.Parameters.Add("@PATCODE", SqlDbType.NVarChar, 7)                'パターンコード
                 Dim P_PATNAME As SqlParameter = SQLcmd.Parameters.Add("@PATNAME", SqlDbType.NVarChar, 40)               'パターンコード名
@@ -11549,8 +11549,8 @@ Public Class OIT0003OrderDetail
                 Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime)                 '集信日時
 
                 '★追加・更新用(更新ジャーナル用)
-                Dim JP_BILLINGNO As SqlParameter = SQLcmdJnl.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar, 11)           '支払請求№
-                Dim JP_ORDERNO As SqlParameter = SQLcmdJnl.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)               '受注№
+                Dim JP_BILLINGNO As SqlParameter = SQLcmdJnl.Parameters.Add("@BILLINGNO", SqlDbType.NVarChar)               '支払請求№
+                Dim JP_ORDERNO As SqlParameter = SQLcmdJnl.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)                   '受注№
                 Dim JP_DETAILNO As SqlParameter = SQLcmdJnl.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)              '受注明細№
                 Dim JP_PATCODE As SqlParameter = SQLcmdJnl.Parameters.Add("@PATCODE", SqlDbType.NVarChar, 7)                'パターンコード
                 Dim JP_ACCOUNTCODE As SqlParameter = SQLcmdJnl.Parameters.Add("@ACCOUNTCODE", SqlDbType.NVarChar, 8)        '科目コード
@@ -11843,18 +11843,18 @@ Public Class OIT0003OrderDetail
                   SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
 
                 '★削除作成用
-                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar) '支払請求№
                 PARATMP01.Value = work.WF_SEL_BILLINGNO.Text
 
                 '　削除実行
                 SQLTMPcmd.ExecuteNonQuery()
 
                 '★追加・更新用
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '支払請求№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)      '支払請求№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '支払請求明細№
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)          '計上年月日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)   '赤黒区分
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar)      '受注№
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 6)   '受注営業所コード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20)  '受注営業所名
@@ -11888,7 +11888,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)  '更新端末
                 Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.DateTime)      '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar)  '支払請求№
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '支払請求明細№
 
                 Dim WW_DATENOW As DateTime = Date.Now
@@ -12487,7 +12487,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA02.Value = C_DELETE_FLG.DELETE
@@ -13550,7 +13550,7 @@ Public Class OIT0003OrderDetail
                 & "    AND DELFLG       <> '1' ;"
 
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLUPcmd As New SqlCommand(SQLUPStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(実績)積込日
@@ -13576,8 +13576,8 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 '★更新用条件設定
-                Dim PARAUP01 As SqlParameter = SQLUPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№(更新元)
-                Dim PARAUP11 As SqlParameter = SQLUPcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 11) '受注№(更新先)
+                Dim PARAUP01 As SqlParameter = SQLUPcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№(更新元)
+                Dim PARAUP11 As SqlParameter = SQLUPcmd.Parameters.Add("@P11", SqlDbType.NVarChar)     '受注№(更新先)
                 Dim PARAUP12 As SqlParameter = SQLUPcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 3)  '受注明細№(更新先)
                 Dim PARAUP13 As SqlParameter = SQLUPcmd.Parameters.Add("@P13", System.Data.SqlDbType.DateTime)
                 Dim PARAUP14 As SqlParameter = SQLUPcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar)
@@ -13625,7 +13625,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)  '受注№
                 PARA01.Value = I_ORDERNO
 
                 SQLcmd.ExecuteNonQuery()
@@ -18852,7 +18852,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLDiffTraincmd As New SqlCommand(SQLDiffTrainStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -18893,7 +18893,7 @@ Public Class OIT0003OrderDetail
                 Next
 
                 '### 20200620 START((全体)No79対応) ######################################
-                Dim PARADF1 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARADF1 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARADF2 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARADF3 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARADF4 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19030,7 +19030,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19322,7 +19322,7 @@ Public Class OIT0003OrderDetail
                   SQLDiffDEPTraincmd As New SqlCommand(SQLDiffDEPTrainStr, SQLcon),
                   SQLDiffLODTraincmd As New SqlCommand(SQLDiffLODTrainStr, SQLcon),
                   SQLSameLODTraincmd As New SqlCommand(SQLSameLODTrainStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19409,7 +19409,7 @@ Public Class OIT0003OrderDetail
                 If O_RTN = "ERR1" Then Exit Sub
 
                 '### 20200620 START((全体)No79対応)異なる列車で同一発日の場合#############
-                Dim PARADF1 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARADF1 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARADF2 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARADF3 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARADF4 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19497,7 +19497,7 @@ Public Class OIT0003OrderDetail
                 '### 20200620 END  ((全体)No79対応)異なる列車で同一発日の場合#############
 
                 '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
-                Dim PARALDF1 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARALDF1 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARALDF2 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARALDF3 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)積込日
                 Dim PARALDF4 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19605,7 +19605,7 @@ Public Class OIT0003OrderDetail
                 '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
 
                 '### 20200805 START((全体)No117対応)異なる列車で同一積込日の場合###########
-                Dim PARALSM1 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARALSM1 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARALSM2 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARALSM3 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)積込日
                 Dim PARALSM4 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19807,7 +19807,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
@@ -19999,7 +19999,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar) '受注№
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -20204,7 +20204,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '荷受人コード
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar) '荷受人コード
                 PARA1.Value = work.WF_SEL_CONSIGNEECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -20637,7 +20637,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = C_DELETE_FLG.DELETE
@@ -21291,7 +21291,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータス(900：受注キャンセル)
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
@@ -22260,7 +22260,7 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text

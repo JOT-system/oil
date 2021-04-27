@@ -867,7 +867,7 @@ Public Class OIT0001EmptyTurnDairyList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)       '受注№
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)           '受注№
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
                 Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 6)  '受注営業所コード
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
@@ -1150,7 +1150,7 @@ Public Class OIT0001EmptyTurnDairyList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 'PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA02.Value = C_DELETE_FLG.DELETE

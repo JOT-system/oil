@@ -980,12 +980,12 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '利用可能日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'ステータス
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '情報
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 11) '前回オーダー№
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar)     '前回オーダー№
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)  '本線列車
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 6)  '登録営業所コード
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 7)  '空車発駅（着駅）コード
@@ -1007,7 +1007,7 @@ Public Class OIT0002LinkList
                 Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20) '更新端末
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 12) '貨車連結順序表№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar) '貨車連結順序表№
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
 
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
@@ -1203,7 +1203,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)           '貨車連結(臨海)順序表№
+                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar)               '貨車連結(臨海)順序表№
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)              '削除フラグ
                 Dim P_TANKSITUATION As SqlParameter = SQLcmd.Parameters.Add("@TANKSITUATION", SqlDbType.NVarChar)   'タンク車状況コード
                 P_RLINKNO.Value = I_RLINKNO
@@ -3419,7 +3419,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar, 11)         '回送№
+                Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar)             '回送№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)          '回送明細№
                 Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar)               '本線列車
                 Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar)           '本線列車名
@@ -3842,7 +3842,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar, 11)             '回送№
+                Dim P_KAISOUNO As SqlParameter = SQLcmd.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar)                 '回送№
                 Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar, 4)                '本線列車
                 Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar, 20)           '本線列車名
                 Dim P_KAISOUYMD As SqlParameter = SQLcmd.Parameters.Add("@KAISOUYMD", SqlDbType.Date)                   '回送登録日
@@ -3896,7 +3896,7 @@ Public Class OIT0002LinkList
                 Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", SqlDbType.NVarChar, 20)           '更新端末
                 Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime)             '集信日時
 
-                Dim JP_KAISOUNO As SqlParameter = SQLcmdJnl.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar, 11)         '回送№
+                Dim JP_KAISOUNO As SqlParameter = SQLcmdJnl.Parameters.Add("@KAISOUNO", SqlDbType.NVarChar)             '回送№
 
                 Dim WW_DATENOW As DateTime = Date.Now
                 Dim strKaisouNo As String = ""
@@ -4567,7 +4567,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)           '受注№
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)               '受注№
                 Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar, 3)          '受注明細№
                 Dim P_SHIPORDER As SqlParameter = SQLcmd.Parameters.Add("@SHIPORDER", SqlDbType.NVarChar, 2)        '発送順
                 Dim P_LINEORDER As SqlParameter = SQLcmd.Parameters.Add("@LINEORDER", SqlDbType.NVarChar, 2)        '貨物駅入線順
@@ -4599,7 +4599,7 @@ Public Class OIT0002LinkList
                 Dim P_LOADINGOUTLETTRAINNO As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETTRAINNO", SqlDbType.NVarChar, 4)        '積込出線列車番号
                 Dim P_LOADINGOUTLETTRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETTRAINNAME", SqlDbType.NVarChar, 40)   '積込出線列車番号名
                 Dim P_LOADINGOUTLETORDER As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETORDER", SqlDbType.NVarChar, 2)            '積込出線順
-                Dim P_RESERVEDNO As SqlParameter = SQLcmd.Parameters.Add("@RESERVEDNO", SqlDbType.NVarChar, 11)     '予約番号
+                Dim P_RESERVEDNO As SqlParameter = SQLcmd.Parameters.Add("@RESERVEDNO", SqlDbType.NVarChar)         '予約番号
                 Dim P_OTSENDCOUNT As SqlParameter = SQLcmd.Parameters.Add("@OTSENDCOUNT", SqlDbType.Int)            'OT発送日報送信回数
                 Dim P_DLRESERVEDCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DLRESERVEDCOUNT", SqlDbType.Int)    '出荷予約ダウンロード回数
                 Dim P_DLTAKUSOUCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DLTAKUSOUCOUNT", SqlDbType.Int)      '託送状ダウンロード回数
@@ -4977,7 +4977,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11) '受注№
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)       '受注№
                 Dim P_TRAINNO As SqlParameter = SQLcmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar, 4)  '本線列車
                 Dim P_TRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@TRAINNAME", SqlDbType.NVarChar, 20) '本線列車名
                 Dim P_ORDERYMD As SqlParameter = SQLcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '受注登録日
@@ -5074,7 +5074,7 @@ Public Class OIT0002LinkList
                 Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", SqlDbType.NVarChar, 20)   '更新端末
                 Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime)     '集信日時
 
-                Dim JP_ORDERNO As SqlParameter = SQLcmdJnl.Parameters.Add("@ORDERNO", SqlDbType.NVarChar, 11)   '受注№
+                Dim JP_ORDERNO As SqlParameter = SQLcmdJnl.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)       '受注№
 
                 Dim WW_DATENOW As DateTime = Date.Now
                 Dim iresult As Integer
@@ -5493,7 +5493,7 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)     '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA01.Value = OrderNo
                 PARA02.Value = C_DELETE_FLG.DELETE

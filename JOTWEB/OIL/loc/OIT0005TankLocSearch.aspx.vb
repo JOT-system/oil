@@ -144,6 +144,9 @@ Public Class OIT0005TankLocSearch
             Me.tileSalesOffice.Recover(work.WF_SEL_SALESOFFICE_TILES.Text) '所属先（タイル選択）
         End If
 
+        '交検一覧ダウンロード関連
+        WF_STYMD.Text = Now.ToShortDateString()
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0005WRKINC.MAPIDS
         rightview.MAPID = OIT0005WRKINC.MAPIDC
@@ -192,12 +195,13 @@ Public Class OIT0005TankLocSearch
             For Each item As ListItem In Me.tileSalesOffice.GetSelectedListData().Items
                 officeCodeDic.Add(item.Value, item.Text)
             Next
-
-            Dim beginDate As Date = Now
-            Dim endDate As Date = New Date(beginDate.Year, beginDate.AddMonths(1).Month, 1).AddDays(-1)
-            If officeCodeDic.ContainsKey(BaseDllConst.CONST_OFFICECODE_011402) Then
-                endDate = New Date(beginDate.Year, beginDate.AddMonths(2).Month, 1).AddDays(-1)
+            '取得開始日付取得（Default：Now）
+            Dim beginDate As Date = Nothing
+            If Not Date.TryParse(WF_STYMD.Text, beginDate) Then
+                beginDate = Now
             End If
+            '取得終了日付計算（取得開始日付の翌月末日）
+            Dim endDate As Date = beginDate.AddDays(beginDate.Day * -1 + 1).AddMonths(2).AddDays(-1)
 
             '******************************
             '出力データ取得
@@ -212,7 +216,7 @@ Public Class OIT0005TankLocSearch
             '出力データ生成
             '******************************
             Dim url As String
-            url = OIT0005CustomReport.CreateKoukenList(Master.MAPID, officeCodeDic, beginDate, endDate, OIT0005ReportTbl)
+            url = OIT0005CustomReport.CreateKoukenList(Master.MAPID, officeCodeDic, beginDate, OIT0005ReportTbl)
 
             '○ 別画面でExcelを表示
             WF_PrintURL.Value = url
@@ -376,10 +380,10 @@ Public Class OIT0005TankLocSearch
                 Select Case CInt(WF_LeftMViewChange.Value)
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                        'Select Case WF_FIELD.Value
-                        '    Case "WF_STYMD"         '年月日
-                        '        .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
-                        'End Select
+                        Select Case WF_FIELD.Value
+                            Case WF_STYMD.ID         '年月日
+                                .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
+                        End Select
                         .ActiveCalendar()
                     Case LIST_BOX_CLASSIFICATION.LC_ORG
                         '組織コード(所属先)
@@ -448,6 +452,18 @@ Public Class OIT0005TankLocSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
+            Case WF_STYMD.ID
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        WF_STYMD.Text = ""
+                    Else
+                        WF_STYMD.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                WF_STYMD.Focus()
             Case Else
 
         End Select
@@ -469,6 +485,8 @@ Public Class OIT0005TankLocSearch
         Select Case WF_FIELD.Value
             Case "TxtSalesOffice"
                 'TxtSalesOffice.Focus()
+            Case WF_STYMD.ID
+                WF_STYMD.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -579,7 +597,8 @@ Public Class OIT0005TankLocSearch
             .AppendLine("   , TNK.JRINSPECTIONDATE    AS JRINSPECTIONDATE ")
             .AppendLine("   , TNK.TANKNUMBER          AS TANKNUMBER ")
             .AppendLine("   , TNK.JRALLINSPECTIONDATE AS JRALLINSPECTIONDATE ")
-            .AppendLine("   , SZI.PREORDERINGOILNAME  AS PREORDERINGOILNAME ")
+            .AppendLine("   , SZI.LASTOILCODE         AS LASTOILCODE ")
+            .AppendLine("   , SZI.LASTOILNAME         AS LASTOILNAME ")
             .AppendLine(" FROM ")
             .AppendLine("   OIL.OIM0005_TANK TNK ")
             .AppendLine("   LEFT JOIN OIL.OIT0005_SHOZAI SZI ")

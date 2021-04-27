@@ -17,7 +17,6 @@
         <div class="actionButtonBox">
             <div class="leftSide"></div>
             <div class="rightSide">
-                <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="交検一覧ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonKoukenList');" />
                 <input type="button" id="WF_ButtonDO"  class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonDO');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
@@ -58,7 +57,17 @@
                 </a>
                 <a></a>
             </div>
-            
+            <%-- 交検一覧ダウンロード --%>
+            <div class="inputItem">
+                <div>
+                    交検一覧
+                    <a class="ef" id="WF_STYMD_CODE" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');" style="display:inline-block;width:10em;">
+                        <asp:TextBox ID="WF_STYMD" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                    </a>
+                    ～
+                    <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonKoukenList');" style="margin-left:1em;" />
+                </div>
+            </div>
         </div>
     </div>
 

@@ -28,14 +28,13 @@ Public Class OIT0005CustomReport
     ''' <param name="mapId"></param>
     ''' <param name="officeCodeDic"></param>
     ''' <param name="beginDate"></param>
-    ''' <param name="endDate"></param>
     ''' <param name="printDataClass"></param>
     ''' <returns></returns>
-    Public Shared Function CreateKoukenList(ByVal mapId As String, ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date, ByVal endDate As Date, ByVal printDataClass As DataTable) As String
+    Public Shared Function CreateKoukenList(ByVal mapId As String, ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date, ByVal printDataClass As DataTable) As String
         Dim url As String
         Using repCbj = New KoukenList(mapId, printDataClass)
             Try
-                url = repCbj.CreatePrintData(officeCodeDic, beginDate, endDate)
+                url = repCbj.CreatePrintData(officeCodeDic, beginDate)
             Catch ex As Exception
                 Throw
             End Try
@@ -419,7 +418,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
     ''' 折り返し日数
     ''' </summary>
     Private Const A_WRAPPING_DAYS As Integer = 16
-    Private Const B_WRAPPING_DAYS As Integer = 11
+    Private Const B_WRAPPING_DAYS As Integer = 16
 
     ''' <summary>
     ''' 明細データ構造
@@ -428,7 +427,9 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
         Public OfficeCode As String
         Public TargetDate As Date
         Public TankNumber As String
-        Public PreorderingOilName As String
+        Public LastOilCode As String
+        Public LastOilName As String
+        Public LastShortOilName As String
         Public JRAllInspectionDate As Date
     End Class
 
@@ -439,13 +440,14 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
         Me.PrintData = printDataClass
     End Sub
 
-    Public Function CreatePrintData(ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date, ByVal endDate As Date) As String
+    Public Function CreatePrintData(ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
 
+            '営業所別にシートを作成
             For Each officeCodePair As KeyValuePair(Of String, String) In officeCodeDic
 
                 '○作業シート設定
@@ -464,14 +466,14 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
                 Select Case officeCodePair.Key
                     Case BaseDllConst.CONST_OFFICECODE_011402
                         '○ヘッダーの設定
-                        EditHeaderAreaB(officeCodePair.Value, beginDate, endDate)
+                        EditHeaderAreaB(officeCodePair.Value, beginDate)
                         '○明細の設定
-                        EditDetailAreaB(officeCodePair.Key, beginDate, endDate)
+                        EditDetailAreaB(officeCodePair.Key, beginDate)
                     Case Else
                         '○ヘッダーの設定
-                        EditHeaderAreaA(officeCodePair.Value, beginDate, endDate)
+                        EditHeaderAreaA(officeCodePair.Value, beginDate)
                         '○明細の設定
-                        EditDetailAreaA(officeCodePair.Key, beginDate, endDate)
+                        EditDetailAreaA(officeCodePair.Key, beginDate)
                 End Select
 
             Next
@@ -496,11 +498,12 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
     ''' <summary>
     ''' ヘッダー部の設定（TEMPLATE_A）
     ''' </summary>
-    Private Sub EditHeaderAreaA(ByVal officeName As String, ByVal beginDate As Date, ByVal endDate As Date)
+    Private Sub EditHeaderAreaA(ByVal officeName As String, ByVal beginDate As Date)
 
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
+            Dim nBeginDate As Date = New Date(beginDate.Year, beginDate.AddMonths(1).Month, 1)
 
             'タイトル(営業所名)
             rngHeaderArea = ExcelWorkSheet.Range("A1")
@@ -517,13 +520,11 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
             rngHeaderArea.Value = beginDate.ToShortDateString()
             ExcelMemoryRelease(rngHeaderArea)
 
-            '出力終了日
+            '出力終了日（開始日付の月末迄）
             rngHeaderArea = ExcelWorkSheet.Range("F2")
-            rngHeaderArea.Value = endDate.ToShortDateString()
+            rngHeaderArea.Value = nBeginDate.AddDays(-1).ToShortDateString()
             ExcelMemoryRelease(rngHeaderArea)
 
-            Dim nBeginDate As Date = New Date(beginDate.Year, beginDate.AddMonths(1).Month, 1)
-            Dim nEndDate As Date = nBeginDate.AddMonths(1).AddDays(-1)
 
             '出力月（出力開始日）
             rngHeaderArea = ExcelWorkSheet.Range("A20")
@@ -537,7 +538,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
 
             '出力終了日
             rngHeaderArea = ExcelWorkSheet.Range("F20")
-            rngHeaderArea.Value = nEndDate.ToShortDateString()
+            rngHeaderArea.Value = nBeginDate.AddMonths(1).AddDays(-1).ToShortDateString()
             ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
@@ -551,7 +552,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
     ''' <summary>
     ''' 明細部分の編集（TEMPLATE_A）
     ''' </summary>
-    Private Sub EditDetailAreaA(ByVal officeCode As String, ByVal beginDate As Date, ByVal endDate As Date)
+    Private Sub EditDetailAreaA(ByVal officeCode As String, ByVal beginDate As Date)
         Try
 
             Dim baseDate As Date = Nothing
@@ -632,7 +633,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
     ''' <summary>
     ''' ヘッダー部の設定（TEMPLATE_B）
     ''' </summary>
-    Private Sub EditHeaderAreaB(ByVal officeName As String, ByVal beginDate As Date, ByVal endDate As Date)
+    Private Sub EditHeaderAreaB(ByVal officeName As String, ByVal beginDate As Date)
 
         Dim rngHeaderArea As Excel.Range = Nothing
 
@@ -649,13 +650,13 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
             ExcelMemoryRelease(rngHeaderArea)
 
             '出力開始日
-            rngHeaderArea = ExcelWorkSheet.Range("D2")
+            rngHeaderArea = ExcelWorkSheet.Range("C2")
             rngHeaderArea.Value = beginDate.ToShortDateString()
             ExcelMemoryRelease(rngHeaderArea)
 
-            '出力終了日
-            rngHeaderArea = ExcelWorkSheet.Range("G2")
-            rngHeaderArea.Value = endDate.ToShortDateString()
+            '出力終了日（開始日付の月末迄）
+            rngHeaderArea = ExcelWorkSheet.Range("F2")
+            rngHeaderArea.Value = (New Date(beginDate.Year, beginDate.AddMonths(1).Month, 1).AddDays(-1)).ToShortDateString()
             ExcelMemoryRelease(rngHeaderArea)
 
         Catch ex As Exception
@@ -669,7 +670,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
     ''' <summary>
     ''' 明細部分の編集（TEMPLATE_B）
     ''' </summary>
-    Private Sub EditDetailAreaB(ByVal officeCode As String, ByVal beginDate As Date, ByVal endDate As Date)
+    Private Sub EditDetailAreaB(ByVal officeCode As String, ByVal beginDate As Date)
         Try
 
             Dim baseDate As Date = Nothing
@@ -678,7 +679,7 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
                        .OfficeCode = r("OFFICECODE").ToString(),
                        .TargetDate = CDate(r("JRINSPECTIONDATE").ToString()),
                        .TankNumber = r("TANKNUMBER").ToString(),
-                       .PreorderingOilName = r("PREORDERINGOILNAME").ToString(),
+                       .LastOilCode = r("LASTOILCODE").ToString(),
                        .JRAllInspectionDate = CDate(r("JRALLINSPECTIONDATE").ToString())
                        }).
                 Where(Function(r) r.OfficeCode = officeCode).ToList()
@@ -688,8 +689,6 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
             SetDetailDataB("B3", baseDate, printRows)
             baseDate = baseDate.AddDays(B_WRAPPING_DAYS)
             SetDetailDataB("B25", baseDate, printRows)
-            baseDate = baseDate.AddDays(B_WRAPPING_DAYS)
-            SetDetailDataB("B47", baseDate, printRows)
 
         Catch ex As Exception
             Throw
@@ -726,7 +725,8 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
                     For Each item In query.Take(B_DETAIL_DATA_COUNT).Select(Function(r, idx) New With {.row = r, .rowOffset = idx})
                         '全検チェック
                         rngWorkArea = rngDetailAreaBase.Offset(RowOffset:=item.rowOffset, ColumnOffset:=colOffset)
-                        rngWorkArea.Value = IIf((item.row.JRAllInspectionDate - thisDate).Days <= 30, "☆", "")
+                        Dim remainingDays As Integer = (item.row.JRAllInspectionDate - item.row.TargetDate).Days
+                        rngWorkArea.Value = IIf(remainingDays >= 0 AndAlso remainingDays <= 30, "☆", "")
                         ExcelMemoryRelease(rngWorkArea)
                         'タンク車番号
                         rngWorkArea = rngDetailAreaBase.Offset(RowOffset:=item.rowOffset, ColumnOffset:=colOffset + 1)
@@ -734,7 +734,25 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
                         ExcelMemoryRelease(rngWorkArea)
                         '前回油種名称
                         rngWorkArea = rngDetailAreaBase.Offset(RowOffset:=item.rowOffset, ColumnOffset:=colOffset + 2)
-                        rngWorkArea.Value = item.row.PreorderingOilName
+                        Dim lastOilName As String = ""
+                        Select Case item.row.LastOilCode
+                            Case CONST_HTank
+                                'ハイオク
+                                lastOilName = "H"
+                            Case CONST_RTank
+                                'レギュラー
+                                lastOilName = "R"
+                            Case CONST_TTank, CONST_MTTank
+                                '灯油・未添加灯油
+                                lastOilName = "ト"
+                            Case CONST_KTank1, CONST_KTank2, CONST_K3Tank1, CONST_K3Tank2, CONST_K5Tank, CONST_K10Tank
+                                '軽油・３号軽油・５号軽油・１０号軽油
+                                lastOilName = "ケ"
+                            Case CONST_LTank1, CONST_LTank2, CONST_ATank, CONST_ATank2, CONST_ATank3
+                                'ＬＳＡ・Ａ重油
+                                lastOilName = "A"
+                        End Select
+                        rngWorkArea.Value = lastOilName
                         ExcelMemoryRelease(rngWorkArea)
                     Next
                 End If

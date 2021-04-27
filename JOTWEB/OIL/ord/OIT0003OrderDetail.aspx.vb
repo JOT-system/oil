@@ -5144,10 +5144,10 @@ Public Class OIT0003OrderDetail
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
                     '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    '引数５：更新フラグ　　⇒　初期化　("2")
                     'WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
-                    '                    I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
-                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
-                                        I_AEMPARRDATE:="", upActualEmparrDate:=True)
+                    '                    I_AEMPARRDATE:="", upActualEmparrDate:=True)
+                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1", upFlag:="2")
 
                 Else
                     i += 1
@@ -13062,13 +13062,25 @@ Public Class OIT0003OrderDetail
                 '★★★タンク車所在(初期化)
             ElseIf upFlag = "2" Then
                 '所在地コード
-                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+                'SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+                If Not String.IsNullOrEmpty(I_LOCATION) Then
+                    SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+                End If
                 'タンク車状態コード
-                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                'SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                If Not String.IsNullOrEmpty(I_STATUS) Then
+                    SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                End If
                 '積車区分
-                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                'SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                If Not String.IsNullOrEmpty(I_KBN) Then
+                    SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                End If
                 'タンク車状況コード
-                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                'SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                If Not String.IsNullOrEmpty(I_SITUATION) Then
+                    SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                End If
                 '空車着日（予定）
                 SQLStr &= String.Format("        EMPARRDATE   = {0}, ", "NULL")
                 '空車着日（実績）

@@ -479,6 +479,7 @@ Public Class M00001MENU
 
         '帳票条件ペインの表示初期化
         Me.transportResultCondPane.Visible = False
+        Me.TankTransportResultCondPane.Visible = False
 
         '帳票条件ぺインの表示変更
         If CONST_REPORTNAME_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) Then
@@ -489,7 +490,7 @@ Public Class M00001MENU
         '帳票条件ぺインの表示変更
         If CONST_REPORTNAME_TANK_TRANSPORT_RESULT.Equals(Me.ddlReportNameList.SelectedItem.Text) OrElse
             CONST_REPORTNAME_TANK_TRANSPORT_RESULT_ARR.Equals(Me.ddlReportNameList.SelectedItem.Text) Then
-            '輸送実績表条件パネル表示
+            'タンク輸送運賃実績表条件パネル表示
             Me.TankTransportResultCondPane.Visible = True
         End If
 

@@ -59,6 +59,15 @@ Partial Public Class OIT0005TankLocSearch
     Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
     
     '''<summary>
+    '''WF_STYMD コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_STYMD As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

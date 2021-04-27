@@ -342,7 +342,7 @@ div.detail_tab {
 div.detail_tab > :nth-child(5n+1) {
     vertical-align: middle;
     display: inline-block;
-    width: 120px;
+    width: 135px;
 }
 
 div.detail_tab > :nth-child(5n+2) {

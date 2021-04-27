@@ -1576,6 +1576,10 @@ Public Class OIT0001EmptyTurnDairyList
 
                     '○袖ヶ浦営業所の場合
                 ElseIf OIT0001exluprow("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '★油種の出荷期間に合致した「Ａ重油」の種類へ変換
+                    For Each OIT0001odrow As DataRow In dtOrderDetail.Select("OILCODE='" + BaseDllConst.CONST_ATank + "'")
+                        CMNPTS.OilTermSearch(OIT0001exluprow("OFFICECODE"), OIT0001exluprow("CONSIGNEECODE"), OIT0001exluprow("LODDATE"), OIT0001odrow)
+                    Next
                     '★油種の出荷期間に合致した「軽油」の種類へ変換
                     For Each OIT0001odrow As DataRow In dtOrderDetail.Select("OILCODE='" + BaseDllConst.CONST_KTank1 + "'")
                         CMNPTS.OilTermSearch(OIT0001exluprow("OFFICECODE"), OIT0001exluprow("CONSIGNEECODE"), OIT0001exluprow("LODDATE"), OIT0001odrow)
@@ -1870,16 +1874,16 @@ Public Class OIT0001EmptyTurnDairyList
                 P_OTHER9OTANK.Value = 0
                 P_OTHER10OTANK.Value = 0
                 P_TOTALTANK.Value = dtrow("TOTALTANK")
-                P_RTANKCH.Value = 0
-                P_HTANKCH.Value = 0
-                P_TTANKCH.Value = 0
-                P_MTTANKCH.Value = 0
-                P_KTANKCH.Value = 0
-                P_K3TANKCH.Value = 0
-                P_K5TANKCH.Value = 0
-                P_K10TANKCH.Value = 0
-                P_LTANKCH.Value = 0
-                P_ATANKCH.Value = 0
+                P_RTANKCH.Value = dtrow("RTANK")
+                P_HTANKCH.Value = dtrow("HTANK")
+                P_TTANKCH.Value = dtrow("TTANK")
+                P_MTTANKCH.Value = dtrow("MTTANK")
+                P_KTANKCH.Value = dtrow("KTANK")
+                P_K3TANKCH.Value = dtrow("K3TANK")
+                P_K5TANKCH.Value = dtrow("K5TANK")
+                P_K10TANKCH.Value = dtrow("K10TANK")
+                P_LTANKCH.Value = dtrow("LTANK")
+                P_ATANKCH.Value = dtrow("ATANK")
                 P_OTHER1OTANKCH.Value = 0
                 P_OTHER2OTANKCH.Value = 0
                 P_OTHER3OTANKCH.Value = 0
@@ -1890,7 +1894,7 @@ Public Class OIT0001EmptyTurnDairyList
                 P_OTHER8OTANKCH.Value = 0
                 P_OTHER9OTANKCH.Value = 0
                 P_OTHER10OTANKCH.Value = 0
-                P_TOTALTANKCH.Value = 0
+                P_TOTALTANKCH.Value = dtrow("TOTALTANK")
                 P_TANKLINKNO.Value = ""
                 P_TANKLINKNOMADE.Value = ""
                 P_BILLINGNO.Value = ""

@@ -45,8 +45,8 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
-                document.getElementById("TxtBulkInspection").disabled = "disabled";
-                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "disabled";
+                document.getElementById("TxtBulkInspection").disabled = "";
+                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
@@ -77,8 +77,8 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
-                document.getElementById("TxtBulkInspection").disabled = "disabled";
-                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "disabled";
+                document.getElementById("TxtBulkInspection").disabled = "";
+                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
 
                 //活性
@@ -93,8 +93,8 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
-                document.getElementById("TxtBulkInspection").disabled = "";
-                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "";
+                document.getElementById("TxtBulkInspection").disabled = "disabled";
+                document.getElementById("WF_ButtonINSPECTION_TAB1").disabled = "disabled";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_KARI_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";

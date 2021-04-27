@@ -27,6 +27,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK8tbl As DataTable                              '作業用8テーブル(異なる列車(同一積込日)タンク車チェック用)
     Private OIT0003WK9tbl As DataTable                              '作業用9テーブル(他受注オーダーで積込日が同日チェック用)
     Private OIT0003WK10tbl As DataTable                             '作業用10テーブル(同一列車(同一積込日)タンク車チェック用)
+    Private OIT0003WK11tbl As DataTable                             '作業用11テーブル(タンク車マスタ)中分類油種チェック用)
     Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003Oiltermtbl As DataTable                          '作業用テーブル(油種出荷期間マスタ取得用)
@@ -5829,6 +5830,7 @@ Public Class OIT0003OrderDetail
         rightview.SetErrorReport("")
 
         Dim WW_RESULT As String = ""
+        Dim WW_CHKMDLOIL_KINOENE As Boolean = False
 
         '〇新規登録時で油種数登録ボタンを押下しているかチェック
         If work.WF_SEL_CREATEFLG.Text = "1" _
@@ -5922,6 +5924,13 @@ Public Class OIT0003OrderDetail
             Exit Sub
 
         End If
+        '### 20210426 START 指摘票対応(No427) ####################################
+        '○ 対象油種(格上げ・格下げ)の中分類油種コードチェック(対象：甲子営業所)
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+            AndAlso (WW_ERRCODE = "ERR2" OrElse WW_ERRCODE = "ERR4") Then
+            WW_CHKMDLOIL_KINOENE = True
+        End If
+        '### 20210426 END   指摘票対応(No427) ####################################
 
         '〇 タンク車状態チェック
         WW_CheckTankStatus(WW_ERRCODE)
@@ -5963,6 +5972,21 @@ Public Class OIT0003OrderDetail
                 WW_UpdateOrderDetail(SQLcon)
             End Using
         End If
+
+        '### 20210426 START 指摘票対応(No427) ####################################
+        '○ 対象油種(格上げ・格下げ)の中分類油種コードチェック(対象：甲子営業所)
+        If WW_CHKMDLOIL_KINOENE = True Then
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                '○油種中分類チェック
+                WW_CheckMiddleOil(SQLcon, WW_ERRCODE)
+                If WW_ERRCODE = "ERR" Then
+                    Exit Sub
+                End If
+            End Using
+        End If
+        '### 20210426 END   指摘票対応(No427) ####################################
 
         '### 20201028 START 根岸営業所(積込可能車数チェック)対応 #########################################
         '### 20201125 指摘票対応(No227) ##################################################################
@@ -12102,7 +12126,6 @@ Public Class OIT0003OrderDetail
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIS0015_2.VALUE1), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIS0015_2.VALUE1), '')" _
             & "   END                                                AS ORDERINFONAME" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')   　       AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ''                                                 AS STACKINGNAME" _
@@ -12110,6 +12133,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.CONTACTFLG), '')   　         AS CONTACTFLG" _
             & " , ISNULL(RTRIM(OIT0002.RESULTFLG), '')   　          AS RESULTFLG" _
             & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -12214,6 +12238,24 @@ Public Class OIT0003OrderDetail
             & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
             & "   ELSE '対象外'" _
             & "   END                                                AS OTSENDSTATUSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.RESERVEDSTATUS), '')          AS RESERVEDSTATUS" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011402) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS RESERVEDSTATUSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.TAKUSOUSTATUS), '')           AS TAKUSOUSTATUS" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012402) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS TAKUSOUSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
@@ -12244,6 +12286,18 @@ Public Class OIT0003OrderDetail
             & "        OIS0015_3.CLASS   = 'OTSENDSTATUS' " _
             & "    AND OIS0015_3.KEYCODE = OIT0002.OTSENDSTATUS " _
         '### 20210409 END   OT発送日報送信状況順対応 #######################################
+        '### 20210421 START 出荷予約対応 ###################################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_4 ON " _
+            & "        OIS0015_4.CLASS   = 'RESERVEDSTATUS' " _
+            & "    AND OIS0015_4.KEYCODE = OIT0002.RESERVEDSTATUS " _
+        '### 20210421 END   出荷予約対応 ###################################################
+        '### 20210421 START 託送状対応 #####################################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_5 ON " _
+            & "        OIS0015_5.CLASS   = 'TAKUSOUSTATUS' " _
+            & "    AND OIS0015_5.KEYCODE = ISNULL(OIT0002.TAKUSOUSTATUS,'0') " _
+        '### 20210421 END   託送状対応 #####################################################
 
         SQLStr &=
               " WHERE OIT0002.LODDATE    >= @P2" _
@@ -18416,6 +18470,108 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
+    End Sub
+
+    ''' <summary>
+    ''' 油種中分類チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckMiddleOil(ByVal SQLcon As SqlConnection, ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        If IsNothing(OIT0003WK11tbl) Then
+            OIT0003WK11tbl = New DataTable
+        End If
+        If OIT0003WK11tbl.Columns.Count <> 0 Then
+            OIT0003WK11tbl.Columns.Clear()
+        End If
+        OIT0003WK11tbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを取得する
+        Dim SQLStr As String = ""
+        SQLStr =
+              " SELECT" _
+            & "   OIT0003.ORDERNO                                    AS ORDERNO " _
+            & " , OIT0003.DETAILNO                                   AS DETAILNO " _
+            & " , OIT0003.OILCODE                                    AS OILCODE " _
+            & " , OIT0003.ORDERINGTYPE                               AS ORDERINGTYPE " _
+            & " , OIT0003.ORDERINGOILNAME                            AS ORDERINGOILNAME " _
+            & " , CASE " _
+            & "   WHEN OIM0003.MIDDLEOILCODE = OIM0005.MIDDLEOILCODE THEN '0' " _
+            & "   ELSE '1' " _
+            & "   END                                                AS MIDDLEOILFLG " _
+            & " , OIM0003.MIDDLEOILCODE                              AS MIDDLEOILCODE_OIM0003" _
+            & " , OIM0003.MIDDLEOILNAME                              AS MIDDLEOILNAME_OIM0003" _
+            & " , OIM0005.MIDDLEOILCODE                              AS MIDDLEOILCODE_OIM0005" _
+            & " , OIM0005.MIDDLEOILNAME                              AS MIDDLEOILNAME_OIM0005" _
+            & " FROM oil.OIT0003_DETAIL OIT0003 " _
+            & " INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "     OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & String.Format(" AND OIT0002.ORDERSTATUS <> '{0}' ", BaseDllConst.CONST_ORDERSTATUS_900) _
+            & String.Format(" AND OIT0002.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE) _
+            & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & String.Format(" AND OIM0003.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE) _
+            & " INNER JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & String.Format(" AND OIM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE) _
+            & " WHERE OIT0003.ORDERNO = @ORDERNO " _
+            & "   AND OIT0003.DETAILNO = @DETAILNO " _
+            & "   AND OIT0003.UPGRADEFLG <> '2' " _
+            & String.Format(" AND OIT0003.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)   '受注№
+                Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", SqlDbType.NVarChar) '受注明細№
+
+                '★格上げ、または格下げにチェックされている行が対象
+                For Each OIT0003row As DataRow In OIT0003tbl.Select("UPGRADEFLG='on' OR DOWNGRADEFLG='on'")
+                    P_ORDERNO.Value = Me.TxtOrderNo.Text
+                    P_DETAILNO.Value = Convert.ToString(OIT0003row("DETAILNO"))
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        If OIT0003WK11tbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0003WK11tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+                        '○ テーブル検索結果をクリア
+                        OIT0003WK11tbl.Clear()
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0003WK11tbl.Load(SQLdr)
+                    End Using
+
+                    '★中分類油種の比較(受注油種(中分類油種)≠タンク車マスタ(中分類油種))
+                    If Convert.ToString(OIT0003WK11tbl.Rows(0)("MIDDLEOILCODE_OIM0003")) <> Convert.ToString(OIT0003WK11tbl.Rows(0)("MIDDLEOILCODE_OIM0005")) Then
+                        Dim Msg As String = ""
+                        Msg = "製油所向けの中分類油種と一致しません。再度確認をお願いします。"
+                        Msg &= String.Format("<br>(受注)中分類油種【{0}】　(貨車)中分類油種【{1}】", OIT0003WK11tbl.Rows(0)("MIDDLEOILNAME_OIM0003"), OIT0003WK11tbl.Rows(0)("MIDDLEOILNAME_OIM0005"))
+                        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+
+                        O_RTN = "ERR"
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_CheckMiddleOil")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_CheckMiddleOil"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            O_RTN = "ERR"
+            Exit Sub
+
+        End Try
     End Sub
 
     ''' <summary>

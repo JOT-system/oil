@@ -365,6 +365,15 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents WF_DView1 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
+    '''TxtBulkInspection コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtBulkInspection As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''pnlListArea1 コントロール。
     '''</summary>
     '''<remarks>

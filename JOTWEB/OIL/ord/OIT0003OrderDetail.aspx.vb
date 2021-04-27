@@ -7823,10 +7823,7 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRINSPECTIONFLG = "3"
                 End If
-            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井営業所・甲子営業所対応 ###########################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRINSPECTIONCNT <= 1 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7836,6 +7833,22 @@ Public Class OIT0003OrderDetail
                     WW_JRINSPECTIONFLG = "3"
                 End If
                 '### 20210402 END   袖ヶ浦営業所対応 ###############################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                '### 20210421 START 五井営業所・甲子営業所対応 #####################################
+                If WW_JRINSPECTIONCNT <= 1 Then
+                    '★OTリース車の場合は警告とする
+                    If WW_GetValue(14) = BaseDllConst.CONST_BRANCHCODE_110001 Then
+                        WW_JRINSPECTIONFLG = "2"
+                    Else
+                        WW_JRINSPECTIONFLG = "1"
+                    End If
+                ElseIf WW_JRINSPECTIONCNT >= 2 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                '### 20210402 END   五井営業所・甲子営業所対応 #####################################
             Else
                 If WW_JRINSPECTIONCNT <= 3 Then
                     WW_JRINSPECTIONFLG = "1"
@@ -7888,10 +7901,7 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
-            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                '### 20210421 五井営業所・甲子営業所対応 ###########################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRALLINSPECTIONCNT <= 1 Then
                     WW_JRALLINSPECTIONFLG = "1"
@@ -7901,6 +7911,22 @@ Public Class OIT0003OrderDetail
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
                 '### 20210402 END   袖ヶ浦営業所対応 ###############################################
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                '### 20210421 START 五井営業所・甲子営業所対応 #####################################
+                If WW_JRALLINSPECTIONCNT <= 1 Then
+                    '★OTリース車の場合は警告とする
+                    If WW_GetValue(14) = BaseDllConst.CONST_BRANCHCODE_110001 Then
+                        WW_JRALLINSPECTIONFLG = "2"
+                    Else
+                        WW_JRALLINSPECTIONFLG = "1"
+                    End If
+                ElseIf WW_JRALLINSPECTIONCNT >= 2 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                '### 20210421 END   五井営業所・甲子営業所対応 #####################################
             Else
                 If WW_JRALLINSPECTIONCNT <= 3 Then
                     WW_JRALLINSPECTIONFLG = "1"
@@ -12076,7 +12102,6 @@ Public Class OIT0003OrderDetail
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIS0015_2.VALUE1), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIS0015_2.VALUE1), '')" _
             & "   END                                                AS ORDERINFONAME" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')   　       AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ''                                                 AS STACKINGNAME" _
@@ -12084,6 +12109,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.CONTACTFLG), '')   　         AS CONTACTFLG" _
             & " , ISNULL(RTRIM(OIT0002.RESULTFLG), '')   　          AS RESULTFLG" _
             & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -12188,6 +12214,24 @@ Public Class OIT0003OrderDetail
             & "   WHEN OIM0007.OTFLG = '1' THEN ISNULL(RTRIM(OIS0015_3.VALUE1), '') " _
             & "   ELSE '対象外'" _
             & "   END                                                AS OTSENDSTATUSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.RESERVEDSTATUS), '')          AS RESERVEDSTATUS" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011402) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_4.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS RESERVEDSTATUSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.TAKUSOUSTATUS), '')           AS TAKUSOUSTATUS" _
+            & " , CASE" _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011201) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011202) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_011203) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012401) _
+            & String.Format("   WHEN OIT0002.OFFICECODE = '{0}' THEN ISNULL(RTRIM(OIS0015_5.VALUE1), '') ", BaseDllConst.CONST_OFFICECODE_012402) _
+            & "   ELSE '対象外'" _
+            & "   END                                                AS TAKUSOUSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
@@ -12218,6 +12262,18 @@ Public Class OIT0003OrderDetail
             & "        OIS0015_3.CLASS   = 'OTSENDSTATUS' " _
             & "    AND OIS0015_3.KEYCODE = OIT0002.OTSENDSTATUS " _
         '### 20210409 END   OT発送日報送信状況順対応 #######################################
+        '### 20210421 START 出荷予約対応 ###################################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_4 ON " _
+            & "        OIS0015_4.CLASS   = 'RESERVEDSTATUS' " _
+            & "    AND OIS0015_4.KEYCODE = OIT0002.RESERVEDSTATUS " _
+        '### 20210421 END   出荷予約対応 ###################################################
+        '### 20210421 START 託送状対応 #####################################################
+        SQLStr &=
+              "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_5 ON " _
+            & "        OIS0015_5.CLASS   = 'TAKUSOUSTATUS' " _
+            & "    AND OIS0015_5.KEYCODE = ISNULL(OIT0002.TAKUSOUSTATUS,'0') " _
+        '### 20210421 END   託送状対応 #####################################################
 
         SQLStr &=
               " WHERE OIT0002.LODDATE    >= @P2" _

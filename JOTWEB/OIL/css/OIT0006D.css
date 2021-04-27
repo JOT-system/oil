@@ -329,3 +329,44 @@ div[id^=pnlListArea] .boxIconArea div, div[id^=pnlListArea] .calendarIconArea di
 _:-ms-lang(x)::backdrop, div[id^=pnlListArea] .calendarIconArea div, div[id^=pnlListArea] .boxIconArea div {
     margin-top: calc(100% - 12.5px);
 }
+
+
+div.detail_tab {
+    width: 100%;
+    box-sizing: border-box;
+    display: inline-block;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+div.detail_tab > :nth-child(5n+1) {
+    vertical-align: middle;
+    display: inline-block;
+    width: 135px;
+}
+
+div.detail_tab > :nth-child(5n+2) {
+    vertical-align: middle;
+    display: inline-block;
+    width: 150px;
+}
+
+/*div.detail_tab > :nth-child(5n+3) {
+    vertical-align: middle;
+    display: inline-block;
+    width: 7.2%;
+    font-size: 0.8em;
+}*/
+
+/*div.detail_tab > :nth-child(5n+4) {
+    vertical-align: middle;
+    display: inline-block;
+    width: 7%;
+    margin-right:5px;
+}
+
+div.detail_tab > :nth-child(5n+5) {
+    vertical-align: top;
+    display: inline-block;
+    width: 64.9%;
+}*/

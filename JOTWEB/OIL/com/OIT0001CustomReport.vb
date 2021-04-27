@@ -836,7 +836,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             'ElseIf Convert.ToString(PrintDatarow("UPGRADEFLG")) = "0" Then
             '    Remark &= "「格下げ」"
             'End If
-            'I_rngDetailArea.Value = Remark
+            I_rngDetailArea.Value = Remark
             ''### 20210413 END   格上げ・格下げ追加対応 ##################################################
             '### 20201218 END   指摘票対応(No276)全体 ###################################################
             ExcelMemoryRelease(I_rngDetailArea)

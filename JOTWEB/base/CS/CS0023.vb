@@ -1168,6 +1168,25 @@ Public Structure CS0023XLSUPLOAD
                     For z As Integer = 31 To 1 Step -1
                         chkTrainNo = Replace(chkTrainNo, z.ToString() + "日", "")
                     Next
+                    'Try
+                    '    '★列車番号に発日が設定されている場合
+                    '    If chkTrainNo <> Convert.ToString(xlsTrainNo) Then
+                    '        Dim sLodDay As String = Date.Parse(Convert.ToString(dtrow("LODDATE"))).ToString("dd")
+                    '        Dim sDepDay As String = Replace(Convert.ToString(xlsTrainNo), chkTrainNo, "")
+                    '        sDepDay = Replace(sDepDay, "日", "")
+
+                    '        '★積込日と同月かチェック(積込日の日数の数値が小さければ同月とする)
+                    '        If Integer.Parse(sLodDay) < Integer.Parse(sDepDay) Then
+                    '            dtrow("DEPDATE") = Date.Parse(Convert.ToString(dtrow("LODDATE"))).ToString("yyyy/MM") + "/" + sDepDay
+                    '        Else
+                    '            dtrow("DEPDATE") = Date.Parse(Convert.ToString(dtrow("LODDATE"))).AddMonths(1).ToString("yyyy/MM") + "/" + sDepDay
+                    '        End If
+                    '    Else
+                    '        dtrow("DEPDATE") = ""
+                    '    End If
+                    'Catch ex As Exception
+                    '    dtrow("DEPDATE") = ""
+                    'End Try
                 End If
                 '### 20210414 END   日数が設定されている場合を考慮(日数を削除) ###############################
 
@@ -1209,6 +1228,7 @@ Public Structure CS0023XLSUPLOAD
         dt.Columns.Add("FILENAME", Type.GetType("System.String"))
         dt.Columns.Add("DATERECEIVEYMD", Type.GetType("System.String"))
         dt.Columns.Add("LODDATE", Type.GetType("System.String"))
+        'dt.Columns.Add("DEPDATE", Type.GetType("System.String"))
         dt.Columns.Add("LINE_HEADER", Type.GetType("System.String"))
         dt.Columns.Add("ARRSTATION_HEADER", Type.GetType("System.String"))
         dt.Columns.Add("TRAINNO_HEADER", Type.GetType("System.String"))

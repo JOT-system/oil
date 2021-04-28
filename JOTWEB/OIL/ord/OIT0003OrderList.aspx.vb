@@ -1878,6 +1878,17 @@ Public Class OIT0003OrderList
             Exit Sub
         End Try
 
+        ''○発日を取得する(回線別予定表に設定されている場合はそのままの日付を採用)
+        'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        'For Each OIT0003EXLUProw In OIT0003EXLUPtbl.Select("TRAINNO<>'' AND DEPDATE=''")
+        '    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        '    WW_FixvalueMasterSearch(I_CODE:=BaseDllConst.CONST_OFFICECODE_011402,
+        '                            I_CLASS:="TRAINNUMBER",
+        '                            I_KEYCODE:=OIT0003EXLUProw("TRAINNO"),
+        '                            O_VALUE:=WW_GetValue)
+        '    OIT0003EXLUProw("DEPDATE") = Date.Parse(OIT0003EXLUProw("LODDATE")).AddDays(WW_GetValue(6)).ToString("yyyy/MM/dd")
+        'Next
+
         '◯回線別積込取込(日新)TBL削除処理(再アップロード対応)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続

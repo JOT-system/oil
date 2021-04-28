@@ -93,7 +93,7 @@
                             <ItemTemplate>
                                 <!-- チェックボックス -->
                                 <span class="WF_COSTLISTTBL_CHECKFLG">
-                                    <asp:CheckBox ID="WF_COSTLISTTBL_CHECKFLG" runat="server" Enabled='<%# GetEnabled(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' Checked='<%# GetCheckVal(DataBinder.Eval(Container.DataItem, "CHECKFLG")) %>'  />
+                                    <asp:CheckBox ID="WF_COSTLISTTBL_CHECKFLG" runat="server" Enabled='<%# GetCheckBoxEnabled(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' Checked='<%# GetCheckBoxVal(DataBinder.Eval(Container.DataItem, "CHECKFLG")) %>'  />
                                 </span>
                             </ItemTemplate>
                         </asp:TemplateField>
@@ -102,18 +102,20 @@
                             <ItemTemplate>
                                 <!-- 詳細ボタン -->
                                 <span class="WF_COSTLISTTBL_CALCACCOUNT">
-                                    <asp:Button ID="WF_COSTLISTTBL_CALCACCOUNT" runat="server" Text="明細を見る" Enabled='<%# GetCalcAccountVal(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' />
+                                    <asp:Button ID="WF_COSTLISTTBL_CALCACCOUNT" runat="server" Text="明細を見る" Enabled='true' />
                                 </span>
+                                <!-- 計算科目 -->
+                                <asp:HiddenField ID="WF_COSTLISTTBL_CODE_CALCACCOUNT" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "CALCACCOUNT") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH4" ItemStyle-CssClass="WF_COSTLISTTBL_TD4">
                             <HeaderTemplate>荷主</HeaderTemplate>
                             <ItemTemplate>
-                                <!-- 荷受人名 -->
+                                <!-- 荷主名 -->
                                 <span ondblclick="Field_DBclick('WF_COSTLISTTBL_SHIPPERSNAME<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST %>)">
-                                    <asp:TextBox ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" CssClass='<%# GetAccountCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' ReadOnly="true" Text='<%# Bind("SHIPPERSNAME")%>' />
+                                    <asp:TextBox ID="WF_COSTLISTTBL_SHIPPERSNAME" runat="server" CssClass='<%# GetEditableCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' ReadOnly="true" Text='<%# Bind("SHIPPERSNAME")%>' />
                                 </span>
-                                <!-- 荷受人コード -->
+                                <!-- 荷主コード -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_SHIPPERSCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "SHIPPERSCODE") %>' />
                             </ItemTemplate>
                         </asp:TemplateField>
@@ -121,7 +123,7 @@
                             <HeaderTemplate>勘定科目</HeaderTemplate>
                             <ItemTemplate>
                                 <span ondblclick="Field_DBclick('WF_COSTLISTTBL_ACCOUNTCODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST%>)">
-                                    <asp:TextBox ID="WF_COSTLISTTBL_ACCOUNTCODE" runat="server" CssClass='<%# GetAccountCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>'  ReadOnly="true" Text='<%# Bind("ACCOUNTCODE")%>' MaxLength="10" />
+                                    <asp:TextBox ID="WF_COSTLISTTBL_ACCOUNTCODE" runat="server" CssClass='<%# GetEditableCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>'  ReadOnly="true" Text='<%# Bind("ACCOUNTCODE")%>' MaxLength="10" />
                                 </span>
                                 <!-- 勘定科目名 -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_ACCOUNTNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "ACCOUNTNAME") %>' />
@@ -148,9 +150,7 @@
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH8" ItemStyle-CssClass="WF_COSTLISTTBL_TD8" ControlStyle-CssClass="WF_TEXTBOX_CSS">
                             <HeaderTemplate>金額</HeaderTemplate>
                             <ItemTemplate>
-                                <span onchange="TextBox_change('WF_COSTLISTTBL_AMOUNT<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
-                                    <asp:TextBox ID="WF_COSTLISTTBL_AMOUNT" runat="server" ReadOnly='<%# GetCalcAccountValAndEditable(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>' Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "AMOUNT"))%>' />
-                                </span>
+                                <asp:Label ID="WF_COSTLISTTBL_AMOUNT" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "AMOUNT"))%>' />
                                 <!-- 数量 -->
                                 <asp:HiddenField ID="WF_COSTLISTTBL_QUANTITY" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "QUANTITY") %>' />
                             </ItemTemplate>
@@ -205,7 +205,7 @@
                             <HeaderTemplate>摘要</HeaderTemplate>
                             <ItemTemplate>
                                 <span onchange="TextBox_change('WF_COSTLISTTBL_TEKIYOU<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>');">
-                                    <asp:TextBox ID="WF_COSTLISTTBL_TEKIYOU" runat="server" ReadOnly='<%# GetEditable() %>' Text='<%# DataBinder.Eval(Container.DataItem, "TEKIYOU")%>' />
+                                    <asp:TextBox ID="WF_COSTLISTTBL_TEKIYOU" runat="server" ReadOnly='<%# GetEditableTekiyo() %>' Text='<%# DataBinder.Eval(Container.DataItem, "TEKIYOU")%>' />
                                 </span>
                             </ItemTemplate>
                         </asp:TemplateField>

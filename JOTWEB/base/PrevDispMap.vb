@@ -104,6 +104,21 @@ Public Module PrevDispMap
         Public Const OIT0007L As String = "ASP.OIL_LOC_OIT0007FILEINPUTLIST_ASPX"
 
         ''' <summary>
+        ''' 費用管理
+        ''' </summary>
+        Public Const OIT0008M As String = "ASP.OIL_PAY_OIT0008COSTMANAGEMENT_ASPX"
+
+        ''' <summary>
+        ''' 費用管理明細表示
+        ''' </summary>
+        Public Const OIT0008D As String = "ASP.OIL_PAY_OIT0008COSTDETAIL_ASPX"
+
+        ''' <summary>
+        ''' 費用管理明細入力
+        ''' </summary>
+        Public Const OIT0008C As String = "ASP.OIL_PAY_OIT0008COSTDETAILCREATE_ASPX"
+
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"

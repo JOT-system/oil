@@ -12,7 +12,7 @@ Public Class OIT0008CostManagement
     Private OIT0008tbl As DataTable                                 ' 一覧格納用テーブル
     Private OIT0008INPtbl As DataTable                              ' チェック用テーブル
     Private OIT0008SubTotaltbl As DataTable                         ' 小計テーブル
-    Private TMP0009tbl As DataTable                                 ' 輸送費明細テーブル
+    Private TCDtbl As DataTable                                     ' 輸送費明細テーブル
 
     Private OIM0002tbl As DataTable
 
@@ -59,7 +59,7 @@ Public Class OIT0008CostManagement
                     If Not WF_ButtonClick.Value = "WF_ButtonEND" OrElse
                        Not WF_ButtonClick.Value = "WF_ListboxDBclick" OrElse
                        Not WF_ButtonClick.Value = "WF_LeftBoxSelectClick" Then
-                        SetGridViewToTempTable()
+                        SetGridViewToWorkTable()
                     End If
 
                     Dim DisplayGridViewFlg As Boolean = True
@@ -92,14 +92,12 @@ Public Class OIT0008CostManagement
                             WF_ButtonUPDATE_Click()
                         Case "WF_Button_DLTransportCostsDetail" ' 「輸送費明細」ボタン押下
                             WF_Button_DLTransportCostsDetail_Click()
-                            'Case "WF_Button_DLTankTransportResult" ' 「タンク車輸送実績表」ボタン押下
-                            '    WF_Button_DLTankTransportResult_Click()
-                            'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
-                            '    WF_ButtonPrint_Click()
 
                         Case Else
                             If WF_ButtonClick.Value.Contains("WF_ButtonShowDetail") Then
-                                WF_ButtonShowDetail()   '「詳細を見る」ボタン押下
+                                WF_ButtonShowDetail()   '「明細を見る」ボタン押下
+                            ElseIf WF_ButtonClick.Value.Contains("WF_ButtonEditDetail") Then
+                                WF_ButtonEditDetail()   '「明細入力」ボタン押下
                             End If
                     End Select
 
@@ -144,7 +142,7 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 「詳細を見る」ボタン押下処理
+    ''' 「明細を見る」ボタン押下処理
     ''' </summary>
     Protected Sub WF_ButtonShowDetail()
         Dim rowIdx As Integer = 0
@@ -188,6 +186,58 @@ Public Class OIT0008CostManagement
         '明細画面に遷移
         Master.CheckParmissionCode(Master.USERCAMP)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
+            Master.MAPID = OIT0008WRKINC.MAPIDM
+            Master.TransitionPage()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 「明細入力」ボタン押下処理
+    ''' </summary>
+    Protected Sub WF_ButtonEditDetail()
+        Dim rowIdx As Integer = 0
+        'ボタンの行番号を取得する
+        Integer.TryParse(WF_ButtonClick.Value.Substring(WF_ButtonClick.Value.Length - 3), rowIdx)
+
+        '明細画面の初期条件を設定
+        '#
+        work.WF_SEL_LINE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_LINE"), Label).Text
+        '勘定科目コード
+        work.WF_SEL_ACCOUNTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
+        '勘定科目名
+        work.WF_SEL_ACCOUNTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_ACCOUNTNAME"), HiddenField).Value
+        'セグメント
+        work.WF_SEL_SEGMENTCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTCODE"), Label).Text
+        'セグメント名
+        work.WF_SEL_SEGMENTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTNAME"), HiddenField).Value
+        'セグメント枝番
+        work.WF_SEL_SEGMENTBRANCHCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHCODE"), HiddenField).Value
+        'セグメント枝番名
+        work.WF_SEL_SEGMENTBRANCHNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SEGMENTBRANCHNAME"), Label).Text
+        '荷主コード
+        work.WF_SEL_SHIPPERSCODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSCODE"), HiddenField).Value
+        '荷主名
+        work.WF_SEL_SHIPPERSNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_SHIPPERSNAME"), TextBox).Text
+        '請求先コード
+        work.WF_SEL_INVOICECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
+        '請求先名
+        work.WF_SEL_INVOICENAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICENAME"), Label).Text
+        '請求先部門
+        work.WF_SEL_INVOICEDEPTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_INVOICEDEPTNAME"), Label).Text
+        '支払先コード
+        work.WF_SEL_PAYEECODE.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEECODE"), TextBox).Text
+        '支払先名
+        work.WF_SEL_PAYEENAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEENAME"), Label).Text
+        '支払先部門
+        work.WF_SEL_PAYEEDEPTNAME.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_PAYEEDEPTNAME"), Label).Text
+        '摘要
+        work.WF_SEL_TEKIYOU.Text = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_TEKIYOU"), TextBox).Text
+
+        '明細入力画面に遷移
+        Master.CheckParmissionCode(Master.USERCAMP)
+        If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
+            Master.MAPID = OIT0008WRKINC.MAPIDMC
             Master.TransitionPage()
         End If
 
@@ -266,11 +316,11 @@ Public Class OIT0008CostManagement
             '初期化フラグが立っている場合は初期化
             If InitFlg Then
 
-                '費用管理ワークテーブル群の初期化
-                InitTempTable(SQLcon)
+                '費用管理WKの初期化
+                InitWorkTable(SQLcon)
 
-                '費用管理ワークテーブル群の初期データ設定
-                SetTempTable(SQLcon)
+                '費用管理WKの初期データ設定
+                SetWorkTable(SQLcon)
 
                 '入力可能の計上年月の場合、入力行を1行追加
                 If WW_EDITABLEFLG Then
@@ -317,53 +367,115 @@ Public Class OIT0008CostManagement
     ''' 行削除
     ''' </summary>
     Protected Sub WF_Grid_DeleteRow()
+        '選択行を削除(費用管理明細WK)
+        Dim DelSQLStrBldr As New StringBuilder
+        DelSQLStrBldr.AppendLine(" DELETE T0009 ")
+        DelSQLStrBldr.AppendLine(" FROM ")
+        DelSQLStrBldr.AppendLine("     oil.TMP0009_COSTDETAIL T0009 ")
+        DelSQLStrBldr.AppendLine("     INNER JOIN oil.TMP0008_COST T0008 ")
+        DelSQLStrBldr.AppendLine("         ON  T0008.OFFICECODE = T0009.OFFICECODE ")
+        DelSQLStrBldr.AppendLine("         AND T0008.KEIJYOYM = T0009.KEIJYOYM ")
+        DelSQLStrBldr.AppendLine("         AND T0008.LINE = T0009.LINE ")
+        DelSQLStrBldr.AppendLine(" WHERE ")
+        DelSQLStrBldr.AppendLine("     T0008.OFFICECODE = @P01 ")
+        DelSQLStrBldr.AppendLine(" AND T0008.KEIJYOYM = @P02 ")
+        DelSQLStrBldr.AppendLine(" AND T0008.CHECKFLG = 1 ")
 
-        '選択行を削除
-        Dim SQLStrBldr As New StringBuilder
-        SQLStrBldr.AppendLine(" DELETE FROM [oil].TMP0008_COST")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     OFFICECODE = @P01")
-        SQLStrBldr.AppendLine(" AND KEIJYOYM = @P02")
-        SQLStrBldr.AppendLine(" AND CHECKFLG = 1")
+        '選択行を削除(費用管理WK)
+        Dim DelSQLStrBldr2 As New StringBuilder
+        DelSQLStrBldr2.AppendLine(" DELETE FROM [oil].TMP0008_COST")
+        DelSQLStrBldr2.AppendLine(" WHERE")
+        DelSQLStrBldr2.AppendLine("     OFFICECODE = @P01")
+        DelSQLStrBldr2.AppendLine(" AND KEIJYOYM = @P02")
+        DelSQLStrBldr2.AppendLine(" AND CHECKFLG = 1")
 
-        '行番号の振り直し
+        '行番号の振り直し(費用管理明細WK)
         Dim MergeSQLStrBldr As New StringBuilder
-        MergeSQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS OLD_T")
-        MergeSQLStrBldr.AppendLine(" USING (")
-        MergeSQLStrBldr.AppendLine("     SELECT")
-        MergeSQLStrBldr.AppendLine("         OFFICECODE")
-        MergeSQLStrBldr.AppendLine("         , KEIJYOYM")
-        MergeSQLStrBldr.AppendLine("         , LINE")
-        MergeSQLStrBldr.AppendLine("         , ROW_NUMBER() OVER(ORDER BY LINE) AS NEW_LINE")
-        MergeSQLStrBldr.AppendLine("     FROM")
-        MergeSQLStrBldr.AppendLine("         [oil].TMP0008_COST")
-        MergeSQLStrBldr.AppendLine("     WHERE")
-        MergeSQLStrBldr.AppendLine("         OFFICECODE = @P01")
-        MergeSQLStrBldr.AppendLine("     AND KEIJYOYM = @P02")
-        MergeSQLStrBldr.AppendLine(" ) AS NEW_T")
-        MergeSQLStrBldr.AppendLine("     ON  OLD_T.OFFICECODE = NEW_T.OFFICECODE")
-        MergeSQLStrBldr.AppendLine("     AND OLD_T.KEIJYOYM = NEW_T.KEIJYOYM")
-        MergeSQLStrBldr.AppendLine("     AND OLD_T.LINE = NEW_T.LINE")
-        MergeSQLStrBldr.AppendLine(" WHEN MATCHED THEN UPDATE SET OLD_T.LINE = NEW_T.NEW_LINE;")
+        MergeSQLStrBldr.AppendLine(" MERGE oil.TMP0009_COSTDETAIL AS OLD_T ")
+        MergeSQLStrBldr.AppendLine(" USING ( ")
+        MergeSQLStrBldr.AppendLine("     SELECT ")
+        MergeSQLStrBldr.AppendLine("         OFFICECODE ")
+        MergeSQLStrBldr.AppendLine("         , KEIJYOYM ")
+        MergeSQLStrBldr.AppendLine("         , LINE ")
+        MergeSQLStrBldr.AppendLine("         , ROW_NUMBER() OVER(ORDER BY LINE) AS NEW_LINE ")
+        MergeSQLStrBldr.AppendLine("     FROM ")
+        MergeSQLStrBldr.AppendLine("         oil.TMP0008_COST ")
+        MergeSQLStrBldr.AppendLine("     WHERE ")
+        MergeSQLStrBldr.AppendLine("         OFFICECODE = @P01 ")
+        MergeSQLStrBldr.AppendLine("     AND KEIJYOYM = @P02 ")
+        MergeSQLStrBldr.AppendLine(" ) AS NEW_T ")
+        MergeSQLStrBldr.AppendLine("     ON  OLD_T.OFFICECODE = NEW_T.OFFICECODE ")
+        MergeSQLStrBldr.AppendLine("     AND OLD_T.KEIJYOYM = NEW_T.KEIJYOYM ")
+        MergeSQLStrBldr.AppendLine("     AND OLD_T.LINE = NEW_T.LINE ")
+        MergeSQLStrBldr.AppendLine(" WHEN MATCHED THEN UPDATE SET OLD_T.LINE = NEW_T.NEW_LINE; ")
+
+        '行番号の振り直し(費用管理WK)
+        Dim MergeSQLStrBldr2 As New StringBuilder
+        MergeSQLStrBldr2.AppendLine(" MERGE [oil].TMP0008_COST AS OLD_T")
+        MergeSQLStrBldr2.AppendLine(" USING (")
+        MergeSQLStrBldr2.AppendLine("     SELECT")
+        MergeSQLStrBldr2.AppendLine("         OFFICECODE")
+        MergeSQLStrBldr2.AppendLine("         , KEIJYOYM")
+        MergeSQLStrBldr2.AppendLine("         , LINE")
+        MergeSQLStrBldr2.AppendLine("         , ROW_NUMBER() OVER(ORDER BY LINE) AS NEW_LINE")
+        MergeSQLStrBldr2.AppendLine("     FROM")
+        MergeSQLStrBldr2.AppendLine("         [oil].TMP0008_COST")
+        MergeSQLStrBldr2.AppendLine("     WHERE")
+        MergeSQLStrBldr2.AppendLine("         OFFICECODE = @P01")
+        MergeSQLStrBldr2.AppendLine("     AND KEIJYOYM = @P02")
+        MergeSQLStrBldr2.AppendLine(" ) AS NEW_T")
+        MergeSQLStrBldr2.AppendLine("     ON  OLD_T.OFFICECODE = NEW_T.OFFICECODE")
+        MergeSQLStrBldr2.AppendLine("     AND OLD_T.KEIJYOYM = NEW_T.KEIJYOYM")
+        MergeSQLStrBldr2.AppendLine("     AND OLD_T.LINE = NEW_T.LINE")
+        MergeSQLStrBldr2.AppendLine(" WHEN MATCHED THEN UPDATE SET OLD_T.LINE = NEW_T.NEW_LINE;")
 
         Try
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()
 
-                Using DelRowCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon), MergeCmd As New SqlCommand(MergeSQLStrBldr.ToString(), SQLcon)
-                    Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+
+                '費用管理明細WKの行削除
+                Using DelRowCmd As New SqlCommand(DelSQLStrBldr.ToString(), SQLcon)
                     Dim PARA1 As SqlParameter = DelRowCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
                     Dim PARA2 As SqlParameter = DelRowCmd.Parameters.Add("@P02", SqlDbType.Date)
-                    Dim MPARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
-                    Dim MPARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
 
-                    '行削除
                     PARA1.Value = WW_OFFICECODE
                     PARA2.Value = WK_DATE
                     DelRowCmd.CommandTimeout = 300
                     DelRowCmd.ExecuteNonQuery()
 
-                    '行番号振り直し
+                End Using
+
+                '費用管理WKの行削除
+                Using DelRowCmd As New SqlCommand(DelSQLStrBldr2.ToString(), SQLcon)
+                    Dim PARA1 As SqlParameter = DelRowCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim PARA2 As SqlParameter = DelRowCmd.Parameters.Add("@P02", SqlDbType.Date)
+
+                    PARA1.Value = WW_OFFICECODE
+                    PARA2.Value = WK_DATE
+                    DelRowCmd.CommandTimeout = 300
+                    DelRowCmd.ExecuteNonQuery()
+
+                End Using
+
+                '費用管理明細WKの行番号振り直し
+                Using MergeCmd As New SqlCommand(MergeSQLStrBldr.ToString(), SQLcon)
+                    Dim MPARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim MPARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
+
+                    MPARA1.Value = WW_OFFICECODE
+                    MPARA2.Value = WK_DATE
+                    MergeCmd.CommandTimeout = 300
+                    MergeCmd.ExecuteNonQuery()
+
+                End Using
+
+                '費用管理WKの行番号振り直し
+                Using MergeCmd As New SqlCommand(MergeSQLStrBldr2.ToString(), SQLcon)
+                    Dim MPARA1 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                    Dim MPARA2 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
+
                     MPARA1.Value = WW_OFFICECODE
                     MPARA2.Value = WK_DATE
                     MergeCmd.CommandTimeout = 300
@@ -455,7 +567,7 @@ Public Class OIT0008CostManagement
     ''' <summary>
     ''' 費用管理ワークテーブルの更新(GridViewから入力テーブルへの変換)
     ''' </summary>
-    Protected Sub SetGridViewToTempTable()
+    Protected Sub SetGridViewToWorkTable()
 
         '前回表示時の営業所コードを設定
         WW_OFFICECODE = work.WF_SEL_LAST_OFFICECODE.Text
@@ -497,13 +609,6 @@ Public Class OIT0008CostManagement
                 Continue For
             End If
 
-            '確認ボタンが使用可ならば自動計算科目なので、処理をスキップする
-            If DirectCast(gRow.FindControl("WF_COSTLISTTBL_CALCACCOUNT"), Button).Enabled = True Then
-                addRow("CALCACCOUNT") = "1"
-            Else
-                addRow("CALCACCOUNT") = "2"
-            End If
-
             '#(LINE)
             addRow("LINE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_LINE"), Label).Text
 
@@ -513,6 +618,9 @@ Public Class OIT0008CostManagement
             Else
                 addRow("CHECKFLG") = 0
             End If
+
+            '自動計算科目(CALCACCOUNT)
+            addRow("CALCACCOUNT") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_CODE_CALCACCOUNT"), HiddenField).Value
 
             '勘定科目コード(ACCOUNTCODE)
             addRow("ACCOUNTCODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_ACCOUNTCODE"), TextBox).Text
@@ -545,7 +653,7 @@ Public Class OIT0008CostManagement
 
             '金額(AMOUNT)
             Dim amount As Decimal = 0
-            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_AMOUNT"), TextBox).Text, amount)
+            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTLISTTBL_AMOUNT"), Label).Text, amount)
             addRow("AMOUNT") = amount
 
             '税金(TAX)
@@ -583,7 +691,7 @@ Public Class OIT0008CostManagement
 
             '更新対象がなければ、一時テーブルの更新は行わない
             If Not OIT0008INPtbl.Rows.Count = 0 Then
-                UpdateTempTable(SQLcon)
+                UpdateWorkTable(SQLcon)
             End If
 
             'メモ欄が編集可能なら更新
@@ -598,7 +706,7 @@ Public Class OIT0008CostManagement
     ''' 費用管理ワークテーブルの更新(DB処理)
     ''' </summary>
     ''' <param name="SQLcon"></param>
-    Protected Sub UpdateTempTable(ByVal SQLcon As SqlConnection)
+    Protected Sub UpdateWorkTable(ByVal SQLcon As SqlConnection)
 
         Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" MERGE [oil].TMP0008_COST AS T0008")
@@ -965,7 +1073,7 @@ Public Class OIT0008CostManagement
         '所属営業所によるボタンの制御
         SetOfficeAuth()
 
-        'メニュー画面からの遷移の場合
+        'メニュー画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
             '計上月の初期化
             InitKEIJYO_YM()
@@ -1336,11 +1444,11 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 費用管理ワークテーブルデータ取得
+    ''' 費用管理WKデータ取得
     ''' </summary>
     ''' <param name="SQLcon">SQL接続設定</param>
     ''' <returns></returns>
-    Protected Function GetTempTable(ByVal SQLcon As SqlConnection) As DataTable
+    Protected Function GetWorkTable(ByVal SQLcon As SqlConnection) As DataTable
 
         Dim retDt As DataTable = Nothing
         Dim SelSQLBldr As New StringBuilder()
@@ -1542,7 +1650,7 @@ Public Class OIT0008CostManagement
     Protected Sub GridViewSetup(ByVal SQLcon As SqlConnection)
 
         '費用管理ワークテーブルからのデータ取得
-        OIT0008tbl = GetTempTable(SQLcon)
+        OIT0008tbl = GetWorkTable(SQLcon)
 
         '小計テーブルの作成
         CreateSubTotalTable()
@@ -1553,7 +1661,12 @@ Public Class OIT0008CostManagement
 
     End Sub
 
-    Protected Function GetCheckVal(ByRef val As Integer) As Boolean
+    ''' <summary>
+    ''' 削除チェックボックス - チェック有無取得処理
+    ''' </summary>
+    ''' <param name="val"></param>
+    ''' <returns></returns>
+    Protected Function GetCheckBoxVal(ByRef val As Integer) As Boolean
 
         If val = 1 Then
             Return True
@@ -1562,15 +1675,25 @@ Public Class OIT0008CostManagement
         Return False
     End Function
 
-    Protected Function GetCalcAccountVal(ByRef val As String) As Boolean
+    ''' <summary>
+    ''' 削除チェックボックス - 編集可否取得
+    ''' </summary>
+    ''' <param name="val"></param>
+    ''' <returns></returns>
+    Protected Function GetCheckBoxEnabled(ByRef val As String) As Boolean
 
-        If val = "1" Then
+        If val = "2" AndAlso WW_EDITABLEFLG Then
             Return True
         End If
 
         Return False
     End Function
 
+    ''' <summary>
+    ''' 勘定科目コード - 編集可否取得処理
+    ''' </summary>
+    ''' <param name="val"></param>
+    ''' <returns></returns>
     Protected Function GetCalcAccountValAndEditable(ByRef val As String) As Boolean
 
         If val = "1" OrElse Not WW_EDITABLEFLG Then
@@ -1580,16 +1703,11 @@ Public Class OIT0008CostManagement
         Return False
     End Function
 
-    Protected Function GetEnabled(ByRef val As String) As Boolean
-
-        If val = "2" AndAlso WW_EDITABLEFLG Then
-            Return True
-        End If
-
-        Return False
-    End Function
-
-    Protected Function GetEditable() As Boolean
+    ''' <summary>
+    ''' 摘要 - 編集可否取得処理
+    ''' </summary>
+    ''' <returns></returns>
+    Protected Function GetEditableTekiyo() As Boolean
 
         If Not WW_EDITABLEFLG Then
             Return True
@@ -1598,7 +1716,12 @@ Public Class OIT0008CostManagement
         Return False
     End Function
 
-    Protected Function GetAccountCodeStyle(ByRef val As String) As String
+    ''' <summary>
+    ''' 編集可能コード(荷主、勘定科目) - CSSスタイル取得
+    ''' </summary>
+    ''' <param name="val"></param>
+    ''' <returns></returns>
+    Protected Function GetEditableCodeStyle(ByRef val As String) As String
 
         Dim cssStyle As String = "WF_TEXTBOX_CSS boxIcon"
 
@@ -1609,12 +1732,23 @@ Public Class OIT0008CostManagement
         Return cssStyle
     End Function
 
+#Region "未使用(削除)"
+    Protected Function GetCalcAccountVal(ByRef val As String) As Boolean
+
+        If val = "1" Then
+            Return True
+        End If
+
+        Return False
+    End Function
+#End Region
+
     ''' <summary>
     ''' 費用管理ワークテーブルへのデータ設定
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub SetTempTable(ByVal SQLcon As SqlConnection)
+    Protected Sub SetWorkTable(ByVal SQLcon As SqlConnection)
 
         '費用管理ワークテーブルへの格納①
         '受注費用明細テーブルの集計レコード
@@ -1765,34 +1899,155 @@ Public Class OIT0008CostManagement
         InsBldr2.AppendLine(" ORDER BY")
         InsBldr2.AppendLine("     OIT0018.SEQ")
 
+        '費用管理明細ワークテーブルへの格納
+        '費用管理明細テーブルに、営業コード、計上年月のレコードがあれば抽出し
+        'SEQ番号順に、費用管理ワークテーブルへの格納①で追加したレコード群の後のLINE番号を振り直して格納する
+        Dim InsBldr3 As StringBuilder = New StringBuilder
+        InsBldr3.AppendLine(" INSERT INTO oil.TMP0009_COSTDETAIL ")
+        InsBldr3.AppendLine(" SELECT ")
+        InsBldr3.AppendLine("     OIT0022.KEIJYOYM ")
+        InsBldr3.AppendLine("     , ISNULL(( ")
+        InsBldr3.AppendLine("         SELECT MAX(TMP0008.LINE) FROM oil.TMP0008_COST TMP0008 ")
+        InsBldr3.AppendLine("         WHERE TMP0008.OFFICECODE = @P01 AND TMP0008.KEIJYOYM = @P02 ")
+        InsBldr3.AppendLine("         AND TMP0008.CALCACCOUNT = '1'), 0) + RTBL.ROWNUM AS LINE ")
+        InsBldr3.AppendLine("     , OIT0022.DETAILNO ")
+        InsBldr3.AppendLine("     , OIT0022.ACCOUNTCODE ")
+        InsBldr3.AppendLine("     , OIT0022.ACCOUNTNAME ")
+        InsBldr3.AppendLine("     , OIT0022.SEGMENTCODE ")
+        InsBldr3.AppendLine("     , OIT0022.SEGMENTNAME ")
+        InsBldr3.AppendLine("     , OIT0022.BREAKDOWNCODE ")
+        InsBldr3.AppendLine("     , OIT0022.BREAKDOWN ")
+        InsBldr3.AppendLine("     , OIT0022.SHIPPERSCODE ")
+        InsBldr3.AppendLine("     , OIT0022.SHIPPERSNAME ")
+        InsBldr3.AppendLine("     , OIT0022.BASECODE ")
+        InsBldr3.AppendLine("     , OIT0022.BASENAME ")
+        InsBldr3.AppendLine("     , OIT0022.OFFICECODE ")
+        InsBldr3.AppendLine("     , OIT0022.OFFICENAME ")
+        InsBldr3.AppendLine("     , OIT0022.DEPSTATION ")
+        InsBldr3.AppendLine("     , OIT0022.DEPSTATIONNAME ")
+        InsBldr3.AppendLine("     , OIT0022.ARRSTATION ")
+        InsBldr3.AppendLine("     , OIT0022.ARRSTATIONNAME ")
+        InsBldr3.AppendLine("     , OIT0022.CONSIGNEECODE ")
+        InsBldr3.AppendLine("     , OIT0022.CONSIGNEENAME ")
+        InsBldr3.AppendLine("     , OIT0022.TRAINNO ")
+        InsBldr3.AppendLine("     , OIT0022.TRAINNAME ")
+        InsBldr3.AppendLine("     , OIT0022.MODEL ")
+        InsBldr3.AppendLine("     , OIT0022.TANKNO ")
+        InsBldr3.AppendLine("     , OIT0022.OTTRANSPORTFLG ")
+        InsBldr3.AppendLine("     , OIT0022.CARSNUMBER ")
+        InsBldr3.AppendLine("     , OIT0022.CARSAMOUNT ")
+        InsBldr3.AppendLine("     , OIT0022.LOADAMOUNT ")
+        InsBldr3.AppendLine("     , OIT0022.OILCODE ")
+        InsBldr3.AppendLine("     , OIT0022.OILNAME ")
+        InsBldr3.AppendLine("     , OIT0022.ORDERINGTYPE ")
+        InsBldr3.AppendLine("     , OIT0022.ORDERINGOILNAME ")
+        InsBldr3.AppendLine("     , OIT0022.CHANGETRAINNO ")
+        InsBldr3.AppendLine("     , OIT0022.CHANGETRAINNAME ")
+        InsBldr3.AppendLine("     , OIT0022.SECONDCONSIGNEECODE ")
+        InsBldr3.AppendLine("     , OIT0022.SECONDCONSIGNEENAME ")
+        InsBldr3.AppendLine("     , OIT0022.SECONDARRSTATION ")
+        InsBldr3.AppendLine("     , OIT0022.SECONDARRSTATIONNAME ")
+        InsBldr3.AppendLine("     , OIT0022.CHANGERETSTATION ")
+        InsBldr3.AppendLine("     , OIT0022.CHANGERETSTATIONNAME ")
+        InsBldr3.AppendLine("     , OIT0022.TRKBN ")
+        InsBldr3.AppendLine("     , OIT0022.TRKBNNAME ")
+        InsBldr3.AppendLine("     , OIT0022.KIRO ")
+        InsBldr3.AppendLine("     , OIT0022.CALCKBN ")
+        InsBldr3.AppendLine("     , OIT0022.CALCKBNNAME ")
+        InsBldr3.AppendLine("     , OIT0022.JROILTYPE ")
+        InsBldr3.AppendLine("     , OIT0022.CHARGE ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT1 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT2 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT3 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT4 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT5 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT6 ")
+        InsBldr3.AppendLine("     , OIT0022.DISCOUNT7 ")
+        InsBldr3.AppendLine("     , OIT0022.APPLYCHARGE ")
+        InsBldr3.AppendLine("     , OIT0022.UNITPRICE ")
+        InsBldr3.AppendLine("     , OIT0022.AMOUNT ")
+        InsBldr3.AppendLine("     , OIT0022.TAX ")
+        InsBldr3.AppendLine("     , OIT0022.CONSUMPTIONTAX ")
+        InsBldr3.AppendLine("     , OIT0022.INVOICECODE ")
+        InsBldr3.AppendLine("     , OIT0022.INVOICENAME ")
+        InsBldr3.AppendLine("     , OIT0022.INVOICEDEPTNAME ")
+        InsBldr3.AppendLine("     , OIT0022.PAYEECODE ")
+        InsBldr3.AppendLine("     , OIT0022.PAYEENAME ")
+        InsBldr3.AppendLine("     , OIT0022.PAYEEDEPTNAME ")
+        InsBldr3.AppendLine(" FROM ")
+        InsBldr3.AppendLine("     [oil].OIT0022_COSTDETAIL OIT0022 ")
+        InsBldr3.AppendLine("     INNER JOIN ( ")
+        InsBldr3.AppendLine("         SELECT ")
+        InsBldr3.AppendLine("             OFFICECODE ")
+        InsBldr3.AppendLine("             , KEIJYOYM ")
+        InsBldr3.AppendLine("             , SEQ ")
+        InsBldr3.AppendLine("             , ROW_NUMBER() OVER(ORDER BY OFFICECODE, KEIJYOYM, SEQ) AS ROWNUM ")
+        InsBldr3.AppendLine("         FROM ")
+        InsBldr3.AppendLine("             oil.OIT0022_COSTDETAIL ")
+        InsBldr3.AppendLine("         WHERE ")
+        InsBldr3.AppendLine("             OFFICECODE = @P01  ")
+        InsBldr3.AppendLine("         AND KEIJYOYM = @P02 ")
+        InsBldr3.AppendLine("         AND DELFLG = '0' ")
+        InsBldr3.AppendLine("         GROUP BY ")
+        InsBldr3.AppendLine("             OFFICECODE ")
+        InsBldr3.AppendLine("             , KEIJYOYM ")
+        InsBldr3.AppendLine("             , SEQ ")
+        InsBldr3.AppendLine("     ) RTBL ")
+        InsBldr3.AppendLine("         ON  OIT0022.OFFICECODE = RTBL.OFFICECODE ")
+        InsBldr3.AppendLine("         AND OIT0022.KEIJYOYM = RTBL.KEIJYOYM ")
+        InsBldr3.AppendLine("         AND OIT0022.SEQ = RTBL.SEQ ")
+        InsBldr3.AppendLine(" WHERE ")
+        InsBldr3.AppendLine("     OIT0022.OFFICECODE = @P01  ")
+        InsBldr3.AppendLine(" AND OIT0022.KEIJYOYM = @P02  ")
+        InsBldr3.AppendLine(" AND OIT0022.DELFLG = '0' ")
+        InsBldr3.AppendLine(" ORDER BY ")
+        InsBldr3.AppendLine("   OIT0022.SEQ ")
+        InsBldr3.AppendLine("   , OIT0022.DETAILNO ")
+
         Try
-            Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon), InsCmd2 As New SqlCommand(InsBldr2.ToString(), SQLcon)
-                Dim PARA1 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
-                Dim PARA2 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.DateTime)
-                Dim PARA3 As SqlParameter = InsCmd.Parameters.Add("@P03", SqlDbType.DateTime)
+            Dim WK_STYMD = DateTime.Parse(WW_KEIJYO_YM + "/01")
+            Dim WK_ENDYMD = New DateTime(WK_STYMD.Year, WK_STYMD.Month, DateTime.DaysInMonth(WK_STYMD.Year, WK_STYMD.Month))
 
-                Dim PARA2_1 As SqlParameter = InsCmd2.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
-                Dim PARA2_2 As SqlParameter = InsCmd2.Parameters.Add("@P02", SqlDbType.DateTime)
+            '費用管理ワークテーブルへの格納①
+            Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon)
+                Dim PARA01 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA02 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.DateTime)
+                Dim PARA03 As SqlParameter = InsCmd.Parameters.Add("@P03", SqlDbType.DateTime)
 
-                '費用管理ワークテーブルのデータ生成
-                PARA1.Value = WW_OFFICECODE
-                Dim WK_STYMD = DateTime.Parse(WW_KEIJYO_YM + "/01")
-                Dim WK_ENDYMD = New DateTime(WK_STYMD.Year, WK_STYMD.Month, DateTime.DaysInMonth(WK_STYMD.Year, WK_STYMD.Month))
-                PARA2.Value = WK_STYMD
-                PARA3.Value = WK_ENDYMD
+                PARA01.Value = WW_OFFICECODE
+                PARA02.Value = WK_STYMD
+                PARA03.Value = WK_ENDYMD
                 InsCmd.CommandTimeout = 300
                 InsCmd.ExecuteNonQuery()
-
-                PARA2_1.Value = WW_OFFICECODE
-                PARA2_2.Value = WK_STYMD
-                InsCmd2.CommandTimeout = 300
-                InsCmd2.ExecuteNonQuery()
             End Using
+
+            '費用管理ワークテーブルへの格納②
+            Using InsCmd As New SqlCommand(InsBldr2.ToString(), SQLcon)
+                Dim PARA01 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA02 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.DateTime)
+
+                PARA01.Value = WW_OFFICECODE
+                PARA02.Value = WK_STYMD
+                InsCmd.CommandTimeout = 300
+                InsCmd.ExecuteNonQuery()
+            End Using
+
+            '費用管理明細ワークテーブルへの格納
+            Using InsCmd As New SqlCommand(InsBldr3.ToString(), SQLcon)
+                Dim PARA01 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA02 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.DateTime)
+
+                PARA01.Value = WW_OFFICECODE
+                PARA02.Value = WK_STYMD
+                InsCmd.CommandTimeout = 300
+                InsCmd.ExecuteNonQuery()
+            End Using
+
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0008_COST AND TMP0009_COSTDETAIL INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0008_COST AND TMP0009_COSTDETAIL INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1807,7 +2062,7 @@ Public Class OIT0008CostManagement
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub InitTempTable(ByVal SQLcon As SqlConnection)
+    Protected Sub InitWorkTable(ByVal SQLcon As SqlConnection)
 
         Dim DelBldr As New StringBuilder
         DelBldr.AppendLine(" DELETE FROM [oil].TMP0008_COST")
@@ -1815,12 +2070,31 @@ Public Class OIT0008CostManagement
         DelBldr.AppendLine("     OFFICECODE = @P1")
         DelBldr.AppendLine(" AND KEIJYOYM = @P2")
 
+        Dim DelBldr2 As New StringBuilder
+        DelBldr2.AppendLine(" DELETE FROM [oil].TMP0009_COSTDETAIL")
+        DelBldr2.AppendLine(" WHERE")
+        DelBldr2.AppendLine("     OFFICECODE = @P1")
+        DelBldr2.AppendLine(" AND KEIJYOYM = @P2")
+
         Try
+            '費用管理ワークテーブルの初期化
             Using DelCmd As New SqlCommand(DelBldr.ToString(), SQLcon)
                 Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
                 Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
 
-                '費用管理ワークテーブルの初期化
+                PARA1.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                DelCmd.CommandTimeout = 300
+                DelCmd.ExecuteNonQuery()
+
+            End Using
+
+            '費用管理明細ワークテーブルの初期化
+            Using DelCmd As New SqlCommand(DelBldr2.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
+
                 PARA1.Value = WW_OFFICECODE
                 Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
                 PARA2.Value = WK_DATE
@@ -1829,10 +2103,10 @@ Public Class OIT0008CostManagement
 
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M InitTempTable")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M InitWorkTable")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0008M InitTempTable"
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M InitWorkTable"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1866,7 +2140,7 @@ Public Class OIT0008CostManagement
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()
 
-            '費用管理テーブルから同一営業所、計上年月のレコードをいったん削除する
+            '費用管理テーブル、費用管理明細テーブルから同一営業所、計上年月のレコードをいったん削除する
             InitCostTable(SQLcon)
 
             '削除エラーの場合は処理を中断
@@ -1892,19 +2166,38 @@ Public Class OIT0008CostManagement
     Protected Sub InitCostTable(ByVal SQLcon As SqlConnection)
 
         Dim DelBldr As New StringBuilder
-        DelBldr.AppendLine(" DELETE FROM [oil].OIT0018_COST")
+        DelBldr.AppendLine(" DELETE FROM [oil].OIT0022_COSTDETAIL")
         DelBldr.AppendLine(" WHERE")
         DelBldr.AppendLine("     OFFICECODE = @P1")
         DelBldr.AppendLine(" AND KEIJYOYM = @P2")
 
+        Dim DelBldr2 As New StringBuilder
+        DelBldr2.AppendLine(" DELETE FROM [oil].OIT0018_COST")
+        DelBldr2.AppendLine(" WHERE")
+        DelBldr2.AppendLine("     OFFICECODE = @P1")
+        DelBldr2.AppendLine(" AND KEIJYOYM = @P2")
+
         Try
+            Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+
+            '費用管理明細テーブルのレコードを削除
             Using DelCmd As New SqlCommand(DelBldr.ToString(), SQLcon)
                 Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
                 Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
 
-                '費用管理テーブルの初期化
                 PARA1.Value = WW_OFFICECODE
-                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA2.Value = WK_DATE
+                DelCmd.CommandTimeout = 300
+                DelCmd.ExecuteNonQuery()
+
+            End Using
+
+            '費用管理テーブルのレコードを削除
+            Using DelCmd As New SqlCommand(DelBldr2.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = DelCmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = DelCmd.Parameters.Add("@P2", SqlDbType.DateTime)
+
+                PARA1.Value = WW_OFFICECODE
                 PARA2.Value = WK_DATE
                 DelCmd.CommandTimeout = 300
                 DelCmd.ExecuteNonQuery()
@@ -1930,13 +2223,13 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 費用管理テーブルへのデータ保存
+    ''' 費用管理・費用管理明細テーブルへのデータ保存
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
     Protected Sub SetCostTable(ByVal SQLcon As SqlConnection)
 
-        'ワークテーブルから費用管理明細テーブルへの移送
+        '費用管理WKから費用管理テーブルへの移送
         Dim InsBldr As New StringBuilder
         InsBldr.AppendLine(" INSERT INTO [oil].OIT0018_COST(")
         InsBldr.AppendLine("     OFFICECODE")
@@ -2012,11 +2305,189 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine(" AND TMP0008.INVOICECODE        IS NOT NULL")
         InsBldr.AppendLine(" AND TMP0008.PAYEECODE          IS NOT NULL")
         InsBldr.AppendLine(" AND (TMP0008.INVOICECODE <> '' OR TMP0008.PAYEECODE <> '')")
-        InsBldr.AppendLine(" AND TMP0008.SHIPPERSCODE      IS NOT NULL")
+        InsBldr.AppendLine(" AND TMP0008.SHIPPERSCODE       IS NOT NULL")
         InsBldr.AppendLine(" ORDER BY")
         InsBldr.AppendLine("     TMP0008.LINE")
 
+        '費用管理明細WKから費用管理明細テーブルへの移送
+        Dim InsBldr2 As New StringBuilder
+        InsBldr2.AppendLine(" INSERT INTO [oil].OIT0022_COSTDETAIL( ")
+        InsBldr2.AppendLine("     KEIJYOYM ")
+        InsBldr2.AppendLine("     , SEQ ")
+        InsBldr2.AppendLine("     , DETAILNO ")
+        InsBldr2.AppendLine("     , ACCOUNTCODE ")
+        InsBldr2.AppendLine("     , ACCOUNTNAME ")
+        InsBldr2.AppendLine("     , SEGMENTCODE ")
+        InsBldr2.AppendLine("     , SEGMENTNAME ")
+        InsBldr2.AppendLine("     , BREAKDOWNCODE ")
+        InsBldr2.AppendLine("     , BREAKDOWN ")
+        InsBldr2.AppendLine("     , SHIPPERSCODE ")
+        InsBldr2.AppendLine("     , SHIPPERSNAME ")
+        InsBldr2.AppendLine("     , BASECODE ")
+        InsBldr2.AppendLine("     , BASENAME ")
+        InsBldr2.AppendLine("     , OFFICECODE ")
+        InsBldr2.AppendLine("     , OFFICENAME ")
+        InsBldr2.AppendLine("     , DEPSTATION ")
+        InsBldr2.AppendLine("     , DEPSTATIONNAME ")
+        InsBldr2.AppendLine("     , ARRSTATION ")
+        InsBldr2.AppendLine("     , ARRSTATIONNAME ")
+        InsBldr2.AppendLine("     , CONSIGNEECODE ")
+        InsBldr2.AppendLine("     , CONSIGNEENAME ")
+        InsBldr2.AppendLine("     , TRAINNO ")
+        InsBldr2.AppendLine("     , TRAINNAME ")
+        InsBldr2.AppendLine("     , MODEL ")
+        InsBldr2.AppendLine("     , TANKNO ")
+        InsBldr2.AppendLine("     , OTTRANSPORTFLG ")
+        InsBldr2.AppendLine("     , CARSNUMBER ")
+        InsBldr2.AppendLine("     , CARSAMOUNT ")
+        InsBldr2.AppendLine("     , LOADAMOUNT ")
+        InsBldr2.AppendLine("     , OILCODE ")
+        InsBldr2.AppendLine("     , OILNAME ")
+        InsBldr2.AppendLine("     , ORDERINGTYPE ")
+        InsBldr2.AppendLine("     , ORDERINGOILNAME ")
+        InsBldr2.AppendLine("     , CHANGETRAINNO ")
+        InsBldr2.AppendLine("     , CHANGETRAINNAME ")
+        InsBldr2.AppendLine("     , SECONDCONSIGNEECODE ")
+        InsBldr2.AppendLine("     , SECONDCONSIGNEENAME ")
+        InsBldr2.AppendLine("     , SECONDARRSTATION ")
+        InsBldr2.AppendLine("     , SECONDARRSTATIONNAME ")
+        InsBldr2.AppendLine("     , CHANGERETSTATION ")
+        InsBldr2.AppendLine("     , CHANGERETSTATIONNAME ")
+        InsBldr2.AppendLine("     , TRKBN ")
+        InsBldr2.AppendLine("     , TRKBNNAME ")
+        InsBldr2.AppendLine("     , KIRO ")
+        InsBldr2.AppendLine("     , CALCKBN ")
+        InsBldr2.AppendLine("     , CALCKBNNAME ")
+        InsBldr2.AppendLine("     , JROILTYPE ")
+        InsBldr2.AppendLine("     , CHARGE ")
+        InsBldr2.AppendLine("     , DISCOUNT1 ")
+        InsBldr2.AppendLine("     , DISCOUNT2 ")
+        InsBldr2.AppendLine("     , DISCOUNT3 ")
+        InsBldr2.AppendLine("     , DISCOUNT4 ")
+        InsBldr2.AppendLine("     , DISCOUNT5 ")
+        InsBldr2.AppendLine("     , DISCOUNT6 ")
+        InsBldr2.AppendLine("     , DISCOUNT7 ")
+        InsBldr2.AppendLine("     , APPLYCHARGE ")
+        InsBldr2.AppendLine("     , UNITPRICE ")
+        InsBldr2.AppendLine("     , AMOUNT ")
+        InsBldr2.AppendLine("     , TAX ")
+        InsBldr2.AppendLine("     , CONSUMPTIONTAX ")
+        InsBldr2.AppendLine("     , INVOICECODE ")
+        InsBldr2.AppendLine("     , INVOICENAME ")
+        InsBldr2.AppendLine("     , INVOICEDEPTNAME ")
+        InsBldr2.AppendLine("     , PAYEECODE ")
+        InsBldr2.AppendLine("     , PAYEENAME ")
+        InsBldr2.AppendLine("     , PAYEEDEPTNAME ")
+        InsBldr2.AppendLine("     , DELFLG ")
+        InsBldr2.AppendLine("     , INITYMD ")
+        InsBldr2.AppendLine("     , INITUSER ")
+        InsBldr2.AppendLine("     , INITTERMID ")
+        InsBldr2.AppendLine("     , UPDYMD ")
+        InsBldr2.AppendLine("     , UPDUSER ")
+        InsBldr2.AppendLine("     , UPDTERMID ")
+        InsBldr2.AppendLine("     , RECEIVEYMD ")
+        InsBldr2.AppendLine(" ) ")
+        InsBldr2.AppendLine(" SELECT ")
+        InsBldr2.AppendLine("     T0009.KEIJYOYM ")
+        InsBldr2.AppendLine("     , RTBL.SEQ ")
+        InsBldr2.AppendLine("     , T0009.DETAILNO ")
+        InsBldr2.AppendLine("     , T0009.ACCOUNTCODE ")
+        InsBldr2.AppendLine("     , T0009.ACCOUNTNAME ")
+        InsBldr2.AppendLine("     , T0009.SEGMENTCODE ")
+        InsBldr2.AppendLine("     , T0009.SEGMENTNAME ")
+        InsBldr2.AppendLine("     , T0009.BREAKDOWNCODE ")
+        InsBldr2.AppendLine("     , T0009.BREAKDOWN ")
+        InsBldr2.AppendLine("     , T0009.SHIPPERSCODE ")
+        InsBldr2.AppendLine("     , T0009.SHIPPERSNAME ")
+        InsBldr2.AppendLine("     , T0009.BASECODE ")
+        InsBldr2.AppendLine("     , T0009.BASENAME ")
+        InsBldr2.AppendLine("     , T0009.OFFICECODE ")
+        InsBldr2.AppendLine("     , T0009.OFFICENAME ")
+        InsBldr2.AppendLine("     , T0009.DEPSTATION ")
+        InsBldr2.AppendLine("     , T0009.DEPSTATIONNAME ")
+        InsBldr2.AppendLine("     , T0009.ARRSTATION ")
+        InsBldr2.AppendLine("     , T0009.ARRSTATIONNAME ")
+        InsBldr2.AppendLine("     , T0009.CONSIGNEECODE ")
+        InsBldr2.AppendLine("     , T0009.CONSIGNEENAME ")
+        InsBldr2.AppendLine("     , T0009.TRAINNO ")
+        InsBldr2.AppendLine("     , T0009.TRAINNAME ")
+        InsBldr2.AppendLine("     , T0009.MODEL ")
+        InsBldr2.AppendLine("     , T0009.TANKNO ")
+        InsBldr2.AppendLine("     , T0009.OTTRANSPORTFLG ")
+        InsBldr2.AppendLine("     , T0009.CARSNUMBER ")
+        InsBldr2.AppendLine("     , T0009.CARSAMOUNT ")
+        InsBldr2.AppendLine("     , T0009.LOADAMOUNT ")
+        InsBldr2.AppendLine("     , T0009.OILCODE ")
+        InsBldr2.AppendLine("     , T0009.OILNAME ")
+        InsBldr2.AppendLine("     , T0009.ORDERINGTYPE ")
+        InsBldr2.AppendLine("     , T0009.ORDERINGOILNAME ")
+        InsBldr2.AppendLine("     , T0009.CHANGETRAINNO ")
+        InsBldr2.AppendLine("     , T0009.CHANGETRAINNAME ")
+        InsBldr2.AppendLine("     , T0009.SECONDCONSIGNEECODE ")
+        InsBldr2.AppendLine("     , T0009.SECONDCONSIGNEENAME ")
+        InsBldr2.AppendLine("     , T0009.SECONDARRSTATION ")
+        InsBldr2.AppendLine("     , T0009.SECONDARRSTATIONNAME ")
+        InsBldr2.AppendLine("     , T0009.CHANGERETSTATION ")
+        InsBldr2.AppendLine("     , T0009.CHANGERETSTATIONNAME ")
+        InsBldr2.AppendLine("     , T0009.TRKBN ")
+        InsBldr2.AppendLine("     , T0009.TRKBNNAME ")
+        InsBldr2.AppendLine("     , T0009.KIRO ")
+        InsBldr2.AppendLine("     , T0009.CALCKBN ")
+        InsBldr2.AppendLine("     , T0009.CALCKBNNAME ")
+        InsBldr2.AppendLine("     , T0009.JROILTYPE ")
+        InsBldr2.AppendLine("     , T0009.CHARGE ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT1 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT2 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT3 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT4 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT5 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT6 ")
+        InsBldr2.AppendLine("     , T0009.DISCOUNT7 ")
+        InsBldr2.AppendLine("     , T0009.APPLYCHARGE ")
+        InsBldr2.AppendLine("     , T0009.UNITPRICE ")
+        InsBldr2.AppendLine("     , T0009.AMOUNT ")
+        InsBldr2.AppendLine("     , T0009.TAX ")
+        InsBldr2.AppendLine("     , T0009.CONSUMPTIONTAX ")
+        InsBldr2.AppendLine("     , T0009.INVOICECODE ")
+        InsBldr2.AppendLine("     , T0009.INVOICENAME ")
+        InsBldr2.AppendLine("     , T0009.INVOICEDEPTNAME ")
+        InsBldr2.AppendLine("     , T0009.PAYEECODE ")
+        InsBldr2.AppendLine("     , T0009.PAYEENAME ")
+        InsBldr2.AppendLine("     , T0009.PAYEEDEPTNAME ")
+        InsBldr2.AppendLine("     , '0' ")
+        InsBldr2.AppendLine("     , @P03 ")
+        InsBldr2.AppendLine("     , @P04 ")
+        InsBldr2.AppendLine("     , @P05 ")
+        InsBldr2.AppendLine("     , @P03 ")
+        InsBldr2.AppendLine("     , @P04 ")
+        InsBldr2.AppendLine("     , @P05 ")
+        InsBldr2.AppendLine("     , @P06 ")
+        InsBldr2.AppendLine(" FROM ")
+        InsBldr2.AppendLine("     [oil].TMP0009_COSTDETAIL T0009 ")
+        InsBldr2.AppendLine("     INNER JOIN ( ")
+        InsBldr2.AppendLine("         SELECT ")
+        InsBldr2.AppendLine("             OFFICECODE ")
+        InsBldr2.AppendLine("             , KEIJYOYM ")
+        InsBldr2.AppendLine("             , LINE ")
+        InsBldr2.AppendLine("             , ROW_NUMBER() OVER(ORDER BY LINE) AS SEQ ")
+        InsBldr2.AppendLine("         FROM ")
+        InsBldr2.AppendLine("             [oil].TMP0009_COSTDETAIL ")
+        InsBldr2.AppendLine("         WHERE ")
+        InsBldr2.AppendLine("             OFFICECODE = @P01 ")
+        InsBldr2.AppendLine("         AND KEIJYOYM = @P02 ")
+        InsBldr2.AppendLine("         GROUP BY ")
+        InsBldr2.AppendLine("             OFFICECODE ")
+        InsBldr2.AppendLine("             , KEIJYOYM ")
+        InsBldr2.AppendLine("             , LINE ")
+        InsBldr2.AppendLine("     ) RTBL ")
+        InsBldr2.AppendLine("         ON  T0009.OFFICECODE = RTBL.OFFICECODE ")
+        InsBldr2.AppendLine("         AND T0009.KEIJYOYM = RTBL.KEIJYOYM ")
+        InsBldr2.AppendLine("         AND T0009.LINE = RTBL.LINE ")
+
         Try
+            Dim WK_DATE = Date.Parse(WW_KEIJYO_YM + "/01")
+
+            '費用管理WK→費用管理T
             Using InsCmd As New SqlCommand(InsBldr.ToString(), SQLcon)
                 Dim PARA1 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
                 Dim PARA2 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.Date)
@@ -2026,7 +2497,6 @@ Public Class OIT0008CostManagement
                 Dim PARA6 As SqlParameter = InsCmd.Parameters.Add("@P06", SqlDbType.DateTime)
 
                 PARA1.Value = WW_OFFICECODE
-                Dim WK_DATE = Date.Parse(WW_KEIJYO_YM + "/01")
                 PARA2.Value = WK_DATE
                 PARA3.Value = DateTime.Now
                 PARA4.Value = Master.USERID
@@ -2036,11 +2506,32 @@ Public Class OIT0008CostManagement
                 InsCmd.CommandTimeout = 300
                 InsCmd.ExecuteNonQuery()
             End Using
+
+            '費用管理明細WK→費用管理明細T
+            Using InsCmd As New SqlCommand(InsBldr2.ToString(), SQLcon)
+                Dim PARA1 As SqlParameter = InsCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA2 As SqlParameter = InsCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim PARA3 As SqlParameter = InsCmd.Parameters.Add("@P03", SqlDbType.DateTime)
+                Dim PARA4 As SqlParameter = InsCmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)
+                Dim PARA5 As SqlParameter = InsCmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)
+                Dim PARA6 As SqlParameter = InsCmd.Parameters.Add("@P06", SqlDbType.DateTime)
+
+                PARA1.Value = WW_OFFICECODE
+                PARA2.Value = WK_DATE
+                PARA3.Value = DateTime.Now
+                PARA4.Value = Master.USERID
+                PARA5.Value = Master.USERTERMID
+                PARA6.Value = C_DEFAULT_YMD
+
+                InsCmd.CommandTimeout = 300
+                InsCmd.ExecuteNonQuery()
+            End Using
+
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M OIT0018_COST INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M OIT0018_COST/OIT0022_COSTDETAIL INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0008M OIT0018_COST INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0018_COST/OIT0022_COSTDETAIL INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2061,15 +2552,15 @@ Public Class OIT0008CostManagement
     ''' <remarks></remarks>
     Protected Sub WF_Button_DLTransportCostsDetail_Click()
 
-        If IsNothing(TMP0009tbl) Then
-            TMP0009tbl = New DataTable
+        If IsNothing(TCDtbl) Then
+            TCDtbl = New DataTable
         End If
 
-        If TMP0009tbl.Columns.Count <> 0 Then
-            TMP0009tbl.Columns.Clear()
+        If TCDtbl.Columns.Count <> 0 Then
+            TCDtbl.Columns.Clear()
         End If
 
-        TMP0009tbl.Clear()
+        TCDtbl.Clear()
 
         Try
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -2091,7 +2582,7 @@ Public Class OIT0008CostManagement
                     RV.Direction = ParameterDirection.ReturnValue
 
                     Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                        TMP0009tbl.Load(SQLdr)
+                        TCDtbl.Load(SQLdr)
                     End Using
 
                 End Using
@@ -2112,7 +2603,7 @@ Public Class OIT0008CostManagement
         End Try
 
         '帳票出力
-        Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TRASPORT_COST_DETAIL.xlsx", TMP0009tbl)
+        Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_TRASPORT_COST_DETAIL.xlsx", TCDtbl)
             Dim url As String
             Try
                 url = repCbj.CreateExcelPrintData_TransportCostDetail(Date.Parse(WW_KEIJYO_YM + "/01"))
@@ -2199,6 +2690,11 @@ Public Class OIT0008CostManagement
 
     End Sub
 
+    ''' <summary>
+    ''' 費用管理リスト - 行データバインド時処理
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Protected Sub WF_COSTLISTTBL_RowDataBound(sender As Object, e As GridViewRowEventArgs) Handles WF_COSTLISTTBL.RowDataBound
         Select Case e.Row.RowType
             Case DataControlRowType.DataRow
@@ -2226,6 +2722,11 @@ Public Class OIT0008CostManagement
         End Select
     End Sub
 
+    ''' <summary>
+    ''' 費用管理リスト - データバインド時処理
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Protected Sub WF_COSTLISTTBL_DataBound(sender As Object, e As EventArgs) Handles WF_COSTLISTTBL.DataBound
 
         'GridView本体を取得
@@ -2255,9 +2756,13 @@ Public Class OIT0008CostManagement
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
 
             If gvrow.RowType = DataControlRowType.DataRow Then
+                Dim hidden As HiddenField = DirectCast(gvrow.FindControl("WF_COSTLISTTBL_CODE_CALCACCOUNT"), HiddenField)
                 Dim button As Button = DirectCast(gvrow.FindControl("WF_COSTLISTTBL_CALCACCOUNT"), Button)
-                If button.Enabled Then
+                If "1".Equals(hidden.Value) Then
                     button.OnClientClick = "ButtonClick('WF_ButtonShowDetail" & String.Format("{0:000}", gvrow.RowIndex + 1) & "');"
+                Else
+                    button.Text = "明細入力"
+                    button.OnClientClick = "ButtonClick('WF_ButtonEditDetail" & String.Format("{0:000}", gvrow.RowIndex + 1) & "');"
                 End If
                 Continue For
             ElseIf Not gvrow.RowType = DataControlRowType.Footer Then
@@ -2527,7 +3032,7 @@ Public Class OIT0008CostManagement
                 End If
 
                 'ワークテーブルへのデータ反映
-                SetGridViewToTempTable()
+                SetGridViewToWorkTable()
         End Select
 
         'GridViewリロード
@@ -2698,7 +3203,7 @@ Public Class OIT0008CostManagement
                 End If
 
                 'ワークテーブルへのデータ反映
-                SetGridViewToTempTable()
+                SetGridViewToWorkTable()
 
         End Select
 

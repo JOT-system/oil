@@ -239,10 +239,13 @@ span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
     overflow: hidden;
 }
 
-input#WF_COSTLISTTBL_AMOUNT {
+span#WF_COSTLISTTBL_AMOUNT {
     width: 112px;
     padding-right: 3px;
+    letter-spacing: 1px;
     text-align: right;
+    vertical-align: middle;
+    display: inline-block;
 }
 
 span#WF_COSTLISTTBL_TAX {

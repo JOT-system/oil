@@ -39,12 +39,20 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     font-size: 0.8em;
 }
 
+.headerbox a > input[readonly] {
+    background-color: #e6f1e6;
+}
+
+.headerbox a.ef > span > div.boxIconArea {
+    top: -5px;
+}
+
 .actionButtonBox {
     padding: 5px;
 }
 
 .headerbox .actionButtonBox div.costHeaderBox {
-    display: inline-block;
+    display:inline-block;
 }
 
 .headerbox .actionButtonBox div.costHeaderBox p {
@@ -118,7 +126,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     white-space: nowrap;
     overflow: hidden;
 }
-/* 【受注パターン】のテキストボックスの長さ */
+
 .headerDetail > span.doubleItem > a:nth-child(2) {
     width: 365px;
 }
@@ -129,7 +137,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 
 .headerDetail > span > a:nth-child(2) input[type=text] {
     width: 100% !important;
-}
+}   
 
 /* 明細 */
 #detailbox {
@@ -141,89 +149,57 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     overflow-y: scroll
 }
 
-/*table#WF_CONSIGNEELIST > tbody > tr > td {
-    min-width:170px;
-}*/
-
-table#WF_CONSIGNEELIST > tbody > tr {
-    min-height: 22px;
-}
-
-table#WF_CONSIGNEELIST td.CONSIGNEENAME {
-    min-width: 144px;
-}
-table#WF_CONSIGNEELIST td.OILNAME {
-    min-width: 96px;
-}
-table#WF_CONSIGNEELIST td.AMOUNT {
-    min-width: 112px;
-}
-table#WF_CONSIGNEELIST td.TAX {
-    min-width: 80px;
-}
-table#WF_CONSIGNEELIST td.TOTAL {
-    min-width: 144px;
-}
-
-table#WF_CONSIGNEELIST td.codeText {
-    text-align: left;
-    padding-left: 5px;
-}
-
-table#WF_CONSIGNEELIST td.centerText {
-    text-align: center;
-}
-
-table#WF_CONSIGNEELIST td.moneyText {
-    text-align: right;
-    padding-right: 10px;
-}
-
-table#WF_CONSIGNEELIST td.footerText {
-    text-align: right;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-table#WF_CONSIGNEELIST th.AllBorder, table#WF_CONSIGNEELIST td.AllBorder {
+table#WF_COSTDETAILTBL, table#WF_COSTDETAILTBL th, table#WF_COSTDETAILTBL td {
     border: solid 1px #2bb6c1;
 }
 
-table#WF_CONSIGNEELIST th.NoneRightBorder, table#WF_CONSIGNEELIST td.NoneTopAndBottomBorder {
-    border-style: solid;
-    border-color: #2bb6c1;
-    border-top-width: 0px;
-    border-bottom-width: 0px;
-    border-left-width: 1px;
-    border-right-width: 1px;
+table#WF_COSTDETAILTBL th {
+    height: 18px;
+    background-color: #2bb6c1;
+    color: #fff;
+    text-align: center;
+    font-weight: normal;
 }
 
-table#WF_CONSIGNEELIST th.NoneRightBorder, table#WF_CONSIGNEELIST td.NoneRightBorder {
-    border-style: solid;
-    border-color: #2bb6c1;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-right-width: 0px;
+table#WF_COSTDETAILTBL span#WF_COSTDETAILTBL_DETAILNO {
+    padding-right: 3px;
+    text-align: right;
+    display: inline-block;
+    width: 20px;
 }
 
-table#WF_CONSIGNEELIST th.NoneLeftBorder, table#WF_CONSIGNEELIST td.NoneLeftBorder {
-    border-style: solid;
-    border-color: #2bb6c1;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 0px;
-    border-right-width: 1px;
+table#WF_COSTDETAILTBL td.WF_COSTDETAILTBL_TD2 {
+    text-align:center;
 }
 
-table#WF_CONSIGNEELIST th {
-    background-color: #163a5a;
-    color: white;
+table#WF_COSTDETAILTBL span#WF_COSTDETAILTBL_CHECKFLG {
+    width: 40px;
+    display: inline-block;
+}
+
+table#WF_COSTDETAILTBL select[id^="WF_COSTDETAILTBL_"],
+table#WF_COSTDETAILTBL span[id^="WF_COSTDETAILTBL_"],
+table#WF_COSTDETAILTBL input[id^="WF_COSTDETAILTBL_"] {
     font-size: 0.9em;
 }
 
-table#WF_CONSIGNEELIST td {
-    background-color: white;
-    font-size: 0.9em;
+table#WF_COSTDETAILTBL select#WF_COSTDETAILTBL_CONSIGNEENAMELIST {
+    width: 144px;
 }
 
+table#WF_COSTDETAILTBL select#WF_COSTDETAILTBL_ORDERINGOILNAMELIST {
+    width: 80px;
+}
+
+table#WF_COSTDETAILTBL input[type=text] {
+    text-align: right;
+    padding-right: 3px;
+    width: 114px;
+}
+
+table#WF_COSTDETAILTBL td.WF_COSTDETAILTBL_TD10,
+table#WF_COSTDETAILTBL td.WF_COSTDETAILTBL_TD11 {
+    text-align: right;
+    padding-right: 3px;
+    width: 114px;
+}

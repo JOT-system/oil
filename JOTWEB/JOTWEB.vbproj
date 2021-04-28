@@ -178,6 +178,7 @@
     <Content Include="OIL\css\OIT0006S.css" />
     <Content Include="OIL\css\OIT0007L.css" />
     <Content Include="OIL\css\OIT0007S.css" />
+    <Content Include="OIL\css\OIT0008C.css" />
     <Content Include="OIL\css\OIT0008D.css" />
     <Content Include="OIL\css\OIT0008M.css" />
     <Content Include="OIL\css\OIT0009TA.css" />
@@ -359,6 +360,7 @@
     <Content Include="OIL\ord\OIT0003OTLinkageList.aspx" />
     <Content Include="OIL\ord\OIT0003OTLinkageSearch.aspx" />
     <Content Include="OIL\pay\OIT0008CostDetail.aspx" />
+    <Content Include="OIL\pay\OIT0008CostDetailCreate.aspx" />
     <Content Include="OIL\pay\OIT0008CostManagement.aspx" />
     <Content Include="OIL\script\M00001.js" />
     <Content Include="OIL\script\OIM0001C.js" />
@@ -444,6 +446,7 @@
     <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="OIL\script\OIT0007L.js" />
     <Content Include="OIL\script\OIT0007S.js" />
+    <Content Include="OIL\script\OIT0008C.js" />
     <Content Include="OIL\script\OIT0008M.js" />
     <Content Include="OIL\script\OIT0009TA.js" />
     <Content Include="script\calendar.js" />
@@ -1498,6 +1501,13 @@
     </Compile>
     <Compile Include="OIL\pay\OIT0008CostDetail.aspx.vb">
       <DependentUpon>OIT0008CostDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\pay\OIT0008CostDetailCreate.aspx.designer.vb">
+      <DependentUpon>OIT0008CostDetailCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\pay\OIT0008CostDetailCreate.aspx.vb">
+      <DependentUpon>OIT0008CostDetailCreate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\pay\OIT0008CostManagement.aspx.designer.vb">

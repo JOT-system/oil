@@ -46,24 +46,14 @@ Public Class OIT0008CostDetail
             If IsPostBack Then
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
-                    '○ 画面表示データ復元
-                    'Master.RecoverTable(OIT0008tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonCSV"             ' ダウンロードボタン押下
-                            WF_ButtonDownload_Click()
-                        Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
-                            WF_ButtonPrint_Click()
+                        'Case "WF_ButtonCSV"             ' ダウンロードボタン押下
+                        '    WF_ButtonDownload_Click()
+                        'Case "WF_ButtonPrint"           ' 一覧印刷ボタン押下
+                        '    WF_ButtonPrint_Click()
                         Case "WF_ButtonEND"             ' 戻るボタン押下
                             WF_ButtonEND_Click()
-                        'Case "WF_ButtonFIRST"           ' 先頭頁ボタン押下
-                        '    WF_ButtonFIRST_Click()
-                        'Case "WF_ButtonLAST"            ' 最終頁ボタン押下
-                        '    WF_ButtonLAST_Click()
-                        'Case "WF_MouseWheelUp"          ' マウスホイール(Up)
-                        '    WF_Grid_Scroll()
-                        'Case "WF_MouseWheelDown"        ' マウスホイール(Down)
-                        '    WF_Grid_Scroll()
                         Case "WF_RadioButonClick"       ' (右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            ' (右ボックス)メモ欄更新
@@ -71,7 +61,6 @@ Public Class OIT0008CostDetail
                     End Select
 
                     '○ 一覧再表示処理
-                    'DisplayGrid()
                     GridViewInitialize()
                 End If
             Else
@@ -172,6 +161,8 @@ Public Class OIT0008CostDetail
         TxtPayeeName.Text = work.WF_SEL_PAYEENAME.Text
         '支払先部門
         TxtPayeeDeptName.Text = work.WF_SEL_PAYEEDEPTNAME.Text
+        '摘要
+        TxtTekiyou.Text = work.WF_SEL_TEKIYOU.Text
 
     End Sub
 
@@ -188,6 +179,14 @@ Public Class OIT0008CostDetail
 
             MAPDataGet(SQLcon)
         End Using
+
+        '営業所
+        Dim officeName As String = ""
+        CODENAME_get("OFFICECODE", work.WF_SEL_LAST_OFFICECODE.Text, officeName, WW_RTN_SW)
+        WF_OFFICENAME.Text = officeName
+
+        '計上年月
+        WF_KEIJYOYM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
 
         WF_CONSIGNEELIST.DataSource = OIT0008tbl
         WF_CONSIGNEELIST.DataBind()
@@ -341,7 +340,7 @@ Public Class OIT0008CostDetail
         SQLStrBldr.AppendLine("                            OIT0013.ACCOUNTCODE   = '41010101'")
         SQLStrBldr.AppendLine("                        AND OIT0013.SEGMENTCODE   = '10102'")
         SQLStrBldr.AppendLine("                        AND OIT0013.BREAKDOWNCODE = '2'")
-        SQLStrBldr.AppendLine("                        THEN FORMAT(MAX(ROUND(OIT0013.APPLYCHARGE/OIT0013.LOAD, 0)), '##.00')")
+        SQLStrBldr.AppendLine("                        THEN FORMAT(MAX(ROUND(OIT0013.APPLYCHARGE/(OIT0013.LOAD+2), 0)), '##.00')")
         '----------------------------------------------業務料の単価
         SQLStrBldr.AppendLine("                        WHEN")
         SQLStrBldr.AppendLine("                            OIT0013.ACCOUNTCODE   = '41010101'")
@@ -361,6 +360,16 @@ Public Class OIT0008CostDetail
         SQLStrBldr.AppendLine("                        AND OIT0013.BREAKDOWNCODE = '1'")
         SQLStrBldr.AppendLine("                        THEN FORMAT(MAX(ROUND(OIT0013.APPLYCHARGE/OIT0013.LOAD, 1)), '##.#0')")
         SQLStrBldr.AppendLine("                        ")
+        SQLStrBldr.AppendLine("                        ELSE ''")
+        SQLStrBldr.AppendLine("                    END)")
+        SQLStrBldr.AppendLine("                WHEN '3' THEN")
+        SQLStrBldr.AppendLine("                    (CASE")
+        '----------------------------------------------OT業務料の単価
+        SQLStrBldr.AppendLine("                        WHEN")
+        SQLStrBldr.AppendLine("                            OIT0013.ACCOUNTCODE   = '41010101'")
+        SQLStrBldr.AppendLine("                        AND OIT0013.SEGMENTCODE   = '10105'")
+        SQLStrBldr.AppendLine("                        AND OIT0013.BREAKDOWNCODE = '1'")
+        SQLStrBldr.AppendLine("                        THEN FORMAT(MAX(ROUND(OIT0013.APPLYCHARGE, 1, 1)), '##.#0')")
         SQLStrBldr.AppendLine("                        ELSE ''")
         SQLStrBldr.AppendLine("                    END)")
         SQLStrBldr.AppendLine("                ELSE")
@@ -400,6 +409,14 @@ Public Class OIT0008CostDetail
         SQLStrBldr.AppendLine("                AND OIT0013.BREAKDOWNCODE = '1'")
         SQLStrBldr.AppendLine("                AND OIT0013.CALCKBN = '1'")
         SQLStrBldr.AppendLine("                THEN SUM(ROUND(OIT0013.CHARGE * OIT0013.CARSNUMBER, 0))")
+        '--------------------------------------OT発地業務料は
+        '--------------------------------------金額の小数点を切り捨てて集計する
+        SQLStrBldr.AppendLine("                WHEN")
+        SQLStrBldr.AppendLine("                    OIT0013.ACCOUNTCODE   = '41010101'")
+        SQLStrBldr.AppendLine("                AND OIT0013.SEGMENTCODE   = '10105'")
+        SQLStrBldr.AppendLine("                AND OIT0013.BREAKDOWNCODE = '1'")
+        SQLStrBldr.AppendLine("                AND OIT0013.CALCKBN = '3'")
+        SQLStrBldr.AppendLine("                THEN SUM(ROUND(OIT0013.AMOUNT, 0, 1))")
         '--------------------------------------上記以外は金額を集計
         SQLStrBldr.AppendLine("                ELSE SUM(ROUND(OIT0013.AMOUNT, 0))")
         SQLStrBldr.AppendLine("            END) AS AMOUNT")
@@ -767,14 +784,7 @@ Public Class OIT0008CostDetail
 
     End Sub
 
-    '''' <summary>
-    '''' 一覧再表示処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub DisplayGrid()
-
-    'End Sub
-
+#Region "未使用"
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -834,6 +844,7 @@ Public Class OIT0008CostDetail
         ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_PDFPrint();", True)
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -948,6 +959,10 @@ Public Class OIT0008CostDetail
 
         Try
             Select Case I_FIELD
+                Case "OFFICECODE"
+                    '営業所コード
+                    prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TORIMASTER"
                     prmData = work.CreateFIXParam(Master.USERCAMP, "TORIMASTER")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)

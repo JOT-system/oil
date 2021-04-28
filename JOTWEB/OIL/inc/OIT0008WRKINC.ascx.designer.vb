@@ -48,7 +48,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INIT_KEIJYO_YM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OFFICENAME コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIT0008WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OFFICENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LINE コントロール。
     '''</summary>

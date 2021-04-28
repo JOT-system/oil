@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0008CostDetail
+Partial Public Class OIT0008CostDetailCreate
     
     '''<summary>
     '''WF_OFFICENAME コントロール。
@@ -185,13 +185,49 @@ Partial Public Class OIT0008CostDetail
     Protected WithEvents TxtTekiyou As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_CONSIGNEELIST コントロール。
+    '''WF_ALLSELECT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CONSIGNEELIST As Global.System.Web.UI.WebControls.GridView
+    Protected WithEvents WF_ALLSELECT As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ALLRELEACE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLRELEACE As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_DELETEROW コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DELETEROW As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ADDROW コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ADDROW As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL As Global.System.Web.UI.WebControls.GridView
     
     '''<summary>
     '''rightview コントロール。

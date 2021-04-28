@@ -536,7 +536,37 @@ Public Class OIT0005TankLocList
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
+            Case "JRINSPECTIONDATE"         '(一覧)交検日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_ListValue, WW_DATE)
+                    If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                        updHeader.Item(WF_FIELD.Value) = ""
+                    Else
+                        updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM/dd")
+                    End If
+                    'タンク車マスタの交検日を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                        I_ITEM:="JRINSPECTIONDATE",
+                                        I_VALUE:=Convert.ToString(updHeader.Item(WF_FIELD.Value)))
+                Catch ex As Exception
+                End Try
             Case "JRALLINSPECTIONDATE"      '(一覧)全検日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_ListValue, WW_DATE)
+                    If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                        updHeader.Item(WF_FIELD.Value) = ""
+                    Else
+                        updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM/dd")
+                    End If
+                    'タンク車マスタの全検日を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                        I_ITEM:="JRALLINSPECTIONDATE",
+                                        I_VALUE:=Convert.ToString(updHeader.Item(WF_FIELD.Value)))
+                Catch ex As Exception
+                End Try
+            Case "ORDER_ACTUALEMPARRDATE"   '(一覧)返送日
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(WW_ListValue, WW_DATE)
@@ -876,7 +906,7 @@ Public Class OIT0005TankLocList
                             '(一覧)全検日に指定した日付を設定
                             updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
                             Master.SaveTable(OIT0005tbl)
-                            'タンク車マスタの交検日を更新
+                            'タンク車マスタの全検日を更新
                             WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
                                                 I_ITEM:="JRALLINSPECTIONDATE",
                                                 I_VALUE:=Convert.ToString(updHeader.Item(WF_FIELD.Value)))
@@ -2085,12 +2115,14 @@ Public Class OIT0005TankLocList
                         If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_13 _
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_03) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                            '★全検の設定
+                            cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            '★全検の設定(次回交検日の入力解除)
                         ElseIf (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         End If
@@ -2099,6 +2131,7 @@ Public Class OIT0005TankLocList
                         If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
                             AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
+                            cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
                             'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
@@ -2106,7 +2139,8 @@ Public Class OIT0005TankLocList
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDER_ACTUALEMPARRDATE") Then
                         '★返送日の設定
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
-                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                        'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     End If
                 Next
 

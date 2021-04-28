@@ -19,6 +19,8 @@ function InitDisplay() {
     addLeftBoxExtention(leftListExtentionTarget);
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    // テキストボックスEnter縦移動イベントバインド
+    commonBindEnterToVerticalTabStep();
     // チェックボックス
     ChangeCheckBox();
 }

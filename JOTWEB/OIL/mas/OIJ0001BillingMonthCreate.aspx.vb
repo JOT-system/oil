@@ -252,14 +252,32 @@ Public Class OIJ0001BillingMonthCreate
                 & "  , ISNULL(RTRIM(VIW0012.DISCOUNT7), '') AS DISCOUNT7" _
                 & "  , ISNULL(RTRIM(VIW0012.DISCOUNTFARE), '') AS APPLYCHARGE" _
                 & "  , CASE" _
-                & "    WHEN VIW0012.CALCKBN = '1' THEN ROUND(OIT0003.CARSNUMBER * VIW0012.DISCOUNTFARE, 0) " _
-                & "    WHEN VIW0012.CALCKBN = '2' THEN ROUND(OIT0003.CARSAMOUNT * VIW0012.DISCOUNTFARE, 0) " _
-                & "    WHEN VIW0012.CALCKBN = '3' THEN ROUND(OIM0005.LOAD * VIW0012.DISCOUNTFARE, 0) " _
+                & String.Format("    WHEN VIW0012.ACCOUNTCODE = '{0}' AND VIW0012.SEGMENTCODE = '{1}' THEN", BaseDllConst.CONST_ACCOUNT_41010101, BaseDllConst.CONST_SEGMENT_10105) _
+                & "        CASE" _
+                & "        WHEN VIW0012.CALCKBN = '1' THEN FLOOR(OIT0003.CARSNUMBER * VIW0012.DISCOUNTFARE) " _
+                & "        WHEN VIW0012.CALCKBN = '2' THEN FLOOR(OIT0003.CARSAMOUNT * VIW0012.DISCOUNTFARE) " _
+                & "        WHEN VIW0012.CALCKBN = '3' THEN FLOOR(OIM0005.LOAD * VIW0012.DISCOUNTFARE) " _
+                & "        END" _
+                & "    ELSE " _
+                & "        CASE" _
+                & "        WHEN VIW0012.CALCKBN = '1' THEN ROUND(OIT0003.CARSNUMBER * VIW0012.DISCOUNTFARE, 0) " _
+                & "        WHEN VIW0012.CALCKBN = '2' THEN ROUND(OIT0003.CARSAMOUNT * VIW0012.DISCOUNTFARE, 0) " _
+                & "        WHEN VIW0012.CALCKBN = '3' THEN ROUND(OIM0005.LOAD * VIW0012.DISCOUNTFARE, 0) " _
+                & "        END" _
                 & "    END                                    AS AMOUNT" _
                 & "  , CASE" _
-                & "    WHEN VIW0012.CALCKBN = '1' THEN ROUND(OIT0003.CARSNUMBER * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
-                & "    WHEN VIW0012.CALCKBN = '2' THEN ROUND(OIT0003.CARSAMOUNT * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
-                & "    WHEN VIW0012.CALCKBN = '3' THEN ROUND(OIM0005.LOAD * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
+                & String.Format("    WHEN VIW0012.ACCOUNTCODE = '{0}' AND VIW0012.SEGMENTCODE = '{1}' THEN", BaseDllConst.CONST_ACCOUNT_41010101, BaseDllConst.CONST_SEGMENT_10105) _
+                & "        CASE" _
+                & "        WHEN VIW0012.CALCKBN = '1' THEN FLOOR(OIT0003.CARSNUMBER * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))) " _
+                & "        WHEN VIW0012.CALCKBN = '2' THEN FLOOR(OIT0003.CARSAMOUNT * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))) " _
+                & "        WHEN VIW0012.CALCKBN = '3' THEN FLOOR(OIM0005.LOAD * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE))) " _
+                & "        END" _
+                & "    ELSE " _
+                & "        CASE" _
+                & "        WHEN VIW0012.CALCKBN = '1' THEN ROUND(OIT0003.CARSNUMBER * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
+                & "        WHEN VIW0012.CALCKBN = '2' THEN ROUND(OIT0003.CARSAMOUNT * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
+                & "        WHEN VIW0012.CALCKBN = '3' THEN ROUND(OIM0005.LOAD * (VIW0012.DISCOUNTFARE * CONVERT(DECIMAL(5,2), OIS0015.KEYCODE)), 0) " _
+                & "        END" _
                 & "    END                                    AS TAX" _
                 & "  , CONVERT(DECIMAL(5,2), OIS0015.KEYCODE) AS CONSUMPTIONTAX" _
                 & "  , ISNULL(RTRIM(VIW0012.INVOICECODE), '') AS INVOICECODE" _

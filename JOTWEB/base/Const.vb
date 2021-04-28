@@ -1132,6 +1132,124 @@ Public Module BaseDllConst
     Public Const CONST_MODEL_243000 As String = "タキ243000"
 #End Region
 
+#Region "科目コード"
+    ''' <summary>
+    ''' 元請輸送
+    ''' </summary>
+    Public Const CONST_ACCOUNT_41010101 As String = "41010101"
+    ''' <summary>
+    ''' 開示対象外
+    ''' </summary>
+    Public Const CONST_ACCOUNT_41010203 As String = "41010203"
+    ''' <summary>
+    ''' 洗浄・ヤード
+    ''' </summary>
+    Public Const CONST_ACCOUNT_41010501 As String = "41010501"
+    ''' <summary>
+    ''' 往路運賃
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51010101 As String = "51010101"
+    ''' <summary>
+    ''' 復路運賃
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51010102 As String = "51010102"
+    ''' <summary>
+    ''' 回送運賃
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51010103 As String = "51010103"
+    ''' <summary>
+    ''' 委託作業費
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51020104 As String = "51020104"
+    ''' <summary>
+    ''' 移送・留置料 容器運用費・留置料
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51040101 As String = "51040101"
+    ''' <summary>
+    ''' 維持修繕費 外注費
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51050101 As String = "51050101"
+    ''' <summary>
+    ''' 維持修繕費 定期検査
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51050102 As String = "51050102"
+    ''' <summary>
+    ''' 維持修繕費 再塗装
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51050104 As String = "51050104"
+    ''' <summary>
+    ''' 維持修繕費 引当金繰入
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51050107 As String = "51050107"
+    ''' <summary>
+    ''' 消耗品費 修理部品（技）
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51060101 As String = "51060101"
+    ''' <summary>
+    ''' 消耗品費 その他
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51060102 As String = "51060102"
+    ''' <summary>
+    ''' 保険料 動産保険料
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51070101 As String = "51070101"
+    ''' <summary>
+    ''' 保険料 生産物保険料
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51070102 As String = "51070102"
+    ''' <summary>
+    ''' 諸税公課 固定資産税
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51080101 As String = "51080101"
+    ''' <summary>
+    ''' 減価償却費 営業費・自社
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51090101 As String = "51090101"
+    ''' <summary>
+    ''' 雑費 直接・手数料
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51110101 As String = "51110101"
+    ''' <summary>
+    ''' 雑費 直接・その他
+    ''' </summary>
+    Public Const CONST_ACCOUNT_51110102 As String = "51110102"
+#End Region
+
+#Region "セグメント"
+    ''' <summary>
+    ''' タンク車使用料
+    ''' </summary>
+    Public Const CONST_SEGMENT_10101 As String = "10101"
+    ''' <summary>
+    ''' 鉄道運賃
+    ''' </summary>
+    Public Const CONST_SEGMENT_10102 As String = "10102"
+    ''' <summary>
+    ''' 業務料
+    ''' </summary>
+    Public Const CONST_SEGMENT_10103 As String = "10103"
+    ''' <summary>
+    ''' 取扱料
+    ''' </summary>
+    Public Const CONST_SEGMENT_10104 As String = "10104"
+    ''' <summary>
+    ''' ＯＴ業務料
+    ''' </summary>
+    Public Const CONST_SEGMENT_10105 As String = "10105"
+    ''' <summary>
+    ''' 通運取扱その他
+    ''' </summary>
+    Public Const CONST_SEGMENT_10106 As String = "10106"
+    ''' <summary>
+    ''' タンク車リース
+    ''' </summary>
+    Public Const CONST_SEGMENT_10107 As String = "10107"
+    ''' <summary>
+    ''' 石油共通
+    ''' </summary>
+    Public Const CONST_SEGMENT_10109 As String = "10109"
+#End Region
+
 #Region "海外向け"
     ''' <summary>
     ''' 集信日時の追加/更新時のデフォルト値

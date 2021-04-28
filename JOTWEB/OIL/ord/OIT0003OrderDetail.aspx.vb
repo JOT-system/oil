@@ -3111,6 +3111,15 @@ Public Class OIT0003OrderDetail
                     'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Ceiling(dclConsumptionTAX))   '切り上げ
                     OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Round(dclConsumptionTAX))     '四捨五入
 
+                    '### 20210428 START ＯＴ発地業務料対応 ###############################################################
+                    '★ＯＴ発地業務料(41010101 10105)の場合は切り捨て
+                    If Convert.ToString(OIT0003tab4row("ACCOUNTCODE")) = BaseDllConst.CONST_ACCOUNT_41010101 _
+                        AndAlso Convert.ToString(OIT0003tab4row("SEGMENTCODE")) = BaseDllConst.CONST_SEGMENT_10105 Then
+                        OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Truncate(dclApplyChargeSUM))  '切り捨て
+                        OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Truncate(dclConsumptionTAX))  '切り捨て
+                    End If
+                    '### 20210428 END   ＯＴ発地業務料対応 ###############################################################
+
                 Next
 
             End Using
@@ -11641,7 +11650,16 @@ Public Class OIT0003OrderDetail
                     End Select
                     P_AMOUNT.Value = Math.Round(dclApplyChargeSUM)      '四捨五入
                     P_TAX.Value = Math.Round(dclConsumptionTAX)         '四捨五入
+                    '### 20210428 START ＯＴ発地業務料対応 ###############################################################
+                    '★ＯＴ発地業務料(41010101 10105)の場合は切り捨て
+                    If Convert.ToString(OIT0003INPtab4row("ACCOUNTCODE")) = BaseDllConst.CONST_ACCOUNT_41010101 _
+                        AndAlso Convert.ToString(OIT0003INPtab4row("SEGMENTCODE")) = BaseDllConst.CONST_SEGMENT_10105 Then
+                        P_AMOUNT.Value = Math.Truncate(dclApplyChargeSUM)      '切り捨て
+                        P_TAX.Value = Math.Truncate(dclConsumptionTAX)         '切り捨て
+                    End If
+                    '### 20210428 END   ＯＴ発地業務料対応 ###############################################################
                     P_CONSUMPTIONTAX.Value = work.WF_SEL_CONSUMPTIONTAX.Text
+
                     '### 20210202 END   指摘票対応(No337)全体 ################################
                     P_INVOICECODE.Value = OIT0003INPtab4row("INVOICECODE")
                     P_INVOICENAME.Value = OIT0003INPtab4row("INVOICENAME")

@@ -2737,12 +2737,19 @@ Public Class OIT0002LinkList
                 & " , OIT0011.SERIALNUMBER                             AS LINEORDER" _
                 & " , OIT0011.TRUCKNO                                  AS TANKNUMBER"
 
+            '### 20210430 START 前回油種をタンク車所在より取得 ######################
             '### 20201002 START 変換マスタに移行したため修正 ########################
             SQLStr &=
-                  " , ISNULL(OIM0029.KEYCODE05, ISNULL(OIT0005.LASTOILCODE, ''))        AS PREOILCODE" _
-                & " , ISNULL(OIM0029.KEYCODE06, ISNULL(OIT0005.LASTOILNAME, ''))        AS PREOILNAME" _
-                & " , ISNULL(OIM0029.KEYCODE08, ISNULL(OIT0005.PREORDERINGTYPE, ''))    AS PREORDERINGTYPE" _
-                & " , ISNULL(OIM0029.KEYCODE09, ISNULL(OIT0005.PREORDERINGOILNAME, '')) AS PREORDERINGOILNAME"
+                  " , ISNULL(OIT0005.LASTOILCODE, '')                  AS PREOILCODE" _
+                & " , ISNULL(OIT0005.LASTOILNAME, '')                  AS PREOILNAME" _
+                & " , ISNULL(OIT0005.PREORDERINGTYPE, '')              AS PREORDERINGTYPE" _
+                & " , ISNULL(OIT0005.PREORDERINGOILNAME, '')           AS PREORDERINGOILNAME"
+            'SQLStr &=
+            '      " , ISNULL(OIM0029.KEYCODE05, ISNULL(OIT0005.LASTOILCODE, ''))        AS PREOILCODE" _
+            '    & " , ISNULL(OIM0029.KEYCODE06, ISNULL(OIT0005.LASTOILNAME, ''))        AS PREOILNAME" _
+            '    & " , ISNULL(OIM0029.KEYCODE08, ISNULL(OIT0005.PREORDERINGTYPE, ''))    AS PREORDERINGTYPE" _
+            '    & " , ISNULL(OIM0029.KEYCODE09, ISNULL(OIT0005.PREORDERINGOILNAME, '')) AS PREORDERINGOILNAME"
+            '### 20210430 START 前回油種をタンク車所在より取得 ######################
             'SQLStr &=
             '      " , ISNULL(TMP0005.OILCODE, OIT0005.LASTOILCODE)     AS PREOILCODE" _
             '    & " , ISNULL(TMP0005.OILNAME, OIT0005.LASTOILNAME)     AS PREOILNAME" _

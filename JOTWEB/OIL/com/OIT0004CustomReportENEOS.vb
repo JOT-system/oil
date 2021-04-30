@@ -234,7 +234,8 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
                     '列見出し部分の数値格納
                     rngOffset = rngTargetRow.Offset(ColumnOffset:=1)
                     rngResize = rngOffset.Resize(ColumnSize:=5)
-                    pasteColHeader(0, 0) = oilItm.TankCapacity '安全容量
+                    '                    pasteColHeader(0, 0) = oilItm.TankCapacity '安全容量
+                    pasteColHeader(0, 0) = oilItm.TankCapacity - oilItm.DS '安全容量 - D/S
                     pasteColHeader(0, 1) = oilItm.DS 'D/S
                     pasteColHeader(0, 2) = oilItm.Stock80  '80%在庫
                     pasteColHeader(0, 3) = oilItm.LastShipmentAve

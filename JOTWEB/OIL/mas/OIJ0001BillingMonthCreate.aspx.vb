@@ -317,6 +317,8 @@ Public Class OIJ0001BillingMonthCreate
                 & "    AND VIW0012.ARRSTATION = OIT0002.ARRSTATION " _
                 & "    AND VIW0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
                 & "    AND VIW0012.LOAD = OIM0005.LOAD " _
+                & "    AND VIW0012.FROMYMD_RYOKIN <= OIT0003.ACTUALLODDATE" _
+                & "    AND VIW0012.ENDYMD_RYOKIN >= OIT0003.ACTUALLODDATE" _
                 & "    AND VIW0012.JROILTYPE = 'X' "
 
             '料金作成用2(危険品・普通品)
@@ -329,6 +331,8 @@ Public Class OIJ0001BillingMonthCreate
                 & "    AND VIW0012.ARRSTATION = OIT0002.ARRSTATION " _
                 & "    AND VIW0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
                 & "    AND VIW0012.LOAD = OIM0005.LOAD " _
+                & "    AND VIW0012.FROMYMD_RYOKIN <= OIT0003.ACTUALLODDATE" _
+                & "    AND VIW0012.ENDYMD_RYOKIN >= OIT0003.ACTUALLODDATE" _
                 & "    AND VIW0012.JROILTYPE <> 'X' " _
                 & "    AND VIW0012.JROILTYPE = CASE " _
                 & String.Format("      WHEN OIT0003.OILCODE = '{0}' ", BaseDllConst.CONST_HTank) _

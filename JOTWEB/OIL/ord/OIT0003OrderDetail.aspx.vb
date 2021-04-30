@@ -7856,6 +7856,16 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRINSPECTIONFLG = "3"
                 End If
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+                '### 20210430 START 根岸営業所対応 #################################################
+                If WW_JRINSPECTIONCNT <= 1 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 2 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                '### 20210430 END   根岸営業所対応 #################################################
             ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRINSPECTIONCNT <= 1 Then
@@ -7934,6 +7944,16 @@ Public Class OIT0003OrderDetail
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
                 End If
+            ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+                '### 20210430 START 根岸営業所対応 #################################################
+                If WW_JRALLINSPECTIONCNT <= 1 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 2 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                '### 20210430 END   根岸営業所対応 #################################################
             ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '### 20210402 START 袖ヶ浦営業所対応 ###############################################
                 If WW_JRALLINSPECTIONCNT <= 1 Then

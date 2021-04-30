@@ -591,9 +591,15 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '◯ 備考
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 Dim Remark As String = ""
+                '### 20201209 START OT積込指示書(翌月発送対応) #########################
+                '★翌月発送
+                If PrintDatarow("NEXTMONTH").ToString <> "" Then
+                    Remark &= "『" + PrintDatarow("NEXTMONTH").ToString + "』"
+                End If
+                '### 20201209 END   OT積込指示書(翌月発送対応) #########################
                 '★ジョイント
                 If PrintDatarow("JOINT").ToString <> "" Then
-                    Remark = "『" + PrintDatarow("JOINT").ToString + "』"
+                    Remark &= "『" + PrintDatarow("JOINT").ToString + "』"
                 End If
                 '★積込
                 If PrintDatarow("STACKING").ToString <> "" Then
@@ -618,12 +624,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Remark &= "『" + PrintDatarow("UPGRADE").ToString + "』"
                     'Remark &= "『" + PrintDatarow("UPGRADE").ToString + "（端切）" + "』"
                 End If
-                '### 20201209 START OT積込指示書(翌月発送対応) #########################
-                '★翌月発送
-                If PrintDatarow("NEXTMONTH").ToString <> "" Then
-                    Remark &= "『" + PrintDatarow("NEXTMONTH").ToString + "』"
-                End If
-                '### 20201209 END   OT積込指示書(翌月発送対応) #########################
                 '★備考
                 If PrintDatarow("REMARK").ToString <> "" Then
                     If Remark = "" Then

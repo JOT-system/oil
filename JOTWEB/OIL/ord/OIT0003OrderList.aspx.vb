@@ -4943,18 +4943,8 @@ Public Class OIT0003OrderList
 
             Case BaseDllConst.CONST_OFFICECODE_010402
                 '★仙台新港営業所の場合
-                SQLStrAri &=
-                      " ORDER BY" _
-                    & "    OIT0002.TRAINNO" _
-                    & "  , STACKING" _
-                    & "  , OIT0003.SHIPPERSCODE" _
-                    & "  , OIM0024.PRIORITYNO" _
-                    & "  , TANKNUMBER"
-
-            Case Else
-                '★上記以外の営業所
-                '### 20201209 START OT積込指示書(翌月発送対応) #########################
                 If tyohyoType = CONST_RPT_OTLOADPLAN Then
+                    '### 20201209 START OT積込指示書(翌月発送対応) #########################
                     SQLStrAri &=
                       " ORDER BY" _
                     & "    OIT0002.TRAINNO" _
@@ -4963,16 +4953,40 @@ Public Class OIT0003OrderList
                     & "  , DEPDATE" _
                     & "  , LODDATE DESC" _
                     & "  , OIM0024.PRIORITYNO"
+                    '### 20201209 END   OT積込指示書(翌月発送対応) #########################
                 Else
                     SQLStrAri &=
                       " ORDER BY" _
                     & "    OIT0002.TRAINNO" _
                     & "  , STACKING" _
+                    & "  , DEPDATE" _
                     & "  , OIT0003.SHIPPERSCODE" _
-                    & "  , OIM0024.PRIORITYNO"
-                    '& "  , OIT0003.OILCODE" _
+                    & "  , OIM0024.PRIORITYNO" _
+                    & "  , TANKNUMBER"
                 End If
-                '### 20201209 END   OT積込指示書(翌月発送対応) #########################
+
+            Case Else
+                ''★上記以外の営業所
+                ''### 20201209 START OT積込指示書(翌月発送対応) #########################
+                'If tyohyoType = CONST_RPT_OTLOADPLAN Then
+                '    SQLStrAri &=
+                '      " ORDER BY" _
+                '    & "    OIT0002.TRAINNO" _
+                '    & "  , OIT0003.SHIPPERSCODE" _
+                '    & "  , STACKING" _
+                '    & "  , DEPDATE" _
+                '    & "  , LODDATE DESC" _
+                '    & "  , OIM0024.PRIORITYNO"
+                'Else
+                SQLStrAri &=
+                  " ORDER BY" _
+                & "    OIT0002.TRAINNO" _
+                & "  , STACKING" _
+                & "  , OIT0003.SHIPPERSCODE" _
+                & "  , OIM0024.PRIORITYNO"
+                '& "  , OIT0003.OILCODE" _
+                'End If
+                ''### 20201209 END   OT積込指示書(翌月発送対応) #########################
         End Select
 
         '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合

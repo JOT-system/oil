@@ -1796,7 +1796,7 @@ Public Class OIT0002LinkList
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
 
-                CMNPTS.GetKaisouTypeInfo(SQLcon, OIT0002EXLUPtbl.Rows(0)("OFFICECODE"), OIT0002KAISOUPTNtbl)
+                CMNPTS.GetKaisouTypeInfo(SQLcon, OIT0002EXLUPtbl.Rows(0)("TARGETOFFICECODE"), OIT0002KAISOUPTNtbl)
             End Using
             '### 20210420 END   指摘票対応(No416)全体 ##################
             '### 20201116 START 指摘票対応(No190)全体 ##################

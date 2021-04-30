@@ -472,8 +472,8 @@ Public Class OIT0003OTLinkageList
             & "  LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "      (OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "       OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
-            & "  AND OIT0003.DELFLG <> @P04 " _
-            & "  AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
+            & "  AND OIT0003.DELFLG <> @P04 "
+        '& "  AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
 
         '★積置フラグ有り用SQL
         SQLStrAri &=

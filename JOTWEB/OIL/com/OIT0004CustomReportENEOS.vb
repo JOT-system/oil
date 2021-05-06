@@ -129,7 +129,8 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData() As String
         Dim rngWrite As Excel.Range = Nothing
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName As String = "ENEOS殿在庫.xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Try
             '***** 生成処理群ここから *****

@@ -107,6 +107,16 @@ Public Class OIT0004OilStockCreate
                             work.WF_SEL_CAMPCODE.Text = Master.USERCAMP
                             'Case "WF_ButtonCSV" 'ダウンロードボタン押下
                             '    WF_ButtonDownload_Click()
+                        Case Else
+                            If Me.hdnPopUpType.Value = "fix" Then
+                                Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+                                If GetIsStockFixed(Me.txtFixDate.Text, dispValues) Then
+                                    Me.lblFixStatus.Text = DISP_FIXED
+                                Else
+                                    Me.lblFixStatus.Text = DISP_NOT_FIXED
+                                End If
+                            End If
+
                     End Select
                 End If
             Else
@@ -294,7 +304,7 @@ Public Class OIT0004OilStockCreate
             '******************************
             '確定情報の設定
             '******************************
-            Me.txtFixDate.Text = Now.ToString("yyyy/MM/dd")
+            Me.txtFixDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
             If GetIsStockFixed(Me.txtFixDate.Text, dispDataObj, sqlCon) Then
                 Me.lblFixStatus.Text = DISP_FIXED
             Else
@@ -815,7 +825,7 @@ Public Class OIT0004OilStockCreate
                     Return
                 End Try
                 '○ 別画面でExcelを表示
-                WF_PrintURL.Value = url
+                WF_PrintURL.Value = url & "?id=" & Now.ToString("yyyyMMddHHmmss")
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 Master.HideCustomPopUp()
             End Using

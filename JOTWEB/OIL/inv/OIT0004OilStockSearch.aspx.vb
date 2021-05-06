@@ -807,7 +807,7 @@ Public Class OIT0004OilStockSearch
                         .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = Me.TxtShipper.Text
                         .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = fieldItem.consigneeCode
                         .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                        .Add("@TODAY", SqlDbType.Date).Value = Now.ToString("yyyy/MM/dd")
+                        .Add("@TODAY", SqlDbType.Date).Value = Now.AddDays(1).ToString("yyyy/MM/dd")
                     End With
 
                     Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()

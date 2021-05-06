@@ -1285,6 +1285,11 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                         rngDetailArea.Value = "ﾄｳﾕ"
                     Case "1401"
                         rngDetailArea.Value = "D.ｹｲﾕ"
+                        '2021/05/06 s.igusa ADD ST
+                        If CONST_OFFICECODE_011203.Equals(r.row("OFFICECODE").ToString()) Then
+                            rngDetailArea.Value = "ｹｲﾕ"
+                        End If
+                        '2021/05/06 s.igusa ADD ED
                     Case "1404"
                         Select Case orderingType
                             Case "A"

@@ -603,7 +603,7 @@
         <div class="divFixDateArea">
             <span >
                 <asp:Label ID="lblFixDateLabel" runat="server" Text="オーダー確定日"></asp:Label>
-                <a class="ef" id="aFixDate" ondblclick="Field_DBclick('txtFixDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('txtFixDate');">
+                <a class="ef" id="aFixDate" ondblclick="Field_DBclick('txtFixDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);"">
                     <asp:TextBox ID="txtFixDate" runat="server" CssClass="calendarIcon" Text=""></asp:TextBox>
                 </a>
                 <asp:Label ID="lblFixStatus" runat="server" Text=""></asp:Label>

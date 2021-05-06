@@ -112,7 +112,7 @@
                         <tr>
                             <th class="userName">更新者</th>
                             <th class="update">更新日時</th>
-                            <th class="fixed">オーダー確定(<%=System.DateTime.Now.ToString("M月d日") %>)</th>
+                            <th class="fixed">オーダー確定(<%=System.DateTime.Now.AddDays(1).ToString("M月d日") %>)</th>
                         </tr>
                         <tr>
                             <td>
@@ -136,7 +136,7 @@
                         <tr>
                             <th class="userName">更新者</th>
                             <th class="update">更新日時</th>
-                            <th class="fixed">オーダー確定(<%=System.DateTime.Now.ToString("M月d日") %>)</th>
+                            <th class="fixed">オーダー確定(<%=System.DateTime.Now.AddDays(1).ToString("M月d日") %>)</th>
                         </tr>
                         <tr>
                             <td>

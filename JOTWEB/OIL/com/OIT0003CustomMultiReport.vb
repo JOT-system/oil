@@ -1284,7 +1284,10 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
                     Case "1301"
                         rngDetailArea.Value = "ﾄｳﾕ"
                     Case "1401"
-                        rngDetailArea.Value = "D.ｹｲﾕ"
+                        '2021/05/06 s.igusa CHG ST
+                        'rngDetailArea.Value = "D.ｹｲﾕ"
+                        rngDetailArea.Value = "ｹｲﾕ"
+                        '2021/05/06 s.igusa CHG ED
                     Case "1404"
                         Select Case orderingType
                             Case "A"

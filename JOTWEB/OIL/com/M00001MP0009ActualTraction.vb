@@ -277,6 +277,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
         Dim rngOffsetWork As Excel.Range = Nothing
         Dim columnOffset As Integer = 0
         Dim strDate As String = ""
+        Dim nextDay As Date = Now.Date.AddDays(1)
 
         Try
             'äÓñ{à íuÇéÊìæ
@@ -297,6 +298,11 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             For day As Integer = 0 To lastDay - 1
                 columnOffset += 1
                 strDate = dt.AddDays(day).ToString("yyyy/MM/dd")
+                'óÇì˙à»ç~ÇÕèoóÕÇµÇ»Ç¢
+                If dt.AddDays(day).CompareTo(nextDay) >= 0 Then
+                    Continue For
+                End If
+
                 If setData.ContainsKey(strDate) Then
                     rngOffsetWork = rngWork.Offset(ColumnOffset:=columnOffset)
                     rngOffsetWork.Value = setData(strDate)
@@ -304,14 +310,14 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                 End If
             Next
 
-            'óÇåéèâì˙
-            columnOffset += 1
-            strDate = dt.AddDays(lastDay).ToString("yyyy/MM/dd")
-            If setData.ContainsKey(strDate) Then
-                rngOffsetWork = rngWork.Offset(ColumnOffset:=columnOffset)
-                rngOffsetWork.Value = setData(strDate)
-                ExcelMemoryRelease(rngOffsetWork)
-            End If
+            ''óÇåéèâì˙
+            'columnOffset += 1
+            'strDate = dt.AddDays(lastDay).ToString("yyyy/MM/dd")
+            'If setData.ContainsKey(strDate) Then
+            '    rngOffsetWork = rngWork.Offset(ColumnOffset:=columnOffset)
+            '    rngOffsetWork.Value = setData(strDate)
+            '    ExcelMemoryRelease(rngOffsetWork)
+            'End If
 
         Catch ex As Exception
             ExcelMemoryRelease(rngWork)

@@ -8405,6 +8405,11 @@ Public Class OIT0003OrderList
             Select Case OIT0003Reprow("TRAINNO")
                 Case "9672"
                     OIT0003Reprow("TRAINNO") = "5461"
+
+                    '2021/05/06 s.igusa ADD ST
+                Case "5972"
+                    OIT0003Reprow("TRAINNO") = "5461"
+                    '2021/05/06 s.igusa ADD ED
             End Select
         ElseIf officeCode = BaseDllConst.CONST_OFFICECODE_012402 Then
             Select Case OIT0003Reprow("TRAINNO")

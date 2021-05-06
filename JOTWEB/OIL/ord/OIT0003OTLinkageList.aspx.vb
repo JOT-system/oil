@@ -2617,7 +2617,7 @@ Public Class OIT0003OTLinkageList
                 Dim setLodMonth As String = ""
                 Dim setDepMonth As String = ""
                 '★仙台新港営業所対応用
-                Dim OTSHIPPERC() As String = {"01", "04", "09"}
+                Dim OTSHIPPERC() As String = {"01", "04", "05"}
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 '★根岸営業所対応用
                 Dim OTTrainNoNegishiChg() As String = {"5692", "8461"}

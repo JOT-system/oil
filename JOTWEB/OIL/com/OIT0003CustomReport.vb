@@ -2030,6 +2030,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     If PrintDatarow("TRAINNO").ToString() = "87" Then i = i + 1
                     If PrintDatarow("TRAINNO").ToString() = "8097" Then i = i + 2
                     If PrintDatarow("TRAINNO").ToString() = "5692" Then i = i + 3
+                    '着駅(南松本)
+                Case "5474", "5160"
+                    i = 39
+                    If PrintDatarow("TRAINNO").ToString() = "5474" Then i = i
+                    If PrintDatarow("TRAINNO").ToString() = "5160" Then i = i + 1
             End Select
 
             '★列位置決め（油種別の固定列を設定）

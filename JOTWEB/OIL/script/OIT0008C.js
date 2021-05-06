@@ -49,6 +49,16 @@ function selectAll(val) {
 function selectChangeDdl(ddl) {
 
     var name = '' + ddl.name;
+    if (ddl.id.indexOf('POSTOFFICENAMELIST') !== -1) {
+        var postOfficeCode = document.getElementsByName(name.replace('POSTOFFICENAMELIST', 'POSTOFFICECODE'));
+        var postOfficeName = document.getElementsByName(name.replace('POSTOFFICENAMELIST', 'POSTOFFICENAME'));
+        if (postOfficeCode.length > 0) {
+            postOfficeCode[0].value = ddl.value;
+        }
+        if (postOfficeName.length > 0) {
+            postOfficeName[0].value = ddl.options[ddl.selectedIndex].innerHTML;
+        }
+    }
     if (ddl.id.indexOf('CONSIGNEENAMELIST') !== -1) {
         var consigneeCode = document.getElementsByName(name.replace('CONSIGNEENAMELIST', 'CONSIGNEECODE'));
         var consigneeName = document.getElementsByName(name.replace('CONSIGNEENAMELIST', 'CONSIGNEENAME'));
@@ -106,7 +116,7 @@ function amountOnBlur(amount) {
         var taxLabel = consumptionTaxLabel[0].parentNode.childNodes[1];
         taxLabel.innerHTML = String(taxValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
         /* 総額を更新 */
-        var totalLabel = consumptionTaxLabel[0].parentNode.parentNode.childNodes[11].childNodes[1];
+        var totalLabel = consumptionTaxLabel[0].parentNode.parentNode.childNodes[7].childNodes[1];
         totalLabel.innerHTML = String(amountValue + taxValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
     }
     amount.value = String(amountValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');

@@ -11,8 +11,9 @@ Public Class OIT0008CostDetailCreate
     '○ 検索結果格納Table
     Private TMP0009tbl As DataTable                                 ' 一覧格納用テーブル
     Private TMP0009INPtbl As DataTable                              ' 更新時入力テーブル
-    Private OIM0003tbl As DataTable                                 ' 油種リスト格納テーブル
+    'Private OIM0003tbl As DataTable                                 ' 油種リスト格納テーブル
     Private OIM0012tbl As DataTable                                 ' 荷受人リスト格納テーブル
+    Private postOfficeTbl As DataTable                              ' 計上営業所格納テーブル
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    ' ログ出力
@@ -42,11 +43,14 @@ Public Class OIT0008CostDetailCreate
     ''' <remarks></remarks>
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
 
-        '油種テーブル取得
-        GetOilTable()
+        ''油種テーブル取得
+        'GetOilTable()
 
         '荷受人テーブル取得
         GetConsigneeTable()
+
+        '計上営業所テーブル取得
+        GetPostOfficeTable()
 
         Try
             If IsPostBack Then
@@ -102,18 +106,25 @@ Public Class OIT0008CostDetailCreate
                 TMP0009INPtbl = Nothing
             End If
 
-            '○ 格納Table Close
-            If Not IsNothing(OIM0003tbl) Then
-                OIM0003tbl.Clear()
-                OIM0003tbl.Dispose()
-                OIM0003tbl = Nothing
-            End If
+            ''○ 格納Table Close
+            'If Not IsNothing(OIM0003tbl) Then
+            '    OIM0003tbl.Clear()
+            '    OIM0003tbl.Dispose()
+            '    OIM0003tbl = Nothing
+            'End If
 
             '○ 格納Table Close
             If Not IsNothing(OIM0012tbl) Then
                 OIM0012tbl.Clear()
                 OIM0012tbl.Dispose()
                 OIM0012tbl = Nothing
+            End If
+
+            '○ 格納Table Close
+            If Not IsNothing(postOfficeTbl) Then
+                postOfficeTbl.Clear()
+                postOfficeTbl.Dispose()
+                postOfficeTbl = Nothing
             End If
         End Try
 
@@ -268,18 +279,19 @@ Public Class OIT0008CostDetailCreate
         addRow("DETAILNO") = maxDetailNo + 1
         addRow("CONSIGNEECODE") = ""
         addRow("CONSIGNEENAME") = ""
-        addRow("OILCODE") = ""
-        addRow("OILNAME") = ""
-        addRow("ORDERINGTYPE") = ""
-        addRow("ORDERINGOILNAME") = ""
-        addRow("CARSAMOUNT") = 0.0
-        addRow("CARSNUMBER") = 0
-        addRow("LOADAMOUNT") = 0
-        addRow("UNITPRICE") = 0.0
+        'addRow("OILCODE") = ""
+        'addRow("OILNAME") = ""
+        'addRow("ORDERINGTYPE") = ""
+        'addRow("ORDERINGOILNAME") = ""
+        'addRow("CARSAMOUNT") = 0.0
+        'addRow("CARSNUMBER") = 0
+        'addRow("LOADAMOUNT") = 0
+        'addRow("UNITPRICE") = 0.0
         addRow("AMOUNT") = 0
         addRow("TAX") = 0
         addRow("CONSUMPTIONTAX") = maxConsumptionTax
         addRow("TOTAL") = 0
+        addRow("TEKIYOU") = ""
 
         TMP0009tbl.Rows.Add(addRow)
 
@@ -330,12 +342,49 @@ Public Class OIT0008CostDetailCreate
 
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
             If gvrow.RowType = DataControlRowType.DataRow Then
-                '荷受人ドロップダウンリスト設定
+                '計上営業所ドロップダウンリスト設定
                 Dim ddl As DropDownList = Nothing
+                Dim postOfficeCode As String = ""
+
+                ddl = gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICENAMELIST")
+                postOfficeCode = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField).Value
+
+                If ddl IsNot Nothing Then
+                    Dim rowCnt As Integer = 0
+                    For Each row As DataRow In postOfficeTbl.Rows
+                        Dim ddlItm As New ListItem(row("OFFICENAME"), row("OFFICECODE"))
+
+                        If String.IsNullOrEmpty(postOfficeCode) Then
+                            If rowCnt = 0 Then
+                                Dim hidden As HiddenField = Nothing
+                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField)
+                                If hidden IsNot Nothing Then
+                                    hidden.Value = row("OFFICECODE")
+                                End If
+                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICENAME"), HiddenField)
+                                If hidden IsNot Nothing Then
+                                    hidden.Value = row("OFFICENAME")
+                                End If
+                            End If
+                        Else
+                            If row("OFFICECODE").Equals(postOfficeCode) Then
+                                ddlItm.Selected = True
+                            Else
+                                ddlItm.Selected = False
+                            End If
+                        End If
+
+                        ddl.Items.Add(ddlItm)
+                        rowCnt += 1
+                    Next
+                    ddl.Attributes.Add("onchange", "selectChangeDdl(this);")
+                End If
+
+                '荷受人ドロップダウンリスト設定
                 Dim consigneddCode As String = ""
 
-                ddl = gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_CONSIGNEENAMELIST")
-                consigneddCode = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_CONSIGNEECODE"), HiddenField).Value
+                ddl = gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_CONSIGNEENAMELIST")
+                consigneddCode = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_CONSIGNEECODE"), HiddenField).Value
 
                 If ddl IsNot Nothing Then
                     For Each row As DataRow In OIM0012tbl.Rows
@@ -350,63 +399,63 @@ Public Class OIT0008CostDetailCreate
                     ddl.Attributes.Add("onchange", "selectChangeDdl(this);")
                 End If
 
-                '油種ドロップダウンリスト設定
-                ddl = Nothing
-                Dim oilCode As String = ""
-                Dim oilName As String = ""
-                Dim segmentOilCode As String = ""
-                Dim keyCode As String = ""
+                ''油種ドロップダウンリスト設定
+                'ddl = Nothing
+                'Dim oilCode As String = ""
+                'Dim oilName As String = ""
+                'Dim segmentOilCode As String = ""
+                'Dim keyCode As String = ""
 
-                ddl = gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_ORDERINGOILNAMELIST")
+                'ddl = gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_ORDERINGOILNAMELIST")
 
-                oilCode = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_OILCODE"), HiddenField).Value
-                oilName = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_OILNAME"), HiddenField).Value
-                segmentOilCode = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_ORDERINGTYPE"), HiddenField).Value
+                'oilCode = DirectCast(gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_OILCODE"), HiddenField).Value
+                'oilName = DirectCast(gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_OILNAME"), HiddenField).Value
+                'segmentOilCode = DirectCast(gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_ORDERINGTYPE"), HiddenField).Value
 
-                If Not String.IsNullOrEmpty(oilCode) Then
-                    keyCode = oilCode + "/" + oilName + "/" + segmentOilCode
-                End If
+                'If Not String.IsNullOrEmpty(oilCode) Then
+                '    keyCode = oilCode + "/" + oilName + "/" + segmentOilCode
+                'End If
 
-                If ddl IsNot Nothing Then
-                    For Each row As DataRow In OIM0003tbl.Rows
-                        Dim ddlItm As New ListItem(row("SEGMENTOILNAME"), row("KEYCODE"))
-                        If row("KEYCODE").Equals(keyCode) Then
-                            ddlItm.Selected = True
-                        Else
-                            ddlItm.Selected = False
-                        End If
-                        ddl.Items.Add(ddlItm)
-                    Next
-                    ddl.Attributes.Add("onchange", "selectChangeDdl(this);")
-                End If
+                'If ddl IsNot Nothing Then
+                '    For Each row As DataRow In OIM0003tbl.Rows
+                '        Dim ddlItm As New ListItem(row("SEGMENTOILNAME"), row("KEYCODE"))
+                '        If row("KEYCODE").Equals(keyCode) Then
+                '            ddlItm.Selected = True
+                '        Else
+                '            ddlItm.Selected = False
+                '        End If
+                '        ddl.Items.Add(ddlItm)
+                '    Next
+                '    ddl.Attributes.Add("onchange", "selectChangeDdl(this);")
+                'End If
 
-                '数量入力
-                Dim textBox As TextBox = Nothing
-                textBox = gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_CARSAMOUNT")
-                If textBox IsNot Nothing Then
-                    textBox.Attributes.Add("onblur", "numberOnBlur(this, 3);")
-                End If
+                ''数量入力
+                'Dim textBox As TextBox = Nothing
+                'textBox = gvrow.Cells(5).FindControl("WF_COSTDETAILTBL_CARSAMOUNT")
+                'If textBox IsNot Nothing Then
+                '    textBox.Attributes.Add("onblur", "numberOnBlur(this, 3);")
+                'End If
 
-                '車数入力
-                textBox = gvrow.Cells(5).FindControl("WF_COSTDETAILTBL_CARSNUMBER")
-                If textBox IsNot Nothing Then
-                    textBox.Attributes.Add("onblur", "numberOnBlur(this, 0);")
-                End If
+                ''車数入力
+                'textBox = gvrow.Cells(6).FindControl("WF_COSTDETAILTBL_CARSNUMBER")
+                'If textBox IsNot Nothing Then
+                '    textBox.Attributes.Add("onblur", "numberOnBlur(this, 0);")
+                'End If
 
-                '屯数入力
-                textBox = gvrow.Cells(6).FindControl("WF_COSTDETAILTBL_LOADAMOUNT")
-                If textBox IsNot Nothing Then
-                    textBox.Attributes.Add("onblur", "numberOnBlur(this, 0);")
-                End If
+                ''屯数入力
+                'textBox = gvrow.Cells(7).FindControl("WF_COSTDETAILTBL_LOADAMOUNT")
+                'If textBox IsNot Nothing Then
+                '    textBox.Attributes.Add("onblur", "numberOnBlur(this, 0);")
+                'End If
 
-                '単価入力
-                textBox = gvrow.Cells(7).FindControl("WF_COSTDETAILTBL_UNITPRICE")
-                If textBox IsNot Nothing Then
-                    textBox.Attributes.Add("onblur", "numberOnBlur(this, 2);")
-                End If
+                ''単価入力
+                'textBox = gvrow.Cells(8).FindControl("WF_COSTDETAILTBL_UNITPRICE")
+                'If textBox IsNot Nothing Then
+                '    textBox.Attributes.Add("onblur", "numberOnBlur(this, 2);")
+                'End If
 
                 '金額入力
-                textBox = gvrow.Cells(8).FindControl("WF_COSTDETAILTBL_AMOUNT")
+                Dim textBox As TextBox = gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_AMOUNT")
                 If textBox IsNot Nothing Then
                     textBox.Attributes.Add("onblur", "amountOnBlur(this);")
                 End If
@@ -476,16 +525,18 @@ Public Class OIT0008CostDetailCreate
         Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" SELECT")
         SQLStrBldr.AppendLine("     DETAILNO")
+        SQLStrBldr.AppendLine("     , POSTOFFICECODE")
+        SQLStrBldr.AppendLine("     , POSTOFFICENAME")
         SQLStrBldr.AppendLine("     , CONSIGNEECODE")
         SQLStrBldr.AppendLine("     , CONSIGNEENAME")
-        SQLStrBldr.AppendLine("     , OILCODE")
-        SQLStrBldr.AppendLine("     , OILNAME")
-        SQLStrBldr.AppendLine("     , ORDERINGTYPE")
-        SQLStrBldr.AppendLine("     , ORDERINGOILNAME")
-        SQLStrBldr.AppendLine("     , CARSAMOUNT")
-        SQLStrBldr.AppendLine("     , CARSNUMBER")
-        SQLStrBldr.AppendLine("     , LOADAMOUNT")
-        SQLStrBldr.AppendLine("     , CAST(UNITPRICE AS NUMERIC(6, 2)) AS UNITPRICE")
+        'SQLStrBldr.AppendLine("     , OILCODE")
+        'SQLStrBldr.AppendLine("     , OILNAME")
+        'SQLStrBldr.AppendLine("     , ORDERINGTYPE")
+        'SQLStrBldr.AppendLine("     , ORDERINGOILNAME")
+        'SQLStrBldr.AppendLine("     , CARSAMOUNT")
+        'SQLStrBldr.AppendLine("     , CARSNUMBER")
+        'SQLStrBldr.AppendLine("     , LOADAMOUNT")
+        'SQLStrBldr.AppendLine("     , CAST(UNITPRICE AS NUMERIC(6, 2)) AS UNITPRICE")
         SQLStrBldr.AppendLine("     , CAST(AMOUNT AS NUMERIC(10, 0)) AS AMOUNT")
         SQLStrBldr.AppendLine("     , CAST(TAX AS NUMERIC(10, 0)) AS TAX")
         SQLStrBldr.AppendLine("     , (")
@@ -499,6 +550,7 @@ Public Class OIT0008CostDetailCreate
         SQLStrBldr.AppendLine("         AND    @P02 BETWEEN STYMD AND ENDYMD")
         SQLStrBldr.AppendLine("     ) AS CONSUMPTIONTAX")
         SQLStrBldr.AppendLine("     , AMOUNT + TAX AS TOTAL")
+        SQLStrBldr.AppendLine("     , TEKIYOU")
         SQLStrBldr.AppendLine(" FROM")
         SQLStrBldr.AppendLine("     oil.TMP0009_COSTDETAIL")
         SQLStrBldr.AppendLine(" WHERE")
@@ -519,16 +571,18 @@ Public Class OIT0008CostDetailCreate
         SQLStrBldr.AppendLine("         AND KEIJYOYM = @P02")
         SQLStrBldr.AppendLine("         AND LINE = @P03")
         SQLStrBldr.AppendLine("     ) AS DETAILNO")
+        SQLStrBldr.AppendLine("     , '' AS POSTOFFICECODE")
+        SQLStrBldr.AppendLine("     , '' AS POSTOFFICENAME")
         SQLStrBldr.AppendLine("     , '' AS CONSIGNEECODE")
         SQLStrBldr.AppendLine("     , '' AS CONSIGNEENAME")
-        SQLStrBldr.AppendLine("     , '' AS OILCODE")
-        SQLStrBldr.AppendLine("     , '' AS OILNAME")
-        SQLStrBldr.AppendLine("     , '' AS ORDERINGTYPE")
-        SQLStrBldr.AppendLine("     , '' AS ORDERINGOILNAME")
-        SQLStrBldr.AppendLine("     , 0.0 AS CARSAMOUNT")
-        SQLStrBldr.AppendLine("     , 0 AS CARSNUMBER")
-        SQLStrBldr.AppendLine("     , 0 AS LOADAMOUNT")
-        SQLStrBldr.AppendLine("     , 0.0 AS UNITPRICE")
+        'SQLStrBldr.AppendLine("     , '' AS OILCODE")
+        'SQLStrBldr.AppendLine("     , '' AS OILNAME")
+        'SQLStrBldr.AppendLine("     , '' AS ORDERINGTYPE")
+        'SQLStrBldr.AppendLine("     , '' AS ORDERINGOILNAME")
+        'SQLStrBldr.AppendLine("     , 0.0 AS CARSAMOUNT")
+        'SQLStrBldr.AppendLine("     , 0 AS CARSNUMBER")
+        'SQLStrBldr.AppendLine("     , 0 AS LOADAMOUNT")
+        'SQLStrBldr.AppendLine("     , 0.0 AS UNITPRICE")
         SQLStrBldr.AppendLine("     , 0 AS AMOUNT")
         SQLStrBldr.AppendLine("     , 0 AS TAX")
         SQLStrBldr.AppendLine("     , (")
@@ -542,6 +596,7 @@ Public Class OIT0008CostDetailCreate
         SQLStrBldr.AppendLine("         AND @P02 BETWEEN STYMD AND ENDYMD")
         SQLStrBldr.AppendLine("     ) AS CONSUMPTIONTAX")
         SQLStrBldr.AppendLine("     , 0 AS TOTAL")
+        SQLStrBldr.AppendLine("     , '' AS TEKIYOU")
         SQLStrBldr.AppendLine(" ")
         SQLStrBldr.AppendLine(" ORDER BY")
         SQLStrBldr.AppendLine("     DETAILNO")
@@ -1065,6 +1120,9 @@ Public Class OIT0008CostDetailCreate
         InsBldr.AppendLine("     , TAX")
         InsBldr.AppendLine("     , CONSUMPTIONTAX")
         InsBldr.AppendLine("     , OFFICENAME")
+        InsBldr.AppendLine("     , POSTOFFICECODE")
+        InsBldr.AppendLine("     , POSTOFFICENAME")
+        InsBldr.AppendLine("     , TEKIYOU")
         InsBldr.AppendLine(" )")
         InsBldr.AppendLine(" VALUES(")
         InsBldr.AppendLine("     @P01")
@@ -1099,6 +1157,9 @@ Public Class OIT0008CostDetailCreate
         InsBldr.AppendLine("     , @P30")
         InsBldr.AppendLine("     , @P31")
         InsBldr.AppendLine("     , @P32")
+        InsBldr.AppendLine("     , @P33")
+        InsBldr.AppendLine("     , @P34")
+        InsBldr.AppendLine("     , @P35")
         InsBldr.AppendLine(" )")
 
         Try
@@ -1136,6 +1197,9 @@ Public Class OIT0008CostDetailCreate
                 Dim PARA30 As SqlParameter = InsCmd.Parameters.Add("@P30", SqlDbType.Money)         '税額
                 Dim PARA31 As SqlParameter = InsCmd.Parameters.Add("@P31", SqlDbType.Decimal)       '税率
                 Dim PARA32 As SqlParameter = InsCmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)  '営業所名
+                Dim PARA33 As SqlParameter = InsCmd.Parameters.Add("@P33", SqlDbType.NVarChar, 6)   '計上営業所コード
+                Dim PARA34 As SqlParameter = InsCmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)  '計上営業所名
+                Dim PARA35 As SqlParameter = InsCmd.Parameters.Add("@P35", SqlDbType.NVarChar, 200) '摘要
 
                 PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
                 PARA02.Value = Date.Parse(work.WF_SEL_LAST_KEIJYO_YM.Text + "/01")
@@ -1164,17 +1228,20 @@ Public Class OIT0008CostDetailCreate
                     PARA04.Value = TMP0009INProw("DETAILNO")
                     PARA19.Value = TMP0009INProw("CONSIGNEECODE")
                     PARA20.Value = TMP0009INProw("CONSIGNEENAME")
-                    PARA21.Value = TMP0009INProw("OILCODE")
-                    PARA22.Value = TMP0009INProw("OILNAME")
-                    PARA23.Value = TMP0009INProw("ORDERINGTYPE")
-                    PARA24.Value = TMP0009INProw("ORDERINGOILNAME")
-                    PARA25.Value = TMP0009INProw("CARSAMOUNT")
-                    PARA26.Value = TMP0009INProw("CARSNUMBER")
-                    PARA27.Value = TMP0009INProw("LOADAMOUNT")
-                    PARA28.Value = TMP0009INProw("UNITPRICE")
+                    PARA21.Value = DBNull.Value
+                    PARA22.Value = DBNull.Value
+                    PARA23.Value = DBNull.Value
+                    PARA24.Value = DBNull.Value
+                    PARA25.Value = 0.0
+                    PARA26.Value = 0
+                    PARA27.Value = 0.0
+                    PARA28.Value = 0.0
                     PARA29.Value = TMP0009INProw("AMOUNT")
                     PARA30.Value = TMP0009INProw("TAX")
                     PARA31.Value = TMP0009INProw("CONSUMPTIONTAX")
+                    PARA33.Value = TMP0009INProw("POSTOFFICECODE")
+                    PARA34.Value = TMP0009INProw("POSTOFFICENAME")
+                    PARA35.Value = TMP0009INProw("TEKIYOU")
 
                     InsCmd.CommandTimeout = 300
                     InsCmd.ExecuteNonQuery()
@@ -1349,17 +1416,18 @@ Public Class OIT0008CostDetailCreate
         For Each TMP0009row In TMP0009tbl.Rows
             '明細入力欄が全て未設定の場合はスキップ
             If String.IsNullOrEmpty(TMP0009row("CONSIGNEECODE")) AndAlso
-               String.IsNullOrEmpty(TMP0009row("CONSIGNEENAME")) AndAlso
-               String.IsNullOrEmpty(TMP0009row("OILCODE")) AndAlso
-               String.IsNullOrEmpty(TMP0009row("OILNAME")) AndAlso
-               String.IsNullOrEmpty(TMP0009row("ORDERINGTYPE")) AndAlso
-               String.IsNullOrEmpty(TMP0009row("ORDERINGOILNAME")) AndAlso
-               TMP0009row("CARSAMOUNT") = 0 AndAlso
-               TMP0009row("CARSNUMBER") = 0 AndAlso
-               TMP0009row("LOADAMOUNT") = 0 AndAlso
-               TMP0009row("UNITPRICE") = 0 AndAlso
-               TMP0009row("AMOUNT") = 0 AndAlso
-               TMP0009row("TAX") = 0 Then
+                String.IsNullOrEmpty(TMP0009row("CONSIGNEENAME")) AndAlso
+                TMP0009row("AMOUNT") = 0 AndAlso
+                TMP0009row("TAX") = 0 AndAlso
+                String.IsNullOrEmpty(TMP0009row("TEKIYOU")) Then
+                'String.IsNullOrEmpty(TMP0009row("OILCODE")) AndAlso
+                'String.IsNullOrEmpty(TMP0009row("OILNAME")) AndAlso
+                'String.IsNullOrEmpty(TMP0009row("ORDERINGTYPE")) AndAlso
+                'String.IsNullOrEmpty(TMP0009row("ORDERINGOILNAME")) AndAlso
+                'TMP0009row("CARSAMOUNT") = 0 AndAlso
+                'TMP0009row("CARSNUMBER") = 0 AndAlso
+                'TMP0009row("LOADAMOUNT") = 0 AndAlso
+                'TMP0009row("UNITPRICE") = 0 AndAlso
                 Continue For
             End If
 
@@ -1586,49 +1654,70 @@ Public Class OIT0008CostDetailCreate
 
             WW_LINE_ERR = ""
 
-            '数量（バリデーションチェック）
-            WW_TEXT = TMP0009INProw("CARSAMOUNT")
-            Master.CheckField(Master.USERCAMP, "CARSAMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(数量エラー)です。"
+            '計上営業所コード（バリデーションチェック）
+            WW_TEXT = TMP0009INProw("POSTOFFICECODE")
+            Master.CheckField(Master.USERCAMP, "POSTOFFICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("OFFICECODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(計上営業所コード)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(計上営業所コード)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '車数（バリデーションチェック）
-            WW_TEXT = TMP0009INProw("CARSNUMBER")
-            Master.CheckField(Master.USERCAMP, "CARSNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(車数エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''数量（バリデーションチェック）
+            'WW_TEXT = TMP0009INProw("CARSAMOUNT")
+            'Master.CheckField(Master.USERCAMP, "CARSAMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(数量エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '屯数（バリデーションチェック）
-            WW_TEXT = TMP0009INProw("LOADAMOUNT")
-            Master.CheckField(Master.USERCAMP, "LOADAMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(屯数エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''車数（バリデーションチェック）
+            'WW_TEXT = TMP0009INProw("CARSNUMBER")
+            'Master.CheckField(Master.USERCAMP, "CARSNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(車数エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '単価（バリデーションチェック）
-            WW_TEXT = TMP0009INProw("UNITPRICE")
-            Master.CheckField(Master.USERCAMP, "UNITPRICE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(単価エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''屯数（バリデーションチェック）
+            'WW_TEXT = TMP0009INProw("LOADAMOUNT")
+            'Master.CheckField(Master.USERCAMP, "LOADAMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(屯数エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            ''単価（バリデーションチェック）
+            'WW_TEXT = TMP0009INProw("UNITPRICE")
+            'Master.CheckField(Master.USERCAMP, "UNITPRICE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(単価エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
             '金額（バリデーションチェック）
             WW_TEXT = TMP0009INProw("AMOUNT")
@@ -1652,15 +1741,29 @@ Public Class OIT0008CostDetailCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            '摘要
+            WW_TEXT = TMP0009INProw("TEKIYOU")
+            Master.CheckField(Master.USERCAMP, "TEKIYOU", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(摘要)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             '重複チェック
             rowCnt += 1
             For i As Integer = rowCnt To TMP0009tbl.Rows.Count - 1
                 Dim row As DataRow = TMP0009tbl.Rows(i)
 
-                '荷受人と油種が一致するレコードが存在する場合、重複エラーとする
-                If row("CONSIGNEENAME") = TMP0009INProw("CONSIGNEENAME") AndAlso
-                   row("ORDERINGOILNAME") = TMP0009INProw("ORDERINGOILNAME") Then
-                    WW_CheckMES1 = "・更新できないレコード(荷受人・油種重複エラー)です。"
+                '計上営業所と荷受人と油種が一致するレコードが存在する場合、重複エラーとする
+                If row("POSTOFFICENAME") = TMP0009INProw("POSTOFFICENAME") AndAlso
+                    row("CONSIGNEENAME") = TMP0009INProw("CONSIGNEENAME") AndAlso
+                    row("TEKIYOU") = TMP0009INProw("TEKIYOU") Then
+                    'row("ORDERINGOILNAME") = TMP0009INProw("ORDERINGOILNAME") AndAlso
+
+                    WW_CheckMES1 = "・更新できないレコード(計上営業所・荷受人・摘要重複エラー)です。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
                     WW_LINE_ERR = "ERR"
@@ -1705,92 +1808,96 @@ Public Class OIT0008CostDetailCreate
 
         If Not IsNothing(TMP0009row) Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> 明細No =" & TMP0009row("DETAILNO") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 計上営業所 =" & TMP0009row("POSTOFFICENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 荷受人 =" & TMP0009row("CONSIGNEENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種 =" & TMP0009row("ORDERINGOILNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 数量 =" & TMP0009row("CARSAMOUNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 車数 =" & TMP0009row("CARSNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 屯数 =" & TMP0009row("LOADAMOUNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 単価 =" & TMP0009row("UNITPRICE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 油種 =" & TMP0009row("ORDERINGOILNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 数量 =" & TMP0009row("CARSAMOUNT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 車数 =" & TMP0009row("CARSNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 屯数 =" & TMP0009row("LOADAMOUNT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 単価 =" & TMP0009row("UNITPRICE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 金額 =" & TMP0009row("AMOUNT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 税額 =" & TMP0009row("TAX") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 総額 =" & TMP0009row("TOTAL")
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 総額 =" & TMP0009row("TOTAL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 摘要 =" & TMP0009row("TEKIYOU")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
 
-    ''' <summary>
-    ''' 油種リストデータ設定
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub GetOilTable()
+#Region "未使用(コメントアウト)"
+    '''' <summary>
+    '''' 油種リストデータ設定
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Protected Sub GetOilTable()
 
-        '油種テーブル初期化
-        OIM0003tbl = New DataTable
-        OIM0003tbl.Columns.Clear()
-        OIM0003tbl.Clear()
+    '    '油種テーブル初期化
+    '    OIM0003tbl = New DataTable
+    '    OIM0003tbl.Columns.Clear()
+    '    OIM0003tbl.Clear()
 
-        '〇検索SQL説明
-        '　検索説明
-        '     条件指定に従い該当データを油種マスタから取得する
-        Dim SQLStrBldr As New StringBuilder
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     OILCODE + '/' + OILNAME + '/' + SEGMENTOILCODE AS KEYCODE")
-        SQLStrBldr.AppendLine("     , SEGMENTOILNAME")
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.OIM0003_PRODUCT")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     DELFLG = '0'")
-        SQLStrBldr.AppendLine(" AND OFFICECODE = @P01")
-        SQLStrBldr.AppendLine(" GROUP BY")
-        SQLStrBldr.AppendLine("     OILCODE")
-        SQLStrBldr.AppendLine("     , OILNAME")
-        SQLStrBldr.AppendLine("     , SEGMENTOILCODE")
-        SQLStrBldr.AppendLine("     , SEGMENTOILNAME")
-        SQLStrBldr.AppendLine(" ")
-        SQLStrBldr.AppendLine(" UNION ALL")
-        SQLStrBldr.AppendLine(" ")
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     '' AS KEYCODE")
-        SQLStrBldr.AppendLine("     , '' AS SEGMENTOILNAME")
-        SQLStrBldr.AppendLine(" ")
-        SQLStrBldr.AppendLine(" ORDER BY")
-        SQLStrBldr.AppendLine("     KEYCODE")
+    '    '〇検索SQL説明
+    '    '　検索説明
+    '    '     条件指定に従い該当データを油種マスタから取得する
+    '    Dim SQLStrBldr As New StringBuilder
+    '    SQLStrBldr.AppendLine(" SELECT")
+    '    SQLStrBldr.AppendLine("     OILCODE + '/' + OILNAME + '/' + SEGMENTOILCODE AS KEYCODE")
+    '    SQLStrBldr.AppendLine("     , SEGMENTOILNAME")
+    '    SQLStrBldr.AppendLine(" FROM")
+    '    SQLStrBldr.AppendLine("     oil.OIM0003_PRODUCT")
+    '    SQLStrBldr.AppendLine(" WHERE")
+    '    SQLStrBldr.AppendLine("     DELFLG = '0'")
+    '    SQLStrBldr.AppendLine(" AND OFFICECODE = @P01")
+    '    SQLStrBldr.AppendLine(" GROUP BY")
+    '    SQLStrBldr.AppendLine("     OILCODE")
+    '    SQLStrBldr.AppendLine("     , OILNAME")
+    '    SQLStrBldr.AppendLine("     , SEGMENTOILCODE")
+    '    SQLStrBldr.AppendLine("     , SEGMENTOILNAME")
+    '    SQLStrBldr.AppendLine(" ")
+    '    SQLStrBldr.AppendLine(" UNION ALL")
+    '    SQLStrBldr.AppendLine(" ")
+    '    SQLStrBldr.AppendLine(" SELECT")
+    '    SQLStrBldr.AppendLine("     '' AS KEYCODE")
+    '    SQLStrBldr.AppendLine("     , '' AS SEGMENTOILNAME")
+    '    SQLStrBldr.AppendLine(" ")
+    '    SQLStrBldr.AppendLine(" ORDER BY")
+    '    SQLStrBldr.AppendLine("     KEYCODE")
 
-        '○ 油種テーブルデータ取得
-        Try
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       ' DataBase接続
+    '    '○ 油種テーブルデータ取得
+    '    Try
+    '        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+    '            SQLcon.Open()       ' DataBase接続
 
-                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
-                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   ' 営業所コード
-                    PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
+    '            Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+    '                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   ' 営業所コード
+    '                PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
 
-                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                        '○ フィールド名とフィールドの型を取得
-                        For index As Integer = 0 To SQLdr.FieldCount - 1
-                            OIM0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                        Next
+    '                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    '                    '○ フィールド名とフィールドの型を取得
+    '                    For index As Integer = 0 To SQLdr.FieldCount - 1
+    '                        OIM0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+    '                    Next
 
-                        '○ テーブル検索結果をテーブル格納
-                        OIM0003tbl.Load(SQLdr)
-                    End Using
+    '                    '○ テーブル検索結果をテーブル格納
+    '                    OIM0003tbl.Load(SQLdr)
+    '                End Using
 
-                End Using
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT OIM0003_PRODUCT")
+    '            End Using
+    '        End Using
+    '    Catch ex As Exception
+    '        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT OIM0003_PRODUCT")
 
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0008C SELECT OIM0003_PRODUCT"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
-        End Try
+    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+    '        CS0011LOGWrite.INFPOSI = "DB:OIT0008C SELECT OIM0003_PRODUCT"
+    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWrite.TEXT = ex.ToString()
+    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+    '    End Try
 
-    End Sub
+    'End Sub
+#End Region
 
     ''' <summary>
     ''' 荷受人リストデータ設定
@@ -1847,6 +1954,66 @@ Public Class OIT0008CostDetailCreate
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0008C SELECT OIM0003_NIUKE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 計上営業所リストデータ設定
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GetPostOfficeTable()
+
+        '計上営業所テーブル初期化
+        postOfficeTbl = New DataTable
+        postOfficeTbl.Columns.Clear()
+        postOfficeTbl.Clear()
+
+        '〇検索SQL説明
+        '　検索説明
+        '     条件指定に従い該当データを営業所関連付けマスタから取得する
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT")
+        SQLStrBldr.AppendLine("     OFFICECODE")
+        SQLStrBldr.AppendLine("     , OFFICENAME")
+        SQLStrBldr.AppendLine(" FROM")
+        SQLStrBldr.AppendLine("     oil.VIW0003_OFFICECHANGE")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     ORGCODE = @P01")
+        SQLStrBldr.AppendLine(" ORDER BY")
+        SQLStrBldr.AppendLine("     OFFICECODE")
+
+        '○ 計上営業所テーブルデータ取得
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       ' DataBase接続
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   ' 営業所コード
+                    PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            postOfficeTbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        postOfficeTbl.Load(SQLdr)
+                    End Using
+
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT VIW0003_OFFICECHANGE")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008C SELECT VIW0003_OFFICECHANGE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1928,20 +2095,23 @@ Public Class OIT0008CostDetailCreate
         '入力テーブル作成
         TMP0009tbl = New DataTable
         TMP0009tbl.Columns.Add("DETAILNO", Type.GetType("System.Int32"))
+        TMP0009tbl.Columns.Add("POSTOFFICECODE", Type.GetType("System.String"))
+        TMP0009tbl.Columns.Add("POSTOFFICENAME", Type.GetType("System.String"))
         TMP0009tbl.Columns.Add("CONSIGNEECODE", Type.GetType("System.String"))
         TMP0009tbl.Columns.Add("CONSIGNEENAME", Type.GetType("System.String"))
-        TMP0009tbl.Columns.Add("OILCODE", Type.GetType("System.String"))
-        TMP0009tbl.Columns.Add("OILNAME", Type.GetType("System.String"))
-        TMP0009tbl.Columns.Add("ORDERINGTYPE", Type.GetType("System.String"))
-        TMP0009tbl.Columns.Add("ORDERINGOILNAME", Type.GetType("System.String"))
-        TMP0009tbl.Columns.Add("CARSAMOUNT", Type.GetType("System.Decimal"))
-        TMP0009tbl.Columns.Add("CARSNUMBER", Type.GetType("System.Decimal"))
-        TMP0009tbl.Columns.Add("LOADAMOUNT", Type.GetType("System.Decimal"))
-        TMP0009tbl.Columns.Add("UNITPRICE", Type.GetType("System.Decimal"))
+        'TMP0009tbl.Columns.Add("OILCODE", Type.GetType("System.String"))
+        'TMP0009tbl.Columns.Add("OILNAME", Type.GetType("System.String"))
+        'TMP0009tbl.Columns.Add("ORDERINGTYPE", Type.GetType("System.String"))
+        'TMP0009tbl.Columns.Add("ORDERINGOILNAME", Type.GetType("System.String"))
+        'TMP0009tbl.Columns.Add("CARSAMOUNT", Type.GetType("System.Decimal"))
+        'TMP0009tbl.Columns.Add("CARSNUMBER", Type.GetType("System.Decimal"))
+        'TMP0009tbl.Columns.Add("LOADAMOUNT", Type.GetType("System.Decimal"))
+        'TMP0009tbl.Columns.Add("UNITPRICE", Type.GetType("System.Decimal"))
         TMP0009tbl.Columns.Add("AMOUNT", Type.GetType("System.Decimal"))
         TMP0009tbl.Columns.Add("TAX", Type.GetType("System.Decimal"))
         TMP0009tbl.Columns.Add("CONSUMPTIONTAX", Type.GetType("System.Decimal"))
         TMP0009tbl.Columns.Add("TOTAL", Type.GetType("System.Decimal"))
+        TMP0009tbl.Columns.Add("TEKIYOU", Type.GetType("System.String"))
 
         'GridViewの行を検索
         For Each gRow As GridViewRow In WF_COSTDETAILTBL.Rows
@@ -1958,40 +2128,46 @@ Public Class OIT0008CostDetailCreate
                 Continue For
             End If
 
+            '計上営業所コード(POSTOFFICECODE)
+            addRow("POSTOFFICECODE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField).Value
+
+            '計上営業所名(POSTOFFICENAME)
+            addRow("POSTOFFICENAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_POSTOFFICENAME"), HiddenField).Value
+
             '荷受人コード(CONSIGNEECODE)
             addRow("CONSIGNEECODE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CONSIGNEECODE"), HiddenField).Value
 
             '荷受人名(CONSIGNEENAME)
             addRow("CONSIGNEENAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CONSIGNEENAME"), HiddenField).Value
 
-            '油種コード(OILCODE)
-            addRow("OILCODE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_OILCODE"), HiddenField).Value
+            ''油種コード(OILCODE)
+            'addRow("OILCODE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_OILCODE"), HiddenField).Value
 
-            '油種名(OILNAME)
-            addRow("OILNAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_OILNAME"), HiddenField).Value
+            ''油種名(OILNAME)
+            'addRow("OILNAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_OILNAME"), HiddenField).Value
 
-            '油種細分コード(受注用)(ORDERINGTYPE)
-            addRow("ORDERINGTYPE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_ORDERINGTYPE"), HiddenField).Value
+            ''油種細分コード(受注用)(ORDERINGTYPE)
+            'addRow("ORDERINGTYPE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_ORDERINGTYPE"), HiddenField).Value
 
-            '油種名(受注用(ORDERINGOILNAME)
-            addRow("ORDERINGOILNAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_ORDERINGOILNAME"), HiddenField).Value
+            ''油種名(受注用(ORDERINGOILNAME)
+            'addRow("ORDERINGOILNAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_ORDERINGOILNAME"), HiddenField).Value
 
-            '数量(CARSAMOUNT)
-            Dim quantity As Decimal = 0
-            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CARSAMOUNT"), TextBox).Text, quantity)
-            addRow("CARSAMOUNT") = quantity
+            ''数量(CARSAMOUNT)
+            'Dim quantity As Decimal = 0
+            'Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CARSAMOUNT"), TextBox).Text, quantity)
+            'addRow("CARSAMOUNT") = quantity
 
-            '車数(CARSNUMBER)
-            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CARSNUMBER"), TextBox).Text, quantity)
-            addRow("CARSNUMBER") = quantity
+            ''車数(CARSNUMBER)
+            'Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CARSNUMBER"), TextBox).Text, quantity)
+            'addRow("CARSNUMBER") = quantity
 
-            '屯数(LOADAMOUNT)
-            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_LOADAMOUNT"), TextBox).Text, quantity)
-            addRow("LOADAMOUNT") = quantity
+            ''屯数(LOADAMOUNT)
+            'Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_LOADAMOUNT"), TextBox).Text, quantity)
+            'addRow("LOADAMOUNT") = quantity
 
-            '単価(UNITPRICE)
-            Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_UNITPRICE"), TextBox).Text, quantity)
-            addRow("UNITPRICE") = quantity
+            ''単価(UNITPRICE)
+            'Decimal.TryParse(DirectCast(gRow.FindControl("WF_COSTDETAILTBL_UNITPRICE"), TextBox).Text, quantity)
+            'addRow("UNITPRICE") = quantity
 
             '金額(AMOUNT)
             Dim amount As Decimal = 0
@@ -2006,6 +2182,9 @@ Public Class OIT0008CostDetailCreate
 
             '合計(TOTAL)
             addRow("TOTAL") = addRow("AMOUNT") + addRow("TAX")
+
+            '摘要(TEKIYOU)
+            addRow("TEKIYOU") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_TEKIYOU"), TextBox).Text
 
             'テーブルに行追加
             TMP0009tbl.Rows.Add(addRow)

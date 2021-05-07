@@ -1581,9 +1581,10 @@ Public Class OIT0002LinkList
 
             '★タンク車No重複チェック
             Dim chkTankNo As String = ""
+            Dim chkModel As String = ""
             For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Select(Nothing, "TRUCKNO")
-                If chkTankNo <> "" _
-                    AndAlso chkTankNo = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) Then
+                If chkTankNo <> "" AndAlso chkModel <> "" _
+                    AndAlso chkTankNo + chkModel = Convert.ToString(OIT0002EXLUProw("TRUCKNO")) + Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL")) Then
                     '★タンク車が重複して設定されている場合はエラー
                     Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR,
                               "ポラリスで設定した貨車(車番)が重複して設定されています。再度確認をおねがいします。", needsPopUp:=True)
@@ -1591,6 +1592,7 @@ Public Class OIT0002LinkList
                     Exit For
                 End If
                 chkTankNo = Convert.ToString(OIT0002EXLUProw("TRUCKNO"))
+                chkModel = Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL"))
             Next
             If WW_ERRCODE = "ERR" Then Exit Sub
 
@@ -2942,7 +2944,7 @@ Public Class OIT0002LinkList
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
                     AndAlso (I_UseFlg = "4") Then
                     'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
-                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME=''")
                         For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") Then
 
@@ -3009,7 +3011,7 @@ Public Class OIT0002LinkList
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
                     AndAlso (I_UseFlg = "4") Then
                     'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
-                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME=''")
 
                         '★入線列車番号が未設定の場合はSKIP
                         If OIT0002ExlUProw("INLINETRAIN") = "" Then
@@ -3060,7 +3062,7 @@ Public Class OIT0002LinkList
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
                     AndAlso (I_UseFlg = "4") Then
                     'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
-                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME=''")
                         If OIT0002ExlUProw("LOADINGTRAINNO").ToString() <> "" AndAlso OIT0002ExlUProw("OFFICECODE").ToString() <> "" Then
 
                             '★ポラリス(タンク車指示(指示内容))が設定されている場合はSKIP
@@ -3232,7 +3234,7 @@ Public Class OIT0002LinkList
                         End If
 
                     Else
-                        P_OFFICECODE.Value = OIT0002EXLUProw("OFFICECODE").ToString()
+                        P_OFFICECODE.Value = OIT0002EXLUProw("TARGETOFFICECODE").ToString()
                         P_TRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO").ToString()
                         P_DEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE").ToString()
 
@@ -3282,7 +3284,7 @@ Public Class OIT0002LinkList
 
                     sKaisouContent(0) = OIT0002EXLUProw("KAISOUNO")
                     sKaisouContent(1) = OIT0002EXLUProw("KAISOUDETAILNO")
-                    sKaisouContent(2) = OIT0002EXLUProw("OFFICECODE")
+                    sKaisouContent(2) = OIT0002EXLUProw("TARGETOFFICECODE")
                     sKaisouContent(3) = OIT0002EXLUProw("LOADINGTRAINNO")
                     'sKaisouContent(4) = OIT0002EXLUProw("LOADINGLODDATE")
                     sKaisouContent(5) = OIT0002EXLUProw("LOADINGDEPDATE")
@@ -3507,7 +3509,7 @@ Public Class OIT0002LinkList
                         '○回送(修理)
                         Case WW_OBJECTIVENAME(4)
                             '★修理-他社負担(F120*11)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(0)
@@ -3521,7 +3523,7 @@ Public Class OIT0002LinkList
                         '○回送(ＭＣ)
                         Case WW_OBJECTIVENAME(5)
                             '★ＭＣ-JOT負担発払(F120*20)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(0)
@@ -3535,7 +3537,7 @@ Public Class OIT0002LinkList
                         '○回送(交検)
                         Case WW_OBJECTIVENAME(6)
                             '★交検-他社負担(F120*30)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(0)
@@ -3549,7 +3551,7 @@ Public Class OIT0002LinkList
                         '○回送(疎開留置)
                         Case WW_OBJECTIVENAME(7)
                             '★疎開留置-他社負担(F120*50)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(0)
@@ -3563,7 +3565,7 @@ Public Class OIT0002LinkList
                         '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
                             '★全検-他社負担(F120*40)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(0)
@@ -3577,7 +3579,7 @@ Public Class OIT0002LinkList
                         '○回送(その他)(移動)
                         Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             '★移動-JOT負担発払(F120*60)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(0)
@@ -3597,7 +3599,7 @@ Public Class OIT0002LinkList
                     P_KAISOUINFO.Value = ""                         '回送情報
                     P_CARSNUMBER.Value = 1                          '車数
                     P_REMARK.Value = ""                             '備考
-                    P_DEPSTATION.Value = OIT0002row("RETSTATION")               '発駅コード
+                    P_DEPSTATION.Value = OIT0002row("ARRSTATIONCODE")           '発駅コード
                     P_DEPSTATIONNAME.Value = OIT0002row("ARRSTATIONNAME")       '発駅名
                     P_ARRSTATION.Value = OIT0002row("FORWARDINGARRSTATIONCODE") '着駅コード
                     P_ARRSTATIONNAME.Value = OIT0002row("FORWARDINGARRSTATION") '着駅名
@@ -3921,7 +3923,7 @@ Public Class OIT0002LinkList
                         '○回送(修理)
                         Case WW_OBJECTIVENAME(4)
                             '★修理-他社負担(F120*10)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_SYURI(0)
@@ -3935,7 +3937,7 @@ Public Class OIT0002LinkList
                         '○回送(ＭＣ)
                         Case WW_OBJECTIVENAME(5)
                             '★ＭＣ-JOT負担発払(F120*20)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_MC(0)
@@ -3949,7 +3951,7 @@ Public Class OIT0002LinkList
                         '○回送(交検)
                         Case WW_OBJECTIVENAME(6)
                             '★交検-他社負担(F120*30)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_KOUKEN(0)
@@ -3963,7 +3965,7 @@ Public Class OIT0002LinkList
                         '○回送(疎開留置)
                         Case WW_OBJECTIVENAME(7)
                             '★疎開留置-他社負担(F120*50)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_RYUCHI(0)
@@ -3977,7 +3979,7 @@ Public Class OIT0002LinkList
                         '○回送(全検)
                         Case WW_OBJECTIVENAME(2)
                             '★全検-他社負担(F120*40)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_ZENKEN(0)
@@ -3991,7 +3993,7 @@ Public Class OIT0002LinkList
                         '○回送(その他)(移動)
                         Case WW_OBJECTIVENAME(3), WW_OBJECTIVENAME(8)
                             '★移動-JOT負担発払(F120*60)を設定
-                            Select Case OIT0002row("OFFICECODE")
+                            Select Case OIT0002row("TARGETOFFICECODE")
                                 '○五井営業所
                                 Case BaseDllConst.CONST_OFFICECODE_011201
                                     P_KAISOUTYPE.Value = WW_KAISOUTYPE_IDOU(0)
@@ -4007,15 +4009,15 @@ Public Class OIT0002LinkList
                     P_TRAINNO.Value = OIT0002row("LOADINGTRAINNO")              '本線列車
                     P_TRAINNAME.Value = ""                                      '本線列車名
                     P_KAISOUYMD.Value = WW_DATENOW                              '回送登録日
-                    P_OFFICECODE.Value = OIT0002row("OFFICECODE")               '回送営業所コード
-                    P_OFFICENAME.Value = OIT0002row("OFFICENAME")               '回送営業所名
+                    P_OFFICECODE.Value = OIT0002row("TARGETOFFICECODE")         '回送営業所コード
+                    P_OFFICENAME.Value = OIT0002row("TARGETOFFICENAME")         '回送営業所名
                     P_SHIPPERSCODE.Value = ""                                   '荷主コード
                     P_SHIPPERSNAME.Value = ""                                   '荷主名
                     P_BASECODE.Value = ""                                       '基地コード
                     P_BASENAME.Value = ""                                       '基地名
                     P_CONSIGNEECODE.Value = ""                                  '荷受人コード
                     P_CONSIGNEENAME.Value = ""                                  '荷受人名
-                    P_DEPSTATION.Value = OIT0002row("RETSTATION")               '発駅コード
+                    P_DEPSTATION.Value = OIT0002row("ARRSTATIONCODE")           '発駅コード
                     P_DEPSTATIONNAME.Value = OIT0002row("ARRSTATIONNAME")       '発駅名
                     P_ARRSTATION.Value = OIT0002row("FORWARDINGARRSTATIONCODE") '着駅コード
                     P_ARRSTATIONNAME.Value = OIT0002row("FORWARDINGARRSTATION") '着駅名
@@ -6376,12 +6378,9 @@ Public Class OIT0002LinkList
                 SQLStr &= String.Format("        USEORDERNO = '{0}', ", "")
             End If
 
+            '### 20210507 START 前回油種の更新を廃止 #######################################
             SQLStr &=
-                      "        LASTOILCODE    = @P04, " _
-                    & "        LASTOILNAME    = @P05, " _
-                    & "        PREORDERINGTYPE    = @P06, " _
-                    & "        PREORDERINGOILNAME = @P07, " _
-                    & "        EMPARRDATE         = @P08, " _
+                      "        EMPARRDATE         = @P08, " _
                     & "        ACTUALEMPARRDATE   = @P09, " _
                     & "        UPDYMD         = @P11, " _
                     & "        UPDUSER        = @P12, " _
@@ -6389,6 +6388,20 @@ Public Class OIT0002LinkList
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
                     & "    AND DELFLG        <> @P02 "
+            'SQLStr &=
+            '          "        LASTOILCODE    = @P04, " _
+            '        & "        LASTOILNAME    = @P05, " _
+            '        & "        PREORDERINGTYPE    = @P06, " _
+            '        & "        PREORDERINGOILNAME = @P07, " _
+            '        & "        EMPARRDATE         = @P08, " _
+            '        & "        ACTUALEMPARRDATE   = @P09, " _
+            '        & "        UPDYMD         = @P11, " _
+            '        & "        UPDUSER        = @P12, " _
+            '        & "        UPDTERMID      = @P13, " _
+            '        & "        RECEIVEYMD     = @P14  " _
+            '        & "  WHERE TANKNUMBER     = @P01  " _
+            '        & "    AND DELFLG        <> @P02 "
+            '### 20210507 END   前回油種の更新を廃止 #######################################
 
             '★受注関連の場合は条件に含める
             '※回送(全検), 回送(その他)⇒残車へ戻す(True)場合は条件をSKIPする。
@@ -6411,10 +6424,12 @@ Public Class OIT0002LinkList
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '所在地コード
-            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '前回油種
-            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種名
-            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
-            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+            '### 20210507 START 前回油種の更新を廃止 #######################################
+            'Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '前回油種
+            'Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種名
+            'Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
+            'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+            '### 20210507 END   前回油種の更新を廃止 #######################################
             Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.Date)      '空車着日（予定）
             Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.Date)      '空車着日（実績）
 
@@ -6438,10 +6453,12 @@ Public Class OIT0002LinkList
                     If I_TANKNO = OIT0002EXLINSrow("TANKNUMBER") Then
                         PARA01.Value = OIT0002EXLINSrow("TANKNUMBER")           'タンク車No
                         PARA03.Value = OIT0002EXLINSrow("RETSTATION")           '空車着駅コード
-                        PARA04.Value = OIT0002EXLINSrow("PREOILCODE")           '前回油種
-                        PARA05.Value = OIT0002EXLINSrow("PREOILNAME")           '前回油種名
-                        PARA06.Value = OIT0002EXLINSrow("PREORDERINGTYPE")      '前回油種区分(受発注用)
-                        PARA07.Value = OIT0002EXLINSrow("PREORDERINGOILNAME")   '前回油種名(受発注用)
+                        '### 20210507 START 前回油種の更新を廃止 #######################################
+                        'PARA04.Value = OIT0002EXLINSrow("PREOILCODE")           '前回油種
+                        'PARA05.Value = OIT0002EXLINSrow("PREOILNAME")           '前回油種名
+                        'PARA06.Value = OIT0002EXLINSrow("PREORDERINGTYPE")      '前回油種区分(受発注用)
+                        'PARA07.Value = OIT0002EXLINSrow("PREORDERINGOILNAME")   '前回油種名(受発注用)
+                        '### 20210507 END   前回油種の更新を廃止 #######################################
                         SQLcmd.ExecuteNonQuery()
                         Exit For
                     End If
@@ -6452,10 +6469,12 @@ Public Class OIT0002LinkList
 
                     PARA01.Value = OIT0002EXLINSrow("TANKNUMBER")           'タンク車No
                     PARA03.Value = OIT0002EXLINSrow("RETSTATION")           '空車着駅コード
-                    PARA04.Value = OIT0002EXLINSrow("PREOILCODE")           '前回油種
-                    PARA05.Value = OIT0002EXLINSrow("PREOILNAME")           '前回油種名
-                    PARA06.Value = OIT0002EXLINSrow("PREORDERINGTYPE")      '前回油種区分(受発注用)
-                    PARA07.Value = OIT0002EXLINSrow("PREORDERINGOILNAME")   '前回油種名(受発注用)
+                    '### 20210507 START 前回油種の更新を廃止 #######################################
+                    'PARA04.Value = OIT0002EXLINSrow("PREOILCODE")           '前回油種
+                    'PARA05.Value = OIT0002EXLINSrow("PREOILNAME")           '前回油種名
+                    'PARA06.Value = OIT0002EXLINSrow("PREORDERINGTYPE")      '前回油種区分(受発注用)
+                    'PARA07.Value = OIT0002EXLINSrow("PREORDERINGOILNAME")   '前回油種名(受発注用)
+                    '### 20210507 END   前回油種の更新を廃止 #######################################
                     SQLcmd.ExecuteNonQuery()
                 Next
             End If

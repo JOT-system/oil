@@ -230,6 +230,87 @@ Partial Public Class OIT0008CostDetailCreate
     Protected WithEvents WF_COSTDETAILTBL As Global.System.Web.UI.WebControls.GridView
     
     '''<summary>
+    '''WF_COSTDETAILTBL_ORDERINGOILNAMELIST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_ORDERINGOILNAMELIST As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_OILCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_OILCODE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_OILNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_OILNAME As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_ORDERINGTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_ORDERINGTYPE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_ORDERINGOILNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_ORDERINGOILNAME As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_CARSAMOUNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_CARSAMOUNT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_CARSNUMBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_CARSNUMBER As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_LOADAMOUNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_LOADAMOUNT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_COSTDETAILTBL_UNITPRICE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COSTDETAILTBL_UNITPRICE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

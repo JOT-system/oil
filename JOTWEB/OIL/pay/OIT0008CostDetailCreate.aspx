@@ -197,6 +197,14 @@
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH3" ItemStyle-CssClass="WF_COSTDETAILTBL_TD3">
+                        <HeaderTemplate>計上営業所</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:DropDownList ID="WF_COSTDETAILTBL_POSTOFFICENAMELIST" runat="server" />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_POSTOFFICECODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "POSTOFFICECODE")%>' />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_POSTOFFICENAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "POSTOFFICENAME")%>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH4" ItemStyle-CssClass="WF_COSTDETAILTBL_TD4">
                         <HeaderTemplate>荷受人</HeaderTemplate>
                         <ItemTemplate>
                             <asp:DropDownList ID="WF_COSTDETAILTBL_CONSIGNEENAMELIST" runat="server" />
@@ -204,63 +212,70 @@
                             <asp:HiddenField ID="WF_COSTDETAILTBL_CONSIGNEENAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "CONSIGNEENAME")%>' />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH4" ItemStyle-CssClass="WF_COSTDETAILTBL_TD4" FooterStyle-CssClass="WF_COSTDETAILTBL_TF4">
-                        <HeaderTemplate>油種</HeaderTemplate>
-                        <ItemTemplate>
-                            <asp:DropDownList ID="WF_COSTDETAILTBL_ORDERINGOILNAMELIST" runat="server" />
-                            <asp:HiddenField ID="WF_COSTDETAILTBL_OILCODE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "OILCODE")%>' />
-                            <asp:HiddenField ID="WF_COSTDETAILTBL_OILNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "OILNAME")%>' />
-                            <asp:HiddenField ID="WF_COSTDETAILTBL_ORDERINGTYPE" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "ORDERINGTYPE")%>' />
-                            <asp:HiddenField ID="WF_COSTDETAILTBL_ORDERINGOILNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "ORDERINGOILNAME")%>' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH5" ItemStyle-CssClass="WF_COSTDETAILTBL_TD5" FooterStyle-CssClass="WF_COSTDETAILTBL_TF5">
-                        <HeaderTemplate>数量</HeaderTemplate>
-                        <ItemTemplate>
-                            <asp:TextBox ID="WF_COSTDETAILTBL_CARSAMOUNT" runat="server" placeholder="0.000" Value='<%# String.Format("{0:#,##0.000}", DataBinder.Eval(Container.DataItem, "CARSAMOUNT")) %>' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH6" ItemStyle-CssClass="WF_COSTDETAILTBL_TD6" FooterStyle-CssClass="WF_COSTDETAILTBL_TF6">
-                        <HeaderTemplate>車数</HeaderTemplate>
-                        <ItemTemplate>
-                            <asp:TextBox ID="WF_COSTDETAILTBL_CARSNUMBER" runat="server" placeholder="0" Value='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "CARSNUMBER")) %>' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH7" ItemStyle-CssClass="WF_COSTDETAILTBL_TD7" FooterStyle-CssClass="WF_COSTDETAILTBL_TF7">
-                        <HeaderTemplate>屯数</HeaderTemplate>
-                        <ItemTemplate>
-                            <asp:TextBox ID="WF_COSTDETAILTBL_LOADAMOUNT" runat="server" placeholder="0" Value='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "LOADAMOUNT")) %>' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH8" ItemStyle-CssClass="WF_COSTDETAILTBL_TD8" FooterStyle-CssClass="WF_COSTDETAILTBL_TF8">
-                        <HeaderTemplate>単価</HeaderTemplate>
-                        <ItemTemplate>
-                            <asp:TextBox ID="WF_COSTDETAILTBL_UNITPRICE" runat="server" placeholder="0.00" Value='<%# String.Format("{0:#,##0.00}", DataBinder.Eval(Container.DataItem, "UNITPRICE")) %>' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH9" ItemStyle-CssClass="WF_COSTDETAILTBL_TD9" FooterStyle-CssClass="WF_COSTDETAILTBL_TF9">
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH10" ItemStyle-CssClass="WF_COSTDETAILTBL_TD10" FooterStyle-CssClass="WF_COSTDETAILTBL_TF10">
                         <HeaderTemplate>金額</HeaderTemplate>
                         <ItemTemplate>
                             <asp:TextBox ID="WF_COSTDETAILTBL_AMOUNT" runat="server" placeholder="0" Value='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "AMOUNT")) %>' />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH10" ItemStyle-CssClass="WF_COSTDETAILTBL_TD10" FooterStyle-CssClass="WF_COSTDETAILTBL_TF10">
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH11" ItemStyle-CssClass="WF_COSTDETAILTBL_TD11" FooterStyle-CssClass="WF_COSTDETAILTBL_TF11">
                         <HeaderTemplate>税額</HeaderTemplate>
                         <ItemTemplate>
                             <asp:Label ID="WF_COSTDETAILTBL_TAX" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "TAX")) %>' />
                             <asp:HiddenField ID="WF_COSTDETAILTBL_CONSUMPTIONTAX" runat="server" Value='<%# String.Format("{0:0.00}", DataBinder.Eval(Container.DataItem, "CONSUMPTIONTAX")) %>' />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH11" ItemStyle-CssClass="WF_COSTDETAILTBL_TD11" FooterStyle-CssClass="WF_COSTDETAILTBL_TF11">
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH12" ItemStyle-CssClass="WF_COSTDETAILTBL_TD12" FooterStyle-CssClass="WF_COSTDETAILTBL_TF12">
                         <HeaderTemplate>総額</HeaderTemplate>
                         <ItemTemplate>
                             <asp:Label ID="WF_COSTDETAILTBL_TOTAL" runat="server" Text='<%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "TOTAL")) %>' />
                         </ItemTemplate>
                     </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH13" ItemStyle-CssClass="WF_COSTDETAILTBL_TD13" FooterStyle-CssClass="WF_COSTDETAILTBL_TF13">
+                        <HeaderTemplate>摘要</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:TextBox ID="WF_COSTDETAILTBL_TEKIYOU" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "TEKIYOU") %>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
                 </Columns>
             </asp:GridView>
         </div>
-
+<!--
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH5" ItemStyle-CssClass="WF_COSTDETAILTBL_TD5">
+                        <HeaderTemplate>油種</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:DropDownList ID="WF_COSTDETAILTBL_ORDERINGOILNAMELIST" runat="server" />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_OILCODE" runat="server" Value='<!--%# DataBinder.Eval(Container.DataItem, "OILCODE")%' />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_OILNAME" runat="server" Value='<!--%# DataBinder.Eval(Container.DataItem, "OILNAME")%>' />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_ORDERINGTYPE" runat="server" Value='<!--%# DataBinder.Eval(Container.DataItem, "ORDERINGTYPE")%>' />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_ORDERINGOILNAME" runat="server" Value='<!--%# DataBinder.Eval(Container.DataItem, "ORDERINGOILNAME")%>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH6" ItemStyle-CssClass="WF_COSTDETAILTBL_TD6" FooterStyle-CssClass="WF_COSTDETAILTBL_TF6">
+                        <HeaderTemplate>数量</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:TextBox ID="WF_COSTDETAILTBL_CARSAMOUNT" runat="server" placeholder="0.000" Value='<!--%# String.Format("{0:#,##0.000}", DataBinder.Eval(Container.DataItem, "CARSAMOUNT")) %>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH7" ItemStyle-CssClass="WF_COSTDETAILTBL_TD7" FooterStyle-CssClass="WF_COSTDETAILTBL_TF7">
+                        <HeaderTemplate>車数</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:TextBox ID="WF_COSTDETAILTBL_CARSNUMBER" runat="server" placeholder="0" Value='<!--%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "CARSNUMBER")) %>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH8" ItemStyle-CssClass="WF_COSTDETAILTBL_TD8" FooterStyle-CssClass="WF_COSTDETAILTBL_TF8">
+                        <HeaderTemplate>屯数</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:TextBox ID="WF_COSTDETAILTBL_LOADAMOUNT" runat="server" placeholder="0" Value='<!--%# String.Format("{0:#,##0}", DataBinder.Eval(Container.DataItem, "LOADAMOUNT")) %>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH9" ItemStyle-CssClass="WF_COSTDETAILTBL_TD9" FooterStyle-CssClass="WF_COSTDETAILTBL_TF9">
+                        <HeaderTemplate>単価</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:TextBox ID="WF_COSTDETAILTBL_UNITPRICE" runat="server" placeholder="0.00" Value='<!--%# String.Format("{0:#,##0.00}", DataBinder.Eval(Container.DataItem, "UNITPRICE")) %>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+-->
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />
 

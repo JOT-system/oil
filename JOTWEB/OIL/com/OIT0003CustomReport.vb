@@ -2099,12 +2099,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
+            Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W"}
+            'Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
             '○帳票の明細共通処理(積込予定表(根岸))
             EditNegishiLoadCmn(rngDetailArea, strYoko, "RNUM=1")
 
             '### 20201020 START 指摘票対応(No174)全体 ##################################################
-            Dim strYokoYobi As String() = {"W", "X", "Y", "Z", "AA"}
+            Dim strYokoYobi As String() = {"X", "Y", "Z", "AA", "AB"}
+            'Dim strYokoYobi As String() = {"W", "X", "Y", "Z", "AA"}
             '○帳票の明細共通処理(積込予定表(根岸))※予備枠の設定
             EditNegishiLoadCmn(rngDetailArea, strYokoYobi, "RNUM=2")
             '### 20201020 END   指摘票対応(No174)全体 ##################################################
@@ -2168,6 +2170,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + intTate(jTate).ToString())
             'rngDetailArea.Value = PrintDatarow("TRAINNAME")
             I_rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
+            If Convert.ToString(PrintDatarow("TRAINNAME")) = "南松本" Then I_rngDetailArea.Value = "松"
             ExcelMemoryRelease(I_rngDetailArea)
             '油種名
             I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + (intTate(jTate) + 1).ToString())

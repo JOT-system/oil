@@ -24,6 +24,7 @@ Public Class OIT0002LinkList
     Private OIT0002UPDtbl As DataTable                              '更新用テーブル
     Private OIT0002WKtbl As DataTable                               '作業用テーブル
     Private OIT0002GETtbl As DataTable                              '取得用テーブル
+    Private OIT0002GETORDERtbl As DataTable                         '取得用(受注情報)テーブル
     Private OIT0002CMPtbl As DataTable                              '比較用テーブル
     Private OIT0002EXLUPtbl As DataTable                            'EXCELアップロード用
     Private OIT0002EXLDELtbl As DataTable                           'EXCELアップロード(削除)用
@@ -6090,6 +6091,43 @@ Public Class OIT0002LinkList
             '### 20210224 END   積込日と発日チェック ########################################################
 
         Next
+
+        '### 20210510 START 回送指示されたタンク車Noチェック ################################################
+        Dim WW_GetTankSts() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Select("OBJECTIVENAME<>''")
+            WW_GetTankSts = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            CMNPTS.FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0002ExlUProw("TRUCKNO"), WW_GetTankSts)
+
+            'タンク車所在の使用受注Noが設定されている場合(受注オーダー中)
+            If WW_GetTankSts(12) <> "" Then
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    '○受注オーダー状況を取得
+                    CMNPTS.SelectOrder(SQLcon, WW_GetTankSts(12), OIT0002GETORDERtbl,
+                                       I_TANKNO:=OIT0002ExlUProw("TRUCKNO"))
+
+                End Using
+
+                '○受注オーダーが存在し、受注進行ステータスが受注受付("100")ではない場合
+                '　※すでに受注するオーダーが進められているかをチェック
+                If OIT0002GETORDERtbl.Rows.Count <> 0 _
+                    AndAlso Convert.ToString(OIT0002GETORDERtbl.Rows(0)("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                    Dim Msg As String = ""
+                    Msg = "指示内容(" + Convert.ToString(OIT0002ExlUProw("OBJECTIVENAME")) + ")された"
+                    Msg &= "タンク車No(" + Convert.ToString(OIT0002ExlUProw("TRUCKNO")) + ")は、"
+                    Msg &= String.Format("受注登録済み({0}({1}))となります。",
+                                         OIT0002GETORDERtbl.Rows(0)("TRAINNAME"),
+                                         Date.Parse(OIT0002GETORDERtbl.Rows(0)("LODDATE")).ToString("yyyy/MM/dd"))
+                    Msg &= "再度ご確認ください。"
+                    Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+
+                    WW_ERRCODE = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Next
+        '### 20210510 END   回送指示されたタンク車Noチェック ################################################
+
     End Sub
 
     ''' <summary>

@@ -582,7 +582,7 @@ Public Class CmnParts
     ''' </summary>
     ''' <param name="SQLcon">SQL接続文字</param>
     ''' <remarks></remarks>
-    Protected Sub SelectOrder(ByVal SQLcon As SqlConnection,
+    Public Sub SelectOrder(ByVal SQLcon As SqlConnection,
                                  ByVal I_ORDERNO As String,
                                  ByRef O_dtORDER As DataTable,
                                  Optional I_OFFICECODE As String = Nothing,

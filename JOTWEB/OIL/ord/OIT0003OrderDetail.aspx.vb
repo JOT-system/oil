@@ -36,7 +36,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0003ReportDeliverytbl As DataTable                   '帳票用(託送指示)テーブル
     Private OIT0003ReportOTLinkagetbl As DataTable                  '帳票用(OT発送日報)テーブル
-    'Private OIT0003FIDtbl_tab1 As DataTable                         '検索用テーブル(タブ１用)
+    Private OIT0003FIDtbl_tab1 As DataTable                         '検索用テーブル(タブ１用)
     'Private OIT0003FIDtbl_tab2 As DataTable                         '検索用テーブル(タブ２用)
     Private OIT0003FIDtbl_tab3 As DataTable                         '検索用1テーブル(タブ３用)
     Private OIT0003FID2tbl_tab3 As DataTable                        '検索用2テーブル(タブ３用)(受注TBLから情報を取得)
@@ -93,6 +93,7 @@ Public Class OIT0003OrderDetail
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private CS0052DetailView As New CS0052DetailView                'Repeterオブジェクト作成
     Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -8039,6 +8040,34 @@ Public Class OIT0003OrderDetail
         If WW_GetValue(15) <> Me.TxtDepstationCode.Text Then
             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
+            '### 20210507 START 指摘票対応(No418)全体 #################################################
+            Try
+                '○使用受注No(回送登録での使用)チェック
+                If WW_GetValue(12).Substring(0, 1) = "K" Then
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        CMNPTS.SelectKaisou(SQLcon,
+                                        I_KAISOUNO:=WW_GetValue(12),
+                                        O_dtKAISOU:=OIT0003FIDtbl_tab1,
+                                        I_TANKNO:=WW_TANKNUMBER)
+                    End Using
+
+                    '★回送登録(返送日)が受注登録(積込日)より前の日付の場合
+                    '　かつ、回送登録(着駅)と受注登録(発駅)が同じ場合
+                    Dim rtnDay As String = Date.Parse(OIT0003FIDtbl_tab1.Rows(0)("ACTUALEMPARRDATE")).ToString("yyyy/MM/dd")
+                    Dim rtnDepstation As String = OIT0003FIDtbl_tab1.Rows(0)("DEPSTATION").ToString()
+                    If rtnDay <= Me.TxtLoadingDate.Text _
+                        AndAlso rtnDepstation = Me.TxtDepstationCode.Text Then
+                        OIT0003row("ORDERINFO") = ""
+                        OIT0003row("ORDERINFONAME") = ""
+                    End If
+                End If
+            Catch ex As Exception
+            End Try
+            '### 20210507 END   指摘票対応(No418)全体 #################################################
+
         ElseIf OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
             OIT0003row("ORDERINFO") = ""
             OIT0003row("ORDERINFONAME") = ""

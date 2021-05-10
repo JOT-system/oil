@@ -379,7 +379,7 @@ Public Class CmnParts
     ''' <param name="I_CLASS"></param>
     ''' <param name="I_KEYCODE"></param>
     ''' <param name="O_VALUE"></param>
-    Protected Sub FixvalueMasterSearch(ByVal I_CODE As String,
+    Public Sub FixvalueMasterSearch(ByVal I_CODE As String,
                                        ByVal I_CLASS As String,
                                        ByVal I_KEYCODE As String,
                                        ByRef O_VALUE() As String,
@@ -576,4 +576,320 @@ Public Class CmnParts
 
         Return retFilterdDt
     End Function
+
+    ''' <summary>
+    ''' 受注TBL登録検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub SelectOrder(ByVal SQLcon As SqlConnection,
+                                 ByVal I_ORDERNO As String,
+                                 ByRef O_dtORDER As DataTable,
+                                 Optional I_OFFICECODE As String = Nothing,
+                                 Optional I_TANKNO As String = Nothing)
+
+        If IsNothing(O_dtORDER) Then
+            O_dtORDER = New DataTable
+        End If
+
+        If O_dtORDER.Columns.Count <> 0 Then
+            O_dtORDER.Columns.Clear()
+        End If
+
+        O_dtORDER.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   OIT0002.ORDERNO                 AS ORDERNO" _
+            & " , OIT0003.DETAILNO                AS DETAILNO" _
+            & " , OIT0002.TRAINNO                 AS TRAINNO" _
+            & " , OIT0002.TRAINNO + 'レ'          AS TRAINNO_NM" _
+            & " , OIT0002.TRAINNAME               AS TRAINNAME" _
+            & " , OIT0002.ORDERYMD                AS ORDERYMD" _
+            & " , OIT0002.OFFICECODE              AS OFFICECODE" _
+            & " , OIT0002.OFFICENAME              AS OFFICENAME" _
+            & " , OIT0002.ORDERTYPE               AS ORDERTYPE" _
+            & " , OIT0002.SHIPPERSCODE            AS SHIPPERSCODE" _
+            & " , OIT0002.SHIPPERSNAME            AS SHIPPERSNAME" _
+            & " , OIT0002.BASECODE                AS BASECODE" _
+            & " , OIT0002.BASENAME                AS BASENAME" _
+            & " , OIT0002.CONSIGNEECODE           AS CONSIGNEECODE" _
+            & " , OIT0002.CONSIGNEENAME           AS CONSIGNEENAME" _
+            & " , OIT0002.DEPSTATION              AS DEPSTATION" _
+            & " , OIT0002.DEPSTATIONNAME          AS DEPSTATIONNAME" _
+            & " , OIT0002.ARRSTATION              AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME          AS ARRSTATIONNAME" _
+            & " , OIT0002.RETSTATION              AS RETSTATION" _
+            & " , OIT0002.RETSTATIONNAME          AS RETSTATIONNAME" _
+            & " , OIT0002.CHANGERETSTATION        AS CHANGERETSTATION" _
+            & " , OIT0002.CHANGERETSTATIONNAME    AS CHANGERETSTATIONNAME" _
+            & " , OIT0002.ORDERSTATUS             AS ORDERSTATUS" _
+            & " , OIT0002.ORDERINFO               AS ORDERINFO" _
+            & " , OIT0002.EMPTYTURNFLG            AS EMPTYTURNFLG" _
+            & " , OIT0002.STACKINGFLG             AS STACKINGFLG" _
+            & " , OIT0002.USEPROPRIETYFLG         AS USEPROPRIETYFLG" _
+            & " , OIT0002.CONTACTFLG              AS CONTACTFLG" _
+            & " , OIT0002.RESULTFLG               AS RESULTFLG" _
+            & " , OIT0002.DELIVERYFLG             AS DELIVERYFLG" _
+            & " , OIT0002.LODDATE                 AS LODDATE" _
+            & " , OIT0002.DEPDATE                 AS DEPDATE" _
+            & " , OIT0002.ARRDATE                 AS ARRDATE" _
+            & " , OIT0002.ACCDATE                 AS ACCDATE" _
+            & " , OIT0002.EMPARRDATE              AS EMPARRDATE" _
+            & " , OIT0002.ACTUALLODDATE           AS ACTUALLODDATE" _
+            & " , OIT0002.ACTUALDEPDATE           AS ACTUALDEPDATE" _
+            & " , OIT0002.ACTUALARRDATE           AS ACTUALARRDATE" _
+            & " , OIT0002.ACTUALACCDATE           AS ACTUALACCDATE" _
+            & " , OIT0002.ACTUALEMPARRDATE        AS ACTUALEMPARRDATE" _
+            & " , OIT0002.RTANK                   AS RTANK" _
+            & " , OIT0002.HTANK                   AS HTANK" _
+            & " , OIT0002.TTANK                   AS TTANK" _
+            & " , OIT0002.MTTANK                  AS MTTANK" _
+            & " , OIT0002.KTANK                   AS KTANK" _
+            & " , OIT0002.K3TANK                  AS K3TANK" _
+            & " , OIT0002.K5TANK                  AS K5TANK" _
+            & " , OIT0002.K10TANK                 AS K10TANK" _
+            & " , OIT0002.LTANK                   AS LTANK" _
+            & " , OIT0002.ATANK                   AS ATANK" _
+            & " , OIT0002.OTHER1OTANK             AS OTHER1OTANK" _
+            & " , OIT0002.OTHER2OTANK             AS OTHER2OTANK" _
+            & " , OIT0002.OTHER3OTANK             AS OTHER3OTANK" _
+            & " , OIT0002.OTHER4OTANK             AS OTHER4OTANK" _
+            & " , OIT0002.OTHER5OTANK             AS OTHER5OTANK" _
+            & " , OIT0002.OTHER6OTANK             AS OTHER6OTANK" _
+            & " , OIT0002.OTHER7OTANK             AS OTHER7OTANK" _
+            & " , OIT0002.OTHER8OTANK             AS OTHER8OTANK" _
+            & " , OIT0002.OTHER9OTANK             AS OTHER9OTANK" _
+            & " , OIT0002.OTHER10OTANK            AS OTHER10OTANK" _
+            & " , OIT0002.TOTALTANK               AS TOTALTANK" _
+            & " , OIT0002.RTANKCH                 AS RTANKCH" _
+            & " , OIT0002.HTANKCH                 AS HTANKCH" _
+            & " , OIT0002.TTANKCH                 AS TTANKCH" _
+            & " , OIT0002.MTTANKCH                AS MTTANKCH" _
+            & " , OIT0002.KTANKCH                 AS KTANKCH" _
+            & " , OIT0002.K3TANKCH                AS K3TANKCH" _
+            & " , OIT0002.K5TANKCH                AS K5TANKCH" _
+            & " , OIT0002.K10TANKCH               AS K10TANKCH" _
+            & " , OIT0002.LTANKCH                 AS LTANKCH" _
+            & " , OIT0002.ATANKCH                 AS ATANKCH" _
+            & " , OIT0002.OTHER1OTANKCH           AS OTHER1OTANKCH" _
+            & " , OIT0002.OTHER2OTANKCH           AS OTHER2OTANKCH" _
+            & " , OIT0002.OTHER3OTANKCH           AS OTHER3OTANKCH" _
+            & " , OIT0002.OTHER4OTANKCH           AS OTHER4OTANKCH" _
+            & " , OIT0002.OTHER5OTANKCH           AS OTHER5OTANKCH" _
+            & " , OIT0002.OTHER6OTANKCH           AS OTHER6OTANKCH" _
+            & " , OIT0002.OTHER7OTANKCH           AS OTHER7OTANKCH" _
+            & " , OIT0002.OTHER8OTANKCH           AS OTHER8OTANKCH" _
+            & " , OIT0002.OTHER9OTANKCH           AS OTHER9OTANKCH" _
+            & " , OIT0002.OTHER10OTANKCH          AS OTHER10OTANKCH" _
+            & " , OIT0002.TOTALTANKCH             AS TOTALTANKCH" _
+            & " , OIT0002.TANKLINKNO              AS TANKLINKNO" _
+            & " , OIT0002.TANKLINKNOMADE          AS TANKLINKNOMADE" _
+            & " , OIT0002.BILLINGNO               AS BILLINGNO" _
+            & " , OIT0002.KEIJYOYMD               AS KEIJYOYMD" _
+            & " , OIT0002.SALSE                   AS SALSE" _
+            & " , OIT0002.SALSETAX                AS SALSETAX" _
+            & " , OIT0002.TOTALSALSE              AS TOTALSALSE" _
+            & " , OIT0002.PAYMENT                 AS PAYMENT" _
+            & " , OIT0002.PAYMENTTAX              AS PAYMENTTAX" _
+            & " , OIT0002.TOTALPAYMENT            AS TOTALPAYMENT" _
+            & " , OIT0002.OTFILENAME              AS OTFILENAME" _
+            & " , OIT0002.RECEIVECOUNT            AS RECEIVECOUNT" _
+            & " , OIT0003.SHIPORDER               AS SHIPORDER" _
+            & " , OIT0003.LINEORDER               AS LINEORDER" _
+            & " , OIT0003.TANKNO                  AS TANKNO" _
+            & " , OIT0003.KAMOKU                  AS KAMOKU" _
+            & " , OIT0003.STACKINGORDERNO         AS STACKINGORDERNO" _
+            & " , OIT0003.STACKINGFLG             AS DETAIL_STACKINGFLG" _
+            & " , OIT0003.FIRSTRETURNFLG          AS FIRSTRETURNFLG" _
+            & " , OIT0003.AFTERRETURNFLG          AS AFTERRETURNFLG" _
+            & " , OIT0003.OTTRANSPORTFLG          AS OTTRANSPORTFLG" _
+            & " , OIT0003.ORDERINFO               AS DETAIL_ORDERINFO" _
+            & " , OIT0003.SHIPPERSCODE            AS DETAIL_SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME            AS DETAIL_SHIPPERSNAME" _
+            & " , OIT0003.OILCODE                 AS OILCODE" _
+            & " , OIT0003.OILNAME                 AS OILNAME" _
+            & " , OIT0003.ORDERINGTYPE            AS ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME         AS ORDERINGOILNAME" _
+            & " , OIT0003.CARSNUMBER              AS CARSNUMBER" _
+            & " , OIT0003.CARSAMOUNT              AS CARSAMOUNT" _
+            & " , OIT0003.RETURNDATETRAIN         AS RETURNDATETRAIN" _
+            & " , OIT0003.JOINTCODE               AS JOINTCODE" _
+            & " , OIT0003.JOINT                   AS JOINT" _
+            & " , OIT0003.REMARK                  AS REMARK" _
+            & " , OIT0003.CHANGETRAINNO           AS CHANGETRAINNO" _
+            & " , OIT0003.CHANGETRAINNAME         AS CHANGETRAINNAME" _
+            & " , OIT0003.SECONDCONSIGNEECODE     AS SECONDCONSIGNEECODE" _
+            & " , OIT0003.SECONDCONSIGNEENAME     AS SECONDCONSIGNEENAME" _
+            & " , OIT0003.SECONDARRSTATION        AS SECONDARRSTATION" _
+            & " , OIT0003.SECONDARRSTATIONNAME    AS SECONDARRSTATIONNAME" _
+            & " , OIT0003.CHANGERETSTATION        AS DETAIL_CHANGERETSTATION" _
+            & " , OIT0003.CHANGERETSTATIONNAME    AS DETAIL_CHANGERETSTATIONNAME" _
+            & " , OIT0003.LINE                    AS LINE" _
+            & " , OIT0003.FILLINGPOINT            AS FILLINGPOINT" _
+            & " , OIT0003.LOADINGIRILINETRAINNO   AS LOADINGIRILINETRAINNO" _
+            & " , OIT0003.LOADINGIRILINETRAINNAME AS LOADINGIRILINETRAINNAME" _
+            & " , OIT0003.LOADINGIRILINEORDER     AS LOADINGIRILINEORDER" _
+            & " , OIT0003.LOADINGOUTLETTRAINNO    AS LOADINGOUTLETTRAINNO" _
+            & " , OIT0003.LOADINGOUTLETTRAINNAME  AS LOADINGOUTLETTRAINNAME" _
+            & " , OIT0003.LOADINGOUTLETORDER      AS LOADINGOUTLETORDER" _
+            & " , OIT0003.ACTUALLODDATE           AS DETAIL_ACTUALLODDATE" _
+            & " , OIT0003.ACTUALDEPDATE           AS DETAIL_ACTUALDEPDATE" _
+            & " , OIT0003.ACTUALARRDATE           AS DETAIL_ACTUALARRDATE" _
+            & " , OIT0003.ACTUALACCDATE           AS DETAIL_ACTUALACCDATE" _
+            & " , OIT0003.ACTUALEMPARRDATE        AS DETAIL_ACTUALEMPARRDATE" _
+            & " , OIT0003.SALSE                   AS DETAIL_SALSE" _
+            & " , OIT0003.SALSETAX                AS DETAIL_SALSETAX" _
+            & " , OIT0003.TOTALSALSE              AS DETAIL_TOTALSALSE" _
+            & " , OIT0003.PAYMENT                 AS DETAIL_PAYMENT" _
+            & " , OIT0003.PAYMENTTAX              AS DETAIL_PAYMENTTAX" _
+            & " , OIT0003.TOTALPAYMENT            AS DETAIL_TOTALPAYMENT" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO "
+
+        '○ 検索条件が指定されていれば追加する
+        'タンク車№
+        If Not String.IsNullOrEmpty(I_TANKNO) Then
+            SQLStr &= String.Format(" AND OIT0003.TANKNO = '{0}' ", I_TANKNO)
+        End If
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0003.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        '受注No
+        SQLStr &= String.Format(" WHERE OIT0002.ORDERNO = '{0}' ", I_ORDERNO)
+        '受注営業所コード
+        If Not String.IsNullOrEmpty(I_OFFICECODE) Then
+            SQLStr &= String.Format(" AND OIT0002.OFFICECODE = '{0}' ", I_OFFICECODE)
+        End If
+        '受注進行ステータス
+        SQLStr &= String.Format(" AND OIT0002.ORDERSTATUS <> '{0}' ", BaseDllConst.CONST_ORDERSTATUS_900)
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0002.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtORDER.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtORDER.Load(SQLdr)
+                End Using
+
+                'Dim i As Integer = 0
+                'For Each O_dtORDERrow As DataRow In O_dtORDER.Rows
+                '    i += 1
+                '    O_dtORDERrow("LINECNT") = i        'LINECNT
+                'Next
+
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+    ''' <summary>
+    ''' 回送TBL登録検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Public Sub SelectKaisou(ByVal SQLcon As SqlConnection,
+                                 ByVal I_KAISOUNO As String,
+                                 ByRef O_dtKAISOU As DataTable,
+                                 Optional I_OFFICECODE As String = Nothing,
+                                 Optional I_TANKNO As String = Nothing)
+
+        If IsNothing(O_dtKAISOU) Then
+            O_dtKAISOU = New DataTable
+        End If
+
+        If O_dtKAISOU.Columns.Count <> 0 Then
+            O_dtKAISOU.Columns.Clear()
+        End If
+
+        O_dtKAISOU.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   OIT0006.KAISOUNO" _
+            & " , OIT0007.DETAILNO" _
+            & " , OIT0006.KAISOUYMD" _
+            & " , OIT0006.KAISOUSTATUS" _
+            & " , OIT0007.TRAINNO" _
+            & " , OIT0007.OBJECTIVECODE" _
+            & " , OIT0007.KAISOUTYPE" _
+            & " , OIT0006.OFFICECODE" _
+            & " , OIT0006.OFFICENAME" _
+            & " , OIT0007.TANKNO" _
+            & " , OIT0007.DEPSTATION" _
+            & " , OIT0007.DEPSTATIONNAME" _
+            & " , OIT0007.TGHSTATION" _
+            & " , OIT0007.TGHSTATIONNAME" _
+            & " , OIT0007.ARRSTATION" _
+            & " , OIT0007.ARRSTATIONNAME" _
+            & " , OIT0007.ACTUALDEPDATE" _
+            & " , OIT0007.ACTUALEMPARRDATE" _
+            & " , OIT0006.TOTALREPAIR" _
+            & " , OIT0006.TOTALMC" _
+            & " , OIT0006.TOTALINSPECTION" _
+            & " , OIT0006.TOTALALLINSPECTION" _
+            & " , OIT0006.TOTALINDWELLING" _
+            & " , OIT0006.TOTALMOVE" _
+            & " , OIT0006.TOTALTANK" _
+            & " FROM oil.OIT0006_KAISOU OIT0006" _
+            & " INNER JOIN oil.OIT0007_KAISOUDETAIL OIT0007 ON" _
+            & " OIT0007.KAISOUNO = OIT0006.KAISOUNO" _
+
+        '○ 検索条件が指定されていれば追加する
+        'タンク車№
+        If Not String.IsNullOrEmpty(I_TANKNO) Then
+            SQLStr &= String.Format(" AND OIT0007.TANKNO = '{0}' ", I_TANKNO)
+        End If
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        '回送No
+        SQLStr &= String.Format(" WHERE OIT0006.KAISOUNO = '{0}' ", I_KAISOUNO)
+        '回送営業所コード
+        If Not String.IsNullOrEmpty(I_OFFICECODE) Then
+            SQLStr &= String.Format(" AND OIT0006.OFFICECODE = '{0}' ", I_OFFICECODE)
+        End If
+        '利用可否フラグ
+        SQLStr &= String.Format(" AND OIT0006.USEPROPRIETYFLG = '{0}' ", "1")
+        '回送進行ステータス
+        SQLStr &= String.Format(" AND OIT0006.KAISOUSTATUS <> '{0}' ", BaseDllConst.CONST_KAISOUSTATUS_900)
+        '削除フラグ
+        SQLStr &= String.Format(" AND OIT0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtKAISOU.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtKAISOU.Load(SQLdr)
+                End Using
+
+                'Dim i As Integer = 0
+                'For Each O_dtORDERrow As DataRow In O_dtORDER.Rows
+                '    i += 1
+                '    O_dtORDERrow("LINECNT") = i        'LINECNT
+                'Next
+
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
 End Class

@@ -703,7 +703,13 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                     ExcelMemoryRelease(moveSheet)
                     ExcelMemoryRelease(beforSheet)
                 Next
+
             End If
+
+            '「まとめ」シートを選択する
+            Dim activeSheet As Excel.Worksheet = DirectCast(ExcelWorkSheets("まとめ"), Excel.Worksheet)
+            activeSheet.Activate()
+            ExcelMemoryRelease(activeSheet)
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)

@@ -2621,6 +2621,7 @@ Public Class OIT0003OTLinkageList
                 Dim OTSHIPPERN() As String = {"日石", "コス", "昭シ"}
                 '★根岸営業所対応用
                 Dim OTTrainNoNegishiChg() As String = {"5692", "8461"}
+                Dim OTConsignee() As String = {"08"}
                 '★四日市営業所対応用
                 Dim OTTrainNoYokkaishiChg() As String = {"6078", "6089"}
                 Dim OTOilNameKana() As String = {"ﾊｲｵｸ", "ﾚｷﾞｭﾗｰ", "ﾄｳﾕ", "ｹｲﾕ", "3ｺﾞｳｹｲﾕ", "Aｼﾞｭｳﾕ", "LSA"}
@@ -2656,6 +2657,15 @@ Public Class OIT0003OTLinkageList
                         AndAlso Convert.ToString(OIT0003row("TRAINNO")) = OTTrainNoNegishiChg(0) Then
                         OIT0003row("TRAINNO") = OTTrainNoNegishiChg(1)
                     End If
+
+                    '### 20210511 START 根岸営業所対応(南松本行きの場合の油種コード対応) ##################
+                    '★根岸営業所の場合(OT松本)
+                    '　HG(ハイオク)を1100⇒1400に変更(平成30年にそのように依頼をしているため(JOT))
+                    If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_011402 _
+                        AndAlso Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC")) = OTConsignee(0) Then
+                        OIT0003row("OTOILCODE") = BaseDllConst.CONST_OTHTank_1400
+                    End If
+                    '### 20210511 END   根岸営業所対応(南松本行きの場合の油種コード対応) ##################
 
                     '★四日市営業所の場合(列車チェック)
                     '　稲沢経由で列車Noが変更(四日市⇒稲沢(6078)　稲沢⇒南松本(6089))

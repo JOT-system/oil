@@ -3362,6 +3362,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , RIGHT('000000'+ODR.CONSIGNEECODE,6)  AS SEQ_CONSIGNEECODE") 'シーケンス当社着受荷受人（内部）C
         sqlStat.AppendLine("     , ''  AS SEQ_YOBI")
         sqlStat.AppendLine("     , TNK.LOAD") '甲子ソート用
+        sqlStat.AppendLine("     , TNK.LOAD_SORT") '甲子ソート用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
         sqlStat.AppendLine("     , DET.STACKINGFLG") '甲子ソート用
@@ -3398,9 +3399,21 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   And PRD.DELFLG         = @DELFLG")
         '油種マスタ結合ここまで↑
         'タンク車マスタ結合ここから↓
-        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK")
+        '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
+        sqlStat.AppendLine(" LEFT JOIN (SELECT ")
+        sqlStat.AppendLine("              TNK.* ")
+        sqlStat.AppendLine("            , CASE ")
+        sqlStat.AppendLine("              WHEN TNK.LOAD = 43.0 THEN 1 ")
+        sqlStat.AppendLine("              WHEN TNK.LOAD = 44.0 THEN 3 ")
+        sqlStat.AppendLine("              WHEN TNK.LOAD = 45.0 THEN 2 ")
+        sqlStat.AppendLine("              END AS LOAD_SORT ")
+        sqlStat.AppendLine("            FROM OIL.OIM0005_TANK TNK) TNK")
         sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
         sqlStat.AppendLine("   And TNK.DELFLG      = @DELFLG")
+        'sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK")
+        'sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
+        'sqlStat.AppendLine("   And TNK.DELFLG      = @DELFLG")
+        '### 20210511 END   甲子営業所対応(荷重のソート順) #############################################
 
 
         'タンク車マスタ結合ここまで↑
@@ -3508,7 +3521,8 @@ Public Class OIT0003OTLinkageList
                     '甲子の場合ソート変更
                     sortedDt = From dr As DataRow In wrkDt Order By Convert.ToString(dr("TRAINNO"))
                    , Convert.ToString(dr("STACKINGFLG")) Descending, Convert.ToString(dr("SHIPPERSCODE"))
-                   , Convert.ToString(dr("PRIORITYNO")), Convert.ToString(dr("LOAD")), CDec(Convert.ToString(dr("TANKNUMBER_SORT")))
+                   , Convert.ToString(dr("PRIORITYNO")), Convert.ToString(dr("LOAD_SORT")), CDec(Convert.ToString(dr("TANKNUMBER_SORT")))
+                    ', Convert.ToString(dr("PRIORITYNO")), Convert.ToString(dr("LOAD")), CDec(Convert.ToString(dr("TANKNUMBER_SORT")))
                 End If
                 Dim isNewReserve As Boolean = False
                 For Each sortedDr As DataRow In sortedDt

@@ -272,7 +272,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
         End Try
     End Sub
 
-    Private Sub SetRowValues(ByVal rngStr As String, ByVal dt As Date, ByVal setData As Dictionary(Of String, Integer))
+    Private Sub SetRowValues(ByVal rngStr As String, ByVal dt As Date, ByVal setData As Dictionary(Of String, Integer), Optional ByVal lineFlg As Boolean = False)
         Dim rngWork As Excel.Range = Nothing
         Dim rngOffsetWork As Excel.Range = Nothing
         Dim columnOffset As Integer = 0
@@ -305,7 +305,33 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
                 If setData.ContainsKey(strDate) Then
                     rngOffsetWork = rngWork.Offset(ColumnOffset:=columnOffset)
-                    rngOffsetWork.Value = setData(strDate)
+                    If lineFlg Then
+                        Dim fmtStr As String = String.Format("{0}/", ((setData(strDate) \ 10) Mod 10))
+                        If setData(strDate) Mod 10 = 1 Then
+                            fmtStr = fmtStr + "á@"
+                        ElseIf setData(strDate) Mod 10 = 2 Then
+                            fmtStr = fmtStr + "áA"
+                        ElseIf setData(strDate) Mod 10 = 3 Then
+                            fmtStr = fmtStr + "áB"
+                        ElseIf setData(strDate) Mod 10 = 4 Then
+                            fmtStr = fmtStr + "áC"
+                        ElseIf setData(strDate) Mod 10 = 5 Then
+                            fmtStr = fmtStr + "áD"
+                        ElseIf setData(strDate) Mod 10 = 6 Then
+                            fmtStr = fmtStr + "áE"
+                        ElseIf setData(strDate) Mod 10 = 7 Then
+                            fmtStr = fmtStr + "áF"
+                        ElseIf setData(strDate) Mod 10 = 8 Then
+                            fmtStr = fmtStr + "áG"
+                        ElseIf setData(strDate) Mod 10 = 9 Then
+                            fmtStr = fmtStr + "áH"
+                        Else
+                            fmtStr = fmtStr + "?"
+                        End If
+                        rngOffsetWork.Value = fmtStr
+                    Else
+                        rngOffsetWork.Value = setData(strDate)
+                    End If
                     ExcelMemoryRelease(rngOffsetWork)
                 End If
             Next
@@ -703,7 +729,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.LINE).Max())
-            SetRowValues("C12", dt, setData)
+            SetRowValues("C12", dt, setData, True)
 
             'ìñì˙êœçûé‘êî
             setData = allData.Where(Function(r)

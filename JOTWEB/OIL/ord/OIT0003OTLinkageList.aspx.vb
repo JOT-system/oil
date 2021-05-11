@@ -3002,9 +3002,21 @@ Public Class OIT0003OTLinkageList
             .AppendLine("     AND TRA.ARRSTATION = ODR.ARRSTATION ")
             .AppendLine("     AND TRA.DEFAULTKBN = 'def' ")
             .AppendLine("     AND TRA.DELFLG = @DELFLG ")
-            .AppendLine("   INNER JOIN OIL.OIM0005_TANK TNK ")
+            '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
+            .AppendLine("   INNER JOIN (SELECT ")
+            .AppendLine("                 TNK.*  ")
+            .AppendLine("               , CASE  ")
+            .AppendLine("                 WHEN TNK.LOAD = 43.0 THEN 1 ")
+            .AppendLine("                 WHEN TNK.LOAD = 44.0 THEN 3 ")
+            .AppendLine("                 WHEN TNK.LOAD = 45.0 THEN 2 ")
+            .AppendLine("                 END AS LOAD_SORT ")
+            .AppendLine("               FROM OIL.OIM0005_TANK TNK) TNK ")
             .AppendLine("     ON TNK.TANKNUMBER = DET.TANKNO ")
             .AppendLine("     AND TNK.DELFLG = @DELFLG ")
+            '.AppendLine("   INNER JOIN OIL.OIM0005_TANK TNK ")
+            '.AppendLine("     ON TNK.TANKNUMBER = DET.TANKNO ")
+            '.AppendLine("     AND TNK.DELFLG = @DELFLG ")
+            '### 20210511 END   甲子営業所対応(荷重のソート順) #############################################
             .AppendLine("   INNER JOIN OIL.OIM0029_CONVERT CNV_SHIP ")
             .AppendLine("     ON CNV_SHIP.CLASS = 'RINKAI_TAKUSOU_SHIP' ")
             .AppendLine("     AND CNV_SHIP.KEYCODE01 = ODR.SHIPPERSCODE ")
@@ -3017,9 +3029,20 @@ Public Class OIT0003OTLinkageList
             .AppendLine("     AND CNV_OIL.DELFLG = @DELFLG ")
             .AppendLine(" WHERE ")
             .AppendFormat("   ODR.ORDERNO IN({0}) ", selectedOrderNoInStat).AppendLine()
-            .AppendLine(" ORDER BY ")
-            .AppendLine("   ODR.ORDERNO ")
-            .AppendLine("   , DET.DETAILNO ")
+            '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
+            If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                .AppendLine(" ORDER BY ")
+                .AppendLine("   DET.OILCODE ")
+                .AppendLine("   , TNK.LOAD_SORT ")
+                .AppendLine("   , TNK.TANKNUMBER ")
+                .AppendLine("   , ODR.ORDERNO ")
+                .AppendLine("   , DET.DETAILNO ")
+            Else
+                .AppendLine(" ORDER BY ")
+                .AppendLine("   ODR.ORDERNO ")
+                .AppendLine("   , DET.DETAILNO ")
+            End If
+            '### 20210511 END   甲子営業所対応(荷重のソート順) #############################################
         End With
 
         Try

@@ -25,6 +25,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0001NewOrderNOtbl As DataTable                       '取得用(新規受注No取得用)テーブル
+    Private OIT0001FIDtbl As DataTable                              '検索用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
@@ -49,6 +50,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -8106,6 +8108,34 @@ Public Class OIT0001EmptyTurnDairyDetail
         If WW_GetValue(15) <> Me.TxtDepstation.Text Then
             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
             CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
+            '### 20210507 START 指摘票対応(No418)全体 #################################################
+            Try
+                '○使用受注No(回送登録での使用)チェック
+                If WW_GetValue(12).Substring(0, 1) = "K" Then
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        CMNPTS.SelectKaisou(SQLcon,
+                                        I_KAISOUNO:=WW_GetValue(12),
+                                        O_dtKAISOU:=OIT0001FIDtbl,
+                                        I_TANKNO:=WW_TANKNUMBER)
+                    End Using
+
+                    '★回送登録(返送日)が受注登録(積込日)より前の日付の場合
+                    '　かつ、回送登録(着駅)と受注登録(発駅)が同じ場合
+                    Dim rtnDay As String = Date.Parse(OIT0001FIDtbl.Rows(0)("ACTUALEMPARRDATE")).ToString("yyyy/MM/dd")
+                    Dim rtnDepstation As String = OIT0001FIDtbl.Rows(0)("DEPSTATION").ToString()
+                    If rtnDay <= Me.TxtLoadingDate.Text _
+                        AndAlso rtnDepstation = Me.TxtDepstation.Text Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+                    End If
+                End If
+            Catch ex As Exception
+            End Try
+            '### 20210507 END   指摘票対応(No418)全体 #################################################
+
         ElseIf OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
             OIT0001row("ORDERINFO") = ""
             OIT0001row("ORDERINFONAME") = ""

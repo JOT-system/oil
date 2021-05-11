@@ -4670,6 +4670,7 @@ Public Class OIT0003OrderList
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIM0005.LOAD                                   AS LOAD" _
+            & " , OIM0005.LOAD_SORT                              AS LOAD_SORT" _
             & " , CONVERT(int, OIM0005.TANKNUMBER)               AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
@@ -4759,11 +4760,26 @@ Public Class OIT0003OrderList
             & " AND OIT0003.STACKINGFLG = '1' " _
             & " AND OIT0003.ACTUALLODDATE = @P03 "
 
+        '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
         SQLStrCmn =
-              " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+              " LEFT JOIN (SELECT " _
+            & "                 OIM0005.* " _
+            & "               , CASE " _
+            & "                 WHEN OIM0005.LOAD = 43.0 THEN 1 " _
+            & "                 WHEN OIM0005.LOAD = 44.0 THEN 3 " _
+            & "                 WHEN OIM0005.LOAD = 45.0 THEN 2 " _
+            & "                 END AS LOAD_SORT " _
+            & "            FROM OIL.OIM0005_TANK OIM0005) OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
-            & " AND OIM0005.DELFLG <> @P02 " _
-            & " LEFT JOIN OIL.OIM0021_LOADRESERVE OIM0021 ON " _
+            & " AND OIM0005.DELFLG <> @P02 "
+        'SQLStrCmn =
+        '      " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+        '    & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+        '    & " AND OIM0005.DELFLG <> @P02 "
+        '### 20210511 END   甲子営業所対応(荷重のソート順) #############################################
+
+        SQLStrCmn &=
+              " LEFT JOIN OIL.OIM0021_LOADRESERVE OIM0021 ON " _
             & "     OIM0021.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0021.MODEL = OIM0005.MODEL " _
             & " AND OIM0021.LOAD = OIM0005.LOAD " _
@@ -4918,7 +4934,7 @@ Public Class OIT0003OrderList
                     & "  , STACKING" _
                     & "  , OIT0003.SHIPPERSCODE" _
                     & "  , OIM0024.PRIORITYNO" _
-                    & "  , OIM0005.LOAD" _
+                    & "  , OIM0005.LOAD_SORT" _
                     & "  , CONVERT(int, OIM0005.TANKNUMBER)"
 
             Case BaseDllConst.CONST_OFFICECODE_011203

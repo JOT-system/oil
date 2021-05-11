@@ -1040,7 +1040,10 @@ Public Class OIM0005TankListKinoene
             Using repCbj = New CsvCreate(WW_OIM0005tbl, I_FileName:=OTFileName, I_Enc:="Shift_JIS")
                 Dim url As String
                 Try
-                    url = repCbj.ConvertDataTableToCsv(False, False, True)
+                    '### 20210510 START 指摘票対応(No457)全体 #################################################
+                    url = repCbj.ConvertDataTableToCsv(False, blnFrame:=False, blnSeparate:=True)
+                    'url = repCbj.ConvertDataTableToCsv(False, False, True)
+                    '### 20210510 END   指摘票対応(No457)全体 #################################################
                 Catch ex As Exception
                     Return
                 End Try

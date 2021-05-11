@@ -1004,6 +1004,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_OTHTank As String = "1100"
     ''' <summary>
+    ''' OT油種(ハイオク)※根岸－南松本限定
+    ''' </summary>
+    Public Const CONST_OTHTank_1400 As String = "1400"
+    ''' <summary>
     ''' OT油種(レギュラー)
     ''' </summary>
     Public Const CONST_OTRTank As String = "2100"

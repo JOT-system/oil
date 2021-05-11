@@ -2662,7 +2662,8 @@ Public Class OIT0003OTLinkageList
                     '★根岸営業所の場合(OT松本)
                     '　HG(ハイオク)を1100⇒1400に変更(平成30年にそのように依頼をしているため(JOT))
                     If Convert.ToString(OIT0003row("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_011402 _
-                        AndAlso Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC")) = OTConsignee(0) Then
+                        AndAlso Convert.ToString(OIT0003row("OTDAILYCONSIGNEEC")) = OTConsignee(0) _
+                        AndAlso Convert.ToString(OIT0003row("OTOILCODE")) = BaseDllConst.CONST_OTHTank Then
                         OIT0003row("OTOILCODE") = BaseDllConst.CONST_OTHTank_1400
                     End If
                     '### 20210511 END   根岸営業所対応(南松本行きの場合の油種コード対応) ##################

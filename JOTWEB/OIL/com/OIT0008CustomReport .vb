@@ -2,7 +2,7 @@
 Imports Microsoft.Office.Interop
 Imports System.Runtime.InteropServices
 ''' <summary>
-''' 受注個別帳票作成クラス
+''' 輸送量・輸送費関連帳票作成クラス
 ''' </summary>
 ''' <remarks>当クラスはUsingで使用する事
 ''' （ファイナライザで正しくExcelオブジェクトを破棄）</remarks>
@@ -34,7 +34,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
     '輸送費明細
     '1ページ辺りの縦長さ
-    Private Const TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH As Double = 705.0
+    Private Const TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH As Double = 902.25
 
     'タンク車輸送実績表
     '1ページ辺りの縦長さ
@@ -151,8 +151,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData_TransportCostDetail(ByVal KEIJYO_YM As Date) As String
         Dim rngWrite As Excel.Range = Nothing
-        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".pdf"
+        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
@@ -165,15 +165,6 @@ Public Class OIT0008CustomReport : Implements IDisposable
             Dim pixel As Double = 0.0
             Dim row_cnt As Int32 = 0
             Dim nowdate As DateTime = DateTime.Now
-
-            ''フッターの設定
-            'Dim pageSetup As Excel.PageSetup = Nothing
-            'pageSetup = ExcelWorkSheet.PageSetup
-            'pageSetup.LeftFooter = String.Format("&L{0}                {1}",
-            '                                    Format(nowdate, "yyyy年M月d日"),
-            '                                    Format(nowdate, "H:mm"))
-            'pageSetup.RightFooter = "&R&P ページ     "
-            'ExcelMemoryRelease(pageSetup)
 
             For Each row As DataRow In PrintData.Rows
 
@@ -192,13 +183,13 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '値出力(転送販売/着駅/荷受人/油種をスキップし、請求先を出力)
                     EditTransportCostDetail_DetailArea(idx, row, 8)
                     'ピクセル加算
-                    pixel += 14.25
+                    pixel += 18
                     '2行目の高さを調整
                     destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                    destRange.RowHeight = 3.75
+                    destRange.RowHeight = 6
                     ExcelMemoryRelease(destRange)
                     idx += 1
-                    pixel += 3.75
+                    pixel += 6
 
                     '〇改頁処理
                     ChangeTansportCostDetailPage(idx, pixel, 1)
@@ -212,12 +203,12 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '値出力
                     EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
                     'ピクセル加算
-                    pixel += 117.75
+                    pixel += 150
                     '◯明細の設定
                     '値出力(全項目)
                     EditTransportCostDetail_DetailArea(idx, row)
                     'ピクセル加算
-                    pixel += 14.25
+                    pixel += 18
                 Else '2行目以降
                     '前行と輸送形態、請求先会社、請求先部門、出荷場所、荷主、扱支店、荷受人が一致する場合 START
                     If lastRow("TRKBN").ToString().Equals((row("TRKBN").ToString())) AndAlso
@@ -241,14 +232,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             '明細出力(油種のみスキップ)
                             EditTransportCostDetail_DetailArea(idx, row, 2)
                             'ピクセル加算
-                            pixel += 14.25
+                            pixel += 18
 
                             '空行を差し込む
                             destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                            destRange.RowHeight = 3.75
+                            destRange.RowHeight = 6
                             ExcelMemoryRelease(destRange)
                             idx += 1
-                            pixel += 3.75
+                            pixel += 6
 
                             '〇明細の設定(転送販売/着駅計)
                             'テンプレート⑤をコピーする
@@ -260,14 +251,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             '値出力(荷受人/油種スキップ)
                             EditTransportCostDetail_DetailArea(idx, row, 3)
                             'ピクセル加算
-                            pixel += 14.25
+                            pixel += 18
 
                             '空行を差し込む
                             destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                            destRange.RowHeight = 3.75
+                            destRange.RowHeight = 6
                             ExcelMemoryRelease(destRange)
                             idx += 1
-                            pixel += 3.75
+                            pixel += 6
 
                             '基地コードが出光昭和四日市又はコスモ四日市の場合
                             '転送販売計は荷受人計と同値なので、転送販売計を出力する
@@ -283,14 +274,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力(着駅/荷受人/油種をスキップ)
                                 EditTransportCostDetail_DetailArea(idx, row, 4)
                                 'ピクセル加算
-                                pixel += 14.25
+                                pixel += 18
 
                                 '空行を差し込む
                                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                destRange.RowHeight = 3.75
+                                destRange.RowHeight = 6
                                 ExcelMemoryRelease(destRange)
                                 idx += 1
-                                pixel += 3.75
+                                pixel += 6
                             End If
                         Else
                             '〇明細の設定(油種計)
@@ -303,7 +294,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             '明細出力(転送販売/着駅/荷受人スキップ)
                             EditTransportCostDetail_DetailArea(idx, row, 1)
                             'ピクセル加算
-                            pixel += 14.25
+                            pixel += 18
                         End If
                     Else
                         '出荷場所が不一致の場合 START
@@ -319,14 +310,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力(着駅/荷受人/油種をスキップし、請求先部門を出力)
                                 EditTransportCostDetail_DetailArea(idx, row, 7)
                                 'ピクセル加算
-                                pixel += 14.25
+                                pixel += 18
 
                                 '空行を差し込む
                                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                destRange.RowHeight = 3.75
+                                destRange.RowHeight = 6
                                 ExcelMemoryRelease(destRange)
                                 idx += 1
-                                pixel += 3.75
+                                pixel += 6
                             ElseIf "9999".Equals(row("BASECODE").ToString()) Then
                                 '〇明細の設定(請求先計)
                                 'テンプレート⑨をコピーする
@@ -338,13 +329,13 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力(着駅/荷受人/油種をスキップし、請求先を出力)
                                 EditTransportCostDetail_DetailArea(idx, row, 8)
                                 'ピクセル加算
-                                pixel += 14.25
+                                pixel += 18
                                 '2行目の高さを調整
                                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                destRange.RowHeight = 3.75
+                                destRange.RowHeight = 6
                                 ExcelMemoryRelease(destRange)
                                 idx += 1
-                                pixel += 3.75
+                                pixel += 6
                             Else
                                 '〇改頁処理
                                 ChangeTansportCostDetailPage(idx, pixel)
@@ -353,7 +344,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力
                                 EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
                                 'ピクセル加算
-                                pixel += 117.75
+                                pixel += 150
 
                                 '〇明細の設定
                                 'テンプレート②をコピーする
@@ -365,7 +356,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力(全項目)
                                 EditTransportCostDetail_DetailArea(idx, row)
                                 'ピクセル加算
-                                pixel += 14.25
+                                pixel += 18
                             End If
                         Else
                             '出荷場所コードが同一だが、出荷場所名に「請求先部門」が入っている場合
@@ -380,14 +371,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 '値出力(着駅/荷受人/油種をスキップし、請求先部門を出力)
                                 EditTransportCostDetail_DetailArea(idx, row, 7)
                                 'ピクセル加算
-                                pixel += 14.25
+                                pixel += 18
 
                                 '空行を差し込む
                                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                destRange.RowHeight = 3.75
+                                destRange.RowHeight = 6
                                 ExcelMemoryRelease(destRange)
                                 idx += 1
-                                pixel += 3.75
+                                pixel += 6
                             Else
                                 '扱支店が不一致の場合 START
                                 If Not lastRow("MANAGEBRANCHCODE").ToString().Equals((row("MANAGEBRANCHCODE").ToString())) Then
@@ -404,14 +395,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                         '値出力(着駅/荷受人/油種をスキップし、荷主を出力)
                                         EditTransportCostDetail_DetailArea(idx, row, 6)
                                         'ピクセル加算
-                                        pixel += 14.25
+                                        pixel += 18
 
                                         '空行を差し込む
                                         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                        destRange.RowHeight = 3.75
+                                        destRange.RowHeight = 6
                                         ExcelMemoryRelease(destRange)
                                         idx += 1
-                                        pixel += 3.75
+                                        pixel += 6
                                     Else
                                         '前行の扱支店＝04かつ現在行の扱支店＝05(関東第2)の場合以外は改頁処理
                                         If Not ("04".Equals(lastRow("MANAGEBRANCHCODE").ToString()) And
@@ -423,7 +414,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             '値出力
                                             EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
                                             'ピクセル加算
-                                            pixel += 117.75
+                                            pixel += 150
                                         End If
 
                                         '〇明細の設定
@@ -436,7 +427,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                         '値出力(全項目)
                                         EditTransportCostDetail_DetailArea(idx, row)
                                         'ピクセル加算
-                                        pixel += 14.25
+                                        pixel += 18
                                     End If
                                     '荷主計の場合 END
                                 Else
@@ -459,14 +450,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                                 '値出力(着駅/荷受人/油種をスキップ)
                                                 EditTransportCostDetail_DetailArea(idx, row, 4)
                                                 'ピクセル加算
-                                                pixel += 14.25
+                                                pixel += 18
 
                                                 '空行を差し込む
                                                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                                destRange.RowHeight = 3.75
+                                                destRange.RowHeight = 6
                                                 ExcelMemoryRelease(destRange)
                                                 idx += 1
-                                                pixel += 3.75
+                                                pixel += 6
                                             End If
 
                                             '〇明細の設定(扱支店計)
@@ -479,20 +470,20 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             '値出力(転送販売/着駅/荷受人/油種をスキップし、扱支店を出力)
                                             EditTransportCostDetail_DetailArea(idx, row, 5)
                                             'ピクセル加算
-                                            pixel += 14.25
+                                            pixel += 18
                                             '2行目の高さを調整
                                             destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                            destRange.RowHeight = 3.75
+                                            destRange.RowHeight = 6
                                             ExcelMemoryRelease(destRange)
                                             idx += 1
-                                            pixel += 3.75
+                                            pixel += 6
 
                                             '空行を差し込む
                                             destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                                            destRange.RowHeight = 3.75
+                                            destRange.RowHeight = 6
                                             ExcelMemoryRelease(destRange)
                                             idx += 1
-                                            pixel += 3.75
+                                            pixel += 6
                                         Else
                                             '〇明細の設定(荷受人替わり)
                                             'テンプレート②をコピーする
@@ -504,7 +495,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             '値出力(全項目)
                                             EditTransportCostDetail_DetailArea(idx, row)
                                             'ピクセル加算
-                                            pixel += 14.25
+                                            pixel += 18
                                         End If
                                     End If
                                     '荷受人が不一致の場合 END
@@ -661,11 +652,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     wkArrStationName = wkArrStationName.Replace(")", "")
                     wkArrStationName = wkArrStationName.Replace("（", "")
                     wkArrStationName = wkArrStationName.Replace("）", "")
-                    If wkArrStationName.Length > 4 Then
-                        rngDetailArea.Value = wkArrStationName.Substring(0, 4)
-                    Else
-                        rngDetailArea.Value = wkArrStationName
-                    End If
+                    rngDetailArea.Value = wkArrStationName
                 Else
                     rngDetailArea.Value = ""
                 End If
@@ -676,12 +663,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
             If type = 0 OrElse type = 2 Then
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + idx.ToString())
                 If row("CONSIGNEENAME") IsNot DBNull.Value Then
-                    If row("CONSIGNEENAME").ToString().Length > 6 Then
-                        rngDetailArea.Value = row("CONSIGNEENAME").ToString().Substring(0, 6)
-                    Else
-                        rngDetailArea.Value = row("CONSIGNEENAME")
-
-                    End If
+                    rngDetailArea.Value = row("CONSIGNEENAME")
                 Else
                     rngDetailArea.Value = ""
                 End If
@@ -692,11 +674,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
             If type = 0 OrElse type = 1 Then
                 rngDetailArea = Me.ExcelWorkSheet.Range("L" + idx.ToString())
                 If row("ORDERINGOILNAME") IsNot DBNull.Value Then
-                    If row("ORDERINGOILNAME").ToString().Length > 5 Then
-                        rngDetailArea.Value = row("ORDERINGOILNAME").ToString().Substring(0, 5)
-                    Else
-                        rngDetailArea.Value = row("ORDERINGOILNAME")
-                    End If
+                    rngDetailArea.Value = row("ORDERINGOILNAME")
                 Else
                     rngDetailArea.Value = ""
                 End If
@@ -706,11 +684,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
             '◯ 扱支店計の場合、扱支店を出力
             If type = 5 Then
                 rngDetailArea = Me.ExcelWorkSheet.Range("F" + idx.ToString())
-                If row("MANAGEBRANCHNAME").ToString().Length > 11 Then
-                    rngDetailArea.Value = row("MANAGEBRANCHNAME").ToString().Substring(0, 11)
-                Else
-                    rngDetailArea.Value = row("MANAGEBRANCHNAME")
-                End If
+                rngDetailArea.Value = row("MANAGEBRANCHNAME")
                 ExcelMemoryRelease(rngDetailArea)
             End If
 
@@ -942,13 +916,13 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
         '出力済みPixel数が最大に達してない場合、ページ埋め処理
         While (pixel < TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH)
-            '明細1行分(14.25)以上
-            If TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel > 14.25 Then
+            '明細1行分(18)以上
+            If TRANSPORT_COST_DETAIL_1PAGE_VERTICAL_LENGTH - pixel > 18 Then
                 '高さの調整のみ
                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
-                destRange.RowHeight = 14.25
+                destRange.RowHeight = 18
                 ExcelMemoryRelease(destRange)
-                pixel += 14.25
+                pixel += 18
             Else
                 '1行以下（フッター行）の場合、MAX - 出力済みPixel数分の高さにして、下罫線を引く
                 destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", idx))
@@ -978,37 +952,37 @@ Public Class OIT0008CustomReport : Implements IDisposable
         ExcelMemoryRelease(destRange)
         '行の高さ設定
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx)))
-        destRange.RowHeight = 14.25
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 1)))
-        destRange.RowHeight = 15.75
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 2)))
-        destRange.RowHeight = 15.75
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 3)))
-        destRange.RowHeight = 14.25
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 4)))
-        destRange.RowHeight = 3.75
+        destRange.RowHeight = 6
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 5)))
-        destRange.RowHeight = 14.25
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 6)))
-        destRange.RowHeight = 3.75
+        destRange.RowHeight = 6
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 7)))
-        destRange.RowHeight = 3.75
+        destRange.RowHeight = 6
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 8)))
-        destRange.RowHeight = 14.25
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 9)))
-        destRange.RowHeight = 14.25
+        destRange.RowHeight = 18
         ExcelMemoryRelease(destRange)
         destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", (idx + 10)))
-        destRange.RowHeight = 3.75
+        destRange.RowHeight = 6
         ExcelMemoryRelease(destRange)
     End Sub
 #End Region

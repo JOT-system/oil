@@ -633,6 +633,14 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String(), ByVal consigneeCode As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '指摘票No.496 袖ケ浦帳票名対応
+        If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011203) Then
+            If consigneeCode.Equals(TankDispatch.CONSIGNEECODE.KOUSYOUTAKASAKI) Then
+                tmpFileName = "タンク車発送実績【コウショウ分】.xlsx"
+            ElseIf consigneeCode.Equals(TankDispatch.CONSIGNEECODE.OTTAKASAKI) Then
+                tmpFileName = "タンク車発送実績【構内取り分】.xlsx"
+            End If
+        End If
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
@@ -1120,6 +1128,10 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '指摘票No0.496 袖ケ浦帳票名対応
+        If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011203) Then
+            tmpFileName = "連結順序5461.xlsx"
+        End If
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try

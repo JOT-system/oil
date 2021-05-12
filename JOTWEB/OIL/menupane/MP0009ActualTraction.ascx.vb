@@ -93,6 +93,10 @@ Public Class MP0009ActualTraction
                 End If
                 '処理フラグを落とす
                 Me.hdnRefreshCall.Value = ""
+            Catch ex As Threading.ThreadAbortException
+                Dim doNothing = Nothing
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
             Catch ex As Exception
                 pnlSysError.Visible = True
                 Me.ddlActualTractionOffice.Enabled = False

@@ -2141,6 +2141,28 @@ Public Class OIT0005TankLocList
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly showDeleteIcon'>")
                         cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+
+                        '### 20210512 START 指摘票対応(No479)全体 #################################################
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTYM") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTSTATION") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTORGCODE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTYM") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTSTATION") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTORGCODE") Then
+                        '★中間点検年月の設定, 中間点検場所の設定, 中間点検実施者
+                        '　自主点検年月      , 自主点検場所      , 自主点検実施者
+
+                        '○タンク車状況(全検)の場合のみ入力可能とする。
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
+                            AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
+                            'cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                        '### 20210512 END   指摘票対応(No479)全体 #################################################
+
                     End If
                 Next
 

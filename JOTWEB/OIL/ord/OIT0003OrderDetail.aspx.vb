@@ -8748,10 +8748,11 @@ Public Class OIT0003OrderDetail
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGOUTLETORDER") = ""
                     '入力された値が0、または一覧の件数より大きい場合
-                ElseIf Integer.Parse(WW_ListValue) = 0 _
-                        OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+                ElseIf Integer.Parse(WW_ListValue) = 0 Then
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGOUTLETORDER") = ""
+                ElseIf Integer.Parse(WW_ListValue) > intListCnt Then
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
                 Else
                     updHeader.Item(WF_FIELD.Value) = WW_ListValue
                     updHeader.Item("LOADINGOUTLETORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
@@ -8772,10 +8773,11 @@ Public Class OIT0003OrderDetail
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGIRILINEORDER") = ""
                     '入力された値が0、または一覧の件数より大きい場合
-                ElseIf Integer.Parse(WW_ListValue) = 0 _
-                        OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+                ElseIf Integer.Parse(WW_ListValue) = 0 Then
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGIRILINEORDER") = ""
+                ElseIf Integer.Parse(WW_ListValue) > intListCnt Then
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
                 Else
                     updHeader.Item(WF_FIELD.Value) = WW_ListValue
                     updHeader.Item("LOADINGIRILINEORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)

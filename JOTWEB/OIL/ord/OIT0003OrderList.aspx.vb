@@ -3357,10 +3357,14 @@ Public Class OIT0003OrderList
         work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
 
         '初期化
+        '○入線方 関連
         Me.divRTrainNo.Visible = False
         Me.txtReportRTrainNo.Text = ""
+        Me.ChkSameTimeLineChk.Checked = False
+        '○タンク車発送実績 関連
         Me.divTrainNo.Visible = False
         Me.txtReportTrainNo.Text = ""
+        '○OT積込指示書 関連
         Me.divEndMonthChk.Visible = False
         Me.ChkEndMonthChk.Checked = False
 
@@ -4140,17 +4144,23 @@ Public Class OIT0003OrderList
                 End Using
                 '使用する帳票の確認
                 Dim tyohyoName As String = ""
-                If Me.txtReportRTrainNo.Text = "401" Then
-                    '◯ファイル名(袖ヶ浦401レ専用入線方)
-                    tyohyoName = "_SODEGAURA_LINEPLAN_401"
+                '★同時入線(チェックボックス)が押下されている場合
+                If Me.ChkSameTimeLineChk.Checked = True Then
+                    '◯ファイル名(袖ヶ浦同時入線専用入線方)
+                    tyohyoName = "_SODEGAURA_LINEPLAN"
                 Else
-                    '◯ファイル名(袖ヶ浦501レ専用入線方)
-                    tyohyoName = "_SODEGAURA_LINEPLAN_501"
+                    If Me.txtReportRTrainNo.Text = "401" Then
+                        '◯ファイル名(袖ヶ浦401レ専用入線方)
+                        tyohyoName = "_SODEGAURA_LINEPLAN_401"
+                    Else
+                        '◯ファイル名(袖ヶ浦501レ専用入線方)
+                        tyohyoName = "_SODEGAURA_LINEPLAN_501"
+                    End If
                 End If
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintSodegauraData(CONST_RPT_LINEPLAN, Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text)
+                        url = repCbj.CreateExcelPrintSodegauraData(CONST_RPT_LINEPLAN, Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text, Me.ChkSameTimeLineChk.Checked)
                     Catch ex As Exception
                         Return
                     End Try
@@ -6248,6 +6258,10 @@ Public Class OIT0003OrderList
             & " , ROW_NUMBER() OVER(ORDER BY OIM0007.OTFLG DESC, " _
             & "                              OIM0007.ZAIKOSORT, " _
             & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS NYUSENNO" _
+            & " , ROW_NUMBER() OVER(PARTITION BY OIM0007.OTFLG, OIM0007.ZAIKOSORT " _
+            & "                     ORDER BY OIM0007.OTFLG DESC, " _
+            & "                              OIM0007.ZAIKOSORT, " _
+            & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS TRAINNO_SORT" _
             & " , ''                                             AS OTRANK" _
             & " , CASE" _
             & "   WHEN OIT0003.LOADINGIRILINEORDER = '' THEN OIT0003.LINEORDER" _
@@ -6373,13 +6387,25 @@ Public Class OIT0003OrderList
                     End Try
                 Next
 
+                Dim strTrainNo As String = ""
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+
+                    '列車Noが前回と違う場合(または初回)
+                    If strTrainNo = "" OrElse strTrainNo <> OIT0003Reprow("TRAINNO") Then
+                        '★列車の合計を設定
+                        tblCnt = OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").Count
+                    End If
+
                     'OT順位を降順で設定
                     OIT0003Reprow("OTRANK") = tblCnt
                     tblCnt -= 1
+
+                    '列車番号を設定(比較用)
+                    strTrainNo = OIT0003Reprow("TRAINNO")
+
                 Next
 
-                Dim strTrainNo As String = ""
+                strTrainNo = ""
                 Dim strNyuuka As String = "(入)"
                 Dim LineCnt As Integer = 0
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
@@ -6400,8 +6426,14 @@ Public Class OIT0003OrderList
                             End If
                         '列車№:5461(JR:5972)は上から
                         Case CONST_SODE_TRAIN_5461
-                            If OIT0003Reprow("LOADINGIRILINEORDER") <= LineCnt Then
-                                OIT0003Reprow("NYUUKA") = strNyuuka
+                            If ChkSameTimeLineChk.Checked = True Then
+                                If OIT0003Reprow("TRAINNO_SORT") <= LineCnt Then
+                                    OIT0003Reprow("NYUUKA") = strNyuuka
+                                End If
+                            Else
+                                If OIT0003Reprow("LOADINGIRILINEORDER") <= LineCnt Then
+                                    OIT0003Reprow("NYUUKA") = strNyuuka
+                                End If
                             End If
                     End Select
 

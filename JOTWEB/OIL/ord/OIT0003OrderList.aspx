@@ -224,6 +224,9 @@
             <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
                 <asp:TextBox ID="txtReportRTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
             </a>
+            <a id="aSameTimeLineChk" style="display:none;">
+                <asp:CheckBox ID="ChkSameTimeLineChk" runat="server" Text=" 同時入線" />
+            </a>
         </span>
     </div>
     <div id="divTrainNo" runat="server">

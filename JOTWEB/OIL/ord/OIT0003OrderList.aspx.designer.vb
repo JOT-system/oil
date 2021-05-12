@@ -482,6 +482,15 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''ChkSameTimeLineChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkSameTimeLineChk As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''divTrainNo コントロール。
     '''</summary>
     '''<remarks>

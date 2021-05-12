@@ -76,7 +76,7 @@
             </div>
 
             <!-- 状態 -->
-            <div class="inputItem" style="display:none">
+            <div class="inputItem">
                 <a id="WF_STATUS_LABEL">状態</a>
                 <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS%>);" onchange="TextBox_change('TxtStatus');">
                     <asp:TextBox ID="TxtStatus" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="3"></asp:TextBox>

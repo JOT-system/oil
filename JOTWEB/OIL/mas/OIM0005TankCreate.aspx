@@ -320,6 +320,17 @@
                         <asp:Label ID="WF_BIGOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
+                    <!-- 油種中分類コード -->
+                    <span class="ef">
+                        <asp:Label ID="WF_MIDDLEOILCODE_L" runat="server" Text="油種中分類コード" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_MIDDLEOILCODE', <%=LIST_BOX_CLASSIFICATION.LC_MIDDLEOILCODE%>);" onchange="TextBox_change('WF_MIDDLEOILCODE');">
+                            <asp:TextBox ID="WF_MIDDLEOILCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_MIDDLEOILCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_15">
                     <!-- 運用基地C -->
                     <span class="ef">
                         <asp:Label ID="WF_OPERATIONBASECODE_L" runat="server" Text="運用基地C"  CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -328,9 +339,7 @@
                         </span>
                         <asp:Label ID="WF_OPERATIONBASECODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
 
-                <p id="KEY_LINE_15">
                     <!-- 塗色C -->
                     <span class="ef">
                         <asp:Label ID="WF_COLORCODE_L" runat="server" Text="塗色C"  CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -339,7 +348,9 @@
                         </span>
                         <asp:Label ID="WF_COLORCODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
 
+                <p id="KEY_LINE_16">
                     <!-- マークコード-->
                     <span class="ef">
                         <asp:Label ID="WF_MARKCODE_L" runat="server" Text="マークコード"  CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -350,7 +361,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_16">
+                <p id="KEY_LINE_17">
                     <!-- JXTG仙台タグコード -->
                     <span class="ef">
                         <asp:Label ID="WF_JXTGTAGCODE1_L" runat="server" Text="JXTG仙台タグコード" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -368,7 +379,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_17">
+                <p id="KEY_LINE_18">
                     <!-- JXT川崎タグコード -->
                     <span class="ef">
                         <asp:Label ID="WF_JXTGTAGCODE3_L" runat="server" Text="JXT川崎タグコード" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -384,7 +395,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_18">
+                <p id="KEY_LINE_19">
                     <!-- 出光昭シタグコード -->
                     <span class="ef">
                         <asp:Label ID="WF_IDSSTAGCODE_L" runat="server" Text="出光昭シタグコード" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -402,7 +413,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_19">
+                <p id="KEY_LINE_20">
                     <!-- 予備1 -->
                     <span class="ef">
                         <asp:Label ID="WF_RESERVE1_L" runat="server" Text="予備1" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -418,7 +429,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_20">
+                <p id="KEY_LINE_21">
                     <!-- 次回交検年月日(JR） -->
                     <span class="ef">
                         <asp:Label ID="WF_JRINSPECTIONDATE_L" runat="server" Text="次回交検年月日(JR）" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -438,7 +449,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_21">
+                <p id="KEY_LINE_22">
                     <!-- 次回指定年月日(JR) -->
                     <span class="ef">
                         <asp:Label ID="WF_JRSPECIFIEDDATE_L" runat="server" Text="次回指定年月日(JR)" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -458,7 +469,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_22">
+                <p id="KEY_LINE_23">
                     <!-- 次回全検年月日(JR)  -->
                     <span class="ef">
                         <asp:Label ID="WF_JRALLINSPECTIONDATE_L" runat="server" Text="次回全検年月日(JR) " CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -478,7 +489,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_23">
+                <p id="KEY_LINE_24">
                     <!-- 前回全検年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_PREINSPECTIONDATE_L" runat="server" Text="前回全検年月日" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -498,7 +509,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_24">
+                <p id="KEY_LINE_25">
                     <!-- 車籍編入年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日"  CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -518,7 +529,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_25">
+                <p id="KEY_LINE_26">
                     <!-- 現在経年 -->
                     <span class="ef">
                         <asp:Label ID="WF_PROGRESSYEAR_L" runat="server" Text="現在経年" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -534,7 +545,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_26">
+                <p id="KEY_LINE_27">
                     <!-- 車籍除外年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_EXCLUDEDATE_L" runat="server" Text="車籍除外年月日" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -554,7 +565,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_27">
+                <p id="KEY_LINE_28">
                     <!-- JR車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_JRTANKNUMBER_L" runat="server" Text="JR車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -572,7 +583,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_28">
+                <p id="KEY_LINE_29">
                     <!-- 旧JOT車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_OLDTANKNUMBER_L" runat="server" Text="旧JOT車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -588,7 +599,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_29">
+                <p id="KEY_LINE_30">
                     <!-- JXTG仙台車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_JXTGTANKNUMBER1_L" runat="server" Text="JXTG仙台車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -604,7 +615,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_30">
+                <p id="KEY_LINE_31">
                     <!-- JXTG川崎車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_JXTGTANKNUMBER3_L" runat="server" Text="JXTG川崎車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -620,7 +631,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_31">
+                <p id="KEY_LINE_32">
                     <!-- コスモ車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_COSMOTANKNUMBER_L" runat="server" Text="コスモ車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -636,7 +647,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_32">
+                <p id="KEY_LINE_33">
                     <!-- 出光昭シ車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_SHELLTANKNUMBER_L" runat="server" Text="出光昭シ車番" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -652,7 +663,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_33">
+                <p id="KEY_LINE_34">
                     <!-- 予備 -->
                     <span class="ef">
                         <asp:Label ID="WF_RESERVE3_L" runat="server" Text="予備" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -667,6 +678,66 @@
                             <asp:TextBox ID="WF_USEDFLG" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_USEDFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_35">
+                    <!-- 中間点検年月 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_INTERINSPECTYM_L" runat="server" Text="中間点検年月" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_INTERINSPECTYM', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
+                            <asp:TextBox ID="WF_INTERINSPECTYM" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon" MaxLength="0"></asp:TextBox>
+                        </span>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_36">
+                    <!-- 中間点検場所 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_INTERINSPECTSTATION_L" runat="server" Text="中間点検場所" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_INTERINSPECTSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('WF_INTERINSPECTSTATION');">
+                            <asp:TextBox ID="WF_INTERINSPECTSTATION" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="7"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_INTERINSPECTSTATION_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    
+                    <!-- 中間点検実施者 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_INTERINSPECTORGCODE_L" runat="server" Text="中間点検実施者" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_INTERINSPECTORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_INTERINSPECTORGCODE');">
+                            <asp:TextBox ID="WF_INTERINSPECTORGCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_INTERINSPECTORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_37">
+                    <!-- 自主点検年月 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_SELFINSPECTYM_L" runat="server" Text="自主点検年月" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_SELFINSPECTYM', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
+                            <asp:TextBox ID="WF_SELFINSPECTYM" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon" MaxLength="0"></asp:TextBox>
+                        </span>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_38">
+                    <!-- 自主点検場所 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_SELFINSPECTSTATION_L" runat="server" Text="自主点検場所" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_SELFINSPECTSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('WF_SELFINSPECTSTATION');">
+                            <asp:TextBox ID="WF_SELFINSPECTSTATION" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="7"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_SELFINSPECTSTATION_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    
+                    <!-- 自主点検実施者 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_SELFINSPECTORGCODE_L" runat="server" Text="自主点検実施者" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_SELFINSPECTORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_SELFINSPECTORGCODE');">
+                            <asp:TextBox ID="WF_SELFINSPECTORGCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_SELFINSPECTORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
             </div>

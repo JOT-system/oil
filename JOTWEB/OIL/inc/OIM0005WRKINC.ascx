@@ -55,6 +55,10 @@
     <asp:TextBox ID="WF_SEL_EXTRADINARYLIMIT" runat="server"></asp:TextBox>         <!-- 臨時専用期限 -->
     <asp:TextBox ID="WF_SEL_BIGOILCODE" runat="server"></asp:TextBox>               <!-- 油種大分類コード -->
     <asp:TextBox ID="WF_SEL_BIGOILNAME" runat="server"></asp:TextBox>               <!-- 油種大分類名 -->
+
+    <asp:TextBox ID="WF_SEL_MIDDLEOILCODE" runat="server"></asp:TextBox>            <!-- 油種中分類コード -->
+    <asp:TextBox ID="WF_SEL_MIDDLEOILNAME" runat="server"></asp:TextBox>            <!-- 油種中分類名 -->
+
     <asp:TextBox ID="WF_SEL_OPERATIONBASECODE" runat="server"></asp:TextBox>        <!-- 運用基地C -->
     <asp:TextBox ID="WF_SEL_OPERATIONBASENAME" runat="server"></asp:TextBox>        <!-- 運用場所 -->
     <asp:TextBox ID="WF_SEL_COLORCODE" runat="server"></asp:TextBox>                <!-- 塗色C -->
@@ -104,6 +108,14 @@
     <asp:TextBox ID="WF_SEL_SAPSHELLTANKNUMBER" runat="server"></asp:TextBox>       <!-- 出光昭シSAP車番 -->
     <asp:TextBox ID="WF_SEL_RESERVE3" runat="server"></asp:TextBox>                 <!-- 予備 -->
     <asp:TextBox ID="WF_SEL_USEDFLG2" runat="server"></asp:TextBox>                 <!-- 利用フラグ -->
+
+    <asp:TextBox ID="WF_SEL_INTERINSPECTYM" runat="server"></asp:TextBox>           <!-- 中間点検年月 -->
+    <asp:TextBox ID="WF_SEL_INTERINSPECTSTATION" runat="server"></asp:TextBox>      <!-- 中間点検場所 -->
+    <asp:TextBox ID="WF_SEL_INTERINSPECTORGCODE" runat="server"></asp:TextBox>      <!-- 中間点検実施者 -->
+    <asp:TextBox ID="WF_SEL_SELFINSPECTYM" runat="server"></asp:TextBox>            <!-- 自主点検年月 -->
+    <asp:TextBox ID="WF_SEL_SELFINSPECTSTATION" runat="server"></asp:TextBox>       <!-- 自主点検場所 -->
+    <asp:TextBox ID="WF_SEL_SELFINSPECTORGCODE" runat="server"></asp:TextBox>       <!-- 自主点検実施者 -->
+
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_INITYMD" runat="server"></asp:TextBox>                  <!-- 登録年月日 -->
     <asp:TextBox ID="WF_SEL_INITUSER" runat="server"></asp:TextBox>                 <!-- 登録ユーザーＩＤ -->

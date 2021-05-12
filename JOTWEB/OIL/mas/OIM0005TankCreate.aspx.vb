@@ -1,7 +1,7 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ登録画面
 ' 作成日 2019/11/08
-' 更新日 2021/04/15
+' 更新日 2021/05/11
 ' 作成者 JOT遠藤
 ' 更新者 JOT伊草
 '
@@ -14,6 +14,8 @@
 '         :2021/04/14 DB更新後に一覧画面に戻る場合に
 '                     コード名称が表示されなくなるバグを修正
 '         :2021/04/15 新規登録を行った際に、一覧画面に新規登録データが追加されないバグに対応
+'         :2021/05/11 1)入力項目「油種中分類」「中間点検年月」「中間点検場所」「中間点検実施者」
+'         :             「自主点検年月」「自主点検場所」「自主点検実施者」を追加
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -277,6 +279,10 @@ Public Class OIM0005TankCreate
         WF_BIGOILCODE.Text = work.WF_SEL_BIGOILCODE.Text
         CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)
 
+        '油種中分類コード, 油種大分類名
+        WF_MIDDLEOILCODE.Text = work.WF_SEL_MIDDLEOILCODE.Text
+        CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)
+
         '運用基地C, 運用場所
         WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE.Text
         CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
@@ -405,6 +411,28 @@ Public Class OIM0005TankCreate
         '利用フラグ
         WF_USEDFLG.Text = work.WF_SEL_USEDFLG2.Text
         CODENAME_get("USEDFLG", WF_USEDFLG.Text, WF_USEDFLG_TEXT.Text, WW_RTN_SW)
+
+        '中間点検年月
+        WF_INTERINSPECTYM.Text = work.WF_SEL_INTERINSPECTYM.Text
+
+        '中間点検場所
+        WF_INTERINSPECTSTATION.Text = work.WF_SEL_INTERINSPECTSTATION.Text
+        CODENAME_get("STATIONFOCUSON", WF_INTERINSPECTSTATION.Text, WF_INTERINSPECTSTATION_TEXT.Text, WW_RTN_SW)
+
+        '中間点検実施者
+        WF_INTERINSPECTORGCODE.Text = work.WF_SEL_INTERINSPECTORGCODE.Text
+        CODENAME_get("ORG", WF_INTERINSPECTORGCODE.Text, WF_INTERINSPECTORGCODE_TEXT.Text, WW_RTN_SW)
+
+        '自主点検年月
+        WF_SELFINSPECTYM.Text = work.WF_SEL_SELFINSPECTYM.Text
+
+        '自主点検場所
+        WF_SELFINSPECTSTATION.Text = work.WF_SEL_SELFINSPECTSTATION.Text
+        CODENAME_get("STATIONFOCUSON", WF_SELFINSPECTSTATION.Text, WF_SELFINSPECTSTATION_TEXT.Text, WW_RTN_SW)
+
+        '自主点検実施者
+        WF_SELFINSPECTORGCODE.Text = work.WF_SEL_SELFINSPECTORGCODE.Text
+        CODENAME_get("ORG", WF_SELFINSPECTORGCODE.Text, WF_SELFINSPECTORGCODE_TEXT.Text, WW_RTN_SW)
 
         '削除フラグ
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -588,6 +616,14 @@ Public Class OIM0005TankCreate
             & "        , MAXCALIBER = @P94" _
             & "        , MINCALIBER = @P95" _
             & "        , LENGTHFLG = @P96" _
+            & "        , INTERINSPECTYM = @P97" _
+            & "        , INTERINSPECTSTATION = @P98" _
+            & "        , INTERINSPECTORGCODE = @P99" _
+            & "        , SELFINSPECTYM = @P100" _
+            & "        , SELFINSPECTSTATION = @P101" _
+            & "        , SELFINSPECTORGCODE = @P102" _
+            & "        , MIDDLEOILCODE = @P103" _
+            & "        , MIDDLEOILNAME = @P104" _
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -688,7 +724,15 @@ Public Class OIM0005TankCreate
             & "        , TANKLENGTH" _
             & "        , MAXCALIBER" _
             & "        , MINCALIBER" _
-            & "        , LENGTHFLG)" _
+            & "        , LENGTHFLG" _
+            & "        , INTERINSPECTYM" _
+            & "        , INTERINSPECTSTATION" _
+            & "        , INTERINSPECTORGCODE" _
+            & "        , SELFINSPECTYM" _
+            & "        , SELFINSPECTSTATION" _
+            & "        , SELFINSPECTORGCODE" _
+            & "        , MIDDLEOILCODE" _
+            & "        , MIDDLEOILNAME)" _
             & "    VALUES" _
             & "        (@P00" _
             & "        , @P01" _
@@ -786,7 +830,15 @@ Public Class OIM0005TankCreate
             & "        , @P93" _
             & "        , @P94" _
             & "        , @P95" _
-            & "        , @P96) ;" _
+            & "        , @P96" _
+            & "        , @P97" _
+            & "        , @P98" _
+            & "        , @P99" _
+            & "        , @P100" _
+            & "        , @P101" _
+            & "        , @P102" _
+            & "        , @P103" _
+            & "        , @P104) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
 
@@ -861,6 +913,8 @@ Public Class OIM0005TankCreate
             & "    , AUTOEXTENTIONNAME" _
             & "    , BIGOILCODE" _
             & "    , BIGOILNAME" _
+            & "    , MIDDLEOILCODE" _
+            & "    , MIDDLEOILNAME" _
             & "    , JXTGTAGCODE1" _
             & "    , JXTGTAGNAME1" _
             & "    , JXTGTAGCODE2" _
@@ -883,6 +937,12 @@ Public Class OIM0005TankCreate
             & "    , JXTGTANKNUMBER3" _
             & "    , JXTGTANKNUMBER4" _
             & "    , SAPSHELLTANKNUMBER" _
+            & "    , INTERINSPECTYM" _
+            & "    , INTERINSPECTSTATION" _
+            & "    , INTERINSPECTORGCODE" _
+            & "    , SELFINSPECTYM" _
+            & "    , SELFINSPECTSTATION" _
+            & "    , SELFINSPECTORGCODE" _
             & "    , INITYMD" _
             & "    , INITUSER" _
             & "    , INITTERMID" _
@@ -995,31 +1055,16 @@ Public Class OIM0005TankCreate
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.Int)                   '最大口径
                 Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.Int)                   '最大口径
                 Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)           '長さフラグ
+                Dim PARA97 As SqlParameter = SQLcmd.Parameters.Add("@P97", SqlDbType.Date)                  '中間点検年月
+                Dim PARA98 As SqlParameter = SQLcmd.Parameters.Add("@P98", SqlDbType.NVarChar, 7)           '中間点検場所
+                Dim PARA99 As SqlParameter = SQLcmd.Parameters.Add("@P99", SqlDbType.NVarChar, 7)           '中間点検実施者
+                Dim PARA100 As SqlParameter = SQLcmd.Parameters.Add("@P100", SqlDbType.Date)                '自主点検年月
+                Dim PARA101 As SqlParameter = SQLcmd.Parameters.Add("@P101", SqlDbType.NVarChar, 7)         '自主点検場所
+                Dim PARA102 As SqlParameter = SQLcmd.Parameters.Add("@P102", SqlDbType.NVarChar, 7)         '自主点検実施者
+                Dim PARA103 As SqlParameter = SQLcmd.Parameters.Add("@P103", SqlDbType.NVarChar, 1)         '油種中分類コード
+                Dim PARA104 As SqlParameter = SQLcmd.Parameters.Add("@P104", SqlDbType.NVarChar, 10)        '油種中分類名
 
-                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       'JOT車番
-                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 20)      '原籍所有者C
-                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 20)      '名義所有者C
-                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 20)      'リース先C
-                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 20)      'リース区分C
-                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 1)       '自動延長
-                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.Date)              'リース開始年月日
-                Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.Date)              'リース満了年月日
-                Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.NVarChar, 20)      '第三者使用者C
-                Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 20)      '原常備駅C
-                Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.NVarChar, 20)      '臨時常備駅C
-                Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.Date)              '第三者使用期限
-                Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.Date)              '臨時常備駅期限
-                Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 20)      '原専用種別C
-                Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.NVarChar, 20)      '臨時専用種別C
-                Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.Date)              '臨時専用期限
-                Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.NVarChar, 20)      '運用基地C
-                Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.NVarChar, 20)      '塗色C
-                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.NVarChar, 1)       'マークコード
-                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.NVarChar, 20)      'マーク名
-                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Date)              '取得年月日
-                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Date)              '車籍編入年月日
-                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 2)       '取得先C
 
                 Dim OIM0005row As DataRow = OIM0005INPtbl.Rows(0)
                 Dim WW_DATENOW As DateTime = Date.Now
@@ -1226,64 +1271,30 @@ Public Class OIM0005TankCreate
                     PARA95.Value = "0"
                 End If
                 PARA96.Value = OIM0005row("LENGTHFLG")
+                If OIM0005row("INTERINSPECTYM") <> "" Then
+                    PARA97.Value = OIM0005row("INTERINSPECTYM") + "/01"
+                Else
+                    PARA97.Value = DBNull.Value
+                End If
+                PARA98.Value = OIM0005row("INTERINSPECTSTATION")
+                PARA99.Value = OIM0005row("INTERINSPECTORGCODE")
+                If OIM0005row("SELFINSPECTYM") <> "" Then
+                    PARA100.Value = OIM0005row("SELFINSPECTYM") + "/01"
+                Else
+                    PARA100.Value = DBNull.Value
+                End If
+                PARA101.Value = OIM0005row("SELFINSPECTSTATION")
+                PARA102.Value = OIM0005row("SELFINSPECTORGCODE")
+                PARA103.Value = OIM0005row("MIDDLEOILCODE")
+                PARA104.Value = OIM0005row("MIDDLEOILNAME")
+
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
                 OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
 
                 '更新ジャーナル出力
-                JPARA00.Value = OIM0005row("DELFLG")
                 JPARA01.Value = OIM0005row("TANKNUMBER")
-                JPARA02.Value = OIM0005row("ORIGINOWNERCODE")
-                JPARA03.Value = OIM0005row("OWNERCODE")
-                JPARA04.Value = OIM0005row("LEASECODE")
-                JPARA05.Value = OIM0005row("LEASECLASS")
-                JPARA06.Value = OIM0005row("AUTOEXTENTION")
-                If OIM0005row("LEASESTYMD") <> "" Then
-                    JPARA07.Value = OIM0005row("LEASESTYMD")
-                Else
-                    JPARA07.Value = DBNull.Value
-                End If
-                If OIM0005row("LEASEENDYMD") <> "" Then
-                    JPARA08.Value = OIM0005row("LEASEENDYMD")
-                Else
-                    JPARA08.Value = DBNull.Value
-                End If
-                JPARA09.Value = OIM0005row("USERCODE")
-                JPARA10.Value = OIM0005row("CURRENTSTATIONCODE")
-                JPARA11.Value = OIM0005row("EXTRADINARYSTATIONCODE")
-                If OIM0005row("USERLIMIT") <> "" Then
-                    JPARA12.Value = OIM0005row("USERLIMIT")
-                Else
-                    JPARA12.Value = DBNull.Value
-                End If
-                If OIM0005row("LIMITTEXTRADIARYSTATION") <> "" Then
-                    JPARA13.Value = OIM0005row("LIMITTEXTRADIARYSTATION")
-                Else
-                    JPARA13.Value = DBNull.Value
-                End If
-                JPARA14.Value = OIM0005row("DEDICATETYPECODE")
-                JPARA15.Value = OIM0005row("EXTRADINARYTYPECODE")
-                If OIM0005row("EXTRADINARYLIMIT") <> "" Then
-                    JPARA16.Value = OIM0005row("EXTRADINARYLIMIT")
-                Else
-                    JPARA16.Value = DBNull.Value
-                End If
-                JPARA17.Value = OIM0005row("OPERATIONBASECODE")
-                JPARA18.Value = OIM0005row("COLORCODE")
-                JPARA19.Value = OIM0005row("MARKCODE")
-                JPARA20.Value = OIM0005row("MARKNAME")
-                If OIM0005row("ALLINSPECTIONDATE") <> "" Then
-                    JPARA21.Value = OIM0005row("ALLINSPECTIONDATE")
-                Else
-                    JPARA21.Value = DBNull.Value
-                End If
-                If OIM0005row("TRANSFERDATE") <> "" Then
-                    JPARA22.Value = OIM0005row("TRANSFERDATE")
-                Else
-                    JPARA22.Value = DBNull.Value
-                End If
-                JPARA23.Value = OIM0005row("OBTAINEDCODE")
 
                 Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
                     If IsNothing(OIM0005UPDtbl) Then
@@ -1494,6 +1505,8 @@ Public Class OIM0005TankCreate
         OIM0005INProw("EXTRADINARYLIMIT") = WF_EXTRADINARYLIMIT.Text                        '臨時専用期限
         OIM0005INProw("BIGOILCODE") = WF_BIGOILCODE.Text                                    '油種大分類コード
         OIM0005INProw("BIGOILNAME") = WF_BIGOILCODE_TEXT.Text                               '油種大分類名
+        OIM0005INProw("MIDDLEOILCODE") = WF_MIDDLEOILCODE.Text                              '油種中分類コード
+        OIM0005INProw("MIDDLEOILNAME") = WF_MIDDLEOILCODE_TEXT.Text                         '油種中分類名
         OIM0005INProw("OPERATIONBASECODE") = WF_OPERATIONBASECODE.Text                      '運用基地C
         OIM0005INProw("OPERATIONBASENAME") = WF_OPERATIONBASECODE_TEXT.Text                 '運用場所
         OIM0005INProw("COLORCODE") = WF_COLORCODE.Text                                      '塗色C
@@ -1544,6 +1557,12 @@ Public Class OIM0005TankCreate
         OIM0005INProw("RESERVE3") = WF_RESERVE3.Text                                        '予備
         OIM0005INProw("USEDFLG") = WF_USEDFLG.Text                                          '利用フラグ
         OIM0005INProw("DELFLG") = WF_DELFLG.Text                                            '削除フラグ
+        OIM0005INProw("INTERINSPECTYM") = WF_INTERINSPECTYM.Text                            '中間点検年月
+        OIM0005INProw("INTERINSPECTSTATION") = WF_INTERINSPECTSTATION.Text                  '中間点検場所
+        OIM0005INProw("INTERINSPECTORGCODE") = WF_INTERINSPECTORGCODE.Text                  '中間点検実施者
+        OIM0005INProw("SELFINSPECTYM") = WF_SELFINSPECTYM.Text                              '自主点検年月
+        OIM0005INProw("SELFINSPECTSTATION") = WF_SELFINSPECTSTATION.Text                    '自主点検場所
+        OIM0005INProw("SELFINSPECTORGCODE") = WF_SELFINSPECTORGCODE.Text                    '自主点検実施者
 
         '○ チェック用テーブルに登録する
         OIM0005INPtbl.Rows.Add(OIM0005INProw)
@@ -1610,6 +1629,8 @@ Public Class OIM0005TankCreate
                     OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
                     OIM0005row("BIGOILCODE") = OIM0005INProw("BIGOILCODE") AndAlso
                     OIM0005row("BIGOILNAME") = OIM0005INProw("BIGOILNAME") AndAlso
+                    OIM0005row("MIDDLEOILCODE") = OIM0005INProw("MIDDLEOILCODE") AndAlso
+                    OIM0005row("MIDDLEOILNAME") = OIM0005INProw("MIDDLEOILNAME") AndAlso
                     OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
                     OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
                     OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
@@ -1659,6 +1680,12 @@ Public Class OIM0005TankCreate
                     OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                     OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                     OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
+                    OIM0005row("INTERINSPECTYM") = OIM0005INProw("INTERINSPECTYM") AndAlso
+                    OIM0005row("INTERINSPECTSTATION") = OIM0005INProw("INTERINSPECTSTATION") AndAlso
+                    OIM0005row("INTERINSPECTORGCODE") = OIM0005INProw("INTERINSPECTORGCODE") AndAlso
+                    OIM0005row("SELFINSPECTYM") = OIM0005INProw("SELFINSPECTYM") AndAlso
+                    OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
+                    OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
                     OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
                     ' 変更がないときは、入力変更フラグをOFFにする
                     inputChangeFlg = False
@@ -1777,6 +1804,8 @@ Public Class OIM0005TankCreate
         WF_EXTRADINARYLIMIT.Text = ""               '臨時専用期限
         WF_BIGOILCODE.Text = ""                     '油種大分類コード
         WF_BIGOILCODE_TEXT.Text = ""                '油種大分類名
+        WF_MIDDLEOILCODE.Text = ""                  '油種中分類コード
+        WF_MIDDLEOILCODE_TEXT.Text = ""             '油種中分類名
         WF_OPERATIONBASECODE.Text = ""              '運用基地C
         WF_OPERATIONBASECODE_TEXT.Text = ""         '運用場所
         WF_COLORCODE.Text = ""                      '塗色C
@@ -1826,6 +1855,12 @@ Public Class OIM0005TankCreate
         WF_SAPSHELLTANKNUMBER.Text = ""             '出光昭シSAP車番
         WF_RESERVE3.Text = ""                       '予備
         WF_USEDFLG.Text = ""                        '利用フラグ
+        WF_INTERINSPECTYM.Text = ""                 '中間点検年月
+        WF_INTERINSPECTSTATION.Text = ""            '中間点検場所
+        WF_INTERINSPECTORGCODE.Text = ""            '中間点検実施者
+        WF_SELFINSPECTYM.Text = ""                  '自主点検年月
+        WF_SELFINSPECTSTATION.Text = ""             '自主点検場所
+        WF_SELFINSPECTORGCODE.Text = ""             '自主点検実施者
         WF_DELFLG.Text = ""                         '削除フラグ
 
     End Sub
@@ -1887,6 +1922,10 @@ Public Class OIM0005TankCreate
                                 .WF_Calendar.Text = WF_EXCLUDEDATE.Text
                             Case "WF_RETIRMENTDATE"                                 '資産除却年月日
                                 .WF_Calendar.Text = WF_RETIRMENTDATE.Text
+                            Case "WF_INTERINSPECTYM"                                '中間点検年月
+                                .WF_Calendar.Text = WF_INTERINSPECTYM.Text + "/01"
+                            Case "WF_SELFINSPECTYM"                                 '自主点検年月
+                                .WF_Calendar.Text = WF_SELFINSPECTYM.Text + "/01"
                         End Select
                         .ActiveCalendar()
 
@@ -1921,6 +1960,9 @@ Public Class OIM0005TankCreate
                             Case "WF_LENGTHFLG"
                                 prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "LENGTHFLG")
 
+                            '中間/自主点検実施者
+                            Case "WF_INTERINSPECTORGCODE", "WF_SELFINSPECTORGCODE"
+                                prmData = work.CreateORGParam(Master.USERCAMP)
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -2108,6 +2150,9 @@ Public Class OIM0005TankCreate
             '油種大分類コード
             Case "WF_BIGOILCODE"
                 CODENAME_get("BIGOILCODE", WF_BIGOILCODE.Text, WF_BIGOILCODE_TEXT.Text, WW_RTN_SW)
+            '油種中分類コード
+            Case "WF_MIDDLEOILCODE"
+                CODENAME_get("MIDDLEOILCODE", WF_MIDDLEOILCODE.Text, WF_MIDDLEOILCODE_TEXT.Text, WW_RTN_SW)
             '運用基地C
             Case "WF_OPERATIONBASECODE"
                 CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
@@ -2135,6 +2180,18 @@ Public Class OIM0005TankCreate
             '利用フラグ
             Case "WF_USEDFLG"
                 CODENAME_get("USEDFLG", WF_USEDFLG.Text, WF_USEDFLG_TEXT.Text, WW_RTN_SW)
+            '中間点検場所
+            Case "WF_INTERINSPECTSTATION"
+                CODENAME_get("STATIONFOCUSON", WF_INTERINSPECTSTATION.Text, WF_INTERINSPECTSTATION_TEXT.Text, WW_RTN_SW)
+            '中間点検場所
+            Case "WF_INTERINSPECTORGCODE"
+                CODENAME_get("ORG", WF_INTERINSPECTORGCODE.Text, WF_INTERINSPECTORGCODE_TEXT.Text, WW_RTN_SW)
+            '自主点検場所
+            Case "WF_SELFINSPECTSTATION"
+                CODENAME_get("STATIONFOCUSON", WF_SELFINSPECTSTATION.Text, WF_SELFINSPECTSTATION_TEXT.Text, WW_RTN_SW)
+            '自主点検場所
+            Case "WF_SELFINSPECTORGCODE"
+                CODENAME_get("ORG", WF_SELFINSPECTORGCODE.Text, WF_SELFINSPECTORGCODE_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -2304,6 +2361,11 @@ Public Class OIM0005TankCreate
                     WF_BIGOILCODE.Text = WW_SelectValue
                     WF_BIGOILCODE_TEXT.Text = WW_SelectText
                     WF_BIGOILCODE.Focus()
+
+                Case "WF_MIDDLEOILCODE"    '油種中分類コード
+                    WF_MIDDLEOILCODE.Text = WW_SelectValue
+                    WF_MIDDLEOILCODE_TEXT.Text = WW_SelectText
+                    WF_MIDDLEOILCODE.Focus()
 
                 Case "WF_OPERATIONBASECODE"    '運用基地C
                     WF_OPERATIONBASECODE.Text = WW_SelectValue
@@ -2493,6 +2555,52 @@ Public Class OIM0005TankCreate
                     WF_USEDFLG_TEXT.Text = WW_SelectText
                     WF_USEDFLG.Focus()
 
+                Case "WF_INTERINSPECTYM"    '中間点検年月
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_INTERINSPECTYM.Text = ""
+                        Else
+                            WF_INTERINSPECTYM.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_INTERINSPECTYM.Focus()
+
+                Case "WF_INTERINSPECTSTATION"    '中間点検場所
+                    WF_INTERINSPECTSTATION.Text = WW_SelectValue
+                    WF_INTERINSPECTSTATION_TEXT.Text = WW_SelectText
+                    WF_INTERINSPECTSTATION.Focus()
+
+                Case "WF_INTERINSPECTORGCODE"    '中間点検実施者
+                    WF_INTERINSPECTORGCODE.Text = WW_SelectValue
+                    WF_INTERINSPECTORGCODE_TEXT.Text = WW_SelectText
+                    WF_INTERINSPECTORGCODE.Focus()
+
+                Case "WF_SELFINSPECTYM"    '自主点検年月
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_SELFINSPECTYM.Text = ""
+                        Else
+                            WF_SELFINSPECTYM.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_SELFINSPECTYM.Focus()
+
+                Case "WF_SELFINSPECTSTATION"    '自主点検場所
+                    WF_SELFINSPECTSTATION.Text = WW_SelectValue
+                    WF_SELFINSPECTSTATION_TEXT.Text = WW_SelectText
+                    WF_SELFINSPECTSTATION.Focus()
+
+                Case "WF_SELFINSPECTORGCODE"    '自主点検実施者
+                    WF_SELFINSPECTORGCODE.Text = WW_SelectValue
+                    WF_SELFINSPECTORGCODE_TEXT.Text = WW_SelectText
+                    WF_SELFINSPECTORGCODE.Focus()
+
             End Select
         Else
         End If
@@ -2630,6 +2738,24 @@ Public Class OIM0005TankCreate
 
                 Case "WF_USEDFLG"                       '利用フラグ
                     WF_USEDFLG.Focus()
+
+                Case "WF_INTERINSPECTYM"                '中間点検年月
+                    WF_INTERINSPECTYM.Focus()
+
+                Case "WF_INTERINSPECTSTATION"           '中間点検場所
+                    WF_INTERINSPECTSTATION.Focus()
+
+                Case "WF_INTERINSPECTORGCODE"           '中間点検実施者
+                    WF_INTERINSPECTORGCODE.Focus()
+
+                Case "WF_SELFINSPECTYM"                 '自主点検年月
+                    WF_SELFINSPECTYM.Focus()
+
+                Case "WF_SELFINSPECTSTATION"            '自主点検場所
+                    WF_SELFINSPECTSTATION.Focus()
+
+                Case "WF_SELFINSPECTORGCODE"            '自主点検実施者
+                    WF_SELFINSPECTORGCODE.Focus()
 
             End Select
         Else
@@ -3570,6 +3696,51 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            ' 油種中分類コード（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("MIDDLEOILCODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MIDDLEOILCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("MIDDLEOILCODE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(油種中分類コード入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(油種中分類コード入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 油種中分類名（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("MIDDLEOILNAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MIDDLEOILNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(油種中分類名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 運用場所（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("OPERATIONBASENAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(運用場所入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             ' 運用場所（バリデーションチェック）
             WW_TEXT = OIM0005INProw("OPERATIONBASENAME")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -4182,6 +4353,154 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            ' 中間点検年月（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("INTERINSPECTYM")
+            If Not String.IsNullOrEmpty(WW_TEXT) Then
+                WW_TEXT = WW_TEXT + "/01"
+            End If
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INTERINSPECTYM", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "中間点検年月", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(中間点検年月入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("INTERINSPECTYM") = CDate(WW_TEXT).ToString("yyyy/MM")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(中間点検年月入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 中間点検場所（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("INTERINSPECTSTATION")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INTERINSPECTSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("STATIONFOCUSON", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(中間点検場所入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(中間点検場所入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 中間点検実施者（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("INTERINSPECTORGCODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INTERINSPECTORGCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("ORG", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(中間点検実施者入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(中間点検実施者入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 自主点検年月（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SELFINSPECTYM")
+            If Not String.IsNullOrEmpty(WW_TEXT) Then
+                WW_TEXT = WW_TEXT + "/01"
+            End If
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SELFINSPECTYM", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "自主点検年月", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(自主点検年月入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("SELFINSPECTYM") = CDate(WW_TEXT).ToString("yyyy/MM")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(自主点検年月入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 自主点検場所（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SELFINSPECTSTATION")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SELFINSPECTSTATION", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("STATIONFOCUSON", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(自主点検場所入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(自主点検場所入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 自主点検実施者（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SELFINSPECTORGCODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SELFINSPECTORGCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("ORG", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(自主点検実施者入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(自主点検実施者入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
             If OIM0005INProw("TANKNUMBER") = work.WF_SEL_TANKNUMBER2.Text Then
@@ -4316,6 +4635,8 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIM0005row("EXTRADINARYLIMIT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類コード =" & OIM0005row("BIGOILCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種大分類名 =" & OIM0005row("BIGOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類コード =" & OIM0005row("MIDDLEOILCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類名 =" & OIM0005row("MIDDLEOILNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIM0005row("OPERATIONBASENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
@@ -4365,6 +4686,12 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シSAP車番 =" & OIM0005row("SAPSHELLTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIM0005row("RESERVE3") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 利用フラグ =" & OIM0005row("USEDFLG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検年月 =" & OIM0005row("INTERINSPECTYM") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検場所 =" & OIM0005row("INTERINSPECTSTATION") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検実施者 =" & OIM0005row("INTERINSPECTORGCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検年月 =" & OIM0005row("SELFINSPECTYM") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検場所 =" & OIM0005row("SELFINSPECTSTATION") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検実施者 =" & OIM0005row("SELFINSPECTORGCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG")
         End If
 
@@ -4449,6 +4776,8 @@ Public Class OIM0005TankCreate
                         OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
                         OIM0005row("BIGOILCODE") = OIM0005INProw("BIGOILCODE") AndAlso
                         OIM0005row("BIGOILNAME") = OIM0005INProw("BIGOILNAME") AndAlso
+                        OIM0005row("MIDDLEOILCODE") = OIM0005INProw("MIDDLEOILCODE") AndAlso
+                        OIM0005row("MIDDLEOILNAME") = OIM0005INProw("MIDDLEOILNAME") AndAlso
                         OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
                         OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
                         OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
@@ -4498,6 +4827,12 @@ Public Class OIM0005TankCreate
                         OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
                         OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
+                        OIM0005row("INTERINSPECTYM") = OIM0005INProw("INTERINSPECTYM") AndAlso
+                        OIM0005row("INTERINSPECTSTATION") = OIM0005INProw("INTERINSPECTSTATION") AndAlso
+                        OIM0005row("INTERINSPECTORGCODE") = OIM0005INProw("INTERINSPECTORGCODE") AndAlso
+                        OIM0005row("SELFINSPECTYM") = OIM0005INProw("SELFINSPECTYM") AndAlso
+                        OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
+                        OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
                         OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
                         Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0005row("OPERATION")) Then
                         ' 変更がないときは「操作」の項目は空白にする
@@ -4629,6 +4964,13 @@ Public Class OIM0005TankCreate
                                     OIM0005row("BIGOILNAME"),
                                     WW_DUMMY)
                     End If
+                    '油種中分類名
+                    If Not String.IsNullOrEmpty(OIM0005row("MIDDLEOILCODE")) Then
+                        CODENAME_get("MIDDLEOILCODE",
+                                    OIM0005row("MIDDLEOILCODE"),
+                                    OIM0005row("MIDDLEOILNAME"),
+                                    WW_DUMMY)
+                    End If
                     '運用場所
                     If Not String.IsNullOrEmpty(OIM0005row("OPERATIONBASECODE")) Then
                         CODENAME_get("BASE",
@@ -4676,6 +5018,34 @@ Public Class OIM0005TankCreate
                         CODENAME_get("USEDFLG",
                                     OIM0005row("USEDFLG"),
                                     OIM0005row("USEDFLGNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '中間点検場所
+                    If Not String.IsNullOrEmpty(OIM0005row("INTERINSPECTSTATION")) Then
+                        CODENAME_get("STATIONFOCUSON",
+                                    OIM0005row("INTERINSPECTSTATION"),
+                                    OIM0005row("INTERINSPECTSTATIONNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '中間点検実施者
+                    If Not String.IsNullOrEmpty(OIM0005row("INTERINSPECTORGCODE")) Then
+                        CODENAME_get("ORG",
+                                    OIM0005row("INTERINSPECTORGCODE"),
+                                    OIM0005row("INTERINSPECTORGNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '自主点検場所
+                    If Not String.IsNullOrEmpty(OIM0005row("SELFINSPECTSTATION")) Then
+                        CODENAME_get("STATIONFOCUSON",
+                                    OIM0005row("SELFINSPECTSTATION"),
+                                    OIM0005row("SELFINSPECTSTATIONNAME"),
+                                    WW_DUMMY)
+                    End If
+                    '自主点検実施者
+                    If Not String.IsNullOrEmpty(OIM0005row("SELFINSPECTORGCODE")) Then
+                        CODENAME_get("ORG",
+                                    OIM0005row("SELFINSPECTORGCODE"),
+                                    OIM0005row("SELFINSPECTORGNAME"),
                                     WW_DUMMY)
                     End If
 
@@ -4775,6 +5145,13 @@ Public Class OIM0005TankCreate
                                 nrow("BIGOILNAME"),
                                 WW_DUMMY)
                 End If
+                '油種中分類名
+                If Not String.IsNullOrEmpty(nrow("MIDDLEOILCODE")) Then
+                    CODENAME_get("MIDDLEOILCODE",
+                                nrow("MIDDLEOILCODE"),
+                                nrow("MIDDLEOILNAME"),
+                                WW_DUMMY)
+                End If
                 '運用場所
                 If Not String.IsNullOrEmpty(nrow("OPERATIONBASECODE")) Then
                     CODENAME_get("BASE",
@@ -4822,6 +5199,34 @@ Public Class OIM0005TankCreate
                     CODENAME_get("USEDFLG",
                                 nrow("USEDFLG"),
                                 nrow("USEDFLGNAME"),
+                                WW_DUMMY)
+                End If
+                '中間点検場所
+                If Not String.IsNullOrEmpty(nrow("INTERINSPECTSTATION")) Then
+                    CODENAME_get("STATIONFOCUSON",
+                                nrow("INTERINSPECTSTATION"),
+                                nrow("INTERINSPECTSTATIONNAME"),
+                                WW_DUMMY)
+                End If
+                '中間点検実施者
+                If Not String.IsNullOrEmpty(nrow("INTERINSPECTORGCODE")) Then
+                    CODENAME_get("ORG",
+                                nrow("INTERINSPECTORGCODE"),
+                                nrow("INTERINSPECTORGNAME"),
+                                WW_DUMMY)
+                End If
+                '自主点検場所
+                If Not String.IsNullOrEmpty(nrow("SELFINSPECTSTATION")) Then
+                    CODENAME_get("STATIONFOCUSON",
+                                nrow("SELFINSPECTSTATION"),
+                                nrow("SELFINSPECTSTATIONNAME"),
+                                WW_DUMMY)
+                End If
+                '自主点検実施者
+                If Not String.IsNullOrEmpty(nrow("SELFINSPECTORGCODE")) Then
+                    CODENAME_get("ORG",
+                                nrow("SELFINSPECTORGCODE"),
+                                nrow("SELFINSPECTORGNAME"),
                                 WW_DUMMY)
                 End If
 
@@ -4938,7 +5343,7 @@ Public Class OIM0005TankCreate
                     prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"                          '運用部署
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+                    prmData = work.CreateORGParam(Master.USERCAMP)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "UNIT"                         '荷重単位, 容積単位
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_UNIT, I_VALUE, O_TEXT, O_RTN, prmData)
@@ -4960,6 +5365,8 @@ Public Class OIM0005TankCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "BIGOILCODE"                   '油種大分類コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BIGOILCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "MIDDLEOILCODE"                '油種中分類コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_MIDDLEOILCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "BASE"                         '運用基地
                     prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
@@ -4983,6 +5390,8 @@ Public Class OIM0005TankCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"                       '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATIONFOCUSON"　             '中間点検場所、自主点検場所(使用駅のみ)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

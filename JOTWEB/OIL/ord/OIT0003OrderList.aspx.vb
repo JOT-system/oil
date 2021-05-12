@@ -2066,7 +2066,7 @@ Public Class OIT0003OrderList
                 Dim RECEIVEYMD As SqlParameter = SQLNLineLoadcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime) '集信日時
 
                 Dim rg As New Regex("/")
-                For Each OIT0003EXLUProw As DataRow In OIT0003EXLUPtbl.Rows
+                For Each OIT0003EXLUProw As DataRow In OIT0003EXLUPtbl.Select("LINE_HEADER<>''")
                     'ファイル名(EXCEL)
                     FILENAME.Value = OIT0003EXLUProw("FILENAME")
                     '登録年月日(EXCEL)

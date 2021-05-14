@@ -8,6 +8,7 @@
 <%@ Register Src="~/OIL/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC"  %>
 
 <asp:Content ID="OIT0005SH" ContentPlaceHolderID="head" runat="server">
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0005S.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0005S.js")%>'></script>
 </asp:Content>
 <asp:Content ID="OIT0005S" ContentPlaceHolderID="contents1" runat="server">
@@ -61,9 +62,10 @@
             <div class="inputItem">
                 <div>
                     交検一覧
-                    <a class="ef" id="WF_STYMD_CODE" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');" style="display:inline-block;width:10em;">
+<%--                    <a class="ef" id="WF_STYMD_CODE" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');" style="display:inline-block;width:10em;">
                         <asp:TextBox ID="WF_STYMD" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
-                    </a>
+                    </a>--%>
+                    <asp:DropDownList ID="ddlKoukenListYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>
                     ～
                     <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonKoukenList');" style="margin-left:1em;" />
                 </div>

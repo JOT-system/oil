@@ -802,21 +802,31 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
             '取扱営業所名
             Select Case OfficeCode
                 Case CONST_OFFICECODE_010402
+                    '### 20210514 START 事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
-                    rngHeaderArea.Value = "日本石油輸送㈱"
+                    rngHeaderArea.Value = "日本石油輸送㈱" + "仙台新港営業所"
                     ExcelMemoryRelease(rngHeaderArea)
-                    rngHeaderArea = ExcelWorkSheet.Range("D6")
-                    rngHeaderArea.Value = "仙台新港営業所"
-                    ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("C6")
+                    'rngHeaderArea.Value = "日本石油輸送㈱"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("D6")
+                    'rngHeaderArea.Value = "仙台新港営業所"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    '### 20210514 END   事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
                 Case CONST_OFFICECODE_011203
+                    '### 20210514 START 事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
-                    rngHeaderArea.Value = "日本石油輸送㈱"
+                    rngHeaderArea.Value = "日本石油輸送㈱" + "袖ケ浦営業所"
                     ExcelMemoryRelease(rngHeaderArea)
-                    rngHeaderArea = ExcelWorkSheet.Range("D6")
-                    rngHeaderArea.Value = "袖ケ浦営業"
-                    ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("C6")
+                    'rngHeaderArea.Value = "日本石油輸送㈱"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("D6")
+                    'rngHeaderArea.Value = "袖ケ浦営業"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    '### 20210514 END   事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
             End Select

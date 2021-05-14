@@ -50,6 +50,9 @@
             & " , OIM0005.LEASENAME                              AS LEASENAME" _
             & " , OIT0003.SHIPORDER                              AS SHIPORDER" _
             & " , OIT0003.LINEORDER                              AS LINEORDER" _
+            & " , ''                                             AS OTRANK" _
+            & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
+            & " , OIT0003.LOADINGOUTLETTRAINNO                   AS LOADINGOUTLETTRAINNO" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0005.JRALLINSPECTIONDATE                    AS JRALLINSPECTIONDATE" _
             & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAIN" _

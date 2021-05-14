@@ -53,6 +53,8 @@ Public Class OIT0005TankLocList
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"                  '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"              '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -254,6 +256,37 @@ Public Class OIT0005TankLocList
                 '★全検日の入力を促すようにするため空白にする。
                 OIT0005row("JRALLINSPECTIONDATE") = ""
             Next
+
+            '### 20210513 START 指摘票対応(No479)全体 #################################################
+            '○名称取得(中間点検場所、自主点検場所)
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("INTERINSPECTSTATION <> '' OR SELFINSPECTSTATION <> ''")
+                '中間点検場所
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN", Convert.ToString(OIT0005row("INTERINSPECTSTATION")), WW_GetValue)
+                OIT0005row("INTERINSPECTSTATION") = WW_GetValue(0)
+                '自主点検場所
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN", Convert.ToString(OIT0005row("SELFINSPECTSTATION")), WW_GetValue)
+                OIT0005row("SELFINSPECTSTATION") = WW_GetValue(0)
+
+            Next
+
+            '○名称取得(中間点検実施者、自主点検実施者)
+            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("INTERINSPECTORGCODE <> '' OR SELFINSPECTORGCODE <> ''")
+                '中間点検場所
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE", Convert.ToString(OIT0005row("INTERINSPECTORGCODE")), WW_GetValue)
+                OIT0005row("INTERINSPECTORGCODE") = WW_GetValue(0)
+                '自主点検場所
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE", Convert.ToString(OIT0005row("SELFINSPECTORGCODE")), WW_GetValue)
+                OIT0005row("SELFINSPECTORGCODE") = WW_GetValue(0)
+
+            Next
+            '### 20210513 END   指摘票対応(No479)全体 #################################################
+
         End If
 
         '○ 画面表示データ保存
@@ -577,6 +610,50 @@ Public Class OIT0005TankLocList
                     End If
                 Catch ex As Exception
                 End Try
+
+            '### 20210513 START 指摘票対応(No479)全体 #################################################
+            Case "MYWEIGHT"                 '(一覧)自重
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+                Try
+                    '○数値チェック(文字の場合はDecimal変換できないためExceptionにてSKIP)
+                    Dim dcWeight As Decimal = 0
+                    dcWeight = Decimal.Parse(WW_ListValue)
+
+                    '○数値チェック(整数のみ、整数と少数などの組み合わせ)
+                    Dim iDecLen As Integer = WW_ListValue.IndexOf(".")
+                    Dim sInt As String = ""
+                    Dim sDec As String = ""
+                    If iDecLen < 0 Then
+                        sInt = WW_ListValue
+                        sDec = "0"
+                        WW_ListValue = WW_ListValue + "." + sDec
+                    Else
+                        sInt = WW_ListValue.Substring(0, iDecLen)
+                        sDec = WW_ListValue.Substring(iDecLen + 1)
+                    End If
+
+                    '○数値チェック(整数の桁数(整数2桁, 小数第1位))対象ではない場合はSKIP
+                    If sInt.Length > 2 Then
+                        Dim Msg As String = "自重の整数は2桁までとしてください。"
+                        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                        Exit Select
+                    ElseIf sDec.Length > 1 Then
+                        Dim Msg As String = "自重の少数は少数第1までとしてください。"
+                        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                        Exit Select
+                    End If
+
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの自重を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="MYWEIGHT",
+                                                I_VALUE:=WW_ListValue)
+                Catch ex As Exception
+                End Try
+                '### 20210513 END   指摘票対応(No479)全体 #################################################
+
         End Select
 
         '○ 画面表示データ保存
@@ -759,7 +836,9 @@ Public Class OIT0005TankLocList
                     '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                     Select Case WF_FIELD.Value
                         '(一覧)受入日, (一覧)空車着日, (一覧)次回交検日
-                        Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE", "JRINSPECTIONDATE"
+                        '(一覧)中間点検年月, (一覧)自主点検年月
+                        Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE", "JRINSPECTIONDATE",
+                             "INTERINSPECTDATE", "SELFINSPECTDATE"
 
                             '○ LINECNT取得
                             Dim WW_LINECNT As Integer = 0
@@ -774,6 +853,42 @@ Public Class OIT0005TankLocList
                     End Select
                     .ActiveCalendar()
 
+                Else
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+
+                    '### 20210513 START 指摘票対応(No479)全体 #################################################
+                    '(一覧)中間点検場所, (一覧)中間点検者, (一覧)自主点検場所, (一覧)自主点検者
+                    If WF_FIELD.Value = "INTERINSPECTSTATION" _
+                        OrElse WF_FIELD.Value = "INTERINSPECTORGCODE" _
+                        OrElse WF_FIELD.Value = "SELFINSPECTSTATION" _
+                        OrElse WF_FIELD.Value = "SELFINSPECTORGCODE" Then
+
+                        '○ LINECNT取得
+                        Dim WW_LINECNT As Integer = 0
+                        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0005tbl.AsEnumerable.
+                        FirstOrDefault(Function(x) CInt(x.Item("LINECNT")) = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
+
+                        '★(一覧)中間点検場所, (一覧)自主点検場所の場合
+                        If WF_FIELD.Value = "INTERINSPECTSTATION" _
+                            OrElse WF_FIELD.Value = "SELFINSPECTSTATION" Then
+
+                        End If
+                        '★(一覧)中間点検者, (一覧)自主点検者
+                        If WF_FIELD.Value = "INTERINSPECTORGCODE" _
+                            OrElse WF_FIELD.Value = "SELFINSPECTORGCODE" Then
+
+                        End If
+
+                    End If
+                    '### 20210513 END   指摘票対応(No479)全体 #################################################
+                    .SetListBox(CType(WF_LeftMViewChange.Value, LIST_BOX_CLASSIFICATION), WW_DUMMY, prmData)
+                    .ActiveListBox()
                 End If
             End With
 
@@ -813,8 +928,13 @@ Public Class OIT0005TankLocList
         Select Case WF_FIELD.Value
             '(一覧)受入日, (一覧)空車着日
             '(一覧)次回交検日, (一覧)次回全検日
+            '(一覧)中間点検年月, (一覧)中間点検場所, (一覧)中間点検者
+            '(一覧)自主点検年月, (一覧)自主点検場所, (一覧)自主点検者
             Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE",
-                 "JRINSPECTIONDATE", "JRALLINSPECTIONDATE"
+                 "JRINSPECTIONDATE", "JRALLINSPECTIONDATE",
+                 "INTERINSPECTDATE", "INTERINSPECTSTATION", "INTERINSPECTORGCODE",
+                 "SELFINSPECTDATE", "SELFINSPECTSTATION", "SELFINSPECTORGCODE"
+
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -915,6 +1035,87 @@ Public Class OIT0005TankLocList
                     Catch ex As Exception
 
                     End Try
+
+                    '### 20210513 START 指摘票対応(No479)全体 #################################################
+                    '(一覧)中間点検年月
+                ElseIf WF_FIELD.Value = "INTERINSPECTDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                            updHeader.Item(WF_FIELD.Value) = ""
+                        Else
+                            '(一覧)中間点検年月に指定した日付を設定
+                            updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM")
+                            Master.SaveTable(OIT0005tbl)
+                            'タンク車マスタの中間点検年月を更新
+                            WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="INTERINSPECTYM",
+                                                I_VALUE:=leftview.WF_Calendar.Text)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    '(一覧)中間点検場所
+                ElseIf WF_FIELD.Value = "INTERINSPECTSTATION" Then
+                    '(一覧)中間点検場所に指定した値を設定
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの中間点検場所を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="INTERINSPECTSTATION",
+                                                I_VALUE:=WW_SETVALUE)
+
+                    '(一覧)中間点検実施者
+                ElseIf WF_FIELD.Value = "INTERINSPECTORGCODE" Then
+                    '(一覧)中間点検実施者に指定した値を設定
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの中間点検実施者を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="INTERINSPECTORGCODE",
+                                                I_VALUE:=WW_SETVALUE)
+
+                    '(一覧)自主点検年月
+                ElseIf WF_FIELD.Value = "SELFINSPECTDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < Date.Parse(C_DEFAULT_YMD) Then
+                            updHeader.Item(WF_FIELD.Value) = ""
+                        Else
+                            '(一覧)自主点検年月に指定した日付を設定
+                            updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM")
+                            Master.SaveTable(OIT0005tbl)
+                            'タンク車マスタの自主点検年月を更新
+                            WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="SELFINSPECTYM",
+                                                I_VALUE:=leftview.WF_Calendar.Text)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    '(一覧)自主点検場所
+                ElseIf WF_FIELD.Value = "SELFINSPECTSTATION" Then
+                    '(一覧)自主点検場所に指定した値を設定
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの自主点検場所を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="SELFINSPECTSTATION",
+                                                I_VALUE:=WW_SETVALUE)
+
+                    '(一覧)自主点検実施者
+                ElseIf WF_FIELD.Value = "SELFINSPECTORGCODE" Then
+                    '(一覧)自主点検実施者に指定した値を設定
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの自主点検実施者を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="SELFINSPECTORGCODE",
+                                                I_VALUE:=WW_SETVALUE)
+                    '### 20210513 END   指摘票対応(No479)全体 #################################################
+
                 End If
 
                 '○ 画面表示データ保存
@@ -2143,10 +2344,23 @@ Public Class OIT0005TankLocList
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                         '### 20210512 START 指摘票対応(No479)全体 #################################################
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "MYWEIGHT") Then
+                        '★自重
+                        '○タンク車状況(全検)の場合のみ入力可能とする。
+                        If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
+                            OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _
+                            AndAlso Convert.ToString(loopdr("ORDER_ACTUALEMPARRDATE")) <> "" Then
+                            'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        Else
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTYM") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTSTATION") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INTERINSPECTORGCODE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTYM") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTSTATION") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SELFINSPECTORGCODE") Then
                         '★中間点検年月の設定, 中間点検場所の設定, 中間点検実施者

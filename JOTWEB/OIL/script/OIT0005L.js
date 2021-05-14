@@ -194,11 +194,21 @@ function ListField_Dbclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_GridDBclick').value = Line;
         document.getElementById('WF_FIELD').value = fieldNM;
 
-        if (fieldNM === "ORDER_ACTUALACCDATE"
+        if (fieldNM === "INTERINSPECTSTATION"
+            || fieldNM === "SELFINSPECTSTATION") {
+            document.getElementById('WF_LeftMViewChange').value = 51;
+        }
+        else if (fieldNM === "INTERINSPECTORGCODE"
+            || fieldNM === "SELFINSPECTORGCODE") {
+            document.getElementById('WF_LeftMViewChange').value = 22;
+        }
+        else if (fieldNM === "ORDER_ACTUALACCDATE"
             || fieldNM === "ORDER_ACTUALEMPARRDATE"
             || fieldNM === "KAISOU_ACTUALEMPARRDATE"
             || fieldNM === "JRINSPECTIONDATE"
-            || fieldNM === "JRALLINSPECTIONDATE") {
+            || fieldNM === "JRALLINSPECTIONDATE"
+            || fieldNM === "INTERINSPECTYM"
+            || fieldNM === "SELFINSPECTYM") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

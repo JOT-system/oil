@@ -102,6 +102,7 @@ Public Class OIT0003OrderDetail
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
     Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:割当確定, 2:入力内容登録, 3:明細更新, 4:訂正更新, 5:割当更新)
+    Private WW_ONCEBEFOREFLG As Boolean = False                     '前々回油種の更新フラグ(TRUE：更新済み FALSE:未更新)
 
     Private WW_ORDERCNT As Integer = 0                              '受注TBLの件数を設定(0件の場合は貨車連結順序表のみと判断するため)
 
@@ -144,6 +145,7 @@ Public Class OIT0003OrderDetail
                     End If
                     '◯ フラグ初期化
                     Me.WW_UPBUTTONFLG = "0"
+                    Me.WW_ONCEBEFOREFLG = False
                     Me.WW_USEORDERFLG = False
                     Me.WW_InitializeTAB3 = False
                     Me.WF_CheckBoxFLG.Value = "FALSE"
@@ -5803,6 +5805,8 @@ Public Class OIT0003OrderDetail
             '託送指示フラグ("0"(未手配))
             work.WF_SEL_DELIVERYFLG.Text = "0"
             '### 20200812 END  (指摘票(全体)No121) ######################################
+            '◯割当解除ボタン押下時処理(タブ「タンク車割当」)
+            WW_ButtonCANCEL_TAB1()
             '### 20201225 START 指摘票対応(No291) #######################################
             work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
             '### 20201225 END   指摘票対応(No291) #######################################
@@ -6895,6 +6899,11 @@ Public Class OIT0003OrderDetail
         '引数４：タンク車状況　⇒　変更あり("1"(残車))
         '引数５：更新フラグ　　⇒　初期化　("2")
         WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
+
+        'タンク車№に紐づく情報を取得・設定
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            WW_TANKNUMBER_FIND(OIT0003row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+        Next
 
     End Sub
 #End Region
@@ -13049,6 +13058,16 @@ Public Class OIT0003OrderDetail
                         & "        LASTOILNAME        = @P04, " _
                         & "        PREORDERINGTYPE    = @P05, " _
                         & "        PREORDERINGOILNAME = @P06, "
+
+                    ''★割当確定ボタン押下時に更新
+                    'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                    '    AndAlso Me.WW_UPBUTTONFLG = "1" AndAlso Me.WW_ONCEBEFOREFLG = False Then
+                    '    SQLStr &=
+                    '      "        OILCODE            = @P07, " _
+                    '    & "        OILNAME            = @P08, " _
+                    '    & "        ORDERINGTYPE       = @P09, " _
+                    '    & "        ORDERINGOILNAME    = @P10, "
+                    'End If
                 End If
 
                 SQLStr &=
@@ -13157,6 +13176,18 @@ Public Class OIT0003OrderDetail
                 '使用受注№
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
 
+                ''前回油種をその前の油種に戻す
+                'SQLStr &=
+                '      "        LASTOILCODE        = OILCODE, " _
+                '    & "        LASTOILNAME        = OILNAME, " _
+                '    & "        PREORDERINGTYPE    = ORDERINGTYPE, " _
+                '    & "        PREORDERINGOILNAME = ORDERINGOILNAME, "
+                'SQLStr &=
+                '      "        OILCODE            = '', " _
+                '    & "        OILNAME            = '', " _
+                '    & "        ORDERINGTYPE       = '', " _
+                '    & "        ORDERINGOILNAME    = '', "
+
                 SQLStr &=
                       "        UPDYMD         = @P11, " _
                     & "        UPDUSER        = @P12, " _
@@ -13203,6 +13234,11 @@ Public Class OIT0003OrderDetail
                     Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
                     Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
 
+                    'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前々回油種コード
+                    'Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.NVarChar)  '前々回油種名
+                    'Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '前々回油種区分(受発注用)
+                    'Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '前々回油種名(受発注用)
+
                     '(一覧)で設定しているタンク車をKEYに前回油種を更新
                     For Each OIT0003row As DataRow In OIT0003tbl.Rows
                         PARA01.Value = OIT0003row("TANKNO")
@@ -13210,6 +13246,10 @@ Public Class OIT0003OrderDetail
                         PARA04.Value = OIT0003row("OILNAME")
                         PARA05.Value = OIT0003row("ORDERINGTYPE")
                         PARA06.Value = OIT0003row("ORDERINGOILNAME")
+                        'PARA07.Value = OIT0003row("LASTOILCODE")
+                        'PARA08.Value = OIT0003row("LASTOILNAME")
+                        'PARA09.Value = OIT0003row("PREORDERINGTYPE")
+                        'PARA10.Value = OIT0003row("PREORDERINGOILNAME")
                         SQLcmd.ExecuteNonQuery()
                     Next
 
@@ -16152,7 +16192,10 @@ Public Class OIT0003OrderDetail
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
+                ''引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)　※20210514追加(石油担当者要望)
+                'WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True, upLastOilCode:=True)
                 WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
+                'Me.WW_ONCEBEFOREFLG = True
 
                 '### 20210219 START 仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
                 If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
@@ -19280,6 +19323,7 @@ Public Class OIT0003OrderDetail
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0003.ORDERNO         = OIT0002.ORDERNO " _
+            & "   AND OIT0003.DELFLG         <> @P05 " _
             & "   AND OIT0003.TANKNO          IN (''"
 
         '一覧に設定しているタンク車を条件に設定

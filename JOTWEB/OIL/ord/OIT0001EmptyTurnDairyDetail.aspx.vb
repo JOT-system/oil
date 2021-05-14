@@ -4370,7 +4370,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.EMPARRDATE), '')      AS EMPARRDATE" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "       OIT0003.ORDERNO         = OIT0002.ORDERNO "
+            & "       OIT0003.ORDERNO         = OIT0002.ORDERNO " _
+            & "   AND OIT0003.DELFLG         <> @P05 "
 
         If OIT0001tbl.Select("TANKNO <> ''").Count <> 0 Then
             SQLStr &= "   AND OIT0003.TANKNO          IN ("

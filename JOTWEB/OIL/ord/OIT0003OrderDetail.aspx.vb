@@ -13059,15 +13059,15 @@ Public Class OIT0003OrderDetail
                         & "        PREORDERINGTYPE    = @P05, " _
                         & "        PREORDERINGOILNAME = @P06, "
 
-                    ''★割当確定ボタン押下時に更新
-                    'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                    '    AndAlso Me.WW_UPBUTTONFLG = "1" AndAlso Me.WW_ONCEBEFOREFLG = False Then
-                    '    SQLStr &=
-                    '      "        OILCODE            = @P07, " _
-                    '    & "        OILNAME            = @P08, " _
-                    '    & "        ORDERINGTYPE       = @P09, " _
-                    '    & "        ORDERINGOILNAME    = @P10, "
-                    'End If
+                    '★割当確定ボタン押下時に更新
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                        AndAlso Me.WW_UPBUTTONFLG = "1" AndAlso Me.WW_ONCEBEFOREFLG = False Then
+                        SQLStr &=
+                          "        OILCODE            = @P07, " _
+                        & "        OILNAME            = @P08, " _
+                        & "        ORDERINGTYPE       = @P09, " _
+                        & "        ORDERINGOILNAME    = @P10, "
+                    End If
                 End If
 
                 SQLStr &=
@@ -13176,12 +13176,12 @@ Public Class OIT0003OrderDetail
                 '使用受注№
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
 
-                ''前回油種をその前の油種に戻す
-                'SQLStr &=
-                '      "        LASTOILCODE        = OILCODE, " _
-                '    & "        LASTOILNAME        = OILNAME, " _
-                '    & "        PREORDERINGTYPE    = ORDERINGTYPE, " _
-                '    & "        PREORDERINGOILNAME = ORDERINGOILNAME, "
+                '前回油種をその前の油種に戻す
+                SQLStr &=
+                      "        LASTOILCODE        = OILCODE, " _
+                    & "        LASTOILNAME        = OILNAME, " _
+                    & "        PREORDERINGTYPE    = ORDERINGTYPE, " _
+                    & "        PREORDERINGOILNAME = ORDERINGOILNAME, "
                 'SQLStr &=
                 '      "        OILCODE            = '', " _
                 '    & "        OILNAME            = '', " _
@@ -13234,10 +13234,10 @@ Public Class OIT0003OrderDetail
                     Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
                     Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
 
-                    'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前々回油種コード
-                    'Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.NVarChar)  '前々回油種名
-                    'Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '前々回油種区分(受発注用)
-                    'Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '前々回油種名(受発注用)
+                    Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前々回油種コード
+                    Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.NVarChar)  '前々回油種名
+                    Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '前々回油種区分(受発注用)
+                    Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '前々回油種名(受発注用)
 
                     '(一覧)で設定しているタンク車をKEYに前回油種を更新
                     For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -13246,10 +13246,10 @@ Public Class OIT0003OrderDetail
                         PARA04.Value = OIT0003row("OILNAME")
                         PARA05.Value = OIT0003row("ORDERINGTYPE")
                         PARA06.Value = OIT0003row("ORDERINGOILNAME")
-                        'PARA07.Value = OIT0003row("LASTOILCODE")
-                        'PARA08.Value = OIT0003row("LASTOILNAME")
-                        'PARA09.Value = OIT0003row("PREORDERINGTYPE")
-                        'PARA10.Value = OIT0003row("PREORDERINGOILNAME")
+                        PARA07.Value = OIT0003row("LASTOILCODE")
+                        PARA08.Value = OIT0003row("LASTOILNAME")
+                        PARA09.Value = OIT0003row("PREORDERINGTYPE")
+                        PARA10.Value = OIT0003row("PREORDERINGOILNAME")
                         SQLcmd.ExecuteNonQuery()
                     Next
 
@@ -16194,9 +16194,9 @@ Public Class OIT0003OrderDetail
                 '引数３：積車区分　　　⇒　変更なし(空白)
                 '引数４：(予定)空車着日⇒　更新対象(画面項目)
                 ''引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)　※20210514追加(石油担当者要望)
-                'WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True, upLastOilCode:=True)
-                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
-                'Me.WW_ONCEBEFOREFLG = True
+                WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True, upLastOilCode:=True)
+                'WW_UpdateTankShozai("", BaseDllConst.CONST_TANKSTATUS_01, "", upEmparrDate:=True)
+                Me.WW_ONCEBEFOREFLG = True
 
                 '### 20210219 START 仙台新港営業所対応(前積のタンク車の油種は積込が完了しているので前回油種を更新) #####
                 If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then

@@ -15171,6 +15171,7 @@ Public Class OIT0003OrderDetail
         Dim retFilterdDt As DataTable
         'キー情報を比較または初期状態または異なるキーの場合は再抽出
         If keyValues Is Nothing OrElse
+            I_CLASS = "NEWHISTORYNOGET" OrElse
            (Not (keyValues("I_CODE") = I_CODE _
                  AndAlso keyValues("I_CLASS") = I_CLASS _
                  AndAlso keyValues("I_PARA01") = I_PARA01)) Then

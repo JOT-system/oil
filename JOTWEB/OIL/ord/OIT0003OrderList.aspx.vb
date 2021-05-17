@@ -5914,10 +5914,22 @@ Public Class OIT0003OrderList
                 End Using
 
                 Dim i As Integer = 0
+                Dim tblcnt As Integer = 0
                 Dim strTrainNosave As String = ""
                 Dim strRTrainNamesave As String = ""
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+
+                    '### 20210514 START 同時入線取得用 ##########################################################
+                    '列車Noが前回と違う場合(または初回)
+                    If strTrainNosave = "" OrElse strTrainNosave <> OIT0003Reprow("TRAINNO") Then
+                        '★列車の合計を設定
+                        tblcnt = OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").Count
+                    End If
+                    'OT順位を降順で設定
+                    OIT0003Reprow("OTRANK") = tblcnt
+                    tblcnt -= 1
+                    '### 20210514 END   同時入線取得用 ##########################################################
 
                     If strTrainNosave <> "" _
                         AndAlso strTrainNosave <> Convert.ToString(OIT0003Reprow("TRAINNO")) Then
@@ -6420,7 +6432,12 @@ Public Class OIT0003OrderList
                     Select Case OIT0003Reprow("TRAINNO")
                         '列車№:8877, 8883, 9672は下から
                         Case CONST_SODE_TRAIN_8877, CONST_SODE_TRAIN_8883, CONST_SODE_TRAIN_9672
-                            If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
+                            If ChkSameTimeLineChk.Checked = True Then
+                                If OIT0003Reprow("OTRANK") = LineCnt Then
+                                    OIT0003Reprow("NYUUKA") = strNyuuka
+                                End If
+                            Else
+                                OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt
                                 OIT0003Reprow("NYUUKA") = strNyuuka
                                 LineCnt -= 1
                             End If

@@ -6437,9 +6437,10 @@ Public Class OIT0003OrderList
                                     OIT0003Reprow("NYUUKA") = strNyuuka
                                 End If
                             Else
-                                OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt
-                                OIT0003Reprow("NYUUKA") = strNyuuka
-                                LineCnt -= 1
+                                If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
+                                    OIT0003Reprow("NYUUKA") = strNyuuka
+                                    LineCnt -= 1
+                                End If
                             End If
                         '列車№:5461(JR:5972)は上から
                         Case CONST_SODE_TRAIN_5461

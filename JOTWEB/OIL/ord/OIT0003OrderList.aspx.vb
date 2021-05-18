@@ -6435,6 +6435,7 @@ Public Class OIT0003OrderList
                             If ChkSameTimeLineChk.Checked = True Then
                                 If OIT0003Reprow("OTRANK") = LineCnt Then
                                     OIT0003Reprow("NYUUKA") = strNyuuka
+                                    LineCnt -= 1
                                 End If
                             Else
                                 If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then

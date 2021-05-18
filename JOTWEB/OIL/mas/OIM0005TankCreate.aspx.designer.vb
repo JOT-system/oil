@@ -2066,6 +2066,33 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_SELFINSPECTORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_INSPECTMEMBERNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INSPECTMEMBERNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INSPECTMEMBERNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INSPECTMEMBERNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INSPECTMEMBERNAME_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INSPECTMEMBERNAME_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

@@ -37,10 +37,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
     Private Const TRANSPORT_COST_DETAIL_1PAGE_VLENGTH As Double = 902.25
 
     'タンク車輸送実績表
-    '1ページ辺りの縦長さ
+    '1ページ辺りの縦長さ(列車別)
     Private Const TANK_TRANSPORT_RESULT_1PAGE_VLENGTH As Double = 628.5
-    '1ページ辺りの明細数
+    '1ページ辺りの縦長さ(着駅別)
+    Private Const TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH As Double = 624
+    '1ページ辺りの明細数(列車別)
     Private Const TANK_TRANSPORT_RESULT_1PAGE_DETAIL_COUNT As Integer = 42
+    '1ページ辺りの明細数(着駅別)
+    Private Const TANK_TRANSPORT_RESULT_ARR_1PAGE_DETAIL_COUNT As Integer = 28
 
     '輸送実績表
     '1ページ辺りの明細数
@@ -1251,13 +1255,13 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '〇 車型(荷重)
                     srcRange = Me.ExcelWorkSheet.Range("Q" + e_idx.ToString())
                     If "1".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "45ｔ"
-                    ElseIf "2".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "44ｔ"
-                    ElseIf "3".Equals(nrow("LOADCODE").ToString()) Then
                         srcRange.Value = "43ｔ"
+                    ElseIf "2".Equals(nrow("LOADCODE").ToString()) Then
+                        srcRange.Value = "45ｔ"
+                    ElseIf "3".Equals(nrow("LOADCODE").ToString()) Then
+                        srcRange.Value = "43ｔ＋45ｔ"
                     ElseIf "4".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "45ｔ＋43ｔ"
+                        srcRange.Value = "44ｔ"
                     ElseIf "5".Equals(nrow("LOADCODE").ToString()) Then
                         srcRange.Value = "総　計"
                     End If
@@ -1398,7 +1402,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票の明細設定(タンク車輸送実績表)
     ''' </summary>
-    Private Sub EditTankTansportResult_DetailArea(ByRef idx As Integer, ByVal row As DataRow)
+    Private Sub EditTankTansportResult_DetailArea(ByRef idx As Integer, ByVal row As DataRow, Optional ByVal arrFlg As Boolean = False)
         Dim rngDetailArea As Excel.Range = Nothing
         Dim total As Long = 0
 
@@ -1409,24 +1413,40 @@ Public Class OIT0008CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 標屯(日計)
-            rngDetailArea = Me.ExcelWorkSheet.Range("AG" + idx.ToString())
+            If arrFlg Then
+                rngDetailArea = Me.ExcelWorkSheet.Range("AF" + idx.ToString())
+            Else
+                rngDetailArea = Me.ExcelWorkSheet.Range("AG" + idx.ToString())
+            End If
             rngDetailArea.Value = row("DAILY_LOAD")
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 運屯(日計)
             Dim dailyLoad As Double = Double.Parse(row("DAILY_LOAD").ToString())
             Dim dailyCarsNumber As Integer = Integer.Parse(row("DAILY_CARSNUMBER").ToString())
-            rngDetailArea = Me.ExcelWorkSheet.Range("AK" + idx.ToString())
+            If arrFlg Then
+                rngDetailArea = Me.ExcelWorkSheet.Range("AJ" + idx.ToString())
+            Else
+                rngDetailArea = Me.ExcelWorkSheet.Range("AK" + idx.ToString())
+            End If
             rngDetailArea.Value = dailyLoad - (2.0 * dailyCarsNumber)
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 往路所定(日計)
-            rngDetailArea = Me.ExcelWorkSheet.Range("AO" + idx.ToString())
+            If arrFlg Then
+                rngDetailArea = Me.ExcelWorkSheet.Range("AN" + idx.ToString())
+            Else
+                rngDetailArea = Me.ExcelWorkSheet.Range("AO" + idx.ToString())
+            End If
             rngDetailArea.Value = row("DAILY_OUTBOUND")
             ExcelMemoryRelease(rngDetailArea)
 
             '〇 返路所定(日計)
-            rngDetailArea = Me.ExcelWorkSheet.Range("AU" + idx.ToString())
+            If arrFlg Then
+                rngDetailArea = Me.ExcelWorkSheet.Range("AT" + idx.ToString())
+            Else
+                rngDetailArea = Me.ExcelWorkSheet.Range("AU" + idx.ToString())
+            End If
             rngDetailArea.Value = row("DAILY_RETURN")
             ExcelMemoryRelease(rngDetailArea)
 
@@ -2095,32 +2115,32 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     EditTankTansportResult_HeaderArea(e_idx, PrintData.Rows(dr_idx), STYMD, EDYMD, type)
 
                     'ページ縦長加算
-                    pageVLength += 93
+                    pageVLength += 97.5
                 Else
-                    Dim pageVLengthPlan = pageVLength + 7.5 + writeDetailCnt * 12.75
+                    Dim pageVLengthPlan = pageVLength + 7.5 + writeDetailCnt * 18.75
                     Dim nrow As DataRow = PrintData.Rows(dr_idx)
                     Dim lrow As DataRow = PrintData.Rows(dr_idx - 1)
 
                     '〇改頁条件
                     '①出力済み縦長＋空行＋明細行が、1ページ当たりの閾値に達した場合
                     '②五井営業所の場合のみ、OT輸送フラグが切り替わったタイミング
-                    If pageVLengthPlan >= TANK_TRANSPORT_RESULT_1PAGE_VLENGTH OrElse
+                    If pageVLengthPlan >= TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH OrElse
                         (
                             CONST_OFFICECODE_011201.Equals(officeCode) AndAlso
                             Not nrow("OTTRANSPORTFLG").ToString().Equals(lrow("OTTRANSPORTFLG").ToString())
                         ) Then
                         '〇改頁処理
-                        While (pageVLength < TANK_TRANSPORT_RESULT_1PAGE_VLENGTH)
+                        While (pageVLength < TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH)
                             destRange = ExcelWorkSheet.Range(String.Format("{0}:{0}", e_idx))
                             '〇行高さの調整
-                            '明細1行分(12.75)以上の場合
-                            If TANK_TRANSPORT_RESULT_1PAGE_VLENGTH - pageVLength > 12.75 Then
-                                destRange.RowHeight = 12.75
-                                pageVLength += 12.75
+                            '明細1行分(18.75)以上の場合
+                            If TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH - pageVLength > 18.75 Then
+                                destRange.RowHeight = 18.75
+                                pageVLength += 18.75
                             Else
                                 '明細1行分未満の場合、「閾値 - 出力済み縦長」
-                                destRange.RowHeight = TANK_TRANSPORT_RESULT_1PAGE_VLENGTH - pageVLength
-                                pageVLength += TANK_TRANSPORT_RESULT_1PAGE_VLENGTH - pageVLength
+                                destRange.RowHeight = TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH - pageVLength
+                                pageVLength += TANK_TRANSPORT_RESULT_ARR_1PAGE_VLENGTH - pageVLength
                             End If
                             ExcelMemoryRelease(destRange)
                             e_idx += 1
@@ -2144,14 +2164,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                         srcRange.RowHeight = 7.5
                         ExcelMemoryRelease(srcRange)
                         srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", e_idx + 5, e_idx + 6))
-                        srcRange.RowHeight = 12.75
+                        srcRange.RowHeight = 15
                         ExcelMemoryRelease(srcRange)
 
                         '〇ヘッダー出力
                         EditTankTansportResult_HeaderArea(e_idx, PrintData.Rows(dr_idx), STYMD, EDYMD, type)
 
                         'ページ縦長加算
-                        pageVLength += 93
+                        pageVLength += 97.5
                     Else
                         '〇空行の差し込み
                         srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", e_idx))
@@ -2233,13 +2253,13 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     '〇 車型(荷重)
                     srcRange = Me.ExcelWorkSheet.Range("Q" + e_idx.ToString())
                     If "1".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "45ｔ"
-                    ElseIf "2".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "44ｔ"
-                    ElseIf "3".Equals(nrow("LOADCODE").ToString()) Then
                         srcRange.Value = "43ｔ"
+                    ElseIf "2".Equals(nrow("LOADCODE").ToString()) Then
+                        srcRange.Value = "45ｔ"
+                    ElseIf "3".Equals(nrow("LOADCODE").ToString()) Then
+                        srcRange.Value = "43ｔ＋45ｔ"
                     ElseIf "4".Equals(nrow("LOADCODE").ToString()) Then
-                        srcRange.Value = "45ｔ＋43ｔ"
+                        srcRange.Value = "44ｔ"
                     ElseIf "5".Equals(nrow("LOADCODE").ToString()) Then
                         srcRange.Value = "総　計"
                     End If
@@ -2247,22 +2267,22 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
                     '〇行高さ調整
                     srcRange = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", e_idx, e_idx + 2))
-                    srcRange.RowHeight = 12.75
+                    srcRange.RowHeight = 18.75
                     ExcelMemoryRelease(srcRange)
 
                     '〇明細出力
                     '危険品
-                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx))
+                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx), True)
                     'その他
-                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx + 1))
+                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx + 1), True)
                     '計
-                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx + 2))
+                    EditTankTansportResult_DetailArea(e_idx, PrintData.Rows(dr_idx + 2), True)
 
                     'データ行index加算
                     dr_idx += 3
 
                     '出力縦長加算
-                    pageVLength += 12.75 * 3
+                    pageVLength += 18.75 * 3
 
                 Next
 
@@ -2854,6 +2874,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                 Else
                     '〇着駅の結合
@@ -2861,12 +2883,16 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                     '〇荷受人の結合
                     srcRange = ExcelWorkSheet.Range(String.Format("K{0}:U{1}", mergeStIdx, mergeStIdx + writeDetailCnt - 1))
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                 End If
 
@@ -3171,6 +3197,8 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                 Else
                     '〇着駅の結合
@@ -3178,12 +3206,16 @@ Public Class OIT0008CustomReport : Implements IDisposable
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                     '〇荷受人の結合
                     srcRange = ExcelWorkSheet.Range(String.Format("K{0}:U{1}", mergeStIdx, mergeStIdx + writeDetailCnt - 1))
                     srcRange.MergeCells = True
                     srcRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter
                     srcRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    '下罫線を引く
+                    srcRange.Borders(Excel.XlBordersIndex.xlEdgeBottom).LineStyle = Excel.XlLineStyle.xlContinuous
                     ExcelMemoryRelease(srcRange)
                 End If
 

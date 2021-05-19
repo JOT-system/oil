@@ -144,8 +144,22 @@ Public Class OIT0005TankLocSearch
             Me.tileSalesOffice.Recover(work.WF_SEL_SALESOFFICE_TILES.Text) '所属先（タイル選択）
         End If
 
-        '交検一覧ダウンロード関連
-        WF_STYMD.Text = Now.ToShortDateString()
+        '○交検一覧ダウンロード関連
+        'WF_STYMD.Text = Now.ToShortDateString()
+
+        '年月ドロップダウンの生成
+        Dim ymDdl As New DropDownList
+        Dim dt As Date = Now
+        For pMonth As Integer = 6 To -6 Step -1
+            ymDdl.Items.Add(dt.AddMonths(pMonth).ToString("yyyy/MM"))
+            If pMonth = 0 Then
+                ymDdl.SelectedValue = dt.AddMonths(pMonth).ToString("yyyy/MM")
+            End If
+        Next
+        If ymDdl.Items.Count > 0 Then
+            Me.ddlKoukenListYearMonth.Items.AddRange(ymDdl.Items.Cast(Of ListItem).ToArray)
+            Me.ddlKoukenListYearMonth.SelectedIndex = ymDdl.SelectedIndex
+        End If
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0005WRKINC.MAPIDS
@@ -197,7 +211,7 @@ Public Class OIT0005TankLocSearch
             Next
             '取得開始日付取得（Default：Now）
             Dim beginDate As Date = Nothing
-            If Not Date.TryParse(WF_STYMD.Text, beginDate) Then
+            If Not Date.TryParse(ddlKoukenListYearMonth.SelectedValue + "/01", beginDate) Then
                 beginDate = Now
             End If
             '取得終了日付計算（取得開始日付の翌月末日）
@@ -379,12 +393,12 @@ Public Class OIT0005TankLocSearch
             With leftview
                 Select Case CInt(WF_LeftMViewChange.Value)
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                        Select Case WF_FIELD.Value
-                            Case WF_STYMD.ID         '年月日
-                                .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
-                        End Select
-                        .ActiveCalendar()
+                        ''日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        'Select Case WF_FIELD.Value
+                        '    Case WF_STYMD.ID         '年月日
+                        '        .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
+                        'End Select
+                        '.ActiveCalendar()
                     Case LIST_BOX_CLASSIFICATION.LC_ORG
                         '組織コード(所属先)
 
@@ -451,22 +465,22 @@ Public Class OIT0005TankLocSearch
         End If
 
         '○ 選択内容を画面項目へセット
-        Select Case WF_FIELD.Value
-            Case WF_STYMD.ID
-                Dim WW_DATE As Date
-                Try
-                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
-                        WF_STYMD.Text = ""
-                    Else
-                        WF_STYMD.Text = leftview.WF_Calendar.Text
-                    End If
-                Catch ex As Exception
-                End Try
-                WF_STYMD.Focus()
-            Case Else
+        'Select Case WF_FIELD.Value
+        '    Case WF_STYMD.ID
+        '        Dim WW_DATE As Date
+        '        Try
+        '            Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+        '            If WW_DATE < CDate(C_DEFAULT_YMD) Then
+        '                WF_STYMD.Text = ""
+        '            Else
+        '                WF_STYMD.Text = leftview.WF_Calendar.Text
+        '            End If
+        '        Catch ex As Exception
+        '        End Try
+        '        WF_STYMD.Focus()
+        '    Case Else
 
-        End Select
+        'End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
@@ -485,8 +499,8 @@ Public Class OIT0005TankLocSearch
         Select Case WF_FIELD.Value
             Case "TxtSalesOffice"
                 'TxtSalesOffice.Focus()
-            Case WF_STYMD.ID
-                WF_STYMD.Focus()
+                'Case WF_STYMD.ID
+                '    WF_STYMD.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

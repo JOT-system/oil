@@ -311,6 +311,109 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "日本石油輸送株式会社(JOT)"
+    ''' <summary>
+    ''' JOT本社
+    ''' </summary>
+    Public Const CONST_JOT_010001 As String = "010001"
+    ''' <summary>
+    ''' 内部監査室
+    ''' </summary>
+    Public Const CONST_JOT_010002 As String = "010002"
+    ''' <summary>
+    ''' 総務部
+    ''' </summary>
+    Public Const CONST_JOT_010003 As String = "010003"
+    ''' <summary>
+    ''' 人事部
+    ''' </summary>
+    Public Const CONST_JOT_010004 As String = "010004"
+    ''' <summary>
+    ''' 経理部
+    ''' </summary>
+    Public Const CONST_JOT_010005 As String = "010005"
+    ''' <summary>
+    ''' LNG部
+    ''' </summary>
+    Public Const CONST_JOT_010008 As String = "010008"
+    ''' <summary>
+    ''' 化成品部
+    ''' </summary>
+    Public Const CONST_JOT_010009 As String = "010009"
+    ''' <summary>
+    ''' 海外事業部
+    ''' </summary>
+    Public Const CONST_JOT_010010 As String = "010010"
+    ''' <summary>
+    ''' コンテナ部
+    ''' </summary>
+    Public Const CONST_JOT_010011 As String = "010011"
+    ''' <summary>
+    ''' グループ安全推進部
+    ''' </summary>
+    Public Const CONST_JOT_010012 As String = "010012"
+    ''' <summary>
+    ''' 北海道支店
+    ''' </summary>
+    Public Const CONST_JOT_010101 As String = "010101"
+    ''' <summary>
+    ''' 帯広営業所
+    ''' </summary>
+    Public Const CONST_JOT_010102 As String = "010102"
+    ''' <summary>
+    ''' 苫小牧営業所
+    ''' </summary>
+    Public Const CONST_JOT_010103 As String = "010103"
+    ''' <summary>
+    ''' 隅田川営業所
+    ''' </summary>
+    Public Const CONST_JOT_011301 As String = "011301"
+    ''' <summary>
+    ''' 大井営業所
+    ''' </summary>
+    Public Const CONST_JOT_011302 As String = "011302"
+    ''' <summary>
+    ''' メンテナンスセンター
+    ''' </summary>
+    Public Const CONST_JOT_011403 As String = "011403"
+    ''' <summary>
+    ''' 関東支店（千葉３営業所用）
+    ''' </summary>
+    Public Const CONST_JOT_011409 As String = "011409"
+    ''' <summary>
+    ''' 新潟事業所
+    ''' </summary>
+    Public Const CONST_JOT_011501 As String = "011501"
+    ''' <summary>
+    ''' 名古屋貨物営業所
+    ''' </summary>
+    Public Const CONST_JOT_012302 As String = "012302"
+    ''' <summary>
+    ''' 関西支店
+    ''' </summary>
+    Public Const CONST_JOT_012701 As String = "012701"
+    ''' <summary>
+    ''' 百済営業所
+    ''' </summary>
+    Public Const CONST_JOT_012702 As String = "012702"
+    ''' <summary>
+    ''' 水島営業所
+    ''' </summary>
+    Public Const CONST_JOT_013301 As String = "013301"
+    ''' <summary>
+    ''' 徳山営業所
+    ''' </summary>
+    Public Const CONST_JOT_013501 As String = "013501"
+    ''' <summary>
+    ''' 九州支店
+    ''' </summary>
+    Public Const CONST_JOT_014001 As String = "014001"
+    ''' <summary>
+    ''' シンガポール支店
+    ''' </summary>
+    Public Const CONST_JOT_019901 As String = "019901"
+#End Region
+
 #Region "貨物駅(営業所指定駅)"
     ''' <summary>
     ''' 仙台北港(仙台新港営業所)

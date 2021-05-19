@@ -144,7 +144,32 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData(ByVal tyohyoType As String, ByVal officeCode As String, Optional ByVal lodDate As String = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        'ダウンロードファイル名の設定
+        '        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim str_tmpFileName As String = ""
+        Select Case tyohyoType
+            '積込指示書
+            Case "LOADPLAN"
+                Select Case officeCode
+                    Case "011201", "011203"
+                        ' 五井、袖ヶ浦
+                        str_tmpFileName = "積込指示書" & ".xlsx"
+
+                    Case "011202"
+                        ' 甲子
+                        str_tmpFileName = "タンク車積込指示書" & ".xlsx"
+
+                    Case Else
+                        ' 仙台、四日市  ※三重塩浜の積込指示書は別
+                        str_tmpFileName = "積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                End Select
+            'OT積込指示書
+            Case "OTLOADPLAN"
+                str_tmpFileName = "OT積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+
+        End Select
+        Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
@@ -1772,7 +1797,17 @@ Public Class OIT0003CustomReport : Implements IDisposable
                                                 Optional ByVal dtFT As DataTable = Nothing,
                                                 Optional ByVal dtPF As DataTable = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        Dim str_tmpFileName As String = ""
+
+        If repPtn = "SHIPPLAN" Then
+            str_tmpFileName = "出荷予定表" & ".xlsx"
+        ElseIf repPtn = "LOADPLAN" Then
+            str_tmpFileName = "回線別出荷予定表" & ".xlsx"
+        End If
+
+        Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -2240,7 +2275,25 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        Dim str_tmpFileName As String = ""
+
+        Select Case repPtn
+            Case "DELIVERYPLAN"
+                '託送指示
+                str_tmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+                '積込指示
+            Case "LOADPLAN"
+                str_tmpFileName = "積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+
+            Case "SHIPCONTACT"
+                'タンク車出荷連絡書
+                str_tmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        End Select
+
+        Dim tmpFileName As String = str_tmpFileName
+
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 

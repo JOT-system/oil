@@ -842,6 +842,33 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_BIGOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_MIDDLEOILCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MIDDLEOILCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MIDDLEOILCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MIDDLEOILCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_MIDDLEOILCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MIDDLEOILCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_OPERATIONBASECODE_L コントロール。
     '''</summary>
     '''<remarks>
@@ -1893,6 +1920,150 @@ Partial Public Class OIM0005TankCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_USEDFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INTERINSPECTYM_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTYM_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INTERINSPECTYM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTYM As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INTERINSPECTSTATION_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTSTATION_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INTERINSPECTSTATION コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTSTATION As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INTERINSPECTSTATION_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTSTATION_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INTERINSPECTORGCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTORGCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INTERINSPECTORGCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTORGCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INTERINSPECTORGCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INTERINSPECTORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELFINSPECTYM_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTYM_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELFINSPECTYM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTYM As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SELFINSPECTSTATION_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTSTATION_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELFINSPECTSTATION コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTSTATION As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SELFINSPECTSTATION_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTSTATION_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELFINSPECTORGCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTORGCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SELFINSPECTORGCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTORGCODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SELFINSPECTORGCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SELFINSPECTORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。

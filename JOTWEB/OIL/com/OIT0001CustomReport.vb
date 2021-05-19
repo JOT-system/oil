@@ -533,6 +533,20 @@ Public Class OIT0001CustomReport : Implements IDisposable
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
+            '### 20210514 START 同時入線取得用 ##########################################################
+            Dim sTrainNo() As String = {"8877", "5461", "9672"}
+            Dim sRTrainNo() As String = {"401", "501"}
+            Dim sCondition As String = ""
+            '○列車No(8877)　京葉臨海列車No(501)※同時入線のみ存在するオーダー
+            sCondition = String.Format("TRAINNO='{0}' AND LOADINGIRILINETRAINNO='{1}'", sTrainNo(0), sRTrainNo(1))
+            Dim i8877 As Integer = Integer.Parse(PrintData.Compute("COUNT(TRAINNO)", sCondition).ToString())
+            '○列車No(5461, 9672)　京葉臨海列車No(401)※同時入線のみ存在するオーダー
+            sCondition = String.Format("(TRAINNO='{0}' OR TRAINNO='{1}') AND LOADINGIRILINETRAINNO='{2}'", sTrainNo(1), sTrainNo(2), sRTrainNo(0))
+            Dim i5461 As Integer = Integer.Parse(PrintData.Compute("COUNT(TRAINNO)", sCondition).ToString())
+            '★同時入線フラグ(TRUE:同時入線)
+            Dim bSameTimeLine As Boolean = False
+            If i8877 <> 0 OrElse i5461 <> 0 Then bSameTimeLine = True
+            '### 20210514 END   同時入線取得用 ##########################################################
             For Each PrintDatarow As DataRow In PrintData.Rows
 
                 If strTrainNoSave = "" Then
@@ -558,7 +572,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End If
 
                 '○帳票の明細(共通)設定
-                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
+                EditDetailCommonArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave, bSameTimeLine:=bSameTimeLine)
 
                 '○列車Noの保存
                 strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
@@ -718,7 +732,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                      ByVal I_rngDetailArea As Excel.Range,
                                      ByVal PrintDatarow As DataRow,
                                      ByVal I_column As Integer,
-                                     ByRef O_OtOilName As String)
+                                     ByRef O_OtOilName As String,
+                                     Optional ByVal bSameTimeLine As Boolean = False)
 
         '◯ 車数
         I_rngDetailArea = Me.ExcelWorkSheet.Range("B" + I_column.ToString())
@@ -795,6 +810,11 @@ Public Class OIT0001CustomReport : Implements IDisposable
             I_rngDetailArea = Me.ExcelWorkSheet.Range("K" + I_column.ToString())
             'I_rngDetailArea = Me.ExcelWorkSheet.Range("I" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("SHIPORDER")
+            '### 20210514 START 同時入線取得用 ##########################################################
+            If bSameTimeLine = True Then
+                I_rngDetailArea.Value = PrintDatarow("OTRANK")
+            End If
+            '### 20210514 END   同時入線取得用 ##########################################################
             ExcelMemoryRelease(I_rngDetailArea)
             '### 20201008 END   指摘票対応(No156)全体 ###################################################
             '◯ 次回交検日

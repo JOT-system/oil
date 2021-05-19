@@ -272,7 +272,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
         End Try
     End Sub
 
-    Private Sub SetRowValues(ByVal rngStr As String, ByVal dt As Date, ByVal setData As Dictionary(Of String, Integer))
+    Private Sub SetRowValues(ByVal rngStr As String, ByVal dt As Date, ByVal setData As Dictionary(Of String, Integer), Optional ByVal lineFlg As Boolean = False)
         Dim rngWork As Excel.Range = Nothing
         Dim rngOffsetWork As Excel.Range = Nothing
         Dim columnOffset As Integer = 0
@@ -305,7 +305,33 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
 
                 If setData.ContainsKey(strDate) Then
                     rngOffsetWork = rngWork.Offset(ColumnOffset:=columnOffset)
-                    rngOffsetWork.Value = setData(strDate)
+                    If lineFlg Then
+                        Dim fmtStr As String = String.Format("{0}/", ((setData(strDate) \ 10) Mod 10))
+                        If setData(strDate) Mod 10 = 1 Then
+                            fmtStr = fmtStr + "①"
+                        ElseIf setData(strDate) Mod 10 = 2 Then
+                            fmtStr = fmtStr + "②"
+                        ElseIf setData(strDate) Mod 10 = 3 Then
+                            fmtStr = fmtStr + "③"
+                        ElseIf setData(strDate) Mod 10 = 4 Then
+                            fmtStr = fmtStr + "④"
+                        ElseIf setData(strDate) Mod 10 = 5 Then
+                            fmtStr = fmtStr + "⑤"
+                        ElseIf setData(strDate) Mod 10 = 6 Then
+                            fmtStr = fmtStr + "⑥"
+                        ElseIf setData(strDate) Mod 10 = 7 Then
+                            fmtStr = fmtStr + "⑦"
+                        ElseIf setData(strDate) Mod 10 = 8 Then
+                            fmtStr = fmtStr + "⑧"
+                        ElseIf setData(strDate) Mod 10 = 9 Then
+                            fmtStr = fmtStr + "⑨"
+                        Else
+                            fmtStr = fmtStr + "?"
+                        End If
+                        rngOffsetWork.Value = fmtStr
+                    Else
+                        rngOffsetWork.Value = setData(strDate)
+                    End If
                     ExcelMemoryRelease(rngOffsetWork)
                 End If
             Next
@@ -500,6 +526,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C9", dt, setData)
 
+            '請負-コスモ-南松本-2081
+            setData = allData.Where(Function(r)
+                                        Return r.OTTRANSPORTFLG = "2" AndAlso
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "5141" AndAlso
+                                        r.TRAINNO = "2081"
+                                    End Function).
+                GroupBy(Function(r) New With {Key r.DEPDATE}).
+                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            SetRowValues("C11", dt, setData)
+
             'OT-コスモ-郡山-1071
             setData = allData.Where(Function(r)
                                         Return r.OTTRANSPORTFLG = "1" AndAlso
@@ -509,7 +546,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C12", dt, setData)
+            SetRowValues("C13", dt, setData)
 
             'OT-コスモ-郡山-8179
             setData = allData.Where(Function(r)
@@ -520,7 +557,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C13", dt, setData)
+            SetRowValues("C14", dt, setData)
 
             'OT-コスモ-宇都宮-8681
             setData = allData.Where(Function(r)
@@ -531,7 +568,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C15", dt, setData)
+            SetRowValues("C16", dt, setData)
 
             'OT-コスモ-宇都宮-8685
             setData = allData.Where(Function(r)
@@ -542,7 +579,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C16", dt, setData)
+            SetRowValues("C17", dt, setData)
 
             'OT-コスモ-宇都宮-9175
             setData = allData.Where(Function(r)
@@ -553,7 +590,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C17", dt, setData)
+            SetRowValues("C18", dt, setData)
 
             'OT-コスモ-倉賀野-8883
             setData = allData.Where(Function(r)
@@ -564,7 +601,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C19", dt, setData)
+            SetRowValues("C20", dt, setData)
 
             'OT-コスモ-倉賀野-8877
             setData = allData.Where(Function(r)
@@ -575,7 +612,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C20", dt, setData)
+            SetRowValues("C21", dt, setData)
 
             'OT-コスモ-倉賀野-8763
             setData = allData.Where(Function(r)
@@ -586,7 +623,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C21", dt, setData)
+            SetRowValues("C22", dt, setData)
 
             'OT-コスモ-八王子-2461
             setData = allData.Where(Function(r)
@@ -594,17 +631,6 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
                                         r.ARRSTATIONCODE = "4610" AndAlso
                                         r.TRAINNO = "2461"
-                                    End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
-            SetRowValues("C23", dt, setData)
-
-            'OT-コスモ-南松本-2081
-            setData = allData.Where(Function(r)
-                                        Return r.OTTRANSPORTFLG = "1" AndAlso
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
-                                        r.ARRSTATIONCODE = "5141" AndAlso
-                                        r.TRAINNO = "2081"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
@@ -703,7 +729,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.LINE).Max())
-            SetRowValues("C12", dt, setData)
+            SetRowValues("C12", dt, setData, True)
 
             '当日積込車数
             setData = allData.Where(Function(r)
@@ -748,8 +774,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                             r.ARRSTATIONCODE = "4113" AndAlso
                                             r.TRAINNO = "8877"
                                         End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C7", dt, setData)
 
             '請負-出光-倉賀野-8883
@@ -758,8 +784,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4113" AndAlso
                                         r.TRAINNO = "8883"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C8", dt, setData)
 
             '請負-出光-南松本-5461
@@ -768,8 +794,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5141" AndAlso
                                         r.TRAINNO = "5461"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C10", dt, setData)
 
             '請負-出光-南松本-9672
@@ -778,8 +804,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5141" AndAlso
                                         r.TRAINNO = "9672"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C11", dt, setData)
 
             '積込回数（その日発送する列車の受注明細の回線の最大値）
@@ -832,8 +858,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                             r.ARRSTATIONCODE = "4425" AndAlso
                                             r.TRAINNO = "4091"
                                         End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C7", dt, setData)
 
             '請負-ENEOS-宇都宮-8571
@@ -842,8 +868,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8571"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C8", dt, setData)
 
             '請負-ENEOS-宇都宮-8569
@@ -852,8 +878,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4425" AndAlso
                                         r.TRAINNO = "8569"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C9", dt, setData)
 
             '請負-ENEOS-倉賀野-3091
@@ -862,8 +888,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4113" AndAlso
                                         r.TRAINNO = "3091"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C11", dt, setData)
 
             '請負-ENEOS-倉賀野-3093
@@ -872,8 +898,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4113" AndAlso
                                         r.TRAINNO = "3093"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C12", dt, setData)
 
             '請負-ENEOS-倉賀野-8777
@@ -882,8 +908,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4113" AndAlso
                                         r.TRAINNO = "8777"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C13", dt, setData)
 
             '請負-ENEOS-八王子-85
@@ -892,8 +918,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4610" AndAlso
                                         r.TRAINNO = "85"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C15", dt, setData)
 
             '請負-ENEOS-八王子-87
@@ -902,8 +928,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4610" AndAlso
                                         r.TRAINNO = "87"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C16", dt, setData)
 
             '請負-ENEOS-八王子-5692
@@ -912,8 +938,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4610" AndAlso
                                         r.TRAINNO = "5692"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C17", dt, setData)
 
             '請負-ENEOS-八王子-8097
@@ -922,8 +948,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4610" AndAlso
                                         r.TRAINNO = "8097"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C18", dt, setData)
 
             '請負-ENEOS-竜王-5575
@@ -932,8 +958,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4620" AndAlso
                                         r.TRAINNO = "81"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C20", dt, setData)
 
             '請負-ENEOS-竜王-5575
@@ -942,8 +968,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "4620" AndAlso
                                         r.TRAINNO = "83"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C21", dt, setData)
 
             '請負-ENEOS-坂城-2085
@@ -952,8 +978,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5009" AndAlso
                                         r.TRAINNO = "2085"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C23", dt, setData)
 
             '請負-ENEOS-坂城-5463
@@ -962,8 +988,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5009" AndAlso
                                         r.TRAINNO = "5463"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C24", dt, setData)
 
             '請負-ENEOS-坂城-8471
@@ -972,8 +998,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5009" AndAlso
                                         r.TRAINNO = "8471"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C25", dt, setData)
 
             '積込回数（手入力）
@@ -1020,8 +1046,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                             r.ARRSTATIONCODE = "5141" AndAlso
                                             r.TRAINNO = "6078"
                                         End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C7", dt, setData)
 
             '請負-コスモ-南松本-8380
@@ -1030,8 +1056,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5141" AndAlso
                                         r.TRAINNO = "8380"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C8", dt, setData)
 
             '積込回数（手入力）
@@ -1078,8 +1104,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                             r.ARRSTATIONCODE = "5141" AndAlso
                                             r.TRAINNO = "5282"
                                         End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C7", dt, setData)
 
             '請負-出光-南松本-8072
@@ -1088,8 +1114,8 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                         r.ARRSTATIONCODE = "5141" AndAlso
                                         r.TRAINNO = "8072"
                                     End Function).
-                GroupBy(Function(r) New With {Key r.DEPDATE}).
-                ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
             SetRowValues("C8", dt, setData)
 
             ''請負-出光-南松本-174

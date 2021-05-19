@@ -394,6 +394,14 @@ Public Class OIT0006OutOfServiceSearch
                     '状態
                     If WF_FIELD.Value = "TxtStatus" Then
                         prmData = work.CreateSALESOFFICEParam(Me.WF_CAMPCODE.Text, Me.TxtStatus.Text)
+                        '★抽出条件追加
+                        Dim condition As String = ""
+                        condition &= " AND KEYCODE IN ("
+                        condition &= "   '" + BaseDllConst.CONST_KAISOUSTATUS_100 + "'"
+                        condition &= " , '" + BaseDllConst.CONST_KAISOUSTATUS_250 + "'"
+                        condition &= " , '" + BaseDllConst.CONST_KAISOUSTATUS_500 + "'"
+                        condition &= " )"
+                        prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = condition
                     End If
 
                     '目的
@@ -637,7 +645,7 @@ Public Class OIT0006OutOfServiceSearch
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "STATUS"           '状態
                     prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "OBJECTIVECODE"    '目的
                     prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, prmData)

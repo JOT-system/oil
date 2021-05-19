@@ -119,7 +119,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("回線別積込"), Excel.Worksheet)
                 'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN_401.xlsx" _
-                OrElse excelFileName = "OIT0003L_SODEGAURA_LINEPLAN_501.xlsx" Then
+                OrElse excelFileName = "OIT0003L_SODEGAURA_LINEPLAN_501.xlsx" _
+                OrElse excelFileName = "OIT0003L_SODEGAURA_LINEPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入線方"), Excel.Worksheet)
                 'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_KINOENE_LOADPLAN.xlsx" Then
@@ -1246,7 +1247,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintSodegauraData(ByVal repPtn As String, ByVal lodDate As String, ByVal rTrainNo As String) As String
+    Public Function CreateExcelPrintSodegauraData(ByVal repPtn As String, ByVal lodDate As String, ByVal rTrainNo As String, Optional ByVal bSameTimeLine As Boolean = False) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -1269,11 +1270,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Case "LINEPLAN"
                     '***** TODO処理 ここから *****
                     '◯ヘッダーの設定
-                    EditSodegauraLineHeaderArea(lodDate, rTrainNo)
+                    EditSodegauraLineHeaderArea(lodDate, rTrainNo, bSameTimeLine)
                     '◯明細の設定
                     EditSodegauraLineDetailArea()
                     '◯フッターの設定
-                    EditSodegauraLineFooterArea(rTrainNo)
+                    EditSodegauraLineFooterArea(rTrainNo, bSameTimeLine)
                     '***** TODO処理 ここまで *****
                     'ExcelTempSheet.Delete() '雛形シート削除
             End Select
@@ -1474,7 +1475,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(入線方(袖ヶ浦))
     ''' </summary>
-    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String, ByVal rTrainNo As String)
+    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String, ByVal rTrainNo As String, ByVal bSameTimeLine As Boolean)
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
@@ -1511,7 +1512,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngHeaderArea.Value = PrintDatarow("LOADINGOUTLETTRAINNO")
                 ExcelMemoryRelease(rngHeaderArea)
                 '★501専用入線方の場合
-                If rTrainNo = "501" Then
+                If rTrainNo = "501" AndAlso bSameTimeLine = False Then
                     '◯ 受入日
                     rngHeaderArea = Me.ExcelWorkSheet.Range("M17")
                     rngHeaderArea.Value = PrintDatarow("ACCDATE")
@@ -1582,7 +1583,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のフッター設定(入線方(袖ヶ浦))
     ''' </summary>
-    Private Sub EditSodegauraLineFooterArea(ByVal rTrainNo As String)
+    Private Sub EditSodegauraLineFooterArea(ByVal rTrainNo As String, ByVal bSameTimeLine As Boolean)
         Dim rngFooterArea As Excel.Range = Nothing
 
         Try
@@ -1590,7 +1591,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Dim svConsigneeCode As String = ""
             '開始行
             Dim j As Integer = 48               '401専用入線方
-            If rTrainNo = "501" Then j = 26     '501専用入線方
+            If rTrainNo = "501" _
+                AndAlso bSameTimeLine = False Then j = 26     '501専用入線方
             Dim i As Integer = j
 
             '★油種合計(列)
@@ -1607,7 +1609,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     '# JONET松本
                         Case BaseDllConst.CONST_CONSIGNEECODE_40
                             svTrain = clnTrain(5)                               '401専用入線方
-                            If rTrainNo = "501" Then svTrain = clnTrain(2)      '501専用入線方
+                            If rTrainNo = "501" _
+                                AndAlso bSameTimeLine = False Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                         Case BaseDllConst.CONST_CONSIGNEECODE_53
                             svTrain = clnTrain(4)
@@ -1690,7 +1693,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     '# JONET松本
                 Case BaseDllConst.CONST_CONSIGNEECODE_40
                     svTrain = clnTrain(5)                               '401専用入線方
-                    If rTrainNo = "501" Then svTrain = clnTrain(2)      '501専用入線方
+                    If rTrainNo = "501" _
+                        AndAlso bSameTimeLine = False Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                 Case BaseDllConst.CONST_CONSIGNEECODE_53
                     svTrain = clnTrain(4)
@@ -1738,7 +1742,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
             '受注オーダーにLTA油種が含まれているか確認
             Dim iLTACnt As Integer = PrintData.Select("ORDERINGOILNAME='" + BaseDllConst.CONST_2101C + "'").Count
-            If iLTACnt >= 1 AndAlso rTrainNo = "401" Then
+            If iLTACnt >= 1 AndAlso (rTrainNo = "401" OrElse bSameTimeLine = True) Then
                 Dim clnLTA() As String = {"B", "D", "F", "H", "J", "L"}
                 For Each strLTA As String In clnLTA
                     '○LTA油種が含まれている場合
@@ -2099,12 +2103,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
+            Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W"}
+            'Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
             '○帳票の明細共通処理(積込予定表(根岸))
             EditNegishiLoadCmn(rngDetailArea, strYoko, "RNUM=1")
 
             '### 20201020 START 指摘票対応(No174)全体 ##################################################
-            Dim strYokoYobi As String() = {"W", "X", "Y", "Z", "AA"}
+            Dim strYokoYobi As String() = {"X", "Y", "Z", "AA", "AB"}
+            'Dim strYokoYobi As String() = {"W", "X", "Y", "Z", "AA"}
             '○帳票の明細共通処理(積込予定表(根岸))※予備枠の設定
             EditNegishiLoadCmn(rngDetailArea, strYokoYobi, "RNUM=2")
             '### 20201020 END   指摘票対応(No174)全体 ##################################################
@@ -2168,6 +2174,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + intTate(jTate).ToString())
             'rngDetailArea.Value = PrintDatarow("TRAINNAME")
             I_rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
+            If Convert.ToString(PrintDatarow("TRAINNAME")) = "南松本" Then I_rngDetailArea.Value = "松"
             ExcelMemoryRelease(I_rngDetailArea)
             '油種名
             I_rngDetailArea = Me.ExcelWorkSheet.Range(I_YOKO(iYoko) + (intTate(jTate) + 1).ToString())

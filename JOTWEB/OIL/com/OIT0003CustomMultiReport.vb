@@ -633,6 +633,14 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String(), ByVal consigneeCode As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '指摘票No.496 袖ケ浦帳票名対応
+        If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011203) Then
+            If consigneeCode.Equals(TankDispatch.CONSIGNEECODE.KOUSYOUTAKASAKI) Then
+                tmpFileName = "タンク車発送実績【コウショウ分】.xlsx"
+            ElseIf consigneeCode.Equals(TankDispatch.CONSIGNEECODE.OTTAKASAKI) Then
+                tmpFileName = "タンク車発送実績【構内取り分】.xlsx"
+            End If
+        End If
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
@@ -703,7 +711,13 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
                     ExcelMemoryRelease(moveSheet)
                     ExcelMemoryRelease(beforSheet)
                 Next
+
             End If
+
+            '「まとめ」シートを選択する
+            Dim activeSheet As Excel.Worksheet = DirectCast(ExcelWorkSheets("まとめ"), Excel.Worksheet)
+            activeSheet.Activate()
+            ExcelMemoryRelease(activeSheet)
 
             '保存処理実行
             ExcelSaveAs(tmpFilePath)
@@ -788,21 +802,31 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
             '取扱営業所名
             Select Case OfficeCode
                 Case CONST_OFFICECODE_010402
+                    '### 20210514 START 事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
-                    rngHeaderArea.Value = "日本石油輸送㈱"
+                    rngHeaderArea.Value = "日本石油輸送㈱" + "仙台新港営業所"
                     ExcelMemoryRelease(rngHeaderArea)
-                    rngHeaderArea = ExcelWorkSheet.Range("D6")
-                    rngHeaderArea.Value = "仙台新港営業所"
-                    ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("C6")
+                    'rngHeaderArea.Value = "日本石油輸送㈱"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("D6")
+                    'rngHeaderArea.Value = "仙台新港営業所"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    '### 20210514 END   事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
                 Case CONST_OFFICECODE_011203
+                    '### 20210514 START 事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("C6")
-                    rngHeaderArea.Value = "日本石油輸送㈱"
+                    rngHeaderArea.Value = "日本石油輸送㈱" + "袖ケ浦営業所"
                     ExcelMemoryRelease(rngHeaderArea)
-                    rngHeaderArea = ExcelWorkSheet.Range("D6")
-                    rngHeaderArea.Value = "袖ケ浦営業"
-                    ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("C6")
+                    'rngHeaderArea.Value = "日本石油輸送㈱"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    'rngHeaderArea = ExcelWorkSheet.Range("D6")
+                    'rngHeaderArea.Value = "袖ケ浦営業"
+                    'ExcelMemoryRelease(rngHeaderArea)
+                    '### 20210514 END   事業所名を結合 ##########################################################
                     rngHeaderArea = ExcelWorkSheet.Range("F6")
                     rngHeaderArea.Value = "1286"
             End Select
@@ -1114,6 +1138,10 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
     Public Function CreatePrintData(ByVal lodDate As String, ByVal trainNo As String) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        '指摘票No0.496 袖ケ浦帳票名対応
+        If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011203) Then
+            tmpFileName = "連結順序5461.xlsx"
+        End If
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try

@@ -163,6 +163,7 @@ Public Class GRIS0005LeftBox
         LC_CTRAINNUMBER
         LC_PRODUCTSEGLIST_FT
         LC_SALESOFFICE_KAISOU
+        LC_USERLIST
     End Enum
 
     ''' <summary>
@@ -259,6 +260,7 @@ Public Class GRIS0005LeftBox
         LP_ADDITINALFROMTO
         LP_PRODUCTSEGLIST_FT
         LP_SALESOFFICE_KAISOU
+        LP_USERLIST
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -814,6 +816,11 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE_KAISOU
                 '営業所(回送用(組織コード))
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SALESOFFICE_KAISOU"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_USERLIST
+                'ユーザマスタ(社員名)表示用
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "USERMASTER"
                 lbox = CreateFixValueList(Params, O_RTN)
 
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR

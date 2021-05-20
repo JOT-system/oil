@@ -882,7 +882,22 @@ Public Class OIT0005TankLocList
                         '★(一覧)中間点検者, (一覧)自主点検者
                         If WF_FIELD.Value = "INTERINSPECTORGCODE" _
                             OrElse WF_FIELD.Value = "SELFINSPECTORGCODE" Then
-
+                            '★抽出条件追加
+                            Dim condition As String = ""
+                            condition &= " AND KEYCODE IN ("
+                            condition &= "   '" + BaseDllConst.CONST_OFFICECODE_010401 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_010402 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_011201 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_011202 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_011203 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_011401 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_011402 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_012301 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_012401 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_OFFICECODE_012402 + "'"
+                            condition &= " , '" + BaseDllConst.CONST_JOT_011403 + "'"
+                            condition &= " )"
+                            prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = condition
                         End If
 
                     End If

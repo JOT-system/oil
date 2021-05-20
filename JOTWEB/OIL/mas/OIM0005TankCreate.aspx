@@ -740,6 +740,15 @@
                         <asp:Label ID="WF_SELFINSPECTORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
+
+                <p id="KEY_LINE_39">
+                    <!-- 点検実施者(社員名) -->
+                    <span class="ef">
+                        <asp:Label ID="WF_INSPECTMEMBERNAME_L" runat="server" Text="点検実施者(社員名)" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_INSPECTMEMBERNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_INSPECTMEMBERNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
             </div>
         </div>
 

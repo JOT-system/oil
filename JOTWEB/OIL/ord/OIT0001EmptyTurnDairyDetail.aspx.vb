@@ -7917,9 +7917,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRINSPECTIONCNT < 0 Then
+                'If WW_JRINSPECTIONCNT < 0 Then
+                If WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRINSPECTIONFLG = "1"
-                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRINSPECTIONFLG = "2"
                 Else
                     WW_JRINSPECTIONFLG = "3"
@@ -8006,9 +8009,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRALLINSPECTIONCNT < 0 Then
+                'If WW_JRALLINSPECTIONCNT < 0 Then
+                If WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRALLINSPECTIONFLG = "1"
-                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRALLINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRALLINSPECTIONFLG = "2"
                 Else
                     WW_JRALLINSPECTIONFLG = "3"

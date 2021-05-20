@@ -1982,8 +1982,14 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim tblMaxLinecnt As Integer = 0
                 '〇 一覧の件数取得
                 Dim intListCnt As Integer = OIT0003tbl.Rows.Count
+                '列車毎の入線順のMAX値を保持
+                Try
+                    tblMaxLinecnt = Integer.Parse(OIT0003tbl.Compute("MAX(LINEORDER)", Nothing).ToString())
+                Catch ex As Exception
+                End Try
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
@@ -2007,6 +2013,9 @@ Public Class OIT0003OrderDetail
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                             Try
                                 intListCnt = OIT0003WKtbl.Rows(0)("CNT")
+                                If tblMaxLinecnt <> intListCnt Then
+                                    intListCnt = OIT0003tbl.Rows.Count
+                                End If
                             Catch ex As Exception
                                 intListCnt = OIT0003tbl.Rows.Count
                             End Try

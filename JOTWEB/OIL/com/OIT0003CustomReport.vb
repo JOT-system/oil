@@ -162,7 +162,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
                     Case Else
                         ' 仙台、四日市  ※三重塩浜の積込指示書は別
-                        str_tmpFileName = "積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                        str_tmpFileName = "積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
                 End Select
             'OT積込指示書
             Case "OTLOADPLAN"
@@ -1318,7 +1318,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 str_tmpFileName = "出荷予定表" & ".xlsx"
             Case "LINEPLAN"
                 '入線方
-                str_tmpFileName = DateTime.Now.ToString("MMdd") & StrConv(rTrainNo, VbStrConv.Wide) & "入線方" & ".xlsx"
+                str_tmpFileName = Format(lodDate, "MMdd") & StrConv(rTrainNo, VbStrConv.Wide) & "入線方" & ".xlsx"
 
             Case Else
                 '例外
@@ -2337,11 +2337,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 str_tmpFileName = "託送状" & ".xlsx"
                 '積込指示
             Case "LOADPLAN"
-                str_tmpFileName = "積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                str_tmpFileName = "積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
 
             Case "SHIPCONTACT"
                 'タンク車出荷連絡書
-                str_tmpFileName = "タンク車出荷連絡書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                str_tmpFileName = "タンク車出荷連絡書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
         End Select
 
         Dim tmpFileName As String = str_tmpFileName

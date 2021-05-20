@@ -435,7 +435,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BIGOILNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_MIDDLEOILCODE コントロール。
     '''</summary>
@@ -444,7 +444,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MIDDLEOILCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_MIDDLEOILNAME コントロール。
     '''</summary>
@@ -453,7 +453,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MIDDLEOILNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OPERATIONBASECODE コントロール。
     '''</summary>
@@ -894,7 +894,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_USEDFLG2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INTERINSPECTYM コントロール。
     '''</summary>
@@ -903,7 +903,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INTERINSPECTYM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INTERINSPECTSTATION コントロール。
     '''</summary>
@@ -912,7 +912,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INTERINSPECTSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INTERINSPECTORGCODE コントロール。
     '''</summary>
@@ -921,7 +921,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INTERINSPECTORGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SELFINSPECTYM コントロール。
     '''</summary>
@@ -930,7 +930,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SELFINSPECTYM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SELFINSPECTSTATION コントロール。
     '''</summary>
@@ -939,7 +939,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SELFINSPECTSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SELFINSPECTORGCODE コントロール。
     '''</summary>
@@ -948,6 +948,15 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SELFINSPECTORGCODE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_INSPECTMEMBERNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_INSPECTMEMBERNAME As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_DELFLG コントロール。

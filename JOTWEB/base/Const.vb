@@ -188,6 +188,60 @@ Public Module BaseDllConst
         ''' </summary>
         Public Const ALERT_GREEN As String = "検査日まで後、7日以上のタンク車"
     End Class
+
+#Region "検査日(交検・全検)アラート日数"
+    ''' <summary>
+    ''' 仙台新港営業所(異常対象日数(以内))
+    ''' </summary>
+    Public Const ALERT_010402_ABNOR As Integer = 1
+    ''' <summary>
+    ''' 仙台新港営業所(警告対象FROM日数(以上))
+    ''' </summary>
+    Public Const ALERT_010402_WANFM As Integer = 2
+    ''' <summary>
+    ''' 仙台新港営業所(警告対象TO日数(以内))
+    ''' </summary>
+    Public Const ALERT_010402_WANTO As Integer = 10
+    ''' <summary>
+    ''' 仙台新港営業所(正常対象日数)
+    ''' </summary>
+    Public Const ALERT_010402_NORML As Integer = 11
+
+    ''' <summary>
+    ''' 関東(五井・甲子・袖ヶ浦・根岸)営業所(異常対象日数(以内))
+    ''' </summary>
+    Public Const ALERT_011401_ABNOR As Integer = 1
+    ''' <summary>
+    ''' 関東(五井・甲子・袖ヶ浦・根岸)営業所(警告対象FROM日数(以上))
+    ''' </summary>
+    Public Const ALERT_011401_WANFM As Integer = 2
+    ''' <summary>
+    ''' 関東(五井・甲子・袖ヶ浦・根岸)営業所(警告対象TO日数(以内))
+    ''' </summary>
+    Public Const ALERT_011401_WANTO As Integer = 6
+    ''' <summary>
+    ''' 関東(五井・甲子・袖ヶ浦・根岸)営業所(正常対象日数)
+    ''' </summary>
+    Public Const ALERT_011401_NORML As Integer = 7
+
+    ''' <summary>
+    ''' 中部(四日市・三重塩浜)営業所(異常対象日数(以内))
+    ''' </summary>
+    Public Const ALERT_012301_ABNOR As Integer = 3
+    ''' <summary>
+    ''' 中部(四日市・三重塩浜)営業所(警告対象FROM日数(以上))
+    ''' </summary>
+    Public Const ALERT_012301_WANFM As Integer = 4
+    ''' <summary>
+    ''' 中部(四日市・三重塩浜)営業所(警告対象TO日数(以内))
+    ''' </summary>
+    Public Const ALERT_012301_WANTO As Integer = 6
+    ''' <summary>
+    ''' 中部(四日市・三重塩浜)営業所(正常対象日数)
+    ''' </summary>
+    Public Const ALERT_012301_NORML As Integer = 7
+#End Region
+
     ''' <summary>
     ''' 端末分類（OIS0001_TERM TERMCLASS）
     ''' </summary>

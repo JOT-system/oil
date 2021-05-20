@@ -533,6 +533,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
+            Dim strLodDateSave As String = ""
             '### 20210514 START 同時入線取得用 ##########################################################
             Dim sTrainNo() As String = {"8877", "5461", "9672"}
             Dim sRTrainNo() As String = {"401", "501"}
@@ -554,7 +555,9 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
                 End If
                 '★列車が変わった場合
-                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
+                '　または、積込日(予定)が変わった場合
+                If (strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO"))) _
+                    OrElse strLodDateSave <> "" AndAlso strLodDateSave <> Convert.ToString(PrintDatarow("LODDATE")) Then
                     '◯ 合計
                     rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
                     rngDetailArea.Value = Convert.ToString(z) + "車"
@@ -576,6 +579,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
                 '○列車Noの保存
                 strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
+                '○積込日(予定)の保存
+                strLodDateSave = Convert.ToString(PrintDatarow("LODDATE"))
 
                 '○次の行へカウント
                 i += 1

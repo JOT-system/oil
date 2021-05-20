@@ -30,10 +30,10 @@ Public Class OIT0003CustomMultiReport
                         sheetName = "Sheet1"
                     Case BaseDllConst.CONST_OFFICECODE_012402
                         Select Case trainNo
-                            Case "8072"
-                                fileName = "タンク車発送フォーマット１.xls"
-                            Case "5282"
+                            Case "8081" '8072列車
                                 fileName = "タンク車発送フォーマット３.xls"
+                            Case "5875" '5282列車
+                                fileName = "タンク車発送フォーマット１.xls"
                             Case "174"
                                 fileName = "タンク車発送フォーマット４.xls"
                         End Select
@@ -640,8 +640,12 @@ Public Class TankDispatch : Inherits OIT0003CustomMultiReportBase
             ElseIf consigneeCode.Equals(TankDispatch.CONSIGNEECODE.OTTAKASAKI) Then
                 tmpFileName = "タンク車発送実績【構内取り分】.xlsx"
             End If
+        ElseIf Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_010402) Then
+            '仙台の場合
+            tmpFileName = "出荷実績表（仙台新港）.xlsx"
+
         End If
-        Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
+            Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 
         Try
 
@@ -1141,6 +1145,16 @@ Public Class ContactOrder : Inherits OIT0003CustomMultiReportBase
         '指摘票No0.496 袖ケ浦帳票名対応
         If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011203) Then
             tmpFileName = "連結順序5461.xlsx"
+
+        ElseIf Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_012402) Then
+            Select Case trainNo
+                Case "8081" '8072列車
+                    tmpFileName = "連結順序8081.xls"
+                Case "5875" '5282列車
+                    tmpFileName = "連結順序5875.xls"
+                Case "174"
+                    tmpFileName = "連結順序174.xls"
+            End Select
         End If
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
 

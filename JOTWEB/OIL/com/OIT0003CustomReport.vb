@@ -166,7 +166,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End Select
             'OT積込指示書
             Case "OTLOADPLAN"
-                str_tmpFileName = "OT積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                str_tmpFileName = "OT積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
 
         End Select
         Dim tmpFileName As String = str_tmpFileName

@@ -7381,7 +7381,8 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
-                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "    SET ACTUALDEPDATE        = @ACTUALDEPDATE, " _
+                    & "        ACTUALARRDATE        = @ACTUALARRDATE, " _
                     & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
                     & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
                     & "        UPDYMD               = @UPDYMD, " _
@@ -7399,13 +7400,15 @@ Public Class OIT0003OrderDetail
             P_ORDERNO.Value = Me.TxtOrderNo.Text
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALDEPDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALDEPDATE", System.Data.SqlDbType.Date)           '発日（実績）
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '積車着日（実績）
             Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)                   '更新ユーザーＩＤ
             Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)               '更新端末
             Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)             '集信日時
+            P_ACTUALDEPDATE.Value = Me.TxtActualDepDate.Text
             P_ACTUALARRDATE.Value = Me.TxtActualArrDate.Text
             P_ACTUALACCDATE.Value = Me.TxtActualAccDate.Text
             P_ACTUALEMPARRDATE.Value = Me.TxtActualEmparrDate.Text
@@ -7450,7 +7453,8 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0003_DETAIL " _
-                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "    SET ACTUALDEPDATE        = @ACTUALDEPDATE, " _
+                    & "        ACTUALARRDATE        = @ACTUALARRDATE, " _
                     & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
                     & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
                     & "        UPDYMD               = @UPDYMD, " _
@@ -7469,7 +7473,8 @@ Public Class OIT0003OrderDetail
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)                     '削除フラグ
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALDEPDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALDEPDATE", System.Data.SqlDbType.Date)           '発日（実績）
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '積車着日（実績）
             Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
@@ -7488,6 +7493,13 @@ Public Class OIT0003OrderDetail
                 P_ORDERNO.Value = OIT0003tab3row("ORDERNO")
                 '○受注明細№
                 P_DETAILNO.Value = OIT0003tab3row("DETAILNO")
+
+                '○発日
+                If OIT0003tab3row("ACTUALDEPDATE") = "" Then
+                    P_ACTUALDEPDATE.Value = DBNull.Value
+                Else
+                    P_ACTUALDEPDATE.Value = OIT0003tab3row("ACTUALDEPDATE")
+                End If
 
                 '○積車着日
                 If OIT0003tab3row("ACTUALARRDATE") = "" Then
@@ -14194,6 +14206,12 @@ Public Class OIT0003OrderDetail
 
                 '(実績)発日に入力された日付を、(一覧)発日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '### 20210521 START 指摘票対応(No246) #######################################
+                    '実績日訂正フラグが"1"(有効)の場合
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                        OIT0003tab3row("OPERATION") = "on"
+                    End If
+                    '### 20210521 END   指摘票対応(No246) #######################################
                     OIT0003tab3row("ACTUALDEPDATE") = Me.TxtActualDepDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -16097,6 +16115,8 @@ Public Class OIT0003OrderDetail
 
         '★実績日訂正フラグが"1"(有効)の場合、一部(実績)日を開放する。
         If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+            '(実績)発日
+            Me.TxtActualDepDate.Enabled = True
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
             '(実績)受入日
@@ -23788,14 +23808,14 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
-                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
 

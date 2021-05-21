@@ -626,7 +626,7 @@ Public Class CmnParts
             & " , OIT0002.CHANGERETSTATION        AS CHANGERETSTATION" _
             & " , OIT0002.CHANGERETSTATIONNAME    AS CHANGERETSTATIONNAME" _
             & " , OIT0002.ORDERSTATUS             AS ORDERSTATUS" _
-            & " , OIT0002.ORDERINFO               AS ORDERINFO" _
+            & " , OIT0003.ORDERINFO               AS ORDERINFO" _
             & " , OIT0002.EMPTYTURNFLG            AS EMPTYTURNFLG" _
             & " , OIT0002.STACKINGFLG             AS STACKINGFLG" _
             & " , OIT0002.USEPROPRIETYFLG         AS USEPROPRIETYFLG" _
@@ -943,7 +943,7 @@ Public Class CmnParts
                 Select Case I_OFFICECODE
                     '★仙台新港営業所
                     Case BaseDllConst.CONST_OFFICECODE_010402
-                        fileName = "OT積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                        fileName = "OT積込指示書" & Date.Parse(I_LODDATE).ToString("yyyy年MM月dd日") & ".xlsx"
                 End Select
 
             '★積込予定表(甲子用)

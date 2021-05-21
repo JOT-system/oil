@@ -70,6 +70,18 @@
                     <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonKoukenList');" style="margin-left:1em;" />
                 </div>
             </div>
+            <%-- 配属表ダウンロード --%>
+            <div class="inputItem">
+                <div>
+                    配属表
+<%--                    <a class="ef" id="WF_STYMD_CODE" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');" style="display:inline-block;width:10em;">
+                        <asp:TextBox ID="WF_STYMD" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                    </a>--%>
+                    <asp:DropDownList ID="ddlHaizokuListYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>
+                    ～
+                    <input type="button" id="WF_ButtonHaizokuList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonHaizokuList');" style="margin-left:1em;" />
+                </div>
+            </div>
         </div>
     </div>
 

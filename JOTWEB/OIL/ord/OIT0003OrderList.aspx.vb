@@ -7740,10 +7740,18 @@ Public Class OIT0003OrderList
             & "   AND OIM0005.DELFLG <> @DELFLG " _
             & "   AND ( " _
             & "     ( " _
-            & "       OIT0002.CONSIGNEECODE = '40' " _
-            & "       AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
-            & "     ) " _
-            & "     OR OIT0003.SECONDCONSIGNEECODE = '40' " _
+            & "       ( " _
+            & "         OIT0002.CONSIGNEECODE = '40' " _
+            & "         AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
+            & "       ) " _
+            & "       OR OIT0003.SECONDCONSIGNEECODE = '40' " _
+            & "     ) OR (" _
+            & "       ( " _
+            & "         OIT0002.CONSIGNEECODE = '70' " _
+            & "         AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
+            & "       ) " _
+            & "       OR OIT0003.SECONDCONSIGNEECODE = '70' " _
+            & "     )" _
             & "   ) " _
             & " ORDER BY " _
             & "   OIT0002.OFFICECODE " _

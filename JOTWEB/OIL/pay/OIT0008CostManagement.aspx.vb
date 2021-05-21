@@ -1143,6 +1143,8 @@ Public Class OIT0008CostManagement
         SQLStrBldr.AppendLine("     FORMAT(KEIJYOYM, 'yyyy/MM') AS KEIJYOYM")
         SQLStrBldr.AppendLine(" FROM")
         SQLStrBldr.AppendLine("     [oil].OIT0019_KEIJYOYM")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     CAMPCODE = @P01")
 
         Try
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1152,6 +1154,9 @@ Public Class OIT0008CostManagement
                 Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
                     'SQL実行
                     Dim WK_TBL As DataTable = New DataTable()
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 2)
+                    PARA01.Value = Master.USERCAMP
+
                     Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                         '○ フィールド名とフィールドの型を取得
                         For index As Integer = 0 To SQLdr.FieldCount - 1

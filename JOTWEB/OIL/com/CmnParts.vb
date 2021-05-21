@@ -896,6 +896,10 @@ Public Class CmnParts
     ''' 帳票ファイル名取得
     ''' </summary>
     ''' <returns></returns>
+    ''' <param name="I_REPTYPE">帳票区分</param>
+    ''' <param name="I_OFFICECODE">営業所コード</param>
+    ''' <param name="I_LODDATE">積込日</param>
+    ''' <param name="I_TRAINNO">列車番号</param>
     Public Function SetReportFileName(ByVal I_REPTYPE As String, ByVal I_OFFICECODE As String, ByVal I_LODDATE As String, ByVal I_TRAINNO As String) As String
         Dim fileName As String = ""
 
@@ -942,13 +946,36 @@ Public Class CmnParts
                         fileName = "OT積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
                 End Select
 
+            '★積込予定表(甲子用)
+            Case "KINOENE_LOADPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★甲子営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011202
+                        fileName = "回線別タンク車積込指示書" & ".xlsx"
+                End Select
+
             '★出荷予定表
             Case "SHIPPLAN"
                 '○営業所
                 Select Case I_OFFICECODE
-                    '★根岸営業所
-                    Case BaseDllConst.CONST_OFFICECODE_011402
+                    '★根岸営業所, 五井営業所, 袖ヶ浦営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011402,
+                         BaseDllConst.CONST_OFFICECODE_011201,
+                         BaseDllConst.CONST_OFFICECODE_011203
                         fileName = "出荷予定表" & ".xlsx"
+                    '★甲子営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011202
+                        fileName = "タンク車出荷予定表" & ".xlsx"
+                End Select
+
+            '★回線別充填ポイント表
+            Case "FILLINGPOINT"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★五井営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011201
+                        fileName = "充填ポイント入線表" & ".xlsx"
                 End Select
 
             '★入線方

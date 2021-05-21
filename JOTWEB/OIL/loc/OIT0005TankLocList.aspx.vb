@@ -653,7 +653,23 @@ Public Class OIT0005TankLocList
                 Catch ex As Exception
                 End Try
                 '### 20210513 END   指摘票対応(No479)全体 #################################################
+            Case "INSPECTMEMBERNAME"        '(一覧)点検実施者(社員名)
+                '文字の長さを設定
+                Dim iNameLen As Integer = WW_ListValue.Length
+                Try
+                    If iNameLen > 20 Then
+                        WW_ListValue = WW_ListValue.Substring(0, 20)
+                    End If
+                Catch ex As Exception
+                    WW_ListValue = ""
+                End Try
 
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                Master.SaveTable(OIT0005tbl)
+                'タンク車マスタの点検実施者(社員名)を更新
+                WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="INSPECTMEMBERNAME",
+                                                I_VALUE:=WW_ListValue)
         End Select
 
         '○ 画面表示データ保存
@@ -859,11 +875,12 @@ Public Class OIT0005TankLocList
                     prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
 
                     '### 20210513 START 指摘票対応(No479)全体 #################################################
-                    '(一覧)中間点検場所, (一覧)中間点検者, (一覧)自主点検場所, (一覧)自主点検者
+                    '(一覧)中間点検場所, (一覧)中間点検者, (一覧)自主点検場所, (一覧)自主点検者, (一覧)点検実施者(社員名)
                     If WF_FIELD.Value = "INTERINSPECTSTATION" _
                         OrElse WF_FIELD.Value = "INTERINSPECTORGCODE" _
                         OrElse WF_FIELD.Value = "SELFINSPECTSTATION" _
-                        OrElse WF_FIELD.Value = "SELFINSPECTORGCODE" Then
+                        OrElse WF_FIELD.Value = "SELFINSPECTORGCODE" _
+                        OrElse WF_FIELD.Value = "INSPECTMEMBERNAME" Then
 
                         '○ LINECNT取得
                         Dim WW_LINECNT As Integer = 0
@@ -900,9 +917,18 @@ Public Class OIT0005TankLocList
                             prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = condition
                         End If
 
+                        '★(一覧)点検実施者(社員名)
+                        If WF_FIELD.Value = "INSPECTMEMBERNAME" Then
+                            '★抽出条件追加
+                            Dim condition As String = ""
+                            condition &= " AND KEYCODE IN ("
+                            condition &= " '" + Master.USER_ORG + "'"
+                            condition &= " )"
+                            prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = condition
+                        End If
                     End If
-                    '### 20210513 END   指摘票対応(No479)全体 #################################################
-                    .SetListBox(CType(WF_LeftMViewChange.Value, LIST_BOX_CLASSIFICATION), WW_DUMMY, prmData)
+                        '### 20210513 END   指摘票対応(No479)全体 #################################################
+                        .SetListBox(CType(WF_LeftMViewChange.Value, LIST_BOX_CLASSIFICATION), WW_DUMMY, prmData)
                     .ActiveListBox()
                 End If
             End With
@@ -945,10 +971,12 @@ Public Class OIT0005TankLocList
             '(一覧)次回交検日, (一覧)次回全検日
             '(一覧)中間点検年月, (一覧)中間点検場所, (一覧)中間点検者
             '(一覧)自主点検年月, (一覧)自主点検場所, (一覧)自主点検者
+            '(一覧)点検実施者(社員名)
             Case "ORDER_ACTUALACCDATE", "ORDER_ACTUALEMPARRDATE",
                  "JRINSPECTIONDATE", "JRALLINSPECTIONDATE",
                  "INTERINSPECTDATE", "INTERINSPECTSTATION", "INTERINSPECTORGCODE",
-                 "SELFINSPECTDATE", "SELFINSPECTSTATION", "SELFINSPECTORGCODE"
+                 "SELFINSPECTDATE", "SELFINSPECTSTATION", "SELFINSPECTORGCODE",
+                 "INSPECTMEMBERNAME"
 
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
@@ -1131,6 +1159,15 @@ Public Class OIT0005TankLocList
                                                 I_VALUE:=WW_SETVALUE)
                     '### 20210513 END   指摘票対応(No479)全体 #################################################
 
+                    '(一覧)点検実施者(社員名)
+                ElseIf WF_FIELD.Value = "INSPECTMEMBERNAME" Then
+                    '(一覧)点検実施者(社員名)に指定した値を設定
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    Master.SaveTable(OIT0005tbl)
+                    'タンク車マスタの点検実施者(社員名)を更新
+                    WW_UpdateTankMaster(Convert.ToString(updHeader.Item("TANKNUMBER")),
+                                                I_ITEM:="INSPECTMEMBERNAME",
+                                                I_VALUE:=WW_SETTEXT)
                 End If
 
                 '○ 画面表示データ保存
@@ -2359,8 +2396,9 @@ Public Class OIT0005TankLocList
                         'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                         '### 20210512 START 指摘票対応(No479)全体 #################################################
-                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "MYWEIGHT") Then
-                        '★自重
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "MYWEIGHT") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "INSPECTMEMBERNAME") Then
+                        '★自重, 点検実施者(社員名)
                         '○タンク車状況(全検)の場合のみ入力可能とする。
                         If (Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_14 _
                             OrElse Convert.ToString(loopdr("TANKSITUATION")) = BaseDllConst.CONST_TANKSITUATION_04) _

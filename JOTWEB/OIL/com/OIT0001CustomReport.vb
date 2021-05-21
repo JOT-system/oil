@@ -41,6 +41,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
     Private PrintData As DataTable
     Private xlProcId As Integer
 
+    Private CMNPTS As New CmnParts                                  '共通関数
+
     Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
 
@@ -110,9 +112,16 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData(ByVal I_officeCode As String, Optional ByVal repPtn As String = Nothing) As String
+    Public Function CreateExcelPrintData(ByVal I_officeCode As String, Optional ByVal repPtn As String = Nothing, Optional ByVal lodDate As String = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        '○帳票名取得
+        Dim tmpGetFileName As String = CMNPTS.SetReportFileName(repPtn, I_officeCode, lodDate, "")
+        If tmpGetFileName <> "" Then
+            tmpFileName = tmpGetFileName
+        End If
+
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -533,6 +542,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
+            Dim strLodDateSave As String = ""
             '### 20210514 START 同時入線取得用 ##########################################################
             Dim sTrainNo() As String = {"8877", "5461", "9672"}
             Dim sRTrainNo() As String = {"401", "501"}
@@ -554,7 +564,9 @@ Public Class OIT0001CustomReport : Implements IDisposable
                     EditHeaderCommonArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
                 End If
                 '★列車が変わった場合
-                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
+                '　または、積込日(予定)が変わった場合
+                If (strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO"))) _
+                    OrElse strLodDateSave <> "" AndAlso strLodDateSave <> Convert.ToString(PrintDatarow("LODDATE")) Then
                     '◯ 合計
                     rngDetailArea = Me.ExcelWorkSheet.Range("G" + Convert.ToString(iFooter(j)))
                     rngDetailArea.Value = Convert.ToString(z) + "車"
@@ -576,6 +588,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
                 '○列車Noの保存
                 strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
+                '○積込日(予定)の保存
+                strLodDateSave = Convert.ToString(PrintDatarow("LODDATE"))
 
                 '○次の行へカウント
                 i += 1

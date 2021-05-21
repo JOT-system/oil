@@ -2493,7 +2493,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0001Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData(officeCode)
+                url = repCbj.CreateExcelPrintData(officeCode, repPtn:="KUUKAI_MEISAI", lodDate:=Me.TxtLoadingDate.Text)
             Catch ex As Exception
                 Return
             End Try

@@ -216,7 +216,8 @@
 
         SQLStr &=
                 " ORDER BY" _
-            & "    OIT0003.SHIPPERSCODE" _
+            & "    OIT0002.LODDATE" _
+            & "  , OIT0003.SHIPPERSCODE" _
             & "  , OIT0002.TRAINNO" _
             & "  , OIT0002.DEPSTATION" _
             & "  , OIM0003.OTOILCODE" _

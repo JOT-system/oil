@@ -943,7 +943,7 @@ Public Class CmnParts
                 Select Case I_OFFICECODE
                     '★仙台新港営業所
                     Case BaseDllConst.CONST_OFFICECODE_010402
-                        fileName = "OT積込指示書" & DateTime.Now.ToString("yyyy年MM月dd日") & ".xlsx"
+                        fileName = "OT積込指示書" & Date.Parse(I_LODDATE).ToString("yyyy年MM月dd日") & ".xlsx"
                 End Select
 
             '★積込予定表(甲子用)

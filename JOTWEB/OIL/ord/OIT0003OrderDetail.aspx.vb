@@ -2846,6 +2846,15 @@ Public Class OIT0003OrderDetail
                         OIT0003tab3row("OTTRANSPORTFLG") = ""
                     End If
                     '### 20200717 END  ((全体)No112対応) ######################################
+
+                    '★交検可否フラグがon("1"(交検あり))の場合、かつ
+                    '　受注情報が"82"(検査間近)の場合
+                    If OIT0003tab3row("INSPECTIONFLG") = "on" _
+                        AndAlso OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                        OIT0003tab3row("ORDERINFO") = ""
+                        OIT0003tab3row("ORDERINFONAME") = ""
+                    End If
+
                 Next
 
             End Using
@@ -4589,6 +4598,7 @@ Public Class OIT0003OrderDetail
                             OIT0003tbl_tab3.Rows(i)("ACTUALACCDATE") = ""
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4600,15 +4610,40 @@ Public Class OIT0003OrderDetail
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        Dim dtOrder As DataTable = New DataTable
                         If OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = ""
                             '★交検可否フラグ未チェック時は、(一覧)空車着日に(実績)の日付を設定
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
+
+                            '受注情報を取得
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.SelectOrder(SQLcon, Me.TxtOrderNo.Text, dtOrder,
+                                                   I_OFFICECODE:=Me.TxtOrderOfficeCode.Text,
+                                                   I_TANKNO:=OIT0003tbl_tab3.Rows(i)("TANKNO"))
+                            End Using
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                '(一覧)受注情報に"82"(検査間近)を設定
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82
+                                CODENAME_get("ORDERINFO", BaseDllConst.CONST_ORDERINFO_ALERT_82, OIT0003tbl_tab3.Rows(i)("ORDERINFONAME"), WW_DUMMY)
+                            End If
+
                         Else
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on"
                             '★交検可否フラグチェック時は、(一覧)空車着日を空白
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If OIT0003tbl_tab3.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFO") = ""
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFONAME") = ""
+                            End If
+
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4629,6 +4664,7 @@ Public Class OIT0003OrderDetail
                             '★留置可否フラグチェック時は、(一覧)空車着日を空白
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4655,6 +4691,7 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4682,6 +4719,7 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20200622 END  ((全体)No87対応) ######################################
@@ -4700,6 +4738,7 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl_tab3.Rows(i)("OTTRANSPORTFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20200717 END  ((全体)No112対応) ######################################

@@ -626,7 +626,7 @@ Public Class CmnParts
             & " , OIT0002.CHANGERETSTATION        AS CHANGERETSTATION" _
             & " , OIT0002.CHANGERETSTATIONNAME    AS CHANGERETSTATIONNAME" _
             & " , OIT0002.ORDERSTATUS             AS ORDERSTATUS" _
-            & " , OIT0002.ORDERINFO               AS ORDERINFO" _
+            & " , OIT0003.ORDERINFO               AS ORDERINFO" _
             & " , OIT0002.EMPTYTURNFLG            AS EMPTYTURNFLG" _
             & " , OIT0002.STACKINGFLG             AS STACKINGFLG" _
             & " , OIT0002.USEPROPRIETYFLG         AS USEPROPRIETYFLG" _

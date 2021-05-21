@@ -41,6 +41,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
     Private PrintData As DataTable
     Private xlProcId As Integer
 
+    Private CMNPTS As New CmnParts                                  '共通関数
+
     Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
 
@@ -110,9 +112,16 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData(ByVal I_officeCode As String, Optional ByVal repPtn As String = Nothing) As String
+    Public Function CreateExcelPrintData(ByVal I_officeCode As String, Optional ByVal repPtn As String = Nothing, Optional ByVal lodDate As String = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        '○帳票名取得
+        Dim tmpGetFileName As String = CMNPTS.SetReportFileName(repPtn, I_officeCode, lodDate, "")
+        If tmpGetFileName <> "" Then
+            tmpFileName = tmpGetFileName
+        End If
+
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 

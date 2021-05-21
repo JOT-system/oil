@@ -4197,7 +4197,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA)
+                        url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA, lodDate:=Me.txtReportLodDate.Text)
                     Catch ex As Exception
                         Return
                     End Try

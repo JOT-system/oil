@@ -43,6 +43,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
     Private KinoeneYusoujyoName As String = "OIREC(大阪国際石油精製)"
 
+    Private CMNPTS As New CmnParts                                  '共通関数
+
     Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
 

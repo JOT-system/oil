@@ -780,7 +780,6 @@ Public Class OIT0005TankLocSearch
             .AppendLine("       OIL.OIT0003_DETAIL DTL ")
             .AppendLine("     WHERE ")
             .AppendLine("       DTL.TANKNO = TNK.TANKNUMBER ")
-            .AppendLine("       AND DTL.DETENTIONFLG = '1' ")
             .AppendLine("       AND DTL.DELFLG = @DELFLG ")
             .AppendLine("   )                       AS ACTUALACCDATE ")
             .AppendLine(" FROM ")

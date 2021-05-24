@@ -626,7 +626,7 @@ Public Class CmnParts
             & " , OIT0002.CHANGERETSTATION        AS CHANGERETSTATION" _
             & " , OIT0002.CHANGERETSTATIONNAME    AS CHANGERETSTATIONNAME" _
             & " , OIT0002.ORDERSTATUS             AS ORDERSTATUS" _
-            & " , OIT0002.ORDERINFO               AS ORDERINFO" _
+            & " , OIT0003.ORDERINFO               AS ORDERINFO" _
             & " , OIT0002.EMPTYTURNFLG            AS EMPTYTURNFLG" _
             & " , OIT0002.STACKINGFLG             AS STACKINGFLG" _
             & " , OIT0002.USEPROPRIETYFLG         AS USEPROPRIETYFLG" _
@@ -891,5 +891,123 @@ Public Class CmnParts
             Throw '呼び出し元の例外にスロー
         End Try
     End Sub
+
+    ''' <summary>
+    ''' 帳票ファイル名取得
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <param name="I_REPTYPE">帳票区分</param>
+    ''' <param name="I_OFFICECODE">営業所コード</param>
+    ''' <param name="I_LODDATE">積込日</param>
+    ''' <param name="I_TRAINNO">列車番号</param>
+    Public Function SetReportFileName(ByVal I_REPTYPE As String, ByVal I_OFFICECODE As String, ByVal I_LODDATE As String, ByVal I_TRAINNO As String) As String
+        Dim fileName As String = ""
+
+        '○帳票名
+        Select Case I_REPTYPE
+            '★空回日報
+            Case "KUUKAI_SODEGAURA", "KUUKAI_LIST", "KUUKAI_MEISAI"
+                Select Case I_REPTYPE
+                    '○受注一覧の帳票（袖ヶ浦）, 空回日報明細からの帳票
+                    Case "KUUKAI_SODEGAURA", "KUUKAI_MEISAI"
+                        fileName = Date.Parse(I_LODDATE).ToString("MMdd") & "空回日報" & ".xlsx"
+                    '○空回日報一覧からの帳票
+                    Case "KUUKAI_LIST"
+                        fileName = "空回日報" & ".xlsx"
+                End Select
+
+            '★積込指示書
+            Case "LOADPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★五井営業所, 袖ヶ浦営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011201,
+                         BaseDllConst.CONST_OFFICECODE_011203
+                        fileName = "積込指示書" & ".xlsx"
+                    '★甲子営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011202
+                        fileName = "タンク車積込指示書" & ".xlsx"
+                    '★根岸営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011402
+                        fileName = "回線別出荷予定表" & ".xlsx"
+                    '★仙台新港営業所, 四日市営業所, 三重塩浜営業所
+                    Case BaseDllConst.CONST_OFFICECODE_010402,
+                         BaseDllConst.CONST_OFFICECODE_012401,
+                         BaseDllConst.CONST_OFFICECODE_012402
+                        fileName = "積込指示書" & Date.Parse(I_LODDATE).ToString("yyyy年MM月dd日") & ".xlsx"
+                End Select
+
+            '★OT積込指示書
+            Case "OTLOADPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★仙台新港営業所
+                    Case BaseDllConst.CONST_OFFICECODE_010402
+                        fileName = "OT積込指示書" & Date.Parse(I_LODDATE).ToString("yyyy年MM月dd日") & ".xlsx"
+                End Select
+
+            '★積込予定表(甲子用)
+            Case "KINOENE_LOADPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★甲子営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011202
+                        fileName = "回線別タンク車積込指示書" & ".xlsx"
+                End Select
+
+            '★出荷予定表
+            Case "SHIPPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★根岸営業所, 五井営業所, 袖ヶ浦営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011402,
+                         BaseDllConst.CONST_OFFICECODE_011201,
+                         BaseDllConst.CONST_OFFICECODE_011203
+                        fileName = "出荷予定表" & ".xlsx"
+                    '★甲子営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011202
+                        fileName = "タンク車出荷予定表" & ".xlsx"
+                End Select
+
+            '★回線別充填ポイント表
+            Case "FILLINGPOINT"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★五井営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011201
+                        fileName = "充填ポイント入線表" & ".xlsx"
+                End Select
+
+            '★入線方
+            Case "LINEPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★袖ヶ浦営業所
+                    Case BaseDllConst.CONST_OFFICECODE_011203
+                        fileName = Date.Parse(I_LODDATE).ToString("MMdd") & StrConv(I_TRAINNO, VbStrConv.Wide) & "入線方" & ".xlsx"
+                End Select
+
+            '★託送指示
+            Case "DELIVERYPLAN"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★三重塩浜営業所
+                    Case BaseDllConst.CONST_OFFICECODE_012402
+                        fileName = "託送状" & ".xlsx"
+                End Select
+
+            '★タンク車出荷連絡書
+            Case "SHIPCONTACT"
+                '○営業所
+                Select Case I_OFFICECODE
+                    '★三重塩浜営業所
+                    Case BaseDllConst.CONST_OFFICECODE_012402
+                        fileName = "タンク車出荷連絡書" & Date.Parse(I_LODDATE).ToString("yyyy年MM月dd日") & ".xlsx"
+                End Select
+
+        End Select
+
+        Return fileName
+    End Function
 
 End Class

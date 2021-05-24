@@ -202,6 +202,9 @@ function ListField_Dbclick(pnlList, Line, fieldNM) {
             || fieldNM === "SELFINSPECTORGCODE") {
             document.getElementById('WF_LeftMViewChange').value = 22;
         }
+        else if (fieldNM === "INSPECTMEMBERNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 76;
+        }
         else if (fieldNM === "ORDER_ACTUALACCDATE"
             || fieldNM === "ORDER_ACTUALEMPARRDATE"
             || fieldNM === "KAISOU_ACTUALEMPARRDATE"

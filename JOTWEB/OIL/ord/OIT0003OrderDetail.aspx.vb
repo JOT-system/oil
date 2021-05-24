@@ -1982,8 +1982,14 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim tblMaxLinecnt As Integer = 0
                 '〇 一覧の件数取得
                 Dim intListCnt As Integer = OIT0003tbl.Rows.Count
+                '列車毎の入線順のMAX値を保持
+                Try
+                    tblMaxLinecnt = Integer.Parse(OIT0003tbl.Compute("MAX(LINEORDER)", Nothing).ToString())
+                Catch ex As Exception
+                End Try
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
@@ -2007,6 +2013,9 @@ Public Class OIT0003OrderDetail
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                             Try
                                 intListCnt = OIT0003WKtbl.Rows(0)("CNT")
+                                If tblMaxLinecnt <> intListCnt Then
+                                    intListCnt = OIT0003tbl.Rows.Count
+                                End If
                             Catch ex As Exception
                                 intListCnt = OIT0003tbl.Rows.Count
                             End Try
@@ -2837,6 +2846,15 @@ Public Class OIT0003OrderDetail
                         OIT0003tab3row("OTTRANSPORTFLG") = ""
                     End If
                     '### 20200717 END  ((全体)No112対応) ######################################
+
+                    '★交検可否フラグがon("1"(交検あり))の場合、かつ
+                    '　受注情報が"82"(検査間近)の場合
+                    If OIT0003tab3row("INSPECTIONFLG") = "on" _
+                        AndAlso OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                        OIT0003tab3row("ORDERINFO") = ""
+                        OIT0003tab3row("ORDERINFONAME") = ""
+                    End If
+
                 Next
 
             End Using
@@ -4580,6 +4598,7 @@ Public Class OIT0003OrderDetail
                             OIT0003tbl_tab3.Rows(i)("ACTUALACCDATE") = ""
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4591,15 +4610,40 @@ Public Class OIT0003OrderDetail
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        Dim dtOrder As DataTable = New DataTable
                         If OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = ""
                             '★交検可否フラグ未チェック時は、(一覧)空車着日に(実績)の日付を設定
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
+
+                            '受注情報を取得
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.SelectOrder(SQLcon, Me.TxtOrderNo.Text, dtOrder,
+                                                   I_OFFICECODE:=Me.TxtOrderOfficeCode.Text,
+                                                   I_TANKNO:=OIT0003tbl_tab3.Rows(i)("TANKNO"))
+                            End Using
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                '(一覧)受注情報に"82"(検査間近)を設定
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82
+                                CODENAME_get("ORDERINFO", BaseDllConst.CONST_ORDERINFO_ALERT_82, OIT0003tbl_tab3.Rows(i)("ORDERINFONAME"), WW_DUMMY)
+                            End If
+
                         Else
                             OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on"
                             '★交検可否フラグチェック時は、(一覧)空車着日を空白
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If OIT0003tbl_tab3.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFO") = ""
+                                OIT0003tbl_tab3.Rows(i)("ORDERINFONAME") = ""
+                            End If
+
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4620,6 +4664,7 @@ Public Class OIT0003OrderDetail
                             '★留置可否フラグチェック時は、(一覧)空車着日を空白
                             OIT0003tbl_tab3.Rows(i)("ACTUALEMPARRDATE") = ""
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4646,6 +4691,7 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
+                        Exit For
                     End If
                 Next
 
@@ -4673,6 +4719,7 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20200622 END  ((全体)No87対応) ######################################
@@ -4691,6 +4738,7 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl_tab3.Rows(i)("OTTRANSPORTFLG") = "on"
                         End If
+                        Exit For
                     End If
                 Next
                 '### 20200717 END  ((全体)No112対応) ######################################
@@ -7333,7 +7381,8 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
-                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "    SET ACTUALDEPDATE        = @ACTUALDEPDATE, " _
+                    & "        ACTUALARRDATE        = @ACTUALARRDATE, " _
                     & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
                     & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
                     & "        UPDYMD               = @UPDYMD, " _
@@ -7351,13 +7400,15 @@ Public Class OIT0003OrderDetail
             P_ORDERNO.Value = Me.TxtOrderNo.Text
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALDEPDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALDEPDATE", System.Data.SqlDbType.Date)           '発日（実績）
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '積車着日（実績）
             Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)                   '更新ユーザーＩＤ
             Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)               '更新端末
             Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)             '集信日時
+            P_ACTUALDEPDATE.Value = Me.TxtActualDepDate.Text
             P_ACTUALARRDATE.Value = Me.TxtActualArrDate.Text
             P_ACTUALACCDATE.Value = Me.TxtActualAccDate.Text
             P_ACTUALEMPARRDATE.Value = Me.TxtActualEmparrDate.Text
@@ -7402,7 +7453,8 @@ Public Class OIT0003OrderDetail
             '更新SQL文･･･受注明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0003_DETAIL " _
-                    & "    SET ACTUALARRDATE        = @ACTUALARRDATE, " _
+                    & "    SET ACTUALDEPDATE        = @ACTUALDEPDATE, " _
+                    & "        ACTUALARRDATE        = @ACTUALARRDATE, " _
                     & "        ACTUALACCDATE        = @ACTUALACCDATE, " _
                     & "        ACTUALEMPARRDATE     = @ACTUALEMPARRDATE, " _
                     & "        UPDYMD               = @UPDYMD, " _
@@ -7421,7 +7473,8 @@ Public Class OIT0003OrderDetail
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)                     '削除フラグ
             P_DELFLG.Value = C_DELETE_FLG.DELETE
 
-            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '受入日（実績）
+            Dim P_ACTUALDEPDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALDEPDATE", System.Data.SqlDbType.Date)           '発日（実績）
+            Dim P_ACTUALARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALARRDATE", System.Data.SqlDbType.Date)           '積車着日（実績）
             Dim P_ACTUALACCDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALACCDATE", System.Data.SqlDbType.Date)           '受入日（実績）
             Dim P_ACTUALEMPARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ACTUALEMPARRDATE", System.Data.SqlDbType.Date)     '空車着日（実績）
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)                     '更新年月日
@@ -7440,6 +7493,13 @@ Public Class OIT0003OrderDetail
                 P_ORDERNO.Value = OIT0003tab3row("ORDERNO")
                 '○受注明細№
                 P_DETAILNO.Value = OIT0003tab3row("DETAILNO")
+
+                '○発日
+                If OIT0003tab3row("ACTUALDEPDATE") = "" Then
+                    P_ACTUALDEPDATE.Value = DBNull.Value
+                Else
+                    P_ACTUALDEPDATE.Value = OIT0003tab3row("ACTUALDEPDATE")
+                End If
 
                 '○積車着日
                 If OIT0003tab3row("ACTUALARRDATE") = "" Then
@@ -7859,9 +7919,12 @@ Public Class OIT0003OrderDetail
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRINSPECTIONCNT < 0 Then
+                'If WW_JRINSPECTIONCNT < 0 Then
+                If WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRINSPECTIONFLG = "1"
-                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRINSPECTIONFLG = "2"
                 Else
                     WW_JRINSPECTIONFLG = "3"
@@ -7947,9 +8010,12 @@ Public Class OIT0003OrderDetail
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRALLINSPECTIONCNT < 0 Then
+                'If WW_JRALLINSPECTIONCNT < 0 Then
+                If WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRALLINSPECTIONFLG = "1"
-                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRALLINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRALLINSPECTIONFLG = "2"
                 Else
                     WW_JRALLINSPECTIONFLG = "3"
@@ -14140,6 +14206,12 @@ Public Class OIT0003OrderDetail
 
                 '(実績)発日に入力された日付を、(一覧)発日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    '### 20210521 START 指摘票対応(No246) #######################################
+                    '実績日訂正フラグが"1"(有効)の場合
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                        OIT0003tab3row("OPERATION") = "on"
+                    End If
+                    '### 20210521 END   指摘票対応(No246) #######################################
                     OIT0003tab3row("ACTUALDEPDATE") = Me.TxtActualDepDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -16043,6 +16115,8 @@ Public Class OIT0003OrderDetail
 
         '★実績日訂正フラグが"1"(有効)の場合、一部(実績)日を開放する。
         If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+            '(実績)発日
+            Me.TxtActualDepDate.Enabled = True
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
             '(実績)受入日
@@ -23734,14 +23808,14 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
-                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
 

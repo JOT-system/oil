@@ -11,7 +11,7 @@ Public Class OIT0008CostDetailCreate
     '○ 検索結果格納Table
     Private TMP0009tbl As DataTable                                 ' 一覧格納用テーブル
     Private TMP0009INPtbl As DataTable                              ' 更新時入力テーブル
-    'Private OIM0003tbl As DataTable                                 ' 油種リスト格納テーブル
+    'Private OIM0003tbl As DataTable                                '' 油種リスト格納テーブル
     Private OIM0012tbl As DataTable                                 ' 荷受人リスト格納テーブル
     Private postOfficeTbl As DataTable                              ' 計上営業所格納テーブル
 
@@ -1977,15 +1977,17 @@ Public Class OIT0008CostDetailCreate
         '　検索説明
         '     条件指定に従い該当データを営業所関連付けマスタから取得する
         Dim SQLStrBldr As New StringBuilder
-        SQLStrBldr.AppendLine(" SELECT")
-        SQLStrBldr.AppendLine("     OFFICECODE")
-        SQLStrBldr.AppendLine("     , OFFICENAME")
-        SQLStrBldr.AppendLine(" FROM")
-        SQLStrBldr.AppendLine("     oil.VIW0003_OFFICECHANGE")
-        SQLStrBldr.AppendLine(" WHERE")
-        SQLStrBldr.AppendLine("     ORGCODE = @P01")
-        SQLStrBldr.AppendLine(" ORDER BY")
-        SQLStrBldr.AppendLine("     OFFICECODE")
+        SQLStrBldr.AppendLine(" SELECT ")
+        SQLStrBldr.AppendLine("     CNVT.KEYCODE03   AS OFFICECODE ")
+        SQLStrBldr.AppendLine("     , CNVT.KEYCODE04 AS OFFICENAME ")
+        SQLStrBldr.AppendLine(" FROM ")
+        SQLStrBldr.AppendLine("     oil.OIM0029_CONVERT CNVT ")
+        SQLStrBldr.AppendLine(" WHERE ")
+        SQLStrBldr.AppendLine("     CNVT.CLASS     = 'OIT0008C_POSTOFFICE' ")
+        SQLStrBldr.AppendLine(" AND CNVT.KEYCODE01 = @P01 ")
+        SQLStrBldr.AppendLine(" AND CNVT.DELFLG   <> @P00 ")
+        SQLStrBldr.AppendLine(" ORDER BY ")
+        SQLStrBldr.AppendLine("     CNVT.VALUE01 ")
 
         '○ 計上営業所テーブルデータ取得
         Try
@@ -1993,7 +1995,9 @@ Public Class OIT0008CostDetailCreate
                 SQLcon.Open()       ' DataBase接続
 
                 Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   ' 削除フラグ
                     Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)   ' 営業所コード
+                    PARA00.Value = C_DELETE_FLG.DELETE
                     PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
 
                     Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

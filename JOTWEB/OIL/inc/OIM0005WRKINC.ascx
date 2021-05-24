@@ -116,6 +116,8 @@
     <asp:TextBox ID="WF_SEL_SELFINSPECTSTATION" runat="server"></asp:TextBox>       <!-- 自主点検場所 -->
     <asp:TextBox ID="WF_SEL_SELFINSPECTORGCODE" runat="server"></asp:TextBox>       <!-- 自主点検実施者 -->
 
+    <asp:TextBox ID="WF_SEL_INSPECTMEMBERNAME" runat="server"></asp:TextBox>        <!-- 点検実施者(社員名) -->
+
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_INITYMD" runat="server"></asp:TextBox>                  <!-- 登録年月日 -->
     <asp:TextBox ID="WF_SEL_INITUSER" runat="server"></asp:TextBox>                 <!-- 登録ユーザーＩＤ -->

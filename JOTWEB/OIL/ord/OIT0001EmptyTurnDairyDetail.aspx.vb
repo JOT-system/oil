@@ -794,6 +794,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                     CODENAME_get("CTRAINNUMBER", Convert.ToString(OIT0001row("RETURNDATETRAINNO")), OIT0001row("RETURNDATETRAIN"), WW_DUMMY)
                     If Convert.ToString(OIT0001row("RETURNDATETRAIN")) = "" Then OIT0001row("RETURNDATETRAIN") = OIT0001row("RETURNDATETRAINNO")
 
+                    '★交検可否フラグがon("1"(交検あり))の場合、かつ
+                    '　受注情報が"82"(検査間近)の場合
+                    If OIT0001row("INSPECTIONFLG") = "on" _
+                        AndAlso OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+                    End If
+
                 Next
             End Using
         Catch ex As Exception
@@ -1308,10 +1316,34 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
                     If Convert.ToString(OIT0001tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                        Dim dtOrder As DataTable = New DataTable
                         If Convert.ToString(OIT0001tbl.Rows(i)("INSPECTIONFLG")) = "on" Then
                             OIT0001tbl.Rows(i)("INSPECTIONFLG") = ""
+
+                            '受注情報を取得
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.SelectOrder(SQLcon, OIT0001tbl.Rows(i)("ORDERNO"), dtOrder,
+                                                   I_OFFICECODE:=work.WF_SEL_SALESOFFICECODE.Text,
+                                                   I_TANKNO:=OIT0001tbl.Rows(i)("TANKNO"))
+                            End Using
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                '(一覧)受注情報に"82"(検査間近)を設定
+                                OIT0001tbl.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82
+                                CODENAME_get("ORDERINFO", BaseDllConst.CONST_ORDERINFO_ALERT_82, OIT0001tbl.Rows(i)("ORDERINFONAME"), WW_DUMMY)
+                            End If
+
                         Else
                             OIT0001tbl.Rows(i)("INSPECTIONFLG") = "on"
+
+                            '★受注情報が"82"(検査間近)の場合
+                            If OIT0001tbl.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                OIT0001tbl.Rows(i)("ORDERINFO") = ""
+                                OIT0001tbl.Rows(i)("ORDERINFONAME") = ""
+                            End If
+
                         End If
                         Exit For
                     End If
@@ -2493,7 +2525,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0001Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData(officeCode)
+                url = repCbj.CreateExcelPrintData(officeCode, repPtn:="KUUKAI_MEISAI", lodDate:=Me.TxtLoadingDate.Text)
             Catch ex As Exception
                 Return
             End Try
@@ -6262,6 +6294,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 8) 'タンク車№
                 'Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 7) '費用科目
 
+                Dim dtOrder As DataTable = New DataTable
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                     '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
@@ -6326,6 +6359,23 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA53.Value = "2"                                'テスト積み可否フラグ
 
                     PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
+
+                    '# 交検可否フラグ(1:交検あり)の場合
+                    If OIT0001row("INSPECTIONFLG") = "on" Then
+                        '★受注情報を取得
+                        CMNPTS.SelectOrder(SQLcon, OIT0001row("ORDERNO"), dtOrder,
+                                        I_OFFICECODE:=work.WF_SEL_SALESOFFICECODE.Text,
+                                        I_TANKNO:=OIT0001row("TANKNO"))
+
+                        If dtOrder.Rows.Count <> 0 Then
+                            '★受注情報が"82"(検査間近)の場合
+                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                '(一覧)受注情報に"82"(検査間近)を設定
+                                PARA34.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
+                            End If
+                        End If
+                    End If
+
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
                     PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
                     PARA05.Value = OIT0001row("OILCODE")              '油種コード
@@ -7917,9 +7967,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim WW_JRINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRINSPECTIONCNT < 0 Then
+                'If WW_JRINSPECTIONCNT < 0 Then
+                If WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRINSPECTIONFLG = "1"
-                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRINSPECTIONFLG = "2"
                 Else
                     WW_JRINSPECTIONFLG = "3"
@@ -8006,9 +8059,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim WW_JRALLINSPECTIONFLG As String
             '### 20200929 START 仙台新港営業所対応 ###############################################
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
-                If WW_JRALLINSPECTIONCNT < 0 Then
+                'If WW_JRALLINSPECTIONCNT < 0 Then
+                If WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_ABNOR Then
                     WW_JRALLINSPECTIONFLG = "1"
-                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                    'ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
+                ElseIf WW_JRALLINSPECTIONCNT >= BaseDllConst.ALERT_010402_WANFM _
+                        And WW_JRALLINSPECTIONCNT <= BaseDllConst.ALERT_010402_WANTO Then
                     WW_JRALLINSPECTIONFLG = "2"
                 Else
                     WW_JRALLINSPECTIONFLG = "3"

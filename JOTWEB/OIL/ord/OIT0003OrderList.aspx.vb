@@ -4137,13 +4137,15 @@ Public Class OIT0003OrderList
                 '******************************
                 '帳票表示データ取得処理
                 '******************************
+                Dim sArrStation As String = ""
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelSodegauraLinePlanDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
+                    ExcelSodegauraLinePlanDataGet(SQLcon, sArrStation, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
                 '使用する帳票の確認
                 Dim tyohyoName As String = ""
+                Dim repRTrainNo As String = Me.txtReportRTrainNo.Text
                 '★同時入線(チェックボックス)が押下されている場合
                 If Me.ChkSameTimeLineChk.Checked = True Then
                     '◯ファイル名(袖ヶ浦同時入線専用入線方)
@@ -4152,15 +4154,25 @@ Public Class OIT0003OrderList
                     If Me.txtReportRTrainNo.Text = "401" Then
                         '◯ファイル名(袖ヶ浦401レ専用入線方)
                         tyohyoName = "_SODEGAURA_LINEPLAN_401"
+                        '★着駅が"5141"(南松本)の場合は、フォーマット(南松本向け)にする。
+                        If sArrStation = "5141" Then
+                            tyohyoName = "_SODEGAURA_LINEPLAN_501"
+                            repRTrainNo = "501"
+                        End If
                     Else
                         '◯ファイル名(袖ヶ浦501レ専用入線方)
                         tyohyoName = "_SODEGAURA_LINEPLAN_501"
+                        '★着駅が"4113"(倉賀野)の場合は、フォーマット(倉賀野向け)にする。
+                        If sArrStation = "4113" Then
+                            tyohyoName = "_SODEGAURA_LINEPLAN_401"
+                            repRTrainNo = "401"
+                        End If
                     End If
                 End If
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintSodegauraData(CONST_RPT_LINEPLAN, Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text, Me.ChkSameTimeLineChk.Checked)
+                        url = repCbj.CreateExcelPrintSodegauraData(CONST_RPT_LINEPLAN, Me.txtReportLodDate.Text, repRTrainNo, Me.ChkSameTimeLineChk.Checked)
                     Catch ex As Exception
                         Return
                     End Try
@@ -4185,7 +4197,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_KUUKAI.xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA)
+                        url = repCbj.CreateExcelPrintData(officeCode, repPtn:=CONST_RPT_KUUKAI_SODEGAURA, lodDate:=Me.txtReportLodDate.Text)
                     Catch ex As Exception
                         Return
                     End Try
@@ -5914,7 +5926,9 @@ Public Class OIT0003OrderList
                 End Using
 
                 Dim i As Integer = 0
-                Dim tblcnt As Integer = 0
+                Dim tblcnt As Integer = 0           '列車毎の件数を保持
+                Dim tblFirstcnt As Integer = 0      '列車毎の件数(サマリー)を保持
+                Dim tblMaxLinecnt As Integer = 0    '列車毎の入線順のMAX値を保持
                 Dim strTrainNosave As String = ""
                 Dim strRTrainNamesave As String = ""
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
@@ -5922,13 +5936,27 @@ Public Class OIT0003OrderList
 
                     '### 20210514 START 同時入線取得用 ##########################################################
                     '列車Noが前回と違う場合(または初回)
-                    If strTrainNosave = "" OrElse strTrainNosave <> OIT0003Reprow("TRAINNO") Then
+                    If strTrainNosave = "" Then
                         '★列車の合計を設定
                         tblcnt = OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").Count
+                        tblFirstcnt = tblcnt
+                    ElseIf strTrainNosave <> OIT0003Reprow("TRAINNO") Then
+                        '★列車の合計を設定
+                        tblcnt = OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").Count
+                        Try
+                            tblMaxLinecnt = Integer.Parse(OIT0003ReportSodegauratbl.Compute("MAX(LINEORDER)", "TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").ToString())
+                        Catch ex As Exception
+                        End Try
+                        '★列車の合計(サマリー)を設定
+                        tblFirstcnt += tblcnt
+                        If tblMaxLinecnt <> tblFirstcnt Then
+                            '○同時入線ではない場合は、列車の合計を設定
+                            tblFirstcnt = tblcnt
+                        End If
                     End If
                     'OT順位を降順で設定
-                    OIT0003Reprow("OTRANK") = tblcnt
-                    tblcnt -= 1
+                    OIT0003Reprow("OTRANK") = (tblFirstcnt - Integer.Parse(OIT0003Reprow("LINEORDER"))) + 1
+                    'tblcnt -= 1
                     '### 20210514 END   同時入線取得用 ##########################################################
 
                     If strTrainNosave <> "" _
@@ -6216,7 +6244,7 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelSodegauraLinePlanDataGet(ByVal SQLcon As SqlConnection,
+    Protected Sub ExcelSodegauraLinePlanDataGet(ByVal SQLcon As SqlConnection, ByRef ArrStation As String,
                                         Optional ByVal lodDate As String = Nothing,
                                         Optional ByVal rTrainNo As String = Nothing)
 
@@ -6244,6 +6272,10 @@ Public Class OIT0003OrderList
             & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0002.DEPSTATION                             AS DEPSTATION" _
+            & " , OIT0002.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
+            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
             & " , OIM0007.OTTRAINNO                              AS OTTRAINNO" _
             & " , OIM0007.JRTRAINNO1                             AS JRTRAINNO1" _
             & " , OIM0007.JRTRAINNO2                             AS JRTRAINNO2" _
@@ -6269,11 +6301,11 @@ Public Class OIT0003OrderList
             & " , OIT0003.ACTUALEMPARRDATE                       AS ACTUALEMPARRDATE" _
             & " , ROW_NUMBER() OVER(ORDER BY OIM0007.OTFLG DESC, " _
             & "                              OIM0007.ZAIKOSORT, " _
-            & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS NYUSENNO" _
+            & "                              RIGHT ('00' + CASE OIT0003.LOADINGIRILINEORDER WHEN '' THEN OIT0003.LINEORDER ELSE OIT0003.LOADINGIRILINEORDER END, 2)) AS NYUSENNO" _
             & " , ROW_NUMBER() OVER(PARTITION BY OIM0007.OTFLG, OIM0007.ZAIKOSORT " _
             & "                     ORDER BY OIM0007.OTFLG DESC, " _
             & "                              OIM0007.ZAIKOSORT, " _
-            & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS TRAINNO_SORT" _
+            & "                              RIGHT ('00' + CASE OIT0003.LOADINGIRILINEORDER WHEN '' THEN OIT0003.LINEORDER ELSE OIT0003.LOADINGIRILINEORDER END, 2)) AS TRAINNO_SORT" _
             & " , ''                                             AS OTRANK" _
             & " , CASE" _
             & "   WHEN OIT0003.LOADINGIRILINEORDER = '' THEN OIT0003.LINEORDER" _
@@ -6415,6 +6447,9 @@ Public Class OIT0003OrderList
                     '列車番号を設定(比較用)
                     strTrainNo = OIT0003Reprow("TRAINNO")
 
+                    '★着駅コードを設定
+                    ArrStation = OIT0003Reprow("ARRSTATION")
+
                 Next
 
                 strTrainNo = ""
@@ -6438,9 +6473,9 @@ Public Class OIT0003OrderList
                                     LineCnt -= 1
                                 End If
                             Else
-                                If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
+                                If OIT0003Reprow("LOADINGOUTLETORDER") <= LineCnt Then
                                     OIT0003Reprow("NYUUKA") = strNyuuka
-                                    LineCnt -= 1
+                                    'LineCnt -= 1
                                 End If
                             End If
                         '列車№:5461(JR:5972)は上から
@@ -7705,10 +7740,18 @@ Public Class OIT0003OrderList
             & "   AND OIM0005.DELFLG <> @DELFLG " _
             & "   AND ( " _
             & "     ( " _
-            & "       OIT0002.CONSIGNEECODE = '40' " _
-            & "       AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
-            & "     ) " _
-            & "     OR OIT0003.SECONDCONSIGNEECODE = '40' " _
+            & "       ( " _
+            & "         OIT0002.CONSIGNEECODE = '40' " _
+            & "         AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
+            & "       ) " _
+            & "       OR OIT0003.SECONDCONSIGNEECODE = '40' " _
+            & "     ) OR (" _
+            & "       ( " _
+            & "         OIT0002.CONSIGNEECODE = '70' " _
+            & "         AND ISNULL(OIT0003.SECONDCONSIGNEECODE, '') = '' " _
+            & "       ) " _
+            & "       OR OIT0003.SECONDCONSIGNEECODE = '70' " _
+            & "     )" _
             & "   ) " _
             & " ORDER BY " _
             & "   OIT0002.OFFICECODE " _

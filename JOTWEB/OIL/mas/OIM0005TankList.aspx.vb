@@ -11,6 +11,7 @@
 '         :             画面下部に更新メッセージを表示するように修正
 '         :2021/05/07 1)項目「油種中分類」「中間点検年月」「中間点検場所」「中間点検実施者」
 '         :             「自主点検年月」「自主点検場所」「自主点検実施者」を追加
+'         :2021/05/18 1)項目「点検実施者(社員名)」を追加
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -453,6 +454,7 @@ Public Class OIM0005TankList
             & " , ''                                                           AS SELFINSPECTSTATIONNAME " _
             & " , ISNULL(RTRIM(OIM0005.SELFINSPECTORGCODE), '')                AS SELFINSPECTORGCODE " _
             & " , ''                                                           AS SELFINSPECTORGNAME " _
+            & " , ISNULL(RTRIM(OIM0005.INSPECTMEMBERNAME), '')                 AS INSPECTMEMBERNAME " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
             & " WHERE OIM0005.DELFLG <> @P3 "
 
@@ -1043,6 +1045,9 @@ Public Class OIM0005TankList
         '自主点検実施者
         work.WF_SEL_SELFINSPECTORGCODE.Text = ""
 
+        '点検実施者(社員名)
+        work.WF_SEL_INSPECTMEMBERNAME.Text = ""
+
         '削除
         work.WF_SEL_DELFLG.Text = "0"
 
@@ -1259,6 +1264,7 @@ Public Class OIM0005TankList
             & "        , SELFINSPECTORGCODE = @P102" _
             & "        , MIDDLEOILCODE = @P103" _
             & "        , MIDDLEOILNAME = @P104" _
+            & "        , INSPECTMEMBERNAME = @P105" _
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -1367,7 +1373,8 @@ Public Class OIM0005TankList
             & "        , SELFINSPECTSTATION" _
             & "        , SELFINSPECTORGCODE" _
             & "        , MIDDLEOILCODE" _
-            & "        , MIDDLEOILNAME)" _
+            & "        , MIDDLEOILNAME" _
+            & "        , INSPECTMEMBERNAME)" _
             & "    VALUES" _
             & "        (@P00" _
             & "        , @P01" _
@@ -1473,7 +1480,8 @@ Public Class OIM0005TankList
             & "        , @P101" _
             & "        , @P102" _
             & "        , @P103" _
-            & "        , @P104) ;" _
+            & "        , @P104" _
+            & "        , @P105) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
 
@@ -1578,6 +1586,7 @@ Public Class OIM0005TankList
             & "    , SELFINSPECTYM" _
             & "    , SELFINSPECTSTATION" _
             & "    , SELFINSPECTORGCODE" _
+            & "    , INSPECTMEMBERNAME" _
             & "    , INITYMD" _
             & "    , INITUSER" _
             & "    , INITTERMID" _
@@ -1698,7 +1707,7 @@ Public Class OIM0005TankList
                 Dim PARA102 As SqlParameter = SQLcmd.Parameters.Add("@P102", SqlDbType.NVarChar, 7)         '自主点検実施者
                 Dim PARA103 As SqlParameter = SQLcmd.Parameters.Add("@P103", SqlDbType.NVarChar, 1)         '油種中分類コード
                 Dim PARA104 As SqlParameter = SQLcmd.Parameters.Add("@P104", SqlDbType.NVarChar, 10)        '油種中分類名
-
+                Dim PARA105 As SqlParameter = SQLcmd.Parameters.Add("@P105", SqlDbType.NVarChar, 20)        '点検実施者(社員名)
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       'JOT車番
 
@@ -1926,6 +1935,7 @@ Public Class OIM0005TankList
                         PARA102.Value = OIM0005row("SELFINSPECTORGCODE")
                         PARA103.Value = OIM0005row("MIDDLEOILCODE")
                         PARA104.Value = OIM0005row("MIDDLEOILNAME")
+                        PARA105.Value = OIM0005row("INSPECTMEMBERNAME")
 
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
@@ -2407,6 +2417,9 @@ Public Class OIM0005TankList
 
         '自主点検実施者
         work.WF_SEL_SELFINSPECTORGCODE.Text = OIM0005tbl.Rows(WW_LINECNT)("SELFINSPECTORGCODE")
+
+        '点検実施者(社員名)
+        work.WF_SEL_INSPECTMEMBERNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("INSPECTMEMBERNAME")
 
         '詳細画面更新メッセージ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
@@ -3180,6 +3193,11 @@ Public Class OIM0005TankList
                 Else
                     OIM0005INProw("SELFINSPECTORGNAME") = ""
                 End If
+            End If
+
+            '点検実施者(社員名)
+            If WW_COLUMNS.IndexOf("INSPECTMEMBERNAME") >= 0 Then
+                OIM0005INProw("INSPECTMEMBERNAME") = XLSTBLrow("INSPECTMEMBERNAME")
             End If
 
             '削除フラグ
@@ -4970,6 +4988,17 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            ' 自主点検実施者(社員名)（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("INSPECTMEMBERNAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INSPECTMEMBERNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(自主点検実施者(社員名))です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             If WW_LINE_ERR = "" Then
                 If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
                     OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -5137,6 +5166,7 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検年月 =" & OIM0005row("SELFINSPECTYM") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検場所 =" & OIM0005row("SELFINSPECTSTATION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検実施者 =" & OIM0005row("SELFINSPECTORGCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 点検実施者(社員名) =" & OIM0005row("INSPECTMEMBERNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG") & " , "
 
         End If
@@ -5288,6 +5318,7 @@ Public Class OIM0005TankList
                         OIM0005row("SELFINSPECTYM") = OIM0005INProw("SELFINSPECTYM") AndAlso
                         OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
                         OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
+                        OIM0005row("INSPECTMEMBERNAME") = OIM0005INProw("INSPECTMEMBERNAME") AndAlso
                         OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA

@@ -73,9 +73,7 @@
                 <%-- 配属表ダウンロード --%>
                 <div>
                     <div>配属表</div>
-                    <div>
-                        <asp:DropDownList ID="ddlHaizokuListYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>～
-                    </div>
+                    <div></div>
                     <div>
                         <input type="button" id="WF_ButtonHaizokuList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonHaizokuList');" style="margin-left:1em;" />
                     </div>

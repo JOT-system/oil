@@ -162,9 +162,6 @@ Public Class OIT0005TankLocSearch
             '交検一覧用
             Me.ddlKoukenListYearMonth.Items.AddRange(ymDdl.Items.Cast(Of ListItem).ToArray)
             Me.ddlKoukenListYearMonth.SelectedIndex = ymDdl.SelectedIndex
-            '配属表用
-            Me.ddlHaizokuListYearMonth.Items.AddRange(ymDdl.Items.Cast(Of ListItem).ToArray)
-            Me.ddlHaizokuListYearMonth.SelectedIndex = ymDdl.SelectedIndex
         End If
 
         '○ RightBox情報設定
@@ -288,13 +285,6 @@ Public Class OIT0005TankLocSearch
             For Each item As ListItem In Me.tileSalesOffice.GetSelectedListData().Items
                 officeCodeDic.Add(item.Value, item.Text)
             Next
-            '取得開始日付取得（Default：Now）
-            Dim beginDate As Date = Nothing
-            If Not Date.TryParse(ddlHaizokuListYearMonth.SelectedValue + "/01", beginDate) Then
-                beginDate = Now
-            End If
-            '取得終了日付計算（取得開始日付の末日）
-            Dim endDate As Date = beginDate.AddDays(beginDate.Day * -1 + 1).AddMonths(1).AddDays(-1)
 
             '******************************
             '出力データ取得
@@ -302,14 +292,14 @@ Public Class OIT0005TankLocSearch
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
                 SqlConnection.ClearPool(SQLcon)
-                ExcelHaizokuListDataGet(SQLcon, officeCodeDic.Keys.ToArray, beginDate, endDate)
+                ExcelHaizokuListDataGet(SQLcon, officeCodeDic.Keys.ToArray)
             End Using
 
             '******************************
             '出力データ生成
             '******************************
             Dim url As String
-            url = OIT0005CustomReport.CreateHaizokuList(Master.MAPID, officeCodeDic, beginDate, OIT0005ReportTbl)
+            url = OIT0005CustomReport.CreateHaizokuList(Master.MAPID, officeCodeDic, OIT0005ReportTbl)
 
             '○ 別画面でExcelを表示
             WF_PrintURL.Value = url
@@ -745,9 +735,7 @@ Public Class OIT0005TankLocSearch
     End Sub
 
     Protected Sub ExcelHaizokuListDataGet(ByVal SQLcon As SqlConnection,
-                                          ByVal officeCodes As String(),
-                                          ByVal beginDate As Date,
-                                          ByVal endDate As Date)
+                                          ByVal officeCodes As String())
 
         If IsNothing(OIT0005ReportTbl) Then
             OIT0005ReportTbl = New DataTable
@@ -775,7 +763,7 @@ Public Class OIT0005TankLocSearch
             .AppendLine("   , TNK.MARKCODE          AS MARKCODE ")
             .AppendLine("   , ( ")
             .AppendLine("      SELECT distinct ")
-            .AppendLine("         MIN(DTL.ACTUALACCDATE) ")
+            .AppendLine("         MAX(DTL.ACTUALACCDATE) ")
             .AppendLine("     FROM ")
             .AppendLine("       OIL.OIT0003_DETAIL DTL ")
             .AppendLine("     WHERE ")
@@ -793,7 +781,6 @@ Public Class OIT0005TankLocSearch
             If Not String.IsNullOrEmpty(officeCodeInStat) Then
                 .AppendFormat("   AND TNK.OPERATIONBASECODE IN ({0}) ", officeCodeInStat).AppendLine()
             End If
-            .AppendLine("   AND TNK.JRINSPECTIONDATE BETWEEN @BEGINDATE AND @ENDDATE ")
             .AppendLine(" ORDER BY ")
             .AppendLine("   TNK.OPERATIONBASECODE ")
             .AppendLine("   , TNK.JRINSPECTIONDATE ")
@@ -803,11 +790,7 @@ Public Class OIT0005TankLocSearch
         Try
             Using SQLcmd As New SqlCommand(SQLStr.ToString(), SQLcon)
 
-                Dim P_BEGINDATE As SqlParameter = SQLcmd.Parameters.Add("@BEGINDATE", SqlDbType.Date)       '出力開始日
-                Dim P_ENDDATE As SqlParameter = SQLcmd.Parameters.Add("@ENDDATE", SqlDbType.Date)           '出力終了日
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)      '削除フラグ
-                P_BEGINDATE.Value = beginDate.ToShortDateString()
-                P_ENDDATE.Value = endDate.ToShortDateString()
                 P_DELFLG.Value = C_DELETE_FLG.ALIVE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

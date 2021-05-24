@@ -50,11 +50,11 @@ Public Class OIT0005CustomReport
     ''' <param name="beginDate"></param>
     ''' <param name="printDataClass"></param>
     ''' <returns></returns>
-    Public Shared Function CreateHaizokuList(ByVal mapId As String, ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date, ByVal printDataClass As DataTable) As String
+    Public Shared Function CreateHaizokuList(ByVal mapId As String, ByVal officeCodeDic As Dictionary(Of String, String), ByVal printDataClass As DataTable) As String
         Dim url As String
         Using repCbj = New HaizokuList(mapId, printDataClass)
             Try
-                url = repCbj.CreatePrintData(officeCodeDic, beginDate)
+                url = repCbj.CreatePrintData(officeCodeDic)
             Catch ex As Exception
                 Throw
             End Try
@@ -1001,7 +1001,7 @@ Public Class HaizokuList : Inherits OIT0005CustomReportBase
         Me.PrintData = printDataClass
     End Sub
 
-    Public Function CreatePrintData(ByVal officeCodeDic As Dictionary(Of String, String), ByVal beginDate As Date) As String
+    Public Function CreatePrintData(ByVal officeCodeDic As Dictionary(Of String, String)) As String
 
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xls"
         Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
@@ -1012,7 +1012,7 @@ Public Class HaizokuList : Inherits OIT0005CustomReportBase
             For Each officeCodePair As KeyValuePair(Of String, String) In officeCodeDic
 
                 '○作業シート設定
-                TrySetExcelWorkSheet(String.Format("{0}({1})", beginDate.ToString("yyyy年MM月"), officeCodePair.Value), "TEMPLATE_A")
+                TrySetExcelWorkSheet(String.Format("{0}({1})", Now.ToString("yyyy年MM月"), officeCodePair.Value), "TEMPLATE_A")
 
                 '○出力シート設定
                 If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
@@ -1239,7 +1239,11 @@ Public Class HaizokuList : Inherits OIT0005CustomReportBase
 
             Dim rIndex As Integer = 0
             Dim cIndex As Integer = 0
-            For Each item As DetailItem In printRows
+            For Each item In printRows.Select(Function(r)
+                                                  Dim index As Integer = 0
+                                                  Integer.TryParse(r.TankNumber, index)
+                                                  Return New With {r.TankNumber, index}
+                                              End Function).OrderBy(Function(r) r.index)
 
                 rngWorkArea = rngOffsetBase.Offset(rIndex, cIndex)
                 rngWorkArea.Value = item.TankNumber

@@ -68,15 +68,6 @@ Partial Public Class OIT0005TankLocSearch
     Protected WithEvents ddlKoukenListYearMonth As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''ddlHaizokuListYearMonth コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ddlHaizokuListYearMonth As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

@@ -12,6 +12,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003tbl_tab1 As DataTable                            '一覧格納用テーブル(タブ１用)
     Private OIT0003tbl_tab2 As DataTable                            '一覧格納用テーブル(タブ２用)
     Private OIT0003tbl_tab3 As DataTable                            '一覧格納用テーブル(タブ３用)
+    Private OIT0003tbl_tab3_CRT As DataTable                        '一覧格納用テーブル(タブ３用)訂正用
     Private OIT0003tbl_tab4 As DataTable                            '一覧格納用テーブル(タブ４用)
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003INPtbl_tab4 As DataTable                         'チェック用テーブル(タブ４用)
@@ -129,6 +130,7 @@ Public Class OIT0003OrderDetail
                     Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
                     Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
                     Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+                    If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then Master.RecoverTable(OIT0003tbl_tab3_CRT, work.WF_SEL_INPTAB3TBL.Text)
 
                     '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
                     If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl, pnlListArea1) Then
@@ -7366,6 +7368,31 @@ Public Class OIT0003OrderDetail
 
                 '実績日訂正フラグを"0"(無効)
                 work.WF_SEL_CORRECTIONDATEFLG.Text = "0"
+
+                '### 20210524 START 指摘票対応(No246) #######################################
+                '実績数量訂正フラグ("0"(無効))
+                Dim CorrectionAmount As String = "0"
+                For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    For Each OIT0003tab3crtrow As DataRow In OIT0003tbl_tab3_CRT.Select("TANKNO='" + OIT0003tab3row("TANKNO") + "'")
+                        If OIT0003tab3crtrow("CARSAMOUNT") <> OIT0003tab3row("CARSAMOUNT") Then
+                            '★実績数量訂正フラグ("1"(有効))
+                            CorrectionAmount = "1"
+
+                            '★受注明細テーブル(数量)を更新
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("CARSAMOUNT"), I_PARA:="CARSAMOUNT")
+                            End Using
+
+                        End If
+                    Next
+                Next
+                '実績数量訂正フラグを"1"(有効)
+                If CorrectionAmount = "1" Then
+                    '数量の変更があったため、「訂正更新ボタン押下時処理」を実施し再計算する。
+                    WW_ButtonUPDATE_TAB4()
+                End If
+                '### 20210524 END   指摘票対応(No246) #######################################
 
         End Select
 
@@ -23806,13 +23833,21 @@ Public Class OIT0003OrderDetail
                     For Each cellObj As TableCell In rowitem.Controls
                         If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") Then
+                            '### 20210524 START 指摘票対応(No246) #######################################
+                            '実績日訂正フラグが"1"(有効)
+                            If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+                            Else
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                            '### 20210524 END   指摘票対応(No246) #######################################
 
                         ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _

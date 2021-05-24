@@ -6366,10 +6366,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         CMNPTS.SelectOrder(SQLcon, OIT0001row("ORDERNO"), dtOrder,
                                         I_OFFICECODE:=work.WF_SEL_SALESOFFICECODE.Text,
                                         I_TANKNO:=OIT0001row("TANKNO"))
-                        '★受注情報が"82"(検査間近)の場合
-                        If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
-                            '(一覧)受注情報に"82"(検査間近)を設定
-                            PARA34.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
+
+                        If dtOrder.Rows.Count <> 0 Then
+                            '★受注情報が"82"(検査間近)の場合
+                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                                '(一覧)受注情報に"82"(検査間近)を設定
+                                PARA34.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
+                            End If
                         End If
                     End If
 

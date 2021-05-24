@@ -3,3 +3,26 @@
     font-size: 12pt;
     padding: 2px;
 }
+
+.downloads {
+    margin:0;
+    padding:0;
+}
+
+    .downloads > div {
+        display: flex;
+        text-align: left;
+    }
+
+        .downloads > div > div:nth-child(1) {
+            width: 6em;
+        }
+        .downloads > div > div:nth-child(2) {
+            width: 7em;
+        }
+        .downloads > div > div:nth-child(3) {
+            width: 10em;
+        }
+        .downloads > div > div:nth-child(4) {
+            width: 20em;
+        }

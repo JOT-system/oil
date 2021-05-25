@@ -14,6 +14,9 @@
     <asp:TextBox ID="WF_SEL_USEDFLG" runat="server"></asp:TextBox>                  <!-- 利用フラグ -->
     <asp:TextBox ID="WF_SEL_LENGTHFLG" runat="server"></asp:TextBox>                <!-- 長さフラグ -->
 
+    <asp:TextBox ID="WF_SEL_OPERATIONBASECODE_S" runat="server"></asp:TextBox>      <!-- 検索用運用基地C -->
+    <asp:TextBox ID="WF_SEL_LEASECODE_S" runat="server"></asp:TextBox>              <!-- 検索用リース先C -->
+
     <!-- 登録・更新用 -->
     <asp:TextBox ID="WF_SEL_TANKNUMBER2" runat="server"></asp:TextBox>              <!-- JOT車番 -->
     <asp:TextBox ID="WF_SEL_MODEL2" runat="server"></asp:TextBox>                   <!-- 形式 -->

@@ -1,2 +1,6 @@
 ﻿body {
 }
+
+table#WF_LEASECODE_LIST > tbody > tr > td {
+    padding-right: 5px;
+}

@@ -156,6 +156,9 @@ Public Class OIT0003OrderDetail
                             WF_ButtonDetailDownload_Click()
                         Case "WF_ButtonOTLINKAGE"             'OT発送日報送信ボタン押下
                             WF_ButtonOTLINKAGE_Click()
+                        Case "WF_ButtonCORRECTIONTRAIN",
+                             "btnChkCrtTrainConfirmYes"       '向け先訂正ボタン押下
+                            WF_ButtonCORRECTIONTRAIN_Click(WF_ButtonClick.Value)
                         Case "WF_ButtonCORRECTIONDATE",
                              "WF_ButtonCORRECTION_TAB3"       '実績日訂正ボタン押下
                             WF_ButtonCORRECTIONDATE_Click(WF_ButtonClick.Value)
@@ -1125,6 +1128,10 @@ Public Class OIT0003OrderDetail
             Me.TxtOrderTrkKbn.Text = ""
         End If
 
+        '### 20210525 START 向け先訂正対応 ##########################################
+        '向け先訂正フラグの初期化
+        work.WF_SEL_CORRECTIONTRAINFLG.Text = "0"
+        '### 20210525 END   向け先訂正対応 ##########################################
         '### 20201210 START 指摘票対応(No246) #######################################
         '実績日訂正フラグの初期化
         work.WF_SEL_CORRECTIONDATEFLG.Text = "0"
@@ -5825,6 +5832,15 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonUPDATE_KARI_Click()
+
+        '### 20210525 START 向け先訂正対応 ##########################################
+        '★向け先訂正フラグを"1"(有効)
+        If work.WF_SEL_CORRECTIONTRAINFLG.Text = "1" Then
+            '○向け先訂正による日付(実績)の初期化
+            WW_CrtTrainInitialize()
+        End If
+        '### 20210525 END   向け先訂正対応 ##########################################
+
         '割当更新ボタン押下時
         Me.WW_UPBUTTONFLG = "5"
         WW_ButtonUPDATE_TAB1()
@@ -5860,6 +5876,15 @@ Public Class OIT0003OrderDetail
             '### 20201225 START 指摘票対応(No291) #######################################
             work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
             '### 20201225 END   指摘票対応(No291) #######################################
+
+            '### 20210525 START 向け先訂正対応 ##########################################
+            '★向け先訂正フラグを"1"(有効)
+            If work.WF_SEL_CORRECTIONTRAINFLG.Text = "1" Then
+                '○向け先訂正による日付(実績)の初期化
+                WW_CrtTrainInitialize()
+            End If
+            '### 20210525 END   向け先訂正対応 ##########################################
+
             WW_ButtonUPDATE_TAB1()
 
             'タブ「入換・積込指示」
@@ -7291,6 +7316,69 @@ Public Class OIT0003OrderDetail
             End Using
 
         End Using
+    End Sub
+
+    ''' <summary>
+    ''' 向け先訂正ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCORRECTIONTRAIN_Click(ByVal chkFieldName As String)
+        Select Case chkFieldName
+            '○向け先訂正(確認)
+            Case "WF_ButtonCORRECTIONTRAIN"
+                '【向け先訂正】に伴い、ステータスが"100"(受注受付)になる旨をメッセージにて確認
+                Dim Msg As String = ""
+                Msg = "向け先訂正(列車変更)をするには、再度受注登録をし直す必要があります。"
+                Msg &= "<br>ステータスが[受注受付]に戻りますがよろしいですか？"
+                Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE,
+                              C_MESSAGE_TYPE.QUES,
+                              I_PARA01:=Msg,
+                              needsPopUp:=True,
+                              messageBoxTitle:="",
+                              IsConfirm:=True,
+                              YesButtonId:="btnChkCrtTrainConfirmYes",
+                              needsConfirmNgToPostBack:=True,
+                              NoButtonId:="btnChkCrtTrainConfirmNo")
+
+            '○向け先訂正(YES)
+            Case "btnChkCrtTrainConfirmYes"
+                '★向け先訂正フラグを"1"(有効)
+                work.WF_SEL_CORRECTIONTRAINFLG.Text = "1"
+
+                '○ 初期化
+                '　受注進行ステータス(初期化)
+                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+                CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, work.WF_SEL_ORDERSTATUSNM.Text, WW_DUMMY)
+                Me.TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
+                '　積込日（実績）
+                Me.TxtActualLoadingDate.Text = ""
+                '　発日（実績）
+                Me.TxtActualDepDate.Text = ""
+                '　積車着日（実績）
+                Me.TxtActualArrDate.Text = ""
+                '　受入日（実績）
+                Me.TxtActualAccDate.Text = ""
+                '　空車着日（実績）
+                Me.TxtActualEmparrDate.Text = ""
+                '　(一覧)日付(実績)
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    '積置フラグが未チェックの場合
+                    If Convert.ToString(OIT0003row("STACKINGFLG")) = "" Then
+                        '積込日(実績)を初期化
+                        OIT0003row("ACTUALLODDATE") = ""
+                    End If
+                Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
+
+                '○ タブ<タンク車割当>に戻す
+                WF_DTAB_CHANGE_NO.Value = "0"
+                '〇 タブ切替
+                WF_Detail_TABChange()
+
+        End Select
+
     End Sub
 
 #Region "実績日訂正"
@@ -9719,7 +9807,7 @@ Public Class OIT0003OrderDetail
                         PARA29.Value = Me.TxtActualLoadingDate.Text
                     End If
                     '発日（実績）
-                    If Me.TxtActualLoadingDate.Text = "" Then
+                    If Me.TxtActualDepDate.Text = "" Then
                         PARA30.Value = DBNull.Value
                     Else
                         PARA30.Value = Me.TxtActualDepDate.Text
@@ -13957,6 +14045,28 @@ Public Class OIT0003OrderDetail
                     WW_SelectValue = selectedItem.Value
                     WW_SelectText = selectedItem.Text
                 End If
+
+                '### 20210525 START 向け先訂正対応 ##########################################
+                '★向け先訂正フラグを"1"(有効)
+                If work.WF_SEL_CORRECTIONTRAINFLG.Text = "1" Then
+                    Me.TxtTrainNo.Text = WW_SelectValue
+                    Me.TxtTrainName.Text = WW_SelectText
+
+                    '〇 取得した列車名から各値を取得し設定する。
+                    WW_TRAINNUMBER_FIND(WW_SelectText)
+
+                    '○ 荷受人を入れ替える(列車変更に伴う荷受人変更を考慮)
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        OIT0003row("CONSIGNEECODE") = work.WF_SEL_CONSIGNEECODE.Text
+                        OIT0003row("CONSIGNEENAME") = work.WF_SEL_CONSIGNEENAME.Text
+                    Next
+
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl)
+
+                    Exit Select
+                End If
+                '### 20210525 END   向け先訂正対応 ##########################################
 
                 '★再設定した列車が前回と違う場合
                 If Me.TxtTrainName.Text <> WW_SelectText Then
@@ -24086,6 +24196,54 @@ Public Class OIT0003OrderDetail
             CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
             Exit Sub
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 向け先訂正による日付(実績)の初期化
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CrtTrainInitialize()
+
+        '● 受注DB更新(受注進行ステータス"100"(受注受付)初期化)
+        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_100)
+        '● 受注DB更新(日付(実績)初期化)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            '★積込日（実績）
+            CMNPTS.UpdateOrderCRT(SQLcon, Me.TxtOrderNo.Text, Master, I_Value:="", I_PARA:="ACTUALLODDATE")
+            '★発日（実績）
+            CMNPTS.UpdateOrderCRT(SQLcon, Me.TxtOrderNo.Text, Master, I_Value:="", I_PARA:="ACTUALDEPDATE")
+            '★積車着日（実績）
+            CMNPTS.UpdateOrderCRT(SQLcon, Me.TxtOrderNo.Text, Master, I_Value:="", I_PARA:="ACTUALARRDATE")
+            '★受入日（実績）
+            CMNPTS.UpdateOrderCRT(SQLcon, Me.TxtOrderNo.Text, Master, I_Value:="", I_PARA:="ACTUALACCDATE")
+            '★空車着日（実績）
+            CMNPTS.UpdateOrderCRT(SQLcon, Me.TxtOrderNo.Text, Master, I_Value:="", I_PARA:="ACTUALEMPARRDATE")
+        End Using
+
+        '● 受注明細DB更新(日付(実績)初期化)
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If Convert.ToString(OIT0003row("TANKNO")) <> "" Then
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '積置フラグが未チェックの場合
+                    If Convert.ToString(OIT0003row("STACKINGFLG")) = "" Then
+                        '★積込日（実績）
+                        CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003row, Master, I_Value:="", I_PARA:="ACTUALLODDATE")
+                    End If
+                    '★発日（実績）
+                    CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003row, Master, I_Value:="", I_PARA:="ACTUALDEPDATE")
+                    '★積車着日（実績）
+                    CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003row, Master, I_Value:="", I_PARA:="ACTUALARRDATE")
+                    '★受入日（実績）
+                    CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003row, Master, I_Value:="", I_PARA:="ACTUALACCDATE")
+                    '★空車着日（実績）
+                    CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003row, Master, I_Value:="", I_PARA:="ACTUALEMPARRDATE")
+                End Using
+            End If
+        Next
+
     End Sub
 
     ''' <summary>

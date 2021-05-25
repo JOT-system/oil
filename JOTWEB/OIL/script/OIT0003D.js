@@ -29,10 +29,12 @@ function InitDisplay() {
     if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
         //活性
         document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "";
+        document.getElementById("WF_ButtonCORRECTIONTRAIN").disabled = "";
     }
     else {
         //非活性
         document.getElementById("WF_ButtonCORRECTIONDATE").disabled = "disabled";
+        document.getElementById("WF_ButtonCORRECTIONTRAIN").disabled = "disabled";
     }
 
     //〇 実績日一括反映ボタン活性／非活性

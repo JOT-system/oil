@@ -1011,6 +1011,69 @@ Public Class CmnParts
     End Function
 
     ''' <summary>
+    ''' 受注TBL更新(訂正更新用)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <remarks></remarks>
+    Public Sub UpdateOrderCRT(ByVal SQLcon As SqlConnection, ByVal I_ORDERNO As String, ByVal I_Master As OILMasterPage,
+                              ByVal I_Value As String, Optional ByVal I_PARA As String = Nothing)
+
+        '更新SQL文
+        Dim SQLStr As String =
+              " UPDATE OIL.OIT0002_ORDER " _
+            & "    SET "
+
+        If Not String.IsNullOrEmpty(I_PARA) Then
+            SQLStr &= String.Format("        {0}   = @VALUE, ", I_PARA)
+        End If
+
+        SQLStr &=
+              "        UPDYMD      = @UPDYMD, " _
+            & "        UPDUSER     = @UPDUSER, " _
+            & "        UPDTERMID   = @UPDTERMID, " _
+            & "        RECEIVEYMD  = @RECEIVEYMD  " _
+            & "  WHERE ORDERNO     = @ORDERNO  " _
+            & "    AND DELFLG     <> @DELFLG; "
+
+        Try
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+            Dim P_VALUE As SqlParameter = SQLcmd.Parameters.Add("@VALUE", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            P_ORDERNO.Value = I_ORDERNO
+            P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+            If I_Value <> "" Then
+                P_VALUE.Value = I_Value
+            Else
+                P_VALUE.Value = DBNull.Value
+            End If
+
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = I_Master.USERID
+            P_UPDTERMID.Value = I_Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' 受注明細TBL更新(訂正更新用)
     ''' </summary>
     ''' <param name="SQLcon">SQL接続</param>
@@ -1024,7 +1087,7 @@ Public Class CmnParts
             & "    SET "
 
         If Not String.IsNullOrEmpty(I_PARA) Then
-            SQLStr &= String.Format("        {0}   = {1}, ", I_PARA, I_Value)
+            SQLStr &= String.Format("        {0}   = @VALUE, ", I_PARA)
         End If
 
         SQLStr &=
@@ -1045,6 +1108,7 @@ Public Class CmnParts
             Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
             Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", System.Data.SqlDbType.NVarChar)
             Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+            Dim P_VALUE As SqlParameter = SQLcmd.Parameters.Add("@VALUE", System.Data.SqlDbType.NVarChar)
 
             Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
             Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
@@ -1055,6 +1119,12 @@ Public Class CmnParts
             P_DETAILNO.Value = Convert.ToString(I_dtRow("DETAILNO"))
             P_TANKNO.Value = Convert.ToString(I_dtRow("TANKNO"))
             P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+            If I_Value <> "" Then
+                P_VALUE.Value = I_Value
+            Else
+                P_VALUE.Value = DBNull.Value
+            End If
 
             P_UPDYMD.Value = Date.Now
             P_UPDUSER.Value = I_Master.USERID

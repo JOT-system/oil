@@ -33,6 +33,11 @@
                 <div style="display:none;">
                 <input type="button" id="WF_ButtonOTLINKAGE" class="btn-sticky" value="OT発送日報送信" onclick="ButtonClick('WF_ButtonOTLINKAGE');" />
                 </div>
+                <%-- 20210525 START 向け先訂正対応 --%>
+                <div style="display:none;">
+                <input type="button" id="WF_ButtonCORRECTIONTRAIN" class="btn-sticky" value="向け先訂正" onclick="ButtonClick('WF_ButtonCORRECTIONTRAIN');" />
+                </div>
+                <%-- 20210525 END   向け先訂正対応 --%>
                 <%-- 20201210 START 指摘票対応(No246) --%>
                 <input type="button" id="WF_ButtonCORRECTIONDATE" class="btn-sticky" value="実績日訂正" onclick="ButtonClick('WF_ButtonCORRECTIONDATE');" />
                 <%-- 20201210 END   指摘票対応(No246) --%>

@@ -58,16 +58,26 @@
                 </a>
                 <a></a>
             </div>
-            <%-- 交検一覧ダウンロード --%>
-            <div class="inputItem">
+            <div class="downloads">
+                <%-- 交検一覧ダウンロード --%>
                 <div>
-                    交検一覧
-<%--                    <a class="ef" id="WF_STYMD_CODE" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('WF_STYMD');" style="display:inline-block;width:10em;">
-                        <asp:TextBox ID="WF_STYMD" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
-                    </a>--%>
-                    <asp:DropDownList ID="ddlKoukenListYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>
-                    ～
-                    <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonKoukenList');" style="margin-left:1em;" />
+                    <div>交検一覧</div>
+                    <div>
+                        <asp:DropDownList ID="ddlKoukenListYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>～
+                    </div>
+                    <div>
+                        <input type="button" id="WF_ButtonKoukenList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonKoukenList');" style="margin-left:1em;" />
+                    </div>
+                    <div></div>
+                </div>
+                <%-- 配属表ダウンロード --%>
+                <div>
+                    <div>配属表</div>
+                    <div></div>
+                    <div>
+                        <input type="button" id="WF_ButtonHaizokuList"  class="btn-sticky" value="ダウンロード" onclick="ButtonClick('WF_ButtonHaizokuList');" style="margin-left:1em;" />
+                    </div>
+                    <div>※仙台新港営業所のレイアウトのみ対応中</div>
                 </div>
             </div>
         </div>

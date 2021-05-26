@@ -39,6 +39,8 @@ Public Class OIT0005TankLocSearch
                 Select Case WF_ButtonClick.Value
                     Case "WF_ButtonKoukenList"          '交検一覧ﾀﾞｳﾝﾛｰﾄﾞボタン押下
                         WF_ButtonKoukenList_Click()
+                    Case "WF_ButtonHaizokuList"         '配属表ﾀﾞｳﾝﾛｰﾄﾞボタン押下
+                        WF_ButtonHaizokuList_Click()
                     Case "WF_ButtonDO"                  '検索ボタン押下
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
@@ -157,6 +159,7 @@ Public Class OIT0005TankLocSearch
             End If
         Next
         If ymDdl.Items.Count > 0 Then
+            '交検一覧用
             Me.ddlKoukenListYearMonth.Items.AddRange(ymDdl.Items.Cast(Of ListItem).ToArray)
             Me.ddlKoukenListYearMonth.SelectedIndex = ymDdl.SelectedIndex
         End If
@@ -231,6 +234,72 @@ Public Class OIT0005TankLocSearch
             '******************************
             Dim url As String
             url = OIT0005CustomReport.CreateKoukenList(Master.MAPID, officeCodeDic, beginDate, OIT0005ReportTbl)
+
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005S DLKoukenList")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005S DLKoukenList"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()
+        End Try
+
+        '○ 正常メッセージ
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+
+    End Sub
+
+    ''' <summary>
+    ''' 交検一覧ﾀﾞｳﾝﾛｰﾄﾞボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonHaizokuList_Click()
+
+        Try
+
+            '******************************
+            '選択項目チェック
+            '******************************
+            '選択項目が1つもない場合
+            If Me.tileSalesOffice.HasSelectedValue = False Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "所属先", needsPopUp:=True)
+                Me.tileSalesOffice.Focus()
+                Exit Sub
+            End If
+
+            '↓未確定のためコメントアウト（複数で出せるようにしておく）
+            ''選択項目が複数ある場合
+            'If Me.tileSalesOffice.GetSelectedListData.Items.Count > 1 Then
+            '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "選択可能な所属先は一つのみ", needsPopUp:=True)
+            '    Me.tileSalesOffice.Focus()
+            '    Exit Sub
+            'End If
+
+            '選択データ取得
+            Dim officeCodeDic As New Dictionary(Of String, String)
+            For Each item As ListItem In Me.tileSalesOffice.GetSelectedListData().Items
+                officeCodeDic.Add(item.Value, item.Text)
+            Next
+
+            '******************************
+            '出力データ取得
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                ExcelHaizokuListDataGet(SQLcon, officeCodeDic.Keys.ToArray)
+            End Using
+
+            '******************************
+            '出力データ生成
+            '******************************
+            Dim url As String
+            url = OIT0005CustomReport.CreateHaizokuList(Master.MAPID, officeCodeDic, OIT0005ReportTbl)
 
             '○ 別画面でExcelを表示
             WF_PrintURL.Value = url
@@ -656,6 +725,90 @@ Public Class OIT0005TankLocSearch
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0005S EXCEL_KOUKENLIST_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    Protected Sub ExcelHaizokuListDataGet(ByVal SQLcon As SqlConnection,
+                                          ByVal officeCodes As String())
+
+        If IsNothing(OIT0005ReportTbl) Then
+            OIT0005ReportTbl = New DataTable
+        End If
+
+        If OIT0005ReportTbl.Columns.Count <> 0 Then
+            OIT0005ReportTbl.Columns.Clear()
+        End If
+
+        OIT0005ReportTbl.Clear()
+
+        Dim officeCodeInStat As String = String.Join(",", (From officeCode In officeCodes Select "'" & officeCode & "'"))
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As New StringBuilder
+        With SQLStr
+            .AppendLine(" SELECT ")
+            .AppendLine("     TNK.OPERATIONBASECODE AS OFFICECODE ")
+            .AppendLine("   , TNK.JRINSPECTIONDATE  AS JRINSPECTIONDATE ")
+            .AppendLine("   , TNK.LOAD               AS LOAD ")
+            .AppendLine("   , TNK.TANKNUMBER        AS TANKNUMBER ")
+            .AppendLine("   , TNK.MIDDLEOILCODE     AS MIDDLEOILCODE ")
+            .AppendLine("   , SZI.TANKSITUATION     AS TANKSITUATION ")
+            .AppendLine("   , TNK.MARKCODE          AS MARKCODE ")
+            .AppendLine("   , ( ")
+            .AppendLine("      SELECT distinct ")
+            .AppendLine("         MAX(DTL.ACTUALACCDATE) ")
+            .AppendLine("     FROM ")
+            .AppendLine("       OIL.OIT0003_DETAIL DTL ")
+            .AppendLine("     WHERE ")
+            .AppendLine("       DTL.TANKNO = TNK.TANKNUMBER ")
+            .AppendLine("       AND DTL.DELFLG = @DELFLG ")
+            .AppendLine("   )                       AS ACTUALACCDATE ")
+            .AppendLine(" FROM ")
+            .AppendLine("   OIL.OIM0005_TANK TNK ")
+            .AppendLine("   LEFT JOIN OIL.OIT0005_SHOZAI SZI ")
+            .AppendLine("     ON SZI.TANKNUMBER = TNK.TANKNUMBER ")
+            .AppendLine("     AND SZI.DELFLG = @DELFLG ")
+            .AppendLine(" WHERE ")
+            .AppendLine("   ISNULL(TNK.OPERATIONBASECODE, '') <> '' ")
+            .AppendLine("   AND TNK.DELFLG = @DELFLG ")
+            If Not String.IsNullOrEmpty(officeCodeInStat) Then
+                .AppendFormat("   AND TNK.OPERATIONBASECODE IN ({0}) ", officeCodeInStat).AppendLine()
+            End If
+            .AppendLine(" ORDER BY ")
+            .AppendLine("   TNK.OPERATIONBASECODE ")
+            .AppendLine("   , TNK.JRINSPECTIONDATE ")
+            .AppendLine("   , TNK.TANKNUMBER DESC ")
+        End With
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr.ToString(), SQLcon)
+
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)      '削除フラグ
+                P_DELFLG.Value = C_DELETE_FLG.ALIVE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0005ReportTbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0005ReportTbl.Load(SQLdr)
+                End Using
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005S EXCEL_HAIZOKULIST_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0005S EXCEL_HAIZOKULIST_DATAGET"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

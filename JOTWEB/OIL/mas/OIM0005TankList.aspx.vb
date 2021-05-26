@@ -12,6 +12,7 @@
 '         :2021/05/07 1)項目「油種中分類」「中間点検年月」「中間点検場所」「中間点検実施者」
 '         :             「自主点検年月」「自主点検場所」「自主点検実施者」を追加
 '         :2021/05/18 1)項目「点検実施者(社員名)」を追加
+'         :2021/05/25 1)検索項目に「運用基地コード」「リース先」を追加
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -472,6 +473,18 @@ Public Class OIM0005TankList
         '利用フラグ
         If Not String.IsNullOrEmpty(work.WF_SEL_USEDFLG.Text) Then
             SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+        End If
+
+        '運用基地コード
+        If Not String.IsNullOrEmpty(work.WF_SEL_OPERATIONBASECODE_S.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.OPERATIONBASECODE = '{0}'",
+                                    work.WF_SEL_OPERATIONBASECODE_S.Text)
+        End If
+
+        'リース先コード
+        If Not String.IsNullOrEmpty(work.WF_SEL_LEASECODE_S.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.LEASECODE = '{0}'",
+                                    work.WF_SEL_LEASECODE_S.Text)
         End If
 
         SQLStr &=

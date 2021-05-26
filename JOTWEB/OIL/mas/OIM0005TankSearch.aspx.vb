@@ -1,12 +1,12 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ検索画面
 ' 作成日 2019/11/08
-' 更新日 2019/11/08
+' 更新日 2021/05/25
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT伊草
 '
-' 修正履歴:
-'         :
+' 修正履歴:2019/11/08 新規作成
+'         :2021/05/25 1)検索項目に「運用基地コード」「リース先」を追加
 ''************************************************************
 Imports JOTWEB.GRIS0005LeftBox
 
@@ -103,6 +103,10 @@ Public Class OIM0005TankSearch
             Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text)    'JOT車番
             Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL_CODE.Text)                   '型式
             Master.GetFirstValue(work.WF_SEL_USEDFLG.Text, "USEPROPRIETY", WF_USEDFLG_CODE.Text)        '利用フラグ
+            '運用基地コード
+            Master.GetFirstValue(work.WF_SEL_OPERATIONBASECODE_S.Text, "OPERATIONBASECODE", WF_OPERATIONBASECODE.Text)
+            'リース先コード
+            WF_LEASECODE_LIST.SelectedValue = ""
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -110,6 +114,10 @@ Public Class OIM0005TankSearch
             WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text   'JOT車番
             WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text             '型式
             WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
+            '運用基地コード
+            WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE_S.Text
+            'リース先コード
+            WF_LEASECODE_LIST.SelectedValue = work.WF_SEL_LEASECODE_S.Text
         Else
             '画面項目設定処理（甲子貨車マスタメンテ画面からの遷移）
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -117,6 +125,10 @@ Public Class OIM0005TankSearch
             WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text   'JOT車番
             WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text             '型式
             WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
+            '運用基地コード
+            WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE_S.Text
+            'リース先コード
+            WF_LEASECODE_LIST.SelectedValue = work.WF_SEL_LEASECODE_S.Text
         End If
 
         'JOT車番・利用フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -150,11 +162,12 @@ Public Class OIM0005TankSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                            '組織コード
+        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)            '会社コード
+        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                           '組織コード
         CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_DUMMY)  'JOT車番
-        'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)                 '型式
+        'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)                '型式
         CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_DUMMY)           '利用フラグ
+        CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASENAME.Text, WW_DUMMY)    '運用基地コード
 
     End Sub
 
@@ -184,9 +197,10 @@ Public Class OIM0005TankSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)     'JOT車番
-        Master.EraseCharToIgnore(WF_MODEL_CODE.Text)          '型式
-        Master.EraseCharToIgnore(WF_USEDFLG_CODE.Text)        '利用フラグ
+        Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)       'JOT車番
+        Master.EraseCharToIgnore(WF_MODEL_CODE.Text)            '型式
+        Master.EraseCharToIgnore(WF_USEDFLG_CODE.Text)          '利用フラグ
+        Master.EraseCharToIgnore(WF_OPERATIONBASECODE.Text)     '運用基地コード
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -195,11 +209,13 @@ Public Class OIM0005TankSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text          '会社コード
-        work.WF_SEL_ORG.Text = WF_ORG.Text                    '組織コード
-        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text 'JOT車番
-        work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text           '型式
-        work.WF_SEL_USEDFLG.Text = WF_USEDFLG_CODE.Text       '利用フラグ  
+        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text                        '会社コード
+        work.WF_SEL_ORG.Text = WF_ORG.Text                                  '組織コード
+        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text               'JOT車番
+        work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text                         '型式
+        work.WF_SEL_USEDFLG.Text = WF_USEDFLG_CODE.Text                     '利用フラグ
+        work.WF_SEL_OPERATIONBASECODE_S.Text = WF_OPERATIONBASECODE.Text    '運用基地コード
+        work.WF_SEL_LEASECODE_S.Text = WF_LEASECODE_LIST.SelectedValue      'リース先コード
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -336,6 +352,11 @@ Public Class OIM0005TankSearch
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, "TANKMODEL")
                 End If
 
+                '運用基地コード
+                If WF_FIELD.Value = "WF_OPERATIONBASECODE" Then
+                    prmData = work.CreateBaseParam(WF_CAMPCODE.Text, WF_OPERATIONBASECODE.Text)
+                End If
+
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                 .ActiveListBox()
             End With
@@ -352,12 +373,14 @@ Public Class OIM0005TankSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_TANKNUMBER"    'JOT車番
+            Case "WF_TANKNUMBER"        'JOT車番
                 CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
-                'Case "WF_MODEL"             '型式
+                'Case "WF_MODEL"        '型式
                 '    CODENAME_get("TANKMODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
-            Case "WF_USEDFLG"       '利用フラグ
+            Case "WF_USEDFLG"           '利用フラグ
                 CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_RTN_SW)
+            Case "WF_OPERATIONBASECODE" '運用基地コード
+                CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASENAME.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -397,15 +420,20 @@ Public Class OIM0005TankSearch
                 WF_TANKNUMBER_NAME.Text = WW_SelectText
                 WF_TANKNUMBER_CODE.Focus()
 
-            Case "WF_MODEL"          '型式
+            Case "WF_MODEL"             '型式
                 WF_MODEL_CODE.Text = WW_SelectValue
                 'WF_MODEL_NAME.Text = WW_SelectText
                 WF_MODEL_CODE.Focus()
 
-            Case "WF_USEDFLG"          '利用フラグ
+            Case "WF_USEDFLG"           '利用フラグ
                 WF_USEDFLG_CODE.Text = WW_SelectValue
                 WF_USEDFLG_NAME.Text = WW_SelectText
                 WF_USEDFLG_CODE.Focus()
+
+            Case "WF_OPERATIONBASECODE" '運用基地コード
+                WF_OPERATIONBASECODE.Text = WW_SelectValue
+                WF_OPERATIONBASENAME.Text = WW_SelectText
+                WF_OPERATIONBASECODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -429,6 +457,9 @@ Public Class OIM0005TankSearch
                 WF_MODEL_CODE.Focus()
             Case "WF_USEDFLG"           '利用フラグ
                 WF_USEDFLG_CODE.Focus()
+            Case "WF_OPERATIONBASECODE" '運用基地C
+                WF_OPERATIONBASECODE.Focus()
+
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -508,6 +539,9 @@ Public Class OIM0005TankSearch
                 Case "USEDFLG"          '利用フラグ
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BASE"             '運用基地
+                    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

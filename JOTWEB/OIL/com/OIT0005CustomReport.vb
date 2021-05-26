@@ -42,6 +42,26 @@ Public Class OIT0005CustomReport
         Return url
     End Function
 
+    ''' <summary>
+    ''' 配属表作成
+    ''' </summary>
+    ''' <param name="mapId"></param>
+    ''' <param name="officeCodeDic"></param>
+    ''' <param name="beginDate"></param>
+    ''' <param name="printDataClass"></param>
+    ''' <returns></returns>
+    Public Shared Function CreateHaizokuList(ByVal mapId As String, ByVal officeCodeDic As Dictionary(Of String, String), ByVal printDataClass As DataTable) As String
+        Dim url As String
+        Using repCbj = New HaizokuList(mapId, printDataClass)
+            Try
+                url = repCbj.CreatePrintData(officeCodeDic)
+            Catch ex As Exception
+                Throw
+            End Try
+        End Using
+        Return url
+    End Function
+
 End Class
 
 ''' <summary>
@@ -248,6 +268,12 @@ Public MustInherit Class OIT0005CustomReportBase : Implements IDisposable
                         ExcelMemoryRelease(beforSheet)
                     Next
                 End If
+
+                '先頭シートを選択
+                Dim selectSheet As Excel.Worksheet = DirectCast(ExcelWorkSheets(1), Excel.Worksheet)
+                selectSheet.Select()
+                ExcelMemoryRelease(selectSheet)
+
             End If
 
         Catch ex As Exception
@@ -942,4 +968,309 @@ Public Class KoukenList : Inherits OIT0005CustomReportBase
         End Try
     End Sub
 #End Region
+End Class
+
+''' <summary>
+''' 配属表
+''' </summary>
+Public Class HaizokuList : Inherits OIT0005CustomReportBase
+
+    ''' <summary>
+    ''' テンプレートファイル名称
+    ''' </summary>
+    Private Const TEMP_XLS_FILE_NAME As String = "HAIZOKULIST.xls"
+
+    ''' <summary>
+    ''' 明細データ構造
+    ''' </summary>
+    Private Class DetailItem
+        Public OfficeCode As String
+        Public Load As Decimal
+        Public TankNumber As String
+        Public MiddleOilCode As String
+        Public TankSituation As String
+        Public MarkCode As String
+        Public IsParseActualDate As Boolean
+        Public ActualDate As Date
+    End Class
+
+    Protected PrintData As DataTable
+
+    Public Sub New(ByVal mapId As String, ByVal printDataClass As DataTable)
+        MyBase.New(mapId, TEMP_XLS_FILE_NAME)
+        Me.PrintData = printDataClass
+    End Sub
+
+    Public Function CreatePrintData(ByVal officeCodeDic As Dictionary(Of String, String)) As String
+
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xls"
+        Dim tmpFilePath As String = IO.Path.Combine(UploadRootPath, tmpFileName)
+
+        Try
+
+            '営業所別にシートを作成
+            For Each officeCodePair As KeyValuePair(Of String, String) In officeCodeDic
+
+                '○作業シート設定
+                TrySetExcelWorkSheet(String.Format("{0}({1})", Now.ToString("yyyy年MM月"), officeCodePair.Value), "TEMPLATE_A")
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
+                End If
+
+                '○ヘッダーの設定
+                EditHeaderAreaA(officeCodePair.Value)
+                '○明細の設定
+                EditDetailAreaA(officeCodePair.Key)
+
+                '○作業シート設定
+                TrySetExcelWorkSheet(String.Format("エネオスマーク貼付車({0})", officeCodePair.Value), "TEMPLATE_A_2")
+
+                '○出力シート設定
+                If ExcelWorkSheet IsNot Nothing AndAlso OutputSheetNames IsNot Nothing AndAlso Not OutputSheetNames.Contains(ExcelWorkSheet.Name) Then
+                    OutputSheetNames.Add(ExcelWorkSheet.Name)
+                End If
+
+                '○ヘッダーの設定
+                EditHeaderAreaA2(officeCodePair.Value)
+                '○明細の設定
+                EditDetailAreaA2(officeCodePair.Key)
+
+            Next
+
+            '○出力シートのみ残す
+            LeaveOnlyOutputSheets()
+
+            '保存処理実行
+            ExcelSaveAs(tmpFilePath)
+            ExcelBookObj.Close(False)
+
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        End Try
+
+    End Function
+
+#Region "TEMPLATE_A"
+
+    ''' <summary>
+    ''' ヘッダー部の設定（TEMPLATE_A）
+    ''' </summary>
+    Private Sub EditHeaderAreaA(ByVal officeName As String)
+
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+
+            '営業所名
+            rngHeaderArea = ExcelWorkSheet.Range("S2")
+            rngHeaderArea.Value = String.Join(" ", officeName.ToCharArray())
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '出力日
+            Dim ci As New Globalization.CultureInfo("ja-JP")
+            Dim jp As New Globalization.JapaneseCalendar
+            ci.DateTimeFormat.Calendar = jp
+            rngHeaderArea = ExcelWorkSheet.Range("S3")
+            rngHeaderArea.Value = StrConv(Now.ToString("ggy年M月d日現在", ci), VbStrConv.Wide)
+            ExcelMemoryRelease(rngHeaderArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 明細部分の編集（TEMPLATE_A）
+    ''' </summary>
+    Private Sub EditDetailAreaA(ByVal officeCode As String)
+        Try
+
+            Dim targetOfficeData As List(Of DetailItem) = PrintData.AsEnumerable.
+                Select(Function(r)
+                           Dim actDt As Date = Nothing
+                           Dim isParseActualDate As Boolean = Date.TryParse(r("ACTUALACCDATE").ToString(), actDt)
+                           Return New DetailItem With {
+                               .OfficeCode = r("OFFICECODE").ToString(),
+                               .Load = CDec(r("LOAD").ToString()),
+                               .TankNumber = r("TANKNUMBER").ToString(),
+                               .MiddleOilCode = r("MIDDLEOILCODE").ToString(),
+                               .TankSituation = r("TANKSITUATION").ToString(),
+                               .IsParseActualDate = isParseActualDate,
+                               .ActualDate = actDt
+                           }
+                       End Function).
+                Where(Function(r)
+                          Return r.OfficeCode = officeCode
+                      End Function).ToList()
+
+            '# 休車以外の45t車
+            Dim nonHolidayCars As List(Of DetailItem) = targetOfficeData.AsEnumerable.
+                Where(Function(r)
+                          Return r.TankSituation <> "22" AndAlso r.Load = 45.0
+                      End Function).ToList()
+            '## 揮発油
+            SetDetailAreaData("B5:G14", nonHolidayCars.Where(Function(r) r.MiddleOilCode = "1").ToList())
+            '## 灯軽油
+            SetDetailAreaData("I5:N14", nonHolidayCars.Where(Function(r) r.MiddleOilCode = "2").ToList())
+            '## Ａ重油
+            SetDetailAreaData("P5:Q14", nonHolidayCars.Where(Function(r) r.MiddleOilCode = "5").ToList())
+
+            '# 休車の45t車
+            Dim holidayCars As List(Of DetailItem) = targetOfficeData.AsEnumerable.
+                Where(Function(r)
+                          Return r.TankSituation = "22" AndAlso r.Load = 45.0
+                      End Function).ToList()
+            '## 揮発油
+            SetDetailAreaData("B20:G22", holidayCars.Where(Function(r) r.MiddleOilCode = "1").ToList())
+            '## 灯軽油
+            SetDetailAreaData("I20:N22", holidayCars.Where(Function(r) r.MiddleOilCode = "2").ToList())
+            '## Ａ重油
+            SetDetailAreaData("P20:Q22", holidayCars.Where(Function(r) r.MiddleOilCode = "5").ToList())
+
+            Dim rngWorkArea As Excel.Range = Nothing
+            Try
+
+                'いつから休車
+                Dim query = holidayCars.Where(Function(r) r.IsParseActualDate).Select(Function(r) r.ActualDate)
+                If query.Any() Then
+                    rngWorkArea = ExcelWorkSheet.Range("B18")
+                    rngWorkArea.Value = query.Min().ToString("MM/dd～休車")
+                    ExcelMemoryRelease(rngWorkArea)
+                End If
+
+            Catch ex As Exception
+                Throw
+            Finally
+                ExcelMemoryRelease(rngWorkArea)
+            End Try
+
+        Catch ex As Exception
+            Throw
+        End Try
+
+    End Sub
+
+
+    ''' <summary>
+    ''' ヘッダー部の設定（TEMPLATE_A_2）
+    ''' </summary>
+    Private Sub EditHeaderAreaA2(ByVal officeName As String)
+
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+
+            '営業所名
+            rngHeaderArea = ExcelWorkSheet.Range("O2")
+            rngHeaderArea.Value = String.Join(" ", officeName.ToCharArray())
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '出力日
+            Dim ci As New Globalization.CultureInfo("ja-JP")
+            Dim jp As New Globalization.JapaneseCalendar
+            ci.DateTimeFormat.Calendar = jp
+            rngHeaderArea = ExcelWorkSheet.Range("O3")
+            rngHeaderArea.Value = StrConv(Now.ToString("ggy年M月d日現在", ci), VbStrConv.Wide)
+            ExcelMemoryRelease(rngHeaderArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 明細部分の編集（TEMPLATE_A_2）
+    ''' </summary>
+    Private Sub EditDetailAreaA2(ByVal officeCode As String)
+        Try
+
+            Dim baseDate As Date = Nothing
+            Dim printRows As List(Of DetailItem) = PrintData.AsEnumerable.
+                Select(Function(r) New DetailItem With {
+                       .OfficeCode = r("OFFICECODE").ToString(),
+                       .Load = CDec(r("LOAD").ToString()),
+                       .TankNumber = r("TANKNUMBER").ToString(),
+                       .MarkCode = r("MARKCODE").ToString()
+                       }).
+                Where(Function(r)
+                          Return r.OfficeCode = officeCode AndAlso
+                          r.MarkCode = "1" AndAlso
+                          r.Load = 45.0
+                      End Function).ToList()
+
+            '# エネオスマーク貼付車
+            '## 45t
+            SetDetailAreaData("B5:N14", printRows)
+
+        Catch ex As Exception
+            Throw
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    '''  明細データ設定（共通）
+    ''' </summary>
+    ''' <param name="strRange"></param>
+    ''' <param name="printRows"></param>
+    Private Sub SetDetailAreaData(ByVal strRange As String, ByVal printRows As List(Of DetailItem))
+        Dim rngDetailArea As Excel.Range = Nothing
+        Dim rngOffsetBase As Excel.Range = Nothing
+        Dim rngWorkArea As Excel.Range = Nothing
+        Try
+            If Not printRows.Any Then Exit Sub
+
+            '基本位置
+            rngDetailArea = ExcelWorkSheet.Range(strRange)
+
+            Dim maxRowIndex As Integer = rngDetailArea.Rows.Count - 1
+            Dim maxColIndex As Integer = rngDetailArea.Columns.Count - 1
+            rngOffsetBase = rngDetailArea.Resize(1, 1)
+
+            Dim rIndex As Integer = 0
+            Dim cIndex As Integer = 0
+            For Each item In printRows.Select(Function(r)
+                                                  Dim index As Integer = 0
+                                                  Integer.TryParse(r.TankNumber, index)
+                                                  Return New With {r.TankNumber, index}
+                                              End Function).OrderBy(Function(r) r.index)
+
+                rngWorkArea = rngOffsetBase.Offset(rIndex, cIndex)
+                rngWorkArea.Value = item.TankNumber
+                ExcelMemoryRelease(rngWorkArea)
+
+                If rIndex < maxRowIndex Then
+                    rIndex += 1
+                Else
+                    rIndex = 0
+                    If cIndex < maxColIndex Then
+                        cIndex += 1
+                    Else
+                        Exit For
+                    End If
+                End If
+            Next
+            ExcelMemoryRelease(rngOffsetBase)
+            ExcelMemoryRelease(rngDetailArea)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngWorkArea)
+            ExcelMemoryRelease(rngOffsetBase)
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+#End Region
+
 End Class

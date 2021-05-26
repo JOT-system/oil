@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIM0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:content id="OIM0005SH" contentplaceholderid="head" runat="server">
-<%--    <link href='<%=ResolveUrl("~/OIL/css/OIM0005S.css")%>' rel="stylesheet" type="text/css" />--%>
+    <link href='<%=ResolveUrl("~/OIL/css/OIM0005S.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0005S.js")%>'></script>
 </asp:content>
 
@@ -76,6 +76,25 @@
                 <a id="WF_USEDFLG_TEXT">
                     <asp:Label ID="WF_USEDFLG_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
+            </div>
+            <!-- 運用基地コード -->
+            <div class="inputItem">
+                <a id="WF_OPERATIONBASE_LABEL">運用基地コード</a>
+                <a class="ef"  id="WF_OPERATIONBASE"  ondblclick="Field_DBclick('WF_OPERATIONBASECODE', <%=LIST_BOX_CLASSIFICATION.LC_BASE%>);" onchange="TextBox_change('WF_OPERATIONBASECODE');">
+                    <asp:TextBox  ID="WF_OPERATIONBASECODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                </a>
+                <a id="WF_OPERATIONBASE_TEXT">
+                    <asp:Label ID="WF_OPERATIONBASENAME" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+            <!-- リース先チェックボックス -->
+            <div class="inputItem">
+                <a id="WF_LEASECODE_LABEL">リース先</a>
+                <asp:RadioButtonList ID="WF_LEASECODE_LIST" runat="server" RepeatColumns="3" RepeatDirection="Vertical" RepeatLayout="Table">
+                    <asp:ListItem Value="">なし　</asp:ListItem>
+                    <asp:ListItem Value="11">日本ＯＴ　</asp:ListItem>
+                    <asp:ListItem Value="71">在日米軍　</asp:ListItem>
+                </asp:RadioButtonList>
             </div>
         </div> <!-- End inputBox -->
     </div> <!-- End searchbox -->

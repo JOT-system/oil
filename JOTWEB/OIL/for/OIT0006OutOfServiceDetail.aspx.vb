@@ -2709,12 +2709,13 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '● 日付妥当性チェック(返送日)
-        WW_CheckListActualValidityDate(WW_ERRCODE)
-        'WW_CheckActualValidityDate(WW_ERRCODE)
-        If WW_ERRCODE = "ERR" Then
-            Exit Sub
-        End If
+        '### 20210526 START 過去日付チェック(廃止) #############################################################
+        ''● 日付妥当性チェック(返送日)
+        'WW_CheckListActualValidityDate(WW_ERRCODE)
+        'If WW_ERRCODE = "ERR" Then
+        '    Exit Sub
+        'End If
+        '### 20210526 END   過去日付チェック(廃止) #############################################################
 
         '〇 回送DB更新
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

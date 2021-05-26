@@ -111,15 +111,15 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonOtRsvSend_Click()
                         Case "WF_ButtonOTLinkageDownLoad"       'OT連携(帳票)ボタン押下
                             WF_ButtonOtRsvDownLoad_Click()
-                        Case "WF_ButtonReserved"          '製油所出荷予約ボタン押下時
+                        Case "WF_ButtonReserved"                '製油所出荷予約ボタン押下時
                             WF_ButtonReserved_Click()
-                        Case "WF_ButtonTakusou"          '託送指示ボタン押下時
-                            WF_ButtonTakusou_Click()     '出荷予約訂正指示ボタン
-                        Case "WF_ButtonReserveMod"
-                            WF_ButtonReserveMod_Click()  '出荷予約訂正指示のダウンロードボタン
-                        Case "WF_ButtonReserveModDownload"
+                        Case "WF_ButtonTakusou"                 '託送指示ボタン押下時
+                            WF_ButtonTakusou_Click()
+                        Case "WF_ButtonReserveMod"              '出荷予約訂正指示ボタン
+                            WF_ButtonReserveMod_Click()
+                        Case "WF_ButtonReserveModDownload"      '出荷予約訂正指示のダウンロードボタン
                             WF_ButtonReserveModDownload_Click()
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND"                     '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_Field_DBClick"             'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -3012,6 +3012,7 @@ Public Class OIT0003OTLinkageList
             .AppendLine("   , DET.LINE                        AS LINE ")
             .AppendLine("   , DET.FILLINGPOINT                AS FILLINGPOINT ")
             .AppendLine("   , DET.GYONO                       AS GYONO ")
+            .AppendLine("   , OIM0026.DELIVERYCODE            AS DELIVERYCODE ")
             .AppendLine(" FROM ")
             .AppendLine("   OIL.OIT0002_ORDER ODR ")
             .AppendLine("   INNER JOIN OIL.OIT0003_DETAIL DET ")
@@ -3055,6 +3056,13 @@ Public Class OIT0003OTLinkageList
             .AppendLine("     AND CNV_OIL.KEYCODE03 = DET.OILCODE ")
             .AppendLine("     AND CNV_OIL.KEYCODE05 = DET.ORDERINGTYPE ")
             .AppendLine("     AND CNV_OIL.DELFLG = @DELFLG ")
+            '### 20210526 START 袖ヶ浦営業所対応(充填ポイント取得) #########################################
+            .AppendLine("   LEFT JOIN oil.OIM0026_DELIVERY OIM0026 ")
+            .AppendLine("     ON OIM0026.OFFICECODE = ODR.OFFICECODE ")
+            .AppendLine("     AND OIM0026.TRAINNAME = DET.LOADINGIRILINETRAINNAME ")
+            .AppendLine("     AND OIM0026.LINEORDER = DET.LINEORDER ")
+            .AppendLine("     AND OIM0026.DELFLG = @DELFLG ")
+            '### 20210526 END   袖ヶ浦営業所対応(充填ポイント取得) #########################################
             .AppendLine(" WHERE ")
             .AppendFormat("   ODR.ORDERNO IN({0}) ", selectedOrderNoInStat).AppendLine()
             '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
@@ -3205,9 +3213,14 @@ Public Class OIT0003OTLinkageList
                         Case BaseDllConst.CONST_OFFICECODE_011203
                             '袖ヶ浦
                             If wrkDr("FILLINGPOINT").ToString() <> "" Then
-                                tsumiKaisen = Strings.Left(wrkDr("FILLINGPOINT").ToString(), 1)
-                                tsumiBansen = Strings.Mid(wrkDr("FILLINGPOINT").ToString(), 2, 1)
-                                tsumiPoint = Strings.Right(wrkDr("FILLINGPOINT").ToString(), 1)
+                                '### 20210526 START 袖ヶ浦営業所対応(充填ポイント取得) #########################################
+                                tsumiKaisen = Strings.Left(wrkDr("DELIVERYCODE").ToString(), 1)
+                                tsumiBansen = Strings.Mid(wrkDr("DELIVERYCODE").ToString(), 2, 1)
+                                tsumiPoint = Strings.Right(wrkDr("DELIVERYCODE").ToString(), 1)
+                                '    tsumiKaisen = Strings.Left(wrkDr("FILLINGPOINT").ToString(), 1)
+                                '    tsumiBansen = Strings.Mid(wrkDr("FILLINGPOINT").ToString(), 2, 1)
+                                '    tsumiPoint = Strings.Right(wrkDr("FILLINGPOINT").ToString(), 1)
+                                '### 20210526 END   袖ヶ浦営業所対応(充填ポイント取得) #########################################
                             End If
                     End Select
                     newDr("積込回線") = tsumiKaisen.PadRight(2, " "c)

@@ -7327,12 +7327,16 @@ Public Class OIT0006OutOfServiceDetail
 
             Using tran = SQLcon.BeginTransaction
                 '■回送履歴テーブル
-                EntryHistory.InsertKaisouHistory(SQLcon, tran, OIT0006His1tbl.Rows(0))
+                If OIT0006His1tbl.Rows.Count <> 0 Then
+                    EntryHistory.InsertKaisouHistory(SQLcon, tran, OIT0006His1tbl.Rows(0))
+                End If
 
                 '■回送明細履歴テーブル
-                For Each OIT0001His2rowtbl In OIT0006His2tbl.Rows
-                    EntryHistory.InsertKaisouDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
-                Next
+                If OIT0006His2tbl.Rows.Count <> 0 Then
+                    For Each OIT0001His2rowtbl In OIT0006His2tbl.Rows
+                        EntryHistory.InsertKaisouDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                    Next
+                End If
 
                 'トランザクションコミット
                 tran.Commit()

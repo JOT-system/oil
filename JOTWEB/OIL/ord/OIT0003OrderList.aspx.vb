@@ -5961,8 +5961,12 @@ Public Class OIT0003OrderList
                             tblFirstcnt = tblcnt
                         End If
                     End If
-                    'OT順位を降順で設定
-                    OIT0003Reprow("OTRANK") = (tblFirstcnt - Integer.Parse(OIT0003Reprow("LINEORDER"))) + 1
+                    Try
+                        'OT順位を降順で設定
+                        OIT0003Reprow("OTRANK") = (tblFirstcnt - Integer.Parse(OIT0003Reprow("LINEORDER"))) + 1
+                    Catch ex As Exception
+                        OIT0003Reprow("OTRANK") = ""
+                    End Try
                     'tblcnt -= 1
                     '### 20210514 END   同時入線取得用 ##########################################################
 

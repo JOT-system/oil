@@ -5944,7 +5944,14 @@ Public Class OIT0003OrderList
                         '★列車の合計を設定
                         tblcnt = OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").Count
                         Try
-                            tblMaxLinecnt = Integer.Parse(OIT0003ReportSodegauratbl.Compute("MAX(LINEORDER)", "TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").ToString())
+                            'tblMaxLinecnt = Integer.Parse(OIT0003ReportSodegauratbl.Compute("MAX(LINEORDER)", "TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'").ToString())
+                            Dim maxLine As Integer = 0
+                            For Each OIT0003row As DataRow In OIT0003ReportSodegauratbl.Select("TRAINNO='" + Convert.ToString(OIT0003Reprow("TRAINNO")) + "'")
+                                If maxLine < Integer.Parse(OIT0003row("LINEORDER")) Then
+                                    maxLine = Integer.Parse(OIT0003row("LINEORDER"))
+                                End If
+                            Next
+                            tblMaxLinecnt = maxLine
                         Catch ex As Exception
                         End Try
                         '★列車の合計(サマリー)を設定

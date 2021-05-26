@@ -1996,7 +1996,15 @@ Public Class OIT0003OrderDetail
                 Dim intListCnt As Integer = OIT0003tbl.Rows.Count
                 '列車毎の入線順のMAX値を保持
                 Try
-                    tblMaxLinecnt = Integer.Parse(OIT0003tbl.Compute("MAX(LINEORDER)", Nothing).ToString())
+                    'tblMaxLinecnt = Integer.Parse(OIT0003tbl.Compute("MAX(LINEORDER)", Nothing).ToString())
+                    Dim maxLine As Integer = 0
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        If maxLine < Integer.Parse(OIT0003row("LINEORDER")) Then
+                            maxLine = Integer.Parse(OIT0003row("LINEORDER"))
+                        End If
+                    Next
+                    tblMaxLinecnt = maxLine
+
                 Catch ex As Exception
                 End Try
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -2026,7 +2034,7 @@ Public Class OIT0003OrderDetail
                                     intListCnt = OIT0003tbl.Rows.Count
                                 End If
                             Catch ex As Exception
-                                intListCnt = OIT0003tbl.Rows.Count
+                                intListCnt = tblMaxLinecnt
                             End Try
                             Try
                                 '発送順を自動設定(貨物駅入線順の値の逆値を設定する)

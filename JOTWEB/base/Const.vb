@@ -1286,6 +1286,107 @@ Public Module BaseDllConst
     Public Const CONST_COSMO_LSABU As String = "LAブ"
 #End Region
 
+#Region "列車(京葉臨海)"
+    ''' <summary>
+    ''' 列車番号(入線 回線1) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I01_201_011201 As String = "201"
+    ''' <summary>
+    ''' 列車番号(出線 回線1) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O01_204_011201 As String = "204"
+    ''' <summary>
+    ''' 列車番号(入線 回線2) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I02_203_011201 As String = "203"
+    ''' <summary>
+    ''' 列車番号(出線 回線2) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O02_206_011201 As String = "206"
+    ''' <summary>
+    ''' 列車番号(入線 回線3) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I03_205_011201 As String = "205"
+    ''' <summary>
+    ''' 列車番号(出線 回線3) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O03_208_011201 As String = "208"
+    ''' <summary>
+    ''' 列車番号(入線 回線4) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I04_207_011201 As String = "207"
+    ''' <summary>
+    ''' 列車番号(出線 回線4) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O04_210_011201 As String = "210"
+    ''' <summary>
+    ''' 列車番号(入線 回線5) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I05_209_011201 As String = "209"
+    ''' <summary>
+    ''' 列車番号(出線 回線5) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O05_212_011201 As String = "212"
+    ''' <summary>
+    ''' 列車番号(入線 回線6) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I06_211_011201 As String = "211"
+    ''' <summary>
+    ''' 列車番号(出線 回線6) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O06_214_011201 As String = "214"
+    ''' <summary>
+    ''' 列車番号(入線 回線7) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I07_213_011201 As String = "213"
+    ''' <summary>
+    ''' 列車番号(出線 回線7) 五井営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O07_216_011201 As String = "216"
+
+    ''' <summary>
+    ''' 列車番号(入線 回線11) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I11_301_011202 As String = "301"
+    ''' <summary>
+    ''' 列車番号(出線 回線11) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O11_504_011202 As String = "504"
+    ''' <summary>
+    ''' 列車番号(入線 回線12) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I12_301_011202 As String = "301"
+    ''' <summary>
+    ''' 列車番号(出線 回線12) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O12_504_011202 As String = "504"
+    ''' <summary>
+    ''' 列車番号(入線 回線21) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I21_503_011202 As String = "503"
+    ''' <summary>
+    ''' 列車番号(出線 回線21) 甲子営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O21_508_011202 As String = "508"
+
+    ''' <summary>
+    ''' 列車番号(入線 回線1) 袖ヶ浦営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I01_501_011203 As String = "501"
+    ''' <summary>
+    ''' 列車番号(出線 回線1) 袖ヶ浦営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O01_402_011203 As String = "402"
+    ''' <summary>
+    ''' 列車番号(入線 回線2) 袖ヶ浦営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_I02_401_011203 As String = "401"
+    ''' <summary>
+    ''' 列車番号(出線 回線2) 袖ヶ浦営業所
+    ''' </summary>
+    Public Const CONST_RTRAIN_O02_404_011203 As String = "404"
+#End Region
+
 #Region "型式(タンク車)"
     ''' <summary>
     ''' タキ1000

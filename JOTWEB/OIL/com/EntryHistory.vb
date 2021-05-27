@@ -21,7 +21,7 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,TRAINNO,TRAINNAME,ORDERYMD,OFFICECODE,OFFICENAME,ORDERTYPE,")
         sqlOrderStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
         sqlOrderStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,RETSTATION,RETSTATIONNAME,")
-        sqlOrderStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,EMPTYTURNFLG,STACKINGFLG,USEPROPRIETYFLG,CONTACTFLG,RESULTFLG,DELIVERYFLG,DELIVERYCOUNT,")
+        sqlOrderStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,EMPTYTURNFLG,STACKINGFLG,USEPROPRIETYFLG,CONTACTFLG,RESULTFLG,DELIVERYFLG,DELIVERYCOUNT,SAMETIMELINEFLG,")
         sqlOrderStat.AppendLine("    LODDATE,DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
         sqlOrderStat.AppendLine("    RTANK,HTANK,TTANK,MTTANK,KTANK,K3TANK,K5TANK,K10TANK,LTANK,ATANK,")
         sqlOrderStat.AppendLine("    OTHER1OTANK,OTHER2OTANK,OTHER3OTANK,OTHER4OTANK,OTHER5OTANK,")
@@ -39,7 +39,7 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@TRAINNO,@TRAINNAME,@ORDERYMD,@OFFICECODE,@OFFICENAME,@ORDERTYPE,")
         sqlOrderStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
         sqlOrderStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@RETSTATION,@RETSTATIONNAME,")
-        sqlOrderStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@EMPTYTURNFLG,@STACKINGFLG,@USEPROPRIETYFLG,@CONTACTFLG,@RESULTFLG,@DELIVERYFLG,@DELIVERYCOUNT,")
+        sqlOrderStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@EMPTYTURNFLG,@STACKINGFLG,@USEPROPRIETYFLG,@CONTACTFLG,@RESULTFLG,@DELIVERYFLG,@DELIVERYCOUNT,@SAMETIMELINEFLG,")
         sqlOrderStat.AppendLine("    @LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
         sqlOrderStat.AppendLine("    @RTANK,@HTANK,@TTANK,@MTTANK,@KTANK,@K3TANK,@K5TANK,@K10TANK,@LTANK,@ATANK,")
         sqlOrderStat.AppendLine("    @OTHER1OTANK,@OTHER2OTANK,@OTHER3OTANK,@OTHER4OTANK,@OTHER5OTANK,")
@@ -88,6 +88,15 @@ Public Class EntryHistory
                 .Add("RESULTFLG", SqlDbType.NVarChar).Value = drOrder("RESULTFLG")
                 .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = drOrder("DELIVERYFLG")
                 .Add("DELIVERYCOUNT", SqlDbType.Int).Value = drOrder("DELIVERYCOUNT")
+                Try
+                    .Add("SAMETIMELINEFLG", SqlDbType.NVarChar).Value = drOrder("SAMETIMELINEFLG")
+                Catch ex As Exception
+                    If .Contains("SAMETIMELINEFLG") Then
+                        .Item("SAMETIMELINEFLG").Value = ""
+                    Else
+                        .Add("SAMETIMELINEFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("LODDATE", SqlDbType.Date).Value = drOrder("LODDATE")
                 .Add("DEPDATE", SqlDbType.Date).Value = drOrder("DEPDATE")
                 .Add("ARRDATE", SqlDbType.Date).Value = drOrder("ARRDATE")
@@ -203,6 +212,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
         sqlDetailStat.AppendLine("    RESERVEDNO,GYONO,OTSENDCOUNT,DLRESERVEDCOUNT,DLTAKUSOUCOUNT,")
         sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,ANASYORIFLG,VOLSYORIFLG,")
+        sqlDetailStat.AppendLine("    TANKBACKORDERNO,TANKBACKINFO,")
         sqlDetailStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
@@ -223,6 +233,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    @ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
         sqlDetailStat.AppendLine("    @RESERVEDNO,@GYONO,@OTSENDCOUNT,@DLRESERVEDCOUNT,@DLTAKUSOUCOUNT,")
         sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@ANASYORIFLG,@VOLSYORIFLG,")
+        sqlDetailStat.AppendLine("    @TANKBACKORDERNO,@TANKBACKINFO,")
         sqlDetailStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlDetailStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
 
@@ -318,6 +329,24 @@ Public Class EntryHistory
                 .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
                 .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
                 .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = drOrder("VOLSYORIFLG")
+                Try
+                    .Add("TANKBACKORDERNO", SqlDbType.NVarChar).Value = drOrder("TANKBACKORDERNO")
+                Catch ex As Exception
+                    If .Contains("TANKBACKORDERNO") Then
+                        .Item("TANKBACKORDERNO").Value = ""
+                    Else
+                        .Add("TANKBACKORDERNO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
+                Try
+                    .Add("TANKBACKINFO", SqlDbType.NVarChar).Value = drOrder("TANKBACKINFO")
+                Catch ex As Exception
+                    If .Contains("TANKBACKINFO") Then
+                        .Item("TANKBACKINFO").Value = ""
+                    Else
+                        .Add("TANKBACKINFO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")

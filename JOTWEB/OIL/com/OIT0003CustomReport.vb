@@ -1613,6 +1613,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '◯ 出線列車No(臨海鉄道)
                 rngHeaderArea = Me.ExcelWorkSheet.Range("F10")
                 rngHeaderArea.Value = PrintDatarow("LOADINGOUTLETTRAINNO")
+                '★ 入線方(501同時入線タイプ)の場合
+                If Convert.ToString(PrintDatarow("LOADINGIRILINETRAINNO")) = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
+                    AndAlso bSameTimeLine = True Then
+                    rngHeaderArea.Value = BaseDllConst.CONST_RTRAIN_O02_404_011203
+                End If
                 ExcelMemoryRelease(rngHeaderArea)
                 '★501専用入線方の場合
                 If rTrainNo = "501" AndAlso bSameTimeLine = False Then

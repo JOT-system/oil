@@ -406,6 +406,9 @@
             & " AND OIM0005.DELFLG <> @DELFLG " _
             & " WHERE OIT0011.RLINKNO = @RLINKNO "
 
+        SQLStr &=
+              " ORDER BY OIT0011.SERIALNUMBER"
+
         Return SQLStr
     End Function
 

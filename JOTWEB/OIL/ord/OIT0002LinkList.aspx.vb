@@ -2160,7 +2160,7 @@ Public Class OIT0002LinkList
                         '★アップロード対象の営業所(対象の駅)の場合は引き継ぐ必要ないのでSKIP
                         If Convert.ToString(OIT0002ExlUProw("TARGETSTATIONNAME")) = Convert.ToString(OIT0002ExlUProw("ARRSTATIONNAME")) Then Continue For
                         For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
-                            If OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") _
+                            If (OIT0002ExlUProw("SERIALNUMBER") = OIT0002Exlrow("SERIALNUMBER") AndAlso OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO")) _
                                 OrElse OIT0002ExlUProw("TRUCKNO") = OIT0002Exlrow("TRUCKNO") Then
                                 OIT0002ExlUProw("OBJECTIVENAME") = OIT0002Exlrow("OBJECTIVENAME")
                                 OIT0002ExlUProw("DAILYREPORTCODE") = OIT0002Exlrow("DAILYREPORTCODE")

@@ -1620,7 +1620,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 End If
                 ExcelMemoryRelease(rngHeaderArea)
                 '★501専用入線方の場合
-                If rTrainNo = "501" AndAlso bSameTimeLine = False Then
+                If rTrainNo = BaseDllConst.CONST_RTRAIN_I01_501_011203 AndAlso bSameTimeLine = False Then
                     '◯ 受入日
                     rngHeaderArea = Me.ExcelWorkSheet.Range("M17")
                     rngHeaderArea.Value = PrintDatarow("ACCDATE")
@@ -1699,7 +1699,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Dim svConsigneeCode As String = ""
             '開始行
             Dim j As Integer = 48               '401専用入線方
-            If rTrainNo = "501" _
+            If rTrainNo = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
                 AndAlso bSameTimeLine = False Then j = 26     '501専用入線方
             Dim i As Integer = j
 
@@ -1717,7 +1717,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     '# JONET松本
                         Case BaseDllConst.CONST_CONSIGNEECODE_40
                             svTrain = clnTrain(5)                               '401専用入線方
-                            If rTrainNo = "501" _
+                            If rTrainNo = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
                                 AndAlso bSameTimeLine = False Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                         Case BaseDllConst.CONST_CONSIGNEECODE_53
@@ -1801,7 +1801,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     '# JONET松本
                 Case BaseDllConst.CONST_CONSIGNEECODE_40
                     svTrain = clnTrain(5)                               '401専用入線方
-                    If rTrainNo = "501" _
+                    If rTrainNo = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
                         AndAlso bSameTimeLine = False Then svTrain = clnTrain(2)      '501専用入線方
                     '# OT宇都宮
                 Case BaseDllConst.CONST_CONSIGNEECODE_53
@@ -1850,7 +1850,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
             '受注オーダーにLTA油種が含まれているか確認
             Dim iLTACnt As Integer = PrintData.Select("ORDERINGOILNAME='" + BaseDllConst.CONST_2101C + "'").Count
-            If iLTACnt >= 1 AndAlso (rTrainNo = "401" OrElse bSameTimeLine = True) Then
+            If iLTACnt >= 1 AndAlso (rTrainNo = BaseDllConst.CONST_RTRAIN_I02_401_011203 OrElse bSameTimeLine = True) Then
                 Dim clnLTA() As String = {"B", "D", "F", "H", "J", "L"}
                 For Each strLTA As String In clnLTA
                     '○LTA油種が含まれている場合

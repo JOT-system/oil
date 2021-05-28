@@ -2522,6 +2522,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNO), '')    AS LOADINGOUTLETTRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNAME), '')  AS LOADINGOUTLETTRAINNAME" _
             & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETORDER), '')      AS LOADINGOUTLETORDER" _
+            & " , ISNULL(RTRIM(OIT0002.SAMETIMELINEFLG), '')         AS SAMETIMELINEFLG" _
             & " , ISNULL(RTRIM(OIT0003.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0003_DETAIL OIT0003 " _
             & " INNER JOIN OIL.OIT0002_ORDER OIT0002 ON " _
@@ -2578,6 +2579,16 @@ Public Class OIT0003OrderDetail
 
                         '託送コード設定(充填ポイント)
                         OIT0003tab2row("FILLINGPOINT") = WW_GetValue(0)
+                    End If
+
+                    '★501(入線列車番号)同時入線タイプの場合
+                    If OIT0003tab2row("LOADINGIRILINETRAINNO") = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
+                        AndAlso OIT0003tab2row("SAMETIMELINEFLG") = "1" _
+                        AndAlso work.WF_SEL_ORDERSTATUS.Text <= BaseDllConst.CONST_ORDERSTATUS_200 Then
+                        '出線列車番号
+                        OIT0003tab2row("LOADINGOUTLETTRAINNO") = BaseDllConst.CONST_RTRAIN_O02_404_011203
+                        '出線列車名
+                        OIT0003tab2row("LOADINGOUTLETTRAINNAME") = BaseDllConst.CONST_RTRAIN_O02_404_011203 + "レ"
                     End If
 
                 Next
@@ -9458,7 +9469,7 @@ Public Class OIT0003OrderDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO " _
-            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG   , DELIVERYCOUNT" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG   , DELIVERYCOUNT, SAMETIMELINEFLG" _
             & "        , LODDATE      , DEPDATE         , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
@@ -9481,7 +9492,7 @@ Public Class OIT0003OrderDetail
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-            & "        , @P95, @P92, @P23, @P96, @P97, @P94, @P98" _
+            & "        , @P95, @P92, @P23, @P96, @P97, @P94, @P98, @P103" _
             & "        , @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
@@ -9535,6 +9546,7 @@ Public Class OIT0003OrderDetail
             & "    , RESULTFLG" _
             & "    , DELIVERYFLG" _
             & "    , DELIVERYCOUNT" _
+            & "    , SAMETIMELINEFLG" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
             & "    , ARRDATE" _
@@ -9645,6 +9657,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA97 As SqlParameter = SQLcmd.Parameters.Add("@P97", SqlDbType.NVarChar, 1)  '結果受理フラグ
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
                 Dim PARA98 As SqlParameter = SQLcmd.Parameters.Add("@P98", SqlDbType.Int)          '託送指示送信回数
+                Dim PARA103 As SqlParameter = SQLcmd.Parameters.Add("@P103", SqlDbType.NVarChar, 1)  '同時入線フラグ
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)         '積車着日（予定）
@@ -9796,6 +9809,7 @@ Public Class OIT0003OrderDetail
                     PARA97.Value = work.WF_SEL_RESULTFLG.Text             '結果受理フラグ(0:未受理)
                     PARA94.Value = work.WF_SEL_DELIVERYFLG.Text           '託送指示フラグ(0:未手配, 1:手配)
                     PARA98.Value = "0"                                    '託送指示送信回数
+                    PARA103.Value = "0"                                   '同時入線フラグ(0:通常)
 
                     PARA24.Value = Me.TxtLoadingDate.Text                 '積込日（予定）
                     PARA25.Value = Me.TxtDepDate.Text                     '発日（予定）
@@ -14684,6 +14698,16 @@ Public Class OIT0003OrderDetail
 
                             '回線
                             updHeader.Item("LINE") = WW_GetValue(5)
+
+                            '★501(入線列車番号)同時入線タイプの場合
+                            If updHeader.Item("LOADINGIRILINETRAINNO") = BaseDllConst.CONST_RTRAIN_I01_501_011203 _
+                                AndAlso updHeader.Item("SAMETIMELINEFLG") = "1" Then
+                                '出線列車番号
+                                WW_GetValue(6) = BaseDllConst.CONST_RTRAIN_O02_404_011203
+                                '出線列車名
+                                WW_GetValue(7) = BaseDllConst.CONST_RTRAIN_O02_404_011203 + "レ"
+                            End If
+
                             '出線列車番号
                             updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
                             '出線列車名

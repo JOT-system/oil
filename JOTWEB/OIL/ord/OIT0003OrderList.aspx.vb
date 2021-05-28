@@ -85,6 +85,7 @@ Public Class OIT0003OrderList
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -4150,14 +4151,27 @@ Public Class OIT0003OrderList
                 If Me.ChkSameTimeLineChk.Checked = True Then
                     '◯ファイル名(袖ヶ浦同時入線専用入線方)
                     tyohyoName = "_SODEGAURA_LINEPLAN"
+
+                    Dim dtOrderNo As String = ""
+                    For Each OIT0001row As DataRow In OIT0003ReportSodegauratbl.Select(Nothing, "ORDERNO")
+                        '★受注TBL(同時入線フラグ)を"1"(同時入線)に更新
+                        If dtOrderNo <> Convert.ToString(OIT0001row("ORDERNO")) Then
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(OIT0001row("ORDERNO")), Master, "1", I_PARA:="SAMETIMELINEFLG")
+                            End Using
+                        End If
+                        dtOrderNo = Convert.ToString(OIT0001row("ORDERNO"))
+                    Next
+
                 Else
-                    If Me.txtReportRTrainNo.Text = "401" Then
+                    If Me.txtReportRTrainNo.Text = BaseDllConst.CONST_RTRAIN_I02_401_011203 Then
                         '◯ファイル名(袖ヶ浦401レ専用入線方)
                         tyohyoName = "_SODEGAURA_LINEPLAN_401"
                         '★着駅が"5141"(南松本)の場合は、フォーマット(南松本向け)にする。
                         If sArrStation = "5141" Then
                             tyohyoName = "_SODEGAURA_LINEPLAN_501"
-                            repRTrainNo = "501"
+                            repRTrainNo = BaseDllConst.CONST_RTRAIN_I01_501_011203
                         End If
                     Else
                         '◯ファイル名(袖ヶ浦501レ専用入線方)
@@ -4165,9 +4179,21 @@ Public Class OIT0003OrderList
                         '★着駅が"4113"(倉賀野)の場合は、フォーマット(倉賀野向け)にする。
                         If sArrStation = "4113" Then
                             tyohyoName = "_SODEGAURA_LINEPLAN_401"
-                            repRTrainNo = "401"
+                            repRTrainNo = BaseDllConst.CONST_RTRAIN_I02_401_011203
                         End If
                     End If
+
+                    Dim dtOrderNo As String = ""
+                    For Each OIT0001row As DataRow In OIT0003ReportSodegauratbl.Select(Nothing, "ORDERNO")
+                        '★受注TBL(同時入線フラグ)を"0"(通常)に更新
+                        If dtOrderNo <> Convert.ToString(OIT0001row("ORDERNO")) Then
+                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()       'DataBase接続
+                                CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(OIT0001row("ORDERNO")), Master, "0", I_PARA:="SAMETIMELINEFLG")
+                            End Using
+                        End If
+                        dtOrderNo = Convert.ToString(OIT0001row("ORDERNO"))
+                    Next
                 End If
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0003ReportSodegauratbl)
                     Dim url As String
@@ -6288,7 +6314,8 @@ Public Class OIT0003OrderList
         '　 説明　：　帳票表示用SQL
         Dim SQLStr As String =
               " SELECT " _
-            & "   OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & "   OIT0002.ORDERNO                                AS ORDERNO" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
             & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _

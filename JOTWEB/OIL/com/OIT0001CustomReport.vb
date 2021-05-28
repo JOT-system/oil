@@ -545,7 +545,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             Dim strLodDateSave As String = ""
             '### 20210514 START 同時入線取得用 ##########################################################
             Dim sTrainNo() As String = {"8877", "5461", "9672"}
-            Dim sRTrainNo() As String = {"401", "501"}
+            Dim sRTrainNo() As String = {BaseDllConst.CONST_RTRAIN_I02_401_011203, BaseDllConst.CONST_RTRAIN_I01_501_011203}
             Dim sCondition As String = ""
             '○列車No(8877)　京葉臨海列車No(501)※同時入線のみ存在するオーダー
             sCondition = String.Format("TRAINNO='{0}' AND LOADINGIRILINETRAINNO='{1}'", sTrainNo(0), sRTrainNo(1))

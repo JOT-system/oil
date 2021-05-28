@@ -217,6 +217,51 @@ Public Class CmnParts
 
     End Sub
     ''' <summary>
+    ''' 計上年月取得
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Public Function GetKeijyoYM(ByVal SQLcon As SqlConnection) As String
+
+        Dim KEIJYOYMtbl As DataTable = Nothing
+        If IsNothing(KEIJYOYMtbl) Then
+            KEIJYOYMtbl = New DataTable
+        End If
+
+        If KEIJYOYMtbl.Columns.Count <> 0 Then
+            KEIJYOYMtbl.Columns.Clear()
+        End If
+
+        KEIJYOYMtbl.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT" _
+            & "   FORMAT(OIT0019.KEIJYOYM, 'yyyy/MM') AS KEIJYOYM" _
+            & " FROM OIL.OIT0019_KEIJYOYM OIT0019"
+
+        Dim KeijyoYM As String = ""
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        KEIJYOYMtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    KEIJYOYMtbl.Load(SQLdr)
+                End Using
+                KeijyoYM = Convert.ToString(KEIJYOYMtbl.Rows(0)("KEIJYOYM"))
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+        Return KeijyoYM
+    End Function
+    ''' <summary>
     ''' 品種出荷期間検索処理
     ''' </summary>
     Public Sub OilTermSearch(ByVal I_OFFICECOE As String, ByVal I_CONSIGNEECODE As String, ByVal I_LODDATE As String, ByRef dtrow As DataRow)

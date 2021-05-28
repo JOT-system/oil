@@ -15,6 +15,7 @@ Public Class OIJ0001BillingMonthCreate
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private CS0052DetailView As New CS0052DetailView                'Repeterオブジェクト作成
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String
@@ -147,6 +148,16 @@ Public Class OIJ0001BillingMonthCreate
         '受注費用明細作成処理
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
+
+            '★計上年月(費用計算月)を取得
+            Dim KeijyoYM As String = CMNPTS.GetKeijyoYM(SQLcon)
+            If KeijyoYM > Me.TxtKeijyoYM.Text Then
+                Dim Msg As String = ""
+                Msg = String.Format("選択した計上年月【{0}】はすでに確定済みのため費用計算できません。", Me.TxtKeijyoYM.Text)
+                Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+
+                Exit Sub
+            End If
 
             WW_ORDERDETAILBILLING(SQLcon)
         End Using

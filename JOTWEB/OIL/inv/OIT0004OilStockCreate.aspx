@@ -364,9 +364,12 @@
                                                                                                          DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock) %>'
                                                         Visible='<%# If(Container.ItemIndex = 0, True, True) %>'
                                                         data-textfield="MorningStock"
-                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday,
-                                                                                                                        "True",
-                                                                                                                        "False") %>' >
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsBeforeToday OrElse
+                                                                                                (DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsTomorrow AndAlso DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsTomorrowMorningStockActive),
+                                                                                                                                                "True",
+                                                                                                                                                "False") %>'
+                                                        date-test1 ='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsTomorrow %>' 
+                                                        date-test2 ='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsTomorrowMorningStockActive  %>'>
                                                     </asp:TextBox>
                                                     <asp:Label ID="lblMorningStock" runat="server" 
                                                         Text='<%# Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0") %>'
@@ -536,6 +539,8 @@
             <!-- 油槽所変更値保持用 -->
             <asp:HiddenField ID="hdnChgConsignee" runat="server" />
             <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
+            <!-- 現在使用油槽所保持 -->
+            <asp:HiddenField ID="hdnCurConsignee" runat="server" />
             <!-- 油槽所変更時初回ロード 0:通常、1:初回 -->
             <asp:HiddenField ID="hdnChgConsigneeFirstLoad" runat="server" Value="0" />
             <!-- 帳票設定表示状態保持用 -->

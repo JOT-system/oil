@@ -283,6 +283,8 @@
 
     <!-- 向け先訂正フラグ -->
     <asp:TextBox ID="WF_SEL_CORRECTIONTRAINFLG" runat="server"></asp:TextBox>
+    <!-- 向け先(一部)訂正フラグ -->
+    <asp:TextBox ID="WF_SEL_CORRECTIONTANKFLG" runat="server"></asp:TextBox>
     <!-- 実績日訂正フラグ -->
     <asp:TextBox ID="WF_SEL_CORRECTIONDATEFLG" runat="server"></asp:TextBox>
     <!-- 手配連絡フラグ -->

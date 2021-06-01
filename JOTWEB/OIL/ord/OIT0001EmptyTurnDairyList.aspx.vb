@@ -1656,7 +1656,7 @@ Public Class OIT0001EmptyTurnDairyList
                 & " , ARRSTATION      , ARRSTATIONNAME      , RETSTATION     , RETSTATIONNAME" _
                 & " , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS    , ORDERINFO" _
                 & " , EMPTYTURNFLG    , STACKINGFLG         , USEPROPRIETYFLG, CONTACTFLG    , RESULTFLG" _
-                & " , DELIVERYFLG     , DELIVERYCOUNT" _
+                & " , DELIVERYFLG     , DELIVERYCOUNT       , SAMETIMELINEFLG" _
                 & " , LODDATE         , DEPDATE             , ARRDATE        , ACCDATE       , EMPARRDATE" _
                 & " , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE  , ACTUALACCDATE , ACTUALEMPARRDATE" _
                 & " , RTANK           , HTANK               , TTANK          , MTTANK        , KTANK" _
@@ -1683,7 +1683,7 @@ Public Class OIT0001EmptyTurnDairyList
                 & " , @ARRSTATION      , @ARRSTATIONNAME      , @RETSTATION     , @RETSTATIONNAME" _
                 & " , @CHANGERETSTATION, @CHANGERETSTATIONNAME, @ORDERSTATUS    , @ORDERINFO" _
                 & " , @EMPTYTURNFLG    , @STACKINGFLG         , @USEPROPRIETYFLG, @CONTACTFLG    , @RESULTFLG" _
-                & " , @DELIVERYFLG     , @DELIVERYCOUNT" _
+                & " , @DELIVERYFLG     , @DELIVERYCOUNT       , @SAMETIMELINEFLG" _
                 & " , @LODDATE         , @DEPDATE             , @ARRDATE        , @ACCDATE       , @EMPARRDATE" _
                 & " , @ACTUALLODDATE   , @ACTUALDEPDATE       , @ACTUALARRDATE  , @ACTUALACCDATE , @ACTUALEMPARRDATE" _
                 & " , @RTANK           , @HTANK               , @TTANK          , @MTTANK        , @KTANK" _
@@ -1733,6 +1733,7 @@ Public Class OIT0001EmptyTurnDairyList
                 Dim P_RESULTFLG As SqlParameter = SQLcmd.Parameters.Add("@RESULTFLG", SqlDbType.NVarChar)                           '-- 結果受理フラグ
                 Dim P_DELIVERYFLG As SqlParameter = SQLcmd.Parameters.Add("@DELIVERYFLG", SqlDbType.NVarChar)                       '-- 託送指示フラグ
                 Dim P_DELIVERYCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DELIVERYCOUNT", SqlDbType.NVarChar)                   '-- 託送指示送信回数
+                Dim P_SAMETIMELINEFLG As SqlParameter = SQLcmd.Parameters.Add("@SAMETIMELINEFLG", SqlDbType.NVarChar)               '-- 同時入線フラグ
                 Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.NVarChar)                               '-- 積込日（予定）
                 Dim P_DEPDATE As SqlParameter = SQLcmd.Parameters.Add("@DEPDATE", SqlDbType.NVarChar)                               '-- 発日（予定）
                 Dim P_ARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ARRDATE", SqlDbType.NVarChar)                               '-- 積車着日（予定）
@@ -1843,6 +1844,7 @@ Public Class OIT0001EmptyTurnDairyList
                 P_RESULTFLG.Value = "0"
                 P_DELIVERYFLG.Value = "0"
                 P_DELIVERYCOUNT.Value = 0
+                P_SAMETIMELINEFLG.Value = "0"
                 P_LODDATE.Value = dtrow("LODDATE")
                 P_DEPDATE.Value = dtrow("DEPDATE")
                 P_ARRDATE.Value = dtrow("ARRDATE")

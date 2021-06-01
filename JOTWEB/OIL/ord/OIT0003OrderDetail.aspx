@@ -37,6 +37,9 @@
                 <div style="display:none;">
                 <input type="button" id="WF_ButtonCORRECTIONTRAIN" class="btn-sticky" value="向け先訂正" onclick="ButtonClick('WF_ButtonCORRECTIONTRAIN');" />
                 </div>
+                <div style="display:none;">
+                <input type="button" id="WF_ButtonCORRECTIONTANK" class="btn-sticky" value="向け先(一部)訂正" onclick="ButtonClick('WF_ButtonCORRECTIONTANK');" />
+                </div>
                 <%-- 20210525 END   向け先訂正対応 --%>
                 <%-- 20201210 START 指摘票対応(No246) --%>
                 <input type="button" id="WF_ButtonCORRECTIONDATE" class="btn-sticky" value="実績日訂正" onclick="ButtonClick('WF_ButtonCORRECTIONDATE');" />
@@ -716,6 +719,8 @@
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
         <!-- OT発送日報フラグ -->
         <input id="WF_OTLINKAGEFLG" runat="server" value="" type="text" />
+        <!-- 向け先(一部)訂正フラグ -->
+        <input id="WF_CORRECTIONTANKFLG" runat="server" value="" type="text" />
         <!-- 実績日訂正フラグ -->
         <input id="WF_CORRECTIONDATEFLG" runat="server" value="" type="text" />
         <!-- 一括フラグ -->

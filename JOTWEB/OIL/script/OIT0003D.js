@@ -25,6 +25,16 @@ function InitDisplay() {
         document.getElementById("WF_ButtonOTLINKAGE").disabled = "disabled";
     }
 
+    //〇 向け先(一部)訂正ボタン活性／非活性
+    if (document.getElementById('WF_CORRECTIONTANKFLG').value === "0") {
+        //活性
+        document.getElementById("WF_ButtonCORRECTIONTANK").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonCORRECTIONTANK").disabled = "disabled";
+    }
+
     //〇 実績日訂正ボタン活性／非活性
     if (document.getElementById('WF_CORRECTIONDATEFLG').value === "0") {
         //活性
@@ -532,6 +542,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "INVOICECODE"
             || fieldNM === "PAYEECODE") {
             document.getElementById('WF_LeftMViewChange').value = 68;
+        }
+        else if (fieldNM === "TANKBACKINFO") {
+            document.getElementById('WF_LeftMViewChange').value = 77;
         }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 

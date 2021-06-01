@@ -159,9 +159,13 @@ Public Class OIT0003OrderDetail
                         Case "WF_ButtonCORRECTIONTRAIN",
                              "btnChkCrtTrainConfirmYes"       '向け先訂正ボタン押下
                             WF_ButtonCORRECTIONTRAIN_Click(WF_ButtonClick.Value)
-                        Case "WF_ButtonCORRECTIONDATE",
-                             "WF_ButtonCORRECTION_TAB3"       '実績日訂正ボタン押下
+                        Case "WF_ButtonCORRECTIONTANK"        '向け先(一部)訂正ボタン押下
+                            WF_ButtonCORRECTIONTANK_Click(WF_ButtonClick.Value)
+                        Case "WF_ButtonCORRECTIONDATE"        '実績日訂正ボタン押下
                             WF_ButtonCORRECTIONDATE_Click(WF_ButtonClick.Value)
+                        Case "WF_ButtonCORRECTION_TAB3",
+                             "btnChkCrtTankConfirmYes"        '訂正ボタン押下
+                            WF_ButtonCORRECTION_Click(WF_ButtonClick.Value)
                         Case "WF_ButtonBULKDATE"              '一括ボタン押下
                             WF_ButtonBULK_Click()
                         Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
@@ -580,7 +584,9 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "0"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(活性)
+                '◯向け先(一部)訂正フラグ(非活性)
+                WF_CORRECTIONTANKFLG.Value = "1"
+                '◯実績日訂正フラグ(非活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
 
@@ -613,7 +619,9 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(活性)
+                '◯向け先(一部)訂正フラグ(非活性)
+                WF_CORRECTIONTANKFLG.Value = "1"
+                '◯実績日訂正フラグ(非活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
                 '### 20210412 START 根岸営業所対応(竜王81列車) ##############################
@@ -641,11 +649,16 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                If work.WF_SEL_CORRECTIONDATEFLG.Text = "0" Then
-                    '◯実績日訂正フラグ(非活性)
+
+                If work.WF_SEL_CORRECTIONDATEFLG.Text = "0" AndAlso work.WF_SEL_CORRECTIONTANKFLG.Text = "0" Then
+                    '◯向け先(一部)訂正フラグ(活性)
+                    WF_CORRECTIONTANKFLG.Value = "0"
+                    '◯実績日訂正フラグ(活性)
                     WF_CORRECTIONDATEFLG.Value = "0"
                 Else
-                    '◯実績日訂正フラグ(活性)
+                    '◯向け先(一部)訂正フラグ(非活性)
+                    WF_CORRECTIONTANKFLG.Value = "1"
+                    '◯実績日訂正フラグ(非活性)
                     WF_CORRECTIONDATEFLG.Value = "1"
                 End If
                 '### 20201210 END   指摘票対応(No246) #######################################
@@ -673,7 +686,9 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
                 '### 20201210 START 指摘票対応(No246) #######################################
-                '◯実績日訂正フラグ(活性)
+                '◯向け先(一部)訂正フラグ(非活性)
+                WF_CORRECTIONTANKFLG.Value = "1"
+                '◯実績日訂正フラグ(非活性)
                 WF_CORRECTIONDATEFLG.Value = "1"
                 '### 20201210 END   指摘票対応(No246) #######################################
 
@@ -1131,6 +1146,8 @@ Public Class OIT0003OrderDetail
         '### 20210525 START 向け先訂正対応 ##########################################
         '向け先訂正フラグの初期化
         work.WF_SEL_CORRECTIONTRAINFLG.Text = "0"
+        '向け先(一部)訂正フラグの初期化
+        work.WF_SEL_CORRECTIONTANKFLG.Text = "0"
         '### 20210525 END   向け先訂正対応 ##########################################
         '### 20201210 START 指摘票対応(No246) #######################################
         '実績日訂正フラグの初期化
@@ -2748,6 +2765,8 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
                 & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0003.TANKBACKORDERNO), '')                    AS TANKBACKORDERNO" _
+                & " , ISNULL(RTRIM(OIT0003.TANKBACKINFO), '')                       AS TANKBACKINFO" _
                 & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
                 & " FROM OIL.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -4335,6 +4354,10 @@ Public Class OIT0003OrderDetail
                         prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) =
                             " AND KEYCODE = '" + BaseDllConst.CONST_CONSIGNEECODE_54 + "'"
 
+                        '(一覧)タンクバック先情報
+                    ElseIf WF_FIELD.Value = "TANKBACKINFO" Then
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = Me.TxtOrderOfficeCode.Text
+
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -4653,7 +4676,7 @@ Public Class OIT0003OrderDetail
                             End Using
 
                             '★受注情報が"82"(検査間近)の場合
-                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                            If dtOrder.Rows(0)("DETAIL_ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
                                 '(一覧)受注情報に"82"(検査間近)を設定
                                 OIT0003tbl_tab3.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82
                                 CODENAME_get("ORDERINFO", BaseDllConst.CONST_ORDERINFO_ALERT_82, OIT0003tbl_tab3.Rows(i)("ORDERINFONAME"), WW_DUMMY)
@@ -7400,109 +7423,231 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+    ''' <summary>
+    ''' 向け先(一部)訂正ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCORRECTIONTANK_Click(ByVal chkFieldName As String)
+        Select Case chkFieldName
+            '○向け先(一部)訂正ボタン押下時
+            Case "WF_ButtonCORRECTIONTANK"
+                '★向け先(一部)訂正フラグを"1"(有効)
+                work.WF_SEL_CORRECTIONTANKFLG.Text = "1"
+        End Select
+    End Sub
+
 #Region "実績日訂正"
     ''' <summary>
     ''' 実績日訂正ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonCORRECTIONDATE_Click(ByVal chkFieldName As String)
-
         Select Case chkFieldName
             '○実績日訂正ボタン押下時(ヘッダー)
             Case "WF_ButtonCORRECTIONDATE"
                 '実績日訂正フラグを"1"(有効)
                 work.WF_SEL_CORRECTIONDATEFLG.Text = "1"
+        End Select
+    End Sub
 
-            '○訂正更新ボタン押下時(タブ<タンク車明細>)
-            Case "WF_ButtonCORRECTION_TAB3"
-                Dim WW_CheckMES1 As String = ""
-                Dim WW_CheckMES2 As String = ""
+    ''' <summary>
+    ''' 訂正ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCORRECTION_Click(ByVal chkFieldName As String)
+        '○向け先(一部)訂正フラグが"1"(有効)
+        If work.WF_SEL_CORRECTIONTANKFLG.Text = "1" Then
 
-                '● 日付妥当性チェック(実績(日付))
-                WW_CheckActualValidityDate(WW_ERRCODE)
-                If WW_ERRCODE = "ERR" Then
-                    Exit Sub
-                End If
-
-                '○ (一覧)受入日と(一覧)空車着日の関係チェック
-                For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
-                    '★(一覧)受入日が未設定、(一覧)空車着日が設定の場合
-                    If Convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" _
-                        AndAlso Convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) <> "" Then
-
-                        OIT0003tab3row("ORDERINFONAME") = "受入日(空白)エラー"
-                        WW_CheckMES1 = "空車着日は入力しているが、受入日は未入力のためエラー。"
-                        WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-
-                        WW_ERRCODE = "ERR"
+            Select Case chkFieldName
+                Case "WF_ButtonCORRECTION_TAB3"
+                    Dim Msg As String = ""
+                    If OIT0003tbl_tab3.Select("TANKBACKINFO<>''").Count <> 0 Then
+                        '【向け先(一部)訂正】に伴い、メッセージにて確認
+                        Msg = "タンクバック先に指定した列車に付替えを実施しますがよろしいですか？"
+                        Msg &= ""
+                        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE,
+                                  C_MESSAGE_TYPE.QUES,
+                                  I_PARA01:=Msg,
+                                  needsPopUp:=True,
+                                  messageBoxTitle:="",
+                                  IsConfirm:=True,
+                                  YesButtonId:="btnChkCrtTankConfirmYes",
+                                  needsConfirmNgToPostBack:=True,
+                                  NoButtonId:="btnChkCrtTankConfirmNo")
                     Else
-                        OIT0003tab3row("ORDERINFO") = ""
-                        OIT0003tab3row("ORDERINFONAME") = ""
+                        '【向け先(一部)訂正】が1件も設定されていない場合はエラーメッセージを表示
+                        Msg = "タンクバック先が1件も設定されていません。"
+                        Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
                     End If
-                Next
+                Case "btnChkCrtTankConfirmYes"
+                    Dim Msg As String = ""
 
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+                    '○タンクバック先が設定されている
+                    For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select("TANKBACKINFO<>'' AND DELFLG<>'" + C_DELETE_FLG.DELETE + "'")
 
-                If WW_ERRCODE = "ERR" Then
-                    Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "受入日が空白です", needsPopUp:=True)
-                    Exit Sub
-                End If
+                        '○タンクバック先の受注明細TBLに追加
+                        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                            SQLcon.Open()       'DataBase接続
 
-                '● 受注DB更新(訂正)
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                            '★タンクバックするデータを取得
+                            Dim dtOrderBefore As DataTable = New DataTable
+                            CMNPTS.SelectOrder(SQLcon, Convert.ToString(OIT0003tab3row("ORDERNO")), dtOrderBefore,
+                                               I_TANKNO:=Convert.ToString(OIT0003tab3row("TANKNO")))
+                            dtOrderBefore.Rows(0)("ORDERNO") = OIT0003tab3row("TANKBACKORDERNO")
 
-                    WW_UpdateOrder_Correction(SQLcon)
-                End Using
+                            Dim dtOrderaAfter As DataTable = New DataTable
+                            Dim iMax As Integer = 0
+                            CMNPTS.SelectOrder(SQLcon, Convert.ToString(OIT0003tab3row("TANKBACKORDERNO")), dtOrderaAfter)
 
-                '● 受注明細DB更新(訂正)
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                            '★指定したタンクバック先が存在しない場合はエラーメッセージを表示
+                            If dtOrderaAfter.Rows.Count = 0 Then
+                                Msg = String.Format("指定したタンクバック先が存在しません。[{0}]", OIT0003tab3row("TANKBACKINFO"))
+                                Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                                Exit Sub
+                            End If
 
-                    WW_UpdateOrderDetail_Correction(SQLcon)
-                End Using
+                            '★タンクバック先の受注明細Noを取得(MAX値 + 1)
+                            For Each dtOrderaAfrow As DataRow In dtOrderaAfter.Select(Nothing, "")
+                                If iMax < Integer.Parse(dtOrderaAfrow("DETAILNO")) Then
+                                    iMax = Integer.Parse(dtOrderaAfrow("DETAILNO"))
+                                End If
+                            Next
+                            iMax += 1
+                            dtOrderBefore.Rows(0)("DETAILNO") = iMax.ToString("000")
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALLODDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALDEPDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALARRDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALACCDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALEMPARRDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("UPDYMD") = Date.Now
+                            dtOrderBefore.Rows(0)("UPDUSER") = Master.USERID
+                            dtOrderBefore.Rows(0)("UPDTERMID") = Master.USERTERMID
+                            dtOrderBefore.Rows(0)("RECEIVEYMD") = C_DEFAULT_YMD
 
-                '● タンク車所在設定処理(訂正)
-                For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select("OPERATION='on'")
-                    OIT0003tab3row("OPERATION") = ""
+                            '★タンクバック先の受注先へ追加
+                            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                                CMNPTS.InsertOrderDetail(SQLcon, sqlTran, dtOrderBefore.Rows(0))
 
-                    WW_TankShozaiSet_Correction(OIT0003tab3row)
-                Next
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
-
-                '実績日訂正フラグを"0"(無効)
-                work.WF_SEL_CORRECTIONDATEFLG.Text = "0"
-
-                '### 20210524 START 指摘票対応(No246) #######################################
-                '実績数量訂正フラグ("0"(無効))
-                Dim CorrectionAmount As String = "0"
-                For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
-                    For Each OIT0003tab3crtrow As DataRow In OIT0003tbl_tab3_CRT.Select("TANKNO='" + OIT0003tab3row("TANKNO") + "'")
-                        If OIT0003tab3crtrow("CARSAMOUNT") <> OIT0003tab3row("CARSAMOUNT") Then
-                            '★実績数量訂正フラグ("1"(有効))
-                            CorrectionAmount = "1"
-
-                            '★受注明細テーブル(数量)を更新
-                            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()       'DataBase接続
-                                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("CARSAMOUNT"), I_PARA:="CARSAMOUNT")
+                                'ここまで来たらコミット
+                                sqlTran.Commit()
                             End Using
+                        End Using
 
+                        '★受注明細TBLの削除フラグを"1"(無効)に更新(※付替え先も合わせて更新)
+                        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                            SQLcon.Open()       'DataBase接続
+                            CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("TANKBACKORDERNO"), I_PARA:="TANKBACKORDERNO")
+                            CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("TANKBACKINFO"), I_PARA:="TANKBACKINFO")
+                            CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, C_DELETE_FLG.DELETE, I_PARA:="DELFLG")
+                        End Using
+
+                        '★削除フラグに"1"(無効)に設定
+                        OIT0003tab3row("DELFLG") = C_DELETE_FLG.DELETE
+                        OIT0003tab3row("HIDDEN") = "1"
+                    Next
+
+                    '○画面表示データ保存
+                    Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+                    '○向け先(一部)訂正フラグが"0"(無効)
+                    work.WF_SEL_CORRECTIONTANKFLG.Text = "0"
+
+            End Select
+
+        End If
+
+        '○実績日訂正フラグが"1"(有効)
+        If work.WF_SEL_CORRECTIONDATEFLG.Text = "1" Then
+            Select Case chkFieldName
+                '○訂正更新ボタン押下時(タブ<タンク車明細>)
+                Case "WF_ButtonCORRECTION_TAB3"
+                    Dim WW_CheckMES1 As String = ""
+                    Dim WW_CheckMES2 As String = ""
+
+                    '● 日付妥当性チェック(実績(日付))
+                    WW_CheckActualValidityDate(WW_ERRCODE)
+                    If WW_ERRCODE = "ERR" Then
+                        Exit Sub
+                    End If
+
+                    '○ (一覧)受入日と(一覧)空車着日の関係チェック
+                    For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                        '★(一覧)受入日が未設定、(一覧)空車着日が設定の場合
+                        If Convert.ToString(OIT0003tab3row("ACTUALACCDATE")) = "" _
+                            AndAlso Convert.ToString(OIT0003tab3row("ACTUALEMPARRDATE")) <> "" Then
+
+                            OIT0003tab3row("ORDERINFONAME") = "受入日(空白)エラー"
+                            WW_CheckMES1 = "空車着日は入力しているが、受入日は未入力のためエラー。"
+                            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+
+                            WW_ERRCODE = "ERR"
+                        Else
+                            OIT0003tab3row("ORDERINFO") = ""
+                            OIT0003tab3row("ORDERINFONAME") = ""
                         End If
                     Next
-                Next
-                '実績数量訂正フラグを"1"(有効)
-                If CorrectionAmount = "1" Then
-                    '数量の変更があったため、「訂正更新ボタン押下時処理」を実施し再計算する。
-                    WW_ButtonUPDATE_TAB4()
-                End If
-                '### 20210524 END   指摘票対応(No246) #######################################
 
-        End Select
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
+                    If WW_ERRCODE = "ERR" Then
+                        Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "受入日が空白です", needsPopUp:=True)
+                        Exit Sub
+                    End If
+
+                    '● 受注DB更新(訂正)
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        WW_UpdateOrder_Correction(SQLcon)
+                    End Using
+
+                    '● 受注明細DB更新(訂正)
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        WW_UpdateOrderDetail_Correction(SQLcon)
+                    End Using
+
+                    '● タンク車所在設定処理(訂正)
+                    For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select("OPERATION='on'")
+                        OIT0003tab3row("OPERATION") = ""
+
+                        WW_TankShozaiSet_Correction(OIT0003tab3row)
+                    Next
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+                    '実績日訂正フラグを"0"(無効)
+                    work.WF_SEL_CORRECTIONDATEFLG.Text = "0"
+
+                    '### 20210524 START 指摘票対応(No246) #######################################
+                    '実績数量訂正フラグ("0"(無効))
+                    Dim CorrectionAmount As String = "0"
+                    For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                        For Each OIT0003tab3crtrow As DataRow In OIT0003tbl_tab3_CRT.Select("TANKNO='" + OIT0003tab3row("TANKNO") + "'")
+                            If OIT0003tab3crtrow("CARSAMOUNT") <> OIT0003tab3row("CARSAMOUNT") Then
+                                '★実績数量訂正フラグ("1"(有効))
+                                CorrectionAmount = "1"
+
+                                '★受注明細テーブル(数量)を更新
+                                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                                    SQLcon.Open()       'DataBase接続
+                                    CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("CARSAMOUNT"), I_PARA:="CARSAMOUNT")
+                                End Using
+
+                            End If
+                        Next
+                    Next
+                    '実績数量訂正フラグを"1"(有効)
+                    If CorrectionAmount = "1" Then
+                        '数量の変更があったため、「訂正更新ボタン押下時処理」を実施し再計算する。
+                        WW_ButtonUPDATE_TAB4()
+                    End If
+                    '### 20210524 END   指摘票対応(No246) #######################################
+            End Select
+        End If
     End Sub
 
     ''' <summary>
@@ -14476,12 +14621,12 @@ Public Class OIT0003OrderDetail
             '                            (一覧)(実績)積込日, (一覧)ジョイント先
             'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線, (一覧)充填ポイント
             'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日,
-            '                            (一覧)ジョイント先, (一覧)第2着駅, (一覧)第2荷受人
+            '                            (一覧)ジョイント先, (一覧)第2着駅, (一覧)第2荷受人, (一覧)タンクバック先情報
             'タブ「費用入力」　　　　⇒　(一覧)計上月, (一覧)科目コード, (一覧)請求先コード, (一覧)支払先コード
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "JRINSPECTIONDATE",
                  "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE", "FILLINGPOINT",
                  "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
-                 "JOINT", "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME",
+                 "JOINT", "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME", "TANKBACKINFO",
                  "KEIJYOYM", "ACCSEGCODE", "INVOICECODE", "PAYEECODE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
@@ -14912,6 +15057,11 @@ Public Class OIT0003OrderDetail
                             '(一覧)第2荷受人
                         ElseIf WF_FIELD.Value = "SECONDCONSIGNEENAME" Then
                             updHeader.Item("SECONDCONSIGNEECODE") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                            '(一覧)タンクバック先情報
+                        ElseIf WF_FIELD.Value = "TANKBACKINFO" Then
+                            updHeader.Item("TANKBACKORDERNO") = WW_SETVALUE
                             updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                         End If
@@ -17065,10 +17215,10 @@ Public Class OIT0003OrderDetail
                 '★他の受注オーダー情報を取得
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
-                    WW_SelectOrder(SQLcon,
-                                   I_ORDERNO:=OIT0003tab3row("USEORDERNO"),
-                                   O_dtORDER:=OIT0003FID2tbl_tab3,
-                                   I_TANKNO:=OIT0003tab3row("TANKNO"))
+                    CMNPTS.SelectOrder(SQLcon,
+                                       I_ORDERNO:=OIT0003tab3row("USEORDERNO"),
+                                       O_dtORDER:=OIT0003FID2tbl_tab3,
+                                       I_TANKNO:=OIT0003tab3row("TANKNO"))
                 End Using
 
                 If OIT0003FID2tbl_tab3.Rows.Count <> 0 Then
@@ -23472,7 +23622,8 @@ Public Class OIT0003OrderDetail
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "TANKBACKINFO") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                                 '### 20210112 START 指摘票対応(No320) #####################################
@@ -23619,7 +23770,8 @@ Public Class OIT0003OrderDetail
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "TANKBACKINFO") Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                     AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
@@ -23877,6 +24029,9 @@ Public Class OIT0003OrderDetail
                                 ''積込可否フラグ(チェックボックス)を非活性
                                 'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
+                                '★タンクバック先情報
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "TANKBACKINFO") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         End If
                     Next
@@ -24004,6 +24159,19 @@ Public Class OIT0003OrderDetail
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                             '### 20201210 END   指摘票対応(No246) #######################################
+
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "TANKBACKINFO") Then
+                            '向け先(一部)訂正フラグが"1"(有効)
+                            If work.WF_SEL_CORRECTIONTANKFLG.Text = "1" Then
+                                '★積置ありの場合は、タンクバックを許可しない。
+                                If loopdr("STACKINGFLG") = "on" Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+                            Else
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
                         End If
                     Next
                     rowIdx += 1

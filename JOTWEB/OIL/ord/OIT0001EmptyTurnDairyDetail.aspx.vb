@@ -1329,7 +1329,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                             End Using
 
                             '★受注情報が"82"(検査間近)の場合
-                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                            If dtOrder.Rows(0)("DETAIL_ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
                                 '(一覧)受注情報に"82"(検査間近)を設定
                                 OIT0001tbl.Rows(i)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82
                                 CODENAME_get("ORDERINFO", BaseDllConst.CONST_ORDERINFO_ALERT_82, OIT0001tbl.Rows(i)("ORDERINFONAME"), WW_DUMMY)
@@ -6373,7 +6373,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                         If dtOrder.Rows.Count <> 0 Then
                             '★受注情報が"82"(検査間近)の場合
-                            If dtOrder.Rows(0)("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
+                            If dtOrder.Rows(0)("DETAIL_ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_82 Then
                                 '(一覧)受注情報に"82"(検査間近)を設定
                                 PARA34.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
                             End If

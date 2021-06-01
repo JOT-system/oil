@@ -414,25 +414,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                         idx += 1
                                         pixel += 6
                                     Else
-                                        '前行の扱支店＝04かつ現在行の扱支店＝05
-                                        '又は前行の扱支店＝05かつ現在行の扱支店＝06(関東第2)の場合以外は改頁処理
-                                        'If Not ("04".Equals(lastRow("MANAGEBRANCHCODE").ToString()) And
-                                        '"05".Equals(row("MANAGEBRANCHCODE").ToString())) Then
-                                        If Not (
-                                            ("04".Equals(lastRow("MANAGEBRANCHCODE").ToString()) AndAlso
-                                            "05".Equals(row("MANAGEBRANCHCODE").ToString())) OrElse
-                                            ("05".Equals(lastRow("MANAGEBRANCHCODE").ToString()) AndAlso
-                                            "06".Equals(row("MANAGEBRANCHCODE").ToString()))
-                                        ) Then
-                                            '〇改頁処理
-                                            ChangeTansportCostDetailPage(idx, pixel)
+                                        '〇改頁処理
+                                        ChangeTansportCostDetailPage(idx, pixel)
 
-                                            '◯ヘッダーの設定
-                                            '値出力
-                                            EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
-                                            'ピクセル加算
-                                            pixel += 150
-                                        End If
+                                        '◯ヘッダーの設定
+                                        '値出力
+                                        EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
+                                        'ピクセル加算
+                                        pixel += 150
 
                                         '〇明細の設定
                                         'テンプレート②をコピーする
@@ -456,7 +445,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             '基地コードが出光昭和四日市又はコスモ四日市以外の場合
                                             '転送販売計は扱支店計と同値なので、転送販売計を出力する
                                             If Not "2401".Equals(row("BASECODE").ToString()) AndAlso
-                                        Not "2402".Equals(row("BASECODE").ToString()) Then
+                                                Not "2402".Equals(row("BASECODE").ToString()) Then
                                                 '〇明細の設定(転送販売計)
                                                 'テンプレート⑥をコピーする
                                                 srcRange = ExcelTempSheet.Cells.Range("I27:CJ27")

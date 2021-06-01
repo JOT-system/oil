@@ -90,11 +90,21 @@
             <!-- リース先チェックボックス -->
             <div class="inputItem">
                 <a id="WF_LEASECODE_LABEL">リース先</a>
-                <asp:RadioButtonList ID="WF_LEASECODE_LIST" runat="server" RepeatColumns="3" RepeatDirection="Vertical" RepeatLayout="Table">
-                    <asp:ListItem Value="">なし　</asp:ListItem>
-                    <asp:ListItem Value="11">日本ＯＴ　</asp:ListItem>
-                    <asp:ListItem Value="71">在日米軍　</asp:ListItem>
-                </asp:RadioButtonList>
+                <div class="grc0001Wrapper">
+                    <ul>
+                        <li>
+                            <asp:RadioButton ID="WF_LEACECODE_NONE" runat="server" GroupName="WF_LEASECODE" Text="なし" />
+                        </li>
+                        <li>
+                            <asp:RadioButton ID="WF_LEACECODE_OT" runat="server" GroupName="WF_LEASECODE" Text="ＯＴ" />
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <asp:RadioButton ID="WF_LEACECODE_USARMY" runat="server" GroupName="WF_LEASECODE" Text="在日米軍" />
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div> <!-- End inputBox -->
     </div> <!-- End searchbox -->

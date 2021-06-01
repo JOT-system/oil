@@ -106,7 +106,10 @@ Public Class OIM0005TankSearch
             '運用基地コード
             Master.GetFirstValue(work.WF_SEL_OPERATIONBASECODE_S.Text, "OPERATIONBASECODE", WF_OPERATIONBASECODE.Text)
             'リース先コード
-            WF_LEASECODE_LIST.SelectedValue = ""
+            WF_LEACECODE_NONE.Checked = True
+            WF_LEACECODE_OT.Checked = False
+            WF_LEACECODE_USARMY.Checked = False
+
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -117,7 +120,19 @@ Public Class OIM0005TankSearch
             '運用基地コード
             WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE_S.Text
             'リース先コード
-            WF_LEASECODE_LIST.SelectedValue = work.WF_SEL_LEASECODE_S.Text
+            If String.IsNullOrEmpty(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_OT.Checked = False
+                WF_LEACECODE_USARMY.Checked = False
+                WF_LEACECODE_NONE.Checked = True
+            ElseIf "11".Equals(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_USARMY.Checked = False
+                WF_LEACECODE_NONE.Checked = False
+                WF_LEACECODE_OT.Checked = True
+            ElseIf "71".Equals(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_NONE.Checked = False
+                WF_LEACECODE_OT.Checked = False
+                WF_LEACECODE_USARMY.Checked = True
+            End If
         Else
             '画面項目設定処理（甲子貨車マスタメンテ画面からの遷移）
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -128,7 +143,19 @@ Public Class OIM0005TankSearch
             '運用基地コード
             WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE_S.Text
             'リース先コード
-            WF_LEASECODE_LIST.SelectedValue = work.WF_SEL_LEASECODE_S.Text
+            If String.IsNullOrEmpty(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_OT.Checked = False
+                WF_LEACECODE_USARMY.Checked = False
+                WF_LEACECODE_NONE.Checked = True
+            ElseIf "11".Equals(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_USARMY.Checked = False
+                WF_LEACECODE_NONE.Checked = False
+                WF_LEACECODE_OT.Checked = True
+            ElseIf "71".Equals(work.WF_SEL_LEASECODE_S.Text) Then
+                WF_LEACECODE_NONE.Checked = False
+                WF_LEACECODE_OT.Checked = False
+                WF_LEACECODE_USARMY.Checked = True
+            End If
         End If
 
         'JOT車番・利用フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -215,7 +242,14 @@ Public Class OIM0005TankSearch
         work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text                         '型式
         work.WF_SEL_USEDFLG.Text = WF_USEDFLG_CODE.Text                     '利用フラグ
         work.WF_SEL_OPERATIONBASECODE_S.Text = WF_OPERATIONBASECODE.Text    '運用基地コード
-        work.WF_SEL_LEASECODE_S.Text = WF_LEASECODE_LIST.SelectedValue      'リース先コード
+        'リース先コード
+        If WF_LEACECODE_NONE.Checked Then
+            work.WF_SEL_LEASECODE_S.Text = ""
+        ElseIf WF_LEACECODE_OT.Checked Then
+            work.WF_SEL_LEASECODE_S.Text = "11"
+        ElseIf WF_LEACECODE_USARMY.Checked Then
+            work.WF_SEL_LEASECODE_S.Text = "71"
+        End If
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then

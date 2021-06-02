@@ -33,11 +33,8 @@
     border-right: solid 1px #2bb6c1;
 }
 
-input#WF_DL_TRASPORTCOSTSDETAIL {
-    margin-left: 20px;
-}
-
-input#WF_DL_TANKTRASPORTRESULT {
+input#WF_DL_TRASPORTCOSTSDETAIL,
+input#WF_DL_FINANCE_COOPERATION {
     margin-left: 20px;
 }
 

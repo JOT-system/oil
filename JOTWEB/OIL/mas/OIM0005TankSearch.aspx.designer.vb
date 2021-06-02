@@ -131,13 +131,31 @@ Partial Public Class OIM0005TankSearch
     Protected WithEvents WF_OPERATIONBASENAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_LEASECODE_LIST コントロール。
+    '''WF_LEACECODE_NONE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_LEASECODE_LIST As Global.System.Web.UI.WebControls.RadioButtonList
+    Protected WithEvents WF_LEACECODE_NONE As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''WF_LEACECODE_OT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LEACECODE_OT As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''WF_LEACECODE_USARMY コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_LEACECODE_USARMY As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rightview コントロール。

@@ -51,6 +51,11 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     Public Const DISP_NOT_FIXED As String = "未確定"
     ''' <summary>
+    ''' 翌日朝在庫解放フラグ(北信のみ解放)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property IsTomorrowMorningStockActive As Boolean = False
+    ''' <summary>
     ''' サーバー処理の遷移先
     ''' </summary>
     ''' <param name="sender"></param>
@@ -133,6 +138,7 @@ Public Class OIT0004OilStockCreate
             If Master.USER_ORG = "011203" AndAlso work.WF_SEL_SALESOFFICECODE.Text = "012402" Then
                 Me.Form.Attributes.Add("CLASS", "mieReadOnly")
             End If
+
             WF_BOXChange.Value = "detailbox"
 
         Finally
@@ -201,6 +207,14 @@ Public Class OIT0004OilStockCreate
             consigneeName = SetConsigneeName
             Me.hdnChgConsigneeFirstLoad.Value = "1"
         End If
+        Me.hdnCurConsignee.Value = consignee
+        '翌朝残解放フラグ制御
+        If work.WF_SEL_SALESOFFICECODE.Text = "011402" AndAlso Me.hdnCurConsignee.Value = "10" Then
+            Me.IsTomorrowMorningStockActive = True
+        Else
+            Me.IsTomorrowMorningStockActive = False
+        End If
+
         Dim daysList As Dictionary(Of String, DaysItem)
         Dim oilTypeList As Dictionary(Of String, OilItem)
         Dim trainList As New Dictionary(Of String, TrainListItem)
@@ -1394,6 +1408,7 @@ Public Class OIT0004OilStockCreate
             baseDtm = baseDtm.AddDays(daySpanBuff * -1)
             Dim dispFromDtm As Date = Date.Parse(baseDate)
             Dim dispToDtm As Date = dispFromDtm.AddDays(daySpan - 1)
+            Dim tomorrowDateStr As String = Now.AddDays(1).ToString("yyyy/MM/dd")
             Dim dtItm As DaysItem
             '基準日から引数期間のデータを生成
             For i As Integer = 0 To daySpan + (daySpanBuff * 2) - 1
@@ -1405,6 +1420,13 @@ Public Class OIT0004OilStockCreate
                    isPrint = True Then
                     dtItm.IsDispArea = True
                 End If
+                '翌日判定フラグ追加
+                If tomorrowDateStr = currentDay.ToString("yyyy/MM/dd") Then
+                    dtItm.IsTomorrow = True
+                Else
+                    dtItm.IsTomorrow = False
+                End If
+                dtItm.IsTomorrowMorningStockActive = Me.IsTomorrowMorningStockActive
                 retVal.Add(dtItm.KeyString, dtItm)
             Next i
 
@@ -6660,6 +6682,16 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property IsHoliday As Boolean = False
         ''' <summary>
+        ''' 翌日フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsTomorrow As Boolean = False
+        ''' <summary>
+        ''' 翌日朝在庫入力可否
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsTomorrowMorningStockActive As Boolean = False
+        ''' <summary>
         ''' 曜日番号(日:0 ～ 土：6)
         ''' </summary>
         ''' <returns></returns>
@@ -7203,7 +7235,10 @@ Public Class OIT0004OilStockCreate
                     '前日日付データ取得
                     Dim prevDayKey As String = itm.DaysItem.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
                     '前日データを元に実行する処理(前日データあり=一覧初日以外)
-                    If stockListItm.StockItemList.ContainsKey(prevDayKey) AndAlso firstDispDay <> itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") AndAlso Now.ToString("yyyy/MM/dd") < itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
+                    If (itm.DaysItem.IsTomorrowMorningStockActive = True AndAlso itm.DaysItem.IsTomorrow) Then
+                        '翌日の朝在庫の場合（北信限定）は画面朝在庫のまま
+                        '何もしない保存したまま
+                    ElseIf stockListItm.StockItemList.ContainsKey(prevDayKey) AndAlso firstDispDay <> itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") AndAlso Now.ToString("yyyy/MM/dd") < itm.DaysItem.ItemDate.ToString("yyyy/MM/dd") Then
                         '前日のデータ
                         Dim prevItm = stockListItm.StockItemList(prevDayKey)
                         '◆1行目 前日夕在庫(前日データの夕在庫フィールドを格納)

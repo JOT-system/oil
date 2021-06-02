@@ -139,6 +139,10 @@ Public Class OIT0008CustomReport : Implements IDisposable
                 Me.ExcelWorkSheet = DirectCast(
                     Me.ExcelWorkSheets(CONST_REPORTNAME_TRANSPORT_RESULT), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+            ElseIf CONST_TEMPNAME_FINANCE_COOPERATION_IF.Equals(excelFileName) Then
+                '経理連携IF
+                Me.ExcelWorkSheet = DirectCast(
+                    Me.ExcelWorkSheets(CONST_REPORTNAME_FINANCE_COOPERATION_IF), Excel.Worksheet)
             End If
         Catch ex As Exception
             If Me.xlProcId <> 0 Then
@@ -410,18 +414,14 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                         idx += 1
                                         pixel += 6
                                     Else
-                                        '前行の扱支店＝04かつ現在行の扱支店＝05(関東第2)の場合以外は改頁処理
-                                        If Not ("04".Equals(lastRow("MANAGEBRANCHCODE").ToString()) And
-                                        "05".Equals(row("MANAGEBRANCHCODE").ToString())) Then
-                                            '〇改頁処理
-                                            ChangeTansportCostDetailPage(idx, pixel)
+                                        '〇改頁処理
+                                        ChangeTansportCostDetailPage(idx, pixel)
 
-                                            '◯ヘッダーの設定
-                                            '値出力
-                                            EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
-                                            'ピクセル加算
-                                            pixel += 150
-                                        End If
+                                        '◯ヘッダーの設定
+                                        '値出力
+                                        EditTransportCostDetail_HeaderArea(idx, row, KEIJYO_YM)
+                                        'ピクセル加算
+                                        pixel += 150
 
                                         '〇明細の設定
                                         'テンプレート②をコピーする
@@ -445,7 +445,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                             '基地コードが出光昭和四日市又はコスモ四日市以外の場合
                                             '転送販売計は扱支店計と同値なので、転送販売計を出力する
                                             If Not "2401".Equals(row("BASECODE").ToString()) AndAlso
-                                        Not "2402".Equals(row("BASECODE").ToString()) Then
+                                                Not "2402".Equals(row("BASECODE").ToString()) Then
                                                 '〇明細の設定(転送販売計)
                                                 'テンプレート⑥をコピーする
                                                 srcRange = ExcelTempSheet.Cells.Range("I27:CJ27")
@@ -981,6 +981,326 @@ Public Class OIT0008CustomReport : Implements IDisposable
         destRange.RowHeight = 6
         ExcelMemoryRelease(destRange)
     End Sub
+#End Region
+
+#Region "ダウンロード(経理連携IF)"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(経理連携IF)URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintData_FinanceCooperationIF(ByVal username As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = "im_SW.xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+
+        Try
+            Dim ridx As Integer = 2
+            '固定帳票(経理連携IF)作成処理
+            For Each row As DataRow In PrintData.Rows
+                '明細出力
+                EditFinanceCooperationIFDetail(ridx, row, username)
+                ridx += 1
+            Next
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票の明細設定(経理連携IF)
+    ''' </summary>
+    Private Sub EditFinanceCooperationIFDetail(ByVal idx As Int32, ByVal row As DataRow, ByVal username As String)
+        Dim rngDetailArea As Excel.Range = Nothing
+        Dim total As Long = 0
+
+        Try
+            '◯ データ基準
+            rngDetailArea = Me.ExcelWorkSheet.Range("A" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("データ基準"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 仕訳入力形式
+            rngDetailArea = Me.ExcelWorkSheet.Range("B" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0000}", row("仕訳入力形式"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 入力画面番号
+            rngDetailArea = Me.ExcelWorkSheet.Range("C" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00}", row("入力画面番号"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 伝票日付
+            rngDetailArea = Me.ExcelWorkSheet.Range("D" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("伝票日付"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 決算月区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("E" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("決算月区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 証憑番号
+            rngDetailArea = Me.ExcelWorkSheet.Range("F" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("証憑番号"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 伝票番号
+            rngDetailArea = Me.ExcelWorkSheet.Range("G" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000000}", row("伝票番号"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 伝票No
+            rngDetailArea = Me.ExcelWorkSheet.Range("H" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("伝票No"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 明細行番号
+            rngDetailArea = Me.ExcelWorkSheet.Range("I" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000}", row("明細行番号"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方科目
+            rngDetailArea = Me.ExcelWorkSheet.Range("J" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000000}", row("借方科目"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方部門
+            rngDetailArea = Me.ExcelWorkSheet.Range("K" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000000}", row("借方部門"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方銀行
+            rngDetailArea = Me.ExcelWorkSheet.Range("L" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0000}", row("借方銀行"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方取引先
+            rngDetailArea = Me.ExcelWorkSheet.Range("M" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0000000000}", row("借方取引先"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方汎用補助1
+            rngDetailArea = Me.ExcelWorkSheet.Range("N" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方汎用補助1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方セグメント1
+            rngDetailArea = Me.ExcelWorkSheet.Range("O" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000}", row("借方セグメント1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方セグメント2
+            rngDetailArea = Me.ExcelWorkSheet.Range("P" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000}", row("借方セグメント2"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方セグメント3
+            rngDetailArea = Me.ExcelWorkSheet.Range("Q" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方セグメント3"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方番号1
+            rngDetailArea = Me.ExcelWorkSheet.Range("R" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方番号1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方番号2
+            rngDetailArea = Me.ExcelWorkSheet.Range("S" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方番号2"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方消費税区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("T" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方消費税区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方消費税コード
+            rngDetailArea = Me.ExcelWorkSheet.Range("U" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00}", row("借方消費税コード"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方消費税率区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("V" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方消費税率区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方外税同時入力区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("W" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方外税同時入力区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方金額
+            rngDetailArea = Me.ExcelWorkSheet.Range("X" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方金額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方消費税額
+            rngDetailArea = Me.ExcelWorkSheet.Range("Y" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("借方消費税額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方外貨金額
+            rngDetailArea = Me.ExcelWorkSheet.Range("Z" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方外貨金額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方外貨レート
+            rngDetailArea = Me.ExcelWorkSheet.Range("AA" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方外貨レート"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 借方外貨取引区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("AB" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("借方外貨取引区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方科目
+            rngDetailArea = Me.ExcelWorkSheet.Range("AC" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000000}", row("貸方科目"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方部門
+            rngDetailArea = Me.ExcelWorkSheet.Range("AD" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000000}", row("貸方部門"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方銀行
+            rngDetailArea = Me.ExcelWorkSheet.Range("AE" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0000}", row("貸方銀行"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方取引先
+            rngDetailArea = Me.ExcelWorkSheet.Range("AF" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0000000000}", row("貸方取引先"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方汎用補助1
+            rngDetailArea = Me.ExcelWorkSheet.Range("AG" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方汎用補助1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方セグメント1
+            rngDetailArea = Me.ExcelWorkSheet.Range("AH" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000}", row("貸方セグメント1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方セグメント2
+            rngDetailArea = Me.ExcelWorkSheet.Range("AI" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000}", row("貸方セグメント2"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方セグメント3
+            rngDetailArea = Me.ExcelWorkSheet.Range("AJ" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方セグメント3"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方番号1
+            rngDetailArea = Me.ExcelWorkSheet.Range("AK" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方番号1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方番号2
+            rngDetailArea = Me.ExcelWorkSheet.Range("AL" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方番号2"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方消費税区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("AM" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方消費税区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方消費税コード
+            rngDetailArea = Me.ExcelWorkSheet.Range("AN" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00}", row("貸方消費税コード"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方消費税率区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("AO" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方消費税率区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方外税同時入力区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("AP" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方外税同時入力区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方金額
+            rngDetailArea = Me.ExcelWorkSheet.Range("AQ" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方金額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方消費税額
+            rngDetailArea = Me.ExcelWorkSheet.Range("AR" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:0}", row("貸方消費税額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方外貨金額
+            rngDetailArea = Me.ExcelWorkSheet.Range("AS" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方外貨金額"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方外貨レート
+            rngDetailArea = Me.ExcelWorkSheet.Range("AT" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方外貨レート"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 貸方外貨取引区分
+            rngDetailArea = Me.ExcelWorkSheet.Range("AU" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("貸方外貨取引区分"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 期日
+            rngDetailArea = Me.ExcelWorkSheet.Range("AV" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("期日"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 摘要
+            rngDetailArea = Me.ExcelWorkSheet.Range("AW" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("摘要"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 摘要コード1
+            rngDetailArea = Me.ExcelWorkSheet.Range("AX" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("摘要コード1"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 作成日
+            rngDetailArea = Me.ExcelWorkSheet.Range("AY" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:00000000}", row("作成日"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 作成時間
+            rngDetailArea = Me.ExcelWorkSheet.Range("AZ" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0:000000}", row("作成時間"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ 作成者
+            rngDetailArea = Me.ExcelWorkSheet.Range("BA" + idx.ToString())
+            rngDetailArea.Value = username
+            ExcelMemoryRelease(rngDetailArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "ダウンロード(タンク車運賃実績表-列車別-仙台以外)"

@@ -283,6 +283,109 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const C_MAX_YMD As String = "2099/12/31"
 
+#Region "会社コード"
+    ''' <summary>
+    ''' 日本石油輸送株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_01 As String = "01"
+    ''' <summary>
+    ''' 日本貨物鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_10 As String = "10"
+    ''' <summary>
+    ''' 日本オイルターミナル株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_11 As String = "11"
+    ''' <summary>
+    ''' 仙台臨海鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_12 As String = "12"
+    ''' <summary>
+    ''' 京葉臨海鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_13 As String = "13"
+    ''' <summary>
+    ''' 神奈川臨海鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_14 As String = "14"
+    ''' <summary>
+    ''' 名古屋臨海鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_15 As String = "15"
+    ''' <summary>
+    ''' ＥＮＥＯＳ株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_30 As String = "30"
+    ''' <summary>
+    ''' コスモ石油株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_31 As String = "31"
+    ''' <summary>
+    ''' 出光興産株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_32 As String = "32"
+    ''' <summary>
+    ''' ジャパンオイルネットワーク株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_33 As String = "33"
+    ''' <summary>
+    ''' 仙台臨海通運株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_50 As String = "50"
+    ''' <summary>
+    ''' 株式会社日新
+    ''' </summary>
+    Public Const CONST_CAMPCODE_51 As String = "51"
+    ''' <summary>
+    ''' コスモペトロサービス株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_52 As String = "52"
+    ''' <summary>
+    ''' 株式会社東伸工業
+    ''' </summary>
+    Public Const CONST_CAMPCODE_53 As String = "53"
+    ''' <summary>
+    ''' コスモテクノ四日市株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_54 As String = "54"
+    ''' <summary>
+    ''' 昭永工業株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_55 As String = "55"
+    ''' <summary>
+    ''' 日本通運株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_56 As String = "56"
+    ''' <summary>
+    ''' 富士臨海鉄道株式会社
+    ''' </summary>
+    Public Const CONST_CAMPCODE_57 As String = "57"
+    ''' <summary>
+    ''' 株式会社日陸
+    ''' </summary>
+    Public Const CONST_CAMPCODE_70 As String = "70"
+    ''' <summary>
+    ''' 在日米軍
+    ''' </summary>
+    Public Const CONST_CAMPCODE_71 As String = "71"
+    ''' <summary>
+    ''' 日本車両製造
+    ''' </summary>
+    Public Const CONST_CAMPCODE_80 As String = "80"
+    ''' <summary>
+    ''' 川崎重工業
+    ''' </summary>
+    Public Const CONST_CAMPCODE_81 As String = "81"
+    ''' <summary>
+    ''' 富士重工
+    ''' </summary>
+    Public Const CONST_CAMPCODE_82 As String = "82"
+    ''' <summary>
+    ''' 三菱重工業
+    ''' </summary>
+    Public Const CONST_CAMPCODE_83 As String = "83"
+#End Region
+
 #Region "管轄支店"
     ''' <summary>
     ''' 東北支店

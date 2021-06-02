@@ -1597,6 +1597,19 @@ Public Class OIT0002LinkList
             Next
             If WW_ERRCODE = "ERR" Then Exit Sub
 
+            ''★タンク車No所属チェック
+            'Dim dtTANKMAS As DataTable = New DataTable
+            'Dim iMatchCnt As Integer = 0
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+            '    CMNPTS.SelectTankMaster(SQLcon, "011409", dtTANKMAS, I_OTFLG:=True)
+            'End Using
+            'For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
+            '    For Each dtTankMasrow As DataRow In dtTANKMAS.Select(String.Format("TANKNUMBER='{0}'", Convert.ToString(OIT0002EXLUProw("TRUCKNO"))))
+            '        iMatchCnt += 1
+            '    Next
+            'Next
+
             '◯ポラリス投入用の場合
             If useFlg = "4" Then
                 '○必須項目チェック(本線列車設定時のチェック)

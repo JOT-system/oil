@@ -961,6 +961,187 @@ Public Class CmnParts
     End Sub
 
     ''' <summary>
+    ''' タンク車マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <param name="I_OFFICEFLG">営業所区分</param>
+    ''' <param name="O_dtTANKMAS">検索結果取得用</param>
+    ''' <param name="I_OTFLG">OTリース車対象有無</param>
+    ''' <remarks></remarks>
+    Public Sub SelectTankMaster(ByVal SQLcon As SqlConnection,
+                                ByVal I_OFFICEFLG As String,
+                                 ByRef O_dtTANKMAS As DataTable,
+                                 Optional I_OTFLG As Boolean = False)
+        If IsNothing(O_dtTANKMAS) Then
+            O_dtTANKMAS = New DataTable
+        End If
+
+        If O_dtTANKMAS.Columns.Count <> 0 Then
+            O_dtTANKMAS.Columns.Clear()
+        End If
+
+        O_dtTANKMAS.Clear()
+
+        Dim SQLStr As String = ""
+        Dim SQLCmnStr As String =
+              " SELECT " _
+            & "   OIM0005.TANKNUMBER" _
+            & " , OIM0005.MODEL" _
+            & " , OIM0005.MODELKANA" _
+            & " , OIM0005.LOAD" _
+            & " , OIM0005.LOADUNIT" _
+            & " , OIM0005.VOLUME" _
+            & " , OIM0005.VOLUMEUNIT" _
+            & " , OIM0005.MYWEIGHT" _
+            & " , OIM0005.LENGTH" _
+            & " , OIM0005.TANKLENGTH" _
+            & " , OIM0005.MAXCALIBER" _
+            & " , OIM0005.MINCALIBER" _
+            & " , OIM0005.LENGTHFLG" _
+            & " , OIM0005.ORIGINOWNERCODE" _
+            & " , OIM0005.ORIGINOWNERNAME" _
+            & " , OIM0005.OWNERCODE" _
+            & " , OIM0005.OWNERNAME" _
+            & " , OIM0005.LEASECODE" _
+            & " , OIM0005.LEASENAME" _
+            & " , OIM0005.LEASECLASS" _
+            & " , OIM0005.LEASECLASSNEMAE" _
+            & " , OIM0005.AUTOEXTENTION" _
+            & " , OIM0005.AUTOEXTENTIONNAME" _
+            & " , OIM0005.LEASESTYMD" _
+            & " , OIM0005.LEASEENDYMD" _
+            & " , OIM0005.USERCODE" _
+            & " , OIM0005.USERNAME" _
+            & " , OIM0005.CURRENTSTATIONCODE" _
+            & " , OIM0005.CURRENTSTATIONNAME" _
+            & " , OIM0005.EXTRADINARYSTATIONCODE" _
+            & " , OIM0005.EXTRADINARYSTATIONNAME" _
+            & " , OIM0005.USERLIMIT" _
+            & " , OIM0005.LIMITTEXTRADIARYSTATION" _
+            & " , OIM0005.DEDICATETYPECODE" _
+            & " , OIM0005.DEDICATETYPENAME" _
+            & " , OIM0005.EXTRADINARYTYPECODE" _
+            & " , OIM0005.EXTRADINARYTYPENAME" _
+            & " , OIM0005.EXTRADINARYLIMIT" _
+            & " , OIM0005.BIGOILCODE" _
+            & " , OIM0005.BIGOILNAME" _
+            & " , OIM0005.MIDDLEOILCODE" _
+            & " , OIM0005.MIDDLEOILNAME" _
+            & " , OIM0005.DOWNLOADDATE" _
+            & " , OIM0005.OPERATIONBASECODE" _
+            & " , OIM0005.OPERATIONBASENAME" _
+            & " , OIM0005.COLORCODE" _
+            & " , OIM0005.COLORNAME" _
+            & " , OIM0005.MARKCODE" _
+            & " , OIM0005.MARKNAME" _
+            & " , OIM0005.JXTGTAGCODE1" _
+            & " , OIM0005.JXTGTAGNAME1" _
+            & " , OIM0005.JXTGTAGCODE2" _
+            & " , OIM0005.JXTGTAGNAME2" _
+            & " , OIM0005.JXTGTAGCODE3" _
+            & " , OIM0005.JXTGTAGNAME3" _
+            & " , OIM0005.JXTGTAGCODE4" _
+            & " , OIM0005.JXTGTAGNAME4" _
+            & " , OIM0005.IDSSTAGCODE" _
+            & " , OIM0005.IDSSTAGNAME" _
+            & " , OIM0005.COSMOTAGCODE" _
+            & " , OIM0005.COSMOTAGNAME" _
+            & " , OIM0005.RESERVE1" _
+            & " , OIM0005.RESERVE2" _
+            & " , OIM0005.JRINSPECTIONDATE" _
+            & " , OIM0005.INSPECTIONDATE" _
+            & " , OIM0005.JRSPECIFIEDDATE" _
+            & " , OIM0005.SPECIFIEDDATE" _
+            & " , OIM0005.JRALLINSPECTIONDATE" _
+            & " , OIM0005.ALLINSPECTIONDATE" _
+            & " , OIM0005.PREINSPECTIONDATE" _
+            & " , OIM0005.GETDATE" _
+            & " , OIM0005.TRANSFERDATE" _
+            & " , OIM0005.OBTAINEDCODE" _
+            & " , OIM0005.OBTAINEDNAME" _
+            & " , OIM0005.PROGRESSYEAR" _
+            & " , OIM0005.NEXTPROGRESSYEAR" _
+            & " , OIM0005.EXCLUDEDATE" _
+            & " , OIM0005.RETIRMENTDATE" _
+            & " , OIM0005.JRTANKNUMBER" _
+            & " , OIM0005.JRTANKTYPE" _
+            & " , OIM0005.OLDTANKNUMBER" _
+            & " , OIM0005.OTTANKNUMBER" _
+            & " , OIM0005.JXTGTANKNUMBER1" _
+            & " , OIM0005.JXTGTANKNUMBER2" _
+            & " , OIM0005.JXTGTANKNUMBER3" _
+            & " , OIM0005.JXTGTANKNUMBER4" _
+            & " , OIM0005.COSMOTANKNUMBER" _
+            & " , OIM0005.FUJITANKNUMBER" _
+            & " , OIM0005.SHELLTANKNUMBER" _
+            & " , OIM0005.SAPSHELLTANKNUMBER" _
+            & " , OIM0005.RESERVE3" _
+            & " , OIM0005.USEDFLG" _
+            & " , OIM0005.INTERINSPECTYM" _
+            & " , OIM0005.INTERINSPECTSTATION" _
+            & " , OIM0005.INTERINSPECTORGCODE" _
+            & " , OIM0005.SELFINSPECTYM" _
+            & " , OIM0005.SELFINSPECTSTATION" _
+            & " , OIM0005.SELFINSPECTORGCODE" _
+            & " , OIM0005.INSPECTMEMBERNAME" _
+            & " , OIM0005.DELFLG" _
+            & " , OIM0005.INITYMD" _
+            & " , OIM0005.INITUSER" _
+            & " , OIM0005.INITTERMID" _
+            & " , OIM0005.UPDYMD" _
+            & " , OIM0005.UPDUSER" _
+            & " , OIM0005.UPDTERMID" _
+            & " , OIM0005.RECEIVEYMD" _
+            & " FROM oil.OIM0005_TANK OIM0005"
+
+        SQLStr = SQLCmnStr
+
+        Select Case I_OFFICEFLG
+            '○関東支店(千葉３営業所用(五井営業所、甲子営業所、袖ヶ浦営業所))
+            Case "011409"
+                SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE IN ('{0}','{1}','{2}','{3}')", BaseDllConst.CONST_OFFICECODE_011401, BaseDllConst.CONST_OFFICECODE_011201, BaseDllConst.CONST_OFFICECODE_011202, BaseDllConst.CONST_OFFICECODE_011203)
+                ''○東北支店(仙台新港営業所)
+                'Case "010401"
+                '    SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE IN ('{0}','{1}')", BaseDllConst.CONST_OFFICECODE_010401, BaseDllConst.CONST_OFFICECODE_010402)
+                ''○関東支店(五井営業所、甲子営業所、袖ヶ浦営業所、根岸営業所)
+                'Case "011401"
+                '    SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE IN ('{0}','{1}','{2}','{3}','{4}')", BaseDllConst.CONST_OFFICECODE_011401, BaseDllConst.CONST_OFFICECODE_011201, BaseDllConst.CONST_OFFICECODE_011202, BaseDllConst.CONST_OFFICECODE_011203, BaseDllConst.CONST_OFFICECODE_011402)
+                ''○関東支店(根岸営業所のみ)
+                'Case "011402"
+                '    SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE IN ('{0}','{1}')", BaseDllConst.CONST_OFFICECODE_011401, BaseDllConst.CONST_OFFICECODE_011402)
+                ''○中部支店(四日市営業所、三重塩浜営業所)
+                'Case "012301"
+                '    SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE IN ('{0}','{1}','{2}')", BaseDllConst.CONST_OFFICECODE_012301, BaseDllConst.CONST_OFFICECODE_012401, BaseDllConst.CONST_OFFICECODE_012402)
+        End Select
+
+        '○OTリース対象の場合は対象に含める
+        If I_OTFLG = True Then
+            SQLStr &=
+              " UNION " _
+            & SQLCmnStr _
+            & String.Format(" WHERE OIM0005.ORIGINOWNERCODE = '{0}'", BaseDllConst.CONST_CAMPCODE_11) _
+            & String.Format("    OR OIM0005.LEASECODE = '{0}'", BaseDllConst.CONST_CAMPCODE_11)
+        End If
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtTANKMAS.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtTANKMAS.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+
+    ''' <summary>
     ''' 帳票ファイル名取得
     ''' </summary>
     ''' <returns></returns>

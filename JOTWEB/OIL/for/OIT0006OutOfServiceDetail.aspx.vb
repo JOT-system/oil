@@ -90,7 +90,7 @@ Public Class OIT0006OutOfServiceDetail
                     'End If
 
                     '◯ フラグ初期化
-                    Me.WW_UPBUTTONFLG = "0"
+                    Me.WW_UPBUTTONFLG = "5"
                     Me.WW_IDO_TANKNO_FLG = "0"
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下

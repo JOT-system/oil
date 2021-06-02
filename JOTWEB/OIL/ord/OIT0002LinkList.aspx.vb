@@ -61,9 +61,9 @@ Public Class OIT0002LinkList
     Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 貨車連結順序表(浜五井, 甲子, 北袖)
-    Private WW_ARRSTATIONCODE() As String = {"434103",
-                                             "434105",
-                                             "434108"}              '着駅
+    Private WW_ARRSTATIONCODE() As String = {BaseDllConst.CONST_STATION_434103,
+                                             BaseDllConst.CONST_STATION_434105,
+                                             BaseDllConst.CONST_STATION_434108}              '着駅
 
     '○ 貨車連結順序表アップロード用
     Private WW_ARTICLENAME() As String = {"検", "○"}               '品名

@@ -7455,6 +7455,17 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonCORRECTION_Click(ByVal chkFieldName As String)
+
+        '○発送順区分の設定(一部、条件にて設定) "1"(発送対象)、"2"(発送対象外)
+        Dim setShipOrderClass As String = work.WF_SEL_SHIPORDERCLASS.Text
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+            '"1"(発送対象)とする
+            setShipOrderClass = "1"
+        End If
+
         '○向け先(一部)訂正フラグが"1"(有効)
         If work.WF_SEL_CORRECTIONTANKFLG.Text = "1" Then
 
@@ -7481,6 +7492,28 @@ Public Class OIT0003OrderDetail
                     End If
                 Case "btnChkCrtTankConfirmYes"
                     Dim Msg As String = ""
+
+                    '★発送順が重複して設定されていないかチェック("1"(発送対象)の場合のみ)
+                    If setShipOrderClass = "1" Then
+                        Dim setShipOrder As String = ""
+                        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select(Nothing, "SHIPORDER")
+                            If setShipOrder <> "" _
+                            AndAlso setShipOrder = Convert.ToString(OIT0003tab3row("SHIPORDER")) Then
+                                Msg = String.Format("発送順が重複して設定されています。")
+                                Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                                Exit Sub
+                            End If
+                            setShipOrder = Convert.ToString(OIT0003tab3row("SHIPORDER"))
+                        Next
+
+                        '★受注明細TBLの発送順を更新
+                        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                            SQLcon.Open()       'DataBase接続
+                            For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select(Nothing, "SHIPORDER")
+                                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0003tab3row, Master, OIT0003tab3row("SHIPORDER"), I_PARA:="SHIPORDER")
+                            Next
+                        End Using
+                    End If
 
                     '○タンクバック先が設定されている
                     For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Select("TANKBACKINFO<>'' AND DELFLG<>'" + C_DELETE_FLG.DELETE + "'")
@@ -7513,12 +7546,18 @@ Public Class OIT0003OrderDetail
                                 End If
                             Next
                             iMax += 1
-                            dtOrderBefore.Rows(0)("DETAILNO") = iMax.ToString("000")
-                            dtOrderBefore.Rows(0)("DETAIL_ACTUALLODDATE") = DBNull.Value
-                            dtOrderBefore.Rows(0)("DETAIL_ACTUALDEPDATE") = DBNull.Value
-                            dtOrderBefore.Rows(0)("DETAIL_ACTUALARRDATE") = DBNull.Value
-                            dtOrderBefore.Rows(0)("DETAIL_ACTUALACCDATE") = DBNull.Value
-                            dtOrderBefore.Rows(0)("DETAIL_ACTUALEMPARRDATE") = DBNull.Value
+                            dtOrderBefore.Rows(0)("DETAILNO") = iMax.ToString("000")        ' 受注明細No
+                            '以下、値を初期化
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALLODDATE") = DBNull.Value    ' 積込日(実績)
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALDEPDATE") = DBNull.Value    ' 発日(実績)
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALARRDATE") = DBNull.Value    ' 積車着日(実績)
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALACCDATE") = DBNull.Value    ' 受入日(実績)
+                            dtOrderBefore.Rows(0)("DETAIL_ACTUALEMPARRDATE") = DBNull.Value ' 空車着日(実績)
+                            dtOrderBefore.Rows(0)("RESERVEDNO") = ""                        ' 予約番号
+                            dtOrderBefore.Rows(0)("GYONO") = ""                             ' 行番号(京葉臨海鉄道用託送データで利用)
+                            dtOrderBefore.Rows(0)("OTSENDCOUNT") = 0                        ' OT発送日報送信回数
+                            dtOrderBefore.Rows(0)("DLRESERVEDCOUNT") = 0                    ' 出荷予約ダウンロード回数
+                            dtOrderBefore.Rows(0)("DLTAKUSOUCOUNT") = 0                     ' 託送状ダウンロード回数
                             dtOrderBefore.Rows(0)("UPDYMD") = Date.Now
                             dtOrderBefore.Rows(0)("UPDUSER") = Master.USERID
                             dtOrderBefore.Rows(0)("UPDTERMID") = Master.USERTERMID
@@ -7548,6 +7587,9 @@ Public Class OIT0003OrderDetail
 
                     '○画面表示データ保存
                     Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+                    '○タンク車の付替えがあったため、「訂正更新ボタン押下時処理」を実施し再計算する。
+                    WW_ButtonUPDATE_TAB4()
 
                     '○向け先(一部)訂正フラグが"0"(無効)
                     work.WF_SEL_CORRECTIONTANKFLG.Text = "0"
@@ -17235,7 +17277,10 @@ Public Class OIT0003OrderDetail
 
                     Dim sOrderInfo As String = "利用中 "
                     sOrderInfo &= OIT0003FID2tbl_tab3.Rows(0)("TRAINNO_NM") + " "
-                    sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("DEPDATE")).ToString("MM/dd") + "発分"
+                    Try
+                        sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("DEPDATE")).ToString("MM/dd") + "発分"
+                    Catch ex As Exception
+                    End Try
 
                     OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
                     'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
@@ -17267,7 +17312,10 @@ Public Class OIT0003OrderDetail
 
                     Dim sOrderInfo As String = "回送中 "
                     sOrderInfo &= OIT0003FID2tbl_tab3.Rows(0)("TRAINNO") + " "
-                    sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("ACTUALDEPDATE")).ToString("MM/dd") + "発分"
+                    Try
+                        sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("ACTUALDEPDATE")).ToString("MM/dd") + "発分"
+                    Catch ex As Exception
+                    End Try
 
                     OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
                     'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
@@ -24129,7 +24177,6 @@ Public Class OIT0003OrderDetail
                     End If
                     For Each cellObj As TableCell In rowitem.Controls
                         If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
@@ -24160,6 +24207,26 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20201210 END   指摘票対応(No246) #######################################
 
+                        ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") Then
+                            '向け先(一部)訂正フラグが"1"(有効)
+                            If work.WF_SEL_CORRECTIONTANKFLG.Text = "1" Then
+                                '★発送順区分が"2"(発送対象外)
+                                If work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                                    '★五井営業所対応
+                                    '　積置の場合は入力不可制約としているが、積込日と発日が同一で設定されることもあり
+                                    '　そのため同一日で設定された場合は入力を可能とする処理を追加する。
+                                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                                    AndAlso (Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8681 _
+                                             OrElse Me.TxtTrainNo.Text = CONST_GOI_TRAINNO_8883) _
+                                    AndAlso Me.TxtLoadingDate.Text = Me.TxtDepDate.Text Then
+                                        '### 制約なし #####################################################
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    End If
+                                End If
+                            Else
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
                         ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "TANKBACKINFO") Then
                             '向け先(一部)訂正フラグが"1"(有効)
                             If work.WF_SEL_CORRECTIONTANKFLG.Text = "1" Then

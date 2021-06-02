@@ -197,6 +197,14 @@
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH3" ItemStyle-CssClass="WF_COSTDETAILTBL_TD3">
+                        <HeaderTemplate>輸送形態区分</HeaderTemplate>
+                        <ItemTemplate>
+                            <asp:DropDownList ID="WF_COSTDETAILTBL_TRKBNLIST" runat="server" />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_TRKBN" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "TRKBN")%>' />
+                            <asp:HiddenField ID="WF_COSTDETAILTBL_TRKBNNAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "TRKBNNAME")%>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH4" ItemStyle-CssClass="WF_COSTDETAILTBL_TD4">
                         <HeaderTemplate>計上営業所</HeaderTemplate>
                         <ItemTemplate>
                             <asp:DropDownList ID="WF_COSTDETAILTBL_POSTOFFICENAMELIST" runat="server" />
@@ -204,7 +212,7 @@
                             <asp:HiddenField ID="WF_COSTDETAILTBL_POSTOFFICENAME" runat="server" Value='<%# DataBinder.Eval(Container.DataItem, "POSTOFFICENAME")%>' />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH4" ItemStyle-CssClass="WF_COSTDETAILTBL_TD4">
+                    <asp:TemplateField HeaderStyle-CssClass="WF_COSTDETAILTBL_TH5" ItemStyle-CssClass="WF_COSTDETAILTBL_TD5">
                         <HeaderTemplate>荷受人</HeaderTemplate>
                         <ItemTemplate>
                             <asp:DropDownList ID="WF_COSTDETAILTBL_CONSIGNEENAMELIST" runat="server" />

@@ -11,9 +11,9 @@ Public Class OIT0008CostDetailCreate
     '○ 検索結果格納Table
     Private TMP0009tbl As DataTable                                 ' 一覧格納用テーブル
     Private TMP0009INPtbl As DataTable                              ' 更新時入力テーブル
-    'Private OIM0003tbl As DataTable                                '' 油種リスト格納テーブル
     Private OIM0012tbl As DataTable                                 ' 荷受人リスト格納テーブル
     Private postOfficeTbl As DataTable                              ' 計上営業所格納テーブル
+    Private trKbnTbl As DataTable                                   ' 輸送形態区分
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    ' ログ出力
@@ -51,6 +51,9 @@ Public Class OIT0008CostDetailCreate
 
         '計上営業所テーブル取得
         GetPostOfficeTable()
+
+        '輸送形態区分テーブル取得
+        GetTrKbnTable()
 
         Try
             If IsPostBack Then
@@ -125,6 +128,13 @@ Public Class OIT0008CostDetailCreate
                 postOfficeTbl.Clear()
                 postOfficeTbl.Dispose()
                 postOfficeTbl = Nothing
+            End If
+
+            '○ 格納Table Close
+            If Not IsNothing(trKbnTbl) Then
+                trKbnTbl.Clear()
+                trKbnTbl.Dispose()
+                trKbnTbl = Nothing
             End If
         End Try
 
@@ -235,6 +245,58 @@ Public Class OIT0008CostDetailCreate
         '計上年月
         WF_KEIJYOYM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
 
+        '荷主が指定されている場合
+        If Not String.IsNullOrEmpty(TxtShippersCode.Text) Then
+
+            Dim initTrKbn As String = ""
+
+            'ENEOSの場合
+            If BaseDllConst.CONST_SHIPPERCODE_0005700010.Equals(TxtShippersCode.Text) Then
+                'ENEOSの場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) OrElse
+                   BaseDllConst.CONST_OFFICECODE_011402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台、根岸の場合、初期値「請負」
+                    initTrKbn = "C"
+                ElseIf BaseDllConst.CONST_OFFICECODE_011202.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '甲子の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                End If
+            ElseIf BaseDllConst.CONST_SHIPPERCODE_0094000010.Equals(TxtShippersCode.Text) Then
+                'コスモの場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                ElseIf BaseDllConst.CONST_OFFICECODE_012401.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '四日市の場合、初期値「請負」
+                    initTrKbn = "C"
+                End If
+            ElseIf BaseDllConst.CONST_SHIPPERCODE_0122700010.Equals(TxtShippersCode.Text) Then
+                '出光の場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                ElseIf BaseDllConst.CONST_OFFICECODE_011203.Equals(work.WF_SEL_LAST_OFFICECODE.Text) OrElse
+                    BaseDllConst.CONST_OFFICECODE_012402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '袖ケ浦、三重塩浜の場合、初期値「請負」
+                    initTrKbn = "C"
+                End If
+            End If
+
+            '初期値が存在する場合、輸送形態区分が未設定の行のみ上書き
+            If Not String.IsNullOrEmpty(initTrKbn) Then
+                For Each drow In TMP0009tbl.Rows
+                    If String.IsNullOrEmpty(drow("TRKBN")) Then
+                        drow("TRKBN") = initTrKbn
+                        If "C".Equals(initTrKbn) Then
+                            drow("TRKBNNAME") = "請負"
+                        Else
+                            drow("TRKBNNAME") = "ＯＴ"
+                        End If
+                    End If
+                Next
+            End If
+        End If
+
         WF_COSTDETAILTBL.DataSource = TMP0009tbl
         WF_COSTDETAILTBL.DataBind()
 
@@ -253,6 +315,58 @@ Public Class OIT0008CostDetailCreate
 
         '計上年月
         WF_KEIJYOYM.Text = work.WF_SEL_LAST_KEIJYO_YM.Text
+
+        '荷主が指定されている場合
+        If Not String.IsNullOrEmpty(TxtShippersCode.Text) Then
+
+            Dim initTrKbn As String = ""
+
+            'ENEOSの場合
+            If BaseDllConst.CONST_SHIPPERCODE_0005700010.Equals(TxtShippersCode.Text) Then
+                'ENEOSの場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) OrElse
+                   BaseDllConst.CONST_OFFICECODE_011402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台、根岸の場合、初期値「請負」
+                    initTrKbn = "C"
+                ElseIf BaseDllConst.CONST_OFFICECODE_011202.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '甲子の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                End If
+            ElseIf BaseDllConst.CONST_SHIPPERCODE_0094000010.Equals(TxtShippersCode.Text) Then
+                'コスモの場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                ElseIf BaseDllConst.CONST_OFFICECODE_012401.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '四日市の場合、初期値「請負」
+                    initTrKbn = "C"
+                End If
+            ElseIf BaseDllConst.CONST_SHIPPERCODE_0122700010.Equals(TxtShippersCode.Text) Then
+                '出光の場合
+                If BaseDllConst.CONST_OFFICECODE_010402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '仙台の場合、初期値「ＯＴ」
+                    initTrKbn = "O"
+                ElseIf BaseDllConst.CONST_OFFICECODE_011203.Equals(work.WF_SEL_LAST_OFFICECODE.Text) OrElse
+                    BaseDllConst.CONST_OFFICECODE_012402.Equals(work.WF_SEL_LAST_OFFICECODE.Text) Then
+                    '袖ケ浦、三重塩浜の場合、初期値「請負」
+                    initTrKbn = "C"
+                End If
+            End If
+
+            '初期値が存在する場合、輸送形態区分が未設定の行のみ上書き
+            If Not String.IsNullOrEmpty(initTrKbn) Then
+                For Each drow In TMP0009tbl.Rows
+                    If String.IsNullOrEmpty(drow("TRKBN")) Then
+                        drow("TRKBN") = initTrKbn
+                        If "C".Equals(initTrKbn) Then
+                            drow("TRKBNNAME") = "請負"
+                        Else
+                            drow("TRKBNNAME") = "ＯＴ"
+                        End If
+                    End If
+                Next
+            End If
+        End If
 
         WF_COSTDETAILTBL.DataSource = TMP0009tbl
         WF_COSTDETAILTBL.DataBind()
@@ -277,6 +391,10 @@ Public Class OIT0008CostDetailCreate
         '空行を追加
         Dim addRow As DataRow = TMP0009tbl.NewRow
         addRow("DETAILNO") = maxDetailNo + 1
+        addRow("TRKBN") = ""
+        addRow("TRKBNNAME") = ""
+        addRow("POSTOFFICECODE") = ""
+        addRow("POSTOFFICENAME") = ""
         addRow("CONSIGNEECODE") = ""
         addRow("CONSIGNEENAME") = ""
         'addRow("OILCODE") = ""
@@ -341,13 +459,51 @@ Public Class OIT0008CostDetailCreate
         Dim grid As GridView = CType(sender, GridView)
 
         For Each gvrow As GridViewRow In CType(grid.Controls(0), Table).Rows
+
             If gvrow.RowType = DataControlRowType.DataRow Then
-                '計上営業所ドロップダウンリスト設定
+                '輸送形態区分ドロップダウンリスト設定
                 Dim ddl As DropDownList = Nothing
+                Dim trKbn As String = ""
+
+                ddl = gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_TRKBNLIST")
+                trKbn = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_TRKBN"), HiddenField).Value
+
+                If ddl IsNot Nothing Then
+                    Dim rowCnt As Integer = 0
+                    For Each row As DataRow In trKbnTbl.Rows
+                        Dim ddlItm As New ListItem(row("TRKBNNAME"), row("TRKBN"))
+
+                        If String.IsNullOrEmpty(trKbn) Then
+                            If rowCnt = 0 Then
+                                Dim hidden As HiddenField = Nothing
+                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_TRKBN"), HiddenField)
+                                If hidden IsNot Nothing Then
+                                    hidden.Value = row("TRKBN")
+                                End If
+                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_TRKBNNAME"), HiddenField)
+                                If hidden IsNot Nothing Then
+                                    hidden.Value = row("TRKBNNAME")
+                                End If
+                            End If
+                        Else
+                            If row("TRKBN").Equals(trKbn) Then
+                                ddlItm.Selected = True
+                            Else
+                                ddlItm.Selected = False
+                            End If
+                        End If
+
+                        ddl.Items.Add(ddlItm)
+                        rowCnt += 1
+                    Next
+                    ddl.Attributes.Add("onchange", "selectChangeDdl(this);")
+                End If
+
+                '計上営業所ドロップダウンリスト設定
                 Dim postOfficeCode As String = ""
 
-                ddl = gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICENAMELIST")
-                postOfficeCode = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField).Value
+                ddl = gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_POSTOFFICENAMELIST")
+                postOfficeCode = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField).Value
 
                 If ddl IsNot Nothing Then
                     Dim rowCnt As Integer = 0
@@ -357,11 +513,11 @@ Public Class OIT0008CostDetailCreate
                         If String.IsNullOrEmpty(postOfficeCode) Then
                             If rowCnt = 0 Then
                                 Dim hidden As HiddenField = Nothing
-                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField)
+                                hidden = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField)
                                 If hidden IsNot Nothing Then
                                     hidden.Value = row("OFFICECODE")
                                 End If
-                                hidden = DirectCast(gvrow.Cells(2).FindControl("WF_COSTDETAILTBL_POSTOFFICENAME"), HiddenField)
+                                hidden = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_POSTOFFICENAME"), HiddenField)
                                 If hidden IsNot Nothing Then
                                     hidden.Value = row("OFFICENAME")
                                 End If
@@ -383,7 +539,7 @@ Public Class OIT0008CostDetailCreate
                 '荷受人ドロップダウンリスト設定
                 Dim consigneddCode As String = ""
 
-                ddl = gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_CONSIGNEENAMELIST")
+                ddl = gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_CONSIGNEENAMELIST")
                 consigneddCode = DirectCast(gvrow.Cells(3).FindControl("WF_COSTDETAILTBL_CONSIGNEECODE"), HiddenField).Value
 
                 If ddl IsNot Nothing Then
@@ -455,7 +611,7 @@ Public Class OIT0008CostDetailCreate
                 'End If
 
                 '金額入力
-                Dim textBox As TextBox = gvrow.Cells(4).FindControl("WF_COSTDETAILTBL_AMOUNT")
+                Dim textBox As TextBox = gvrow.Cells(5).FindControl("WF_COSTDETAILTBL_AMOUNT")
                 If textBox IsNot Nothing Then
                     textBox.Attributes.Add("onblur", "amountOnBlur(this);")
                 End If
@@ -525,6 +681,8 @@ Public Class OIT0008CostDetailCreate
         Dim SQLStrBldr As New StringBuilder
         SQLStrBldr.AppendLine(" SELECT")
         SQLStrBldr.AppendLine("     DETAILNO")
+        SQLStrBldr.AppendLine("     , TRKBN")
+        SQLStrBldr.AppendLine("     , TRKBNNAME")
         SQLStrBldr.AppendLine("     , POSTOFFICECODE")
         SQLStrBldr.AppendLine("     , POSTOFFICENAME")
         SQLStrBldr.AppendLine("     , CONSIGNEECODE")
@@ -571,6 +729,8 @@ Public Class OIT0008CostDetailCreate
         SQLStrBldr.AppendLine("         AND KEIJYOYM = @P02")
         SQLStrBldr.AppendLine("         AND LINE = @P03")
         SQLStrBldr.AppendLine("     ) AS DETAILNO")
+        SQLStrBldr.AppendLine("     , '' AS TRKBN")
+        SQLStrBldr.AppendLine("     , '' AS TRKBNNAME")
         SQLStrBldr.AppendLine("     , '' AS POSTOFFICECODE")
         SQLStrBldr.AppendLine("     , '' AS POSTOFFICENAME")
         SQLStrBldr.AppendLine("     , '' AS CONSIGNEECODE")
@@ -1123,6 +1283,9 @@ Public Class OIT0008CostDetailCreate
         InsBldr.AppendLine("     , POSTOFFICECODE")
         InsBldr.AppendLine("     , POSTOFFICENAME")
         InsBldr.AppendLine("     , TEKIYOU")
+        InsBldr.AppendLine("     , OTTRANSPORTFLG")
+        InsBldr.AppendLine("     , TRKBN")
+        InsBldr.AppendLine("     , TRKBNNAME")
         InsBldr.AppendLine(" )")
         InsBldr.AppendLine(" VALUES(")
         InsBldr.AppendLine("     @P01")
@@ -1160,6 +1323,9 @@ Public Class OIT0008CostDetailCreate
         InsBldr.AppendLine("     , @P33")
         InsBldr.AppendLine("     , @P34")
         InsBldr.AppendLine("     , @P35")
+        InsBldr.AppendLine("     , @P36")
+        InsBldr.AppendLine("     , @P37")
+        InsBldr.AppendLine("     , @P38")
         InsBldr.AppendLine(" )")
 
         Try
@@ -1200,6 +1366,9 @@ Public Class OIT0008CostDetailCreate
                 Dim PARA33 As SqlParameter = InsCmd.Parameters.Add("@P33", SqlDbType.NVarChar, 6)   '計上営業所コード
                 Dim PARA34 As SqlParameter = InsCmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)  '計上営業所名
                 Dim PARA35 As SqlParameter = InsCmd.Parameters.Add("@P35", SqlDbType.NVarChar, 200) '摘要
+                Dim PARA36 As SqlParameter = InsCmd.Parameters.Add("@P36", SqlDbType.NVarChar, 1)   'OT輸送可否フラグ
+                Dim PARA37 As SqlParameter = InsCmd.Parameters.Add("@P37", SqlDbType.NVarChar, 1)   '輸送形態区分
+                Dim PARA38 As SqlParameter = InsCmd.Parameters.Add("@P38", SqlDbType.NVarChar, 30)  '輸送形態
 
                 PARA01.Value = work.WF_SEL_LAST_OFFICECODE.Text
                 PARA02.Value = Date.Parse(work.WF_SEL_LAST_KEIJYO_YM.Text + "/01")
@@ -1242,6 +1411,15 @@ Public Class OIT0008CostDetailCreate
                     PARA33.Value = TMP0009INProw("POSTOFFICECODE")
                     PARA34.Value = TMP0009INProw("POSTOFFICENAME")
                     PARA35.Value = TMP0009INProw("TEKIYOU")
+                    If "C".Equals(TMP0009INProw("TRKBN")) Then
+                        PARA36.Value = "2"
+                    ElseIf "O".Equals(TMP0009INProw("TRKBN")) Then
+                        PARA36.Value = "1"
+                    Else
+                        PARA36.Value = ""
+                    End If
+                    PARA37.Value = TMP0009INProw("TRKBN")
+                    PARA38.Value = TMP0009INProw("TRKBNNAME")
 
                     InsCmd.CommandTimeout = 300
                     InsCmd.ExecuteNonQuery()
@@ -1415,7 +1593,11 @@ Public Class OIT0008CostDetailCreate
         '行コピー
         For Each TMP0009row In TMP0009tbl.Rows
             '明細入力欄が全て未設定の場合はスキップ
-            If String.IsNullOrEmpty(TMP0009row("CONSIGNEECODE")) AndAlso
+            If String.IsNullOrEmpty(TMP0009row("TRKBN")) AndAlso
+                String.IsNullOrEmpty(TMP0009row("TRKBNNAME")) AndAlso
+                String.IsNullOrEmpty(TMP0009row("POSTOFFICECODE")) AndAlso
+                String.IsNullOrEmpty(TMP0009row("POSTOFFICENAME")) AndAlso
+                String.IsNullOrEmpty(TMP0009row("CONSIGNEECODE")) AndAlso
                 String.IsNullOrEmpty(TMP0009row("CONSIGNEENAME")) AndAlso
                 TMP0009row("AMOUNT") = 0 AndAlso
                 TMP0009row("TAX") = 0 AndAlso
@@ -1654,6 +1836,18 @@ Public Class OIT0008CostDetailCreate
 
             WW_LINE_ERR = ""
 
+            '輸送形態区分（バリデーションチェック）
+            WW_TEXT = TMP0009INProw("TRKBN")
+            '荷主が空欄でない時は必須チェック
+            If Not String.IsNullOrEmpty(TxtShippersCode.Text) AndAlso
+                Not ("C".Equals(WW_TEXT) OrElse "O".Equals(WW_TEXT)) Then
+                WW_CheckMES1 = "・更新できないレコード(輸送形態区分)です。"
+                WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             '計上営業所コード（バリデーションチェック）
             WW_TEXT = TMP0009INProw("POSTOFFICECODE")
             Master.CheckField(Master.USERCAMP, "POSTOFFICECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -1757,13 +1951,14 @@ Public Class OIT0008CostDetailCreate
             For i As Integer = rowCnt To TMP0009tbl.Rows.Count - 1
                 Dim row As DataRow = TMP0009tbl.Rows(i)
 
-                '計上営業所と荷受人と油種が一致するレコードが存在する場合、重複エラーとする
-                If row("POSTOFFICENAME") = TMP0009INProw("POSTOFFICENAME") AndAlso
+                '輸送形態区分・計上営業所・荷受人・摘要が一致するレコードが存在する場合、重複エラーとする
+                If row("TRKBN") = TMP0009INProw("TRKBN") AndAlso
+                    row("POSTOFFICENAME") = TMP0009INProw("POSTOFFICENAME") AndAlso
                     row("CONSIGNEENAME") = TMP0009INProw("CONSIGNEENAME") AndAlso
                     row("TEKIYOU") = TMP0009INProw("TEKIYOU") Then
                     'row("ORDERINGOILNAME") = TMP0009INProw("ORDERINGOILNAME") AndAlso
 
-                    WW_CheckMES1 = "・更新できないレコード(計上営業所・荷受人・摘要重複エラー)です。"
+                    WW_CheckMES1 = "・更新できないレコード(輸送形態区分・計上営業所・荷受人・摘要重複エラー)です。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, TMP0009INProw)
                     WW_LINE_ERR = "ERR"
@@ -1808,6 +2003,7 @@ Public Class OIT0008CostDetailCreate
 
         If Not IsNothing(TMP0009row) Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> 明細No =" & TMP0009row("DETAILNO") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 輸送形態区分 =" & TMP0009row("TRKBNNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 計上営業所 =" & TMP0009row("POSTOFFICENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 荷受人 =" & TMP0009row("CONSIGNEENAME") & " , "
             'WW_ERR_MES &= ControlChars.NewLine & "  --> 油種 =" & TMP0009row("ORDERINGOILNAME") & " , "
@@ -2027,6 +2223,35 @@ Public Class OIT0008CostDetailCreate
     End Sub
 
     ''' <summary>
+    ''' 輸送形態区分リストデータ設定
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GetTrKbnTable()
+
+        '計上営業所テーブル初期化
+        trKbnTbl = New DataTable
+        trKbnTbl.Columns.Clear()
+        trKbnTbl.Clear()
+
+        trKbnTbl.Columns.Add(New DataColumn("TRKBN", Type.GetType("System.String")))
+        trKbnTbl.Columns.Add(New DataColumn("TRKBNNAME", Type.GetType("System.String")))
+
+        Dim addRow = trKbnTbl.NewRow
+        addRow("TRKBN") = ""
+        addRow("TRKBNNAME") = ""
+        trKbnTbl.Rows.Add(addRow)
+        addRow = trKbnTbl.NewRow
+        addRow("TRKBN") = "C"
+        addRow("TRKBNNAME") = "請負"
+        trKbnTbl.Rows.Add(addRow)
+        addRow = trKbnTbl.NewRow
+        addRow("TRKBN") = "O"
+        addRow("TRKBNNAME") = "ＯＴ"
+        trKbnTbl.Rows.Add(addRow)
+
+    End Sub
+
+    ''' <summary>
     ''' 税率取得
     ''' </summary>
     ''' <remarks></remarks>
@@ -2099,6 +2324,8 @@ Public Class OIT0008CostDetailCreate
         '入力テーブル作成
         TMP0009tbl = New DataTable
         TMP0009tbl.Columns.Add("DETAILNO", Type.GetType("System.Int32"))
+        TMP0009tbl.Columns.Add("TRKBN", Type.GetType("System.String"))
+        TMP0009tbl.Columns.Add("TRKBNNAME", Type.GetType("System.String"))
         TMP0009tbl.Columns.Add("POSTOFFICECODE", Type.GetType("System.String"))
         TMP0009tbl.Columns.Add("POSTOFFICENAME", Type.GetType("System.String"))
         TMP0009tbl.Columns.Add("CONSIGNEECODE", Type.GetType("System.String"))
@@ -2131,6 +2358,12 @@ Public Class OIT0008CostDetailCreate
             If DirectCast(gRow.FindControl("WF_COSTDETAILTBL_CHECKFLG"), CheckBox).Checked = True Then
                 Continue For
             End If
+
+            '輸送形態区分(TRKBN)
+            addRow("TRKBN") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_TRKBN"), HiddenField).Value
+
+            '輸送形態(POSTOFFICENAME)
+            addRow("TRKBNNAME") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_TRKBNNAME"), HiddenField).Value
 
             '計上営業所コード(POSTOFFICECODE)
             addRow("POSTOFFICECODE") = DirectCast(gRow.FindControl("WF_COSTDETAILTBL_POSTOFFICECODE"), HiddenField).Value

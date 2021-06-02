@@ -49,6 +49,16 @@ function selectAll(val) {
 function selectChangeDdl(ddl) {
 
     var name = '' + ddl.name;
+    if (ddl.id.indexOf('TRKBNLIST') !== -1) {
+        var trKbn = document.getElementsByName(name.replace('TRKBNLIST', 'TRKBN'));
+        var trKbnName = document.getElementsByName(name.replace('TRKBNLIST', 'TRKBNNAME'));
+        if (trKbn.length > 0) {
+            trKbn[0].value = ddl.value;
+        }
+        if (trKbnName.length > 0) {
+            trKbnName[0].value = ddl.options[ddl.selectedIndex].innerHTML;
+        }
+    }
     if (ddl.id.indexOf('POSTOFFICENAMELIST') !== -1) {
         var postOfficeCode = document.getElementsByName(name.replace('POSTOFFICENAMELIST', 'POSTOFFICECODE'));
         var postOfficeName = document.getElementsByName(name.replace('POSTOFFICENAMELIST', 'POSTOFFICENAME'));
@@ -69,34 +79,34 @@ function selectChangeDdl(ddl) {
             consigneeName[0].value = ddl.options[ddl.selectedIndex].innerHTML;
         }
     }
-    if (ddl.id.indexOf('ORDERINGOILNAMELIST') !== -1) {
-        var keyCode = '' + ddl.value;
-        var code1 = '';
-        var code2 = '';
-        var code3 = '';
-        var oilCode = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'OILCODE'));
-        var oilName = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'OILNAME'));
-        var orderingType = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'ORDERINGTYPE'));
-        var orderingOilName = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'ORDERINGOILNAME'));
+    //if (ddl.id.indexOf('ORDERINGOILNAMELIST') !== -1) {
+    //    var keyCode = '' + ddl.value;
+    //    var code1 = '';
+    //    var code2 = '';
+    //    var code3 = '';
+    //    var oilCode = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'OILCODE'));
+    //    var oilName = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'OILNAME'));
+    //    var orderingType = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'ORDERINGTYPE'));
+    //    var orderingOilName = document.getElementsByName(name.replace('ORDERINGOILNAMELIST', 'ORDERINGOILNAME'));
 
-        if (keyCode.indexOf('/') !== -1) {
-            code1 = keyCode.split('/')[0]
-            code2 = keyCode.split('/')[1]
-            code3 = keyCode.split('/')[2]
-        }
-        if (oilCode.length > 0) {
-            oilCode[0].value = code1;
-        }
-        if (oilName.length > 0) {
-            oilName[0].value = code2;
-        }
-        if (orderingType.length > 0) {
-            orderingType[0].value = code3;
-        }
-        if (orderingOilName.length > 0) {
-            orderingOilName[0].value = ddl.options[ddl.selectedIndex].innerHTML;
-        }
-    }
+    //    if (keyCode.indexOf('/') !== -1) {
+    //        code1 = keyCode.split('/')[0]
+    //        code2 = keyCode.split('/')[1]
+    //        code3 = keyCode.split('/')[2]
+    //    }
+    //    if (oilCode.length > 0) {
+    //        oilCode[0].value = code1;
+    //    }
+    //    if (oilName.length > 0) {
+    //        oilName[0].value = code2;
+    //    }
+    //    if (orderingType.length > 0) {
+    //        orderingType[0].value = code3;
+    //    }
+    //    if (orderingOilName.length > 0) {
+    //        orderingOilName[0].value = ddl.options[ddl.selectedIndex].innerHTML;
+    //    }
+    //}
 }
 
 /*
@@ -116,7 +126,7 @@ function amountOnBlur(amount) {
         var taxLabel = consumptionTaxLabel[0].parentNode.childNodes[1];
         taxLabel.innerHTML = String(taxValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
         /* 総額を更新 */
-        var totalLabel = consumptionTaxLabel[0].parentNode.parentNode.childNodes[7].childNodes[1];
+        var totalLabel = consumptionTaxLabel[0].parentNode.parentNode.childNodes[8].childNodes[1];
         totalLabel.innerHTML = String(amountValue + taxValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
     }
     amount.value = String(amountValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');

@@ -116,12 +116,18 @@ function amountOnBlur(amount) {
     var name = '' + amount.name;
     var amountValueStr = String(amount.value).replace(',', '');
     var amountValue = parseInt(amountValueStr);
+
+    /* 税区分を取得 */
+    var hdnTaxKbn = document.getElementById('HdnTaxKbn');
     /* 税率を取得 */
     var consumptionTaxLabel = document.getElementsByName(name.replace('AMOUNT', 'CONSUMPTIONTAX'));
     if (consumptionTaxLabel.length > 0) {
         var consumptionTaxValue = parseFloat(consumptionTaxLabel[0].value);
-        /* 税額を計算 */
-        var taxValue = Math.round(amountValue * consumptionTaxValue);
+        /* 税区分が非課税以外の場合は、税額を計算 */
+        var taxValue = 0;
+        if (hdnTaxKbn.value != "3") {
+            var taxValue = Math.round(amountValue * consumptionTaxValue);
+        }
         /* 税額をセット */
         var taxLabel = consumptionTaxLabel[0].parentNode.childNodes[1];
         taxLabel.innerHTML = String(taxValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');

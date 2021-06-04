@@ -97,7 +97,9 @@
                             <asp:TextBox ID="TxtSegmentBranchName" runat="server" onblur="MsgClear();" ReadOnly="true"></asp:TextBox>
                         </a>
                     </span>
-                    <span></span><span></span>
+                    <span>
+                        <asp:HiddenField ID="HdnTaxKbn" runat="server" Value="" />
+                    </span><span></span>
 
                     <!-- ■　荷主　■ -->
                     <span class="left">

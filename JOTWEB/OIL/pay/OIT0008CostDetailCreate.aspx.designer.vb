@@ -104,6 +104,15 @@ Partial Public Class OIT0008CostDetailCreate
     Protected WithEvents TxtSegmentBranchName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''HdnTaxKbn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents HdnTaxKbn As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''TxtShippersCode コントロール。
     '''</summary>
     '''<remarks>

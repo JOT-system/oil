@@ -222,6 +222,13 @@ Public Class OIT0008CostDetailCreate
         '摘要
         TxtTekiyou.Text = work.WF_SEL_TEKIYOU.Text
 
+        '勘定科目が決定されている場合、税区分を取得する
+        If Not String.IsNullOrEmpty(TxtAccountCode.Text) AndAlso
+            Not String.IsNullOrEmpty(TxtSegmentCode.Text) AndAlso
+            Not String.IsNullOrEmpty(TxtSegmentBranchCode.Text) Then
+            GetTaxKbnByAccount()
+        End If
+
     End Sub
 
     ''' <summary>
@@ -297,6 +304,19 @@ Public Class OIT0008CostDetailCreate
             End If
         End If
 
+        '税額計算
+        For Each row In TMP0009tbl.Rows
+            '非課税以外は税額と総額を再計算する
+            If "3".Equals(HdnTaxKbn.Value) Then
+                row("TAX") = 0
+                row("CONSUMPTIONTAX") = 0.0
+                row("TOTAL") = row("AMOUNT")
+            Else
+                row("TAX") = Math.Round(row("AMOUNT") * row("CONSUMPTIONTAX"))
+                row("TOTAL") = row("AMOUNT") + row("TAX")
+            End If
+        Next
+
         WF_COSTDETAILTBL.DataSource = TMP0009tbl
         WF_COSTDETAILTBL.DataBind()
 
@@ -367,6 +387,19 @@ Public Class OIT0008CostDetailCreate
                 Next
             End If
         End If
+
+        '税額計算
+        For Each row In TMP0009tbl.Rows
+            '非課税以外は税額と総額を再計算する
+            If "3".Equals(HdnTaxKbn.Value) Then
+                row("TAX") = 0
+                row("CONSUMPTIONTAX") = 0.0
+                row("TOTAL") = row("AMOUNT")
+            Else
+                row("TAX") = Math.Round(row("AMOUNT") * row("CONSUMPTIONTAX"))
+                row("TOTAL") = row("AMOUNT") + row("TAX")
+            End If
+        Next
 
         WF_COSTDETAILTBL.DataSource = TMP0009tbl
         WF_COSTDETAILTBL.DataBind()
@@ -1054,6 +1087,9 @@ Public Class OIT0008CostDetailCreate
                 If patternNames.Length > 2 Then
                     TxtSegmentBranchName.Text = patternNames(2)
                 End If
+
+                '税区分を取得する
+                GetTaxKbnByAccount()
 
                 'フォーカスセット
                 TxtAccountCode.Focus()
@@ -2315,6 +2351,77 @@ Public Class OIT0008CostDetailCreate
 
         Return consumptionTax
     End Function
+
+    ''' <summary>
+    ''' 税区分取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GetTaxKbnByAccount()
+
+        'テーブル初期化
+        Dim dt As DataTable = New DataTable
+        dt.Columns.Clear()
+        dt.Clear()
+
+        '〇検索SQL説明
+        '　検索説明
+        '     条件指定に従い該当データを油種マスタから取得する
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT ")
+        SQLStrBldr.AppendLine("     M19.TAXTYPE ")
+        SQLStrBldr.AppendLine(" FROM ")
+        SQLStrBldr.AppendLine("     [oil].OIM0019_ACCOUNT M19 ")
+        SQLStrBldr.AppendLine(" WHERE ")
+        SQLStrBldr.AppendLine("     DELFLG <> @P00 ")
+        SQLStrBldr.AppendLine(" AND @P01 BETWEEN M19.FROMYMD AND M19.ENDYMD ")
+        SQLStrBldr.AppendLine(" AND M19.ACCOUNTCODE = @P02 ")
+        SQLStrBldr.AppendLine(" AND M19.SEGMENTCODE = @P03 ")
+        SQLStrBldr.AppendLine(" AND M19.SEGMENTBRANCHCODE = @P04 ")
+
+        '○ 油種テーブルデータ取得
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       ' DataBase接続
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   ' 削除フラグ
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)          ' 計上年月(月初日)
+                    Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 8)   ' 科目コード
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 5)   ' セグメント
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 2)   ' セグメント枝番
+                    PARA00.Value = C_DELETE_FLG.DELETE
+                    PARA01.Value = Date.Parse(work.WF_SEL_LAST_KEIJYO_YM.Text + "/01")
+                    PARA02.Value = TxtAccountCode.Text
+                    PARA03.Value = TxtSegmentCode.Text
+                    PARA04.Value = TxtSegmentBranchCode.Text
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+                    End Using
+
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008C  SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+        End Try
+
+        '税区分を設定
+        HdnTaxKbn.Value = dt.Rows(0)(0)
+
+    End Sub
 
     ''' <summary>
     ''' GridViewからDataTableへの変換

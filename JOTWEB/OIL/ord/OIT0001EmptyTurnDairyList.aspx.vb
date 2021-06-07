@@ -942,16 +942,19 @@ Public Class OIT0001EmptyTurnDairyList
 
         End Using
 
-        '○ 受注TBLとOT受注TBLデータの比較(前準備)
-        WW_CompareOrderToOTOrderAgo()
+        '○受注明細テーブルが存在(2回目以降)の場合
+        If OIT0001Detailtbl.Rows.Count <> 0 Then
+            '○ 受注TBLとOT受注TBLデータの比較(前準備)
+            WW_CompareOrderToOTOrderAgo()
 
-        '○ 受注TBLとOT受注TBLデータの比較
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+            '○ 受注TBLとOT受注TBLデータの比較
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            '★受注TBLとOT受注TBL比較
-            WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
-        End Using
+                '★受注TBLとOT受注TBL比較
+                WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
+            End Using
+        End If
 
         '○ 画面表示データ取得(一覧再取得)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -2578,7 +2581,12 @@ Public Class OIT0001EmptyTurnDairyList
             & " , '0' AS USEFLG" _
             & " , OIT0017.ORDERNO" _
             & " , OIT0017.DETAILNO" _
+            & " , '' AS OTORDERNO" _
             & " , OIT0017.OTDETAILNO" _
+            & " , '' AS OFFICECODE" _
+            & " , '' AS TRAINNO" _
+            & " , '' AS LODDATE" _
+            & " , '' AS DEPDATE" _
             & " , OIT0017.SHIPORDER" _
             & " , OIT0017.LINEORDER" _
             & " , OIT0017.TANKNO" _
@@ -2663,6 +2671,10 @@ Public Class OIT0001EmptyTurnDairyList
             & "   '0' AS USEFLG" _
             & " , OIT0003.ORDERNO" _
             & " , OIT0003.DETAILNO" _
+            & " , '' AS OFFICECODE" _
+            & " , '' AS TRAINNO" _
+            & " , '' AS LODDATE" _
+            & " , '' AS DEPDATE" _
             & " , OIT0003.SHIPORDER" _
             & " , OIT0003.LINEORDER" _
             & " , OIT0003.TANKNO" _
@@ -2740,8 +2752,23 @@ Public Class OIT0001EmptyTurnDairyList
         Dim SQLChkOrderStr As String =
               " SELECT" _
             & "   OIT0002.ORDERNO" _
-            & " FROM OIL.OIT0002_ORDER OIT0002" _
-            & " WHERE OIT0002.ORDERNO = @ORDERNO"
+            & " , OIT0002.OFFICECODE" _
+            & " , OIT0002.TRAINNO" _
+            & " , OIT0002.LODDATE" _
+            & " , OIT0002.DEPDATE" _
+            & " FROM oil.OIT0016_OTORDER OIT0016" _
+            & " INNER JOIN oil.OIT0002_ORDER OIT0002 ON" _
+            & "     OIT0002.OFFICECODE = OIT0016.OFFICECODE" _
+            & " AND OIT0002.TRAINNO = OIT0016.TRAINNO" _
+            & " AND OIT0002.LODDATE = OIT0016.LODDATE" _
+            & " AND OIT0002.DEPDATE = OIT0016.DEPDATE" _
+            & String.Format(" AND OIT0002.ORDERSTATUS <> '{0}'", BaseDllConst.CONST_ORDERSTATUS_900) _
+            & " WHERE OIT0016.ORDERNO = @ORDERNO"
+        'Dim SQLChkOrderStr As String =
+        '      " SELECT" _
+        '    & "   OIT0002.ORDERNO" _
+        '    & " FROM OIL.OIT0002_ORDER OIT0002" _
+        '    & " WHERE OIT0002.ORDERNO = @ORDERNO"
 
         Try
             Using SQLOTOrdercmd As New SqlCommand(SQLOTOrderStr, SQLcon),
@@ -2794,6 +2821,23 @@ Public Class OIT0001EmptyTurnDairyList
 
                 Next
 
+                '○ テーブル検索結果クリア
+                OIT0001CHKOrdertbl.Clear()
+                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                    P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
+
+                    Using SQLdr As SqlDataReader = SQLChkOrdercmd.ExecuteReader()
+                        If OIT0001CHKOrdertbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0001CHKOrdertbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0001CHKOrdertbl.Load(SQLdr)
+                    End Using
+                Next
+
                 '★OT受注明細TBLからデータを取得
                 With SQLOTDetailcmd.Parameters
                     .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text    '営業所コード
@@ -2814,8 +2858,13 @@ Public Class OIT0001EmptyTurnDairyList
                 '★受注TBLに存在した受注NoをOT受注明細の受注にも設定する。
                 For Each OIT0001OTOrderrow As DataRow In OIT0001OTOrdertbl.Select("ORDERFLAG='1'")
                     For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Rows
-                        If OIT0001OTOrderrow("ORDERNO") = OIT0001OTOrderrow("ORDERNO") Then
+                        If OIT0001OTDetailrow("ORDERNO") = OIT0001OTOrderrow("ORDERNO") Then
                             OIT0001OTDetailrow("ORDERFLAG") = "1"
+
+                            OIT0001OTDetailrow("OFFICECODE") = OIT0001OTOrderrow("OFFICECODE")
+                            OIT0001OTDetailrow("TRAINNO") = OIT0001OTOrderrow("TRAINNO")
+                            OIT0001OTDetailrow("LODDATE") = OIT0001OTOrderrow("LODDATE")
+                            OIT0001OTDetailrow("DEPDATE") = OIT0001OTOrderrow("DEPDATE")
                         End If
                     Next
                 Next
@@ -2825,7 +2874,8 @@ Public Class OIT0001EmptyTurnDairyList
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
 
                 P_ORDERNO = SQLDetailcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar) '受注№
-                For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                'For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                For Each OIT0001OTrow As DataRow In OIT0001CHKOrdertbl.Rows
                     P_ORDERNO.Value = OIT0001OTrow("ORDERNO")
                     Using SQLdr As SqlDataReader = SQLDetailcmd.ExecuteReader()
                         If OIT0001Detailtbl.Columns.Count = 0 Then
@@ -2837,6 +2887,13 @@ Public Class OIT0001EmptyTurnDairyList
                         '○ テーブル検索結果をテーブル格納
                         OIT0001Detailtbl.Load(SQLdr)
                     End Using
+
+                    For Each OIT0001Detailrow As DataRow In OIT0001Detailtbl.Select("ORDERNO='" + OIT0001OTrow("ORDERNO") + "'")
+                        OIT0001Detailrow("OFFICECODE") = OIT0001OTrow("OFFICECODE")
+                        OIT0001Detailrow("TRAINNO") = OIT0001OTrow("TRAINNO")
+                        OIT0001Detailrow("LODDATE") = OIT0001OTrow("LODDATE")
+                        OIT0001Detailrow("DEPDATE") = OIT0001OTrow("DEPDATE")
+                    Next
                 Next
             End Using
         Catch ex As Exception
@@ -3587,13 +3644,21 @@ Public Class OIT0001EmptyTurnDairyList
     Protected Sub WW_CompareOrderToOTOrderAgo()
 
         '★タンク車Noと一致した明細Noを設定
-        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
-            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0'")
-                If Convert.ToString(OIT0001OTrow("TANKNO")) = Convert.ToString(OIT0001row("TANKNO")) Then
-                    OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
-                    OIT0001row("USEFLG") = "1"
-                    OIT0001OTrow("USEFLG") = "1"
-                    Exit For
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0' AND TANKNO<>''")
+            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0' AND TANKNO<>''")
+                If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("TRAINNO")) = Convert.ToString(OIT0001row("TRAINNO")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("LODDATE")) = Convert.ToString(OIT0001row("LODDATE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("DEPDATE")) = Convert.ToString(OIT0001row("DEPDATE")) Then
+
+                    '★一致している場合、明細Noを設定
+                    If Convert.ToString(OIT0001OTrow("TANKNO")) = Convert.ToString(OIT0001row("TANKNO")) Then
+                        OIT0001OTrow("OTORDERNO") = OIT0001row("ORDERNO")
+                        OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
+                        OIT0001row("USEFLG") = "1"
+                        OIT0001OTrow("USEFLG") = "1"
+                        Exit For
+                    End If
                 End If
             Next
         Next
@@ -3601,11 +3666,19 @@ Public Class OIT0001EmptyTurnDairyList
         '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
         For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
             For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0' AND TANKNO = ''")
-                If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) Then
-                    OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
-                    OIT0001row("USEFLG") = "1"
-                    OIT0001OTrow("USEFLG") = "1"
-                    Exit For
+
+                If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("TRAINNO")) = Convert.ToString(OIT0001row("TRAINNO")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("LODDATE")) = Convert.ToString(OIT0001row("LODDATE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("DEPDATE")) = Convert.ToString(OIT0001row("DEPDATE")) Then
+                    '★一致している場合、明細Noを設定
+                    If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) Then
+                        OIT0001OTrow("OTORDERNO") = OIT0001row("ORDERNO")
+                        OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
+                        OIT0001row("USEFLG") = "1"
+                        OIT0001OTrow("USEFLG") = "1"
+                        Exit For
+                    End If
                 End If
             Next
         Next
@@ -3644,7 +3717,8 @@ Public Class OIT0001EmptyTurnDairyList
 
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
-        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTCompare(OIT0001OTOrdertbl, inOrder)
+        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTCompare(OIT0001CHKOrdertbl, inOrder)
+        'Dim SQLStr As String = RSSQL.EmptyTurnDairyOTCompare(OIT0001OTOrdertbl, inOrder)
 
         '削除・追加用
         Dim SQLTempTblStr As String =

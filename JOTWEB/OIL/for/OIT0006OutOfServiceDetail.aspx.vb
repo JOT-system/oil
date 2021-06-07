@@ -4537,6 +4537,9 @@ Public Class OIT0006OutOfServiceDetail
 
             '(一覧)発送日(空白チェック)
             If OIT0006row("ACTUALDEPDATE") = "" And OIT0006row("DELFLG") = "0" Then
+                OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_110
+                CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
+
                 Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送日", needsPopUp:=True)
 
                 WW_CheckMES1 = "発送日未設定エラー。"
@@ -4544,6 +4547,9 @@ Public Class OIT0006OutOfServiceDetail
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
                 O_RTN = "ERR"
                 Exit Sub
+            Else
+                OIT0006row("KAISOUINFO") = ""
+                OIT0006row("KAISOUINFONAME") = ""
             End If
 
             '(一覧)着日(空白チェック)
@@ -7849,7 +7855,7 @@ Public Class OIT0006OutOfServiceDetail
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "KAISOUSTATUS"))
 
                 Case "KAISOUINFO"       '回送情報
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "KAISOUINFO"))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
                 Case "SALESOFFICE"      '営業所
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))

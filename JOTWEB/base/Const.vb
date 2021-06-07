@@ -837,6 +837,10 @@ Public Module BaseDllConst
     ''' 日付(発駅戻り日)エラー
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_109 As String = "109"
+    ''' <summary>
+    ''' 発送日エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_110 As String = "110"
 
     ''' <summary>
     ''' 失注（荷主都合）

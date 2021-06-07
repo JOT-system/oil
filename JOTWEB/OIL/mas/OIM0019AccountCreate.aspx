@@ -24,8 +24,8 @@
                     <div class="leftSide">
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="表更新" onclick="ButtonClick('WF_UPDATE');" />
-                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="クリア" onclick="ButtonClick('WF_CLEAR');" />
+                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="更新" onclick="ButtonClick('WF_UPDATE');" />
+                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="戻る" onclick="ButtonClick('WF_CLEAR');" />
                     </div>
                 </div>
             </div>
@@ -149,6 +149,18 @@
                         <asp:Label ID="WF_ACCOUNTTYPENAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
+
+                <p id="KEY_LINE_13">
+                    <!-- 税区分 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_TAXTYPE_L" runat="server" Text="税区分" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_TAXTYPE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_TAXTYPE');">
+                            <asp:TextBox ID="WF_TAXTYPE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_TAXTYPE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+                
             </div>
         </div>
 

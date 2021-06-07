@@ -1090,13 +1090,21 @@
             & "     OIT0017.ORDERNO = OIT0016.ORDERNO " _
             & "     WHERE OIT0016.OFFICECODE = @OFFICECODE " _
             & "     AND OIT0016.ORDERYMD = @ORDERYMD " _
-            & "     ) OT ON " _
-            & " OT.ORDERNO = OIT0002.ORDERNO " _
-            & " AND OT.OTDETAILNO = OIT0003.DETAILNO "
+            & "     ) OT ON "
+
+        SQLORDERStr &=
+              " OT.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OT.OTDETAILNO = OIT0003.DETAILNO " _
+        'SQLORDERStr &=
+        '      " OT.ORDERNO = OIT0002.ORDERNO " _
+        '    & " AND OT.OTDETAILNO = OIT0003.DETAILNO "
 
         SQLORDERStr &=
               String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
             & " AND OIT0002.OFFICECODE = @OFFICECODE " _
+            & " AND OT.TRAINNO = OIT0002.TRAINNO " _
+            & " AND OT.LODDATE = OIT0002.LODDATE " _
+            & " AND OT.DEPDATE = OIT0002.DEPDATE "
 
         '######################################################
         '# OT受注TBLにのみ存在するデータを取得(比較は受注TBL)
@@ -1258,13 +1266,21 @@
             & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
             & "     AND OIT0002.OFFICECODE = @OFFICECODE " _
-            & "     ) JOT ON " _
-            & " JOT.ORDERNO = OIT0016.ORDERNO " _
-            & " AND JOT.DETAILNO = OIT0017.OTDETAILNO "
+            & "     ) JOT ON "
+
+        SQLOTORDERStr &=
+              " JOT.OFFICECODE = OIT0016.OFFICECODE " _
+            & " AND JOT.DETAILNO = OIT0017.OTDETAILNO " _
+        'SQLOTORDERStr &=
+        '      " JOT.ORDERNO = OIT0016.ORDERNO " _
+        '    & " AND JOT.DETAILNO = OIT0017.OTDETAILNO "
 
         SQLOTORDERStr &=
               " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
             & " AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & " AND JOT.TRAINNO = OIT0016.TRAINNO " _
+            & " AND JOT.LODDATE = OIT0016.LODDATE " _
+            & " AND JOT.DEPDATE = OIT0016.DEPDATE " _
             & " AND JOT.ORDERNO IS NULL "
 
         '★SQL結合

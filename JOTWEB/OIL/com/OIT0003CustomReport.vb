@@ -154,30 +154,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             tmpFileName = tmpGetFileName
         End If
 
-        ''ダウンロードファイル名の設定
-        'Dim str_tmpFileName As String = ""
-        'Select Case tyohyoType
-        '    '積込指示書
-        '    Case "LOADPLAN"
-        '        Select Case officeCode
-        '            Case "011201", "011203"
-        '                ' 五井、袖ヶ浦
-        '                str_tmpFileName = "積込指示書" & ".xlsx"
-
-        '            Case "011202"
-        '                ' 甲子
-        '                str_tmpFileName = "タンク車積込指示書" & ".xlsx"
-
-        '            Case Else
-        '                ' 仙台、四日市  ※三重塩浜の積込指示書は別
-        '                str_tmpFileName = "積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
-        '        End Select
-        '    'OT積込指示書
-        '    Case "OTLOADPLAN"
-        '        str_tmpFileName = "OT積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
-
-        'End Select
-        'Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
 
         Try
@@ -274,6 +250,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("K:K").Columns.Hidden = True
                 Case BaseDllConst.CONST_OFFICECODE_011202
+                    Me.ExcelWorkSheet.Range("E:E").ColumnWidth = 15.25
                     Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
                 Case BaseDllConst.CONST_OFFICECODE_011203
@@ -700,23 +677,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             tmpFileName = tmpGetFileName
         End If
 
-        'Dim str_tmpFileName As String = ""
-
-        'Select Case repPtn
-        '    Case "FILLINGPOINT"
-        '        '回線別充填ポイント表
-        '        str_tmpFileName = "充填ポイント入線表" & ".xlsx"
-
-        '    Case "SHIPPLAN"
-        '        '出荷予定表
-        '        str_tmpFileName = "出荷予定表" & ".xlsx"
-        '    Case Else
-        '        '例外
-        '        str_tmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
-        'End Select
-
-        'Dim tmpFileName As String = str_tmpFileName
-
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -993,22 +953,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             tmpFileName = tmpGetFileName
         End If
 
-        'Dim str_tmpFileName As String = ""
-
-        'Select Case repPtn
-        '    Case "SHIPPLAN"
-        '        '出荷予定表
-        '        str_tmpFileName = "タンク車出荷予定表" & ".xlsx"
-        '    Case "KINOENE_LOADPLAN"
-        '        '積込予定表甲子用
-        '        str_tmpFileName = "回線別タンク車積込指示書" & ".xlsx"
-        '    Case Else
-        '        '例外
-        '        str_tmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
-        'End Select
-
-
-        'Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -1337,22 +1281,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             tmpFileName = tmpGetFileName
         End If
 
-        'Dim str_tmpFileName As String = ""
-        'Select Case repPtn
-        '    Case "SHIPPLAN"
-        '        '出荷予定表
-        '        str_tmpFileName = "出荷予定表" & ".xlsx"
-        '    Case "LINEPLAN"
-        '        '入線方
-        '        str_tmpFileName = Format(lodDate, "MMdd") & StrConv(rTrainNo, VbStrConv.Wide) & "入線方" & ".xlsx"
-
-        '    Case Else
-        '        '例外
-        '        str_tmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
-
-        'End Select
-
-        'Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -1888,15 +1816,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             tmpFileName = tmpGetFileName
         End If
 
-        'Dim str_tmpFileName As String = ""
-
-        'If repPtn = "SHIPPLAN" Then
-        '    str_tmpFileName = "出荷予定表" & ".xlsx"
-        'ElseIf repPtn = "LOADPLAN" Then
-        '    str_tmpFileName = "回線別出荷予定表" & ".xlsx"
-        'End If
-
-        'Dim tmpFileName As String = str_tmpFileName
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -2371,23 +2290,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
         If tmpGetFileName <> "" Then
             tmpFileName = tmpGetFileName
         End If
-
-        'Dim str_tmpFileName As String = ""
-
-        'Select Case repPtn
-        '    Case "DELIVERYPLAN"
-        '        '託送指示
-        '        str_tmpFileName = "託送状" & ".xlsx"
-        '        '積込指示
-        '    Case "LOADPLAN"
-        '        str_tmpFileName = "積込指示書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
-
-        '    Case "SHIPCONTACT"
-        '        'タンク車出荷連絡書
-        '        str_tmpFileName = "タンク車出荷連絡書" & Date.Parse(lodDate).ToString("yyyy年MM月dd日") & ".xlsx"
-        'End Select
-
-        'Dim tmpFileName As String = str_tmpFileName
 
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte

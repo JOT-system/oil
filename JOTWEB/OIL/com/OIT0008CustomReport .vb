@@ -273,7 +273,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                             '基地コードが出光昭和四日市又はコスモ四日市の場合
                             '転送販売計は荷受人計と同値なので、転送販売計を出力する
                             If "2401".Equals(row("BASECODE").ToString()) OrElse
-                                    "2402".Equals(row("BASECODE").ToString()) Then
+                                "2402".Equals(row("BASECODE").ToString()) Then
                                 '〇明細の設定(転送販売計)
                                 'テンプレート⑥をコピーする
                                 srcRange = ExcelTempSheet.Cells.Range("I27:CJ27")
@@ -369,7 +369,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 pixel += 18
                             End If
                         Else
-                            '出荷場所コードが同一だが、出荷場所名に「請求先部門」が入っている場合
+                            '出荷場所コードが同一だが、出荷場所名に「請求先部門」が入っている場合 START
                             If "請求先部門計".Equals(row("BASENAME").ToString()) Then
                                 '〇明細の設定(請求先部門計)
                                 'テンプレート⑨をコピーする
@@ -508,7 +508,7 @@ Public Class OIT0008CustomReport : Implements IDisposable
                                 End If
                                 '扱支店が不一致の場合 END
                             End If
-
+                            '出荷場所コードが同一だが、出荷場所名に「請求先部門」が入っている場合 END
                         End If
                         '出荷場所が不一致の場合 END
                     End If

@@ -668,8 +668,19 @@ Public Class OIT0008CostManagement
             addRow("AMOUNT") = amount
 
             '税金(TAX)
-            Dim tax As Decimal = 0
-            addRow("TAX") = Math.Round(amount * 0.1)
+            '税区分取得
+            Dim taxKbn As String = GetTaxKbnByAccount(addRow("ACCOUNTCODE"),
+                                                      addRow("SEGMENTCODE"),
+                                                      addRow("SEGMENTBRANCHCODE"))
+            '税率取得
+            Dim consumptionTax As Decimal = GetConsumptionTax()
+
+            '非課税の場合は税金は0を設定し、それ以外の場合は取得した税率と金額を四捨五入
+            If "3".Equals(taxKbn) Then
+                addRow("TAX") = 0
+            Else
+                addRow("TAX") = Math.Round(amount * consumptionTax)
+            End If
 
             '請求先コード(INVOICECODE)
             addRow("INVOICECODE") = DirectCast(gRow.FindControl("WF_COSTLISTTBL_INVOICECODE"), TextBox).Text
@@ -702,6 +713,10 @@ Public Class OIT0008CostManagement
 
             '更新対象がなければ、一時テーブルの更新は行わない
             If Not OIT0008INPtbl.Rows.Count = 0 Then
+                '費用管理明細Workの更新
+                UpdateT0009WorkTable(SQLcon)
+
+                '費用管理Workの更新
                 UpdateWorkTable(SQLcon)
             End If
 
@@ -712,6 +727,153 @@ Public Class OIT0008CostManagement
         End Using
 
     End Sub
+
+    ''' <summary>
+    ''' 費用管理ワークテーブルの更新(DB処理)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    Protected Sub UpdateT0009WorkTable(ByVal SQLcon As SqlConnection)
+
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" MERGE [oil].TMP0009_COSTDETAIL AS T0009")
+        SQLStrBldr.AppendLine(" USING (")
+        SQLStrBldr.AppendLine("     SELECT")
+        SQLStrBldr.AppendLine("         @P01 AS OFFICECODE")
+        SQLStrBldr.AppendLine("         , @P02 AS KEIJYOYM")
+        SQLStrBldr.AppendLine("         , @P03 AS LINE")
+        SQLStrBldr.AppendLine("         , @P04 AS ACCOUNTCODE")
+        SQLStrBldr.AppendLine("         , @P05 AS ACCOUNTNAME")
+        SQLStrBldr.AppendLine("         , @P06 AS SEGMENTCODE")
+        SQLStrBldr.AppendLine("         , @P07 AS SEGMENTNAME")
+        SQLStrBldr.AppendLine("         , @P08 AS BREAKDOWNCODE")
+        SQLStrBldr.AppendLine("         , @P09 AS BREAKDOWN")
+        SQLStrBldr.AppendLine("         , @P10 AS SHIPPERSCODE")
+        SQLStrBldr.AppendLine("         , @P11 AS SHIPPERSNAME")
+        SQLStrBldr.AppendLine("         , @P12 AS INVOICECODE")
+        SQLStrBldr.AppendLine("         , @P13 AS INVOICENAME")
+        SQLStrBldr.AppendLine("         , @P14 AS INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("         , @P15 AS PAYEECODE")
+        SQLStrBldr.AppendLine("         , @P16 AS PAYEENAME")
+        SQLStrBldr.AppendLine("         , @P17 AS PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("         , M19.TAXTYPE")
+        SQLStrBldr.AppendLine("         , RATE.CONSUMPTIONTAX")
+        SQLStrBldr.AppendLine("     FROM")
+        SQLStrBldr.AppendLine("         oil.OIM0019_ACCOUNT M19")
+        SQLStrBldr.AppendLine("         INNER JOIN (")
+        SQLStrBldr.AppendLine("             SELECT")
+        SQLStrBldr.AppendLine("                 CAST(MAX(KEYCODE) AS NUMERIC(5, 2)) AS CONSUMPTIONTAX")
+        SQLStrBldr.AppendLine("             FROM")
+        SQLStrBldr.AppendLine("                 oil.VIW0001_FIXVALUE")
+        SQLStrBldr.AppendLine("             WHERE")
+        SQLStrBldr.AppendLine("                 [CLASS] = 'CONSUMPTIONTAX'")
+        SQLStrBldr.AppendLine("             AND CAMPCODE = 'ZZ'")
+        SQLStrBldr.AppendLine("             AND @P02 BETWEEN STYMD AND ENDYMD")
+        SQLStrBldr.AppendLine("         ) RATE")
+        SQLStrBldr.AppendLine("         ON 1 = 1")
+        SQLStrBldr.AppendLine("     WHERE")
+        SQLStrBldr.AppendLine("         M19.ACCOUNTCODE = @P04")
+        SQLStrBldr.AppendLine("     AND M19.SEGMENTCODE = @P06")
+        SQLStrBldr.AppendLine("     AND M19.SEGMENTBRANCHCODE = @P08")
+        SQLStrBldr.AppendLine("     AND @P02 BETWEEN M19.FROMYMD AND M19.ENDYMD")
+        SQLStrBldr.AppendLine("     AND M19.DELFLG <> '1'")
+        SQLStrBldr.AppendLine(" ) AS GVROW")
+        SQLStrBldr.AppendLine("     ON  T0009.OFFICECODE = GVROW.OFFICECODE")
+        SQLStrBldr.AppendLine("     AND T0009.KEIJYOYM = GVROW.KEIJYOYM")
+        SQLStrBldr.AppendLine("     AND T0009.LINE = GVROW.LINE")
+        SQLStrBldr.AppendLine(" WHEN MATCHED")
+        SQLStrBldr.AppendLine("         THEN UPDATE")
+        SQLStrBldr.AppendLine("             SET")
+        SQLStrBldr.AppendLine("                 T0009.ACCOUNTCODE = GVROW.ACCOUNTCODE")
+        SQLStrBldr.AppendLine("                 , T0009.ACCOUNTNAME = GVROW.ACCOUNTNAME")
+        SQLStrBldr.AppendLine("                 , T0009.SEGMENTCODE = GVROW.SEGMENTCODE")
+        SQLStrBldr.AppendLine("                 , T0009.SEGMENTNAME = GVROW.SEGMENTNAME")
+        SQLStrBldr.AppendLine("                 , T0009.BREAKDOWNCODE = GVROW.BREAKDOWNCODE")
+        SQLStrBldr.AppendLine("                 , T0009.BREAKDOWN = GVROW.BREAKDOWN")
+        SQLStrBldr.AppendLine("                 , T0009.SHIPPERSCODE = GVROW.SHIPPERSCODE")
+        SQLStrBldr.AppendLine("                 , T0009.SHIPPERSNAME = GVROW.SHIPPERSNAME")
+        SQLStrBldr.AppendLine("                 , T0009.INVOICECODE = GVROW.INVOICECODE")
+        SQLStrBldr.AppendLine("                 , T0009.INVOICENAME = GVROW.INVOICENAME")
+        SQLStrBldr.AppendLine("                 , T0009.INVOICEDEPTNAME = GVROW.INVOICEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0009.PAYEECODE = GVROW.PAYEECODE")
+        SQLStrBldr.AppendLine("                 , T0009.PAYEENAME = GVROW.PAYEENAME")
+        SQLStrBldr.AppendLine("                 , T0009.PAYEEDEPTNAME = GVROW.PAYEEDEPTNAME")
+        SQLStrBldr.AppendLine("                 , T0009.CONSUMPTIONTAX = (CASE GVROW.TAXTYPE")
+        SQLStrBldr.AppendLine("                     WHEN '3' THEN   0.0")
+        SQLStrBldr.AppendLine("                     ELSE            GVROW.CONSUMPTIONTAX")
+        SQLStrBldr.AppendLine("                 END)")
+        SQLStrBldr.AppendLine("                 , T0009.TAX = (CASE GVROW.TAXTYPE")
+        SQLStrBldr.AppendLine("                     WHEN '3' THEN   0")
+        SQLStrBldr.AppendLine("                     ELSE            ROUND(T0009.AMOUNT * GVROW.CONSUMPTIONTAX, 0)")
+        SQLStrBldr.AppendLine("                 END)")
+        SQLStrBldr.AppendLine(" ;")
+
+        Try
+            Using MergeCmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                Dim PARA01 As SqlParameter = MergeCmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6)
+                Dim PARA02 As SqlParameter = MergeCmd.Parameters.Add("@P02", SqlDbType.Date)
+                Dim PARA03 As SqlParameter = MergeCmd.Parameters.Add("@P03", SqlDbType.Int)
+                Dim PARA04 As SqlParameter = MergeCmd.Parameters.Add("@P04", SqlDbType.NVarChar, 8)
+                Dim PARA05 As SqlParameter = MergeCmd.Parameters.Add("@P05", SqlDbType.NVarChar, 40)
+                Dim PARA06 As SqlParameter = MergeCmd.Parameters.Add("@P06", SqlDbType.NVarChar, 5)
+                Dim PARA07 As SqlParameter = MergeCmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40)
+                Dim PARA08 As SqlParameter = MergeCmd.Parameters.Add("@P08", SqlDbType.NVarChar, 2)
+                Dim PARA09 As SqlParameter = MergeCmd.Parameters.Add("@P09", SqlDbType.NVarChar, 40)
+                Dim PARA10 As SqlParameter = MergeCmd.Parameters.Add("@P10", SqlDbType.NVarChar, 10)
+                Dim PARA11 As SqlParameter = MergeCmd.Parameters.Add("@P11", SqlDbType.NVarChar, 40)
+                Dim PARA12 As SqlParameter = MergeCmd.Parameters.Add("@P12", SqlDbType.NVarChar, 10)
+                Dim PARA13 As SqlParameter = MergeCmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40)
+                Dim PARA14 As SqlParameter = MergeCmd.Parameters.Add("@P14", SqlDbType.NVarChar, 40)
+                Dim PARA15 As SqlParameter = MergeCmd.Parameters.Add("@P15", SqlDbType.NVarChar, 10)
+                Dim PARA16 As SqlParameter = MergeCmd.Parameters.Add("@P16", SqlDbType.NVarChar, 40)
+                Dim PARA17 As SqlParameter = MergeCmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40)
+
+                '費用管理ワークテーブルのデータ更新
+                PARA01.Value = WW_OFFICECODE
+                Dim WK_DATE = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                PARA02.Value = WK_DATE
+
+                '入力テーブルに格納された行数分、更新処理を行う
+                For Each row As DataRow In OIT0008INPtbl.Rows
+
+                    '自動計算科目以外はスキップ
+                    If row("CALCACCOUNT") <> "1" Then
+                        PARA03.Value = row("LINE")
+                        PARA04.Value = row("ACCOUNTCODE")
+                        PARA05.Value = row("ACCOUNTNAME")
+                        PARA06.Value = row("SEGMENTCODE")
+                        PARA07.Value = row("SEGMENTNAME")
+                        PARA08.Value = row("SEGMENTBRANCHCODE")
+                        PARA09.Value = row("SEGMENTBRANCHNAME")
+                        PARA10.Value = row("SHIPPERSCODE")
+                        PARA11.Value = row("SHIPPERSNAME")
+                        PARA12.Value = row("INVOICECODE")
+                        PARA13.Value = row("INVOICENAME")
+                        PARA14.Value = row("INVOICEDEPTNAME")
+                        PARA15.Value = row("PAYEECODE")
+                        PARA16.Value = row("PAYEENAME")
+                        PARA17.Value = row("PAYEEDEPTNAME")
+
+                        MergeCmd.CommandTimeout = 300
+                        MergeCmd.ExecuteNonQuery()
+                    End If
+
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M TMP0009_COSTDETAIL MERGE")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M TMP0009_COSTDETAIL MERGE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
 
     ''' <summary>
     ''' 費用管理ワークテーブルの更新(DB処理)
@@ -903,7 +1065,7 @@ Public Class OIT0008CostManagement
                         PARA12.Value = 0.0  '単価(0固定)
                         PARA13.Value = row("AMOUNT")
                         PARA15.Value = row("INVOICECODE")
-                        PARA14.Value = Math.Floor(row("AMOUNT") * 0.1) '税額(10%切り捨て)
+                        PARA14.Value = row("TAX")
                         PARA16.Value = row("INVOICENAME")
                         PARA17.Value = row("INVOICEDEPTNAME")
                         PARA18.Value = row("PAYEECODE")
@@ -3256,6 +3418,26 @@ Public Class OIT0008CostManagement
                     If patternNames.Length > 2 Then
                         WK_Label.Text = patternNames(2)
                     End If
+
+                    ''税区分取得
+                    'Dim taxKbn As String = GetTaxKbnByAccount(patternCodes(0),
+                    '                                          patternCodes(1),
+                    '                                          patternCodes(2))
+                    ''税率取得
+                    'Dim consumptionTax As Decimal = GetConsumptionTax()
+
+                    ''金額取得
+                    'Dim amount As Long = Long.Parse(DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_AMOUNT"), Label).Text.Replace(",", ""))
+
+                    ''税額ラベル取得
+                    'WK_Label = DirectCast(WF_COSTLISTTBL.Rows(rowIdx - 1).FindControl("WF_COSTLISTTBL_TAX"), Label)
+
+                    'If "3".Equals(taxKbn) Then
+                    '    WK_Label.Text = "0"
+                    'Else
+                    '    WK_Label.Text = String.Format("{0:#,##0", Math.Round(amount * consumptionTax))
+                    'End If
+
                 End If
 
                 '請求先
@@ -3406,6 +3588,149 @@ Public Class OIT0008CostManagement
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
+
+    ''' <summary>
+    ''' 税率取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Function GetConsumptionTax() As Decimal
+
+        Dim consumptionTax As Decimal = 0.0
+
+        'テーブル初期化
+        Dim dt As DataTable = New DataTable
+        dt.Columns.Clear()
+        dt.Clear()
+
+        '〇検索SQL説明
+        '　検索説明
+        '     条件指定に従い該当データを油種マスタから取得する
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT")
+        SQLStrBldr.AppendLine("     CAST(MAX(KEYCODE) AS NUMERIC(5, 2)) AS CONSUMPTIONTAX")
+        SQLStrBldr.AppendLine(" FROM")
+        SQLStrBldr.AppendLine("     oil.VIW0001_FIXVALUE")
+        SQLStrBldr.AppendLine(" WHERE")
+        SQLStrBldr.AppendLine("     [CLASS] = 'CONSUMPTIONTAX'")
+        SQLStrBldr.AppendLine(" AND CAMPCODE = 'ZZ'")
+        SQLStrBldr.AppendLine(" AND @P01 BETWEEN STYMD AND ENDYMD")
+
+        '○ 油種テーブルデータ取得
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       ' DataBase接続
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)          ' 計上年月(月初日)
+                    PARA01.Value = Date.Parse(work.WF_SEL_LAST_KEIJYO_YM.Text + "/01")
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+                    End Using
+
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008C  SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+        End Try
+
+        If dt.Rows.Count > 0 Then
+            consumptionTax = dt.Rows(0)("CONSUMPTIONTAX")
+        End If
+
+        Return consumptionTax
+    End Function
+
+    ''' <summary>
+    ''' 税区分取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Function GetTaxKbnByAccount(ByVal AccountCode As String,
+                                         ByVal SegmentCode As String,
+                                         ByVal SegmentBranchCode As String) As String
+
+        Dim taxKbn As String = ""
+
+        'テーブル初期化
+        Dim dt As DataTable = New DataTable
+        dt.Columns.Clear()
+        dt.Clear()
+
+        '〇検索SQL説明
+        '　検索説明
+        '     条件指定に従い該当データを油種マスタから取得する
+        Dim SQLStrBldr As New StringBuilder
+        SQLStrBldr.AppendLine(" SELECT ")
+        SQLStrBldr.AppendLine("     M19.TAXTYPE ")
+        SQLStrBldr.AppendLine(" FROM ")
+        SQLStrBldr.AppendLine("     [oil].OIM0019_ACCOUNT M19 ")
+        SQLStrBldr.AppendLine(" WHERE ")
+        SQLStrBldr.AppendLine("     DELFLG <> @P00 ")
+        SQLStrBldr.AppendLine(" AND @P01 BETWEEN M19.FROMYMD AND M19.ENDYMD ")
+        SQLStrBldr.AppendLine(" AND M19.ACCOUNTCODE = @P02 ")
+        SQLStrBldr.AppendLine(" AND M19.SEGMENTCODE = @P03 ")
+        SQLStrBldr.AppendLine(" AND M19.SEGMENTBRANCHCODE = @P04 ")
+
+        '○ 油種テーブルデータ取得
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       ' DataBase接続
+
+                Using SQLcmd As New SqlCommand(SQLStrBldr.ToString(), SQLcon)
+                    Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   ' 削除フラグ
+                    Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)          ' 計上年月(月初日)
+                    Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 8)   ' 科目コード
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 5)   ' セグメント
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 2)   ' セグメント枝番
+                    PARA00.Value = C_DELETE_FLG.DELETE
+                    PARA01.Value = Date.Parse(work.WF_SEL_LAST_KEIJYO_YM.Text + "/01")
+                    PARA02.Value = AccountCode
+                    PARA03.Value = SegmentCode
+                    PARA04.Value = SegmentBranchCode
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+                    End Using
+
+                    If dt.Rows.Count > 0 Then
+                        '税区分を設定
+                        taxKbn = dt.Rows(0)("TAXTYPE")
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0008C SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0008C  SELECT VIW0001_FIXVALUE(CONSUMPTIONTAX)"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
+        End Try
+
+        Return taxKbn
+
+    End Function
 
     ''' <summary>
     ''' 入力値チェック

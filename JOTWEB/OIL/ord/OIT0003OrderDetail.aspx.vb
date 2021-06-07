@@ -837,7 +837,10 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
 
-            WF_DTAB_CHANGE_NO.Value = "3"
+            '### 20210607 START 輸送完了以上でもタブ<タンク車明細>を初期表示とする対応 #######################
+            WF_DTAB_CHANGE_NO.Value = "2"
+            'WF_DTAB_CHANGE_NO.Value = "3"
+            '### 20210607 END   輸送完了以上でもタブ<タンク車明細>を初期表示とする対応 #######################
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 (一覧)テキストボックスの制御(読取専用)

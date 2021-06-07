@@ -1597,28 +1597,43 @@ Public Class OIT0002LinkList
             Next
             If WW_ERRCODE = "ERR" Then Exit Sub
 
-            ''★タンク車No所属チェック
-            'Dim dtTANKMAS As DataTable = New DataTable
-            'Dim iMatchCnt As Integer = 0
-            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            '    SQLcon.Open()       'DataBase接続
-            '    CMNPTS.SelectTankMaster(SQLcon, "011409", dtTANKMAS, I_OTFLG:=True)
-            'End Using
-            'Dim cvTruckSymbol As String = ""
-            'For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
-            '    If Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL")) = "" Then Continue For
+            '★タンク車No所属チェック
+            Dim dtTANKMAS As DataTable = New DataTable
+            Dim iMatchCnt As Integer = 0
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                CMNPTS.SelectTankMaster(SQLcon, "011409", dtTANKMAS, I_OTFLG:=True)
+            End Using
+            Dim cvTruckSymbol As String = ""
+            For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
+                If Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL")) = "" Then Continue For
+                Try
+                    '★型式が「タキ」、「コタキ」以外はチェック対象外のためSKIP
+                    cvTruckSymbol = StrConv(Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL")), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
+                    If cvTruckSymbol.Substring(0, 2) <> "コタ" AndAlso cvTruckSymbol.Substring(0, 2) <> "タキ" Then
+                        iMatchCnt += 1
+                        Continue For
+                    End If
+                Catch ex As Exception
+                    iMatchCnt += 1
+                    Continue For
+                End Try
 
-            '    '★型式が「タキ」、「コタキ」以外はチェック対象外のためSKIP
-            '    cvTruckSymbol = StrConv(Convert.ToString(OIT0002EXLUProw("TRUCKSYMBOL")), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
-            '    If cvTruckSymbol.Substring(0, 2) <> "コタ" AndAlso cvTruckSymbol.Substring(0, 2) <> "タキ" Then
-            '        iMatchCnt += 1
-            '        Continue For
-            '    End If
-            '    '★設定されたタンク車Noが所属なのかチェック(所属の場合はカウント)
-            '    For Each dtTankMasrow As DataRow In dtTANKMAS.Select(String.Format("TANKNUMBER='{0}'", Convert.ToString(OIT0002EXLUProw("TRUCKNO"))))
-            '        iMatchCnt += 1
-            '    Next
-            'Next
+                '★設定されたタンク車Noが所属なのかチェック(所属の場合はカウント)
+                If dtTANKMAS.Select(String.Format("TANKNUMBER='{0}'", Convert.ToString(OIT0002EXLUProw("TRUCKNO")))).Count <> 0 Then
+                    iMatchCnt += 1
+                Else
+                    '★タンク車が所属外の場合はエラー
+                    Dim Msg As String = ""
+                    Msg = "ポラリスで設定した貨車(車番)が所属外です。再度確認をおねがいします。"
+                    Msg &= "<br>タンク車No(" + Convert.ToString(OIT0002EXLUProw("TRUCKNO")) + ")"
+                    Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, Msg, needsPopUp:=True)
+                    WW_ERRCODE = "ERR"
+
+                    Exit For
+                End If
+            Next
+            If WW_ERRCODE = "ERR" Then Exit Sub
 
             '◯ポラリス投入用の場合
             If useFlg = "4" Then

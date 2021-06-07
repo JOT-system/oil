@@ -1120,7 +1120,8 @@ Public Class CmnParts
               " UNION " _
             & SQLCmnStr _
             & String.Format(" WHERE OIM0005.OWNERCODE = '{0}'", BaseDllConst.CONST_CAMPCODE_11) _
-            & String.Format("    OR OIM0005.LEASECODE = '{0}'", BaseDllConst.CONST_CAMPCODE_11)
+            & String.Format("    OR OIM0005.LEASECODE = '{0}'", BaseDllConst.CONST_CAMPCODE_11) _
+            & String.Format("    OR OIM0005.ORIGINOWNERCODE = '{0}'", BaseDllConst.CONST_CAMPCODE_70)
         End If
 
         Try

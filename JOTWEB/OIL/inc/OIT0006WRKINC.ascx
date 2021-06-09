@@ -149,6 +149,8 @@
     <!-- MAPID退避(受注明細画面への遷移制御のため) -->
     <asp:TextBox ID="WF_SEL_MAPIDBACKUP" runat="server"></asp:TextBox>
 
+    <!-- 回送訂正フラグ -->
+    <asp:TextBox ID="WF_SEL_CORRECTIONFLG" runat="server"></asp:TextBox>
     <!-- 託送指示フラグ -->
     <asp:TextBox ID="WF_SEL_DELIVERYFLG" runat="server"></asp:TextBox>
     <!-- タンク車状況コード -->

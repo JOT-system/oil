@@ -95,6 +95,8 @@ Public Class OIT0006OutOfServiceDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
                             WF_ButtonDELIVERY_Click()
+                        Case "WF_ButtonCORRECTION"            '回送訂正ボタン押下
+                            WF_ButtonCORRECTION_Click()
                         Case "WF_ButtonINSERT"                '回送登録ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"                   '戻るボタン押下
@@ -159,7 +161,7 @@ Public Class OIT0006OutOfServiceDetail
                         Case "btnChkIdoSpecifyOfficeConfirmYes" '確認メッセージはいボタン押下(目的(移動)でタンク車ステータスを更新確認)
                             Me.WW_IDO_TANKNO_FLG = "1"
                             Me.WW_UPBUTTONFLG = "2"
-                        Case "btnChkIdoSpecifyOfficeConfirmNo"  '確認メッセージいいえボタン押下(目的(移動)でタタンク車ステータスを更新確認)
+                        Case "btnChkIdoSpecifyOfficeConfirmNo"  '確認メッセージいいえボタン押下(目的(移動)でタンク車ステータスを更新確認)
                             Me.WW_IDO_TANKNO_FLG = "2"
                             Me.WW_UPBUTTONFLG = "2"
                     End Select
@@ -508,6 +510,9 @@ Public Class OIT0006OutOfServiceDetail
         ''着駅
         'CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
 #End Region
+
+        '回送訂正フラグの初期化
+        work.WF_SEL_CORRECTIONFLG.Text = "0"
 
     End Sub
 
@@ -872,6 +877,16 @@ Public Class OIT0006OutOfServiceDetail
         If WW_UPBUTTONFLG = "0" OrElse WW_UPBUTTONFLG = "2" OrElse WW_UPBUTTONFLG = "3" Then
             '〇タンク車所在の更新
             WW_TankShozaiSet()
+
+        ElseIf WW_UPBUTTONFLG = "4" Then
+            '★回送訂正ボタン押下時
+            For Each OIT0006row As DataRow In OIT0006tbl.Select("OPERATION='on'")
+                'タンク車所在設定(回送訂正時)処理
+                WW_TankShozaiCorrectionSet(OIT0006row)
+
+                '元に戻す(未チェックにする)
+                OIT0006row("OPERATION") = ""
+            Next
         End If
 
     End Sub
@@ -1056,6 +1071,15 @@ Public Class OIT0006OutOfServiceDetail
         '〇 回送進行ステータスの状態を取得
         WW_ScreenKaisouStatusSet()
 
+    End Sub
+
+    ''' <summary>
+    ''' 回送訂正ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCORRECTION_Click()
+        '回送訂正フラグを"1"(有効)
+        work.WF_SEL_CORRECTIONFLG.Text = "1"
     End Sub
 
     ''' <summary>
@@ -1944,6 +1968,14 @@ Public Class OIT0006OutOfServiceDetail
                                 updHeader.Item("TGHSTATIONNAME") = OIT0006GETrow("TGHSTATIONNAME")
                                 updHeader.Item("ARRSTATION") = OIT0006GETrow("ARRSTATION")
                                 updHeader.Item("ARRSTATIONNAME") = OIT0006GETrow("ARRSTATIONNAME")
+
+                                '### START ★訂正時は以下のチェックは設定しない ##############################
+                                If work.WF_SEL_CORRECTIONFLG.Text = "1" Then
+                                    updHeader.Item("OPERATION") = "on"
+                                    Continue For
+                                End If
+                                '### END   ★訂正時は以下のチェックは設定しない ##############################
+
                                 Try
                                     updHeader.Item("ACTUALDEPDATE") = Now.AddDays(Integer.Parse(OIT0006GETrow("DEPDAYS"))).ToString("yyyy/MM/dd")
                                 Catch ex As Exception
@@ -2583,9 +2615,15 @@ Public Class OIT0006OutOfServiceDetail
                     WW_ButtonUPDATE_MEISAI_TAB1()
                 End If
 
-            ElseIf WW_TAB1_SW = "2" Then
+            ElseIf WW_TAB1_SW = "2" AndAlso work.WF_SEL_CORRECTIONFLG.Text = "0" Then
                 '明細更新ボタン押下時
                 WW_ButtonUPDATE_MEISAI_TAB1()
+
+            ElseIf WW_TAB1_SW = "2" AndAlso work.WF_SEL_CORRECTIONFLG.Text = "1" Then
+                '更新フラグ"4"(訂正更新)
+                Me.WW_UPBUTTONFLG = "4"
+                '明細更新ボタン押下時(訂正時)
+                WW_ButtonUPDATE_CORRECTION_TAB1()
 
             End If
 
@@ -2898,6 +2936,32 @@ Public Class OIT0006OutOfServiceDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0006tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 明細更新ボタン(訂正時)押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ButtonUPDATE_CORRECTION_TAB1()
+
+        '○ 関連チェック
+        WW_Check(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            '◯ フラグ初期化
+            Me.WW_UPBUTTONFLG = "5"
+            Exit Sub
+        End If
+
+        '〇 回送明細DB更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UpdateKaisouDetailMeisai(SQLcon)
+        End Using
+
+        '回送訂正フラグの初期化
+        work.WF_SEL_CORRECTIONFLG.Text = "0"
 
     End Sub
 
@@ -3949,8 +4013,24 @@ Public Class OIT0006OutOfServiceDetail
                     & "        ACTUALDEPDATE        = @P04, " _
                     & "        ACTUALARRDATE        = @P05, " _
                     & "        ACTUALACCDATE        = @P06, " _
-                    & "        ACTUALEMPARRDATE     = @P07, " _
-                    & "        UPDYMD               = @P08, " _
+                    & "        ACTUALEMPARRDATE     = @P07, "
+
+            '### ★訂正時のみ更新 START ################################################## 
+            '★回送訂正時は、下記項目も更新対象とする
+            If work.WF_SEL_CORRECTIONFLG.Text = "1" Then
+                '○回送パターン、着駅コード、着駅名, 経由駅コード, 経由駅名
+                SQLStr &=
+                          "        OBJECTIVECODE        = @P13, " _
+                        & "        KAISOUTYPE           = @P14, " _
+                        & "        ARRSTATION           = @P15, " _
+                        & "        ARRSTATIONNAME       = @P16, " _
+                        & "        TGHSTATION           = @P17, " _
+                        & "        TGHSTATIONNAME       = @P18, "
+            End If
+            '### ★訂正時のみ更新 END   ################################################## 
+
+            SQLStr &=
+                      "        UPDYMD               = @P08, " _
                     & "        UPDUSER              = @P09, " _
                     & "        UPDTERMID            = @P10, " _
                     & "        RECEIVEYMD           = @P11  " _
@@ -3969,6 +4049,12 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '着日（実績）
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '受入日（実績）
             Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '返送日（実績）
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)  '目的
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar)  '回送パターン
+            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.NVarChar)  '着駅コード
+            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '着駅名
+            Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", System.Data.SqlDbType.NVarChar)  '経由駅コード
+            Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", System.Data.SqlDbType.NVarChar)  '経由駅名
 
             Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.DateTime)  '更新年月日
             Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
@@ -3976,6 +4062,12 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)  '集信日時
 
             For Each OIT0006row As DataRow In OIT0006tbl.Rows
+                '### ★訂正時のみ更新 START ################################################## 
+                '回送訂正時は、回送パターンを更新された行以外はSKIPする。
+                If work.WF_SEL_CORRECTIONFLG.Text = "1" AndAlso OIT0006row("OPERATION") = "" Then
+                    Continue For
+                End If
+                '### ★訂正時のみ更新 END   ################################################## 
                 PARA01.Value = OIT0006row("KAISOUNO")
                 PARA02.Value = OIT0006row("DETAILNO")
                 PARA03.Value = C_DELETE_FLG.DELETE
@@ -4010,6 +4102,21 @@ Public Class OIT0006OutOfServiceDetail
                 Else
                     PARA07.Value = OIT0006row("ACTUALEMPARRDATE")
                 End If
+
+                '### ★訂正時のみ更新 START ################################################## 
+                '　目的
+                PARA13.Value = OIT0006row("OBJECTIVECODE")
+                '　回送パターン
+                PARA14.Value = OIT0006row("KAISOUTYPE")
+                '　着駅コード
+                PARA15.Value = OIT0006row("ARRSTATION")
+                '　着駅名
+                PARA16.Value = OIT0006row("ARRSTATIONNAME")
+                '　経由駅コード
+                PARA17.Value = OIT0006row("TGHSTATION")
+                '　経由駅名
+                PARA18.Value = OIT0006row("TGHSTATIONNAME")
+                '### ★訂正時のみ更新 END   ################################################## 
 
                 PARA08.Value = Date.Now
                 PARA09.Value = Master.USERID
@@ -4571,6 +4678,10 @@ Public Class OIT0006OutOfServiceDetail
                 OIT0006row("KAISOUINFO") = ""
                 OIT0006row("KAISOUINFONAME") = ""
             End If
+
+            '### START ★訂正時は以下のチェックはSKIP ####################################
+            If work.WF_SEL_CORRECTIONFLG.Text = "1" Then Continue For
+            '### END   ★訂正時は以下のチェックはSKIP ####################################
 
             '★指定したタンク車№が受注オーダー中の場合
             If OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_107 _
@@ -6121,17 +6232,25 @@ Public Class OIT0006OutOfServiceDetail
                     Select Case work.WF_SEL_KAISOUSTATUS.Text
                         '手配完了
                         Case BaseDllConst.CONST_KAISOUSTATUS_250
-                            '(実績)発送日, (実績)受入日を入力可能(読取専用)とする。
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "KAISOUTYPENAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "DEPSTATIONNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
+                            '回送パターン, 着駅名, (実績)発送日を入力可能(読取専用)とする。
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "KAISOUTYPENAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ARRSTATIONNAME") Then
+                                If work.WF_SEL_CORRECTIONFLG.Text = "0" Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+                            End If
+
+                            '(実績)受入日を入力不可とする。
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "DEPSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 'cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             End If
 
-                            '交検日
+                            '交検日を入力不可とする。
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
                                 If loopdr("OBJECTIVECODE") = BaseDllConst.CONST_OBJECTCODE_22 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " class='iconOnly'>")
@@ -6493,6 +6612,47 @@ Public Class OIT0006OutOfServiceDetail
             '### 特になし ###############################################################
 
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車所在設定(回送訂正時)処理
+    ''' </summary>
+    Protected Sub WW_TankShozaiCorrectionSet(ByVal I_DR As DataRow)
+
+        'タンク車状況コード
+        Dim stTankSituation As String = ""
+        Select Case I_DR("OBJECTIVECODE")
+                    '★修理
+            Case BaseDllConst.CONST_OBJECTCODE_20
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_11
+                    '★ＭＣ
+            Case BaseDllConst.CONST_OBJECTCODE_21
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_12
+                    '★交検
+            Case BaseDllConst.CONST_OBJECTCODE_22
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_13
+                    '★全検
+            Case BaseDllConst.CONST_OBJECTCODE_23
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_14
+                    '★留置
+            Case BaseDllConst.CONST_OBJECTCODE_24
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_15
+                    '★留置
+            Case BaseDllConst.CONST_OBJECTCODE_25
+                stTankSituation = BaseDllConst.CONST_TANKSITUATION_08
+        End Select
+
+        '★タンク車所在の更新
+        '引数１：所在地コード　⇒　変更なし(空白)
+        '引数２：タンク車状態　⇒　変更なし(空白)
+        '引数３：積車区分　　　⇒　変更なし(空白)
+        '引数４：タンク車状況　⇒　変更あり(※パターンコードで設定された目的)
+        WW_UpdateTankShozai("", "", "",
+                            I_TANKNO:=I_DR("TANKNO"),
+                            I_SITUATION:=stTankSituation,
+                            I_EmparrDate:=I_DR("ACTUALEMPARRDATE"),
+                            upActualEmparrDate:=True)
 
     End Sub
 
@@ -7025,6 +7185,7 @@ Public Class OIT0006OutOfServiceDetail
                                       Optional ByVal I_OFFICE As String = Nothing,
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_EmparrDate As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False)
 
@@ -7059,19 +7220,24 @@ Public Class OIT0006OutOfServiceDetail
             If Not String.IsNullOrEmpty(I_SITUATION) Then
                 SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
-            '返送日（予定）
-            If upEmparrDate = True Then
-                Dim EmparrDate As String = Me.TxtEmparrDate.Text
-                If EmparrDate = "" Then EmparrDate = Me.TxtAccDate.Text
-                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", EmparrDate)
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            '返送日（予定）返送日（実績）
+            If upEmparrDate = True OrElse upActualEmparrDate = True Then
+                SQLStr &= "        EMPARRDATE         = @P03, "
+                SQLStr &= "        ACTUALEMPARRDATE   = @P04, "
             End If
-            '返送日（実績）
-            If upActualEmparrDate = True Then
-                Dim ActualEmparrDate As String = Me.TxtActualEmparrDate.Text
-                If ActualEmparrDate = "" Then ActualEmparrDate = Me.TxtActualAccDate.Text
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", ActualEmparrDate)
-            End If
+            ''返送日（予定）
+            'If upEmparrDate = True Then
+            '    Dim EmparrDate As String = Me.TxtEmparrDate.Text
+            '    If EmparrDate = "" Then EmparrDate = Me.TxtAccDate.Text
+            '    SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", EmparrDate)
+            '    SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            'End If
+            ''返送日（実績）
+            'If upActualEmparrDate = True Then
+            '    Dim ActualEmparrDate As String = Me.TxtActualEmparrDate.Text
+            '    If ActualEmparrDate = "" Then ActualEmparrDate = Me.TxtActualAccDate.Text
+            '    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", ActualEmparrDate)
+            'End If
 
             SQLStr &=
                       "        UPDYMD       = @P11, " _
@@ -7086,6 +7252,8 @@ Public Class OIT0006OutOfServiceDetail
 
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.Date)      '空車着日（予定）
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '空車着日（実績）
 
             Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
             Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
@@ -7093,6 +7261,13 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
 
             PARA02.Value = C_DELETE_FLG.DELETE
+            If I_EmparrDate <> "" Then
+                PARA03.Value = I_EmparrDate
+                PARA04.Value = I_EmparrDate
+            Else
+                PARA03.Value = DBNull.Value
+                PARA04.Value = DBNull.Value
+            End If
 
             PARA11.Value = Date.Now
             PARA12.Value = Master.USERID

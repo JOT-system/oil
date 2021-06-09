@@ -300,7 +300,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TANKCARTOTAL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_REPAIR コントロール。
     '''</summary>
@@ -309,7 +309,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_REPAIR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_MC コントロール。
     '''</summary>
@@ -318,7 +318,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MC As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INSPECTION コントロール。
     '''</summary>
@@ -327,7 +327,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INSPECTION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ALLINSPECTION コントロール。
     '''</summary>
@@ -336,7 +336,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ALLINSPECTION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INDWELLING コントロール。
     '''</summary>
@@ -345,7 +345,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INDWELLING As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_MOVE コントロール。
     '''</summary>
@@ -354,7 +354,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MOVE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DEPDATE コントロール。
     '''</summary>
@@ -606,7 +606,16 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MAPIDBACKUP As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_CORRECTIONFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CORRECTIONFLG As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DELIVERYFLG コントロール。
     '''</summary>

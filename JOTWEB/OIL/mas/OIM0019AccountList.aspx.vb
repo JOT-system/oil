@@ -1,4 +1,16 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 勘定科目マスタメンテ一覧画面
+' 作成日 2021/01/25
+' 更新日 2021/06/07
+' 作成者 JOT伊草
+' 更新者 JOT伊草
+'
+' 修正履歴:2021/01/25 新規作成
+' 　　　　:2021/06/07 1)登録・更新画面にて更新メッセージが設定された場合
+'         :             画面下部に更新メッセージを表示するように修正
+' 　　　　:           2)項目「税区分」を追加
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIM0019AccountList
@@ -151,6 +163,12 @@ Public Class OIM0019AccountList
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
+        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        End If
+
     End Sub
 
     ''' <summary>
@@ -202,7 +220,7 @@ Public Class OIM0019AccountList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -258,6 +276,8 @@ Public Class OIM0019AccountList
             & " , ISNULL(RTRIM(OIM0019.SEGMENTBRANCHNAME), '')              AS SEGMENTBRANCHNAME " _
             & " , ISNULL(RTRIM(OIM0019.ACCOUNTTYPE), '')                    AS ACCOUNTTYPE " _
             & " , ISNULL(RTRIM(OIM0019.ACCOUNTTYPENAME), '')                AS ACCOUNTTYPENAME " _
+            & " , ISNULL(RTRIM(OIM0019.TAXTYPE), '')                        AS TAXTYPE " _
+            & " , ''　　　　　　　　　　　　　　　　                        AS TAXTYPENAME " _
             & " FROM OIL.OIM0019_ACCOUNT OIM0019 " _
             & " WHERE OIM0019.DELFLG <> @P1 "
 
@@ -357,6 +377,10 @@ Public Class OIM0019AccountList
                 For Each OIM0019row As DataRow In OIM0019tbl.Rows
                     i += 1
                     OIM0019row("LINECNT") = i        'LINECNT
+
+                    '名称取得
+                    '〇税区分
+                    CODENAME_get("TAXTYPE", OIM0019row("TAXTYPE"), OIM0019row("TAXTYPENAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -434,7 +458,7 @@ Public Class OIM0019AccountList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -491,8 +515,14 @@ Public Class OIM0019AccountList
         '科目区分名
         work.WF_SEL_ACCOUNTTYPENAME.Text = ""
 
+        '税区分
+        work.WF_SEL_TAXTYPE.Text = ""
+
         '削除
         work.WF_SEL_DELFLG.Text = "0"
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -580,7 +610,6 @@ Public Class OIM0019AccountList
 
     End Sub
 
-
     ''' <summary>
     ''' 勘定科目マスタ登録更新
     ''' </summary>
@@ -614,6 +643,7 @@ Public Class OIM0019AccountList
             & "        , SEGMENTBRANCHNAME = @P08 " _
             & "        , ACCOUNTTYPE       = @P09 " _
             & "        , ACCOUNTTYPENAME   = @P10 " _
+            & "        , TAXTYPE           = @P18 " _
             & "        , UPDYMD            = @P14" _
             & "        , UPDUSER           = @P15" _
             & "        , UPDTERMID         = @P16" _
@@ -637,6 +667,7 @@ Public Class OIM0019AccountList
             & "        , SEGMENTBRANCHNAME" _
             & "        , ACCOUNTTYPE" _
             & "        , ACCOUNTTYPENAME" _
+            & "        , TAXTYPE" _
             & "        , INITYMD" _
             & "        , INITUSER" _
             & "        , INITTERMID" _
@@ -656,6 +687,7 @@ Public Class OIM0019AccountList
             & "        , @P08" _
             & "        , @P09" _
             & "        , @P10" _
+            & "        , @P18" _
             & "        , @P11" _
             & "        , @P12" _
             & "        , @P13" _
@@ -680,6 +712,7 @@ Public Class OIM0019AccountList
             & "    , SEGMENTBRANCHNAME" _
             & "    , ACCOUNTTYPE" _
             & "    , ACCOUNTTYPENAME" _
+            & "    , TAXTYPE" _
             & "    , INITYMD" _
             & "    , INITUSER" _
             & "    , INITTERMID" _
@@ -710,6 +743,7 @@ Public Class OIM0019AccountList
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40)  'セグメント枝番名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 2)   '科目区分
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40)  '科目区分名
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 1)   '税区分
 
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.DateTime)      '登録年月日
                 Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 20)  '登録ユーザーＩＤ
@@ -729,6 +763,7 @@ Public Class OIM0019AccountList
                     If Trim(OIM0019row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                         Trim(OIM0019row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
                         Trim(OIM0019row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
+
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
@@ -744,6 +779,7 @@ Public Class OIM0019AccountList
                         PARA08.Value = OIM0019row("SEGMENTBRANCHNAME")
                         PARA09.Value = OIM0019row("ACCOUNTTYPE")
                         PARA10.Value = OIM0019row("ACCOUNTTYPENAME")
+                        PARA18.Value = OIM0019row("TAXTYPE")
 
                         PARA11.Value = WW_DATENOW
                         PARA12.Value = Master.USERID
@@ -813,7 +849,6 @@ Public Class OIM0019AccountList
 
     End Sub
 
-
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
@@ -872,7 +907,6 @@ Public Class OIM0019AccountList
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -882,7 +916,6 @@ Public Class OIM0019AccountList
         Master.TransitionPrevPage()
 
     End Sub
-
 
     ''' <summary>
     ''' 先頭頁ボタン押下時処理
@@ -916,7 +949,6 @@ Public Class OIM0019AccountList
         TBLview = Nothing
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  一覧表示(GridView)関連操作                                            ***
@@ -974,8 +1006,14 @@ Public Class OIM0019AccountList
         '科目区分名
         work.WF_SEL_ACCOUNTTYPENAME.Text = OIM0019tbl.Rows(WW_LINECNT)("ACCOUNTTYPENAME")
 
+        '税区分
+        work.WF_SEL_TAXTYPE.Text = OIM0019tbl.Rows(WW_LINECNT)("TAXTYPE")
+
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIM0019tbl.Rows(WW_LINECNT)("DELFLG")
+
+        '詳細画面更新メッセージ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
 
         '○ 状態をクリア
         For Each OIM0019row As DataRow In OIM0019tbl.Rows
@@ -1033,7 +1071,6 @@ Public Class OIM0019AccountList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
-
 
     ''' <summary>
     ''' ファイルアップロード時処理
@@ -1115,7 +1152,10 @@ Public Class OIM0019AccountList
                         XLSTBLrow("ACCOUNTCODE") = OIM0019row("ACCOUNTCODE") AndAlso
                         XLSTBLrow("SEGMENTCODE") = OIM0019row("SEGMENTCODE") AndAlso
                         XLSTBLrow("SEGMENTBRANCHCODE") = OIM0019row("SEGMENTBRANCHCODE") Then
+
                         OIM0019INProw.ItemArray = OIM0019row.ItemArray
+
+                        OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         Exit For
                     End If
                 Next
@@ -1124,57 +1164,65 @@ Public Class OIM0019AccountList
             '○ 項目セット
             '適用開始年月日
             If WW_COLUMNS.IndexOf("FROMYMD") >= 0 Then
-                OIM0019INProw("FROMYMD ") = XLSTBLrow("FROMYMD")
+                OIM0019INProw("FROMYMD") = XLSTBLrow("FROMYMD")
             End If
 
             '適用終了年月日
             If WW_COLUMNS.IndexOf("ENDYMD") >= 0 Then
-                OIM0019INProw("ENDYMD ") = XLSTBLrow("ENDYMD")
+                OIM0019INProw("ENDYMD") = XLSTBLrow("ENDYMD")
             End If
 
             '科目コード
             If WW_COLUMNS.IndexOf("ACCOUNTCODE") >= 0 Then
-                OIM0019INProw("ACCOUNTCODE ") = XLSTBLrow("ACCOUNTCODE")
+                OIM0019INProw("ACCOUNTCODE") = XLSTBLrow("ACCOUNTCODE")
             End If
 
             '科目名
             If WW_COLUMNS.IndexOf("ACCOUNTNAME") >= 0 Then
-                OIM0019INProw("ACCOUNTNAME ") = XLSTBLrow("ACCOUNTNAME")
+                OIM0019INProw("ACCOUNTNAME") = XLSTBLrow("ACCOUNTNAME")
             End If
 
             'セグメント
             If WW_COLUMNS.IndexOf("SEGMENTCODE") >= 0 Then
-                OIM0019INProw("SEGMENTCODE ") = XLSTBLrow("SEGMENTCODE")
+                OIM0019INProw("SEGMENTCODE") = XLSTBLrow("SEGMENTCODE")
             End If
 
             'セグメント名
             If WW_COLUMNS.IndexOf("SEGMENTNAME") >= 0 Then
-                OIM0019INProw("SEGMENTNAME ") = XLSTBLrow("SEGMENTNAME")
+                OIM0019INProw("SEGMENTNAME") = XLSTBLrow("SEGMENTNAME")
             End If
 
             'セグメント枝番
             If WW_COLUMNS.IndexOf("SEGMENTBRANCHCODE") >= 0 Then
-                OIM0019INProw("SEGMENTBRANCHCODE ") = XLSTBLrow("SEGMENTBRANCHCODE")
+                OIM0019INProw("SEGMENTBRANCHCODE") = XLSTBLrow("SEGMENTBRANCHCODE")
             End If
 
             'セグメント枝番名
             If WW_COLUMNS.IndexOf("SEGMENTBRANCHNAME") >= 0 Then
-                OIM0019INProw("SEGMENTBRANCHNAME ") = XLSTBLrow("SEGMENTBRANCHNAME")
+                OIM0019INProw("SEGMENTBRANCHNAME") = XLSTBLrow("SEGMENTBRANCHNAME")
             End If
 
             '科目区分
             If WW_COLUMNS.IndexOf("ACCOUNTTYPE") >= 0 Then
-                OIM0019INProw("ACCOUNTTYPE ") = XLSTBLrow("ACCOUNTTYPE")
+                OIM0019INProw("ACCOUNTTYPE") = XLSTBLrow("ACCOUNTTYPE")
             End If
 
             '科目区分名
             If WW_COLUMNS.IndexOf("ACCOUNTTYPENAME") >= 0 Then
-                OIM0019INProw("ACCOUNTTYPENAME ") = XLSTBLrow("ACCOUNTTYPENAME")
+                OIM0019INProw("ACCOUNTTYPENAME") = XLSTBLrow("ACCOUNTTYPENAME")
+            End If
+
+            '税区分
+            If WW_COLUMNS.IndexOf("TAXTYPE") >= 0 Then
+                OIM0019INProw("TAXTYPE") = XLSTBLrow("TAXTYPE")
+
+                '名称
+                CODENAME_get("TAXTYPE", OIM0019INProw("TAXTYPE"), OIM0019INProw("TAXTYPENAME"), WW_DUMMY)
             End If
 
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-                OIM0019INProw("DELFLG ") = XLSTBLrow("DELFLG")
+                OIM0019INProw("DELFLG") = XLSTBLrow("DELFLG")
             Else
                 OIM0019INProw("DELFLG") = "0"
             End If
@@ -1268,7 +1316,6 @@ Public Class OIM0019AccountList
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1381,7 +1428,7 @@ Public Class OIM0019AccountList
 
             '科目コード（バリデーションチェック）
             WW_TEXT = OIM0019INProw("ACCOUNTCODE")
-            Master.CheckField(work.WF_SEL_ACCOUNTCODE.Text, "ACCOUNTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(科目コードエラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1392,7 +1439,7 @@ Public Class OIM0019AccountList
 
             '科目名（バリデーションチェック）
             WW_TEXT = OIM0019INProw("ACCOUNTNAME")
-            Master.CheckField(work.WF_SEL_ACCOUNTNAME.Text, "ACCOUNTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(科目名エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1403,7 +1450,7 @@ Public Class OIM0019AccountList
 
             'セグメント（バリデーションチェック）
             WW_TEXT = OIM0019INProw("SEGMENTCODE")
-            Master.CheckField(work.WF_SEL_SEGMENTCODE.Text, "SEGMENTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "SEGMENTCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(セグメントエラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1414,7 +1461,7 @@ Public Class OIM0019AccountList
 
             'セグメント名（バリデーションチェック）
             WW_TEXT = OIM0019INProw("SEGMENTNAME")
-            Master.CheckField(work.WF_SEL_SEGMENTNAME.Text, "SEGMENTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "SEGMENTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(セグメント名エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1425,7 +1472,7 @@ Public Class OIM0019AccountList
 
             'セグメント枝番（バリデーションチェック）
             WW_TEXT = OIM0019INProw("SEGMENTBRANCHCODE")
-            Master.CheckField(work.WF_SEL_SEGMENTBRANCHCODE.Text, "SEGMENTBRANCHCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "SEGMENTBRANCHCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(セグメント枝番エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1436,7 +1483,7 @@ Public Class OIM0019AccountList
 
             'セグメント枝番名（バリデーションチェック）
             WW_TEXT = OIM0019INProw("SEGMENTBRANCHNAME")
-            Master.CheckField(work.WF_SEL_SEGMENTBRANCHNAME.Text, "SEGMENTBRANCHNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "SEGMENTBRANCHNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(セグメント枝番名エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1447,7 +1494,7 @@ Public Class OIM0019AccountList
 
             '科目区分（バリデーションチェック）
             WW_TEXT = OIM0019INProw("ACCOUNTTYPE")
-            Master.CheckField(work.WF_SEL_ACCOUNTTYPE.Text, "ACCOUNTTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(科目区分エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1458,9 +1505,29 @@ Public Class OIM0019AccountList
 
             '科目区分名（バリデーションチェック）
             WW_TEXT = OIM0019INProw("ACCOUNTTYPENAME")
-            Master.CheckField(work.WF_SEL_ACCOUNTTYPENAME.Text, "ACCOUNTTYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTTYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(科目区分名エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0019INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '税区分（バリデーションチェック）
+            WW_TEXT = OIM0019INProw("TAXTYPE")
+            Master.CheckField(Master.USERCAMP, "TAXTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                CODENAME_get("TAXTYPE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(税区分エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0019INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(税区分エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0019INProw)
                 WW_LINE_ERR = "ERR"
@@ -1547,6 +1614,7 @@ Public Class OIM0019AccountList
             WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント枝番名 =" & OIM0019row("SEGMENTBRANCHNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 科目区分 =" & OIM0019row("ACCOUNTTYPE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 科目区分名 =" & OIM0019row("ACCOUNTTYPENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 税区分 =" & OIM0019row("TAXTYPE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0019row("DELFLG")
         End If
 
@@ -1610,6 +1678,7 @@ Public Class OIM0019AccountList
                         OIM0019row("SEGMENTBRANCHNAME") = OIM0019INProw("SEGMENTBRANCHNAME") AndAlso
                         OIM0019row("ACCOUNTTYPE") = OIM0019INProw("ACCOUNTTYPE") AndAlso
                         OIM0019row("ACCOUNTTYPENAME") = OIM0019INProw("ACCOUNTTYPENAME") AndAlso
+                        OIM0019row("TAXTYPE") = OIM0019INProw("TAXTYPE") AndAlso
                         OIM0019row("DELFLG") = OIM0019INProw("DELFLG") Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
@@ -1753,6 +1822,10 @@ Public Class OIM0019AccountList
                     '削除
                     prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TAXTYPE"
+                    '税区分
+                    prmData = work.CreateFIXParam("ZZ", "TAXTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

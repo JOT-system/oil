@@ -874,7 +874,6 @@ Public Class OIT0008CostManagement
 
     End Sub
 
-
     ''' <summary>
     ''' 費用管理ワークテーブルの更新(DB処理)
     ''' </summary>
@@ -2496,6 +2495,7 @@ Public Class OIT0008CostManagement
         InsBldr.AppendLine(" AND TMP0008.PAYEECODE          IS NOT NULL")
         InsBldr.AppendLine(" AND (TMP0008.INVOICECODE <> '' OR TMP0008.PAYEECODE <> '')")
         InsBldr.AppendLine(" AND TMP0008.SHIPPERSCODE       IS NOT NULL")
+        InsBldr.AppendLine(" AND TMP0008.AMOUNT <> 0")
         InsBldr.AppendLine(" ORDER BY")
         InsBldr.AppendLine("     TMP0008.LINE")
 
@@ -3784,6 +3784,11 @@ Public Class OIT0008CostManagement
 
             '計算科目=1:自動計算は摘要以外スキップ
             If OIT0008INProw("CALCACCOUNT") = "1" Then
+                Continue For
+            End If
+
+            '金額が0のレコードは摘要以外スキップ 
+            If OIT0008INProw("AMOUNT") = 0 Then
                 Continue For
             End If
 

@@ -1628,24 +1628,8 @@ Public Class OIT0008CostDetailCreate
 
         '行コピー
         For Each TMP0009row In TMP0009tbl.Rows
-            '明細入力欄が全て未設定の場合はスキップ
-            If String.IsNullOrEmpty(TMP0009row("TRKBN")) AndAlso
-                String.IsNullOrEmpty(TMP0009row("TRKBNNAME")) AndAlso
-                String.IsNullOrEmpty(TMP0009row("POSTOFFICECODE")) AndAlso
-                String.IsNullOrEmpty(TMP0009row("POSTOFFICENAME")) AndAlso
-                String.IsNullOrEmpty(TMP0009row("CONSIGNEECODE")) AndAlso
-                String.IsNullOrEmpty(TMP0009row("CONSIGNEENAME")) AndAlso
-                TMP0009row("AMOUNT") = 0 AndAlso
-                TMP0009row("TAX") = 0 AndAlso
-                String.IsNullOrEmpty(TMP0009row("TEKIYOU")) Then
-                'String.IsNullOrEmpty(TMP0009row("OILCODE")) AndAlso
-                'String.IsNullOrEmpty(TMP0009row("OILNAME")) AndAlso
-                'String.IsNullOrEmpty(TMP0009row("ORDERINGTYPE")) AndAlso
-                'String.IsNullOrEmpty(TMP0009row("ORDERINGOILNAME")) AndAlso
-                'TMP0009row("CARSAMOUNT") = 0 AndAlso
-                'TMP0009row("CARSNUMBER") = 0 AndAlso
-                'TMP0009row("LOADAMOUNT") = 0 AndAlso
-                'TMP0009row("UNITPRICE") = 0 AndAlso
+            '金額欄が未入力又は0の行はスキップ
+            If String.IsNullOrEmpty(TMP0009row("AMOUNT")) OrElse TMP0009row("AMOUNT") = 0 Then
                 Continue For
             End If
 

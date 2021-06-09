@@ -1,4 +1,19 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 勘定科目マスタメンテ登録画面
+' 作成日 2021/01/25
+' 更新日 2021/06/07
+' 作成者 JOT伊草
+' 更新者 JOT伊草
+'
+' 修正履歴:2021/01/25 新規作成
+'         :2021/06/07 1)表更新→更新、クリア→戻る、に名称変更
+'                     2)戻るボタン押下時、確認ダイアログ表示→
+'                       確認ダイアログでOK押下時、一覧画面に戻るように修正
+'                     3)更新ボタン押下時、この画面でDB更新→
+'                       一覧画面の表示データに更新後の内容反映して戻るように修正
+'                     4)項目「税区分」を追加
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -52,9 +67,9 @@ Public Class OIM0019AccountCreate
                     Master.RecoverTable(OIM0019tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_UPDATE"                '表更新ボタン押下
+                        Case "WF_UPDATE"                '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
+                        Case "WF_CLEAR"                 '戻るボタン押下
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -70,6 +85,8 @@ Public Class OIM0019AccountCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -190,6 +207,10 @@ Public Class OIM0019AccountCreate
         '科目区分名
         WF_ACCOUNTTYPENAME.Text = work.WF_SEL_ACCOUNTTYPENAME.Text
 
+        '税区分
+        WF_TAXTYPE.Text = work.WF_SEL_TAXTYPE.Text
+        CODENAME_get("TAXTYPE", WF_TAXTYPE.Text, WF_TAXTYPE_TEXT.Text, WW_RTN_SW)
+
         '削除フラグ
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
@@ -279,10 +300,236 @@ Public Class OIM0019AccountCreate
     End Sub
 
     ''' <summary>
-    ''' 一覧画面-マウスホイール時処理
+    ''' 勘定科目マスタ登録更新
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub WF_Grid_Scroll()
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0019_ACCOUNT" _
+            & "    WHERE" _
+            & "        FROMYMD             = @P01 " _
+            & "    AND ENDYMD              = @P02 " _
+            & "    AND ACCOUNTCODE         = @P03 " _
+            & "    AND SEGMENTCODE         = @P05 " _
+            & "    AND SEGMENTBRANCHCODE   = @P07 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0019_ACCOUNT" _
+            & "    SET" _
+            & "        DELFLG              = @P00" _
+            & "        , ACCOUNTNAME       = @P04 " _
+            & "        , SEGMENTNAME       = @P06 " _
+            & "        , SEGMENTBRANCHNAME = @P08 " _
+            & "        , ACCOUNTTYPE       = @P09 " _
+            & "        , ACCOUNTTYPENAME   = @P10 " _
+            & "        , TAXTYPE           = @P18 " _
+            & "        , UPDYMD            = @P14" _
+            & "        , UPDUSER           = @P15" _
+            & "        , UPDTERMID         = @P16" _
+            & "        , RECEIVEYMD        = @P17" _
+            & "    WHERE" _
+            & "        FROMYMD             = @P01 " _
+            & "    AND ENDYMD              = @P02 " _
+            & "    AND ACCOUNTCODE         = @P03 " _
+            & "    AND SEGMENTCODE         = @P05 " _
+            & "    AND SEGMENTBRANCHCODE   = @P07 ;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0019_ACCOUNT" _
+            & "        (DELFLG" _
+            & "        , FROMYMD" _
+            & "        , ENDYMD" _
+            & "        , ACCOUNTCODE" _
+            & "        , ACCOUNTNAME" _
+            & "        , SEGMENTCODE" _
+            & "        , SEGMENTNAME" _
+            & "        , SEGMENTBRANCHCODE" _
+            & "        , SEGMENTBRANCHNAME" _
+            & "        , ACCOUNTTYPE" _
+            & "        , ACCOUNTTYPENAME" _
+            & "        , TAXTYPE" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        (@P00" _
+            & "        , @P01" _
+            & "        , @P02" _
+            & "        , @P03" _
+            & "        , @P04" _
+            & "        , @P05" _
+            & "        , @P06" _
+            & "        , @P07" _
+            & "        , @P08" _
+            & "        , @P09" _
+            & "        , @P10" _
+            & "        , @P18" _
+            & "        , @P11" _
+            & "        , @P12" _
+            & "        , @P13" _
+            & "        , @P14" _
+            & "        , @P15" _
+            & "        , @P16" _
+            & "        , @P17) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " Select" _
+            & "    DELFLG" _
+            & "    , FROMYMD" _
+            & "    , ENDYMD" _
+            & "    , ACCOUNTCODE" _
+            & "    , ACCOUNTNAME" _
+            & "    , SEGMENTCODE" _
+            & "    , SEGMENTNAME" _
+            & "    , SEGMENTBRANCHCODE" _
+            & "    , SEGMENTBRANCHNAME" _
+            & "    , ACCOUNTTYPE" _
+            & "    , ACCOUNTTYPENAME" _
+            & "    , TAXTYPE" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "    OIL.OIM0019_ACCOUNT" _
+            & " WHERE" _
+            & "     FROMYMD           = @P01 " _
+            & " AND ENDYMD            = @P02 " _
+            & " AND ACCOUNTCODE       = @P03 " _
+            & " AND SEGMENTCODE       = @P05 " _
+            & " AND SEGMENTBRANCHCODE = @P07 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)          '適用開始年月日
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)          '適用終了年月日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   '科目コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 40)  '科目名
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 5)   'セグメント
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 40)  'セグメント名
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 2)   'セグメント枝番
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40)  'セグメント枝番名
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 2)   '科目区分
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40)  '科目区分名
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 1)   '税区分
+
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.DateTime)      '登録年月日
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 20)  '登録ユーザーＩＤ
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 20)  '登録端末
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.DateTime)      '更新年月日
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)  '更新ユーザーＩＤ
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 20)  '更新端末
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.DateTime)      '集信日時
+
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.Date)         '適用開始年月日
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.Date)         '適用終了年月日
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 8)  '科目コード
+                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 5)  'セグメント
+                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.NVarChar, 2)  'セグメント枝番
+
+                Dim OIM0019row As DataRow = OIM0019INPtbl.Rows(0)
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA00.Value = OIM0019row("DELFLG")
+
+                PARA01.Value = OIM0019row("FROMYMD")
+                PARA02.Value = OIM0019row("ENDYMD")
+                PARA03.Value = OIM0019row("ACCOUNTCODE")
+                PARA04.Value = OIM0019row("ACCOUNTNAME")
+                PARA05.Value = OIM0019row("SEGMENTCODE")
+                PARA06.Value = OIM0019row("SEGMENTNAME")
+                PARA07.Value = OIM0019row("SEGMENTBRANCHCODE")
+                PARA08.Value = OIM0019row("SEGMENTBRANCHNAME")
+                PARA09.Value = OIM0019row("ACCOUNTTYPE")
+                PARA10.Value = OIM0019row("ACCOUNTTYPENAME")
+                PARA18.Value = OIM0019row("TAXTYPE")
+
+                PARA11.Value = WW_DATENOW
+                PARA12.Value = Master.USERID
+                PARA13.Value = Master.USERTERMID
+                PARA14.Value = WW_DATENOW
+                PARA15.Value = Master.USERID
+                PARA16.Value = Master.USERTERMID
+                PARA17.Value = C_DEFAULT_YMD
+
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIM0019row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA01.Value = OIM0019row("FROMYMD")
+                JPARA02.Value = OIM0019row("ENDYMD")
+                JPARA03.Value = OIM0019row("ACCOUNTCODE")
+                JPARA05.Value = OIM0019row("SEGMENTCODE")
+                JPARA07.Value = OIM0019row("SEGMENTBRANCHCODE")
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0019UPDtbl) Then
+                        OIM0019UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0019UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0019UPDtbl.Clear()
+                    OIM0019UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0019UPDrow As DataRow In OIM0019UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0019L"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIM0019UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0019L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0019L UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -291,7 +538,7 @@ Public Class OIM0019AccountCreate
     ' ******************************************************************************
 
     ''' <summary>
-    ''' 詳細画面-表更新ボタン押下時処理
+    ''' 詳細画面-更新ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_UPDATE_Click()
@@ -311,6 +558,11 @@ Public Class OIM0019AccountCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0019tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
@@ -413,19 +665,74 @@ Public Class OIM0019AccountCreate
         OIM0019INProw("SEGMENTBRANCHNAME") = WF_SEGMENTBRANCHNAME.Text  'セグメント枝番名
         OIM0019INProw("ACCOUNTTYPE") = WF_ACCOUNTTYPE.Text              '科目区分
         OIM0019INProw("ACCOUNTTYPENAME") = WF_ACCOUNTTYPENAME.Text      '科目区分名
+        OIM0019INProw("TAXTYPE") = WF_TAXTYPE.Text                      '税区分
         OIM0019INProw("DELFLG") = WF_DELFLG.Text                        '削除フラグ
+
+        '○ 名称取得
+        '税区分名
+        CODENAME_get("TAXTYPE", OIM0019INProw("TAXTYPE"), OIM0019INProw("TAXTYPENAME"), WW_DUMMY)
 
         '○ チェック用テーブルに登録する
         OIM0019INPtbl.Rows.Add(OIM0019INProw)
 
     End Sub
 
-
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0019INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIM0019INProw As DataRow = OIM0019INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIM0019row As DataRow In OIM0019tbl.Rows
+            'KEY項目が等しい時
+            If OIM0019row("FROMYMD") = OIM0019INProw("FROMYMD") AndAlso
+                OIM0019row("ENDYMD") = OIM0019INProw("ENDYMD") AndAlso
+                OIM0019row("ACCOUNTCODE") = OIM0019INProw("ACCOUNTCODE") AndAlso
+                OIM0019row("SEGMENTCODE") = OIM0019INProw("SEGMENTCODE") AndAlso
+                OIM0019row("SEGMENTBRANCHCODE") = OIM0019INProw("SEGMENTBRANCHCODE") Then
+
+                ' KEY項目以外の項目の差異をチェック
+                If OIM0019row("ACCOUNTNAME") = OIM0019INProw("ACCOUNTNAME") AndAlso
+                    OIM0019row("SEGMENTNAME") = OIM0019INProw("SEGMENTNAME") AndAlso
+                    OIM0019row("SEGMENTBRANCHNAME") = OIM0019INProw("SEGMENTBRANCHNAME") AndAlso
+                    OIM0019row("ACCOUNTTYPE") = OIM0019INProw("ACCOUNTTYPE") AndAlso
+                    OIM0019row("ACCOUNTTYPENAME") = OIM0019INProw("ACCOUNTTYPENAME") AndAlso
+                    OIM0019row("DELFLG") = OIM0019INProw("DELFLG") Then
+                    '変更がない場合、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面-戻るボタン押下時、確認ダイアログOKボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -438,7 +745,7 @@ Public Class OIM0019AccountCreate
         WF_FIELD_REP.Value = ""
         WF_LeftboxOpen.Value = ""
 
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(Master.USERCAMP)
 
     End Sub
 
@@ -488,9 +795,9 @@ Public Class OIM0019AccountCreate
         WF_SEGMENTBRANCHNAME.Text = ""  'セグメント枝番名
         WF_ACCOUNTTYPE.Text = ""        '科目区分
         WF_ACCOUNTTYPENAME.Text = ""    '科目区分名
+        WF_TAXTYPE.Text = ""            '税区分
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -550,13 +857,21 @@ Public Class OIM0019AccountCreate
                                 '科目区分
                                 WW_FIXCODE = "ACCOUNTTYPE"
 
+                            Case WF_TAXTYPE.ID
+                                '税区分
+                                WW_FIXCODE = "TAXTYPE"
+
                             Case WF_DELFLG.ID
                                 '削除フラグ
                                 WW_FIXCODE = "DELFLG"
 
                         End Select
 
-                        prmData = work.CreateFIXParam(Master.USERCAMP, WW_FIXCODE)
+                        If WF_FIELD.Value.Equals(WF_TAXTYPE.ID) Then
+                            prmData = work.CreateFIXParam("ZZ", WW_FIXCODE)
+                        Else
+                            prmData = work.CreateFIXParam(Master.USERCAMP, WW_FIXCODE)
+                        End If
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
                 End Select
@@ -605,6 +920,10 @@ Public Class OIM0019AccountCreate
                     WF_ACCOUNTTYPENAME.Text = WW_NAME
                 End If
 
+            Case WF_TAXTYPE.ID
+                '税区分
+                CODENAME_get("TAXTYPE", WF_TAXTYPE.Text, WF_TAXTYPE_TEXT.Text, WW_RTN_SW)
+
         End Select
 
         '○ メッセージ表示
@@ -613,7 +932,6 @@ Public Class OIM0019AccountCreate
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
@@ -691,6 +1009,12 @@ Public Class OIM0019AccountCreate
                     WF_ACCOUNTTYPENAME.Text = WW_SelectText
                     WF_ACCOUNTTYPE.Focus()
 
+                Case WF_TAXTYPE.ID
+                    '税区分
+                    WF_TAXTYPE.Text = WW_SelectValue
+                    WF_TAXTYPE_TEXT.Text = WW_SelectText
+                    WF_TAXTYPE.Focus()
+
             End Select
         Else
         End If
@@ -729,6 +1053,10 @@ Public Class OIM0019AccountCreate
                     '科目区分
                     WF_ACCOUNTTYPE.Focus()
 
+                Case WF_TAXTYPE.ID
+                    '税区分
+                    WF_TAXTYPE.Focus()
+
             End Select
         Else
         End If
@@ -740,7 +1068,6 @@ Public Class OIM0019AccountCreate
         WF_RightboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -978,6 +1305,26 @@ Public Class OIM0019AccountCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            '税区分（バリデーションチェック）
+            WW_TEXT = OIM0019INProw("TAXTYPE")
+            Master.CheckField(Master.USERCAMP, "TAXTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                CODENAME_get("TAXTYPE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(税区分エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0019INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(税区分エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0019INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             '一意制約チェック
             'プライマリキーの項目エラーがある場合、又は同一レコードの更新の場合、チェック対象外
             If WW_PKEY_ERR.Equals("ERR") OrElse
@@ -1089,13 +1436,13 @@ Public Class OIM0019AccountCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> セグメント枝番名 =" & OIM0019row("SEGMENTBRANCHNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 科目区分 =" & OIM0019row("ACCOUNTTYPE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 科目区分名 =" & OIM0019row("ACCOUNTTYPENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 税区分 =" & OIM0019row("TAXTYPE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0019row("DELFLG")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
-
 
     ''' <summary>
     ''' OIM0019tbl更新
@@ -1158,23 +1505,78 @@ Public Class OIM0019AccountCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIM0019INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIM0019INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIM0019INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIM0019INProw As DataRow In OIM0019INPtbl.Rows
-            Select Case OIM0019INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0019INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0019INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0019INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0019INProw)
-            End Select
+
+            '発見フラグ
+            Dim isFound As Boolean = False
+
+            For Each OIM0019row As DataRow In OIM0019tbl.Rows
+
+                '同一レコードか判定
+                If OIM0019row("FROMYMD") = OIM0019INProw("FROMYMD") AndAlso
+                    OIM0019row("ENDYMD") = OIM0019INProw("ENDYMD") AndAlso
+                    OIM0019row("ACCOUNTCODE") = OIM0019INProw("ACCOUNTCODE") AndAlso
+                    OIM0019row("SEGMENTCODE") = OIM0019INProw("SEGMENTCODE") AndAlso
+                    OIM0019row("SEGMENTBRANCHCODE") = OIM0019INProw("SEGMENTBRANCHCODE") Then
+                    '画面入力テーブル項目設定
+                    OIM0019INProw("LINECNT") = OIM0019row("LINECNT")
+                    OIM0019INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIM0019INProw("UPDTIMSTP") = OIM0019row("UPDTIMSTP")
+                    OIM0019INProw("SELECT") = 0
+                    OIM0019INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIM0019row.ItemArray = OIM0019INProw.ItemArray
+
+                    '発見フラグON
+                    isFound = True
+                    Exit For
+                End If
+            Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIM0019tbl.NewRow
+                nrow.ItemArray = OIM0019INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIM0019tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("UPDTIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                '名称設定
+                '税区分
+                CODENAME_get("TAXTYPE", nrow("TAXTYPE"), nrow("TAXTYPENAME"), WW_DUMMY)
+
+                OIM0019tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -1232,7 +1634,6 @@ Public Class OIM0019AccountCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -1262,6 +1663,7 @@ Public Class OIM0019AccountCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得
@@ -1301,6 +1703,10 @@ Public Class OIM0019AccountCreate
                     '削除
                     prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TAXTYPE"
+                    '税区分
+                    prmData = work.CreateFIXParam("ZZ", "TAXTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

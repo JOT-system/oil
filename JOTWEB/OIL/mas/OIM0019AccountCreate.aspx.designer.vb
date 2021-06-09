@@ -329,6 +329,33 @@ Partial Public Class OIM0019AccountCreate
     Protected WithEvents WF_ACCOUNTTYPENAME_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_TAXTYPE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TAXTYPE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TAXTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TAXTYPE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TAXTYPE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TAXTYPE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

@@ -27,6 +27,7 @@
     <asp:TextBox ID="WF_SEL_SEGMENTBRANCHNAME" runat="server"></asp:TextBox>        <!-- セグメント枝番名 -->
     <asp:TextBox ID="WF_SEL_ACCOUNTTYPE2" runat="server"></asp:TextBox>             <!-- 科目区分 -->
     <asp:TextBox ID="WF_SEL_ACCOUNTTYPENAME" runat="server"></asp:TextBox>          <!-- 科目区分名 -->
+    <asp:TextBox ID="WF_SEL_TAXTYPE" runat="server"></asp:TextBox>                  <!-- 税区分 -->
 
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
 
@@ -40,4 +41,6 @@
     <asp:TextBox ID="WF_SEL_UPDTIMSTP" runat="server"></asp:TextBox>                <!-- タイムスタンプ -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>                   <!-- 更新データ(退避用) -->
 
+    <!-- 詳細画面更新 -->
+    <asp:TextBox ID="WF_SEL_DETAIL_UPDATE_MESSAGE" runat="server"></asp:TextBox>
 </div>

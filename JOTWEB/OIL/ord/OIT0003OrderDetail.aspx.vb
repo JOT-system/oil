@@ -6906,6 +6906,10 @@ Public Class OIT0003OrderDetail
                 WW_UpdateOrderDetailBilling(SQLcon)
                 '受注(TBL)更新
                 WW_UpdateOrder_TAB4(SQLcon)
+
+                '### START 受注履歴テーブルの追加(2021/06/09) #############
+                WW_InsertOrderHistory(SQLcon)
+                '### END   ################################################
             End If
 
         End Using

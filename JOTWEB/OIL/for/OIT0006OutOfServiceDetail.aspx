@@ -28,6 +28,7 @@
             <div class="rightSide">
                 <!-- ボタン -->
                 <input type="button" id="WF_ButtonDELIVERY" style="display:none" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
+                <input type="button" id="WF_ButtonCORRECTION" class="btn-sticky" value="回送訂正" onclick="ButtonClick('WF_ButtonCORRECTION');" />
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="回送登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>

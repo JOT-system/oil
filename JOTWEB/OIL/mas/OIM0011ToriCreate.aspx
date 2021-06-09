@@ -24,8 +24,8 @@
                     <div class="leftSide">
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="表更新" onclick="ButtonClick('WF_UPDATE');" />
-                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="クリア" onclick="ButtonClick('WF_CLEAR');" />
+                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="更新" onclick="ButtonClick('WF_UPDATE');" />
+                        <input type="button" id="WF_CLEAR"  class="btn-sticky" value="戻る" onclick="ButtonClick('WF_CLEAR');" />
                     </div>
                 </div>
             </div>
@@ -192,45 +192,18 @@
                 </p>
 
                 <p id="KEY_LINE_11">
-                    <!-- 銀行コード -->
+                    <!-- 請求先銀行外部コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_BANKCODE_L" runat="server" Text="銀行コード" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_BANKCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
-                        <asp:Label ID="WF_BANKCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_INVOICEBANKOUTSIDECODE_L" runat="server" Text="請求先銀行外部コード" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_INVOICEBANKOUTSIDECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
+                        <asp:Label ID="WF_INVOICEBANKOUTSIDECODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
-                    <!-- 支店コード -->
+                    <!-- 支払先銀行外部コード -->
                     <span class="ef">
-                        <asp:Label ID="WF_BANKBRANCHCODE_L" runat="server" Text="支店コード" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_BANKBRANCHCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
-                        <asp:Label ID="WF_BANKBRANCHCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                </p>
-
-                <p id="KEY_LINE_12">
-                    <!-- 口座種別 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ACCOUNTTYPE_L" runat="server" Text="口座種別" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_ACCOUNTTYPE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_ACCOUNTTYPE');">
-                            <asp:TextBox ID="WF_ACCOUNTTYPE" runat="server" readOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="WF_ACCOUNTTYPE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-
-                    <!-- 口座番号 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ACCOUNTNUMBER_L" runat="server" Text="口座番号" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_ACCOUNTNUMBER" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="7"></asp:TextBox>
-                        <asp:Label ID="WF_ACCOUNTNUMBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                </p>
-
-                <p id="KEY_LINE_13">
-                    <!-- 口座名義 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ACCOUNTNAME_L" runat="server" Text="口座名義" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_ACCOUNTNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="30"></asp:TextBox>
-                        <asp:Label ID="WF_ACCOUNTNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_PAYEEBANKOUTSIDECODE_L" runat="server" Text="支払先銀行外部コード" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_PAYEEBANKOUTSIDECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
+                        <asp:Label ID="WF_PAYEEBANKOUTSIDECODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
             </div>

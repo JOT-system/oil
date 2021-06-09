@@ -1,4 +1,13 @@
-﻿Imports JOTWEB.GRIS0005LeftBox
+﻿''************************************************************
+' 取引先マスタメンテ検索画面
+' 作成日 2020/10/07
+' 更新日 
+' 作成者 JOT常井
+' 更新者 
+'
+' 修正履歴:2020/10/07 新規作成
+''************************************************************
+Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIM0011ToriSearch
     Inherits Page
@@ -82,14 +91,14 @@ Public Class OIM0011ToriSearch
             work.Initialize()
 
             '初期変数設定処理
-            Master.GetFirstValue(work.WF_SEL_TORICODE.Text, "TORICODE", WF_TORICODE.Text)          '取引先コード
-            Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD.Text)                   '有効年月日(開始）
-            Master.GetFirstValue(work.WF_SEL_ENDYMD.Text, "ENDYMD", WF_ENDYMD.Text)                '有効年月日(終了）
+            Master.GetFirstValue(work.WF_SEL_TORICODE.Text, "TORICODE", WF_TORICODE.Text)   '取引先コード
+            Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD.Text)            '有効年月日(開始）
+            Master.GetFirstValue(work.WF_SEL_ENDYMD.Text, "ENDYMD", WF_ENDYMD.Text)         '有効年月日(終了）
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0011L Then   '実行画面からの遷移
             '画面項目設定処理
-            WF_TORICODE.Text = work.WF_SEL_TORICODE.Text       '取引先コード
-            WF_STYMD.Text = work.WF_SEL_STYMD.Text             '有効年月日(開始）
-            WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text           '有効年月日(終了）
+            WF_TORICODE.Text = work.WF_SEL_TORICODE.Text                                    '取引先コード
+            WF_STYMD.Text = work.WF_SEL_STYMD.Text                                          '有効年月日(開始）
+            WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text                                        '有効年月日(終了）
         End If
 
         '○ RightBox情報設定
@@ -109,8 +118,6 @@ Public Class OIM0011ToriSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                            '組織コード
         CODENAME_get("TORICODE", WF_TORICODE.Text, WF_TORICODE_NAME.Text, WW_DUMMY)        '取引先コード
 
     End Sub
@@ -311,7 +318,6 @@ Public Class OIM0011ToriSearch
                         .ActiveCalendar()
 
                     Case Else
-                        '会社コード
                         Dim prmData As New Hashtable
 
                         '取引先コード
@@ -348,7 +354,6 @@ Public Class OIM0011ToriSearch
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
@@ -410,7 +415,6 @@ Public Class OIM0011ToriSearch
         WF_LeftboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' LeftBoxキャンセルボタン押下時処理

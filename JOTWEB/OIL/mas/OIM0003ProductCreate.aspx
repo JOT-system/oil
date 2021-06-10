@@ -226,7 +226,45 @@
                         <asp:Label ID="WF_ORDERTODATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
+                <p id="KEY_LINE_14">
+                    <!-- 帳票用油種名 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_REPORTOILNAME_L" runat="server" Text="帳票用油種名" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_REPORTOILNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="40"></asp:TextBox>
+                        <asp:Label ID="WF_REPORTOILNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    <!-- JR油種区分 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_JROILTYPE_L" runat="server" Text="JR油種区分" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_JROILTYPE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_JROILTYPE');">
+                            <asp:TextBox ID="WF_JROILTYPE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_JROILTYPENAME" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
                 <p id="KEY_LINE_15">
+                    <!-- 出荷口 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_SHIPPINGGATE_L" runat="server" Text="出荷口" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_SHIPPINGGATE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="40"></asp:TextBox>
+                        <asp:Label ID="WF_SHIPPINGGATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    <!-- 平均積込数量 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_AVERAGELOADAMOUNT_L" runat="server" Text="平均積込数量" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_AVERAGELOADAMOUNT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
+                        <asp:Label ID="WF_AVERAGELOADAMOUNT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+                <p id="KEY_LINE_16">
+                    <!-- 出荷計画枠 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_SHIPPINGPLAN_L" runat="server" Text="出荷計画枠" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_SHIPPINGPLAN" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
+                        <asp:Label ID="WF_SHIPPINGPLAN_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+                <p id="KEY_LINE_17">
                     <asp:Label ID="WF_OILTERMTBL_L" runat="server" Text="品種出荷期間" CssClass="WF_TEXT_LABEL"></asp:Label>
                     <asp:GridView ID="WF_OILTERMTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" Visible="true" ShowFooter="false" CssClass="WF_OILTERMTBL">
                         <Columns>

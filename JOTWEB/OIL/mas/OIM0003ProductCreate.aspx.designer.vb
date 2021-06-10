@@ -680,6 +680,141 @@ Partial Public Class OIM0003ProductCreate
     Protected WithEvents WF_ORDERTODATE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_REPORTOILNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_REPORTOILNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_REPORTOILNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_REPORTOILNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_REPORTOILNAME_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_REPORTOILNAME_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_JROILTYPE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_JROILTYPE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_JROILTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_JROILTYPE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_JROILTYPENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_JROILTYPENAME As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SHIPPINGGATE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGGATE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SHIPPINGGATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGGATE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SHIPPINGGATE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGGATE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_AVERAGELOADAMOUNT_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVERAGELOADAMOUNT_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_AVERAGELOADAMOUNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVERAGELOADAMOUNT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVERAGELOADAMOUNT_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVERAGELOADAMOUNT_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SHIPPINGPLAN_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGPLAN_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SHIPPINGPLAN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGPLAN As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SHIPPINGPLAN_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHIPPINGPLAN_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_OILTERMTBL_L コントロール。
     '''</summary>
     '''<remarks>

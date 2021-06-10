@@ -16,6 +16,8 @@
 '                     2)戻るボタン押下時、確認ダイアログ表示→
 '                       確認ダイアログでOK押下時、一覧画面に戻るように修正
 '                     3)新規登録を行って一覧画面に戻った際に、追加したデータが表示されないバグに対応
+'         :2021/06/10 項目「出荷口」「平均積込数量」「出荷計画枠」
+'                     「帳票用油種名」「JR油種区分(JR油種区分名)」を追加
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -277,6 +279,24 @@ Public Class OIM0003ProductCreate
 
         '受注登録可能期間TO
         WF_ORDERTODATE.Text = work.WF_SEL_ORDERTODATE.Text
+
+        '帳票用油種名
+        WF_REPORTOILNAME.Text = work.WF_SEL_REPORTOILNAME.Text
+
+        'JR油種区分
+        WF_JROILTYPE.Text = work.WF_SEL_JROILTYPE.Text
+
+        'JR油種区分名
+        WF_JROILTYPENAME.Text = work.WF_SEL_JROILTYPENAME.Text
+
+        '出荷口
+        WF_SHIPPINGGATE.Text = work.WF_SEL_SHIPPINGGATE.Text
+
+        '平均積込数量
+        WF_AVERAGELOADAMOUNT.Text = work.WF_SEL_AVERAGELOADAMOUNT.Text
+
+        '出荷計画枠
+        WF_SHIPPINGPLAN.Text = work.WF_SEL_SHIPPINGPLAN.Text
 
         '削除フラグ
         WF_DELFLG.Text = work.WF_SEL_DELFLG2.Text
@@ -601,9 +621,15 @@ Public Class OIM0003ProductCreate
 
                 '品種マスタ更新
                 UpdateMasterProduct(SQLcon)
+                If Not isNormal(WW_ERR_SW) Then
+                    Exit Sub
+                End If
 
                 '品種出荷期間マスタ更新
                 UpdateMasterOilTerm(SQLcon)
+                If Not isNormal(WW_ERR_SW) Then
+                    Exit Sub
+                End If
             End Using
         End If
 
@@ -704,30 +730,36 @@ Public Class OIM0003ProductCreate
         OIM0003INProw("SELECT") = 1
         OIM0003INProw("HIDDEN") = 0
 
-        OIM0003INProw("OFFICECODE") = WF_OFFICECODE.Text            '営業所コード
-        OIM0003INProw("SHIPPERCODE") = WF_SHIPPERCODE.Text          '荷主コード
-        OIM0003INProw("PLANTCODE") = WF_PLANTCODE.Text              '基地コード
-        OIM0003INProw("BIGOILCODE") = WF_BIGOILCODE.Text            '油種大分類コード
-        OIM0003INProw("BIGOILNAME") = WF_BIGOILNAME.Text            '油種大分類名
-        OIM0003INProw("BIGOILKANA") = WF_BIGOILKANA.Text            '油種大分類名カナ
-        OIM0003INProw("MIDDLEOILCODE") = WF_MIDDLEOILCODE.Text      '油種中分類コード
-        OIM0003INProw("MIDDLEOILNAME") = WF_MIDDLEOILNAME.Text      '油種中分類名
-        OIM0003INProw("MIDDLEOILKANA") = WF_MIDDLEOILKANA.Text      '油種中分類名カナ
-        OIM0003INProw("OILCODE") = WF_OILCODE.Text                  '油種コード
-        OIM0003INProw("OILNAME") = WF_OILNAME.Text                  '油種名
-        OIM0003INProw("OILKANA") = WF_OILKANA.Text                  '油種名カナ
-        OIM0003INProw("SEGMENTOILCODE") = WF_SEGMENTOILCODE.Text    '油種細分コード
-        OIM0003INProw("SEGMENTOILNAME") = WF_SEGMENTOILNAME.Text    '油種名（細分）
-        OIM0003INProw("OTOILCODE") = WF_OTOILCODE.Text              'OT油種コード
-        OIM0003INProw("OTOILNAME") = WF_OTOILNAME.Text              'OT油種名
-        OIM0003INProw("SHIPPEROILCODE") = WF_SHIPPEROILCODE.Text    '荷主油種コード
-        OIM0003INProw("SHIPPEROILNAME") = WF_SHIPPEROILNAME.Text    '荷主油種名
-        OIM0003INProw("CHECKOILCODE") = WF_CHECKOILCODE.Text        '積込チェック用油種コード
-        OIM0003INProw("CHECKOILNAME") = WF_CHECKOILNAME.Text        '積込チェック用油種名
-        OIM0003INProw("STOCKFLG") = WF_STOCKFLG.Text                '在庫管理対象フラグ
-        OIM0003INProw("ORDERFROMDATE") = WF_ORDERFROMDATE.Text      '受注登録可能期間FROM
-        OIM0003INProw("ORDERTODATE") = WF_ORDERTODATE.Text          '受注登録可能期間TO
-        OIM0003INProw("DELFLG") = WF_DELFLG.Text                    '削除フラグ
+        OIM0003INProw("OFFICECODE") = WF_OFFICECODE.Text                '営業所コード
+        OIM0003INProw("SHIPPERCODE") = WF_SHIPPERCODE.Text              '荷主コード
+        OIM0003INProw("PLANTCODE") = WF_PLANTCODE.Text                  '基地コード
+        OIM0003INProw("BIGOILCODE") = WF_BIGOILCODE.Text                '油種大分類コード
+        OIM0003INProw("BIGOILNAME") = WF_BIGOILNAME.Text                '油種大分類名
+        OIM0003INProw("BIGOILKANA") = WF_BIGOILKANA.Text                '油種大分類名カナ
+        OIM0003INProw("MIDDLEOILCODE") = WF_MIDDLEOILCODE.Text          '油種中分類コード
+        OIM0003INProw("MIDDLEOILNAME") = WF_MIDDLEOILNAME.Text          '油種中分類名
+        OIM0003INProw("MIDDLEOILKANA") = WF_MIDDLEOILKANA.Text          '油種中分類名カナ
+        OIM0003INProw("OILCODE") = WF_OILCODE.Text                      '油種コード
+        OIM0003INProw("OILNAME") = WF_OILNAME.Text                      '油種名
+        OIM0003INProw("OILKANA") = WF_OILKANA.Text                      '油種名カナ
+        OIM0003INProw("SEGMENTOILCODE") = WF_SEGMENTOILCODE.Text        '油種細分コード
+        OIM0003INProw("SEGMENTOILNAME") = WF_SEGMENTOILNAME.Text        '油種名（細分）
+        OIM0003INProw("OTOILCODE") = WF_OTOILCODE.Text                  'OT油種コード
+        OIM0003INProw("OTOILNAME") = WF_OTOILNAME.Text                  'OT油種名
+        OIM0003INProw("SHIPPEROILCODE") = WF_SHIPPEROILCODE.Text        '荷主油種コード
+        OIM0003INProw("SHIPPEROILNAME") = WF_SHIPPEROILNAME.Text        '荷主油種名
+        OIM0003INProw("CHECKOILCODE") = WF_CHECKOILCODE.Text            '積込チェック用油種コード
+        OIM0003INProw("CHECKOILNAME") = WF_CHECKOILNAME.Text            '積込チェック用油種名
+        OIM0003INProw("STOCKFLG") = WF_STOCKFLG.Text                    '在庫管理対象フラグ
+        OIM0003INProw("ORDERFROMDATE") = WF_ORDERFROMDATE.Text          '受注登録可能期間FROM
+        OIM0003INProw("ORDERTODATE") = WF_ORDERTODATE.Text              '受注登録可能期間TO
+        OIM0003INProw("REPORTOILNAME") = WF_REPORTOILNAME.Text          '帳票用油種名
+        OIM0003INProw("JROILTYPE") = WF_JROILTYPE.Text                  'JR油種区分
+        OIM0003INProw("JROILTYPENAME") = WF_JROILTYPENAME.Text          'JR油種区分名
+        OIM0003INProw("SHIPPINGGATE") = WF_SHIPPINGGATE.Text            '出荷口
+        OIM0003INProw("AVERAGELOADAMOUNT") = WF_AVERAGELOADAMOUNT.Text  '平均積込数量
+        OIM0003INProw("SHIPPINGPLAN") = WF_SHIPPINGPLAN.Text            '出荷計画枠
+        OIM0003INProw("DELFLG") = WF_DELFLG.Text                        '削除フラグ
 
         '○ チェック用テーブルに登録する
         OIM0003INPtbl.Rows.Add(OIM0003INProw)
@@ -885,6 +917,12 @@ Public Class OIM0003ProductCreate
         WF_STOCKFLG.Text = ""               '在庫管理対象フラグ
         WF_ORDERFROMDATE.Text = ""          '受注登録可能期間FROM
         WF_ORDERTODATE.Text = ""            '受注登録可能期間TO
+        WF_REPORTOILNAME.Text = ""          '帳票用油種名
+        WF_JROILTYPE.Text = ""              'JR油種区分
+        WF_JROILTYPENAME.Text = ""          'JR油種区分名
+        WF_SHIPPINGGATE.Text = ""           '出荷口
+        WF_AVERAGELOADAMOUNT.Text = ""      '平均積込数量
+        WF_SHIPPINGPLAN.Text = ""           '出荷計画枠
         WF_DELFLG.Text = ""                 '削除フラグ
 
     End Sub
@@ -965,6 +1003,9 @@ Public Class OIM0003ProductCreate
                             Case WF_STOCKFLG.ID
                                 '在庫管理対象フラグ
                                 prmData = work.CreateFIXParam(Master.USERCAMP, "PRODUCTSTOCKFLG")
+                            Case WF_JROILTYPE.ID
+                                'JR油種区分
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "JROILTYPE")
                             Case WF_DELFLG.ID
                                 '削除フラグ
                                 prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
@@ -1010,6 +1051,9 @@ Public Class OIM0003ProductCreate
             Case WF_STOCKFLG.ID
                 '在庫管理対象フラグ
                 CODENAME_get("STOCKFLG", WF_STOCKFLG.Text, WF_STOCKFLG_TEXT.Text, WW_RTN_SW)
+            Case WF_JROILTYPE.ID
+                'JR油種区分
+                CODENAME_get("JROILTYPE", WF_JROILTYPE.Text, WF_JROILTYPENAME.Text, WW_RTN_SW)
             Case WF_DELFLG.ID
                 '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
@@ -1109,6 +1153,11 @@ Public Class OIM0003ProductCreate
                     Catch ex As Exception
                     End Try
                     WF_ORDERTODATE.Focus()
+                Case WF_JROILTYPE.ID
+                    'JR油種区分
+                    WF_JROILTYPE.Text = WW_SelectValue
+                    WF_JROILTYPENAME.Text = WW_SelectText
+                    WF_JROILTYPE.Focus()
                 Case WF_DELFLG.ID
                     '削除フラグ
                     WF_DELFLG.Text = WW_SelectValue
@@ -1192,6 +1241,9 @@ Public Class OIM0003ProductCreate
                 Case WF_ORDERTODATE.ID
                     '受注登録可能期間TO
                     WF_ORDERTODATE.Focus()
+                Case WF_JROILTYPE.ID
+                    'JR油種区分
+                    WF_JROILTYPE.Focus()
                 Case WF_DELFLG.ID
                     '削除フラグ
                     WF_DELFLG.Focus()
@@ -1314,6 +1366,12 @@ Public Class OIM0003ProductCreate
             & "        , STOCKFLG       = @P21" _
             & "        , ORDERFROMDATE  = @P22" _
             & "        , ORDERTODATE    = @P23" _
+            & "        , REPORTOILNAME  = @P32" _
+            & "        , JROILTYPE      = @P33" _
+            & "        , JROILTYPENAME  = @P34" _
+            & "        , SHIPPINGGATE   = @P35" _
+            & "        , AVERAGELOADAMOUNT = @P36" _
+            & "        , SHIPPINGPLAN   = @P37" _
             & "        , DELFLG         = @P24" _
             & "        , UPDYMD         = @P28" _
             & "        , UPDUSER        = @P29" _
@@ -1350,6 +1408,12 @@ Public Class OIM0003ProductCreate
             & "        , STOCKFLG" _
             & "        , ORDERFROMDATE" _
             & "        , ORDERTODATE" _
+            & "        , REPORTOILNAME" _
+            & "        , JROILTYPE" _
+            & "        , JROILTYPENAME" _
+            & "        , SHIPPINGGATE" _
+            & "        , AVERAGELOADAMOUNT" _
+            & "        , SHIPPINGPLAN" _
             & "        , DELFLG" _
             & "        , INITYMD" _
             & "        , INITUSER" _
@@ -1379,6 +1443,12 @@ Public Class OIM0003ProductCreate
             & "        , @P21" _
             & "        , @P22" _
             & "        , @P23" _
+            & "        , @P32" _
+            & "        , @P33" _
+            & "        , @P34" _
+            & "        , @P35" _
+            & "        , @P36" _
+            & "        , @P37" _
             & "        , @P24" _
             & "        , @P25" _
             & "        , @P26" _
@@ -1413,6 +1483,12 @@ Public Class OIM0003ProductCreate
             & "    , STOCKFLG" _
             & "    , ORDERFROMDATE" _
             & "    , ORDERTODATE" _
+            & "    , REPORTOILNAME" _
+            & "    , JROILTYPE" _
+            & "    , JROILTYPENAME" _
+            & "    , SHIPPINGGATE" _
+            & "    , AVERAGELOADAMOUNT" _
+            & "    , SHIPPINGPLAN" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -1464,6 +1540,13 @@ Public Class OIM0003ProductCreate
                 Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 20)          '更新ユーザーID
                 Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          '更新端末
                 Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime)              '集信日時
+
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)          '帳票用油種名
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 1)           'JR油種区分
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 40)          'JR油種区分名
+                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 40)          '出荷口
+                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.Float, 2, 1)           '平均積込数量
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.Int)                   '出荷計画枠
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 6)        '営業所コード
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 10)       '荷主コード
@@ -1520,6 +1603,21 @@ Public Class OIM0003ProductCreate
                         PARA29.Value = Master.USERID
                         PARA30.Value = Master.USERTERMID
                         PARA31.Value = C_DEFAULT_YMD
+
+                        PARA32.Value = OIM0003INProw("REPORTOILNAME")
+                        PARA33.Value = OIM0003INProw("JROILTYPE")
+                        PARA34.Value = OIM0003INProw("JROILTYPENAME")
+                        PARA35.Value = OIM0003INProw("SHIPPINGGATE")
+                        If String.IsNullOrEmpty(OIM0003INProw("AVERAGELOADAMOUNT")) Then
+                            PARA36.Value = 0.0
+                        Else
+                            PARA36.Value = OIM0003INProw("AVERAGELOADAMOUNT")
+                        End If
+                        If String.IsNullOrEmpty(OIM0003INProw("SHIPPINGPLAN")) Then
+                            PARA37.Value = 0
+                        Else
+                            PARA37.Value = OIM0003INProw("SHIPPINGPLAN")
+                        End If
 
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
@@ -2224,6 +2322,96 @@ Public Class OIM0003ProductCreate
                 End If
             End If
 
+            '帳票用油種名(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("REPORTOILNAME")
+            Master.CheckField(Master.USERCAMP, "REPORTOILNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(帳票用油種名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'JR油種区分(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("JROILTYPE")
+            Master.CheckField(Master.USERCAMP, "JROILTYPE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(WW_TEXT) Then
+                    '値存在チェック
+                    CODENAME_get("JROILTYPE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(JR油種区分入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(JR油種区分入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'JR油種区分名(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("JROILTYPENAME")
+            Master.CheckField(Master.USERCAMP, "JROILTYPENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(JR油種区分名入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '出荷口(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("SHIPPINGGATE")
+            Master.CheckField(Master.USERCAMP, "SHIPPINGGATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(出荷口入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '平均積込数量(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("AVERAGELOADAMOUNT")
+            Master.CheckField(Master.USERCAMP, "AVERAGELOADAMOUNT", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(平均積込数量入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '出荷計画枠(バリデーションチェック）
+            WW_TEXT = OIM0003INProw("SHIPPINGPLAN")
+            Master.CheckField(Master.USERCAMP, "SHIPPINGPLAN", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(WW_TEXT) Then
+                    Try
+                        Int32.Parse(WW_TEXT)
+                    Catch ex As Exception
+                        WW_CheckMES1 = "・更新できないレコード(出荷計画枠数値変換エラー)です。"
+                        WW_CheckMES2 = ex.Message
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End Try
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(出荷計画枠入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             '一意制約チェック
             '同一レコードの更新の場合、更新内容チェックを行う
             If OIM0003INProw("OFFICECODE") = work.WF_SEL_OFFICECODE2.Text AndAlso
@@ -2479,6 +2667,12 @@ Public Class OIM0003ProductCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> 在庫管理対象フラグ       =" & OIM0003row("STOCKFLG") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間FROM     =" & OIM0003row("ORDERFROMDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 受注登録可能期間TO       =" & OIM0003row("ORDERTODATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 帳票用油種名             =" & OIM0003row("REPORTOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> JR油種区分               =" & OIM0003row("JROILTYPE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> JR油種区分名             =" & OIM0003row("JROILTYPENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 出荷口                   =" & OIM0003row("SHIPPINGGATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 平均積込数量             =" & OIM0003row("AVERAGELOADAMOUNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 出荷計画枠               =" & OIM0003row("SHIPPINGPLAN") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ               =" & OIM0003row("DELFLG")
         End If
 
@@ -2689,6 +2883,8 @@ Public Class OIM0003ProductCreate
                 CODENAME_get("PLANTCODE", OIM0003row("PLANTCODE"), OIM0003row("PLANTNAME"), WW_DUMMY)
                 '在庫管理対象フラグ
                 CODENAME_get("STOCKFLG", OIM0003row("STOCKFLG"), OIM0003row("STOCKFLGNAME"), WW_DUMMY)
+                'JR油種区分名
+                CODENAME_get("JROILTYPE", OIM0003row("JROILTYPE"), OIM0003row("JROILTYPENAME"), WW_DUMMY)
 
                 '品種出荷期間マスタ項目設定
                 CopyOIM0030RowToOIM0003Row(OIM0003row)
@@ -2721,6 +2917,8 @@ Public Class OIM0003ProductCreate
             CODENAME_get("PLANTCODE", OIM0003row("PLANTCODE"), OIM0003row("PLANTNAME"), WW_DUMMY)
             '在庫管理対象フラグ
             CODENAME_get("STOCKFLG", OIM0003row("STOCKFLG"), OIM0003row("STOCKFLGNAME"), WW_DUMMY)
+            'JR油種区分名
+            CODENAME_get("JROILTYPE", OIM0003row("JROILTYPE"), OIM0003row("JROILTYPENAME"), WW_DUMMY)
 
             '品種出荷期間マスタ項目設定
             CopyOIM0030RowToOIM0003Row(OIM0003row)
@@ -2869,6 +3067,10 @@ Public Class OIM0003ProductCreate
                     '在庫管理対象フラグ
                     prmData = work.CreateFIXParam(Master.USERCAMP, "PRODUCTSTOCKFLG")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "JROILTYPE"
+                    'JR油種区分
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "JROILTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"
                     '削除フラグ
                     prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
@@ -2917,6 +3119,12 @@ Public Class OIM0003ProductCreate
                     OIM0003row("STOCKFLG") = OIM0003INProw("STOCKFLG") AndAlso
                     OIM0003row("ORDERFROMDATE") = OIM0003INProw("ORDERFROMDATE") AndAlso
                     OIM0003row("ORDERTODATE") = OIM0003INProw("ORDERTODATE") AndAlso
+                    OIM0003row("REPORTOILNAME") = OIM0003INProw("REPORTOILNAME") AndAlso
+                    OIM0003row("JROILTYPE") = OIM0003INProw("JROILTYPE") AndAlso
+                    OIM0003row("JROILTYPENAME") = OIM0003INProw("JROILTYPENAME") AndAlso
+                    OIM0003row("SHIPPINGGATE") = OIM0003INProw("SHIPPINGGATE") AndAlso
+                    OIM0003row("AVERAGELOADAMOUNT") = OIM0003INProw("AVERAGELOADAMOUNT") AndAlso
+                    OIM0003row("SHIPPINGPLAN") = OIM0003INProw("SHIPPINGPLAN") AndAlso
                     OIM0003row("DELFLG") = OIM0003INProw("DELFLG") AndAlso
                     Not C_LIST_OPERATION_CODE.UPDATING.Equals(OIM0003row("OPERATION")) Then
 

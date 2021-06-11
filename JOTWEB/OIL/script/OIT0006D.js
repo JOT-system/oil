@@ -15,6 +15,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 回送訂正ボタン活性／非活性
+    if (document.getElementById('WF_CORRECTIONFLG').value === "0") {
+        //活性 
+        document.getElementById("WF_ButtonCORRECTION").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonCORRECTION").disabled = "disabled";
+    }
+
     //〇 託送指示ボタン活性／非活性
     if (document.getElementById('WF_DELIVERYFLG').value === "0") {
         //活性 

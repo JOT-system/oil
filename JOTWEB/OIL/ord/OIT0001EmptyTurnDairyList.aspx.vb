@@ -78,7 +78,7 @@ Public Class OIT0001EmptyTurnDairyList
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
                             WF_ButtonLINE_LIFTED_Click()
-                        Case "WF_ButtonOTCOMPARE"       'OT比較結果ボタン押下
+                        Case "WF_ButtonOTCOMPARE"       'OT取込結果ボタン押下
                             WF_ButtonOTCOMPARE_Click()
                         Case "WF_ButtonOTINSERT"        '空回日報取込ボタン押下
                             WF_ButtonOTINSERT_Click()
@@ -2460,6 +2460,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , OIT0016.CMPRESULTSCODE" _
             & " , OIT0016.CMPRESULTSNAME" _
             & " , OIT0016.ORDERNO" _
+            & " , '' AS OTORDERNO" _
             & " , OIT0016.TRAINNO" _
             & " , OIT0016.TRAINNAME" _
             & " , OIT0016.ORDERYMD" _
@@ -2812,6 +2813,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                     '★受注TBLに存在した場合
                     If OIT0001CHKOrdertbl.Rows.Count <> 0 Then
+                        OIT0001OTrow("OTORDERNO") = OIT0001CHKOrdertbl.Rows(0)("ORDERNO")
                         '受注TBL"1"(存在)に設定
                         OIT0001OTrow("ORDERFLAG") = "1"
                         'OT受注TBLの取込フラグを"1"(取込済み)に更新
@@ -2859,12 +2861,19 @@ Public Class OIT0001EmptyTurnDairyList
                 For Each OIT0001OTOrderrow As DataRow In OIT0001OTOrdertbl.Select("ORDERFLAG='1'")
                     For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Rows
                         If OIT0001OTDetailrow("ORDERNO") = OIT0001OTOrderrow("ORDERNO") Then
+                            OIT0001OTDetailrow("OTORDERNO") = OIT0001OTOrderrow("OTORDERNO")
                             OIT0001OTDetailrow("ORDERFLAG") = "1"
 
                             OIT0001OTDetailrow("OFFICECODE") = OIT0001OTOrderrow("OFFICECODE")
                             OIT0001OTDetailrow("TRAINNO") = OIT0001OTOrderrow("TRAINNO")
                             OIT0001OTDetailrow("LODDATE") = OIT0001OTOrderrow("LODDATE")
                             OIT0001OTDetailrow("DEPDATE") = OIT0001OTOrderrow("DEPDATE")
+
+                            '受注TBLに存在した受注NoをOT受注明細TBLのOT受注Noに更新
+                            WW_UpdateOTDetailStatus(SQLcon, OIT0001OTDetailrow,
+                                                    I_ITEM:="OTORDERNO",
+                                                    I_VALUE:=Convert.ToString(OIT0001OTDetailrow("OTORDERNO")))
+
                         End If
                     Next
                 Next
@@ -3663,9 +3672,29 @@ Public Class OIT0001EmptyTurnDairyList
             Next
         Next
 
-        '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
+        '★★タンク車Noが見つからない場合は、(タンク車が未設定時で)油種と一致した明細Noを設定
         For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
             For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0' AND TANKNO = ''")
+
+                If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("TRAINNO")) = Convert.ToString(OIT0001row("TRAINNO")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("LODDATE")) = Convert.ToString(OIT0001row("LODDATE")) _
+                   AndAlso Convert.ToString(OIT0001OTrow("DEPDATE")) = Convert.ToString(OIT0001row("DEPDATE")) Then
+                    '★一致している場合、明細Noを設定
+                    If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) Then
+                        OIT0001OTrow("OTORDERNO") = OIT0001row("ORDERNO")
+                        OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
+                        OIT0001row("USEFLG") = "1"
+                        OIT0001OTrow("USEFLG") = "1"
+                        Exit For
+                    End If
+                End If
+            Next
+        Next
+
+        '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
+            For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0'")
 
                 If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
                    AndAlso Convert.ToString(OIT0001OTrow("TRAINNO")) = Convert.ToString(OIT0001row("TRAINNO")) _

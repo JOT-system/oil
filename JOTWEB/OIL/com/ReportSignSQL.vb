@@ -1095,6 +1095,9 @@
         SQLORDERStr &=
               " OT.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OT.OTDETAILNO = OIT0003.DETAILNO " _
+            & " AND OT.TRAINNO = OIT0002.TRAINNO " _
+            & " AND OT.LODDATE = OIT0002.LODDATE " _
+            & " AND OT.DEPDATE = OIT0002.DEPDATE "
         'SQLORDERStr &=
         '      " OT.ORDERNO = OIT0002.ORDERNO " _
         '    & " AND OT.OTDETAILNO = OIT0003.DETAILNO "
@@ -1102,16 +1105,13 @@
         SQLORDERStr &=
               String.Format(" WHERE OIT0002.ORDERNO IN {0} ", inOrder) _
             & " AND OIT0002.OFFICECODE = @OFFICECODE " _
-            & " AND OT.TRAINNO = OIT0002.TRAINNO " _
-            & " AND OT.LODDATE = OIT0002.LODDATE " _
-            & " AND OT.DEPDATE = OIT0002.DEPDATE "
 
         '######################################################
         '# OT受注TBLにのみ存在するデータを取得(比較は受注TBL)
         '######################################################
         Dim SQLOTORDERStr As String =
               " SELECT " _
-            & "   OIT0016.ORDERNO AS KEYCODE1 " _
+            & "   OIT0017.OTORDERNO AS KEYCODE1 " _
             & " , OIT0017.OTDETAILNO AS KEYCODE2 " _
             & " , OIT0016.OFFICECODE AS KEYCODE3 " _
             & " , CASE " _
@@ -1271,6 +1271,9 @@
         SQLOTORDERStr &=
               " JOT.OFFICECODE = OIT0016.OFFICECODE " _
             & " AND JOT.DETAILNO = OIT0017.OTDETAILNO " _
+            & " AND JOT.TRAINNO = OIT0016.TRAINNO " _
+            & " AND JOT.LODDATE = OIT0016.LODDATE " _
+            & " AND JOT.DEPDATE = OIT0016.DEPDATE "
         'SQLOTORDERStr &=
         '      " JOT.ORDERNO = OIT0016.ORDERNO " _
         '    & " AND JOT.DETAILNO = OIT0017.OTDETAILNO "
@@ -1278,10 +1281,8 @@
         SQLOTORDERStr &=
               " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
             & " AND OIT0016.ORDERYMD = @ORDERYMD " _
-            & " AND JOT.TRAINNO = OIT0016.TRAINNO " _
-            & " AND JOT.LODDATE = OIT0016.LODDATE " _
-            & " AND JOT.DEPDATE = OIT0016.DEPDATE " _
-            & " AND JOT.ORDERNO IS NULL "
+            & " AND OIT0017.OTDETAILNO = '' "
+        '& " AND JOT.ORDERNO IS NULL "
 
         '★SQL結合
         SQLStr = SQLORDERStr

@@ -5157,12 +5157,14 @@ Public Class OIT0003OrderList
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
             & " , OIT0002.RETURNDATETRAIN                        AS RETURNDATETRAIN" _
+            & " , OIM0003.SHIPPINGGATE                           AS SHIPPINGGATE" _
             & " FROM oil.VIW0013_OILFOR_GOI_FILLINGPOINT VIW0013 "
 
         SQLStr &=
               " LEFT JOIN (" _
             & "        SELECT " _
             & "          OIT0002.ORDERNO" _
+            & "        , OIT0002.OFFICECODE" _
             & "        , OIT0002.LODDATE" _
             & "        , OIT0002.TOTALTANKCH" _
             & "        , OIT0002.ARRSTATION" _
@@ -5195,6 +5197,13 @@ Public Class OIT0003OrderList
               " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0002.TANKNO " _
             & " AND OIM0005.DELFLG      <> @DELFLG "
+
+        SQLStr &=
+              " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003.OILCODE    = OIT0002.OILCODE " _
+            & " AND OIM0003.SEGMENTOILCODE = OIT0002.ORDERINGTYPE " _
+            & " AND OIM0003.DELFLG    <> @DELFLG "
 
         SQLStr &=
               " ORDER BY" _
@@ -6598,6 +6607,7 @@ Public Class OIT0003OrderList
             & " , OIM0003.SEGMENTOILNAME                         AS SEGMENTOILNAME" _
             & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
             & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , OIM0003.AVERAGELOADAMOUNT                      AS AVERAGELOADAMOUNT" _
             & " , OIM0003.SHIPPINGPLAN                           AS SHIPPINGPLAN" _
             & " , '0'                                            AS DELFLG" _
             & " FROM oil.OIM0003_PRODUCT OIM0003 " _

@@ -390,6 +390,8 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 新規・更新切替用フラグ -->
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
+        <!-- 回送訂正フラグ -->
+        <input id="WF_CORRECTIONFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->

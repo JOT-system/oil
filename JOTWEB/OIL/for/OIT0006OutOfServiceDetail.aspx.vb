@@ -223,6 +223,8 @@ Public Class OIT0006OutOfServiceDetail
 
                 'タブ「タンク車割当」の割当確定ボタンを非活性
                 WF_MAPButtonControl.Value = "1"
+                '回送訂正ボタンを活性
+                Me.WF_CORRECTIONFLG.Value = "0"
 
                 '◯回送進行ステータスが500:回送完了以降のステータスに変更された場合
             ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
@@ -234,6 +236,12 @@ Public Class OIT0006OutOfServiceDetail
 
                 'タブ「タンク車割当」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "2"
+                '回送訂正ボタンを非活性
+                Me.WF_CORRECTIONFLG.Value = "1"
+
+            Else
+                '回送訂正ボタンを非活性
+                Me.WF_CORRECTIONFLG.Value = "1"
 
             End If
 

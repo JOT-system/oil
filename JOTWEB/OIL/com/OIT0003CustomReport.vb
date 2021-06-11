@@ -805,6 +805,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + Convert.ToString(i))
                 rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
                 ExcelMemoryRelease(rngDetailArea)
+                '◯ 出荷口
+                rngDetailArea = Me.ExcelWorkSheet.Range("R" + Convert.ToString(i))
+                rngDetailArea.Value = PrintDatarow("SHIPPINGGATE")
+                ExcelMemoryRelease(rngDetailArea)
                 i += 1
             Next
 
@@ -1886,43 +1890,73 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngHeaderArea)
             '### 20201105 START 指摘票対応(No193) ####################################################################
             '#枠(計画)
+            Dim iAmount As Decimal = 0
             Dim iTTank As Integer = 0
             For Each dtPFrow As DataRow In dtPF.Rows
                 Select Case Convert.ToString(dtPFrow("OILCODE"))
                     'HG
                     Case BaseDllConst.CONST_HTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D61")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E61")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)
                     'RG
                     Case BaseDllConst.CONST_RTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D62")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E62")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)
                     '灯油、未添加灯油
                     Case BaseDllConst.CONST_TTank,
                          BaseDllConst.CONST_MTTank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D63")
+                        iAmount += Decimal.Parse(Convert.ToString(dtPFrow("AVERAGELOADAMOUNT")))
+                        rngHeaderArea.Value = iAmount
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E63")
                         iTTank += Integer.Parse(Convert.ToString(dtPFrow("SHIPPINGPLAN")))
                         rngHeaderArea.Value = iTTank
                         ExcelMemoryRelease(rngHeaderArea)
                     '軽油
                     Case BaseDllConst.CONST_KTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D65")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E65")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)
                     '3号軽油
                     Case BaseDllConst.CONST_K3Tank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D66")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E66")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)
                     'A重油
                     Case BaseDllConst.CONST_ATank
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D67")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E67")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)
                     'LSA
                     Case BaseDllConst.CONST_LTank1
+                        rngHeaderArea = Me.ExcelWorkSheet.Range("D68")
+                        rngHeaderArea.Value = dtPFrow("AVERAGELOADAMOUNT")
+                        ExcelMemoryRelease(rngHeaderArea)
+
                         rngHeaderArea = Me.ExcelWorkSheet.Range("E68")
                         rngHeaderArea.Value = dtPFrow("SHIPPINGPLAN")
                         ExcelMemoryRelease(rngHeaderArea)

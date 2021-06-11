@@ -1006,6 +1006,9 @@ Public Class OIM0003ProductCreate
                             Case WF_JROILTYPE.ID
                                 'JR油種区分
                                 prmData = work.CreateFIXParam(Master.USERCAMP, "JROILTYPE")
+                            Case WF_SHIPPINGGATE.ID
+                                '出荷口
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "SHIPPINGGATE")
                             Case WF_DELFLG.ID
                                 '削除フラグ
                                 prmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
@@ -1054,6 +1057,9 @@ Public Class OIM0003ProductCreate
             Case WF_JROILTYPE.ID
                 'JR油種区分
                 CODENAME_get("JROILTYPE", WF_JROILTYPE.Text, WF_JROILTYPENAME.Text, WW_RTN_SW)
+            Case WF_JROILTYPE.ID
+                '出荷口
+                CODENAME_get("SHIPPINGGATE", WF_SHIPPINGGATE.Text, WW_DUMMY, WW_RTN_SW)
             Case WF_DELFLG.ID
                 '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
@@ -1158,6 +1164,10 @@ Public Class OIM0003ProductCreate
                     WF_JROILTYPE.Text = WW_SelectValue
                     WF_JROILTYPENAME.Text = WW_SelectText
                     WF_JROILTYPE.Focus()
+                Case WF_SHIPPINGGATE.ID
+                    '出荷口
+                    WF_SHIPPINGGATE.Text = WW_SelectValue
+                    WF_SHIPPINGGATE.Focus()
                 Case WF_DELFLG.ID
                     '削除フラグ
                     WF_DELFLG.Text = WW_SelectValue
@@ -1244,6 +1254,9 @@ Public Class OIM0003ProductCreate
                 Case WF_JROILTYPE.ID
                     'JR油種区分
                     WF_JROILTYPE.Focus()
+                Case WF_SHIPPINGGATE.ID
+                    'JR油種区分
+                    WF_SHIPPINGGATE.Focus()
                 Case WF_DELFLG.ID
                     '削除フラグ
                     WF_DELFLG.Focus()
@@ -2370,7 +2383,19 @@ Public Class OIM0003ProductCreate
             '出荷口(バリデーションチェック）
             WW_TEXT = OIM0003INProw("SHIPPINGGATE")
             Master.CheckField(Master.USERCAMP, "SHIPPINGGATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If Not String.IsNullOrEmpty(WW_TEXT) Then
+                    '値存在チェック
+                    CODENAME_get("SHIPPINGGATE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(出荷口入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
                 WW_CheckMES1 = "・更新できないレコード(出荷口入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0003INProw)
@@ -3070,6 +3095,10 @@ Public Class OIM0003ProductCreate
                 Case "JROILTYPE"
                     'JR油種区分
                     prmData = work.CreateFIXParam(Master.USERCAMP, "JROILTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SHIPPINGGATE"
+                    '出荷口
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "SHIPPINGGATE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"
                     '削除フラグ

@@ -1019,16 +1019,6 @@ Public Class OIT0008CostDetail
                     '営業所コード
                     prmData = work.CreateSALESOFFICEParam(Master.USERCAMP, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TORIMASTER"
-                    prmData = work.CreateFIXParam(Master.USERCAMP, "TORIMASTER")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ACCOUNTPATTERN"
-                    prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TORI_DEPT"
-                    ' 請求先コード/支払先コード
-                    prmData = work.CreateFIXParam(Master.USERCAMP, "TORI_DEPT")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

@@ -56,7 +56,7 @@
                     <span class="left">
                         <a id="WF_ACCOUNTCODE_LABEL">勘定科目コード</a>
                         <a class="ef" id="WF_ACCOUNTCODE">
-                            <span ondblclick="Field_DBclick('TxtAccountCode', <%=LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST %>)">
+                            <span ondblclick="Field_DBclick('TxtAccountCode', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE %>)">
                                 <asp:TextBox ID="TxtAccountCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" onblur="MsgClear();" ReadOnly="true"></asp:TextBox>
                             </span>
                         </a>

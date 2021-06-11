@@ -22,7 +22,7 @@ function InitDisplay() {
 
 // ロード時処理(共通処理により、GridView内のアイコン付きTextBoxの幅がcalc(100% + 1px)に補正される為、100%に戻す)
 window.addEventListener('load', function () {
-    let queryString = "table#WF_COSTLISTTBL > tbody > tr > td > span > input[type=text]"
+    let queryString = "table[id*=WF_COSTLISTTBL] > tbody > tr > td > span > input[type=text]"
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList != null) {
         for (let i = 0; i < targetTextBoxList.length; i++) {
@@ -33,7 +33,7 @@ window.addEventListener('load', function () {
 });
 
 function selectAll(val) {
-    let queryString = "table#WF_COSTLISTTBL > tbody > tr > td > span > input[type=checkbox]"
+    let queryString = "table[id*=WF_COSTLISTTBL] > tbody > tr > td > span > input[type=checkbox]"
     var targetCheckBoxList = document.querySelectorAll(queryString);
     if (targetCheckBoxList != null) {
         for (let i = 0; i < targetCheckBoxList.length; i++) {

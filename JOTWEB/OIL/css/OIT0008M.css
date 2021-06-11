@@ -114,10 +114,9 @@ div.detail_costlist {
     }
 }
 
-table#WF_COSTLISTTBL, table#WF_COSTLISTTBL th, table#WF_COSTLISTTBL td {
+table[id*=WF_COSTLISTTBL], table[id*=WF_COSTLISTTBL] th, table[id*=WF_COSTLISTTBL] td {
     border: solid 1px #2bb6c1;
 }
-
 
 th[class^="WF_COSTLISTTBL_TH"] {
     height: 18px;
@@ -127,7 +126,7 @@ th[class^="WF_COSTLISTTBL_TH"] {
     font-weight: normal;
 }
 
-div.detail_costlist span[id^="WF_COSTLISTTBL_"], input[id^="WF_COSTLISTTBL_"] {
+div.detail_costlist span[id*="WF_COSTLISTTBL"], input[id*="WF_COSTLISTTBL"] {
     font-size: 0.9em;
 }
 
@@ -171,7 +170,7 @@ div#RowOperationBox {
     color: #2bb6c1;
 }
 
-span#WF_COSTLISTTBL_LINE {
+span[id*=WF_COSTLISTTBL_LINE] {
     padding-right:3px;
     text-align: right;
     display: inline-block;
@@ -188,22 +187,22 @@ span.WF_COSTLISTTBL_CALCACCOUNT {
     display: inline-block;
 }
 
-input#WF_COSTLISTTBL_SHIPPERSNAME {
+input[id*=WF_COSTLISTTBL_SHIPPERSNAME] {
     width: 112px;
-    padding-left: 25px;
+    padding-left: 25px !important;
 }
 
-input#WF_COSTLISTTBL_ACCOUNTCODE {
+input[id*=WF_COSTLISTTBL_ACCOUNTCODE] {
     width: 112px;
-    padding-left:25px;
+    padding-left: 25px !important;
 }
 
-input#WF_COSTLISTTBL_INVOICECODE, input#WF_COSTLISTTBL_PAYEECODE {
+input[id*=WF_COSTLISTTBL_INVOICECODE], input[id*=WF_COSTLISTTBL_PAYEECODE] {
     width: 128px;
-    padding-left: 25px;
+    padding-left: 25px !important;
 }
 
-span#WF_COSTLISTTBL_SEGMENTCODE {
+span[id*=WF_COSTLISTTBL_SEGMENTCODE] {
     width: 80px;
     padding-left: 2px;
     letter-spacing: 1px;
@@ -212,7 +211,7 @@ span#WF_COSTLISTTBL_SEGMENTCODE {
     display: inline-block;
 }
 
-span#WF_COSTLISTTBL_SHIPPERSNAME {
+span[id*=WF_COSTLISTTBL_SHIPPERSNAME] {
     padding-left: 2px;
     text-align: left;
     vertical-align: middle;
@@ -224,7 +223,7 @@ span#WF_COSTLISTTBL_SHIPPERSNAME {
     overflow: hidden;
 }
 
-span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
+span[id*=WF_COSTLISTTBL_SEGMENTBRANCHNAME] {
     padding-left: 2px;
     text-align: left;
     vertical-align: middle;
@@ -236,7 +235,7 @@ span#WF_COSTLISTTBL_SEGMENTBRANCHNAME {
     overflow: hidden;
 }
 
-span#WF_COSTLISTTBL_AMOUNT {
+span[id*=WF_COSTLISTTBL_AMOUNT] {
     width: 112px;
     padding-right: 3px;
     letter-spacing: 1px;
@@ -245,7 +244,7 @@ span#WF_COSTLISTTBL_AMOUNT {
     display: inline-block;
 }
 
-span#WF_COSTLISTTBL_TAX {
+span[id*=WF_COSTLISTTBL_TAX] {
     width: 94px;
     padding-right: 3px;
     letter-spacing: 1px;
@@ -254,7 +253,7 @@ span#WF_COSTLISTTBL_TAX {
     display: inline-block;
 }
 
-span#WF_COSTLISTTBL_INVOICENAME, span#WF_COSTLISTTBL_PAYEENAME, span#WF_COSTLISTTBL_INVOICEDEPTNAME, span#WF_COSTLISTTBL_PAYEEDEPTNAME {
+span[id*=WF_COSTLISTTBL_INVOICENAME], span[id*=WF_COSTLISTTBL_PAYEENAME], span[id*=WF_COSTLISTTBL_INVOICEDEPTNAME], span[id*=WF_COSTLISTTBL_PAYEEDEPTNAME] {
     padding-left: 2px;
     text-align: left;
     vertical-align: middle;
@@ -266,7 +265,7 @@ span#WF_COSTLISTTBL_INVOICENAME, span#WF_COSTLISTTBL_PAYEENAME, span#WF_COSTLIST
     overflow: hidden;
 }
 
-input#WF_COSTLISTTBL_ABSTRACT {
+input[id*=WF_COSTLISTTBL_ABSTRACT] {
     width: 216px;
 }
 

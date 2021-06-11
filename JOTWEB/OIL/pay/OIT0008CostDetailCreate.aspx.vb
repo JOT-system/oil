@@ -923,7 +923,7 @@ Public Class OIT0008CostDetailCreate
 
                     Case TxtAccountCode.ID  '勘定科目
                         '勘定科目パターンマスタ検索
-                        prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
+                        prmData = work.CreateFIXParam(Master.USERCAMP, "INVOICEACCOUNT")
 
                     Case TxtInvoiceCode.ID, TxtPayeeCode.ID '請求先/支払先
                         '取引マスタ検索
@@ -1718,7 +1718,7 @@ Public Class OIT0008CostDetailCreate
                 Not String.IsNullOrEmpty(TxtSegmentBranchCode.Text) Then
 
             Dim WW_CODE As String = TxtAccountCode.Text & " " & TxtSegmentCode.Text & " " & TxtSegmentBranchCode.Text
-            CODENAME_get("ACCOUNTPATTERN", WW_CODE, WW_DUMMY, WW_RTN_SW)
+            CODENAME_get("INVOICEACCOUNT", WW_CODE, WW_DUMMY, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 WW_CheckMES1 = "・更新できないレコード(勘定科目コード/セグメント/セグメント枝番エラー)です。"
                 WW_CheckMES2 = "勘定科目マスタに存在しません。"
@@ -2578,9 +2578,9 @@ Public Class OIT0008CostDetailCreate
                     '荷主コード
                     prmData.Item(C_PARAMETERS.LP_COMPANY) = Master.USERCAMP
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ACCOUNTPATTERN"
-                    '勘定科目パターン
-                    prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
+                Case "INVOICEACCOUNT"
+                    '請求科目
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "INVOICEACCOUNT")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TORI_DEPT"
                     '請求先コード/支払先コード

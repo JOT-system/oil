@@ -1,8 +1,24 @@
-﻿Imports System.Data.SqlClient
+﻿''************************************************************
+' 取引先マスタメンテ一覧画面
+' 作成日 2020/10/07
+' 更新日 
+' 作成者 JOT常井
+' 更新者 JOT伊草
+'
+' 修正履歴:2020/10/07 新規作成
+'         :2021/06/09 1)表更新→更新、クリア→戻る、に名称変更
+'         :           2)戻るボタン押下時、確認ダイアログ表示→
+'         :             確認ダイアログでOK押下時、一覧画面に戻るように修正
+'         :           3)更新ボタン押下時、この画面でDB更新→
+'         :             一覧画面の表示データに更新後の内容反映して戻るように修正
+'         :           4)項目追加「請求先銀行外部コード」「支払先銀行外部コード」
+'         :           5)項目削除「銀行コード」「支店コード」「口座種別」「口座番号」「口座名義」
+''************************************************************
+Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' 取引マスタ登録（実行）
+''' 取引先マスタ登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIM0011ToriCreate
@@ -70,6 +86,8 @@ Public Class OIM0011ToriCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -121,8 +139,6 @@ Public Class OIM0011ToriCreate
         Master.dispHelp = False
         '○D&D有無設定
         Master.eventDrop = True
-        '○Grid情報保存先のファイル名
-        'Master.CreateXMLSaveFile()
 
         '○初期値設定
         WF_FIELD.Value = ""
@@ -212,21 +228,11 @@ Public Class OIM0011ToriCreate
         WF_OILUSEFLG.Text = work.WF_SEL_OILUSEFLG.Text
         CODENAME_get("OILUSEFLG", WF_OILUSEFLG.Text, WF_OILUSEFLG_TEXT.Text, WW_RTN_SW)
 
-        '銀行コード
-        WF_BANKCODE.Text = work.WF_SEL_BANKCODE.Text
+        '請求先銀行外部コード
+        WF_INVOICEBANKOUTSIDECODE.Text = work.WF_SEL_INVOICEBANKOUTSIDECODE.Text
 
-        '支店コード
-        WF_BANKBRANCHCODE.Text = work.WF_SEL_BANKBRANCHCODE.Text
-
-        '口座種別
-        WF_ACCOUNTTYPE.Text = work.WF_SEL_ACCOUNTTYPE.Text
-        CODENAME_get("ACCOUNTTYPE", WF_ACCOUNTTYPE.Text, WF_ACCOUNTTYPE_TEXT.Text, WW_RTN_SW)
-
-        '口座番号
-        WF_ACCOUNTNUMBER.Text = work.WF_SEL_ACCOUNTNUMBER.Text
-
-        '口座名義
-        WF_ACCOUNTNAME.Text = work.WF_SEL_ACCOUNTNAME.Text
+        '支払先銀行外部コード
+        WF_PAYEEBANKOUTSIDECODE.Text = work.WF_SEL_PAYEEBANKOUTSIDECODE.Text
 
         '削除フラグ
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -295,10 +301,280 @@ Public Class OIM0011ToriCreate
     End Sub
 
     ''' <summary>
-    ''' 一覧画面-マウスホイール時処理
+    ''' 取引先マスタ登録更新
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub WF_Grid_Scroll()
+    Protected Sub UpdateMaster(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIM0011_TORI" _
+            & "    WHERE" _
+            & "        TORICODE       = @P01 " _
+            & "        AND STYMD      = @P02 ;" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIM0011_TORI" _
+            & "    SET" _
+            & "        DELFLG = @P00" _
+            & "        , ENDYMD = @P03" _
+            & "        , TORINAME = @P04" _
+            & "        , TORINAMES = @P05" _
+            & "        , TORINAMEKANA = @P06" _
+            & "        , DEPTNAME = @P07" _
+            & "        , POSTNUM1 = @P08" _
+            & "        , POSTNUM2 = @P09" _
+            & "        , ADDR1 = @P10" _
+            & "        , ADDR2 = @P11" _
+            & "        , ADDR3 = @P12" _
+            & "        , ADDR4 = @P13" _
+            & "        , TEL = @P14" _
+            & "        , FAX = @P15" _
+            & "        , MAIL = @P16" _
+            & "        , OILUSEFLG = @P17" _
+            & "        , INVOICEBANKOUTSIDECODE = @P18" _
+            & "        , PAYEEBANKOUTSIDECODE = @P19" _
+            & "        , UPDYMD = @P23" _
+            & "        , UPDUSER = @P24" _
+            & "        , UPDTERMID = @P25" _
+            & "    WHERE" _
+            & "        TORICODE       = @P01" _
+            & "        AND STYMD      = @P02 ;" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIM0011_TORI" _
+            & "        (DELFLG" _
+            & "        , TORICODE" _
+            & "        , STYMD" _
+            & "        , ENDYMD" _
+            & "        , TORINAME" _
+            & "        , TORINAMES" _
+            & "        , TORINAMEKANA" _
+            & "        , DEPTNAME" _
+            & "        , POSTNUM1" _
+            & "        , POSTNUM2" _
+            & "        , ADDR1" _
+            & "        , ADDR2" _
+            & "        , ADDR3" _
+            & "        , ADDR4" _
+            & "        , TEL" _
+            & "        , FAX" _
+            & "        , MAIL" _
+            & "        , OILUSEFLG" _
+            & "        , INVOICEBANKOUTSIDECODE" _
+            & "        , PAYEEBANKOUTSIDECODE" _
+            & "        , INITYMD" _
+            & "        , INITUSER" _
+            & "        , INITTERMID" _
+            & "        , UPDYMD" _
+            & "        , UPDUSER" _
+            & "        , UPDTERMID" _
+            & "        , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        (@P00" _
+            & "        , @P01" _
+            & "        , @P02" _
+            & "        , @P03" _
+            & "        , @P04" _
+            & "        , @P05" _
+            & "        , @P06" _
+            & "        , @P07" _
+            & "        , @P08" _
+            & "        , @P09" _
+            & "        , @P10" _
+            & "        , @P11" _
+            & "        , @P12" _
+            & "        , @P13" _
+            & "        , @P14" _
+            & "        , @P15" _
+            & "        , @P16" _
+            & "        , @P17" _
+            & "        , @P18" _
+            & "        , @P19" _
+            & "        , @P23" _
+            & "        , @P24" _
+            & "        , @P25" _
+            & "        , @P23" _
+            & "        , @P24" _
+            & "        , @P25" _
+            & "        , @P29) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+              " Select" _
+            & "     DELFLG" _
+            & "     , TORICODE" _
+            & "     , STYMD" _
+            & "     , ENDYMD" _
+            & "     , TORINAME" _
+            & "     , TORINAMES" _
+            & "     , TORINAMEKANA" _
+            & "     , DEPTNAME" _
+            & "     , POSTNUM1" _
+            & "     , POSTNUM2" _
+            & "     , ADDR1" _
+            & "     , ADDR2" _
+            & "     , ADDR3" _
+            & "     , ADDR4" _
+            & "     , TEL" _
+            & "     , FAX" _
+            & "     , MAIL" _
+            & "     , OILUSEFLG" _
+            & "     , INVOICEBANKOUTSIDECODE" _
+            & "     , PAYEEBANKOUTSIDECODE" _
+            & "     , INITYMD" _
+            & "     , INITUSER" _
+            & "     , INITTERMID" _
+            & "     , UPDYMD" _
+            & "     , UPDUSER" _
+            & "     , UPDTERMID" _
+            & "     , RECEIVEYMD" _
+            & "     , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+            & " FROM" _
+            & "     OIL.OIM0011_TORI" _
+            & " WHERE" _
+            & "     TORICODE = @P01" _
+            & " AND STYMD = @P02"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 10)          '取引先コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)                  '開始年月日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)                  '終了年月日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 100)         '取引先名称
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 50)          '取引先略称
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 100)         '取引先カナ名称
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 20)          '部門名称
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 3)           '郵便番号（上）
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 4)           '郵便番号（下）
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 120)         '住所１
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 120)         '住所２
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 120)         '住所３
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 120)         '住所４
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 15)          '電話番号
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 15)          'ＦＡＸ番号
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 128)         'メールアドレス
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 1)           '石油利用フラグ
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4)           '請求先銀行外部コード
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4)           '支払先銀行外部コード
+
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.DateTime)              '登録年月日
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 20)          '登録ユーザーＩＤ
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.NVarChar, 20)          '登録端末
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.DateTime)              '集信日時
+
+                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 10)      '取引先コード
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.Date)              '開始年月日
+
+                Dim OIM0011row As DataRow = OIM0011INPtbl.Rows(0)
+
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                'DB更新
+                PARA00.Value = OIM0011row("DELFLG")
+                PARA01.Value = OIM0011row("TORICODE")
+                If RTrim(OIM0011row("STYMD")) <> "" Then
+                    PARA02.Value = RTrim(OIM0011row("STYMD"))
+                Else
+                    PARA02.Value = C_DEFAULT_YMD
+                End If
+                If RTrim(OIM0011row("ENDYMD")) <> "" Then
+                    PARA03.Value = RTrim(OIM0011row("ENDYMD"))
+                Else
+                    PARA03.Value = C_DEFAULT_YMD
+                End If
+                PARA04.Value = OIM0011row("TORINAME")
+                PARA05.Value = OIM0011row("TORINAMES")
+                PARA06.Value = OIM0011row("TORINAMEKANA")
+                PARA07.Value = OIM0011row("DEPTNAME")
+                PARA08.Value = OIM0011row("POSTNUM1")
+                PARA09.Value = OIM0011row("POSTNUM2")
+                PARA10.Value = OIM0011row("ADDR1")
+                PARA11.Value = OIM0011row("ADDR2")
+                PARA12.Value = OIM0011row("ADDR3")
+                PARA13.Value = OIM0011row("ADDR4")
+                PARA14.Value = OIM0011row("TEL")
+                PARA15.Value = OIM0011row("FAX")
+                PARA16.Value = OIM0011row("MAIL")
+                PARA17.Value = OIM0011row("OILUSEFLG")
+                PARA18.Value = OIM0011row("INVOICEBANKOUTSIDECODE")
+                PARA19.Value = OIM0011row("PAYEEBANKOUTSIDECODE")
+
+                PARA23.Value = WW_DATENOW
+                PARA24.Value = Master.USERID
+                PARA25.Value = Master.USERTERMID
+
+                PARA29.Value = C_DEFAULT_YMD
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+                OIM0011row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                '更新ジャーナル出力
+                JPARA00.Value = OIM0011row("DELFLG")
+                JPARA01.Value = OIM0011row("TORICODE")
+                If RTrim(OIM0011row("STYMD")) <> "" Then
+                    JPARA02.Value = RTrim(OIM0011row("STYMD"))
+                Else
+                    JPARA02.Value = C_DEFAULT_YMD
+                End If
+
+                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                    If IsNothing(OIM0011UPDtbl) Then
+                        OIM0011UPDtbl = New DataTable
+
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIM0011UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    End If
+
+                    OIM0011UPDtbl.Clear()
+                    OIM0011UPDtbl.Load(SQLdr)
+                End Using
+
+                For Each OIM0011UPDrow As DataRow In OIM0011UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "OIM0011L"
+                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                    CS0020JOURNAL.ROW = OIM0011UPDrow
+                    CS0020JOURNAL.CS0020JOURNAL()
+                    If Not isNormal(CS0020JOURNAL.ERR) Then
+                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                        Exit Sub
+                    End If
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0011L UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0011L UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -327,6 +603,11 @@ Public Class OIM0011ToriCreate
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
             OIM0011tbl_UPD()
+            '入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
+            If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ERRCODE) Then
+                Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                Exit Sub
+            End If
         End If
 
         '○ 画面表示データ保存
@@ -338,10 +619,8 @@ Public Class OIM0011ToriCreate
         Else
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
             ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
                 Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "取引先コード", needsPopUp:=True)
-
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End If
@@ -438,11 +717,10 @@ Public Class OIM0011ToriCreate
         OIM0011INProw("FAX") = WF_FAX.Text                          'ＦＡＸ番号
         OIM0011INProw("MAIL") = WF_MAIL.Text                        'メールアドレス
         OIM0011INProw("OILUSEFLG") = WF_OILUSEFLG.Text              '石油利用フラグ
-        OIM0011INProw("BANKCODE") = WF_BANKCODE.Text                '銀行コード
-        OIM0011INProw("BANKBRANCHCODE") = WF_BANKBRANCHCODE.Text    '支店コード
-        OIM0011INProw("ACCOUNTTYPE") = WF_ACCOUNTTYPE.Text          '口座種別
-        OIM0011INProw("ACCOUNTNUMBER") = WF_ACCOUNTNUMBER.Text      '口座番号
-        OIM0011INProw("ACCOUNTNAME") = WF_ACCOUNTNAME.Text          '口座名義
+        '請求先銀行外部コード
+        OIM0011INProw("INVOICEBANKOUTSIDECODE") = WF_INVOICEBANKOUTSIDECODE.Text
+        '支払先銀行外部コード
+        OIM0011INProw("PAYEEBANKOUTSIDECODE") = WF_PAYEEBANKOUTSIDECODE.Text
         OIM0011INProw("DELFLG") = WF_DELFLG.Text                    '削除フラグ
 
         '○ チェック用テーブルに登録する
@@ -450,12 +728,70 @@ Public Class OIM0011ToriCreate
 
     End Sub
 
-
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIM0011INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        Dim inputChangeFlg As Boolean = True
+        Dim OIM0011INProw As DataRow = OIM0011INPtbl.Rows(0)
+
+        ' 既存レコードとの比較
+        For Each OIM0011row As DataRow In OIM0011tbl.Rows
+            ' KEY項目が等しい時
+            If OIM0011row("TORICODE") = OIM0011INProw("TORICODE") AndAlso
+                OIM0011row("STYMD") = OIM0011INProw("STYMD") Then
+                ' KEY項目以外の項目の差異をチェック
+                If OIM0011row("ENDYMD") = OIM0011INProw("ENDYMD") AndAlso
+                    OIM0011row("TORINAME") = OIM0011INProw("TORINAME") AndAlso
+                    OIM0011row("TORINAMES") = OIM0011INProw("TORINAMES") AndAlso
+                    OIM0011row("TORINAMEKANA") = OIM0011INProw("TORINAMEKANA") AndAlso
+                    OIM0011row("DEPTNAME") = OIM0011INProw("DEPTNAME") AndAlso
+                    OIM0011row("POSTNUM1") = OIM0011INProw("POSTNUM1") AndAlso
+                    OIM0011row("POSTNUM2") = OIM0011INProw("POSTNUM2") AndAlso
+                    OIM0011row("ADDR1") = OIM0011INProw("ADDR1") AndAlso
+                    OIM0011row("ADDR2") = OIM0011INProw("ADDR2") AndAlso
+                    OIM0011row("ADDR3") = OIM0011INProw("ADDR3") AndAlso
+                    OIM0011row("ADDR4") = OIM0011INProw("ADDR4") AndAlso
+                    OIM0011row("TEL") = OIM0011INProw("TEL") AndAlso
+                    OIM0011row("FAX") = OIM0011INProw("FAX") AndAlso
+                    OIM0011row("MAIL") = OIM0011INProw("MAIL") AndAlso
+                    OIM0011row("OILUSEFLG") = OIM0011INProw("OILUSEFLG") AndAlso
+                    OIM0011row("INVOICEBANKOUTSIDECODE") = OIM0011INProw("INVOICEBANKOUTSIDECODE") AndAlso
+                    OIM0011row("PAYEEBANKOUTSIDECODE") = OIM0011INProw("PAYEEBANKOUTSIDECODE") AndAlso
+                    OIM0011row("DELFLG") = OIM0011INProw("DELFLG") Then
+                    '変更がない場合、入力変更フラグをOFFにする
+                    inputChangeFlg = False
+                End If
+
+                Exit For
+
+            End If
+        Next
+
+        If inputChangeFlg Then
+            '変更がある場合は、確認ダイアログを表示
+            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        Else
+            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+            WF_CLEAR_ConfirmOkClick()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面詳細画面-戻るボタン押下時、確認ダイアログOKボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_ConfirmOkClick()
 
         '○ 詳細画面初期化
         DetailBoxClear()
@@ -506,7 +842,7 @@ Public Class OIM0011ToriCreate
         '○ 画面表示データ保存
         Master.SaveTable(OIM0011tbl, work.WF_SEL_INPTBL.Text)
 
-        WF_Sel_LINECNT.Text = ""                    'LINECNT
+        WF_Sel_LINECNT.Text = ""             'LINECNT
 
         WF_TORICODE.Text = ""                '取引先コード
         WF_STYMD.Text = ""                   '開始年月日
@@ -525,15 +861,11 @@ Public Class OIM0011ToriCreate
         WF_FAX.Text = ""                     'ＦＡＸ番号
         WF_MAIL.Text = ""                    'メールアドレス
         WF_OILUSEFLG.Text = ""               '石油利用フラグ
-        WF_BANKCODE.Text = ""                '銀行コード
-        WF_BANKBRANCHCODE.Text = ""          '支店コード
-        WF_ACCOUNTTYPE.Text = ""             '口座種別
-        WF_ACCOUNTNUMBER.Text = ""           '口座名義
-        WF_ACCOUNTNAME.Text = ""             '口座名義
+        WF_INVOICEBANKOUTSIDECODE.Text = ""  '請求先銀行外部コード
+        WF_PAYEEBANKOUTSIDECODE.Text = ""    '支払先銀行外部コード
         WF_DELFLG.Text = ""                  '削除フラグ
 
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -628,8 +960,6 @@ Public Class OIM0011ToriCreate
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
             Case "WF_OILUSEFLG"     '石油利用フラグ
                 CODENAME_get("OILUSEFLG", WF_OILUSEFLG.Text, WF_OILUSEFLG_TEXT.Text, WW_RTN_SW)
-            Case "WF_ACCOUNTTYPE"   '口座種別
-                CODENAME_get("ACCOUNTTYPE", WF_ACCOUNTTYPE.Text, WF_ACCOUNTTYPE_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -640,7 +970,6 @@ Public Class OIM0011ToriCreate
         End If
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***
@@ -703,11 +1032,6 @@ Public Class OIM0011ToriCreate
                     WF_OILUSEFLG_TEXT.Text = WW_SelectText
                     WF_OILUSEFLG.Focus()
 
-                Case "WF_ACCOUNTTYPE"     '口座種別
-                    WF_ACCOUNTTYPE.Text = WW_SelectValue
-                    WF_ACCOUNTTYPE_TEXT.Text = WW_SelectText
-                    WF_ACCOUNTTYPE.Focus()
-
             End Select
         Else
         End If
@@ -735,9 +1059,6 @@ Public Class OIM0011ToriCreate
                 Case "WF_OILUSEFLG"                     '石油利用フラグ
                     WF_OILUSEFLG.Focus()
 
-                Case "WF_ACCOUNTTYPE"                   '口座種別
-                    WF_ACCOUNTTYPE.Focus()
-
             End Select
         Else
         End If
@@ -749,7 +1070,6 @@ Public Class OIM0011ToriCreate
         WF_RightboxOpen.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -779,7 +1099,6 @@ Public Class OIM0011ToriCreate
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -1064,64 +1383,88 @@ Public Class OIM0011ToriCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '銀行コード(バリデーションチェック)
-            WW_TEXT = OIM0011INProw("BANKCODE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BANKCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ''銀行コード(バリデーションチェック)
+            'WW_TEXT = OIM0011INProw("BANKCODE")
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BANKCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(銀行コード入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            ''支店コード(バリデーションチェック)
+            'WW_TEXT = OIM0011INProw("BANKBRANCHCODE")
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BANKBRANCHCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(支店コード入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            ''口座種別(バリデーションチェック）
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTTYPE", OIM0011INProw("ACCOUNTTYPE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If isNormal(WW_CS0024FCHECKERR) Then
+            '    '値存在チェック
+            '    CODENAME_get("ACCOUNTTYPE", OIM0011INProw("ACCOUNTTYPE"), WW_DUMMY, WW_RTN_SW)
+            '    If Not isNormal(WW_RTN_SW) Then
+            '        WW_CheckMES1 = "・更新できないレコード(口座種別エラー)です。"
+            '        WW_CheckMES2 = "マスタに存在しません。"
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '    End If
+            'Else
+            '    WW_CheckMES1 = "・更新できないレコード(口座種別エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            ''口座番号(バリデーションチェック)
+            'WW_TEXT = OIM0011INProw("ACCOUNTNUMBER")
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(口座番号入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            ''口座名義(バリデーションチェック)
+            'WW_TEXT = OIM0011INProw("ACCOUNTNAME")
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "・更新できないレコード(口座名義入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+
+            '請求先銀行外部コード(バリデーションチェック)
+            WW_TEXT = OIM0011INProw("INVOICEBANKOUTSIDECODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INVOICEBANKOUTSIDECODE",
+                              WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(銀行コード入力エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(請求先銀行外部コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '支店コード(バリデーションチェック)
-            WW_TEXT = OIM0011INProw("BANKBRANCHCODE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BANKBRANCHCODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            '支払先銀行外部コード(バリデーションチェック)
+            WW_TEXT = OIM0011INProw("PAYEEBANKOUTSIDECODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PAYEEBANKOUTSIDECODE",
+                              WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(支店コード入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '口座種別(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTTYPE", OIM0011INProw("ACCOUNTTYPE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("ACCOUNTTYPE", OIM0011INProw("ACCOUNTTYPE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(口座種別エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(口座種別エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '口座番号(バリデーションチェック)
-            WW_TEXT = OIM0011INProw("ACCOUNTNUMBER")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTNUMBER", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(口座番号入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '口座名義(バリデーションチェック)
-            WW_TEXT = OIM0011INProw("ACCOUNTNAME")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCOUNTNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(口座名義入力エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(支払先銀行外部コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0011INProw)
                 WW_LINE_ERR = "ERR"
@@ -1238,18 +1581,19 @@ Public Class OIM0011ToriCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> ＦＡＸ番号 =" & OIM0011row("FAX") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIM0011row("MAIL") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 石油利用フラグ =" & OIM0011row("OILUSEFLG") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 銀行コード =" & OIM0011row("BANKCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 支店コード =" & OIM0011row("BANKBRANCHCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 口座種別 =" & OIM0011row("ACCOUNTTYPE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 口座番号 =" & OIM0011row("ACCOUNTNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 口座名義 =" & OIM0011row("ACCOUNTNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 銀行コード =" & OIM0011row("BANKCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 支店コード =" & OIM0011row("BANKBRANCHCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 口座種別 =" & OIM0011row("ACCOUNTTYPE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 口座番号 =" & OIM0011row("ACCOUNTNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 口座名義 =" & OIM0011row("ACCOUNTNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先銀行外部コード =" & OIM0011row("INVOICEBANKOUTSIDECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先銀行外部コード =" & OIM0011row("PAYEEBANKOUTSIDECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0011row("DELFLG")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
-
 
     ''' <summary>
     ''' OIM0011tbl更新
@@ -1304,11 +1648,8 @@ Public Class OIM0011ToriCreate
                         OIM0011row("FAX") = OIM0011INProw("FAX") AndAlso
                         OIM0011row("MAIL") = OIM0011INProw("MAIL") AndAlso
                         OIM0011row("OILUSEFLG") = OIM0011INProw("OILUSEFLG") AndAlso
-                        OIM0011row("BANKCODE") = OIM0011INProw("BANKCODE") AndAlso
-                        OIM0011row("BANKBRANCHCODE") = OIM0011INProw("BANKBRANCHCODE") AndAlso
-                        OIM0011row("ACCOUNTTYPE") = OIM0011INProw("ACCOUNTTYPE") AndAlso
-                        OIM0011row("ACCOUNTNUMBER") = OIM0011INProw("ACCOUNTNUMBER") AndAlso
-                        OIM0011row("ACCOUNTNAME") = OIM0011INProw("ACCOUNTNAME") AndAlso
+                        OIM0011row("INVOICEBANKOUTSIDECODE") = OIM0011INProw("INVOICEBANKOUTSIDECODE") AndAlso
+                        OIM0011row("PAYEEBANKOUTSIDECODE") = OIM0011INProw("PAYEEBANKOUTSIDECODE") AndAlso
                         OIM0011row("DELFLG") = OIM0011INProw("DELFLG") Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
@@ -1323,23 +1664,71 @@ Public Class OIM0011ToriCreate
             Next
         Next
 
+        '更新チェック
+        If C_LIST_OPERATION_CODE.NODATA.Equals(OIM0011INPtbl.Rows(0)("OPERATION")) Then
+            '更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
+            WW_ERRCODE = C_MESSAGE_NO.NO_CHANGE_UPDATE
+            Exit Sub
+        ElseIf CONST_UPDATE.Equals(OIM0011INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(OIM0011INPtbl.Rows(0)("OPERATION")) Then
+            '追加/更新の場合、DB更新処理
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                'マスタ更新
+                UpdateMaster(SQLcon)
+
+                work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            End Using
+        End If
+
         '○ 変更有無判定　&　入力値反映
         For Each OIM0011INProw As DataRow In OIM0011INPtbl.Rows
-            Select Case OIM0011INProw("OPERATION")
-                Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIM0011INProw)
-                Case CONST_INSERT
-                    TBL_INSERT_SUB(OIM0011INProw)
-                Case CONST_PATTERNERR
-                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIM0011INProw)
-                Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIM0011INProw)
-            End Select
+            '発見フラグ
+            Dim isFound As Boolean = False
+
+            ' 既存レコードとの比較
+            For Each OIM0011row As DataRow In OIM0011tbl.Rows
+                ' KEY項目が等しい時
+                If OIM0011row("TORICODE") = OIM0011INProw("TORICODE") AndAlso
+                    OIM0011row("STYMD") = OIM0011INProw("STYMD") Then
+
+                    '画面入力テーブル項目設定
+                    OIM0011INProw("LINECNT") = OIM0011row("LINECNT")
+                    OIM0011INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIM0011INProw("UPDTIMSTP") = OIM0011row("UPDTIMSTP")
+                    OIM0011INProw("SELECT") = 0
+                    OIM0011INProw("HIDDEN") = 0
+
+                    '項目テーブル項目設定
+                    OIM0011row.ItemArray = OIM0011INProw.ItemArray
+
+                    '発見フラグON
+                    isFound = True
+                    Exit For
+                End If
+            Next
+
+            '同一レコードが発見できない場合は、追加する
+            If Not isFound Then
+                Dim nrow = OIM0011tbl.NewRow
+                nrow.ItemArray = OIM0011INProw.ItemArray
+
+                '画面入力テーブル項目設定
+                nrow("LINECNT") = OIM0011tbl.Rows.Count + 1
+                nrow("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                nrow("UPDTIMSTP") = "0"
+                nrow("SELECT") = 0
+                nrow("HIDDEN") = 0
+
+                OIM0011tbl.Rows.Add(nrow)
+            End If
         Next
 
     End Sub
 
+#Region "未使用"
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
@@ -1393,7 +1782,6 @@ Public Class OIM0011ToriCreate
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -1420,6 +1808,7 @@ Public Class OIM0011ToriCreate
         Next
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 名称取得
@@ -1446,9 +1835,6 @@ Public Class OIM0011ToriCreate
             Select Case I_FIELD
                 Case "OILUSEFLG"                    '石油利用フラグ
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "OILUSEFLG")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ACCOUNTTYPE"                  '口座種別
-                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "BANKACCOUNTTYPE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"                       '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)

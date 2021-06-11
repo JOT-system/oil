@@ -39,6 +39,12 @@
     <asp:TextBox ID="WF_SEL_STOCKFLG" runat="server"></asp:TextBox>             <!-- 在庫管理対象フラグ -->
     <asp:TextBox ID="WF_SEL_ORDERFROMDATE" runat="server"></asp:TextBox>        <!-- 受注登録可能期間FROM -->
     <asp:TextBox ID="WF_SEL_ORDERTODATE" runat="server"></asp:TextBox>          <!-- 受注登録可能期間TO -->
+    <asp:TextBox ID="WF_SEL_REPORTOILNAME" runat="server"></asp:TextBox>        <!-- 帳票用油種名 -->
+    <asp:TextBox ID="WF_SEL_JROILTYPE" runat="server"></asp:TextBox>            <!-- JR油種区分 -->
+    <asp:TextBox ID="WF_SEL_JROILTYPENAME" runat="server"></asp:TextBox>        <!-- JR油種区分名 -->
+    <asp:TextBox ID="WF_SEL_SHIPPINGGATE" runat="server"></asp:TextBox>         <!-- 出荷口 -->
+    <asp:TextBox ID="WF_SEL_AVERAGELOADAMOUNT" runat="server"></asp:TextBox>    <!-- 平均積込数量 -->
+    <asp:TextBox ID="WF_SEL_SHIPPINGPLAN" runat="server"></asp:TextBox>         <!-- 出荷計画枠 -->
     <asp:TextBox ID="WF_SEL_DELFLG2" runat="server"></asp:TextBox>              <!-- 削除フラグ -->
     <!-- 品種出荷期間マスタ -->
     <asp:TextBox ID="WF_SEL_OILTERM_CONSIGNEECODE_01" runat="server"></asp:TextBox> <!-- 品種出荷期間01.荷受人コード -->

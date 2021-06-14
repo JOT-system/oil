@@ -13602,6 +13602,28 @@ Public Class OIT0003OrderDetail
                 If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
                 SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
 
+
+                '★★★タンク車所在(輸送完了前に、交検にした場合の対応)
+            ElseIf upFlag = "3" Then
+                '使用受注№
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
+
+                SQLStr &=
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND DELFLG        <> @P02 " _
+                '& "    AND TANKSITUATION IN ('1','2') "
+
+                SQLStr &= String.Format("     AND TANKSITUATION IN ('{0}') ",
+                                        BaseDllConst.CONST_TANKSITUATION_13)
+
+                '★受注Noが未設定の場合は、オーダー中の受注№を設定
+                If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
+                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
+
             End If
             '### 20200907 END   タンク車がOT所有の場合のステータス更新対応 #########################
 
@@ -16836,6 +16858,15 @@ Public Class OIT0003OrderDetail
                                                      BaseDllConst.CONST_TANKSITUATION_02,
                                                      OI_TANKNO:=OIT0003row("TANKNO"))
                             'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, BaseDllConst.CONST_TANKSTATUS_03, "E", I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_02, I_TANKNO:=OIT0003row("TANKNO"), upLastOilCode:=True, upFlag:="1")
+
+                            '★タンク車所在の更新(輸送完了前に、交検にした場合の対応)
+                            '引数１：所在地コード　⇒　変更なし
+                            '引数２：タンク車状態　⇒　変更なし
+                            '引数３：積車区分　　　⇒　変更なし
+                            If Not String.IsNullOrEmpty(OIT0003row("TANKNO")) AndAlso Not String.IsNullOrEmpty(OIT0003row("ACTUALEMPARRDATE")) Then
+                                WW_UpdateTankShozai("", "", "", I_TANKNO:=OIT0003row("TANKNO"), upFlag:="3")
+                            End If
+
                         End If
                     Else
                         '    ### ①START ##################################################################
@@ -16878,6 +16909,15 @@ Public Class OIT0003OrderDetail
                                                    OI_ACTUALEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"))
                             'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, BaseDllConst.CONST_TANKSTATUS_02, "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:=BaseDllConst.CONST_TANKSITUATION_01, I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
                             '### ②END ####################################################################
+
+                            '★タンク車所在の更新(輸送完了前に、交検にした場合の対応)
+                            '引数１：所在地コード　⇒　変更なし
+                            '引数２：タンク車状態　⇒　変更なし
+                            '引数３：積車区分　　　⇒　変更なし
+                            If Not String.IsNullOrEmpty(OIT0003row("TANKNO")) AndAlso Not String.IsNullOrEmpty(OIT0003row("ACTUALEMPARRDATE")) Then
+                                WW_UpdateTankShozai("", "", "", I_TANKNO:=OIT0003row("TANKNO"), upFlag:="3")
+                            End If
+
                         End If
 
                     End If

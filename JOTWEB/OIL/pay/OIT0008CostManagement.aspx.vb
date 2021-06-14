@@ -1792,7 +1792,7 @@ Public Class OIT0008CostManagement
                 '勘定科目/セグメント/セグメント枝番名称取得
                 Dim WK_CODE As String = strow("ACCOUNTCODE") & " " & strow("SEGMENTCODE") & " " & strow("SEGMENTBRANCHCODE")
                 Dim WK_NAME As String = ""
-                CODENAME_get("ACCOUNTPATTERN", WK_CODE, WK_NAME, WW_RTN_SW)
+                CODENAME_get("INVOICEACCOUNT", WK_CODE, WK_NAME, WW_RTN_SW)
                 If Not String.IsNullOrEmpty(WK_NAME) Then
                     Dim names = ConvertAccountPatternName(WK_NAME)
                     If names.Length > 0 Then strow("ACCOUNTNAME") = names(0)
@@ -3816,7 +3816,7 @@ Public Class OIT0008CostManagement
                 Dim WW_CODE As String = OIT0008INProw("ACCOUNTCODE") & " " &
                                         OIT0008INProw("SEGMENTCODE") & " " &
                                         OIT0008INProw("SEGMENTBRANCHCODE")
-                CODENAME_get("ACCOUNTPATTERN", WW_CODE, WW_DUMMY, WW_RTN_SW)
+                CODENAME_get("INVOICEACCOUNT", WW_CODE, WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     WW_CheckMES1 = "・更新できないレコード(勘定科目コード/セグメント/セグメント枝番エラー)です。"
                     WW_CheckMES2 = "勘定科目マスタに存在しません。"

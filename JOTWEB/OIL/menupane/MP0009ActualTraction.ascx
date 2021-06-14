@@ -37,6 +37,10 @@
                         <asp:DropDownList ID="ddlActualTractionYearMonth" runat="server" ClientIDMode="Predictable" CssClass="yearMonthDdl"></asp:DropDownList>
                     </span>
                     <span>
+                        基準日
+                        <asp:DropDownList ID="ddlActualTractionDayStandard" runat="server" ClientIDMode="Predictable" CssClass="dayStandardDdl"></asp:DropDownList>
+                    </span>
+                    <span>
                         <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);'  />
                         <asp:HiddenField ID="hdnDownloadCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
                     </span>

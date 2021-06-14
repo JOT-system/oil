@@ -36,6 +36,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
     Private ArrStationCode As String = ""
     Private ArrStationName As String = ""
     Private YearMonth As String = ""
+    Private DayStandard As String = ""
 
 
     ''' <summary>
@@ -66,8 +67,15 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
     ''' <param name="mapId"></param>
     ''' <param name="excelFileName"></param>
     ''' <param name="dispData"></param>
-    Public Sub New(mapId As String, excelFileName As String, dispData As DataTable,
-                   officeCode As String, officeName As String, arrStationCode As String, arrStationName As String, yearMonth As String)
+    Public Sub New(mapId As String,
+                   excelFileName As String,
+                   dispData As DataTable,
+                   officeCode As String,
+                   officeName As String,
+                   arrStationCode As String,
+                   arrStationName As String,
+                   yearMonth As String,
+                   dayStandard As String)
         Dim CS0050SESSION As New CS0050SESSION
         Me.DispData = dispData
         Me.OfficeCode = officeCode
@@ -75,6 +83,7 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
         Me.ArrStationCode = arrStationCode
         Me.ArrStationName = arrStationName
         Me.YearMonth = yearMonth
+        Me.DayStandard = dayStandard
         Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                               "PRINTFORMAT",
                                               C_DEFAULT_DATAKEY,
@@ -262,6 +271,13 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             If Date.TryParse(strDt, dt) Then
                 rngWork = Me.ExcelWorkSheet.Range("A2")
                 rngWork.Value = String.Format("{0:yyyy年M月}", dt)
+                ExcelMemoryRelease(rngWork)
+            End If
+            '五井かつ積基準の場合
+            If Me.OfficeCode.Equals(BaseDllConst.CONST_OFFICECODE_011201) AndAlso
+                Me.DayStandard.Equals("1") Then
+                rngWork = Me.ExcelWorkSheet.Range("E4")
+                rngWork.Value = "積日基準"
                 ExcelMemoryRelease(rngWork)
             End If
 
@@ -496,12 +512,23 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
             '請負-コスモ-倉賀野-8877
             Dim setData = allData.Where(Function(r)
                                             Return r.OTTRANSPORTFLG = "2" AndAlso
-                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
-                                            r.ARRSTATIONCODE = "4113" AndAlso
-                                            r.TRAINNO = "8877"
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "4113" AndAlso
+                                        r.TRAINNO = "8877"
                                         End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "2" AndAlso
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "4113" AndAlso
+                                        r.TRAINNO = "8877"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C7", dt, setData)
 
             '請負-コスモ-倉賀野-8883
@@ -513,17 +540,39 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "2" AndAlso
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "4113" AndAlso
+                                        r.TRAINNO = "8883"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C8", dt, setData)
 
             '請負-コスモ-倉賀野-5972
             setData = allData.Where(Function(r)
                                         Return r.OTTRANSPORTFLG = "2" AndAlso
-                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
-                                        r.ARRSTATIONCODE = "4113" AndAlso
-                                        r.TRAINNO = "5972"
+                                    r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                    r.ARRSTATIONCODE = "4113" AndAlso
+                                    r.TRAINNO = "5972"
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "2" AndAlso
+                                    r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                    r.ARRSTATIONCODE = "4113" AndAlso
+                                    r.TRAINNO = "5972"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C9", dt, setData)
 
             '請負-コスモ-南松本-2081
@@ -535,6 +584,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "2" AndAlso
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "5141" AndAlso
+                                        r.TRAINNO = "2081"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C11", dt, setData)
 
             'OT-コスモ-郡山-1071
@@ -546,6 +606,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                        r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                        r.ARRSTATIONCODE = "2407" AndAlso
+                                        r.TRAINNO = "1071"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C13", dt, setData)
 
             'OT-コスモ-郡山-8179
@@ -557,6 +628,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "2407" AndAlso
+                                            r.TRAINNO = "8179"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C14", dt, setData)
 
             'OT-コスモ-宇都宮-8681
@@ -568,6 +650,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4425" AndAlso
+                                            r.TRAINNO = "8681"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C16", dt, setData)
 
             'OT-コスモ-宇都宮-8685
@@ -579,6 +672,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4425" AndAlso
+                                            r.TRAINNO = "8685"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C17", dt, setData)
 
             'OT-コスモ-宇都宮-9175
@@ -590,6 +694,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4425" AndAlso
+                                            r.TRAINNO = "9175"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C18", dt, setData)
 
             'OT-コスモ-倉賀野-8883
@@ -601,6 +716,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4113" AndAlso
+                                            r.TRAINNO = "8883"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C20", dt, setData)
 
             'OT-コスモ-倉賀野-8877
@@ -612,6 +738,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4113" AndAlso
+                                            r.TRAINNO = "8877"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C21", dt, setData)
 
             'OT-コスモ-倉賀野-8763
@@ -623,6 +760,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4113" AndAlso
+                                            r.TRAINNO = "8763"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C22", dt, setData)
 
             'OT-コスモ-八王子-2461
@@ -634,6 +782,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "4610" AndAlso
+                                            r.TRAINNO = "2461"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C24", dt, setData)
 
             'OT-コスモ-南松本-5972
@@ -645,6 +804,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "5141" AndAlso
+                                            r.TRAINNO = "5972"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C25", dt, setData)
 
             'OT-コスモ-南松本-9672
@@ -656,6 +826,17 @@ Public Class M00001MP0009ActualTraction : Implements IDisposable
                                     End Function).
                 GroupBy(Function(r) New With {Key r.DEPDATE}).
                 ToDictionary(Function(g) g.Key.DEPDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            '積基準の場合は積日で集計し直し
+            If Me.DayStandard = "1" Then
+                setData = allData.Where(Function(r)
+                                            Return r.OTTRANSPORTFLG = "1" AndAlso
+                                            r.SHIPPERCODE = BaseDllConst.CONST_SHIPPERCODE_0094000010 AndAlso
+                                            r.ARRSTATIONCODE = "5141" AndAlso
+                                            r.TRAINNO = "9672"
+                                        End Function).
+                GroupBy(Function(r) New With {Key r.LODDATE}).
+                ToDictionary(Function(g) g.Key.LODDATE, Function(g) g.Select(Function(r) r.CARSNUMBER).Sum())
+            End If
             SetRowValues("C26", dt, setData)
 
             '積込回数（その日発送する列車の受注明細の回線の最大値）

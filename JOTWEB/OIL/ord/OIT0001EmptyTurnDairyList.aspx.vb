@@ -937,8 +937,8 @@ Public Class OIT0001EmptyTurnDairyList
             WW_InsertOrder(SQLcon)
             '★OT受注明細TBL⇒受注明細TBLへ追加(すでに登録済みの場合は追加しない)
             WW_InsertOrderDetail(SQLcon)
-            '★取込したOT受注TBLの削除フラグを"1"(無効)更新
-            WW_UpdateOTOrderStatus(SQLcon, I_ITEM:="DELFLG", I_VALUE:=C_DELETE_FLG.DELETE)
+            ''★取込したOT受注TBLの削除フラグを"1"(無効)更新
+            'WW_UpdateOTOrderStatus(SQLcon, I_ITEM:="DELFLG", I_VALUE:=C_DELETE_FLG.DELETE)
 
         End Using
 
@@ -955,6 +955,12 @@ Public Class OIT0001EmptyTurnDairyList
                 WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
             End Using
         End If
+
+        '★取込したOT受注TBLの削除フラグを"1"(無効)更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            WW_UpdateOTOrderStatus(SQLcon, I_ITEM:="DELFLG", I_VALUE:=C_DELETE_FLG.DELETE)
+        End Using
 
         '○ 画面表示データ取得(一覧再取得)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

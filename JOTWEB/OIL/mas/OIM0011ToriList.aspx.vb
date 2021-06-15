@@ -307,7 +307,8 @@ Public Class OIM0011ToriList
 
         SQLStr &=
               " ORDER BY" _
-            & "    RIGHT('0000' + CAST(OIM0011.TORICODE AS NVARCHAR), 4)"
+            & "    RIGHT('0000000000' + CAST(OIM0011.TORICODE AS NVARCHAR), 10)" _
+            & "    , FORMAT(OIM0011.STYMD, 'yyyy/MM/dd')"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

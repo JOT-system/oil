@@ -804,7 +804,7 @@ Public Class OIT0001EmptyTurnDairyList
     End Sub
 
     ''' <summary>
-    ''' OT比較結果ボタン押下時処理
+    ''' OT取込結果ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOTCOMPARE_Click()
@@ -845,7 +845,7 @@ Public Class OIT0001EmptyTurnDairyList
     End Sub
 
     ''' <summary>
-    ''' 帳票表示(OT比較結果)データ取得
+    ''' 帳票表示(OT取込結果)データ取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>

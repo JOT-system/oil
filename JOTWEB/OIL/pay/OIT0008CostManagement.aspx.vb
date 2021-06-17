@@ -39,8 +39,6 @@ Public Class OIT0008CostManagement
     '〇　請求/支払合計計算用
     Private WK_INV_AMOUNT_ALL As Integer = 0
     Private WK_INV_TAX_ALL As Integer = 0
-    Private WK_PAY_AMOUNT_ALL As Integer = 0
-    Private WK_PAY_TAX_ALL As Integer = 0
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -1794,7 +1792,7 @@ Public Class OIT0008CostManagement
                 '勘定科目/セグメント/セグメント枝番名称取得
                 Dim WK_CODE As String = strow("ACCOUNTCODE") & " " & strow("SEGMENTCODE") & " " & strow("SEGMENTBRANCHCODE")
                 Dim WK_NAME As String = ""
-                CODENAME_get("ACCOUNTPATTERN", WK_CODE, WK_NAME, WW_RTN_SW)
+                CODENAME_get("INVOICEACCOUNT", WK_CODE, WK_NAME, WW_RTN_SW)
                 If Not String.IsNullOrEmpty(WK_NAME) Then
                     Dim names = ConvertAccountPatternName(WK_NAME)
                     If names.Length > 0 Then strow("ACCOUNTNAME") = names(0)
@@ -2977,13 +2975,6 @@ Public Class OIT0008CostManagement
                     If Not row("TAX") Is DBNull.Value Then
                         WK_INV_TAX_ALL += row("TAX")
                     End If
-                ElseIf row("ACCOUNTCODE").ToString().Substring(0, 1) = "5" Then
-                    If Not row("AMOUNT") Is DBNull.Value Then
-                        WK_PAY_AMOUNT_ALL += row("AMOUNT")
-                    End If
-                    If Not row("TAX") Is DBNull.Value Then
-                        WK_PAY_TAX_ALL += row("TAX")
-                    End If
                 End If
         End Select
     End Sub
@@ -3093,16 +3084,7 @@ Public Class OIT0008CostManagement
                 gvrow.Cells(2).CssClass = "footerCells money"
                 gvrow.Cells(2).Text = String.Format("{0:#,##0}", WK_INV_TAX_ALL)
 
-                gvrow.Cells(3).CssClass = "footerCells text"
-                gvrow.Cells(3).Text = "支払合計"
-
-                gvrow.Cells(4).CssClass = "footerCells money"
-                gvrow.Cells(4).Text = String.Format("{0:#,##0}", WK_PAY_AMOUNT_ALL)
-
-                gvrow.Cells(5).CssClass = "footerCells money"
-                gvrow.Cells(5).Text = String.Format("{0:#,##0}", WK_PAY_TAX_ALL)
-
-                For j = 6 To gvrow.Cells.Count - 1
+                For j = 3 To gvrow.Cells.Count - 1
                     gvrow.Cells(j).Visible = False
                 Next
 
@@ -3143,7 +3125,7 @@ Public Class OIT0008CostManagement
                         End If
                         '勘定科目コード/セグメント/セグメント枝番
                         If WF_FIELD.Value.Contains("WF_COSTLISTTBL_ACCOUNTCODE") Then
-                            prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
+                            prmData = work.CreateFIXParam(Master.USERCAMP, "INVOICEACCOUNT")
                         End If
                         '請求/支払先
                         If WF_FIELD.Value.Contains("WF_COSTLISTTBL_INVOICECODE") OrElse
@@ -3834,7 +3816,7 @@ Public Class OIT0008CostManagement
                 Dim WW_CODE As String = OIT0008INProw("ACCOUNTCODE") & " " &
                                         OIT0008INProw("SEGMENTCODE") & " " &
                                         OIT0008INProw("SEGMENTBRANCHCODE")
-                CODENAME_get("ACCOUNTPATTERN", WW_CODE, WW_DUMMY, WW_RTN_SW)
+                CODENAME_get("INVOICEACCOUNT", WW_CODE, WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     WW_CheckMES1 = "・更新できないレコード(勘定科目コード/セグメント/セグメント枝番エラー)です。"
                     WW_CheckMES2 = "勘定科目マスタに存在しません。"
@@ -4002,8 +3984,8 @@ Public Class OIT0008CostManagement
 
         Try
             Select Case I_FIELD
-                Case "ACCOUNTPATTERN"
-                    prmData = work.CreateFIXParam(Master.USERCAMP, "ACCOUNTPATTERN")
+                Case "INVOICEACCOUNT"
+                    prmData = work.CreateFIXParam(Master.USERCAMP, "INVOICEACCOUNT")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TORI_DEPT"
                     ' 請求先コード/支払先コード

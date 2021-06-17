@@ -62,6 +62,14 @@ Public Class MP0009ActualTraction
                             SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
                         End If
                         Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
+                        '選択営業所が五井の場合
+                        If Me.ddlActualTractionOffice.SelectedValue.Equals(BaseDllConst.CONST_OFFICECODE_011201) Then
+                            Me.ddlActualTractionDayStandard.Enabled = True
+                            Me.ddlActualTractionDayStandard.Visible = True
+                        Else
+                            Me.ddlActualTractionDayStandard.Visible = False
+                            Me.ddlActualTractionDayStandard.Enabled = False
+                        End If
                     End If
                     With Me.ddlActualTractionArrStation
                         Me.SaveCookie(.ClientID, .SelectedValue)
@@ -80,12 +88,16 @@ Public Class MP0009ActualTraction
                         dt = GetDownloadListData(sqlCon)
                     End Using
                     '帳票生成
+                    Dim dayStandard As String = "1"
+                    If Me.ddlActualTractionOffice.SelectedValue.Equals(BaseDllConst.CONST_OFFICECODE_011201) Then
+                        dayStandard = Me.ddlActualTractionDayStandard.SelectedValue
+                    End If
                     Dim tempFileName As String = String.Format("{0}_ACTUALTRACTION_{1}.xlsx", Me.ID, Me.ddlActualTractionOffice.SelectedValue)
                     Using clsPrint As New M00001MP0009ActualTraction(
                         Me.Page.Title, tempFileName, dt,
                         Me.ddlActualTractionOffice.SelectedValue, Me.ddlActualTractionOffice.SelectedItem.Text,
                         Me.ddlActualTractionArrStation.SelectedValue, Me.ddlActualTractionArrStation.SelectedItem.Text,
-                        Me.ddlActualTractionYearMonth.SelectedItem.Text
+                        Me.ddlActualTractionYearMonth.SelectedItem.Text, dayStandard
                         )
                         clsPrint.CreateExcelFileStream(Me.Page)
                     End Using
@@ -140,6 +152,19 @@ Public Class MP0009ActualTraction
             Dim savedSelectedVal As String = ""
             savedSelectedVal = Me.LoadCookie(Me.ddlActualTractionArrStation.ClientID)
             SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
+        End If
+        '基準日ドロップダウンの生成
+        Dim dsDdl As New DropDownList
+        dsDdl.Items.Add(New ListItem("積基準", "1"))
+        dsDdl.Items.Add(New ListItem("発基準", "2"))
+        Me.ddlActualTractionDayStandard.Items.AddRange(dsDdl.Items.Cast(Of ListItem).ToArray)
+        Me.ddlActualTractionDayStandard.SelectedIndex = 0   'デフォルトを積基準とする
+        Me.ddlActualTractionDayStandard.Visible = False
+        Me.ddlActualTractionDayStandard.Enabled = False
+        '五井営業所のみ表示＆操作可とする
+        If Me.ddlActualTractionOffice.SelectedValue.Equals(BaseDllConst.CONST_OFFICECODE_011201) Then
+            Me.ddlActualTractionDayStandard.Enabled = True
+            Me.ddlActualTractionDayStandard.Visible = True
         End If
         '年月ドロップダウンの生成
         Dim ymDdl As New DropDownList

@@ -246,7 +246,9 @@
                     <!-- 出荷口 -->
                     <span class="ef">
                         <asp:Label ID="WF_SHIPPINGGATE_L" runat="server" Text="出荷口" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_SHIPPINGGATE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="40"></asp:TextBox>
+                        <span ondblclick="Field_DBclick('WF_SHIPPINGGATE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_SHIPPINGGATE');">
+                            <asp:TextBox ID="WF_SHIPPINGGATE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="40"></asp:TextBox>
+                        </span>
                         <asp:Label ID="WF_SHIPPINGGATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                     <!-- 平均積込数量 -->
@@ -266,7 +268,7 @@
                 </p>
                 <p id="KEY_LINE_17">
                     <asp:Label ID="WF_OILTERMTBL_L" runat="server" Text="品種出荷期間" CssClass="WF_TEXT_LABEL"></asp:Label>
-                    <asp:GridView ID="WF_OILTERMTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" Visible="true" ShowFooter="false" CssClass="WF_OILTERMTBL">
+                    <asp:GridView ID="WF_OILTERMTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" Visible="true" ShowFooter="false" CssClass="WF_OILTERMTBL" ClientIDMode="Predictable">
                         <Columns>
                             <asp:TemplateField Visible="False">
                                 <ItemTemplate>

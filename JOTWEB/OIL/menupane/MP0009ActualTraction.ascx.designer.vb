@@ -77,6 +77,15 @@ Partial Public Class MP0009ActualTraction
     Protected WithEvents ddlActualTractionYearMonth As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''ddlActualTractionDayStandard コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlActualTractionDayStandard As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''btnDownload コントロール。
     '''</summary>
     '''<remarks>

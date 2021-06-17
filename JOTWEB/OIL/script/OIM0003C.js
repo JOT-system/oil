@@ -18,7 +18,7 @@ function InitDisplay() {
 
 // ロード時処理(共通処理により、GridView内のアイコン付きTextBoxの幅がcalc(100% + 1px)に補正される為、100%に戻す)
 window.addEventListener('load', function () {
-    let queryString = "table#WF_OILTERMTBL > tbody > tr > td > span > input[type=text]"
+    let queryString = "table[id*=WF_OILTERMTBL] > tbody > tr > td > span > input[type=text]"
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList != null) {
         for (let i = 0; i < targetTextBoxList.length; i++) {

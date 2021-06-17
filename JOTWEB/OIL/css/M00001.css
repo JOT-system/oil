@@ -446,7 +446,8 @@ div.showGuidance a[id^="Menu_"] {
 
 .paneContent select.officeDdl,
 .paneContent select.stationDdl,
-.paneContent select.yearMonthDdl {
+.paneContent select.yearMonthDdl,
+.paneContent select.dayStandardDdl {
     height: 28px;
     font-size: 12pt;
     padding: 2px;

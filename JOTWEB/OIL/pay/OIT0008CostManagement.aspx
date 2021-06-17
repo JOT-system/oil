@@ -81,7 +81,7 @@
                 </div>
             </div>
             <div class="detail_costlist">
-                <asp:GridView ID="WF_COSTLISTTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" ShowHeaderWhenEmpty="true" Visible="true" ShowFooter="true" CssClass="WF_COSTLISTTBL" BorderColor="#2bb6c1">
+                <asp:GridView ID="WF_COSTLISTTBL" runat="server" AllowPaging="false" AutoGenerateColumns="false" ShowHeader="true" ShowHeaderWhenEmpty="true" Visible="true" ShowFooter="true" CssClass="WF_COSTLISTTBL" BorderColor="#2bb6c1" ClientIDMode="Predictable">
                     <Columns>
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH1" ItemStyle-CssClass="WF_COSTLISTTBL_TD1">
                             <HeaderTemplate>#</HeaderTemplate>
@@ -123,7 +123,7 @@
                         <asp:TemplateField HeaderStyle-CssClass="WF_COSTLISTTBL_TH5" ItemStyle-CssClass="WF_COSTLISTTBL_TD5">
                             <HeaderTemplate>勘定科目</HeaderTemplate>
                             <ItemTemplate>
-                                <span ondblclick="Field_DBclick('WF_COSTLISTTBL_ACCOUNTCODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST%>)">
+                                <span ondblclick="Field_DBclick('WF_COSTLISTTBL_ACCOUNTCODE<%# String.Format("{0:000}", DirectCast(Container, GridViewRow).RowIndex + 1) %>', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE %>)">
                                     <asp:TextBox ID="WF_COSTLISTTBL_ACCOUNTCODE" runat="server" CssClass='<%# GetEditableCodeStyle(DataBinder.Eval(Container.DataItem, "CALCACCOUNT")) %>'  ReadOnly="true" Text='<%# Bind("ACCOUNTCODE")%>' MaxLength="10" />
                                 </span>
                                 <!-- 勘定科目名 -->

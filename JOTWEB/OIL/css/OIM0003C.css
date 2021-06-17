@@ -13,9 +13,9 @@
 }*/
 
 /* 実行画面 ヘッダー部(詳細) */
-.detailboxOnly input[type='text'] {
+/*.detailboxOnly input[type='text'] {
     padding-left: 1.3em;
-}
+}*/
 
 /*削除フラグ(虫眼鏡アイコン ※ワンクリック用)*/
 #WF_DELFLG_ICON {
@@ -32,9 +32,9 @@ table.WF_OILTERMTBL {
     margin-bottom: 5px;
 }
 
-table.WF_OILTERMTBL input.WF_TEXTBOX_CSS {
+/*table.WF_OILTERMTBL input.WF_TEXTBOX_CSS {
     width: 100%;
-}
+}*/
 
 table.WF_OILTERMTBL td.WF_OILTERMTBL_TD2 div.calendarIconArea div {
     margin-top: 0px;

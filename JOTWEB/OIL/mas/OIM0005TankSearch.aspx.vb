@@ -7,6 +7,7 @@
 '
 ' 修正履歴:2019/11/08 新規作成
 '         :2021/05/25 1)検索項目に「運用基地コード」「リース先」を追加
+'         :2021/06/17 1)検索項目に「削除含む」チェックボックスを追加
 ''************************************************************
 Imports JOTWEB.GRIS0005LeftBox
 
@@ -109,6 +110,8 @@ Public Class OIM0005TankSearch
             WF_LEACECODE_NONE.Checked = True
             WF_LEACECODE_OT.Checked = False
             WF_LEACECODE_USARMY.Checked = False
+            '削除フラグ
+            WF_DELFLG.Checked = False
 
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
             '画面項目設定処理
@@ -133,6 +136,12 @@ Public Class OIM0005TankSearch
                 WF_LEACECODE_OT.Checked = False
                 WF_LEACECODE_USARMY.Checked = True
             End If
+            '削除フラグ
+            If Boolean.Parse(work.WF_SEL_DELFLG_S.Text) Then
+                WF_DELFLG.Checked = True
+            Else
+                WF_DELFLG.Checked = False
+            End If
         Else
             '画面項目設定処理（甲子貨車マスタメンテ画面からの遷移）
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -155,6 +164,12 @@ Public Class OIM0005TankSearch
                 WF_LEACECODE_NONE.Checked = False
                 WF_LEACECODE_OT.Checked = False
                 WF_LEACECODE_USARMY.Checked = True
+            End If
+            '削除フラグ
+            If Boolean.Parse(work.WF_SEL_DELFLG_S.Text) Then
+                WF_DELFLG.Checked = True
+            Else
+                WF_DELFLG.Checked = False
             End If
         End If
 
@@ -249,6 +264,12 @@ Public Class OIM0005TankSearch
             work.WF_SEL_LEASECODE_S.Text = "11"
         ElseIf WF_LEACECODE_USARMY.Checked Then
             work.WF_SEL_LEASECODE_S.Text = "71"
+        End If
+        '削除フラグ
+        If WF_DELFLG.Checked Then
+            work.WF_SEL_DELFLG_S.Text = True.ToString
+        Else
+            work.WF_SEL_DELFLG_S.Text = False.ToString
         End If
 
         '○ 画面レイアウト設定

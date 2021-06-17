@@ -75,7 +75,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LENGTHFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OPERATIONBASECODE_S コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OPERATIONBASECODE_S As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LEASECODE_S コントロール。
     '''</summary>
@@ -93,6 +93,15 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LEASECODE_S As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_DELFLG_S コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DELFLG_S As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_TANKNUMBER2 コントロール。

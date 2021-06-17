@@ -87,7 +87,7 @@
                     <asp:Label ID="WF_OPERATIONBASENAME" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
-            <!-- リース先チェックボックス -->
+            <!-- リース先ラジオボタン -->
             <div class="inputItem">
                 <a id="WF_LEASECODE_LABEL">リース先</a>
                 <div class="grc0001Wrapper">
@@ -105,6 +105,9 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+            <div class="inputItem">
+                <asp:CheckBox ID="WF_DELFLG" runat="server" Text="削除含む" />
             </div>
         </div> <!-- End inputBox -->
     </div> <!-- End searchbox -->

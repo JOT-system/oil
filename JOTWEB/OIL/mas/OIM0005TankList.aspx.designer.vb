@@ -86,6 +86,15 @@ Partial Public Class OIM0005TankList
     Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
+    '''WF_DELFLG_INDEX コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DELFLG_INDEX As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

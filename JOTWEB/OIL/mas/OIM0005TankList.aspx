@@ -50,7 +50,8 @@
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 
-
+        <!-- 削除フラグ表示位置 -->
+        <asp:HiddenField ID="WF_DELFLG_INDEX" runat="server" />
 
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />

@@ -13,6 +13,8 @@
 '         :             「自主点検年月」「自主点検場所」「自主点検実施者」を追加
 '         :2021/05/18 1)項目「点検実施者(社員名)」を追加
 '         :2021/05/25 1)検索項目に「運用基地コード」「リース先」を追加
+'         :2021/06/17 1)検索項目に「削除含む」チェックボックスを追加
+'         :           2)削除済みのレコードの背景色を灰色に設定する
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -207,6 +209,79 @@ Public Class OIM0005TankList
             CODENAME_get("LENGTHFLG", WF_FIL_LENGTHFLG.Text, WF_FIL_LENGTHFLG_TEXT.Text, WW_RTN_SW)
         End If
 
+        '〇 削除フラグ表示位置の初期化
+        WF_DELFLG_INDEX_Initialize()
+
+    End Sub
+
+    ''' <summary>
+    ''' 削除フラグ表示位置の初期化
+    ''' </summary>
+    Protected Sub WF_DELFLG_INDEX_Initialize()
+
+        WF_DELFLG_INDEX.Value = "NON"
+
+        '○ 削除フラグ表示位置をDBより取得する
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()
+
+            Dim dt = New DataTable
+            dt.Columns.Clear()
+            dt.Clear()
+
+            '検索SQL
+            Dim SQLBldr = New StringBuilder(String.Empty)
+            SQLBldr.AppendLine(" SELECT")
+            SQLBldr.AppendLine("     TMP.SEQ")
+            SQLBldr.AppendLine(" FROM (")
+            SQLBldr.AppendLine("     SELECT")
+            SQLBldr.AppendLine("         ROW_NUMBER() OVER(ORDER BY POSICOL) - 1 AS SEQ")
+            SQLBldr.AppendLine("         , FIELD")
+            SQLBldr.AppendLine("     FROM")
+            SQLBldr.AppendLine("         com.OIS0012_PROFMVIEW")
+            SQLBldr.AppendLine("     WHERE")
+            SQLBldr.AppendLine("         MAPID = 'OIM0005L'")
+            SQLBldr.AppendLine("     AND HDKBN = 'H'")
+            SQLBldr.AppendLine("     AND EFFECT = 'Y'")
+            SQLBldr.AppendLine("     AND DELFLG <> '1'")
+            SQLBldr.AppendLine("     AND POSICOL > 0")
+            SQLBldr.AppendLine(" ) TMP")
+            SQLBldr.AppendLine(" WHERE")
+            SQLBldr.AppendLine("     TMP.FIELD = 'DELFLG'")
+
+            Try
+                Using SQLcmd = New SqlCommand(SQLBldr.ToString, SQLcon)
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+
+                        If dt.Rows.Count > 0 Then
+                            '〇 削除フラグ表示位置に設定
+                            WF_DELFLG_INDEX.Value = dt.Rows(0)("SEQ").ToString
+                        End If
+
+                    End Using
+                End Using
+
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005L WF_DELFLG_INDEX_Initialize")
+
+                CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                CS0011LOGWrite.INFPOSI = "DB:OIM0005L WF_DELFLG_INDEX_Initialize"
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = ex.ToString()
+                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+                Exit Sub
+            End Try
+
+        End Using
+
     End Sub
 
     ''' <summary>
@@ -295,6 +370,8 @@ Public Class OIM0005TankList
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
+
+        Dim whereAddFlg As Boolean = False
 
         If IsNothing(OIM0005tbl) Then
             OIM0005tbl = New DataTable
@@ -456,35 +533,63 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.SELFINSPECTORGCODE), '')                AS SELFINSPECTORGCODE " _
             & " , ''                                                           AS SELFINSPECTORGNAME " _
             & " , ISNULL(RTRIM(OIM0005.INSPECTMEMBERNAME), '')                 AS INSPECTMEMBERNAME " _
-            & " FROM OIL.OIM0005_TANK OIM0005 " _
-            & " WHERE OIM0005.DELFLG <> @P3 "
+            & " FROM OIL.OIM0005_TANK OIM0005 "
+
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '「削除含む」チェックボックスがONの場合、削除フラグは検索条件から除外する
+        If work.WF_SEL_DELFLG_S.Text.Equals(False.ToString) Then
+            SQLStr &= " WHERE DELFLG <> '1'"
+            whereAddFlg = True
+        End If
+
         'タンク車№
         If Not String.IsNullOrEmpty(work.WF_SEL_TANKNUMBER.Text) Then
-            SQLStr &= String.Format("    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
+            If whereAddFlg Then
+                SQLStr &= String.Format("    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
+            Else
+                SQLStr &= String.Format(" WHERE OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
+            End If
         End If
 
         '型式
         If Not String.IsNullOrEmpty(work.WF_SEL_MODEL.Text) Then
-            SQLStr &= String.Format("    AND OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
+            If whereAddFlg Then
+                SQLStr &= String.Format("    AND OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
+            Else
+                SQLStr &= String.Format(" WHERE OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
+            End If
         End If
 
         '利用フラグ
         If Not String.IsNullOrEmpty(work.WF_SEL_USEDFLG.Text) Then
-            SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+            If whereAddFlg Then
+                SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+            Else
+                SQLStr &= String.Format(" WHERE OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+            End If
         End If
 
         '運用基地コード
         If Not String.IsNullOrEmpty(work.WF_SEL_OPERATIONBASECODE_S.Text) Then
-            SQLStr &= String.Format("    AND OIM0005.OPERATIONBASECODE = '{0}'",
-                                    work.WF_SEL_OPERATIONBASECODE_S.Text)
+            If whereAddFlg Then
+                SQLStr &= String.Format("    AND OIM0005.OPERATIONBASECODE = '{0}'",
+                                        work.WF_SEL_OPERATIONBASECODE_S.Text)
+            Else
+                SQLStr &= String.Format(" WHERE OIM0005.OPERATIONBASECODE = '{0}'",
+                                        work.WF_SEL_OPERATIONBASECODE_S.Text)
+            End If
         End If
 
         'リース先コード
         If Not String.IsNullOrEmpty(work.WF_SEL_LEASECODE_S.Text) Then
-            SQLStr &= String.Format("    AND OIM0005.LEASECODE = '{0}'",
-                                    work.WF_SEL_LEASECODE_S.Text)
+            If whereAddFlg Then
+                SQLStr &= String.Format("    AND OIM0005.LEASECODE = '{0}'",
+                                        work.WF_SEL_LEASECODE_S.Text)
+            Else
+                SQLStr &= String.Format(" WHERE OIM0005.LEASECODE = '{0}'",
+                                        work.WF_SEL_LEASECODE_S.Text)
+            End If
         End If
 
         SQLStr &=
@@ -493,9 +598,6 @@ Public Class OIM0005TankList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
-
-                PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

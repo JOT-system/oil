@@ -16,6 +16,7 @@
 
     <asp:TextBox ID="WF_SEL_OPERATIONBASECODE_S" runat="server"></asp:TextBox>      <!-- 検索用運用基地C -->
     <asp:TextBox ID="WF_SEL_LEASECODE_S" runat="server"></asp:TextBox>              <!-- 検索用リース先C -->
+    <asp:TextBox ID="WF_SEL_DELFLG_S" runat="server"></asp:TextBox>                 <!-- 検索用削除フラグ -->
 
     <!-- 登録・更新用 -->
     <asp:TextBox ID="WF_SEL_TANKNUMBER2" runat="server"></asp:TextBox>              <!-- JOT車番 -->

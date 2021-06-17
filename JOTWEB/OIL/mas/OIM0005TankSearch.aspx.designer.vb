@@ -158,6 +158,15 @@ Partial Public Class OIM0005TankSearch
     Protected WithEvents WF_LEACECODE_USARMY As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''WF_DELFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DELFLG As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

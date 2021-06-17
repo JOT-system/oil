@@ -1281,6 +1281,7 @@
         SQLOTORDERStr &=
               " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
             & " AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & String.Format(" AND OIT0016.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
             & " AND OIT0017.OTDETAILNO = '' "
         '& " AND JOT.ORDERNO IS NULL "
 

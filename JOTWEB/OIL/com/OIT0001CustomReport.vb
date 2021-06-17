@@ -213,13 +213,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
             Dim z As Integer = 0                            '明細の合計
             Dim strOtOilNameSave As String = ""
             Dim strTrainNoSave As String = ""
+            Dim strLodDateSave As String = ""
             For Each PrintDatarow As DataRow In PrintData.Rows
                 If strTrainNoSave = "" Then
                     '○ 帳票のヘッダー(共通)設定(初回)
                     EditOTCompareHeaderArea(I_officeCode, rngHeaderArea, PrintDatarow, j)
                 End If
+                ''★列車が変わった場合
+                'If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
                 '★列車が変わった場合
-                If strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO")) Then
+                '　または、積込日(予定)が変わった場合
+                If (strTrainNoSave <> "" AndAlso strTrainNoSave <> Convert.ToString(PrintDatarow("TRAINNO"))) _
+                    OrElse strLodDateSave <> "" AndAlso strLodDateSave <> Convert.ToString(PrintDatarow("LODDATE")) Then
                     '◯ 合計
                     rngDetailArea = Me.ExcelWorkSheet.Range("F" + Convert.ToString(iFooter(j)))
                     rngDetailArea.Value = Convert.ToString(z) + "車"
@@ -241,6 +246,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
                 '○列車Noの保存
                 strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
+                '○積込日(予定)の保存
+                strLodDateSave = Convert.ToString(PrintDatarow("LODDATE"))
 
                 '○次の行へカウント
                 i += 1

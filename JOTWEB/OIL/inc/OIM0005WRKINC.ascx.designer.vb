@@ -93,7 +93,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LEASECODE_S As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DELFLG_S コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG_S As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TANKNUMBER2 コントロール。
     '''</summary>
@@ -282,16 +282,16 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LEASECLASS As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
-    '''WF_SEL_LEASECLASSNEMAE コントロール。
+    '''WF_SEL_LEASECLASSNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_LEASECLASSNEMAE As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_LEASECLASSNAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_AUTOEXTENTION コントロール。
     '''</summary>
@@ -498,6 +498,24 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OPERATIONBASENAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SUBOPERATIONBASECODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SUBOPERATIONBASECODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SUBOPERATIONBASENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SUBOPERATIONBASENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_COLORCODE コントロール。
@@ -986,6 +1004,69 @@ Partial Public Class OIM0005WRKINC
     Public WithEvents WF_SEL_INSPECTMEMBERNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_ALLINSPECTPLANYM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ALLINSPECTPLANYM As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SUSPENDFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SUSPENDFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SUSPENDDATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SUSPENDDATE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_PURCHASEPRICE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_PURCHASEPRICE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_INTERNALCOATING コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_INTERNALCOATING As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SAFETYVALVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SAFETYVALVE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_CENTERVALVEINFO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CENTERVALVEINFO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
     '''<remarks>
@@ -993,6 +1074,15 @@ Partial Public Class OIM0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_DELREASONKBN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DELREASONKBN As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_INITYMD コントロール。

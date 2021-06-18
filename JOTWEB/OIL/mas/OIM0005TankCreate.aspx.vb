@@ -559,7 +559,7 @@ Public Class OIM0005TankCreate
             & "        , ORIGINOWNERNAME = @P30" _
             & "        , OWNERNAME = @P31" _
             & "        , LEASENAME = @P32" _
-            & "        , LEASECLASSNEMAE = @P33" _
+            & "        , LEASECLASSNAME = @P33" _
             & "        , USERNAME = @P34" _
             & "        , CURRENTSTATIONNAME = @P35" _
             & "        , EXTRADINARYSTATIONNAME = @P36" _
@@ -666,7 +666,7 @@ Public Class OIM0005TankCreate
             & "        , ORIGINOWNERNAME" _
             & "        , OWNERNAME" _
             & "        , LEASENAME" _
-            & "        , LEASECLASSNEMAE" _
+            & "        , LEASECLASSNAME" _
             & "        , USERNAME" _
             & "        , CURRENTSTATIONNAME" _
             & "        , EXTRADINARYSTATIONNAME" _
@@ -885,7 +885,7 @@ Public Class OIM0005TankCreate
             & "    , ORIGINOWNERNAME" _
             & "    , OWNERNAME" _
             & "    , LEASENAME" _
-            & "    , LEASECLASSNEMAE" _
+            & "    , LEASECLASSNAME" _
             & "    , USERNAME" _
             & "    , CURRENTSTATIONNAME" _
             & "    , EXTRADINARYSTATIONNAME" _
@@ -1148,7 +1148,7 @@ Public Class OIM0005TankCreate
                 PARA30.Value = OIM0005row("ORIGINOWNERNAME")
                 PARA31.Value = OIM0005row("OWNERNAME")
                 PARA32.Value = OIM0005row("LEASENAME")
-                PARA33.Value = OIM0005row("LEASECLASSNEMAE")
+                PARA33.Value = OIM0005row("LEASECLASSNAME")
                 PARA34.Value = OIM0005row("USERNAME")
                 PARA35.Value = OIM0005row("CURRENTSTATIONNAME")
                 PARA36.Value = OIM0005row("EXTRADINARYSTATIONNAME")
@@ -1495,7 +1495,7 @@ Public Class OIM0005TankCreate
         OIM0005INProw("LEASECODE") = WF_LEASECODE.Text                                      'リース先C
         OIM0005INProw("LEASENAME") = WF_LEASECODE_TEXT.Text                                 'リース先
         OIM0005INProw("LEASECLASS") = WF_LEASECLASS.Text                                    'リース区分C
-        OIM0005INProw("LEASECLASSNEMAE") = WF_LEASECLASS_TEXT.Text                          'リース区分
+        OIM0005INProw("LEASECLASSNAME") = WF_LEASECLASS_TEXT.Text                          'リース区分
         OIM0005INProw("AUTOEXTENTION") = WF_AUTOEXTENTION.Text                              '自動延長
         OIM0005INProw("AUTOEXTENTIONNAME") = WF_AUTOEXTENTION_TEXT.Text                     '自動延長名
         OIM0005INProw("LEASESTYMD") = WF_LEASESTYMD.Text                                    'リース開始年月日
@@ -1620,7 +1620,7 @@ Public Class OIM0005TankCreate
                     OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
                     OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
                     OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
-                    OIM0005row("LEASECLASSNEMAE") = OIM0005INProw("LEASECLASSNEMAE") AndAlso
+                    OIM0005row("LEASECLASSNAME") = OIM0005INProw("LEASECLASSNAME") AndAlso
                     OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
                     OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
                     OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
@@ -3599,8 +3599,8 @@ Public Class OIM0005TankCreate
             End If
 
             ' リース区分（バリデーションチェック）
-            WW_TEXT = OIM0005INProw("LEASECLASSNEMAE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASSNEMAE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            WW_TEXT = OIM0005INProw("LEASECLASSNAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASSNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(リース区分入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -4639,7 +4639,7 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース先C =" & OIM0005row("LEASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース先 =" & OIM0005row("LEASENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分C =" & OIM0005row("LEASECLASS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIM0005row("LEASECLASSNEMAE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIM0005row("LEASECLASSNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長 =" & OIM0005row("AUTOEXTENTION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長名 =" & OIM0005row("AUTOEXTENTIONNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース開始年月日 =" & OIM0005row("LEASESTYMD") & " , "
@@ -4781,7 +4781,7 @@ Public Class OIM0005TankCreate
                         OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
                         OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
                         OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
-                        OIM0005row("LEASECLASSNEMAE") = OIM0005INProw("LEASECLASSNEMAE") AndAlso
+                        OIM0005row("LEASECLASSNAME") = OIM0005INProw("LEASECLASSNAME") AndAlso
                         OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
                         OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
                         OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
@@ -4938,7 +4938,7 @@ Public Class OIM0005TankCreate
                     If Not String.IsNullOrEmpty(OIM0005row("LEASECLASS")) Then
                         CODENAME_get("LEASECLASS",
                                     OIM0005row("LEASECLASS"),
-                                    OIM0005row("LEASECLASSNEMAE"),
+                                    OIM0005row("LEASECLASSNAME"),
                                     WW_DUMMY)
                     End If
                     '自動延長名
@@ -5119,7 +5119,7 @@ Public Class OIM0005TankCreate
                 If Not String.IsNullOrEmpty(nrow("LEASECLASS")) Then
                     CODENAME_get("LEASECLASS",
                                 nrow("LEASECLASS"),
-                                nrow("LEASECLASSNEMAE"),
+                                nrow("LEASECLASSNAME"),
                                 WW_DUMMY)
                 End If
                 '自動延長名

@@ -245,7 +245,7 @@
                 <p id="KEY_LINE_15">
                     <!-- 出荷口 -->
                     <span class="ef">
-                        <asp:Label ID="WF_SHIPPINGGATE_L" runat="server" Text="出荷口" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_SHIPPINGGATE_L" runat="server" Text="出荷口(充填ポイント表用)" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_SHIPPINGGATE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_SHIPPINGGATE');">
                             <asp:TextBox ID="WF_SHIPPINGGATE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="40"></asp:TextBox>
                         </span>

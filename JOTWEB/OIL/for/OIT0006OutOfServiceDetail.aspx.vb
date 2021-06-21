@@ -3004,7 +3004,15 @@ Public Class OIT0006OutOfServiceDetail
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(Me.TxtBulkInspection.Text, WW_DATE)
-                    For Each OIT0006row As DataRow In OIT0006tbl.Select("TANKNO<>''")
+                    For Each OIT0006row As DataRow In OIT0006tbl.Select("TANKNO<>'' AND OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_22 + "'")
+                        '★回送情報が"101"(タンク車状態未到着), "102"(タンク車所属外), "107"(受注オーダー中), "108"(回送オーダー中)
+                        '　の場合は設定しない。
+                        If Convert.ToString(OIT0006row("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_101 _
+                            OrElse Convert.ToString(OIT0006row("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_102 _
+                            OrElse Convert.ToString(OIT0006row("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_107 _
+                            OrElse Convert.ToString(OIT0006row("KAISOUINFO")) = BaseDllConst.CONST_ORDERINFO_ALERT_108 Then
+                            Continue For
+                        End If
 
                         'タンク車マスタの交検日を更新
                         WW_UpdateTankMaster(OIT0006row("TANKNO"), I_JRINSPECTIONDATE:=Me.TxtBulkInspection.Text)

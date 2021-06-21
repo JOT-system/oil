@@ -219,6 +219,13 @@ Public Class OIM0005TankSearch
     ''' <remarks></remarks>
     Protected Sub WF_ButtonKINOENE_Click()
 
+        '削除フラグ
+        If WF_DELFLG.Checked Then
+            work.WF_SEL_DELFLG_S.Text = True.ToString
+        Else
+            work.WF_SEL_DELFLG_S.Text = False.ToString
+        End If
+
         ''○ 画面レイアウト設定（特殊処理のため、会社コード＋"1"(011）でVIEWを登録）
         If Master.VIEWID = "" Then
             Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)

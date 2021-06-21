@@ -5558,7 +5558,6 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-
             If WW_LINE_ERR = "" Then
                 If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
                     OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -5730,14 +5729,14 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検実施者 =" & OIM0005row("SELFINSPECTORGCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 点検実施者(社員名) =" & OIM0005row("INSPECTMEMBERNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 全検計画年月 =" & OIM0005row("ALLINSPECTPLANYM") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 休車フラグ =" & OIM0005row("SUSPENDFLGNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 休車フラグ =" & OIM0005row("SUSPENDFLG") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 休車日 =" & OIM0005row("SUSPENDDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 取得価格 =" & OIM0005row("PURCHASEPRICE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 内部塗装 =" & OIM0005row("INTERNALCOATINGNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 内部塗装 =" & OIM0005row("INTERNALCOATING") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 安全弁 =" & OIM0005row("SAFETYVALVE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> センターバルブ情報 =" & OIM0005row("CENTERVALVEINFO") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除理由区分 =" & OIM0005row("DELREASONKBNNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除理由区分 =" & OIM0005row("DELREASONKBN") & " , "
 
         End If
 
@@ -5899,7 +5898,7 @@ Public Class OIM0005TankList
                         OIM0005row("SAFETYVALVE") = OIM0005INProw("SAFETYVALVE") AndAlso
                         OIM0005row("CENTERVALVEINFO") = OIM0005INProw("CENTERVALVEINFO") AndAlso
                         OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELREASONKBN") Then
+                        OIM0005row("DELREASONKBN") = OIM0005INProw("DELREASONKBN") Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else

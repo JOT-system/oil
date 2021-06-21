@@ -21,6 +21,7 @@
 '         :             「休車フラグ」「休車日」「取得価格」「内部塗装」
 '         :             「安全弁」「センターバルブ情報」を追加
 '         :             項目名称変更「請負リース区分」→「請負請負リース区分」
+'         :           2)「戻る：ボタン押下時に確認ダイアログを表示しないように修正
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -91,8 +92,8 @@ Public Class OIM0005TankCreate
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
-                        Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
-                            WF_CLEAR_ConfirmOkClick()
+                            'Case "btnClearConfirmOk"        '戻るボタン押下後の確認ダイアログでOK押下
+                            '    WF_CLEAR_ConfirmOkClick()
                     End Select
                 End If
             Else
@@ -1705,146 +1706,148 @@ Public Class OIM0005TankCreate
     ''' <remarks></remarks>
     Protected Sub WF_CLEAR_Click()
 
-        '○ DetailBoxをINPtblへ退避
-        DetailBoxToOIM0005INPtbl(WW_ERR_SW)
-        If Not isNormal(WW_ERR_SW) Then
-            Exit Sub
-        End If
+        ''○ DetailBoxをINPtblへ退避
+        'DetailBoxToOIM0005INPtbl(WW_ERR_SW)
+        'If Not isNormal(WW_ERR_SW) Then
+        '    Exit Sub
+        'End If
 
-        Dim inputChangeFlg As Boolean = True
-        Dim OIM0005INProw As DataRow = OIM0005INPtbl.Rows(0)
+        'Dim inputChangeFlg As Boolean = True
+        'Dim OIM0005INProw As DataRow = OIM0005INPtbl.Rows(0)
 
-        ' 既存レコードとの比較
-        For Each OIM0005row As DataRow In OIM0005tbl.Rows
-            ' KEY項目が等しい時
-            If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
-                ' KEY項目以外の項目の差異をチェック
-                If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
-                    OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
-                    OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
-                    OIM0005row("LOAD") = OIM0005INProw("LOAD") AndAlso
-                    OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
-                    OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
-                    OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
-                    OIM0005row("MYWEIGHT") = OIM0005INProw("MYWEIGHT") AndAlso
-                    OIM0005row("LENGTH") = OIM0005INProw("LENGTH") AndAlso
-                    OIM0005row("TANKLENGTH") = OIM0005INProw("TANKLENGTH") AndAlso
-                    OIM0005row("MAXCALIBER") = OIM0005INProw("MAXCALIBER") AndAlso
-                    OIM0005row("MINCALIBER") = OIM0005INProw("MINCALIBER") AndAlso
-                    OIM0005row("LENGTHFLG") = OIM0005INProw("LENGTHFLG") AndAlso
-                    OIM0005row("ORIGINOWNERCODE") = OIM0005INProw("ORIGINOWNERCODE") AndAlso
-                    OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
-                    OIM0005row("OWNERCODE") = OIM0005INProw("OWNERCODE") AndAlso
-                    OIM0005row("OWNERNAME") = OIM0005INProw("OWNERNAME") AndAlso
-                    OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
-                    OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
-                    OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
-                    OIM0005row("LEASECLASSNAME") = OIM0005INProw("LEASECLASSNAME") AndAlso
-                    OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
-                    OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
-                    OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
-                    OIM0005row("LEASEENDYMD") = OIM0005INProw("LEASEENDYMD") AndAlso
-                    OIM0005row("USERCODE") = OIM0005INProw("USERCODE") AndAlso
-                    OIM0005row("USERNAME") = OIM0005INProw("USERNAME") AndAlso
-                    OIM0005row("CURRENTSTATIONCODE") = OIM0005INProw("CURRENTSTATIONCODE") AndAlso
-                    OIM0005row("CURRENTSTATIONNAME") = OIM0005INProw("CURRENTSTATIONNAME") AndAlso
-                    OIM0005row("EXTRADINARYSTATIONCODE") = OIM0005INProw("EXTRADINARYSTATIONCODE") AndAlso
-                    OIM0005row("EXTRADINARYSTATIONNAME") = OIM0005INProw("EXTRADINARYSTATIONNAME") AndAlso
-                    OIM0005row("USERLIMIT") = OIM0005INProw("USERLIMIT") AndAlso
-                    OIM0005row("LIMITTEXTRADIARYSTATION") = OIM0005INProw("LIMITTEXTRADIARYSTATION") AndAlso
-                    OIM0005row("DEDICATETYPECODE") = OIM0005INProw("DEDICATETYPECODE") AndAlso
-                    OIM0005row("DEDICATETYPENAME") = OIM0005INProw("DEDICATETYPENAME") AndAlso
-                    OIM0005row("EXTRADINARYTYPECODE") = OIM0005INProw("EXTRADINARYTYPECODE") AndAlso
-                    OIM0005row("EXTRADINARYTYPENAME") = OIM0005INProw("EXTRADINARYTYPENAME") AndAlso
-                    OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
-                    OIM0005row("BIGOILCODE") = OIM0005INProw("BIGOILCODE") AndAlso
-                    OIM0005row("BIGOILNAME") = OIM0005INProw("BIGOILNAME") AndAlso
-                    OIM0005row("MIDDLEOILCODE") = OIM0005INProw("MIDDLEOILCODE") AndAlso
-                    OIM0005row("MIDDLEOILNAME") = OIM0005INProw("MIDDLEOILNAME") AndAlso
-                    OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
-                    OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
-                    OIM0005row("SUBOPERATIONBASECODE") = OIM0005INProw("SUBOPERATIONBASECODE") AndAlso
-                    OIM0005row("SUBOPERATIONBASENAME") = OIM0005INProw("SUBOPERATIONBASENAME") AndAlso
-                    OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
-                    OIM0005row("COLORNAME") = OIM0005INProw("COLORNAME") AndAlso
-                    OIM0005row("MARKCODE") = OIM0005INProw("MARKCODE") AndAlso
-                    OIM0005row("MARKNAME") = OIM0005INProw("MARKNAME") AndAlso
-                    OIM0005row("JXTGTAGCODE1") = OIM0005INProw("JXTGTAGCODE1") AndAlso
-                    OIM0005row("JXTGTAGNAME1") = OIM0005INProw("JXTGTAGNAME1") AndAlso
-                    OIM0005row("JXTGTAGCODE2") = OIM0005INProw("JXTGTAGCODE2") AndAlso
-                    OIM0005row("JXTGTAGNAME2") = OIM0005INProw("JXTGTAGNAME2") AndAlso
-                    OIM0005row("JXTGTAGCODE3") = OIM0005INProw("JXTGTAGCODE3") AndAlso
-                    OIM0005row("JXTGTAGNAME3") = OIM0005INProw("JXTGTAGNAME3") AndAlso
-                    OIM0005row("JXTGTAGCODE4") = OIM0005INProw("JXTGTAGCODE4") AndAlso
-                    OIM0005row("JXTGTAGNAME4") = OIM0005INProw("JXTGTAGNAME4") AndAlso
-                    OIM0005row("IDSSTAGCODE") = OIM0005INProw("IDSSTAGCODE") AndAlso
-                    OIM0005row("IDSSTAGNAME") = OIM0005INProw("IDSSTAGNAME") AndAlso
-                    OIM0005row("COSMOTAGCODE") = OIM0005INProw("COSMOTAGCODE") AndAlso
-                    OIM0005row("COSMOTAGNAME") = OIM0005INProw("COSMOTAGNAME") AndAlso
-                    OIM0005row("RESERVE1") = OIM0005INProw("RESERVE1") AndAlso
-                    OIM0005row("RESERVE2") = OIM0005INProw("RESERVE2") AndAlso
-                    OIM0005row("JRINSPECTIONDATE") = OIM0005INProw("JRINSPECTIONDATE") AndAlso
-                    OIM0005row("INSPECTIONDATE") = OIM0005INProw("INSPECTIONDATE") AndAlso
-                    OIM0005row("JRSPECIFIEDDATE") = OIM0005INProw("JRSPECIFIEDDATE") AndAlso
-                    OIM0005row("SPECIFIEDDATE") = OIM0005INProw("SPECIFIEDDATE") AndAlso
-                    OIM0005row("JRALLINSPECTIONDATE") = OIM0005INProw("JRALLINSPECTIONDATE") AndAlso
-                    OIM0005row("ALLINSPECTIONDATE") = OIM0005INProw("ALLINSPECTIONDATE") AndAlso
-                    OIM0005row("PREINSPECTIONDATE") = OIM0005INProw("PREINSPECTIONDATE") AndAlso
-                    OIM0005row("GETDATE") = OIM0005INProw("GETDATE") AndAlso
-                    OIM0005row("TRANSFERDATE") = OIM0005INProw("TRANSFERDATE") AndAlso
-                    OIM0005row("OBTAINEDCODE") = OIM0005INProw("OBTAINEDCODE") AndAlso
-                    OIM0005row("OBTAINEDNAME") = OIM0005INProw("OBTAINEDNAME") AndAlso
-                    OIM0005row("PROGRESSYEAR") = OIM0005INProw("PROGRESSYEAR") AndAlso
-                    OIM0005row("NEXTPROGRESSYEAR") = OIM0005INProw("NEXTPROGRESSYEAR") AndAlso
-                    OIM0005row("EXCLUDEDATE") = OIM0005INProw("EXCLUDEDATE") AndAlso
-                    OIM0005row("RETIRMENTDATE") = OIM0005INProw("RETIRMENTDATE") AndAlso
-                    OIM0005row("JRTANKNUMBER") = OIM0005INProw("JRTANKNUMBER") AndAlso
-                    OIM0005row("JRTANKTYPE") = OIM0005INProw("JRTANKTYPE") AndAlso
-                    OIM0005row("OLDTANKNUMBER") = OIM0005INProw("OLDTANKNUMBER") AndAlso
-                    OIM0005row("OTTANKNUMBER") = OIM0005INProw("OTTANKNUMBER") AndAlso
-                    OIM0005row("JXTGTANKNUMBER1") = OIM0005INProw("JXTGTANKNUMBER1") AndAlso
-                    OIM0005row("JXTGTANKNUMBER2") = OIM0005INProw("JXTGTANKNUMBER2") AndAlso
-                    OIM0005row("JXTGTANKNUMBER3") = OIM0005INProw("JXTGTANKNUMBER3") AndAlso
-                    OIM0005row("JXTGTANKNUMBER4") = OIM0005INProw("JXTGTANKNUMBER4") AndAlso
-                    OIM0005row("COSMOTANKNUMBER") = OIM0005INProw("COSMOTANKNUMBER") AndAlso
-                    OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
-                    OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
-                    OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
-                    OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
-                    OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
-                    OIM0005row("INTERINSPECTYM") = OIM0005INProw("INTERINSPECTYM") AndAlso
-                    OIM0005row("INTERINSPECTSTATION") = OIM0005INProw("INTERINSPECTSTATION") AndAlso
-                    OIM0005row("INTERINSPECTORGCODE") = OIM0005INProw("INTERINSPECTORGCODE") AndAlso
-                    OIM0005row("SELFINSPECTYM") = OIM0005INProw("SELFINSPECTYM") AndAlso
-                    OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
-                    OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
-                    OIM0005row("INSPECTMEMBERNAME") = OIM0005INProw("INSPECTMEMBERNAME") AndAlso
-                    OIM0005row("ALLINSPECTPLANYM") = OIM0005INProw("ALLINSPECTPLANYM") AndAlso
-                    OIM0005row("SUSPENDFLG") = OIM0005INProw("SUSPENDFLG") AndAlso
-                    OIM0005row("SUSPENDDATE") = OIM0005INProw("SUSPENDDATE") AndAlso
-                    OIM0005row("PURCHASEPRICE") = OIM0005INProw("PURCHASEPRICE") AndAlso
-                    OIM0005row("INTERNALCOATING") = OIM0005INProw("INTERNALCOATING") AndAlso
-                    OIM0005row("SAFETYVALVE") = OIM0005INProw("SAFETYVALVE") AndAlso
-                    OIM0005row("CENTERVALVEINFO") = OIM0005INProw("CENTERVALVEINFO") AndAlso
-                    OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                    OIM0005row("DELREASONKBN") = OIM0005INProw("DELREASONKBN") Then
-                    ' 変更がないときは、入力変更フラグをOFFにする
-                    inputChangeFlg = False
-                End If
+        '' 既存レコードとの比較
+        'For Each OIM0005row As DataRow In OIM0005tbl.Rows
+        '    ' KEY項目が等しい時
+        '    If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
+        '        ' KEY項目以外の項目の差異をチェック
+        '        If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") AndAlso
+        '            OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
+        '            OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
+        '            OIM0005row("LOAD") = OIM0005INProw("LOAD") AndAlso
+        '            OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
+        '            OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
+        '            OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
+        '            OIM0005row("MYWEIGHT") = OIM0005INProw("MYWEIGHT") AndAlso
+        '            OIM0005row("LENGTH") = OIM0005INProw("LENGTH") AndAlso
+        '            OIM0005row("TANKLENGTH") = OIM0005INProw("TANKLENGTH") AndAlso
+        '            OIM0005row("MAXCALIBER") = OIM0005INProw("MAXCALIBER") AndAlso
+        '            OIM0005row("MINCALIBER") = OIM0005INProw("MINCALIBER") AndAlso
+        '            OIM0005row("LENGTHFLG") = OIM0005INProw("LENGTHFLG") AndAlso
+        '            OIM0005row("ORIGINOWNERCODE") = OIM0005INProw("ORIGINOWNERCODE") AndAlso
+        '            OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
+        '            OIM0005row("OWNERCODE") = OIM0005INProw("OWNERCODE") AndAlso
+        '            OIM0005row("OWNERNAME") = OIM0005INProw("OWNERNAME") AndAlso
+        '            OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
+        '            OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
+        '            OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
+        '            OIM0005row("LEASECLASSNAME") = OIM0005INProw("LEASECLASSNAME") AndAlso
+        '            OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
+        '            OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
+        '            OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
+        '            OIM0005row("LEASEENDYMD") = OIM0005INProw("LEASEENDYMD") AndAlso
+        '            OIM0005row("USERCODE") = OIM0005INProw("USERCODE") AndAlso
+        '            OIM0005row("USERNAME") = OIM0005INProw("USERNAME") AndAlso
+        '            OIM0005row("CURRENTSTATIONCODE") = OIM0005INProw("CURRENTSTATIONCODE") AndAlso
+        '            OIM0005row("CURRENTSTATIONNAME") = OIM0005INProw("CURRENTSTATIONNAME") AndAlso
+        '            OIM0005row("EXTRADINARYSTATIONCODE") = OIM0005INProw("EXTRADINARYSTATIONCODE") AndAlso
+        '            OIM0005row("EXTRADINARYSTATIONNAME") = OIM0005INProw("EXTRADINARYSTATIONNAME") AndAlso
+        '            OIM0005row("USERLIMIT") = OIM0005INProw("USERLIMIT") AndAlso
+        '            OIM0005row("LIMITTEXTRADIARYSTATION") = OIM0005INProw("LIMITTEXTRADIARYSTATION") AndAlso
+        '            OIM0005row("DEDICATETYPECODE") = OIM0005INProw("DEDICATETYPECODE") AndAlso
+        '            OIM0005row("DEDICATETYPENAME") = OIM0005INProw("DEDICATETYPENAME") AndAlso
+        '            OIM0005row("EXTRADINARYTYPECODE") = OIM0005INProw("EXTRADINARYTYPECODE") AndAlso
+        '            OIM0005row("EXTRADINARYTYPENAME") = OIM0005INProw("EXTRADINARYTYPENAME") AndAlso
+        '            OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
+        '            OIM0005row("BIGOILCODE") = OIM0005INProw("BIGOILCODE") AndAlso
+        '            OIM0005row("BIGOILNAME") = OIM0005INProw("BIGOILNAME") AndAlso
+        '            OIM0005row("MIDDLEOILCODE") = OIM0005INProw("MIDDLEOILCODE") AndAlso
+        '            OIM0005row("MIDDLEOILNAME") = OIM0005INProw("MIDDLEOILNAME") AndAlso
+        '            OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
+        '            OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
+        '            OIM0005row("SUBOPERATIONBASECODE") = OIM0005INProw("SUBOPERATIONBASECODE") AndAlso
+        '            OIM0005row("SUBOPERATIONBASENAME") = OIM0005INProw("SUBOPERATIONBASENAME") AndAlso
+        '            OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
+        '            OIM0005row("COLORNAME") = OIM0005INProw("COLORNAME") AndAlso
+        '            OIM0005row("MARKCODE") = OIM0005INProw("MARKCODE") AndAlso
+        '            OIM0005row("MARKNAME") = OIM0005INProw("MARKNAME") AndAlso
+        '            OIM0005row("JXTGTAGCODE1") = OIM0005INProw("JXTGTAGCODE1") AndAlso
+        '            OIM0005row("JXTGTAGNAME1") = OIM0005INProw("JXTGTAGNAME1") AndAlso
+        '            OIM0005row("JXTGTAGCODE2") = OIM0005INProw("JXTGTAGCODE2") AndAlso
+        '            OIM0005row("JXTGTAGNAME2") = OIM0005INProw("JXTGTAGNAME2") AndAlso
+        '            OIM0005row("JXTGTAGCODE3") = OIM0005INProw("JXTGTAGCODE3") AndAlso
+        '            OIM0005row("JXTGTAGNAME3") = OIM0005INProw("JXTGTAGNAME3") AndAlso
+        '            OIM0005row("JXTGTAGCODE4") = OIM0005INProw("JXTGTAGCODE4") AndAlso
+        '            OIM0005row("JXTGTAGNAME4") = OIM0005INProw("JXTGTAGNAME4") AndAlso
+        '            OIM0005row("IDSSTAGCODE") = OIM0005INProw("IDSSTAGCODE") AndAlso
+        '            OIM0005row("IDSSTAGNAME") = OIM0005INProw("IDSSTAGNAME") AndAlso
+        '            OIM0005row("COSMOTAGCODE") = OIM0005INProw("COSMOTAGCODE") AndAlso
+        '            OIM0005row("COSMOTAGNAME") = OIM0005INProw("COSMOTAGNAME") AndAlso
+        '            OIM0005row("RESERVE1") = OIM0005INProw("RESERVE1") AndAlso
+        '            OIM0005row("RESERVE2") = OIM0005INProw("RESERVE2") AndAlso
+        '            OIM0005row("JRINSPECTIONDATE") = OIM0005INProw("JRINSPECTIONDATE") AndAlso
+        '            OIM0005row("INSPECTIONDATE") = OIM0005INProw("INSPECTIONDATE") AndAlso
+        '            OIM0005row("JRSPECIFIEDDATE") = OIM0005INProw("JRSPECIFIEDDATE") AndAlso
+        '            OIM0005row("SPECIFIEDDATE") = OIM0005INProw("SPECIFIEDDATE") AndAlso
+        '            OIM0005row("JRALLINSPECTIONDATE") = OIM0005INProw("JRALLINSPECTIONDATE") AndAlso
+        '            OIM0005row("ALLINSPECTIONDATE") = OIM0005INProw("ALLINSPECTIONDATE") AndAlso
+        '            OIM0005row("PREINSPECTIONDATE") = OIM0005INProw("PREINSPECTIONDATE") AndAlso
+        '            OIM0005row("GETDATE") = OIM0005INProw("GETDATE") AndAlso
+        '            OIM0005row("TRANSFERDATE") = OIM0005INProw("TRANSFERDATE") AndAlso
+        '            OIM0005row("OBTAINEDCODE") = OIM0005INProw("OBTAINEDCODE") AndAlso
+        '            OIM0005row("OBTAINEDNAME") = OIM0005INProw("OBTAINEDNAME") AndAlso
+        '            OIM0005row("PROGRESSYEAR") = OIM0005INProw("PROGRESSYEAR") AndAlso
+        '            OIM0005row("NEXTPROGRESSYEAR") = OIM0005INProw("NEXTPROGRESSYEAR") AndAlso
+        '            OIM0005row("EXCLUDEDATE") = OIM0005INProw("EXCLUDEDATE") AndAlso
+        '            OIM0005row("RETIRMENTDATE") = OIM0005INProw("RETIRMENTDATE") AndAlso
+        '            OIM0005row("JRTANKNUMBER") = OIM0005INProw("JRTANKNUMBER") AndAlso
+        '            OIM0005row("JRTANKTYPE") = OIM0005INProw("JRTANKTYPE") AndAlso
+        '            OIM0005row("OLDTANKNUMBER") = OIM0005INProw("OLDTANKNUMBER") AndAlso
+        '            OIM0005row("OTTANKNUMBER") = OIM0005INProw("OTTANKNUMBER") AndAlso
+        '            OIM0005row("JXTGTANKNUMBER1") = OIM0005INProw("JXTGTANKNUMBER1") AndAlso
+        '            OIM0005row("JXTGTANKNUMBER2") = OIM0005INProw("JXTGTANKNUMBER2") AndAlso
+        '            OIM0005row("JXTGTANKNUMBER3") = OIM0005INProw("JXTGTANKNUMBER3") AndAlso
+        '            OIM0005row("JXTGTANKNUMBER4") = OIM0005INProw("JXTGTANKNUMBER4") AndAlso
+        '            OIM0005row("COSMOTANKNUMBER") = OIM0005INProw("COSMOTANKNUMBER") AndAlso
+        '            OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
+        '            OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
+        '            OIM0005row("SAPSHELLTANKNUMBER") = OIM0005INProw("SAPSHELLTANKNUMBER") AndAlso
+        '            OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
+        '            OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
+        '            OIM0005row("INTERINSPECTYM") = OIM0005INProw("INTERINSPECTYM") AndAlso
+        '            OIM0005row("INTERINSPECTSTATION") = OIM0005INProw("INTERINSPECTSTATION") AndAlso
+        '            OIM0005row("INTERINSPECTORGCODE") = OIM0005INProw("INTERINSPECTORGCODE") AndAlso
+        '            OIM0005row("SELFINSPECTYM") = OIM0005INProw("SELFINSPECTYM") AndAlso
+        '            OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
+        '            OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
+        '            OIM0005row("INSPECTMEMBERNAME") = OIM0005INProw("INSPECTMEMBERNAME") AndAlso
+        '            OIM0005row("ALLINSPECTPLANYM") = OIM0005INProw("ALLINSPECTPLANYM") AndAlso
+        '            OIM0005row("SUSPENDFLG") = OIM0005INProw("SUSPENDFLG") AndAlso
+        '            OIM0005row("SUSPENDDATE") = OIM0005INProw("SUSPENDDATE") AndAlso
+        '            OIM0005row("PURCHASEPRICE") = OIM0005INProw("PURCHASEPRICE") AndAlso
+        '            OIM0005row("INTERNALCOATING") = OIM0005INProw("INTERNALCOATING") AndAlso
+        '            OIM0005row("SAFETYVALVE") = OIM0005INProw("SAFETYVALVE") AndAlso
+        '            OIM0005row("CENTERVALVEINFO") = OIM0005INProw("CENTERVALVEINFO") AndAlso
+        '            OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
+        '            OIM0005row("DELREASONKBN") = OIM0005INProw("DELREASONKBN") Then
+        '            ' 変更がないときは、入力変更フラグをOFFにする
+        '            inputChangeFlg = False
+        '        End If
 
-                Exit For
+        '        Exit For
 
-            End If
-        Next
+        '    End If
+        'Next
 
-        If inputChangeFlg Then
-            '変更がある場合は、確認ダイアログを表示
-            Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
-                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
-        Else
-            '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
-            WF_CLEAR_ConfirmOkClick()
-        End If
+        'If inputChangeFlg Then
+        '    '変更がある場合は、確認ダイアログを表示
+        '    Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
+        '        needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnClearConfirmOk")
+        'Else
+        '    '変更がない場合は、確認ダイアログを表示せずに、前画面に戻る
+        '    WF_CLEAR_ConfirmOkClick()
+        'End If
+
+        WF_CLEAR_ConfirmOkClick()
 
     End Sub
 

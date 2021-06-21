@@ -289,6 +289,7 @@ Public Class OIM0005TankListKinoene
             & "   END                                                          AS DOWNLOADDATE " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
             & " WHERE OIM0005.OPERATIONBASECODE = @P1 "
+            & " AND   OIM0005.DELFLG = '0' "
 
         SQLStr &=
               " ORDER BY" _

@@ -3537,7 +3537,7 @@ Public Class OIM0005TankList
                                  OIM0005INProw("INTERNALCOATINGNAME"),
                                  WW_DUMMY)
                 Else
-                    OIM0005INProw("INTERNALCOATING") = ""
+                    OIM0005INProw("INTERNALCOATINGNAME") = ""
                 End If
             End If
 
@@ -3569,7 +3569,7 @@ Public Class OIM0005TankList
                                  OIM0005INProw("DELREASONKBNNAME"),
                                  WW_DUMMY)
                 Else
-                    OIM0005INProw("DELREASONKBN") = ""
+                    OIM0005INProw("DELREASONKBNNAME") = ""
                 End If
             End If
 

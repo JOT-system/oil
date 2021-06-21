@@ -729,7 +729,7 @@ Public Class OIM0005TankListKinoene
             & "    , ORIGINOWNERNAME" _
             & "    , OWNERNAME" _
             & "    , LEASENAME" _
-            & "    , LEASECLASSNEMAE" _
+            & "    , LEASECLASSNAME" _
             & "    , USERNAME" _
             & "    , CURRENTSTATIONNAME" _
             & "    , EXTRADINARYSTATIONNAME" _

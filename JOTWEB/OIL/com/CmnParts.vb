@@ -1005,7 +1005,7 @@ Public Class CmnParts
             & " , OIM0005.LEASECODE" _
             & " , OIM0005.LEASENAME" _
             & " , OIM0005.LEASECLASS" _
-            & " , OIM0005.LEASECLASSNEMAE" _
+            & " , OIM0005.LEASECLASSNAME" _
             & " , OIM0005.AUTOEXTENTION" _
             & " , OIM0005.AUTOEXTENTIONNAME" _
             & " , OIM0005.LEASESTYMD" _

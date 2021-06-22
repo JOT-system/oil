@@ -696,7 +696,7 @@ Public Class OIT0005TankLocSearch
             .AppendLine(" ORDER BY ")
             .AppendLine("   TNK.OPERATIONBASECODE ")
             .AppendLine("   , TNK.JRINSPECTIONDATE ")
-            .AppendLine("   , TNK.TANKNUMBER DESC ")
+            .AppendLine("   , RIGHT('0000000000' + CAST(TNK.TANKNUMBER AS NVARCHAR), 10) ")
         End With
 
         Try

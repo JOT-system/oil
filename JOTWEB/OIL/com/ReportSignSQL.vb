@@ -946,9 +946,9 @@
             & "   END AS COMPAREINFOCD " _
             & " , CASE " _
             & "   WHEN OT.IMPORTFLG = '0' THEN '新規作成' " _
-            & "   WHEN OT.ORDERNO IS NULL THEN 'データ削除' " _
-            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '油種不一致' " _
-            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN 'タンク車No不一致' " _
+            & "   WHEN OT.ORDERNO IS NULL THEN '削除' " _
+            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '油種変更' " _
+            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '車番更新' " _
             & "   ELSE '一致' " _
             & "   END AS COMPAREINFONM " _
             & " , OIT0002.ORDERNO " _
@@ -1123,9 +1123,9 @@
             & "   END AS COMPAREINFOCD " _
             & " , CASE " _
             & "   WHEN OIT0016.IMPORTFLG = '0' THEN '新規作成' " _
-            & "   WHEN JOT.ORDERNO IS NULL THEN 'データ追加' " _
-            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '油種不一致' " _
-            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN 'タンク車No不一致' " _
+            & "   WHEN JOT.ORDERNO IS NULL THEN '追加' " _
+            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '油種変更' " _
+            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '車番更新' " _
             & "   ELSE '一致' " _
             & "   END AS COMPAREINFONM " _
             & " , JOT.ORDERNO AS JOT_ORDERNO " _
@@ -1297,7 +1297,7 @@
     ''' 空回日報(OT連携)比較結果(帳票)SQL
     ''' </summary>
     ''' <remarks>OT連携されたデータと空回日報との比較結果を表示する際のSQLを設定</remarks>
-    Public Function EmptyTurnDairyOTComparePrint(ByVal mapID As String)
+    Public Function EmptyTurnDairyOTComparePrint(ByVal mapID As String, Optional ByVal blnChoiceFlg As Boolean = False)
         '★共通項目
         Dim SQLStr As String =
               " SELECT " _
@@ -1391,9 +1391,18 @@
             & "       OIM0003.OFFICECODE = OIT0020.KEYCODE3 " _
             & "   AND OIM0003.OILCODE = ISNULL(OIT0020.OILCODE, OIT0020.OT_OILCODE) " _
             & "   AND OIM0003.SEGMENTOILCODE = ISNULL(OIT0020.ORDERINGTYPE, OIT0020.OT_ORDERINGTYPE) " _
-            & "   AND OIM0003.DELFLG <> @DELFLG " _
-            & "   WHERE OIT0020.KEYCODE1 = @ORDERNO " _
-            & "   GROUP BY " _
+            & "   AND OIM0003.DELFLG <> @DELFLG "
+
+        If blnChoiceFlg = False Then
+            SQLStr &=
+              "   WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) "
+        Else
+            SQLStr &=
+              "   WHERE OIT0020.KEYCODE1 = @ORDERNO "
+        End If
+
+        SQLStr &=
+              "   GROUP BY " _
             & "         OIT0020.KEYCODE1 " _
             & "       , ISNULL(OIT0020.SHIPPERSCODE,OIT0020.OT_SHIPPERSCODE) " _
             & "       , ISNULL(OIT0020.SHIPPERSNAME,OIT0020.OT_SHIPPERSNAME) " _
@@ -1404,14 +1413,22 @@
             & " AND OTOILCT.SHIPPERSCODE = ISNULL(OIT0020.SHIPPERSCODE, OIT0020.OT_SHIPPERSCODE) " _
             & " AND OTOILCT.OTOILCODE = ISNULL(OIM0003_JOT.OTOILCODE,OIM0003_OT.OTOILCODE) "
 
-        SQLStr &=
+        If blnChoiceFlg = False Then
+            SQLStr &=
+              " WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) " _
+            & "   AND OIT0020.KEYCODE3 = @OFFICECODE "
+        Else
+            SQLStr &=
               " WHERE OIT0020.KEYCODE1 = @ORDERNO " _
             & "   AND OIT0020.KEYCODE3 = @OFFICECODE "
+        End If
 
         SQLStr &=
                 " ORDER BY" _
-            & "    ISNULL(OIT0020.SHIPPERSCODE,OIT0020.OT_SHIPPERSCODE)" _
-            & "  , ISNULL(OIT0020.TRAINNO,OIT0020.OT_TRAINNO)" _
+            & "    ISNULL(OIT0020.TRAINNO,OIT0020.OT_TRAINNO)" _
+            & "  , ISNULL(OIT0020.LODDATE, OIT0020.OT_LODDATE)" _
+            & "  , ISNULL(OIT0020.DEPDATE, OIT0020.OT_DEPDATE)" _
+            & "  , ISNULL(OIT0020.SHIPPERSCODE,OIT0020.OT_SHIPPERSCODE)" _
             & "  , ISNULL(OIT0020.DEPSTATION,OIT0020.OT_DEPSTATION)" _
             & "  , ISNULL(OIM0003_JOT.OTOILCODE,OIM0003_OT.OTOILCODE)" _
             & "  , ISNULL(OIT0020.LINEORDER,OIT0020.OT_LINEORDER)" _

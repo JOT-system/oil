@@ -31,7 +31,7 @@
     <asp:TextBox ID="WF_SEL_TANKLENGTH" runat="server"></asp:TextBox>               <!-- タンク車体長 -->
     <asp:TextBox ID="WF_SEL_MAXCALIBER" runat="server"></asp:TextBox>               <!-- 最大口径 -->
     <asp:TextBox ID="WF_SEL_MINCALIBER" runat="server"></asp:TextBox>               <!-- 最大口径 -->
-    <asp:TextBox ID="WF_SEL_LENGTHFLG2" runat="server"></asp:TextBox>                <!-- 長さフラグ -->
+    <asp:TextBox ID="WF_SEL_LENGTHFLG2" runat="server"></asp:TextBox>               <!-- 長さフラグ -->
     <asp:TextBox ID="WF_SEL_ORIGINOWNERCODE" runat="server"></asp:TextBox>          <!-- 原籍所有者C -->
     <asp:TextBox ID="WF_SEL_ORIGINOWNERNAME" runat="server"></asp:TextBox>          <!-- 原籍所有者 -->
     <asp:TextBox ID="WF_SEL_OWNERCODE" runat="server"></asp:TextBox>                <!-- 名義所有者C -->
@@ -39,7 +39,7 @@
     <asp:TextBox ID="WF_SEL_LEASECODE" runat="server"></asp:TextBox>                <!-- リース先C -->
     <asp:TextBox ID="WF_SEL_LEASENAME" runat="server"></asp:TextBox>                <!-- リース先 -->
     <asp:TextBox ID="WF_SEL_LEASECLASS" runat="server"></asp:TextBox>               <!-- リース区分C -->
-    <asp:TextBox ID="WF_SEL_LEASECLASSNEMAE" runat="server"></asp:TextBox>          <!-- リース区分 -->
+    <asp:TextBox ID="WF_SEL_LEASECLASSNAME" runat="server"></asp:TextBox>           <!-- リース区分 -->
     <asp:TextBox ID="WF_SEL_AUTOEXTENTION" runat="server"></asp:TextBox>            <!-- 自動延長 -->
     <asp:TextBox ID="WF_SEL_AUTOEXTENTIONNAME" runat="server"></asp:TextBox>        <!-- 自動延長名 -->
     <asp:TextBox ID="WF_SEL_LEASESTYMD" runat="server"></asp:TextBox>               <!-- リース開始年月日 -->
@@ -65,6 +65,10 @@
 
     <asp:TextBox ID="WF_SEL_OPERATIONBASECODE" runat="server"></asp:TextBox>        <!-- 運用基地C -->
     <asp:TextBox ID="WF_SEL_OPERATIONBASENAME" runat="server"></asp:TextBox>        <!-- 運用場所 -->
+
+    <asp:TextBox ID="WF_SEL_SUBOPERATIONBASECODE" runat="server"></asp:TextBox>     <!-- 運用基地C（サブ） -->
+    <asp:TextBox ID="WF_SEL_SUBOPERATIONBASENAME" runat="server"></asp:TextBox>     <!-- 運用場所（サブ） -->
+
     <asp:TextBox ID="WF_SEL_COLORCODE" runat="server"></asp:TextBox>                <!-- 塗色C -->
     <asp:TextBox ID="WF_SEL_COLORNAME" runat="server"></asp:TextBox>                <!-- 塗色 -->
     <asp:TextBox ID="WF_SEL_MARKCODE" runat="server"></asp:TextBox>                 <!-- マークコード -->
@@ -122,7 +126,18 @@
 
     <asp:TextBox ID="WF_SEL_INSPECTMEMBERNAME" runat="server"></asp:TextBox>        <!-- 点検実施者(社員名) -->
 
+    <asp:TextBox ID="WF_SEL_ALLINSPECTPLANYM" runat="server"></asp:TextBox>         <!-- 全検計画年月 -->
+    <asp:TextBox ID="WF_SEL_SUSPENDFLG" runat="server"></asp:TextBox>               <!-- 休車フラグ -->
+    <asp:TextBox ID="WF_SEL_SUSPENDDATE" runat="server"></asp:TextBox>              <!-- 休車日 -->
+    <asp:TextBox ID="WF_SEL_PURCHASEPRICE" runat="server"></asp:TextBox>            <!-- 取得価格 -->
+    <asp:TextBox ID="WF_SEL_INTERNALCOATING" runat="server"></asp:TextBox>          <!-- 内部塗装 -->
+    <asp:TextBox ID="WF_SEL_SAFETYVALVE" runat="server"></asp:TextBox>              <!-- 安全弁 -->
+    <asp:TextBox ID="WF_SEL_CENTERVALVEINFO" runat="server"></asp:TextBox>          <!-- センターバルブ情報 -->
+
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
+
+    <asp:TextBox ID="WF_SEL_DELREASONKBN" runat="server"></asp:TextBox>             <!-- 削除理由区分 -->
+
     <asp:TextBox ID="WF_SEL_INITYMD" runat="server"></asp:TextBox>                  <!-- 登録年月日 -->
     <asp:TextBox ID="WF_SEL_INITUSER" runat="server"></asp:TextBox>                 <!-- 登録ユーザーＩＤ -->
     <asp:TextBox ID="WF_SEL_INITTERMID" runat="server"></asp:TextBox>               <!-- 登録端末 -->

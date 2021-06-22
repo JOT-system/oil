@@ -313,8 +313,8 @@ Public Class OIM0005TankSearch
         'JOT車番
         Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            If WF_TANKNUMBER_CODE.Text <> "" Then
+            '存在チェック(削除含むチェックが入っている場合はチェックしない）
+            If WF_TANKNUMBER_CODE.Text <> "" AndAlso Not WF_DELFLG.Checked Then
                 CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text, needsPopUp:=True)

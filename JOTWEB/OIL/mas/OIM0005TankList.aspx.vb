@@ -15,6 +15,10 @@
 '         :2021/05/25 1)検索項目に「運用基地コード」「リース先」を追加
 '         :2021/06/17 1)検索項目に「削除含む」チェックボックスを追加
 '         :           2)削除済みのレコードの背景色を灰色に設定する
+'         :           3)項目「運用基地（サブ）」「削除理由区分」「全検計画年月」
+'         :             「休車フラグ」「休車日」「取得価格」「内部塗装」
+'         :             「安全弁」「センターバルブ情報」を追加
+'         :             項目名称変更「請負リース区分」→「請負請負リース区分」
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -414,7 +418,7 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')                         AS LEASECODE " _
             & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')                         AS LEASENAME " _
             & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')                        AS LEASECLASS " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')                   AS LEASECLASSNEMAE " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNAME), '')                    AS LEASECLASSNAME " _
             & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')                     AS AUTOEXTENTION " _
             & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTIONNAME), '')                 AS AUTOEXTENTIONNAME " _
             & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN '' " _
@@ -448,6 +452,8 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.MIDDLEOILNAME), '')                     AS MIDDLEOILNAME " _
             & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')                 AS OPERATIONBASECODE " _
             & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')                 AS OPERATIONBASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.SUBOPERATIONBASECODE), '')              AS SUBOPERATIONBASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.SUBOPERATIONBASENAME), '')              AS SUBOPERATIONBASENAME " _
             & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')                         AS COLORCODE " _
             & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')                         AS COLORNAME " _
             & " , ISNULL(RTRIM(OIM0005.MARKCODE), '')                          AS MARKCODE " _
@@ -533,6 +539,23 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.SELFINSPECTORGCODE), '')                AS SELFINSPECTORGCODE " _
             & " , ''                                                           AS SELFINSPECTORGNAME " _
             & " , ISNULL(RTRIM(OIM0005.INSPECTMEMBERNAME), '')                 AS INSPECTMEMBERNAME " _
+            & " , CASE WHEN OIM0005.ALLINSPECTPLANYM IS NULL THEN '' " _
+            & "   ELSE FORMAT(OIM0005.ALLINSPECTPLANYM,'yyyy/MM') " _
+            & "   END                                                          AS ALLINSPECTPLANYM " _
+            & " , ISNULL(RTRIM(OIM0005.SUSPENDFLG), '')                        AS SUSPENDFLG " _
+            & " , ''                                                           AS SUSPENDFLGNAME " _
+            & " , CASE WHEN OIM0005.SUSPENDDATE IS NULL THEN '' " _
+            & "   ELSE FORMAT(OIM0005.SUSPENDDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS SUSPENDDATE " _
+            & " , CASE WHEN OIM0005.PURCHASEPRICE IS NULL THEN '' " _
+            & "   ELSE FORMAT(OIM0005.PURCHASEPRICE,'#,##0') " _
+            & "   END                                                          AS PURCHASEPRICE " _
+            & " , ISNULL(RTRIM(OIM0005.INTERNALCOATING), '')                   AS INTERNALCOATING " _
+            & " , ''                                                           AS INTERNALCOATINGNAME " _
+            & " , ISNULL(RTRIM(OIM0005.SAFETYVALVE), '')                       AS SAFETYVALVE " _
+            & " , ISNULL(RTRIM(OIM0005.CENTERVALVEINFO), '')                   AS CENTERVALVEINFO " _
+            & " , ISNULL(RTRIM(OIM0005.DELREASONKBN), '')                      AS DELREASONKBN " _
+            & " , ''                                                           AS DELREASONKBNNAME " _
             & " FROM OIL.OIM0005_TANK OIM0005 "
 
 
@@ -629,6 +652,15 @@ Public Class OIM0005TankList
                     '自主点検実施者
                     CODENAME_get("ORG", OIM0005row("SELFINSPECTORGCODE"),
                                  OIM0005row("SELFINSPECTORGNAME"), WW_DUMMY)
+                    '休車フラグ
+                    CODENAME_get("SUSPENDFLG", OIM0005row("SUSPENDFLG"),
+                                 OIM0005row("SUSPENDFLGNAME"), WW_DUMMY)
+                    '内部塗装
+                    CODENAME_get("INTERNALCOATING", OIM0005row("INTERNALCOATING"),
+                                 OIM0005row("INTERNALCOATINGNAME"), WW_DUMMY)
+                    '削除理由区分
+                    CODENAME_get("DELREASONKBN", OIM0005row("DELREASONKBN"),
+                                 OIM0005row("DELREASONKBNNAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -881,7 +913,7 @@ Public Class OIM0005TankList
         'リース先C
         work.WF_SEL_LEASECODE.Text = ""
 
-        'リース区分C
+        '請負リース区分C
         work.WF_SEL_LEASECLASS.Text = ""
 
         '自動延長
@@ -934,6 +966,9 @@ Public Class OIM0005TankList
 
         '運用基地C
         work.WF_SEL_OPERATIONBASECODE.Text = ""
+
+        '運用基地C（サブ）
+        work.WF_SEL_SUBOPERATIONBASECODE.Text = ""
 
         '塗色C
         work.WF_SEL_COLORCODE.Text = ""
@@ -1049,8 +1084,8 @@ Public Class OIM0005TankList
         'リース先
         work.WF_SEL_LEASENAME.Text = ""
 
-        'リース区分
-        work.WF_SEL_LEASECLASSNEMAE.Text = ""
+        '請負リース区分
+        work.WF_SEL_LEASECLASSNAME.Text = ""
 
         '第三者使用者
         work.WF_SEL_USERNAME.Text = ""
@@ -1069,6 +1104,9 @@ Public Class OIM0005TankList
 
         '運用場所
         work.WF_SEL_OPERATIONBASENAME.Text = ""
+
+        '運用場所（サブ）
+        work.WF_SEL_SUBOPERATIONBASENAME.Text = ""
 
         '塗色
         work.WF_SEL_COLORNAME.Text = ""
@@ -1163,8 +1201,32 @@ Public Class OIM0005TankList
         '点検実施者(社員名)
         work.WF_SEL_INSPECTMEMBERNAME.Text = ""
 
+        '全検計画年月
+        work.WF_SEL_ALLINSPECTPLANYM.Text = ""
+
+        '休車フラグ
+        work.WF_SEL_SUSPENDFLG.Text = ""
+
+        '休車日
+        work.WF_SEL_SUSPENDDATE.Text = ""
+
+        '取得価格
+        work.WF_SEL_PURCHASEPRICE.Text = "0"
+
+        '内部塗装
+        work.WF_SEL_INTERNALCOATING.Text = ""
+
+        '安全弁
+        work.WF_SEL_SAFETYVALVE.Text = ""
+
+        'センターバルブ情報
+        work.WF_SEL_CENTERVALVEINFO.Text = ""
+
         '削除
         work.WF_SEL_DELFLG.Text = "0"
+
+        '削除理由区分
+        work.WF_SEL_DELREASONKBN.Text = ""
 
         '詳細画面更新メッセージ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
@@ -1310,7 +1372,7 @@ Public Class OIM0005TankList
             & "        , ORIGINOWNERNAME = @P30" _
             & "        , OWNERNAME = @P31" _
             & "        , LEASENAME = @P32" _
-            & "        , LEASECLASSNEMAE = @P33" _
+            & "        , LEASECLASSNAME = @P33" _
             & "        , USERNAME = @P34" _
             & "        , CURRENTSTATIONNAME = @P35" _
             & "        , EXTRADINARYSTATIONNAME = @P36" _
@@ -1380,6 +1442,16 @@ Public Class OIM0005TankList
             & "        , MIDDLEOILCODE = @P103" _
             & "        , MIDDLEOILNAME = @P104" _
             & "        , INSPECTMEMBERNAME = @P105" _
+            & "        , SUBOPERATIONBASECODE = @P106" _
+            & "        , SUBOPERATIONBASENAME = @P107" _
+            & "        , ALLINSPECTPLANYM = @P108" _
+            & "        , SUSPENDFLG = @P109" _
+            & "        , SUSPENDDATE = @P110" _
+            & "        , PURCHASEPRICE = @P111" _
+            & "        , INTERNALCOATING = @P112" _
+            & "        , SAFETYVALVE = @P113" _
+            & "        , CENTERVALVEINFO = @P114" _
+            & "        , DELREASONKBN = @P115" _
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -1417,7 +1489,7 @@ Public Class OIM0005TankList
             & "        , ORIGINOWNERNAME" _
             & "        , OWNERNAME" _
             & "        , LEASENAME" _
-            & "        , LEASECLASSNEMAE" _
+            & "        , LEASECLASSNAME" _
             & "        , USERNAME" _
             & "        , CURRENTSTATIONNAME" _
             & "        , EXTRADINARYSTATIONNAME" _
@@ -1489,7 +1561,17 @@ Public Class OIM0005TankList
             & "        , SELFINSPECTORGCODE" _
             & "        , MIDDLEOILCODE" _
             & "        , MIDDLEOILNAME" _
-            & "        , INSPECTMEMBERNAME)" _
+            & "        , INSPECTMEMBERNAME" _
+            & "        , SUBOPERATIONBASECODE" _
+            & "        , SUBOPERATIONBASENAME" _
+            & "        , ALLINSPECTPLANYM" _
+            & "        , SUSPENDFLG" _
+            & "        , SUSPENDDATE" _
+            & "        , PURCHASEPRICE" _
+            & "        , INTERNALCOATING" _
+            & "        , SAFETYVALVE" _
+            & "        , CENTERVALVEINFO" _
+            & "        , DELREASONKBN)" _
             & "    VALUES" _
             & "        (@P00" _
             & "        , @P01" _
@@ -1596,124 +1678,145 @@ Public Class OIM0005TankList
             & "        , @P102" _
             & "        , @P103" _
             & "        , @P104" _
-            & "        , @P105) ;" _
+            & "        , @P105" _
+            & "        , @P106" _
+            & "        , @P107" _
+            & "        , @P108" _
+            & "        , @P109" _
+            & "        , @P110" _
+            & "        , @P111" _
+            & "        , @P112" _
+            & "        , @P113" _
+            & "        , @P114" _
+            & "        , @P115) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
 
         '○ 更新ジャーナル出力
         Dim SQLJnl As String =
-              " Select" _
-            & "    DELFLG" _
-            & "    , TANKNUMBER" _
-            & "    , ORIGINOWNERCODE" _
-            & "    , OWNERCODE" _
-            & "    , LEASECODE" _
-            & "    , LEASECLASS" _
-            & "    , AUTOEXTENTION" _
-            & "    , LEASESTYMD" _
-            & "    , LEASEENDYMD" _
-            & "    , USERCODE" _
-            & "    , CURRENTSTATIONCODE" _
-            & "    , EXTRADINARYSTATIONCODE" _
-            & "    , USERLIMIT" _
-            & "    , LIMITTEXTRADIARYSTATION" _
-            & "    , DEDICATETYPECODE" _
-            & "    , EXTRADINARYTYPECODE" _
-            & "    , EXTRADINARYLIMIT" _
-            & "    , OPERATIONBASECODE" _
-            & "    , COLORCODE" _
-            & "    , MARKCODE" _
-            & "    , MARKNAME" _
-            & "    , GETDATE" _
-            & "    , TRANSFERDATE" _
-            & "    , OBTAINEDCODE" _
-            & "    , MODEL" _
-            & "    , MODELKANA" _
-            & "    , LOAD" _
-            & "    , LOADUNIT" _
-            & "    , VOLUME" _
-            & "    , VOLUMEUNIT" _
-            & "    , ORIGINOWNERNAME" _
-            & "    , OWNERNAME" _
-            & "    , LEASENAME" _
-            & "    , LEASECLASSNEMAE" _
-            & "    , USERNAME" _
-            & "    , CURRENTSTATIONNAME" _
-            & "    , EXTRADINARYSTATIONNAME" _
-            & "    , DEDICATETYPENAME" _
-            & "    , EXTRADINARYTYPENAME" _
-            & "    , OPERATIONBASENAME" _
-            & "    , COLORNAME" _
-            & "    , RESERVE1" _
-            & "    , RESERVE2" _
-            & "    , SPECIFIEDDATE" _
-            & "    , JRALLINSPECTIONDATE" _
-            & "    , PROGRESSYEAR" _
-            & "    , NEXTPROGRESSYEAR" _
-            & "    , JRINSPECTIONDATE" _
-            & "    , INSPECTIONDATE" _
-            & "    , JRSPECIFIEDDATE" _
-            & "    , JRTANKNUMBER" _
-            & "    , OLDTANKNUMBER" _
-            & "    , OTTANKNUMBER" _
-            & "    , JXTGTANKNUMBER1" _
-            & "    , COSMOTANKNUMBER" _
-            & "    , FUJITANKNUMBER" _
-            & "    , SHELLTANKNUMBER" _
-            & "    , RESERVE3" _
-            & "    , USEDFLG" _
-            & "    , MYWEIGHT" _
-            & "    , LENGTH" _
-            & "    , TANKLENGTH" _
-            & "    , MAXCALIBER" _
-            & "    , MINCALIBER" _
-            & "    , LENGTHFLG" _
-            & "    , AUTOEXTENTIONNAME" _
-            & "    , BIGOILCODE" _
-            & "    , BIGOILNAME" _
-            & "    , MIDDLEOILCODE" _
-            & "    , MIDDLEOILNAME" _
-            & "    , JXTGTAGCODE1" _
-            & "    , JXTGTAGNAME1" _
-            & "    , JXTGTAGCODE2" _
-            & "    , JXTGTAGNAME2" _
-            & "    , JXTGTAGCODE3" _
-            & "    , JXTGTAGNAME3" _
-            & "    , JXTGTAGCODE4" _
-            & "    , JXTGTAGNAME4" _
-            & "    , IDSSTAGCODE" _
-            & "    , IDSSTAGNAME" _
-            & "    , COSMOTAGCODE" _
-            & "    , COSMOTAGNAME" _
-            & "    , ALLINSPECTIONDATE" _
-            & "    , PREINSPECTIONDATE" _
-            & "    , OBTAINEDNAME" _
-            & "    , EXCLUDEDATE" _
-            & "    , RETIRMENTDATE" _
-            & "    , JRTANKTYPE" _
-            & "    , JXTGTANKNUMBER2" _
-            & "    , JXTGTANKNUMBER3" _
-            & "    , JXTGTANKNUMBER4" _
-            & "    , SAPSHELLTANKNUMBER" _
-            & "    , INTERINSPECTYM" _
-            & "    , INTERINSPECTSTATION" _
-            & "    , INTERINSPECTORGCODE" _
-            & "    , SELFINSPECTYM" _
-            & "    , SELFINSPECTSTATION" _
-            & "    , SELFINSPECTORGCODE" _
-            & "    , INSPECTMEMBERNAME" _
-            & "    , INITYMD" _
-            & "    , INITUSER" _
-            & "    , INITTERMID" _
-            & "    , UPDYMD" _
-            & "    , UPDUSER" _
-            & "    , UPDTERMID" _
-            & "    , RECEIVEYMD" _
-            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
+              " SELECT" _
+            & "     DELFLG" _
+            & "     , TANKNUMBER" _
+            & "     , MODEL" _
+            & "     , MODELKANA" _
+            & "     , LOAD" _
+            & "     , LOADUNIT" _
+            & "     , VOLUME" _
+            & "     , VOLUMEUNIT" _
+            & "     , MYWEIGHT" _
+            & "     , LENGTH" _
+            & "     , TANKLENGTH" _
+            & "     , MAXCALIBER" _
+            & "     , MINCALIBER" _
+            & "     , LENGTHFLG" _
+            & "     , ORIGINOWNERCODE" _
+            & "     , ORIGINOWNERNAME" _
+            & "     , OWNERCODE" _
+            & "     , OWNERNAME" _
+            & "     , LEASECODE" _
+            & "     , LEASENAME" _
+            & "     , LEASECLASS" _
+            & "     , LEASECLASSNAME" _
+            & "     , AUTOEXTENTION" _
+            & "     , AUTOEXTENTIONNAME" _
+            & "     , LEASESTYMD" _
+            & "     , LEASEENDYMD" _
+            & "     , USERCODE" _
+            & "     , USERNAME" _
+            & "     , CURRENTSTATIONCODE" _
+            & "     , CURRENTSTATIONNAME" _
+            & "     , EXTRADINARYSTATIONCODE" _
+            & "     , EXTRADINARYSTATIONNAME" _
+            & "     , USERLIMIT" _
+            & "     , LIMITTEXTRADIARYSTATION" _
+            & "     , DEDICATETYPECODE" _
+            & "     , DEDICATETYPENAME" _
+            & "     , EXTRADINARYTYPECODE" _
+            & "     , EXTRADINARYTYPENAME" _
+            & "     , EXTRADINARYLIMIT" _
+            & "     , BIGOILCODE" _
+            & "     , BIGOILNAME" _
+            & "     , MIDDLEOILCODE" _
+            & "     , MIDDLEOILNAME" _
+            & "     , DOWNLOADDATE" _
+            & "     , OPERATIONBASECODE" _
+            & "     , OPERATIONBASENAME" _
+            & "     , SUBOPERATIONBASECODE" _
+            & "     , SUBOPERATIONBASENAME" _
+            & "     , COLORCODE" _
+            & "     , COLORNAME" _
+            & "     , MARKCODE" _
+            & "     , MARKNAME" _
+            & "     , JXTGTAGCODE1" _
+            & "     , JXTGTAGNAME1" _
+            & "     , JXTGTAGCODE2" _
+            & "     , JXTGTAGNAME2" _
+            & "     , JXTGTAGCODE3" _
+            & "     , JXTGTAGNAME3" _
+            & "     , JXTGTAGCODE4" _
+            & "     , JXTGTAGNAME4" _
+            & "     , IDSSTAGCODE" _
+            & "     , IDSSTAGNAME" _
+            & "     , COSMOTAGCODE" _
+            & "     , COSMOTAGNAME" _
+            & "     , RESERVE1" _
+            & "     , RESERVE2" _
+            & "     , JRINSPECTIONDATE" _
+            & "     , INSPECTIONDATE" _
+            & "     , JRSPECIFIEDDATE" _
+            & "     , SPECIFIEDDATE" _
+            & "     , JRALLINSPECTIONDATE" _
+            & "     , ALLINSPECTIONDATE" _
+            & "     , PREINSPECTIONDATE" _
+            & "     , GETDATE" _
+            & "     , TRANSFERDATE" _
+            & "     , OBTAINEDCODE" _
+            & "     , OBTAINEDNAME" _
+            & "     , PROGRESSYEAR" _
+            & "     , NEXTPROGRESSYEAR" _
+            & "     , EXCLUDEDATE" _
+            & "     , RETIRMENTDATE" _
+            & "     , JRTANKNUMBER" _
+            & "     , JRTANKTYPE" _
+            & "     , OLDTANKNUMBER" _
+            & "     , OTTANKNUMBER" _
+            & "     , JXTGTANKNUMBER1" _
+            & "     , JXTGTANKNUMBER2" _
+            & "     , JXTGTANKNUMBER3" _
+            & "     , JXTGTANKNUMBER4" _
+            & "     , COSMOTANKNUMBER" _
+            & "     , FUJITANKNUMBER" _
+            & "     , SHELLTANKNUMBER" _
+            & "     , SAPSHELLTANKNUMBER" _
+            & "     , RESERVE3" _
+            & "     , USEDFLG" _
+            & "     , INTERINSPECTYM" _
+            & "     , INTERINSPECTSTATION" _
+            & "     , INTERINSPECTORGCODE" _
+            & "     , SELFINSPECTYM" _
+            & "     , SELFINSPECTSTATION" _
+            & "     , SELFINSPECTORGCODE" _
+            & "     , INSPECTMEMBERNAME" _
+            & "     , ALLINSPECTPLANYM" _
+            & "     , SUSPENDFLG" _
+            & "     , SUSPENDDATE" _
+            & "     , PURCHASEPRICE" _
+            & "     , INTERNALCOATING" _
+            & "     , SAFETYVALVE" _
+            & "     , CENTERVALVEINFO" _
+            & "     , DELREASONKBN" _
+            & "     , INITYMD" _
+            & "     , INITUSER" _
+            & "     , INITTERMID" _
+            & "     , UPDYMD" _
+            & "     , UPDUSER" _
+            & "     , UPDTERMID" _
+            & "     , RECEIVEYMD" _
+            & "     , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
             & " FROM" _
-            & "    OIL.OIM0005_TANK" _
+            & "     OIL.OIM0005_TANK" _
             & " WHERE" _
-            & "        TANKNUMBER = @P01"
+            & "     TANKNUMBER = @P01"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
@@ -1722,7 +1825,7 @@ Public Class OIM0005TankList
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)          '原籍所有者C
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)          '名義所有者C
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)          'リース先C
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)          'リース区分C
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)          '請負リース区分C
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)           '自動延長
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Date)                  'リース開始年月日
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.Date)                  'リース満了年月日
@@ -1750,7 +1853,7 @@ Public Class OIM0005TankList
                 Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          '原籍所有者
                 Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 20)          '名義所有者
                 Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)          'リース先
-                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          'リース区分
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          '請負リース区分
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)          '第三者使用者
                 Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 20)          '原常備駅
                 Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)          '臨時常備駅
@@ -1823,6 +1926,16 @@ Public Class OIM0005TankList
                 Dim PARA103 As SqlParameter = SQLcmd.Parameters.Add("@P103", SqlDbType.NVarChar, 1)         '油種中分類コード
                 Dim PARA104 As SqlParameter = SQLcmd.Parameters.Add("@P104", SqlDbType.NVarChar, 10)        '油種中分類名
                 Dim PARA105 As SqlParameter = SQLcmd.Parameters.Add("@P105", SqlDbType.NVarChar, 20)        '点検実施者(社員名)
+                Dim PARA106 As SqlParameter = SQLcmd.Parameters.Add("@P106", SqlDbType.NVarChar, 20)        '運用基地C（サブ）
+                Dim PARA107 As SqlParameter = SQLcmd.Parameters.Add("@P107", SqlDbType.NVarChar, 20)        '運用基地（サブ）
+                Dim PARA108 As SqlParameter = SQLcmd.Parameters.Add("@P108", SqlDbType.Date)                '全検計画年月
+                Dim PARA109 As SqlParameter = SQLcmd.Parameters.Add("@P109", SqlDbType.NVarChar, 1)         '休車フラグ
+                Dim PARA110 As SqlParameter = SQLcmd.Parameters.Add("@P110", SqlDbType.Date)                '休車日
+                Dim PARA111 As SqlParameter = SQLcmd.Parameters.Add("@P111", SqlDbType.Money)               '取得価格
+                Dim PARA112 As SqlParameter = SQLcmd.Parameters.Add("@P112", SqlDbType.NVarChar, 1)         '内部塗装
+                Dim PARA113 As SqlParameter = SQLcmd.Parameters.Add("@P113", SqlDbType.NVarChar, 20)        '安全弁
+                Dim PARA114 As SqlParameter = SQLcmd.Parameters.Add("@P114", SqlDbType.NVarChar, 20)        'センターバルブ情報
+                Dim PARA115 As SqlParameter = SQLcmd.Parameters.Add("@P115", SqlDbType.NVarChar, 1)         '削除理由区分
 
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       'JOT車番
 
@@ -1902,7 +2015,7 @@ Public Class OIM0005TankList
                         PARA30.Value = OIM0005row("ORIGINOWNERNAME")
                         PARA31.Value = OIM0005row("OWNERNAME")
                         PARA32.Value = OIM0005row("LEASENAME")
-                        PARA33.Value = OIM0005row("LEASECLASSNEMAE")
+                        PARA33.Value = OIM0005row("LEASECLASSNAME")
                         PARA34.Value = OIM0005row("USERNAME")
                         PARA35.Value = OIM0005row("CURRENTSTATIONNAME")
                         PARA36.Value = OIM0005row("EXTRADINARYSTATIONNAME")
@@ -2051,6 +2164,28 @@ Public Class OIM0005TankList
                         PARA103.Value = OIM0005row("MIDDLEOILCODE")
                         PARA104.Value = OIM0005row("MIDDLEOILNAME")
                         PARA105.Value = OIM0005row("INSPECTMEMBERNAME")
+                        PARA106.Value = OIM0005row("SUBOPERATIONBASECODE")
+                        PARA107.Value = OIM0005row("SUBOPERATIONBASENAME")
+                        If OIM0005row("ALLINSPECTPLANYM") <> "" Then
+                            PARA108.Value = OIM0005row("ALLINSPECTPLANYM") + "/01"
+                        Else
+                            PARA108.Value = DBNull.Value
+                        End If
+                        PARA109.Value = OIM0005row("SUSPENDFLG")
+                        If OIM0005row("SUSPENDDATE") <> "" Then
+                            PARA110.Value = OIM0005row("SUSPENDDATE")
+                        Else
+                            PARA110.Value = DBNull.Value
+                        End If
+                        If OIM0005row("PURCHASEPRICE") <> "" Then
+                            PARA111.Value = OIM0005row("PURCHASEPRICE")
+                        Else
+                            PARA111.Value = 0
+                        End If
+                        PARA112.Value = OIM0005row("INTERNALCOATING")
+                        PARA113.Value = OIM0005row("SAFETYVALVE")
+                        PARA114.Value = OIM0005row("CENTERVALVEINFO")
+                        PARA115.Value = OIM0005row("DELREASONKBN")
 
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
@@ -2254,7 +2389,7 @@ Public Class OIM0005TankList
         'リース先C
         work.WF_SEL_LEASECODE.Text = OIM0005tbl.Rows(WW_LINECNT)("LEASECODE")
 
-        'リース区分C
+        '請負リース区分C
         work.WF_SEL_LEASECLASS.Text = OIM0005tbl.Rows(WW_LINECNT)("LEASECLASS")
 
         '自動延長
@@ -2292,6 +2427,9 @@ Public Class OIM0005TankList
 
         '運用基地C
         work.WF_SEL_OPERATIONBASECODE.Text = OIM0005tbl.Rows(WW_LINECNT)("OPERATIONBASECODE")
+
+        '運用基地C（サブ）
+        work.WF_SEL_SUBOPERATIONBASECODE.Text = OIM0005tbl.Rows(WW_LINECNT)("SUBOPERATIONBASECODE")
 
         '塗色C
         work.WF_SEL_COLORCODE.Text = OIM0005tbl.Rows(WW_LINECNT)("COLORCODE")
@@ -2335,8 +2473,8 @@ Public Class OIM0005TankList
         'リース先
         work.WF_SEL_LEASENAME.Text = OIM0005tbl.Rows(WW_LINECNT)("LEASENAME")
 
-        'リース区分
-        work.WF_SEL_LEASECLASSNEMAE.Text = OIM0005tbl.Rows(WW_LINECNT)("LEASECLASSNEMAE")
+        '請負リース区分
+        work.WF_SEL_LEASECLASSNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("LEASECLASSNAME")
 
         '第三者使用者
         work.WF_SEL_USERNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("USERNAME")
@@ -2355,6 +2493,9 @@ Public Class OIM0005TankList
 
         '運用場所
         work.WF_SEL_OPERATIONBASENAME.Text = OIM0005tbl.Rows(WW_LINECNT)("OPERATIONBASENAME")
+
+        '運用場所（サブ）
+        work.WF_SEL_SUBOPERATIONBASENAME.Text = OIM0005tbl.Rows(WW_LINECNT)("SUBOPERATIONBASENAME")
 
         '塗色
         work.WF_SEL_COLORNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("COLORNAME")
@@ -2535,6 +2676,30 @@ Public Class OIM0005TankList
 
         '点検実施者(社員名)
         work.WF_SEL_INSPECTMEMBERNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("INSPECTMEMBERNAME")
+
+        '全検計画年月
+        work.WF_SEL_ALLINSPECTPLANYM.Text = OIM0005tbl.Rows(WW_LINECNT)("ALLINSPECTPLANYM")
+
+        '休車フラグ
+        work.WF_SEL_SUSPENDFLG.Text = OIM0005tbl.Rows(WW_LINECNT)("SUSPENDFLG")
+
+        '休車日
+        work.WF_SEL_SUSPENDDATE.Text = OIM0005tbl.Rows(WW_LINECNT)("SUSPENDDATE")
+
+        '取得価格
+        work.WF_SEL_PURCHASEPRICE.Text = OIM0005tbl.Rows(WW_LINECNT)("PURCHASEPRICE")
+
+        '内部塗装
+        work.WF_SEL_INTERNALCOATING.Text = OIM0005tbl.Rows(WW_LINECNT)("INTERNALCOATING")
+
+        '安全弁
+        work.WF_SEL_SAFETYVALVE.Text = OIM0005tbl.Rows(WW_LINECNT)("SAFETYVALVE")
+
+        'センターバルブ情報
+        work.WF_SEL_CENTERVALVEINFO.Text = OIM0005tbl.Rows(WW_LINECNT)("CENTERVALVEINFO")
+
+        '削除理由区分
+        work.WF_SEL_DELREASONKBN.Text = OIM0005tbl.Rows(WW_LINECNT)("DELREASONKBN")
 
         '詳細画面更新メッセージ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
@@ -2787,18 +2952,18 @@ Public Class OIM0005TankList
                 End If
             End If
 
-            'リース区分C
+            '請負リース区分C
             If WW_COLUMNS.IndexOf("LEASECLASS") >= 0 Then
                 OIM0005INProw("LEASECLASS") = XLSTBLrow("LEASECLASS")
 
-                'リース区分
+                '請負リース区分
                 If Not String.IsNullOrEmpty(OIM0005INProw("LEASECLASS")) Then
                     CODENAME_get("LEASECLASS",
                         OIM0005INProw("LEASECLASS"),
-                        OIM0005INProw("LEASECLASSNEMAE"),
+                        OIM0005INProw("LEASECLASSNAME"),
                         WW_DUMMY)
                 Else
-                    OIM0005INProw("LEASECLASSNEMAE") = ""
+                    OIM0005INProw("LEASECLASSNAME") = ""
                 End If
             End If
 
@@ -2965,6 +3130,22 @@ Public Class OIM0005TankList
                         WW_DUMMY)
                 Else
                     OIM0005INProw("OPERATIONBASENAME") = ""
+                End If
+            End If
+
+            '運用基地C（サブ）
+            If WW_COLUMNS.IndexOf("SUBOPERATIONBASECODE") >= 0 Then
+                OIM0005INProw("SUBOPERATIONBASECODE") = XLSTBLrow("SUBOPERATIONBASECODE")
+
+                '運用場所
+                If Not String.IsNullOrEmpty(OIM0005INProw("SUBOPERATIONBASECODE")) Then
+                    CODENAME_get(
+                        "BASE",
+                        OIM0005INProw("SUBOPERATIONBASECODE"),
+                        OIM0005INProw("SUBOPERATIONBASENAME"),
+                        WW_DUMMY)
+                Else
+                    OIM0005INProw("SUBOPERATIONBASENAME") = ""
                 End If
             End If
 
@@ -3315,11 +3496,81 @@ Public Class OIM0005TankList
                 OIM0005INProw("INSPECTMEMBERNAME") = XLSTBLrow("INSPECTMEMBERNAME")
             End If
 
+            '全検計画年月
+            If WW_COLUMNS.IndexOf("ALLINSPECTPLANYM") >= 0 Then
+                OIM0005INProw("ALLINSPECTPLANYM") = XLSTBLrow("ALLINSPECTPLANYM")
+            End If
+
+            '休車フラグ
+            If WW_COLUMNS.IndexOf("SUSPENDFLG") >= 0 Then
+                OIM0005INProw("SUSPENDFLG") = XLSTBLrow("SUSPENDFLG")
+
+                '休車フラグ(名)
+                If Not String.IsNullOrEmpty(OIM0005INProw("SUSPENDFLG")) Then
+                    CODENAME_get("SUSPENDFLG",
+                                 OIM0005INProw("SUSPENDFLG"),
+                                 OIM0005INProw("SUSPENDFLGNAME"),
+                                 WW_DUMMY)
+                Else
+                    OIM0005INProw("SUSPENDFLGNAME") = ""
+                End If
+            End If
+
+            '休車日
+            If WW_COLUMNS.IndexOf("SUSPENDDATE") >= 0 Then
+                OIM0005INProw("SUSPENDDATE") = XLSTBLrow("SUSPENDDATE")
+            End If
+
+            '取得価格
+            If WW_COLUMNS.IndexOf("PURCHASEPRICE") >= 0 Then
+                OIM0005INProw("PURCHASEPRICE") = XLSTBLrow("PURCHASEPRICE")
+            End If
+
+            '内部塗装
+            If WW_COLUMNS.IndexOf("INTERNALCOATING") >= 0 Then
+                OIM0005INProw("INTERNALCOATING") = XLSTBLrow("INTERNALCOATING")
+
+                '内部塗装(名)
+                If Not String.IsNullOrEmpty(OIM0005INProw("INTERNALCOATING")) Then
+                    CODENAME_get("INTERNALCOATING",
+                                 OIM0005INProw("INTERNALCOATING"),
+                                 OIM0005INProw("INTERNALCOATINGNAME"),
+                                 WW_DUMMY)
+                Else
+                    OIM0005INProw("INTERNALCOATINGNAME") = ""
+                End If
+            End If
+
+            '安全弁
+            If WW_COLUMNS.IndexOf("SAFETYVALVE") >= 0 Then
+                OIM0005INProw("SAFETYVALVE") = XLSTBLrow("SAFETYVALVE")
+            End If
+
+            'センターバルブ情報
+            If WW_COLUMNS.IndexOf("CENTERVALVEINFO") >= 0 Then
+                OIM0005INProw("CENTERVALVEINFO") = XLSTBLrow("CENTERVALVEINFO")
+            End If
+
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
                 OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
             Else
                 OIM0005INProw("DELFLG") = "0"
+            End If
+
+            '削除理由区分
+            If WW_COLUMNS.IndexOf("DELREASONKBN") >= 0 Then
+                OIM0005INProw("DELREASONKBN") = XLSTBLrow("DELREASONKBN")
+
+                '削除理由区分(名)
+                If Not String.IsNullOrEmpty(OIM0005INProw("DELREASONKBN")) Then
+                    CODENAME_get("DELREASONKBN",
+                                 OIM0005INProw("DELREASONKBN"),
+                                 OIM0005INProw("DELREASONKBNNAME"),
+                                 WW_DUMMY)
+                Else
+                    OIM0005INProw("DELREASONKBNNAME") = ""
+                End If
             End If
 
             OIM0005INPtbl.Rows.Add(OIM0005INProw)
@@ -3476,6 +3727,33 @@ Public Class OIM0005TankList
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
+            '-----------------------------------------------------
+            ' 削除フラグ＝削除の場合、削除理由区分の入力チェック
+            '-----------------------------------------------------
+            If OIM0005INProw("DELFLG").ToString.Equals(C_DELETE_FLG.DELETE) Then
+                ' 削除理由区分（バリデーションチェック）
+                WW_TEXT = OIM0005INProw("DELREASONKBN")
+                Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELREASONKBN", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                If isNormal(WW_CS0024FCHECKERR) Then
+                    If WW_TEXT <> "" Then
+                        '値存在チェック
+                        CODENAME_get("DELREASONKBN", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                        If Not isNormal(WW_RTN_SW) Then
+                            WW_CheckMES1 = "・更新できないレコード(削除理由区分入力エラー)です。"
+                            WW_CheckMES2 = "マスタに存在しません。"
+                            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                            WW_LINE_ERR = "ERR"
+                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        End If
+                    End If
+                Else
+                    WW_CheckMES1 = "・更新できないレコード(削除理由区分入力エラー)です。"
+                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
 
             'JOT車番(バリデーションチェック)
             WW_TEXT = OIM0005INProw("TANKNUMBER")
@@ -3557,7 +3835,7 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            'リース区分C(バリデーションチェック)
+            '請負リース区分C(バリデーションチェック)
             WW_TEXT = OIM0005INProw("LEASECLASS")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
@@ -3565,7 +3843,7 @@ Public Class OIM0005TankList
                     '値存在チェック
                     CODENAME_get("LEASECLASS", WW_TEXT, WW_DUMMY, WW_RTN_SW)
                     If Not isNormal(WW_RTN_SW) Then
-                        WW_CheckMES1 = "・更新できないレコード(リース区分C入力エラー)です。"
+                        WW_CheckMES1 = "・更新できないレコード(請負リース区分C入力エラー)です。"
                         WW_CheckMES2 = "マスタに存在しません。"
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                         WW_LINE_ERR = "ERR"
@@ -3573,8 +3851,8 @@ Public Class OIM0005TankList
                     End If
                 End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(リース区分C入力エラー)です。"
-                WW_CheckMES1 = "リース区分C入力エラー。"
+                WW_CheckMES1 = "・更新できないレコード(請負リース区分C入力エラー)です。"
+                WW_CheckMES1 = "請負リース区分C入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -3861,6 +4139,29 @@ Public Class OIM0005TankList
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(運用基地C入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '運用基地C（サブ）(バリデーションチェック)
+            WW_TEXT = OIM0005INProw("SUBOPERATIONBASECODE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SUBOPERATIONBASECODE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("BASE", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(運用基地C（サブ）入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(運用基地C（サブ）入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4198,11 +4499,11 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            ' リース区分（バリデーションチェック）
-            WW_TEXT = OIM0005INProw("LEASECLASSNEMAE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASSNEMAE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ' 請負リース区分（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("LEASECLASSNAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASSNAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・更新できないレコード(リース区分入力エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(請負リース区分入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -4348,6 +4649,17 @@ Public Class OIM0005TankList
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・更新できないレコード(運用場所入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 運用場所（サブ）（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SUBOPERATIONBASENAME")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SUBOPERATIONBASENAME", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(運用場所（サブ）入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -5114,6 +5426,138 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            ' 全検計画年月（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("ALLINSPECTPLANYM")
+            If Not String.IsNullOrEmpty(WW_TEXT) Then
+                WW_TEXT = WW_TEXT + "/01"
+            End If
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTPLANYM", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '全検計画年月
+                    WW_CheckDate(WW_TEXT, "全検計画年月", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(全検計画年月入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("ALLINSPECTPLANYM") = CDate(WW_TEXT).ToString("yyyy/MM")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(全検計画年月入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 休車フラグ（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SUSPENDFLG")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SUSPENDFLG", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("SUSPENDFLG", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(休車フラグ入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(休車フラグ入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 休車日（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SUSPENDDATE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SUSPENDDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '休車日
+                    WW_CheckDate(WW_TEXT, "休車日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(休車日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("SUSPENDDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(休車日入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 取得価格（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("PURCHASEPRICE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PURCHASEPRICE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(取得価格入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 内部塗装（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("INTERNALCOATING")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INTERNALCOATING", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '値存在チェック
+                    CODENAME_get("INTERNALCOATING", WW_TEXT, WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(内部塗装入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(内部塗装入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' 安全弁（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("SAFETYVALVE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SAFETYVALVE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(安全弁入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            ' センターバルブ情報（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("CENTERVALVEINFO")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CENTERVALVEINFO", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "・更新できないレコード(センターバルブ情報入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             If WW_LINE_ERR = "" Then
                 If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
                     OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -5203,8 +5647,8 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者 =" & OIM0005row("OWNERNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース先C =" & OIM0005row("LEASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース先 =" & OIM0005row("LEASENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分C =" & OIM0005row("LEASECLASS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIM0005row("LEASECLASSNEMAE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請負リース区分C =" & OIM0005row("LEASECLASS") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請負リース区分 =" & OIM0005row("LEASECLASSNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長 =" & OIM0005row("AUTOEXTENTION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長名 =" & OIM0005row("AUTOEXTENTIONNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> リース開始年月日 =" & OIM0005row("LEASESTYMD") & " , "
@@ -5228,6 +5672,8 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 油種中分類名 =" & OIM0005row("MIDDLEOILNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIM0005row("OPERATIONBASENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C（サブ） =" & OIM0005row("SUBOPERATIONBASECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所（サブ） =" & OIM0005row("SUBOPERATIONBASENAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色名 =" & OIM0005row("COLORNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> マークコード =" & OIM0005row("MARKCODE") & " , "
@@ -5274,7 +5720,7 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIM0005row("SHELLTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シSAP車番 =" & OIM0005row("SAPSHELLTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIM0005row("RESERVE3") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 利用フラグ =" & OIM0005row("USEDFLG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 利用フラグ =" & OIM0005row("USEDFLGNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検年月 =" & OIM0005row("INTERINSPECTYM") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検場所 =" & OIM0005row("INTERINSPECTSTATION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 中間点検実施者 =" & OIM0005row("INTERINSPECTORGCODE") & " , "
@@ -5282,7 +5728,15 @@ Public Class OIM0005TankList
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検場所 =" & OIM0005row("SELFINSPECTSTATION") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 自主点検実施者 =" & OIM0005row("SELFINSPECTORGCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 点検実施者(社員名) =" & OIM0005row("INSPECTMEMBERNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 全検計画年月 =" & OIM0005row("ALLINSPECTPLANYM") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 休車フラグ =" & OIM0005row("SUSPENDFLG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 休車日 =" & OIM0005row("SUSPENDDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得価格 =" & OIM0005row("PURCHASEPRICE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 内部塗装 =" & OIM0005row("INTERNALCOATING") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 安全弁 =" & OIM0005row("SAFETYVALVE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> センターバルブ情報 =" & OIM0005row("CENTERVALVEINFO") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除理由区分 =" & OIM0005row("DELREASONKBN") & " , "
 
         End If
 
@@ -5356,7 +5810,7 @@ Public Class OIM0005TankList
                         OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
                         OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
                         OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
-                        OIM0005row("LEASECLASSNEMAE") = OIM0005INProw("LEASECLASSNEMAE") AndAlso
+                        OIM0005row("LEASECLASSNAME") = OIM0005INProw("LEASECLASSNAME") AndAlso
                         OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
                         OIM0005row("AUTOEXTENTIONNAME") = OIM0005INProw("AUTOEXTENTIONNAME") AndAlso
                         OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
@@ -5380,6 +5834,8 @@ Public Class OIM0005TankList
                         OIM0005row("MIDDLEOILNAME") = OIM0005INProw("MIDDLEOILNAME") AndAlso
                         OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
                         OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
+                        OIM0005row("SUBOPERATIONBASECODE") = OIM0005INProw("SUBOPERATIONBASECODE") AndAlso
+                        OIM0005row("SUBOPERATIONBASENAME") = OIM0005INProw("SUBOPERATIONBASENAME") AndAlso
                         OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
                         OIM0005row("COLORNAME") = OIM0005INProw("COLORNAME") AndAlso
                         OIM0005row("MARKCODE") = OIM0005INProw("MARKCODE") AndAlso
@@ -5434,7 +5890,15 @@ Public Class OIM0005TankList
                         OIM0005row("SELFINSPECTSTATION") = OIM0005INProw("SELFINSPECTSTATION") AndAlso
                         OIM0005row("SELFINSPECTORGCODE") = OIM0005INProw("SELFINSPECTORGCODE") AndAlso
                         OIM0005row("INSPECTMEMBERNAME") = OIM0005INProw("INSPECTMEMBERNAME") AndAlso
-                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") Then
+                        OIM0005row("ALLINSPECTPLANYM") = OIM0005INProw("ALLINSPECTPLANYM") AndAlso
+                        OIM0005row("SUSPENDFLG") = OIM0005INProw("SUSPENDFLG") AndAlso
+                        OIM0005row("SUSPENDDATE") = OIM0005INProw("SUSPENDDATE") AndAlso
+                        OIM0005row("PURCHASEPRICE") = OIM0005INProw("PURCHASEPRICE") AndAlso
+                        OIM0005row("INTERNALCOATING") = OIM0005INProw("INTERNALCOATING") AndAlso
+                        OIM0005row("SAFETYVALVE") = OIM0005INProw("SAFETYVALVE") AndAlso
+                        OIM0005row("CENTERVALVEINFO") = OIM0005INProw("CENTERVALVEINFO") AndAlso
+                        OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
+                        OIM0005row("DELREASONKBN") = OIM0005INProw("DELREASONKBN") Then
                         ' 変更がないときは「操作」の項目は空白にする
                         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
@@ -5577,14 +6041,14 @@ Public Class OIM0005TankList
                 Case "ORIGINOWNERCODE"              '原籍所有者C
                     prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "LEASECLASS"                   'リース区分C
+                Case "LEASECLASS"                   '請負リース区分C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LEASECLASS, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "AUTOEXTENTION"                '自動延長
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "USERCODE"                     '第三者使用者C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_THIRDUSER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "STATIONPATTERN"　              '原常備駅C、臨時常備駅C
+                Case "STATIONPATTERN"　             '原常備駅C、臨時常備駅C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DEDICATETYPECODE"             '原専用種別C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE, I_VALUE, O_TEXT, O_RTN, prmData)
@@ -5619,6 +6083,15 @@ Public Class OIM0005TankList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "STATIONFOCUSON"　             '中間点検場所、自主点検場所(使用駅のみ)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SUSPENDFLG"                   '休車フラグ
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SUSPENDFLG")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "INTERNALCOATING"              '内部塗装
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "INTERNALCOATING")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DELREASONKBN"                 '削除理由区分
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELREASONKBN")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

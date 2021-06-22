@@ -288,7 +288,8 @@ Public Class OIM0005TankListKinoene
             & "              ELSE FORMAT(OIM0005.DOWNLOADDATE,'yyyy/MM/dd') " _
             & "   END                                                          AS DOWNLOADDATE " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
-            & " WHERE OIM0005.OPERATIONBASECODE = @P1 "
+            & " WHERE OIM0005.SUBOPERATIONBASECODE = @P1 " _
+            & " AND   OIM0005.DELFLG = '0' "
 
         SQLStr &=
               " ORDER BY" _
@@ -729,7 +730,7 @@ Public Class OIM0005TankListKinoene
             & "    , ORIGINOWNERNAME" _
             & "    , OWNERNAME" _
             & "    , LEASENAME" _
-            & "    , LEASECLASSNEMAE" _
+            & "    , LEASECLASSNAME" _
             & "    , USERNAME" _
             & "    , CURRENTSTATIONNAME" _
             & "    , EXTRADINARYSTATIONNAME" _

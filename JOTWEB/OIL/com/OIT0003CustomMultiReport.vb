@@ -31,9 +31,11 @@ Public Class OIT0003CustomMultiReport
                     Case BaseDllConst.CONST_OFFICECODE_012402
                         Select Case trainNo
                             Case "8081" '8072列車
-                                fileName = "タンク車発送フォーマット３.xls"
-                            Case "5875" '5282列車
                                 fileName = "タンク車発送フォーマット１.xls"
+                                'fileName = "タンク車発送フォーマット３.xls"
+                            Case "5875" '5282列車
+                                fileName = "タンク車発送フォーマット３.xls"
+                                'fileName = "タンク車発送フォーマット１.xls"
                             Case "174"
                                 fileName = "タンク車発送フォーマット４.xls"
                         End Select

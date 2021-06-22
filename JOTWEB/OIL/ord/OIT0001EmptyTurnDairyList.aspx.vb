@@ -52,7 +52,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private RSSQL As New ReportSignSQL                              '帳票表示用SQL取得
-    Private CMNPTS As New CmnParts                                       '共通関数
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -808,25 +808,29 @@ Public Class OIT0001EmptyTurnDairyList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOTCOMPARE_Click()
+        Dim blnChoiceFlg As Boolean = False
 
-        '    ★一覧の表示が0件の場合
-        If OIT0001tbl.Rows.Count = 0 Then
-            Master.Output(C_MESSAGE_NO.OIL_OTCOMPAREDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+        ''    ★一覧の表示が0件の場合
+        'If OIT0001tbl.Rows.Count = 0 Then
+        '    Master.Output(C_MESSAGE_NO.OIL_OTCOMPAREDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '    Exit Sub
 
-            '★一覧件数が１件以上で未選択の場合
-        ElseIf OIT0001tbl.Select("OPERATION='on'").Count = 0 Then
-            Master.Output(C_MESSAGE_NO.OIL_OTCOMPARELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+        '    '★一覧件数が１件以上で未選択の場合
+        'ElseIf OIT0001tbl.Select("OPERATION='on'").Count = 0 Then
+        '    Master.Output(C_MESSAGE_NO.OIL_OTCOMPARELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '    Exit Sub
+        'End If
+        '★一覧件数が１件以上で選択されている場合
+        If OIT0001tbl.Select("OPERATION='on'").Count <> 0 Then
+            blnChoiceFlg = True
         End If
-
         '******************************
         '帳票表示データ取得処理
         '******************************
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelOTCompareDataGet(SQLcon)
+            ExcelOTCompareDataGet(SQLcon, blnChoiceFlg)
         End Using
 
         Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & "_OTCOMPARE.xlsx", OIT0001ReportOTComparetbl)
@@ -849,7 +853,7 @@ Public Class OIT0001EmptyTurnDairyList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelOTCompareDataGet(ByVal SQLcon As SqlConnection)
+    Protected Sub ExcelOTCompareDataGet(ByVal SQLcon As SqlConnection, ByVal blnChoiceFlg As Boolean)
 
         If IsNothing(OIT0001ReportOTComparetbl) Then
             OIT0001ReportOTComparetbl = New DataTable
@@ -863,44 +867,76 @@ Public Class OIT0001EmptyTurnDairyList
 
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
-        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTComparePrint("OIT0001")
+        Dim SQLStr As String = RSSQL.EmptyTurnDairyOTComparePrint("OIT0001", blnChoiceFlg:=blnChoiceFlg)
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)           '受注№
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
                 Dim P_OFFICECODE As SqlParameter = SQLcmd.Parameters.Add("@OFFICECODE", SqlDbType.NVarChar, 6)  '受注営業所コード
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
                 P_OFFICECODE.Value = work.WF_SEL_SALESOFFICECODE.Text
 
-                '○一覧で選択された受注NoをKEYに取得
-                For Each OIT0001row As DataRow In OIT0001tbl.Select("OPERATION='on'")
-                    P_ORDERNO.Value = OIT0001row("ORDERNO")
+                '★本日分の差分データを取得
+                If blnChoiceFlg = False Then
+                    Dim P_ORDERYMD As SqlParameter = SQLcmd.Parameters.Add("@ORDERYMD", SqlDbType.Date)         '受注登録日
+                    P_ORDERYMD.Value = Now.ToString("yyyy/MM/dd")
                     Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                        If OIT0001ReportOTComparetbl.Columns.Count = 0 Then
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                OIT0001ReportOTComparetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-                        End If
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIT0001ReportOTComparetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
 
                         '○ テーブル検索結果をテーブル格納
                         OIT0001ReportOTComparetbl.Load(SQLdr)
                     End Using
-                Next
+                Else
+                    Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)           '受注№
+                    '○一覧で選択された受注NoをKEYに取得
+                    For Each OIT0001row As DataRow In OIT0001tbl.Select("OPERATION='on'")
+                        P_ORDERNO.Value = OIT0001row("ORDERNO")
+                        Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                            If OIT0001ReportOTComparetbl.Columns.Count = 0 Then
+                                '○ フィールド名とフィールドの型を取得
+                                For index As Integer = 0 To SQLdr.FieldCount - 1
+                                    OIT0001ReportOTComparetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                Next
+                            End If
+
+                            '○ テーブル検索結果をテーブル格納
+                            OIT0001ReportOTComparetbl.Load(SQLdr)
+                        End Using
+                    Next
+                End If
 
                 Dim i As Integer = 0
+                Dim strTrainNo As String = ""
                 Dim strTrainNosave As String = ""
+                Dim strLodDate As String = ""
+                Dim strLodDateSave As String = ""
+                'Dim strDepDate As String = ""
+                'Dim strDepDateSave As String = ""
                 For Each OIT0001Reprow As DataRow In OIT0001ReportOTComparetbl.Rows
-                    If strTrainNosave <> "" _
-                        AndAlso strTrainNosave <> Convert.ToString(OIT0001Reprow("TRAINNO")) Then
+                    strTrainNo = Convert.ToString(OIT0001Reprow("TRAINNO"))
+                    If strTrainNo = "" Then strTrainNo = Convert.ToString(OIT0001Reprow("OT_TRAINNO"))
+                    strLodDate = Convert.ToString(OIT0001Reprow("LODDATE"))
+                    If strLodDate = "" Then strLodDate = Convert.ToString(OIT0001Reprow("OT_LODDATE"))
+                    If (strTrainNosave <> "" AndAlso strTrainNosave <> strTrainNo) _
+                        OrElse (strLodDateSave <> "" AndAlso strLodDateSave <> strLodDate) Then
                         i = 1
                         OIT0001Reprow("LINECNT") = i        'LINECNT
                     Else
                         i += 1
                         OIT0001Reprow("LINECNT") = i        'LINECNT
                     End If
+                    '○列車Noの保存
                     strTrainNosave = Convert.ToString(OIT0001Reprow("TRAINNO"))
+                    If strTrainNosave = "" Then strTrainNosave = Convert.ToString(OIT0001Reprow("OT_TRAINNO"))
+                    '○積込日(予定)の保存
+                    strLodDateSave = Convert.ToString(OIT0001Reprow("LODDATE"))
+                    If strLodDateSave = "" Then strTrainNosave = Convert.ToString(OIT0001Reprow("OT_LODDATE"))
+                    ''○発日(予定)の保存
+                    'strDepDateSave = Convert.ToString(OIT0001Reprow("DEPDATE"))
+                    'If strDepDateSave = "" Then strTrainNosave = Convert.ToString(OIT0001Reprow("OT_DEPDATE"))
                 Next
             End Using
         Catch ex As Exception
@@ -940,6 +976,9 @@ Public Class OIT0001EmptyTurnDairyList
             ''★取込したOT受注TBLの削除フラグを"1"(無効)更新
             'WW_UpdateOTOrderStatus(SQLcon, I_ITEM:="DELFLG", I_VALUE:=C_DELETE_FLG.DELETE)
 
+            '★OT受注履歴テーブルの追加
+            WW_InsertOTOrderHistory(SQLcon)
+
         End Using
 
         '○受注明細テーブルが存在(2回目以降)の場合
@@ -953,6 +992,10 @@ Public Class OIT0001EmptyTurnDairyList
 
                 '★受注TBLとOT受注TBL比較
                 WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
+
+                '★最新のOT空回日報データを反映
+                WW_SetOTOrderToOrder(SQLcon)
+
             End Using
         End If
 
@@ -2577,7 +2620,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " FROM OIL.OIT0016_OTORDER OIT0016" _
             & " WHERE " _
             & "     OIT0016.OFFICECODE = @OFFICECODE" _
-            & " AND OIT0016.ORDERYMD   = @ORDERYMD" _
+            & " AND OIT0016.ORDERYMD   <= @ORDERYMD" _
             & " AND OIT0016.DELFLG    <> @DELFLG"
 
         '　検索説明
@@ -2665,7 +2708,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " FROM OIL.OIT0017_OTDETAIL OIT0017" _
             & " INNER JOIN OIL.OIT0016_OTORDER OIT0016 ON" _
             & "     OIT0016.OFFICECODE = @OFFICECODE" _
-            & " AND OIT0016.ORDERYMD   = @ORDERYMD" _
+            & " AND OIT0016.ORDERYMD   <= @ORDERYMD" _
             & " AND OIT0016.ORDERNO    = OIT0017.ORDERNO" _
             & " AND OIT0016.DELFLG    <> @DELFLG" _
             & " WHERE " _
@@ -3870,6 +3913,179 @@ Public Class OIT0001EmptyTurnDairyList
 
     End Sub
 
+    ''' <summary>
+    ''' 最新のOT空回日報データを反映
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_SetOTOrderToOrder(ByVal SQLcon As SqlConnection)
+        'SELECT条件用
+        Dim sCondition As String = ""
+
+        '##################################################
+        '○削除反映
+        '##################################################
+        Dim svOrderNo As String = ""
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='4' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
+            '★受注明細TBLの削除フラグを"1"(無効)に更新
+            CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, C_DELETE_FLG.DELETE, I_PARA:="DELFLG")
+
+            '★削除された油種に対して合計値を最新化する。
+            If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("ORDERNO")) Then
+                '○受注TBLの合計油種の最新化反映
+                WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
+            End If
+
+            svOrderNo = Convert.ToString(OIT0001Cmprow("ORDERNO"))
+        Next
+
+        '##################################################
+        '○追加反映
+        '##################################################
+        svOrderNo = ""
+        Dim maxDetailNo As Integer = 0
+        '★受注Noに反映
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
+            OIT0001Cmprow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
+        Next
+        '★追加分のデータの場合
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
+
+            If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
+                '○受注TBLの合計油種の最新化反映
+                WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
+
+                '○受注明細TBLに追加分の油種を反映
+                sCondition = String.Format("ORDERNO='{0}'", OIT0001Cmprow("KEYCODE1"))
+                maxDetailNo = Integer.Parse(OIT0001CMPOrdertbl.Compute("MAX(KEYCODE2)", sCondition).ToString())
+                For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO=''")
+                    OIT0001OTDetailrow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
+                    maxDetailNo += 1
+                    OIT0001OTDetailrow("DETAILNO") = (maxDetailNo).ToString("000")
+                    '★受注明細TBLにデータを追加
+                    Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                        CMNPTS.InsertOrderDetail(SQLcon, sqlTran, OIT0001OTDetailrow)
+
+                        'ここまで来たらコミット
+                        sqlTran.Commit()
+                    End Using
+                Next
+            End If
+
+            svOrderNo = Convert.ToString(OIT0001Cmprow("KEYCODE1"))
+        Next
+
+        '##################################################
+        '○油種反映
+        '##################################################
+        svOrderNo = ""
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='2'")
+            If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
+                '○受注TBLの合計油種の最新化反映
+                WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
+            End If
+            '○受注明細TBLに変更分の油種を反映
+            For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
+                '★受注明細TBLの油種を更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_OILCODE"), I_PARA:="OILCODE")
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_OILNAME"), I_PARA:="OILNAME")
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_ORDERINGTYPE"), I_PARA:="ORDERINGTYPE")
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_ORDERINGOILNAME"), I_PARA:="ORDERINGOILNAME")
+
+                Exit For
+            Next
+
+            svOrderNo = Convert.ToString(OIT0001Cmprow("KEYCODE1"))
+        Next
+
+        '##################################################
+        '○車番反映
+        '##################################################
+        svOrderNo = ""
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='3'")
+            '○受注明細TBLに変更分の車番(タンク車No)を反映
+            For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
+                '★受注明細TBLの車番(タンク車No)を更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_TANKNO"), I_PARA:="TANKNO")
+                Exit For
+            Next
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注TBLの合計油種の最新化反映
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_SetOrderCarsCnt(ByVal SQLcon As SqlConnection, ByVal dtrow As DataRow)
+        'SELECT条件用
+        Dim sCondition As String = ""
+        '車数（ハイオク,レギュラー,灯油,未添加灯油,軽油,3号軽油,5号軽油,10号軽油,LSA,A重油）
+        Dim iOilCnt() As Integer = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        Dim iOilAllCnt As Integer = 0
+
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_HTank)
+        iOilCnt(0) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_RTank)
+        iOilCnt(1) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_TTank)
+        iOilCnt(2) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_MTTank)
+        iOilCnt(3) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_KTank1)
+        iOilCnt(4) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_K3Tank1)
+        iOilCnt(5) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_K5Tank)
+        iOilCnt(6) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_K10Tank)
+        iOilCnt(7) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_LTank1)
+        iOilCnt(8) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        sCondition = String.Format("ORDERNO='{0}' AND OT_OILCODE='{1}'", dtrow("ORDERNO"), BaseDllConst.CONST_ATank)
+        iOilCnt(9) = Integer.Parse(OIT0001CMPOrdertbl.Compute("COUNT(OT_OILCODE)", sCondition).ToString())
+        '合計値をカウント
+        For Each iOil As Integer In iOilCnt
+            iOilAllCnt += iOil
+        Next
+
+        '★受注TBLの車数を更新（ハイオク,レギュラー,灯油,未添加灯油,軽油,3号軽油,5号軽油,10号軽油,LSA,A重油）
+        '　ハイオク
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(0)), I_PARA:="HTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(0)), I_PARA:="HTANKCH")
+        '　レギュラー
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(1)), I_PARA:="RTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(1)), I_PARA:="RTANKCH")
+        '　灯油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(2)), I_PARA:="TTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(2)), I_PARA:="TTANKCH")
+        '　未添加灯油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(3)), I_PARA:="MTTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(3)), I_PARA:="MTTANKCH")
+        '　軽油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(4)), I_PARA:="KTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(4)), I_PARA:="KTANKCH")
+        '　３号軽油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(5)), I_PARA:="K3TANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(5)), I_PARA:="K3TANKCH")
+        '　５号軽油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(6)), I_PARA:="K5TANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(6)), I_PARA:="K5TANKCH")
+        '　１０号軽油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(7)), I_PARA:="K10TANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(7)), I_PARA:="K10TANKCH")
+        '　LSA
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(8)), I_PARA:="LTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(8)), I_PARA:="LTANKCH")
+        '　A重油
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(9)), I_PARA:="ATANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilCnt(9)), I_PARA:="ATANKCH")
+        '　合計車数
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilAllCnt), I_PARA:="TOTALTANK")
+        CMNPTS.UpdateOrderCRT(SQLcon, Convert.ToString(dtrow("ORDERNO")), Master, Convert.ToString(iOilAllCnt), I_PARA:="TOTALTANKCH")
+
+    End Sub
+
+
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
@@ -4143,6 +4359,120 @@ Public Class OIT0001EmptyTurnDairyList
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0001L ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' OT受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOTOrderHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+
+        '◯OT受注履歴テーブル格納用
+        If IsNothing(OIT0001His1tbl) Then
+            OIT0001His1tbl = New DataTable
+        End If
+
+        If OIT0001His1tbl.Columns.Count <> 0 Then
+            OIT0001His1tbl.Columns.Clear()
+        End If
+        OIT0001His1tbl.Clear()
+
+        '◯OT受注明細履歴テーブル格納用
+        If IsNothing(OIT0001His2tbl) Then
+            OIT0001His2tbl = New DataTable
+        End If
+
+        If OIT0001His2tbl.Columns.Count <> 0 Then
+            OIT0001His2tbl.Columns.Clear()
+        End If
+        OIT0001His2tbl.Clear()
+
+        '○ OT受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & "   @OTHISTORYNO AS HISTORYNO" _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0016.*" _
+            & " FROM OIL.OIT0016_OTORDER OIT0016 " _
+            & " WHERE OIT0016.ORDERNO = @ORDERNO "
+
+        '○ OT受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & "   @OTHISTORYNO AS HISTORYNO" _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0017.*" _
+            & " FROM OIL.OIT0017_OTDETAIL OIT0017 " _
+            & " WHERE OIT0017.ORDERNO = @ORDERNO "
+
+        Try
+            For Each OIT0001OTrow As DataRow In OIT0001OTOrdertbl.Rows
+                WW_FixvalueMasterSearch("", "NEWOTHISTORYNOGET", "", WW_GetHistoryNo)
+                Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                    Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)         'オーダーNo
+                    Dim P_OTHISTORYNO As SqlParameter = SQLcmd.Parameters.Add("@OTHISTORYNO", SqlDbType.NVarChar) 'OT履歴No
+                    P_ORDERNO.Value = Convert.ToString(OIT0001OTrow("ORDERNO"))
+                    P_OTHISTORYNO.Value = WW_GetHistoryNo(0)
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        If OIT0001His1tbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0001His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0001His1tbl.Clear()
+                        OIT0001His1tbl.Load(SQLdr)
+                    End Using
+                End Using
+
+                Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                    Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", SqlDbType.NVarChar)         'オーダーNo
+                    Dim P_OTHISTORYNO As SqlParameter = SQLcmd.Parameters.Add("@OTHISTORYNO", SqlDbType.NVarChar) 'OT履歴No
+                    P_ORDERNO.Value = Convert.ToString(OIT0001OTrow("ORDERNO"))
+                    P_OTHISTORYNO.Value = WW_GetHistoryNo(0)
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        If OIT0001His2tbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0001His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0001His2tbl.Clear()
+                        OIT0001His2tbl.Load(SQLdr)
+                    End Using
+                End Using
+
+                Using tran = SQLcon.BeginTransaction
+                    '■OT受注履歴テーブル
+                    EntryHistory.InsertOTOrderHistory(SQLcon, tran, OIT0001His1tbl.Rows(0))
+
+                    '■OT受注明細履歴テーブル
+                    For Each OIT0001His2rowtbl In OIT0001His2tbl.Rows
+                        EntryHistory.InsertOTOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                    Next
+
+                    'トランザクションコミット
+                    tran.Commit()
+                End Using
+            Next
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L OTORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L OTORDERHISTORY"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

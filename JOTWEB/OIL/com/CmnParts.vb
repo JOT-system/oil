@@ -1458,7 +1458,11 @@ Public Class CmnParts
                 Try
                     .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("DETAIL_STACKINGFLG")
                 Catch ex As Exception
-                    .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
+                    If .Contains("STACKINGFLG") Then
+                        .Item("STACKINGFLG").Value = drOrder("STACKINGFLG")
+                    Else
+                        .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
+                    End If
                 End Try
                 .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = drOrder("WHOLESALEFLG")
                 .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
@@ -1467,21 +1471,41 @@ Public Class CmnParts
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
                 .Add("UPGRADEFLG", SqlDbType.NVarChar).Value = drOrder("UPGRADEFLG")
-                .Add("TESTPRODUCTFLG", SqlDbType.NVarChar).Value = drOrder("TESTPRODUCTFLG")
+                Try
+                    .Add("TESTPRODUCTFLG", SqlDbType.NVarChar).Value = drOrder("TESTPRODUCTFLG")
+                Catch ex As Exception
+                    If .Contains("TESTPRODUCTFLG") Then
+                        .Item("TESTPRODUCTFLG").Value = "2"
+                    Else
+                        .Add("TESTPRODUCTFLG", SqlDbType.NVarChar).Value = "2"
+                    End If
+                End Try
                 Try
                     .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("DETAIL_ORDERINFO")
                 Catch ex As Exception
-                    .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
+                    If .Contains("ORDERINFO") Then
+                        .Item("ORDERINFO").Value = drOrder("ORDERINFO")
+                    Else
+                        .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
+                    End If
                 End Try
                 Try
                     .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("DETAIL_SHIPPERSCODE")
                 Catch ex As Exception
-                    .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                    If .Contains("SHIPPERSCODE") Then
+                        .Item("SHIPPERSCODE").Value = drOrder("SHIPPERSCODE")
+                    Else
+                        .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                    End If
                 End Try
                 Try
                     .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("DETAIL_SHIPPERSNAME")
                 Catch ex As Exception
-                    .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
+                    If .Contains("SHIPPERSNAME") Then
+                        .Item("SHIPPERSNAME").Value = drOrder("SHIPPERSNAME")
+                    Else
+                        .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
+                    End If
                 End Try
                 .Add("OILCODE", SqlDbType.NVarChar).Value = drOrder("OILCODE")
                 .Add("OILNAME", SqlDbType.NVarChar).Value = drOrder("OILNAME")
@@ -1502,12 +1526,20 @@ Public Class CmnParts
                 Try
                     .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = drOrder("DETAIL_CHANGERETSTATION")
                 Catch ex As Exception
-                    .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATION")
+                    If .Contains("CHANGERETSTATION") Then
+                        .Item("CHANGERETSTATION").Value = drOrder("CHANGERETSTATION")
+                    Else
+                        .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATION")
+                    End If
                 End Try
                 Try
                     .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("DETAIL_CHANGERETSTATIONNAME")
                 Catch ex As Exception
-                    .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATIONNAME")
+                    If .Contains("CHANGERETSTATIONNAME") Then
+                        .Item("CHANGERETSTATIONNAME").Value = drOrder("CHANGERETSTATIONNAME")
+                    Else
+                        .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATIONNAME")
+                    End If
                 End Try
                 .Add("LINE", SqlDbType.NVarChar).Value = drOrder("LINE")
                 .Add("FILLINGPOINT", SqlDbType.NVarChar).Value = drOrder("FILLINGPOINT")
@@ -1520,27 +1552,47 @@ Public Class CmnParts
                 Try
                     .Add("ACTUALLODDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("DETAIL_ACTUALLODDATE"), CType(DBNull.Value, Object), drOrder("DETAIL_ACTUALLODDATE"))
                 Catch ex As Exception
-                    .Add("ACTUALLODDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALLODDATE"), CType(DBNull.Value, Object), drOrder("ACTUALLODDATE"))
+                    If .Contains("ACTUALLODDATE") Then
+                        .Item("ACTUALLODDATE").Value = If(drOrder.IsNull("ACTUALLODDATE"), CType(DBNull.Value, Object), drOrder("ACTUALLODDATE"))
+                    Else
+                        .Add("ACTUALLODDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALLODDATE"), CType(DBNull.Value, Object), drOrder("ACTUALLODDATE"))
+                    End If
                 End Try
                 Try
                     .Add("ACTUALDEPDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("DETAIL_ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("DETAIL_ACTUALDEPDATE"))
                 Catch ex As Exception
-                    .Add("ACTUALDEPDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                    If .Contains("ACTUALDEPDATE") Then
+                        .Item("ACTUALDEPDATE").Value = If(drOrder.IsNull("ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                    Else
+                        .Add("ACTUALDEPDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                    End If
                 End Try
                 Try
                     .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("DETAIL_ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("DETAIL_ACTUALARRDATE"))
                 Catch ex As Exception
-                    .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                    If .Contains("ACTUALARRDATE") Then
+                        .Item("ACTUALARRDATE").Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                    Else
+                        .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                    End If
                 End Try
                 Try
                     .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("DETAIL_ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("DETAIL_ACTUALACCDATE"))
                 Catch ex As Exception
-                    .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                    If .Contains("ACTUALACCDATE") Then
+                        .Item("ACTUALACCDATE").Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                    Else
+                        .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                    End If
                 End Try
                 Try
                     .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("DETAIL_ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("DETAIL_ACTUALEMPARRDATE"))
                 Catch ex As Exception
-                    .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                    If .Contains("ACTUALEMPARRDATE") Then
+                        .Item("ACTUALEMPARRDATE").Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                    Else
+                        .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                    End If
                 End Try
                 .Add("RESERVEDNO", SqlDbType.NVarChar).Value = drOrder("RESERVEDNO")
                 .Add("GYONO", SqlDbType.NVarChar).Value = drOrder("GYONO")
@@ -1550,37 +1602,77 @@ Public Class CmnParts
                 Try
                     .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("DETAIL_SALSE")
                 Catch ex As Exception
-                    .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
+                    If .Contains("SALSE") Then
+                        .Item("SALSE").Value = drOrder("SALSE")
+                    Else
+                        .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
+                    End If
                 End Try
                 Try
                     .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("DETAIL_SALSETAX")
                 Catch ex As Exception
-                    .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
+                    If .Contains("SALSETAX") Then
+                        .Item("SALSETAX").Value = drOrder("SALSETAX")
+                    Else
+                        .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
+                    End If
                 End Try
                 Try
                     .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("DETAIL_TOTALSALSE")
                 Catch ex As Exception
-                    .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")
+                    If .Contains("TOTALSALSE") Then
+                        .Item("TOTALSALSE").Value = drOrder("TOTALSALSE")
+                    Else
+                        .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")
+                    End If
                 End Try
                 Try
                     .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("DETAIL_PAYMENT")
                 Catch ex As Exception
-                    .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
+                    If .Contains("PAYMENT") Then
+                        .Item("PAYMENT").Value = drOrder("PAYMENT")
+                    Else
+                        .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
+                    End If
                 End Try
                 Try
                     .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("DETAIL_PAYMENTTAX")
                 Catch ex As Exception
-                    .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
+                    If .Contains("PAYMENTTAX") Then
+                        .Item("PAYMENTTAX").Value = drOrder("PAYMENTTAX")
+                    Else
+                        .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
+                    End If
                 End Try
                 Try
                     .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("DETAIL_TOTALPAYMENT")
                 Catch ex As Exception
-                    .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
+                    If .Contains("TOTALPAYMENT") Then
+                        .Item("TOTALPAYMENT").Value = drOrder("TOTALPAYMENT")
+                    Else
+                        .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
+                    End If
                 End Try
                 .Add("ANASYORIFLG", SqlDbType.NVarChar).Value = drOrder("ANASYORIFLG")
                 .Add("VOLSYORIFLG", SqlDbType.NVarChar).Value = drOrder("VOLSYORIFLG")
-                .Add("TANKBACKORDERNO", SqlDbType.NVarChar).Value = drOrder("TANKBACKORDERNO")
-                .Add("TANKBACKINFO", SqlDbType.NVarChar).Value = drOrder("TANKBACKINFO")
+                Try
+                    .Add("TANKBACKORDERNO", SqlDbType.NVarChar).Value = drOrder("TANKBACKORDERNO")
+                Catch ex As Exception
+                    If .Contains("TANKBACKORDERNO") Then
+                        .Item("TANKBACKORDERNO").Value = ""
+                    Else
+                        .Add("TANKBACKORDERNO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
+                Try
+                    .Add("TANKBACKINFO", SqlDbType.NVarChar).Value = drOrder("TANKBACKINFO")
+                Catch ex As Exception
+                    If .Contains("TANKBACKINFO") Then
+                        .Item("TANKBACKINFO").Value = ""
+                    Else
+                        .Add("TANKBACKINFO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")

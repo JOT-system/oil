@@ -405,7 +405,8 @@ Public Class OIT0005TankLocList
 
         OIT0005tbl.Clear()
         Dim sqlStat As New StringBuilder
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005C Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005C OrElse
+           Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005D Then
             Dim viewName As String = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
             Dim salesOfficeInstat As String = GRC0001TILESELECTORWRKINC.GetSelectedSqlInStatement(work.WF_SEL_SALESOFFICE_TILES.Text)
             Dim sotrOrderValue As String = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)

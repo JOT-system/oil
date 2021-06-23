@@ -5917,7 +5917,7 @@ Public Class OIT0003OrderDetail
             work.WF_SEL_DELIVERYFLG.Text = "0"
             '### 20200812 END  (指摘票(全体)No121) ######################################
             '◯割当解除ボタン押下時処理(タブ「タンク車割当」)
-            WW_ButtonCANCEL_TAB1()
+            WW_ButtonCANCEL_TAB1(blnLastOilFlg:=False)
             '### 20201225 START 指摘票対応(No291) #######################################
             work.WG_SEL_KEROSENE_3DIESEL_FLG.Text = "0"
             '### 20201225 END   指摘票対応(No291) #######################################
@@ -6998,7 +6998,7 @@ Public Class OIT0003OrderDetail
     ''' 割当解除ボタン押下時処理(タブ「タンク車割当」)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_ButtonCANCEL_TAB1()
+    Protected Sub WW_ButtonCANCEL_TAB1(Optional ByVal blnLastOilFlg As Boolean = True)
 
         '★初期化
         work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
@@ -7021,8 +7021,12 @@ Public Class OIT0003OrderDetail
         '引数２：タンク車状態　⇒　変更あり("3"(到着))
         '引数３：積車区分　　　⇒　変更あり("E"(空車))
         '引数４：タンク車状況　⇒　変更あり("1"(残車))
-        '引数５：更新フラグ　　⇒　初期化　("2")
-        WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
+        '引数５：更新フラグ　　⇒　初期化　("2")※"4"の場合は、前々回油種は元に戻さない。
+        If blnLastOilFlg = True Then
+            WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
+        Else
+            WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="4")
+        End If
 
         'タンク車№に紐づく情報を取得・設定
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -13545,7 +13549,7 @@ Public Class OIT0003OrderDetail
                 SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
 
                 '★★★タンク車所在(初期化)
-            ElseIf upFlag = "2" Then
+            ElseIf upFlag = "2" OrElse upFlag = "4" Then
                 '所在地コード
                 'SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
                 If Not String.IsNullOrEmpty(I_LOCATION) Then
@@ -13574,16 +13578,18 @@ Public Class OIT0003OrderDetail
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
 
                 '前回油種をその前の油種に戻す
-                SQLStr &=
+                If upFlag = "2" Then
+                    SQLStr &=
                       "        LASTOILCODE        = OILCODE, " _
                     & "        LASTOILNAME        = OILNAME, " _
                     & "        PREORDERINGTYPE    = ORDERINGTYPE, " _
                     & "        PREORDERINGOILNAME = ORDERINGOILNAME, "
-                'SQLStr &=
-                '      "        OILCODE            = '', " _
-                '    & "        OILNAME            = '', " _
-                '    & "        ORDERINGTYPE       = '', " _
-                '    & "        ORDERINGOILNAME    = '', "
+                    'SQLStr &=
+                    '      "        OILCODE            = '', " _
+                    '    & "        OILNAME            = '', " _
+                    '    & "        ORDERINGTYPE       = '', " _
+                    '    & "        ORDERINGOILNAME    = '', "
+                End If
 
                 SQLStr &=
                       "        UPDYMD         = @P11, " _

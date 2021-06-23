@@ -3722,7 +3722,7 @@ Public Class OIT0001EmptyTurnDairyList
         Next
 
         '★★タンク車Noが見つからない場合は、(タンク車が未設定時で)油種と一致した明細Noを設定
-        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0' AND STACKINGFLG='2'")
             For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0' AND TANKNO = ''")
 
                 If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
@@ -3742,7 +3742,7 @@ Public Class OIT0001EmptyTurnDairyList
         Next
 
         '★★タンク車Noが見つからない場合は、油種と一致した明細Noを設定
-        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0'")
+        For Each OIT0001row As DataRow In OIT0001Detailtbl.Select("USEFLG = '0' AND STACKINGFLG='2'")
             For Each OIT0001OTrow As DataRow In OIT0001OTDetailtbl.Select("USEFLG = '0'")
 
                 If Convert.ToString(OIT0001OTrow("OFFICECODE")) = Convert.ToString(OIT0001row("OFFICECODE")) _
@@ -3943,6 +3943,7 @@ Public Class OIT0001EmptyTurnDairyList
         '##################################################
         svOrderNo = ""
         Dim maxDetailNo As Integer = 0
+        Dim dtOrder As DataTable = New DataTable
         '★受注Noに反映
         For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
             OIT0001Cmprow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
@@ -3951,6 +3952,13 @@ Public Class OIT0001EmptyTurnDairyList
         For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
 
             If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
+                '○登録済みの受注進行ステータスを取得
+                CMNPTS.SelectOrder(SQLcon, I_ORDERNO:=Convert.ToString(OIT0001Cmprow("KEYCODE1")), O_dtORDER:=dtOrder)
+                '★受注進行ステータスが"100"(受注受付)ではない場合は、追加しない。(SKIP)
+                If Convert.ToString(dtOrder.Rows(0)("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
+                    Continue For
+                End If
+
                 '○受注TBLの合計油種の最新化反映
                 WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
 
@@ -3978,7 +3986,7 @@ Public Class OIT0001EmptyTurnDairyList
         '○油種反映
         '##################################################
         svOrderNo = ""
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='2'")
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='2' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
             If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
                 '○受注TBLの合計油種の最新化反映
                 WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
@@ -4001,7 +4009,7 @@ Public Class OIT0001EmptyTurnDairyList
         '○車番反映
         '##################################################
         svOrderNo = ""
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='3'")
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='3' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
             '○受注明細TBLに変更分の車番(タンク車No)を反映
             For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
                 '★受注明細TBLの車番(タンク車No)を更新

@@ -1209,10 +1209,11 @@ Public Class CmnParts
             Case "SHIPPLAN"
                 '○営業所
                 Select Case I_OFFICECODE
-                    '★根岸営業所, 五井営業所, 袖ヶ浦営業所
+                    '★根岸営業所, 五井営業所, 袖ヶ浦営業所, 三重塩浜営業所
                     Case BaseDllConst.CONST_OFFICECODE_011402,
                          BaseDllConst.CONST_OFFICECODE_011201,
-                         BaseDllConst.CONST_OFFICECODE_011203
+                         BaseDllConst.CONST_OFFICECODE_011203,
+                         BaseDllConst.CONST_OFFICECODE_012402
                         fileName = "出荷予定表" & ".xlsx"
                     '★甲子営業所
                     Case BaseDllConst.CONST_OFFICECODE_011202

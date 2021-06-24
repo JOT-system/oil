@@ -31,12 +31,13 @@ Public Class OIT0003OrderList
     Private OIT0003ReportGoitbl As DataTable                        '帳票用(五井)テーブル
     Private OIT0003ReportKinoenetbl As DataTable                    '帳票用(甲子)テーブル
     Private OIT0003ReportSodegauratbl As DataTable                  '帳票用(袖ヶ浦)テーブル
-    Private OIT0003ReportMieShiohamatbl As DataTable                  '帳票用(三重塩浜)テーブル
+    Private OIT0003ReportMieShiohamatbl As DataTable                '帳票用(三重塩浜)テーブル
     Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
     Private OIT0003ReportPlanFrame As DataTable                     '帳票用(計画枠用)テーブル
+    Private OIT0003ReportReserveAmount As DataTable                 '帳票用(予約数量枠用)テーブル
     Private OIT0003CsvDeliverytbl As DataTable                      'CSV用(託送指示)テーブル
     Private OIT0003ItemGettbl As DataTable                          '値取得用テーブル
-    Private OIT0003CsvActualLoadtbl As DataTable                  'CSV用(積込実績)テーブル
+    Private OIT0003CsvActualLoadtbl As DataTable                    'CSV用(積込実績)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -4567,6 +4568,15 @@ Public Class OIT0003OrderList
                 ''★ 固定帳票(積込予定(共通))作成処理  止める！！
                 ''WW_TyohyoLoadCommonCreate(tyohyoType, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
+                '******************************
+                '帳票表示(予約数量枠)データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelReserveAmountDataGet(SQLcon, Me.txtReportLodDate.Text)
+                End Using
+
                 '★ 固定帳票(積込予定（三重塩浜))作成処理
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
@@ -4577,7 +4587,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_MIESHIOHAMA_LOADPLAN.xlsx", OIT0003Reporttbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintMieShiohamaData(CONST_RPT_LOADPLAN, Me.txtReportLodDate.Text)
+                        url = repCbj.CreateExcelPrintMieShiohamaData(CONST_RPT_LOADPLAN, Me.txtReportLodDate.Text, dtReserveAmount:=OIT0003ReportReserveAmount)
                     Catch ex As Exception
                         Return
                     End Try
@@ -6572,6 +6582,75 @@ Public Class OIT0003OrderList
 
         '○ 画面表示データ保存
         'Master.SaveTable(OIT0003ReportSodegauratbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示(予約数量枠)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelReserveAmountDataGet(ByVal SQLcon As SqlConnection, ByVal I_LODDATE As String)
+
+        If IsNothing(OIT0003ReportReserveAmount) Then
+            OIT0003ReportReserveAmount = New DataTable
+        End If
+
+        If OIT0003ReportReserveAmount.Columns.Count <> 0 Then
+            OIT0003ReportReserveAmount.Columns.Clear()
+        End If
+
+        OIT0003ReportReserveAmount.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　積込指示書(三重塩浜営業所(予約数量枠))取得用SQL
+        Dim SQLStr As String =
+            " SELECT " _
+            & "   OIM0021.OFFICECODE                             AS OFFICECODE" _
+            & " , OIM0021.MODEL                                  AS MODEL" _
+            & " , OIM0021.LOAD                                   AS LOAD" _
+            & " , OIM0021.OILCODE                                AS OILCODE" _
+            & " , OIM0021.SEGMENTOILCODE                         AS SEGMENTOILCODE" _
+            & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEDQUANTITY" _
+            & " , '0'                                            AS DELFLG" _
+            & " FROM oil.OIM0021_LOADRESERVE OIM0021 " _
+            & " WHERE " _
+            & "     OIM0021.OFFICECODE = @P01 " _
+            & " AND OIM0021.LOAD       = 45 " _
+            & " AND OIM0021.FROMYMD   <= @P02 " _
+            & " AND OIM0021.TOYMD     >= @P02 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 6) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar)    '積込日
+                PARA01.Value = BaseDllConst.CONST_OFFICECODE_012402
+                PARA02.Value = I_LODDATE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportReserveAmount.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportReserveAmount.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LMIESHIOHAMA RESERVEAMOUNT_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LMIESHIOHAMA RESERVEAMOUNT_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)

@@ -107,6 +107,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_MIESHIOHAMA_LOADPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
+                Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("出荷数量(昭四分)"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_GOI_SHIPPLAN.xlsx" _
                 OrElse excelFileName = "OIT0003L_KINOENE_SHIPPLAN.xlsx" _
@@ -2315,7 +2316,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
+    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String,
+                                                    Optional ByVal dtReserveAmount As DataTable = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
 
@@ -2347,6 +2349,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     EditLoadPlanHeaderArea(lodDate)
                     '◯明細の設定
                     EditLoadPlanDetailArea()
+                    '◯予約数量の設定
+                    EditReserveAmountArea(dtReserveAmount)
                     '***** TODO処理 ここまで *****
                 'タンク車出荷連絡書
                 Case "SHIPCONTACT"
@@ -2489,6 +2493,13 @@ Public Class OIT0003CustomReport : Implements IDisposable
             rngHeaderArea = Me.ExcelWorkSheet.Range("H1")
             rngHeaderArea.Value = lodDate
             ExcelMemoryRelease(rngHeaderArea)
+
+            '○シート[出荷数量(昭四分)]
+            '　積込日
+            rngHeaderArea = Me.ExcelTempSheet.Range("V1")
+            rngHeaderArea.Value = lodDate
+            ExcelMemoryRelease(rngHeaderArea)
+
         Catch ex As Exception
             Throw
         Finally
@@ -2536,6 +2547,53 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Throw
         Finally
             ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の予約数量設定(三重塩浜営業所(積込指示))
+    ''' </summary>
+    Private Sub EditReserveAmountArea(ByVal dtReserveAmount As DataTable)
+        If dtReserveAmount.Rows.Count = 0 Then Exit Sub
+        Dim rngReserveAmountArea As Excel.Range = Nothing
+
+        Try
+            For Each ReserveAmountrow As DataRow In dtReserveAmount.Rows
+                '○油種
+                Select Case Convert.ToString(ReserveAmountrow("OILCODE")) + Convert.ToString(ReserveAmountrow("SEGMENTOILCODE"))
+                    'SG(ハイオク)
+                    Case BaseDllConst.CONST_HTank + "A"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F4")
+                    'RG(レギュラー)
+                    Case BaseDllConst.CONST_RTank + "A"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F5")
+                    'DK(灯油)
+                    Case BaseDllConst.CONST_TTank + "A"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F6")
+                    'GO(軽油)
+                    Case BaseDllConst.CONST_KTank1 + "A"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F7")
+                    '3GO(寒冷軽油)
+                    Case BaseDllConst.CONST_K3Tank1 + "E"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F8")
+                    '0.5AFO(0.5A重油)
+                    Case BaseDllConst.CONST_ATank + "B"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F9")
+                    'LTA
+                    Case BaseDllConst.CONST_ATank + "C"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F10")
+                    '0.1AFO(0.1A重油)
+                    Case BaseDllConst.CONST_LTank1 + "B"
+                        rngReserveAmountArea = Me.ExcelTempSheet.Range("F11")
+                End Select
+                rngReserveAmountArea.Value = ReserveAmountrow("RESERVEDQUANTITY")
+                ExcelMemoryRelease(rngReserveAmountArea)
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngReserveAmountArea)
         End Try
     End Sub
 

@@ -3327,6 +3327,8 @@ Public Class OIT0003OrderList
                 ''OT積込指示(ラジオボタン)を表示
                 'Me.rbOTLoadBtn.Visible = True
                 '### 20201014 END   指摘票No168(OT積込指示対応) ###############################################
+                '出荷予定(ラジオボタン)を表示
+                Me.rbShipBtn.Visible = True
 
             '◯三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
@@ -3648,6 +3650,10 @@ Public Class OIT0003OrderList
                 If Me.rbDeliveryBtn.Checked = True Then         '■託送指示を選択
                     '☆ 固定帳票(託送指示)作成処理
                     WW_TyohyoYokkaichiCreate(CONST_RPT_DELIVERYPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+
+                ElseIf Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
+                    '★ 固定帳票(出荷予定(四日市))作成処理
+                    WW_TyohyoYokkaichiCreate(CONST_RPT_SHIPPLAN, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then         '■積込指示を選択
                     '★ 固定帳票(積込予定(共通))作成処理
@@ -4520,6 +4526,29 @@ Public Class OIT0003OrderList
                     ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
                 End Using
 
+            'ダウンロードボタン(出荷予定(四日市))押下
+            Case CONST_RPT_SHIPPLAN
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelCentralOfficeShipPlanDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_012401, lodDate:=Me.txtReportLodDate.Text)
+                End Using
+
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_YOKKAICHI_SHIPPLAN.xlsx", OIT0003ReportMieShiohamatbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintYokkaichiData(CONST_RPT_SHIPPLAN, Me.txtReportLodDate.Text, dt:=OIT0003ReportOilDuration)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+
             'ダウンロードボタン(積込指示)押下
             Case CONST_RPT_LOADPLAN
                 '★ 固定帳票(積込予定(共通))作成処理
@@ -4577,7 +4606,7 @@ Public Class OIT0003OrderList
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelMieshiohamaShipPlanDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
+                    ExcelCentralOfficeShipPlanDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_012402, lodDate:=Me.txtReportLodDate.Text)
                 End Using
 
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_MIESHIOHAMA_SHIPPLAN.xlsx", OIT0003ReportMieShiohamatbl)
@@ -7509,12 +7538,13 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
-    ''' 帳票表示(出荷予定（三重塩浜営業所）)データ取得
+    ''' 帳票表示(出荷予定（四日市営業所, 三重塩浜営業所）)データ取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelMieshiohamaShipPlanDataGet(ByVal SQLcon As SqlConnection,
-                                      Optional ByVal lodDate As String = Nothing)
+    Protected Sub ExcelCentralOfficeShipPlanDataGet(ByVal SQLcon As SqlConnection,
+                                                  ByVal I_OFFICECODE As String,
+                                                  Optional ByVal lodDate As String = Nothing)
 
         If IsNothing(OIT0003ReportMieShiohamatbl) Then
             OIT0003ReportMieShiohamatbl = New DataTable
@@ -7572,6 +7602,7 @@ Public Class OIT0003OrderList
               " LEFT JOIN oil.OIM0007_TRAIN OIM0007 " _
             & " ON  OIM0007.OFFICECODE = OIM0029.KEYCODE01 " _
             & " AND OIM0007.TRAINNO = OIM0029.KEYCODE03 " _
+            & " AND OIM0007.TRAINNAME = OIM0029.VALUE03 " _
             & " AND OIM0029.DELFLG <>  @P02 "
 
         '★受注データより油種数を取得（荷受人向け（第２荷受人が空白）の場合）
@@ -7726,7 +7757,8 @@ Public Class OIT0003OrderList
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '分類
-                PARA01.Value = BaseDllConst.CONST_OFFICECODE_012402
+                PARA01.Value = I_OFFICECODE
+                'PARA01.Value = BaseDllConst.CONST_OFFICECODE_012402
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
                     PARA03.Value = lodDate
@@ -7756,7 +7788,8 @@ Public Class OIT0003OrderList
                 '★品種出荷期限マスタより出荷期間を取得
                 Dim PARAOilDure01 As SqlParameter = SQLOilDuracmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARAOilDure02 As SqlParameter = SQLOilDuracmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
-                PARAOilDure01.Value = BaseDllConst.CONST_OFFICECODE_012402
+                PARAOilDure01.Value = I_OFFICECODE
+                'PARAOilDure01.Value = BaseDllConst.CONST_OFFICECODE_012402
                 PARAOilDure02.Value = C_DELETE_FLG.DELETE
                 Using SQLdr As SqlDataReader = SQLOilDuracmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

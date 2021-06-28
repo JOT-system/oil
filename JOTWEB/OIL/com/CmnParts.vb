@@ -1263,6 +1263,147 @@ Public Class CmnParts
     End Function
 
     ''' <summary>
+    ''' 出荷休業日(月末月初)チェック
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <param name="I_OFFICECODE">営業所コード</param>
+    ''' <param name="I_LODDATE">積込日</param>
+    ''' <param name="I_SHIPFLG">1:出荷休業日 2:振替出荷日</param>
+    Public Function ChkShipClose(ByVal SQLcon As SqlConnection,
+                                 ByVal I_OFFICECODE As String,
+                                 ByVal I_LODDATE As String,
+                                 ByVal I_SHIPFLG As String,
+                                 ByRef O_dtShipClose As DataTable) As Boolean
+        Dim ChkSrtEndMonth As Boolean = False
+        Dim dtShipClose As DataTable = New DataTable
+
+        If IsNothing(dtShipClose) Then
+            dtShipClose = New DataTable
+        End If
+
+        If dtShipClose.Columns.Count <> 0 Then
+            dtShipClose.Columns.Clear()
+        End If
+
+        dtShipClose.Clear()
+
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   '' AS LINECNT" _
+            & " , OIM0034.OFFICECODE" _
+            & " , OIM0034.TRAINNO" _
+            & " , OIM0034.SHIPCLOSEDATE" _
+            & " FROM oil.OIM0034_SHIPCLOSE OIM0034" _
+            & String.Format(" WHERE OIM0034.OFFICECODE = '{0}'", I_OFFICECODE)
+
+        If I_SHIPFLG = "1" Then
+            SQLStr &= String.Format("   AND OIM0034.SHIPCLOSEDATE = '{0}'", I_LODDATE)
+        Else
+            SQLStr &= String.Format("   AND OIM0034.SHIPRESCHEDULE = '{0}'", I_LODDATE)
+        End If
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        dtShipClose.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    dtShipClose.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each dtShipCloserow As DataRow In dtShipClose.Rows
+                    i += 1
+                    dtShipCloserow("LINECNT") = i        'LINECNT
+                Next
+
+            End Using
+            If dtShipClose.Rows.Count <> 0 Then ChkSrtEndMonth = True
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+        O_dtShipClose = dtShipClose.Copy
+        Return ChkSrtEndMonth
+    End Function
+
+    ''' <summary>
+    ''' 出荷休業日(月末月初)(前積)受注データチェック
+    ''' </summary>
+    ''' <param name="I_OFFICECODE">営業所コード</param>
+    ''' <param name="I_ORDERNO">受注No</param>
+    Public Sub ChkShipCloseOrder(ByVal SQLcon As SqlConnection,
+                                 ByVal I_OFFICECODE As String,
+                                 ByVal I_ORDERNO As String,
+                                 ByRef checkedRow As DataTable)
+
+        Dim dtShipClose As DataTable = New DataTable
+
+        If IsNothing(dtShipClose) Then
+            dtShipClose = New DataTable
+        End If
+
+        If dtShipClose.Columns.Count <> 0 Then
+            dtShipClose.Columns.Clear()
+        End If
+
+        dtShipClose.Clear()
+
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   OIT0002.ORDERNO" _
+            & " FROM oil.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & " AND OIT0003.STACKINGFLG = '1'" _
+            & " INNER JOIN ( " _
+            & "     SELECT DISTINCT " _
+            & "       OIT0002.ORDERNO " _
+            & "     , OIM0034.OFFICECODE " _
+            & "     , OIM0034.TRAINNO " _
+            & "     , OIM0034.SHIPCLOSEDATE " _
+            & "     , OIM0034.SHIPRESCHEDULE " _
+            & "     FROM oil.OIM0034_SHIPCLOSE OIM0034 " _
+            & "     INNER JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "         OIT0002.OFFICECODE = OIM0034.OFFICECODE " _
+            & "     AND OIT0002.DEPDATE = OIM0034.SHIPCLOSEDATE " _
+            & "     INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "         OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & String.Format("     WHERE OIM0034.OFFICECODE = '{0}' ", I_OFFICECODE) _
+            & "     AND FORMAT(OIM0034.SHIPCLOSEDATE,'yyyy/MM') = FORMAT(GETDATE(),'yyyy/MM') " _
+            & " ) SHIPCLOSETBL ON " _
+            & "     OIT0002.OFFICECODE = SHIPCLOSETBL.OFFICECODE " _
+            & " AND OIT0002.TRAINNO = SHIPCLOSETBL.TRAINNO " _
+            & " AND OIT0003.ACTUALLODDATE = SHIPCLOSETBL.SHIPRESCHEDULE " _
+            & String.Format(" WHERE OIT0002.ORDERNO <> '{0}'", I_ORDERNO)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        dtShipClose.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    dtShipClose.Load(SQLdr)
+                End Using
+
+                For Each OIT0003row As DataRow In dtShipClose.Rows
+                    Dim dtSendairow As DataRow = checkedRow.NewRow
+                    dtSendairow("ORDERNO") = OIT0003row("ORDERNO")
+                    checkedRow.Rows.Add(dtSendairow)
+                Next
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' 受注TBL更新(訂正更新用)
     ''' </summary>
     ''' <param name="SQLcon">SQL接続</param>

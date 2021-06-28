@@ -41,6 +41,7 @@ Public Class OIT0003OTLinkageList
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
@@ -2242,7 +2243,7 @@ Public Class OIT0003OTLinkageList
             & " , FORMAT(CONVERT(INT,OIT0002.TRAINNO), '0000')   AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , FORMAT(OIT0002.TOTALTANKCH, '00')              AS TOTALTANK" _
-            & " , FORMAT(CONVERT(INT, OIT0003.SHIPORDER), '00')  AS SHIPORDER" _
+            & " , FORMAT(CONVERT(INT, ISNULL(OIT0003.SHIPORDER,'')), '00')  AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '0')                         AS LANDC" _
             & " , CONVERT(NCHAR(1), '0')                         AS EMPTYFAREFLG" _
@@ -2385,6 +2386,24 @@ Public Class OIT0003OTLinkageList
         'Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
         If IsNothing(I_ORDERNO) Then
             checkedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+
+            '★仙台新港営業所の場合
+            If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                Dim cpcheckedRow As DataTable = checkedRow.Copy
+
+                '★出荷休業日チェック(対象受注が出荷休業日対象で、他に受注オーダーであった場合は含める。)
+                For Each OIT0003row As DataRow In cpcheckedRow.Rows
+                    CMNPTS.ChkShipCloseOrder(SQLcon, BaseDllConst.CONST_OFFICECODE_010402,
+                                             Convert.ToString(OIT0003row("ORDERNO")), checkedRow)
+                Next
+
+                'For Each OIT0003row As DataRow In checkedRow.Select("ORDERNO='O2021062803'")
+                '    Dim dtSendairow As DataRow = checkedRow.NewRow
+                '    dtSendairow("ORDERNO") = "O2021062805"
+                '    checkedRow.Rows.Add(dtSendairow)
+                'Next
+            End If
+
             For Each OIT0003row As DataRow In checkedRow.Rows
 
                 If j = 0 Then

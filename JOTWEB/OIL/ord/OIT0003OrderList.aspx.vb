@@ -4873,9 +4873,28 @@ Public Class OIT0003OrderList
 
         '★積置フラグ有り用SQL
         SQLStrAri &=
-              SQLStrCmn _
-            & " AND OIT0003.STACKINGFLG = '1' " _
-            & " AND OIT0003.ACTUALLODDATE = @P03 "
+                  SQLStrCmn _
+                & " AND OIT0003.STACKINGFLG = '1' "
+
+        Dim dtShipClose As DataTable = New DataTable
+        '○チェックボックス(当月積込、翌月発分を含める)未選択
+        If ChkEndMonthChk.Checked = False Then
+            SQLStrAri &=
+              " AND OIT0003.ACTUALLODDATE = @P03 "
+        Else
+            '○出荷休業日マスタに設定されているかチェック
+            If CMNPTS.ChkShipClose(SQLcon, BaseDllConst.CONST_OFFICECODE_010402, lodDate, "1", dtShipClose) = True Then
+                SQLStrAri &=
+                  String.Format(" AND OIT0003.ACTUALLODDATE = '{0}' ", Format(Date.Parse(lodDate).AddDays(-1), "yyyy/MM/dd"))
+            ElseIf CMNPTS.ChkShipClose(SQLcon, BaseDllConst.CONST_OFFICECODE_010402, lodDate, "2", dtShipClose) = True Then
+                SQLStrAri &=
+                  String.Format(" AND OIT0003.ACTUALLODDATE = '{0}' ", Format(Date.Parse(lodDate).AddDays(1), "yyyy/MM/dd"))
+            Else
+                SQLStrAri &=
+                  " AND OIT0003.ACTUALLODDATE = @P03 "
+            End If
+
+        End If
 
         '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
         SQLStrCmn =
@@ -4966,6 +4985,20 @@ Public Class OIT0003OrderList
                 SQLStrAri &= SQLStrCmn _
                 & "   AND CONVERT(VARCHAR(6), OIT0002.DEPDATE, 112) = @P05 "
                 '### 20201109 END   『(チェックボックス)当月積込、翌月発分を含める』がチェックされた場合 ##########
+
+                '★出荷休業日マスタと一致した場合(月末休業日)
+                If dtShipClose.Rows.Count <> 0 Then
+                    SQLStrAri &= "AND OIT0002.TRAINNO IN ("
+                    For Each dtShipCloserow As DataRow In dtShipClose.Rows
+                        If dtShipCloserow("LINECNT") = "1" Then
+                            SQLStrAri &= "'" + Convert.ToString(dtShipCloserow("TRAINNO")) + "'"
+                        Else
+                            SQLStrAri &= ", '" + Convert.ToString(dtShipCloserow("TRAINNO")) + "'"
+                        End If
+                    Next
+                    SQLStrAri &= ")"
+                End If
+
             End If
         End If
 

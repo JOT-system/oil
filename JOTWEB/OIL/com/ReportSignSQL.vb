@@ -937,19 +937,20 @@
             & "   OIT0002.ORDERNO AS KEYCODE1" _
             & " , OIT0003.DETAILNO AS KEYCODE2 " _
             & " , OIT0002.OFFICECODE AS KEYCODE3 " _
+            & " , @ORDERYMD AS KEYCODE4 " _
             & " , CASE " _
-            & "   WHEN OT.IMPORTFLG = '0' THEN '0' " _
-            & "   WHEN OT.ORDERNO IS NULL THEN '4' " _
-            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '2' " _
-            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '3' " _
-            & "   ELSE '1' " _
+            & "   WHEN OT.IMPORTFLG = '0' THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD00 + "'" _
+            & "   WHEN OT.ORDERNO IS NULL THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD04 + "'" _
+            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD02 + "'" _
+            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD03 + "'" _
+            & "   ELSE '" + C_OTKUUKAI_DIFF.CONST_ITEMCD01 + "'" _
             & "   END AS COMPAREINFOCD " _
             & " , CASE " _
-            & "   WHEN OT.IMPORTFLG = '0' THEN '新規作成' " _
-            & "   WHEN OT.ORDERNO IS NULL THEN '削除' " _
-            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '油種変更' " _
-            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '車番更新' " _
-            & "   ELSE '一致' " _
+            & "   WHEN OT.IMPORTFLG = '0' THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM00 + "'" _
+            & "   WHEN OT.ORDERNO IS NULL THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM04 + "'" _
+            & "   WHEN OIT0003.OILCODE + OIT0003.ORDERINGTYPE <> OT.OILCODE + OT.ORDERINGTYPE THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM02 + "'" _
+            & "   WHEN OIT0003.TANKNO <> OT.TANKNO THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM03 + "'" _
+            & "   ELSE '" + C_OTKUUKAI_DIFF.CONST_ITEMNM01 + "'" _
             & "   END AS COMPAREINFONM " _
             & " , OIT0002.ORDERNO " _
             & " , OIT0003.DETAILNO " _
@@ -972,6 +973,7 @@
             & " , OIT0003.SHIPORDER " _
             & " , OIT0003.LINEORDER " _
             & " , OIT0003.TANKNO " _
+            & " , OIT0003.OTTRANSPORTFLG " _
             & " , OIT0003.OILCODE " _
             & " , OIT0003.OILNAME " _
             & " , OIT0003.ORDERINGTYPE " _
@@ -1012,6 +1014,7 @@
             & " , OT.SHIPORDER AS OT_SHIPORDER" _
             & " , OT.LINEORDER AS OT_LINEORDER " _
             & " , OT.TANKNO AS OT_TANKNO " _
+            & " , OT.OTTRANSPORTFLG AS OT_OTTRANSPORTFLG " _
             & " , OT.OILCODE AS OT_OILCODE " _
             & " , OT.OILNAME AS OT_OILNAME " _
             & " , OT.ORDERINGTYPE AS OT_ORDERINGTYPE " _
@@ -1068,6 +1071,7 @@
             & "     , OIT0017.SHIPORDER " _
             & "     , OIT0017.LINEORDER " _
             & "     , OIT0017.TANKNO " _
+            & "     , OIT0017.OTTRANSPORTFLG " _
             & "     , OIT0017.OILCODE " _
             & "     , OIT0017.OILNAME " _
             & "     , OIT0017.ORDERINGTYPE " _
@@ -1090,7 +1094,8 @@
             & "     INNER JOIN oil.OIT0017_OTDETAIL OIT0017 ON " _
             & "     OIT0017.ORDERNO = OIT0016.ORDERNO " _
             & "     WHERE OIT0016.OFFICECODE = @OFFICECODE " _
-            & "     AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & "     AND OIT0016.ORDERYMD <= @ORDERYMD " _
+            & String.Format(" AND OIT0016.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
             & "     ) OT ON "
 
         SQLORDERStr &=
@@ -1115,19 +1120,20 @@
             & "   OIT0017.OTORDERNO AS KEYCODE1 " _
             & " , OIT0017.OTDETAILNO AS KEYCODE2 " _
             & " , OIT0016.OFFICECODE AS KEYCODE3 " _
+            & " , @ORDERYMD AS KEYCODE4 " _
             & " , CASE " _
-            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '0' " _
-            & "   WHEN JOT.ORDERNO IS NULL THEN '5' " _
-            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '2' " _
-            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '3' " _
-            & "   ELSE '1' " _
+            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD00 + "'" _
+            & "   WHEN JOT.ORDERNO IS NULL THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD05 + "'" _
+            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD02 + "'" _
+            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMCD03 + "'" _
+            & "   ELSE '" + C_OTKUUKAI_DIFF.CONST_ITEMCD01 + "'" _
             & "   END AS COMPAREINFOCD " _
             & " , CASE " _
-            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '新規作成' " _
-            & "   WHEN JOT.ORDERNO IS NULL THEN '追加' " _
-            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '油種変更' " _
-            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '車番更新' " _
-            & "   ELSE '一致' " _
+            & "   WHEN OIT0016.IMPORTFLG = '0' THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM00 + "'" _
+            & "   WHEN JOT.ORDERNO IS NULL THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM05 + "'" _
+            & "   WHEN OIT0017.OILCODE + OIT0017.ORDERINGTYPE <> JOT.OILCODE + JOT.ORDERINGTYPE THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM02 + "'" _
+            & "   WHEN OIT0017.TANKNO <> JOT.TANKNO THEN '" + C_OTKUUKAI_DIFF.CONST_ITEMNM03 + "'" _
+            & "   ELSE '" + C_OTKUUKAI_DIFF.CONST_ITEMNM01 + "'" _
             & "   END AS COMPAREINFONM " _
             & " , JOT.ORDERNO AS JOT_ORDERNO " _
             & " , JOT.DETAILNO AS JOT_DETAILNO " _
@@ -1150,6 +1156,7 @@
             & " , JOT.SHIPORDER AS JOT_SHIPORDER " _
             & " , JOT.LINEORDER AS JOT_LINEORDER " _
             & " , JOT.TANKNO AS JOT_TANKNO " _
+            & " , JOT.OTTRANSPORTFLG AS JOT_OTTRANSPORTFLG " _
             & " , JOT.OILCODE AS JOT_OILCODE " _
             & " , JOT.OILNAME AS JOT_OILNAME " _
             & " , JOT.ORDERINGTYPE AS JOT_ORDERINGTYPE " _
@@ -1190,6 +1197,7 @@
             & " , OIT0017.SHIPORDER " _
             & " , OIT0017.LINEORDER " _
             & " , OIT0017.TANKNO " _
+            & " , OIT0017.OTTRANSPORTFLG " _
             & " , OIT0017.OILCODE " _
             & " , OIT0017.OILNAME " _
             & " , OIT0017.ORDERINGTYPE " _
@@ -1244,6 +1252,7 @@
             & "     , OIT0003.SHIPORDER " _
             & "     , OIT0003.LINEORDER " _
             & "     , OIT0003.TANKNO " _
+            & "     , OIT0003.OTTRANSPORTFLG " _
             & "     , OIT0003.OILCODE " _
             & "     , OIT0003.OILNAME " _
             & "     , OIT0003.ORDERINGTYPE " _
@@ -1282,9 +1291,10 @@
 
         SQLOTORDERStr &=
               " WHERE OIT0016.OFFICECODE = @OFFICECODE " _
-            & " AND OIT0016.ORDERYMD = @ORDERYMD " _
+            & " AND OIT0016.ORDERYMD <= @ORDERYMD " _
             & String.Format(" AND OIT0016.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
-            & " AND OIT0017.OTDETAILNO = '' "
+            & " AND OIT0017.OTDETAILNO = '' " _
+            & " AND OIT0016.IMPORTFLG <> '0' "
         '& " AND JOT.ORDERNO IS NULL "
 
         '######################################################
@@ -1295,8 +1305,9 @@
             & "   OIT0002.ORDERNO AS KEYCODE1" _
             & " , OIT0003.DETAILNO AS KEYCODE2 " _
             & " , OIT0002.OFFICECODE AS KEYCODE3 " _
-            & " , '6' AS COMPAREINFOCD " _
-            & " , '前積' AS COMPAREINFONM " _
+            & " , @ORDERYMD AS KEYCODE4 " _
+            & String.Format(" , '{0}' AS COMPAREINFOCD ", C_OTKUUKAI_DIFF.CONST_ITEMCD06) _
+            & String.Format(" , '{0}' AS COMPAREINFONM ", C_OTKUUKAI_DIFF.CONST_ITEMNM06) _
             & " , OIT0002.ORDERNO " _
             & " , OIT0003.DETAILNO " _
             & " , OIT0002.ORDERSTATUS " _
@@ -1318,6 +1329,7 @@
             & " , OIT0003.SHIPORDER " _
             & " , OIT0003.LINEORDER " _
             & " , OIT0003.TANKNO " _
+            & " , OIT0003.OTTRANSPORTFLG " _
             & " , OIT0003.OILCODE " _
             & " , OIT0003.OILNAME " _
             & " , OIT0003.ORDERINGTYPE " _
@@ -1358,6 +1370,7 @@
             & " , '' AS OT_SHIPORDER" _
             & " , '' AS OT_LINEORDER " _
             & " , '' AS OT_TANKNO " _
+            & " , '' AS OT_OTTRANSPORTFLG " _
             & " , '' AS OT_OILCODE " _
             & " , '' AS OT_OILNAME " _
             & " , '' AS OT_ORDERINGTYPE " _
@@ -1507,7 +1520,8 @@
 
         If blnChoiceFlg = False Then
             SQLStr &=
-              "   WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) "
+              " WHERE OIT0020.KEYCODE4 = @ORDERYMD " _
+            '"   WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) "
         Else
             SQLStr &=
               "   WHERE OIT0020.KEYCODE1 = @ORDERNO "
@@ -1527,8 +1541,9 @@
 
         If blnChoiceFlg = False Then
             SQLStr &=
-              " WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) " _
+              " WHERE OIT0020.KEYCODE4 = @ORDERYMD " _
             & "   AND OIT0020.KEYCODE3 = @OFFICECODE "
+            '"   WHERE (OIT0020.ORDERYMD = @ORDERYMD OR OIT0020.OT_ORDERYMD = @ORDERYMD) "
         Else
             SQLStr &=
               " WHERE OIT0020.KEYCODE1 = @ORDERNO " _

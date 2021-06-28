@@ -189,6 +189,58 @@ Public Module BaseDllConst
         Public Const ALERT_GREEN As String = "検査日まで後、7日以上のタンク車"
     End Class
 
+    ''' <summary>
+    ''' OT空回日報連携時の差分コード
+    ''' </summary>
+    Public Class C_OTKUUKAI_DIFF
+        ''' <summary>
+        ''' 新規作成
+        ''' </summary>
+        Public Const CONST_ITEMCD00 As String = "0"
+        Public Const CONST_ITEMNM00 As String = "新規作成"
+        ''' <summary>
+        ''' 一致
+        ''' </summary>
+        Public Const CONST_ITEMCD01 As String = "1"
+        Public Const CONST_ITEMNM01 As String = "一致"
+        ''' <summary>
+        ''' 油種変更
+        ''' </summary>
+        Public Const CONST_ITEMCD02 As String = "2"
+        Public Const CONST_ITEMNM02 As String = "油種変更"
+        ''' <summary>
+        ''' 車番更新
+        ''' </summary>
+        Public Const CONST_ITEMCD03 As String = "3"
+        Public Const CONST_ITEMNM03 As String = "車番更新"
+        ''' <summary>
+        ''' 削除
+        ''' </summary>
+        Public Const CONST_ITEMCD04 As String = "4"
+        Public Const CONST_ITEMNM04 As String = "削除"
+        ''' <summary>
+        ''' 追加
+        ''' </summary>
+        Public Const CONST_ITEMCD05 As String = "5"
+        Public Const CONST_ITEMNM05 As String = "追加"
+        ''' <summary>
+        ''' 前積
+        ''' </summary>
+        Public Const CONST_ITEMCD06 As String = "6"
+        Public Const CONST_ITEMNM06 As String = "前積"
+        ''' <summary>
+        ''' OT輸送変更
+        ''' </summary>
+        Public Const CONST_ITEMCD07 As String = "7"
+        Public Const CONST_ITEMNM07 As String = "OT輸送変更"
+        ''' <summary>
+        ''' JOINT変更
+        ''' </summary>
+        Public Const CONST_ITEMCD08 As String = "8"
+        Public Const CONST_ITEMNM08 As String = "JOINT変更"
+    End Class
+
+
 #Region "検査日(交検・全検)アラート日数"
     ''' <summary>
     ''' 仙台新港営業所(異常対象日数(以内))

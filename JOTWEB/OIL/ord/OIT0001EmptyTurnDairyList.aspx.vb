@@ -993,6 +993,9 @@ Public Class OIT0001EmptyTurnDairyList
                 '★受注TBLとOT受注TBL比較
                 WW_CompareOrderToOTOrder(SQLcon, WW_ERRCODE)
 
+                '★受注TBLとOT受注TBL(その他)比較
+                WW_CompareOtherOrderToOTOrder(SQLcon, WW_ERRCODE)
+
                 '★最新のOT空回日報データを反映
                 WW_SetOTOrderToOrder(SQLcon)
 
@@ -3696,6 +3699,71 @@ Public Class OIT0001EmptyTurnDairyList
     End Sub
 
     ''' <summary>
+    ''' OT空回日報比較TBLステータス更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOTCompareStatus(ByVal SQLcon As SqlConnection, OIT0001row As DataRow,
+                                           Optional I_ITEM As String = Nothing,
+                                           Optional I_VALUE As String = Nothing)
+        Try
+            '更新SQL文･･･OT空回日報比較TBLのステータスを更新
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0020_OTCOMPARE " _
+                    & "    SET " _
+                    & String.Format("        {0}  = '{1}', ", I_ITEM, I_VALUE)
+
+            SQLStr &=
+                      "        UPDYMD      = @UPDYMD, " _
+                    & "        UPDUSER     = @UPDUSER, " _
+                    & "        UPDTERMID   = @UPDTERMID, " _
+                    & "        RECEIVEYMD  = @RECEIVEYMD  " _
+                    & "  WHERE KEYCODE1    = @ORDERNO  " _
+                    & "    AND KEYCODE2    = @DETAILNO  "
+            '& "    AND DELFLG     <> @DELFLG; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            Dim P_ORDERNO As SqlParameter = SQLcmd.Parameters.Add("@ORDERNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DETAILNO As SqlParameter = SQLcmd.Parameters.Add("@DETAILNO", System.Data.SqlDbType.NVarChar)
+            'Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            'P_DELFLG.Value = C_DELETE_FLG.DELETE
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            P_ORDERNO.Value = OIT0001row("KEYCODE1")
+            P_DETAILNO.Value = OIT0001row("KEYCODE2")
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L_OTCOMPARESTATUS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L_OTCOMPARESTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' 受注TBLとOT受注TBL比較(前準備)
     ''' </summary>
     ''' <remarks></remarks>
@@ -3804,18 +3872,18 @@ Public Class OIT0001EmptyTurnDairyList
         & " WHERE KEYCODE3 = @OFFICECODE " _
         & String.Format("   AND KEYCODE1 IN {0}; ", inOrder) _
         & " INSERT INTO OIL.OIT0020_OTCOMPARE " _
-        & " (KEYCODE1, KEYCODE2, KEYCODE3, COMPAREINFOCD, COMPAREINFONM, " _
+        & " (KEYCODE1, KEYCODE2, KEYCODE3, KEYCODE4, COMPAREINFOCD, COMPAREINFONM, " _
         & "  ORDERNO, DETAILNO, ORDERSTATUS, TRAINNO, TRAINNAME, ORDERYMD, " _
         & "  OFFICECODE, OFFICENAME, SHIPPERSCODE, SHIPPERSNAME, BASECODE, BASENAME, " _
         & "  CONSIGNEECODE, CONSIGNEENAME, DEPSTATION, DEPSTATIONNAME, " _
-        & "  ARRSTATION, ARRSTATIONNAME, SHIPORDER, LINEORDER, TANKNO, " _
+        & "  ARRSTATION, ARRSTATIONNAME, SHIPORDER, LINEORDER, TANKNO, OTTRANSPORTFLG, " _
         & "  OILCODE, OILNAME, ORDERINGTYPE, ORDERINGOILNAME, CARSNUMBER, CARSAMOUNT, RETURNDATETRAIN, " _
         & "  JOINTCODE, JOINT, REMARK, SECONDCONSIGNEECODE, SECONDCONSIGNEENAME, " _
         & "  LODDATE, DEPDATE, ARRDATE, ACCDATE, EMPARRDATE, BTRAINNO, IMPORTFLG, " _
         & "  OT_ORDERNO, OT_DETAILNO, OT_ORDERSTATUS, OT_TRAINNO, OT_TRAINNAME, OT_ORDERYMD, " _
         & "  OT_OFFICECODE, OT_OFFICENAME, OT_SHIPPERSCODE, OT_SHIPPERSNAME, OT_BASECODE, OT_BASENAME, " _
         & "  OT_CONSIGNEECODE, OT_CONSIGNEENAME, OT_DEPSTATION, OT_DEPSTATIONNAME, " _
-        & "  OT_ARRSTATION, OT_ARRSTATIONNAME, OT_SHIPORDER, OT_LINEORDER, OT_TANKNO, " _
+        & "  OT_ARRSTATION, OT_ARRSTATIONNAME, OT_SHIPORDER, OT_LINEORDER, OT_TANKNO, OT_OTTRANSPORTFLG, " _
         & "  OT_OILCODE, OT_OILNAME, OT_ORDERINGTYPE, OT_ORDERINGOILNAME, OT_CARSNUMBER, OT_CARSAMOUNT, OT_RETURNDATETRAIN, " _
         & "  OT_JOINTCODE, OT_JOINT, OT_REMARK, OT_SECONDCONSIGNEECODE, OT_SECONDCONSIGNEENAME, " _
         & "  OT_LODDATE, OT_DEPDATE, OT_ARRDATE, OT_ACCDATE, OT_EMPARRDATE, OT_BTRAINNO, " _
@@ -3914,6 +3982,60 @@ Public Class OIT0001EmptyTurnDairyList
     End Sub
 
     ''' <summary>
+    ''' 受注TBLとOT受注TBL(その他)比較
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CompareOtherOrderToOTOrder(ByVal SQLcon As SqlConnection, ByRef O_RTN As String)
+
+        '○五井営業所(浜五井-倉賀野)
+        Dim GoiStationName434103 As String = "434103"
+        Dim GoiStationName4113 As String = "4113"
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='1'")
+            '○営業所が五井営業所で発駅"434103"(浜五井), 着駅が"4113"(倉賀野)の場合
+            If Convert.ToString(OIT0001Cmprow("KEYCODE3")) = BaseDllConst.CONST_OFFICECODE_011201 _
+                AndAlso Convert.ToString(OIT0001Cmprow("DEPSTATION")) = GoiStationName434103 _
+                AndAlso Convert.ToString(OIT0001Cmprow("ARRSTATION")) = GoiStationName4113 Then
+                '★OT輸送可否フラグチェック
+                If Convert.ToString(OIT0001Cmprow("OTTRANSPORTFLG")) <> Convert.ToString(OIT0001Cmprow("OT_OTTRANSPORTFLG")) Then
+                    '★OT輸送フラグ変更・更新
+                    OIT0001Cmprow("COMPAREINFOCD") = C_OTKUUKAI_DIFF.CONST_ITEMCD07
+                    WW_UpdateOTCompareStatus(SQLcon, OIT0001Cmprow, I_ITEM:="COMPAREINFOCD", I_VALUE:=C_OTKUUKAI_DIFF.CONST_ITEMCD07)
+                    OIT0001Cmprow("COMPAREINFONM") = C_OTKUUKAI_DIFF.CONST_ITEMNM07
+                    WW_UpdateOTCompareStatus(SQLcon, OIT0001Cmprow, I_ITEM:="COMPAREINFONM", I_VALUE:=C_OTKUUKAI_DIFF.CONST_ITEMNM07)
+
+                    '★OT受注TBLの取込結果を"不一致"とする。
+                    WW_UpdateOTOrderStatus(SQLcon, OIT0001Cmprow, I_ITEM:="CMPRESULTSCODE", I_VALUE:="1")
+                    O_RTN = "ERR"
+                End If
+            End If
+        Next
+
+        '○仙台新港営業所(仙台北港-郡山)
+        Dim SendaiStationName243202 As String = "243202"
+        Dim SendaiStationName2407 As String = "2407"
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='1'")
+            '○営業所が仙台新港営業所で発駅"243202"(仙台北港), 着駅が"2407"(郡山)の場合
+            If Convert.ToString(OIT0001Cmprow("KEYCODE3")) = BaseDllConst.CONST_OFFICECODE_010402 _
+                AndAlso Convert.ToString(OIT0001Cmprow("DEPSTATION")) = SendaiStationName243202 Then
+                'AndAlso Convert.ToString(OIT0001Cmprow("ARRSTATION")) = SendaiStationName2407 Then
+                '★JOINTチェック
+                If Convert.ToString(OIT0001Cmprow("JOINT")) <> Convert.ToString(OIT0001Cmprow("OT_JOINT")) Then
+                    '★JOINT変更・更新
+                    OIT0001Cmprow("COMPAREINFOCD") = C_OTKUUKAI_DIFF.CONST_ITEMCD08
+                    WW_UpdateOTCompareStatus(SQLcon, OIT0001Cmprow, I_ITEM:="COMPAREINFOCD", I_VALUE:=C_OTKUUKAI_DIFF.CONST_ITEMCD08)
+                    OIT0001Cmprow("COMPAREINFONM") = C_OTKUUKAI_DIFF.CONST_ITEMNM08
+                    WW_UpdateOTCompareStatus(SQLcon, OIT0001Cmprow, I_ITEM:="COMPAREINFONM", I_VALUE:=C_OTKUUKAI_DIFF.CONST_ITEMNM08)
+
+                    '★OT受注TBLの取込結果を"不一致"とする。
+                    WW_UpdateOTOrderStatus(SQLcon, OIT0001Cmprow, I_ITEM:="CMPRESULTSCODE", I_VALUE:="1")
+                    O_RTN = "ERR"
+                End If
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
     ''' 最新のOT空回日報データを反映
     ''' </summary>
     ''' <remarks></remarks>
@@ -3925,7 +4047,8 @@ Public Class OIT0001EmptyTurnDairyList
         '○削除反映
         '##################################################
         Dim svOrderNo As String = ""
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='4' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
+        sCondition = String.Format("COMPAREINFOCD='{0}' AND ORDERSTATUS='{1}'", C_OTKUUKAI_DIFF.CONST_ITEMCD04, BaseDllConst.CONST_ORDERSTATUS_100)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
             '★受注明細TBLの削除フラグを"1"(無効)に更新
             CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, C_DELETE_FLG.DELETE, I_PARA:="DELFLG")
 
@@ -3945,11 +4068,13 @@ Public Class OIT0001EmptyTurnDairyList
         Dim maxDetailNo As Integer = 0
         Dim dtOrder As DataTable = New DataTable
         '★受注Noに反映
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
+        sCondition = String.Format("COMPAREINFOCD='{0}'", C_OTKUUKAI_DIFF.CONST_ITEMCD05)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
             OIT0001Cmprow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
         Next
         '★追加分のデータの場合
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='5'")
+        sCondition = String.Format("COMPAREINFOCD='{0}'", C_OTKUUKAI_DIFF.CONST_ITEMCD05)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
 
             If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
                 '○登録済みの受注進行ステータスを取得
@@ -3963,8 +4088,9 @@ Public Class OIT0001EmptyTurnDairyList
                 WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
 
                 '○受注明細TBLに追加分の油種を反映
-                sCondition = String.Format("ORDERNO='{0}'", OIT0001Cmprow("KEYCODE1"))
-                maxDetailNo = Integer.Parse(OIT0001CMPOrdertbl.Compute("MAX(KEYCODE2)", sCondition).ToString())
+                Dim sConditionSub As String = ""
+                sConditionSub = String.Format("ORDERNO='{0}'", OIT0001Cmprow("KEYCODE1"))
+                maxDetailNo = Integer.Parse(OIT0001CMPOrdertbl.Compute("MAX(KEYCODE2)", sConditionSub).ToString())
                 For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO=''")
                     OIT0001OTDetailrow("ORDERNO") = OIT0001Cmprow("KEYCODE1")
                     maxDetailNo += 1
@@ -3986,7 +4112,8 @@ Public Class OIT0001EmptyTurnDairyList
         '○油種反映
         '##################################################
         svOrderNo = ""
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='2' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
+        sCondition = String.Format("COMPAREINFOCD='{0}' AND ORDERSTATUS='{1}'", C_OTKUUKAI_DIFF.CONST_ITEMCD02, BaseDllConst.CONST_ORDERSTATUS_100)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
             If svOrderNo = "" OrElse svOrderNo <> Convert.ToString(OIT0001Cmprow("KEYCODE1")) Then
                 '○受注TBLの合計油種の最新化反映
                 WW_SetOrderCarsCnt(SQLcon, OIT0001Cmprow)
@@ -4009,11 +4136,44 @@ Public Class OIT0001EmptyTurnDairyList
         '○車番反映
         '##################################################
         svOrderNo = ""
-        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='3' AND ORDERSTATUS='" + BaseDllConst.CONST_ORDERSTATUS_100 + "'")
+        sCondition = String.Format("COMPAREINFOCD='{0}' AND ORDERSTATUS='{1}'", C_OTKUUKAI_DIFF.CONST_ITEMCD03, BaseDllConst.CONST_ORDERSTATUS_100)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
             '○受注明細TBLに変更分の車番(タンク車No)を反映
             For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
                 '★受注明細TBLの車番(タンク車No)を更新
                 CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_TANKNO"), I_PARA:="TANKNO")
+                Exit For
+            Next
+        Next
+
+        '##################################################
+        '○OT輸送反映(独自チェック対応(浜五井-倉賀野))
+        '##################################################
+        svOrderNo = ""
+        sCondition = String.Format("COMPAREINFOCD='{0}' AND ORDERSTATUS='{1}'", C_OTKUUKAI_DIFF.CONST_ITEMCD07, BaseDllConst.CONST_ORDERSTATUS_100)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
+            '○受注明細TBLに変更分のOT輸送を反映
+            For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
+                '★受注明細TBLのOT輸送可否フラグを更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_OTTRANSPORTFLG"), I_PARA:="OTTRANSPORTFLG")
+                '★受注明細TBLの備考を更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_REMARK"), I_PARA:="REMARK")
+                Exit For
+            Next
+        Next
+
+        '##################################################
+        '○JOINT反映(独自チェック対応(仙台北港-郡山))
+        '##################################################
+        svOrderNo = ""
+        sCondition = String.Format("COMPAREINFOCD='{0}' AND ORDERSTATUS='{1}'", C_OTKUUKAI_DIFF.CONST_ITEMCD08, BaseDllConst.CONST_ORDERSTATUS_100)
+        For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select(sCondition)
+            '○受注明細TBLに変更分のJOINTを反映
+            For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
+                '★受注明細TBLのJOINTコードを更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_JOINTCODE"), I_PARA:="JOINTCODE")
+                '★受注明細TBLのJOINTを更新
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_JOINT"), I_PARA:="JOINT")
                 Exit For
             Next
         Next

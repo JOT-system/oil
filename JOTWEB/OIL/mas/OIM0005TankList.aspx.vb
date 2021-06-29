@@ -1,7 +1,7 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ一覧画面
 ' 作成日 2019/11/08
-' 更新日 2021/05/07
+' 更新日 2021/06/28
 ' 作成者 JOT遠藤
 ' 更新者 JOT伊草
 '
@@ -19,6 +19,10 @@
 '         :             「休車フラグ」「休車日」「取得価格」「内部塗装」
 '         :             「安全弁」「センターバルブ情報」を追加
 '         :             項目名称変更「請負リース区分」→「請負請負リース区分」
+'         :2021/06/28 1)DB更新処理の設定項目に以下の誤りがあったのを修正
+'         :             「取得年月日」に「次回全検年月日」が設定されていた
+'         :             「取得名」に「取得年月日」が設定されていた
+'         :           2)EXCELアップロード時の「現在経年」の自動計算処理を追加
 ''************************************************************
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -1904,7 +1908,7 @@ Public Class OIM0005TankList
                 Dim PARA81 As SqlParameter = SQLcmd.Parameters.Add("@P81", SqlDbType.NVarChar, 20)          'コスモタグ名
                 Dim PARA82 As SqlParameter = SQLcmd.Parameters.Add("@P82", SqlDbType.Date)                  '次回全件年月日
                 Dim PARA83 As SqlParameter = SQLcmd.Parameters.Add("@P83", SqlDbType.Date)                  '前回全件年月日
-                Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.Date)                  '取得年月日
+                Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.NVarChar, 20)          '取得先名
                 Dim PARA85 As SqlParameter = SQLcmd.Parameters.Add("@P85", SqlDbType.Date)                  '車籍除外年月日
                 Dim PARA86 As SqlParameter = SQLcmd.Parameters.Add("@P86", SqlDbType.Date)                  '資産除却年月日
                 Dim PARA87 As SqlParameter = SQLcmd.Parameters.Add("@P87", SqlDbType.NVarChar, 20)          'JR車種コード
@@ -1987,8 +1991,8 @@ Public Class OIM0005TankList
                         PARA18.Value = OIM0005row("COLORCODE")
                         PARA19.Value = OIM0005row("MARKCODE")
                         PARA20.Value = OIM0005row("MARKNAME")
-                        If OIM0005row("ALLINSPECTIONDATE") <> "" Then
-                            PARA21.Value = OIM0005row("ALLINSPECTIONDATE")
+                        If OIM0005row("GETDATE") <> "" Then
+                            PARA21.Value = OIM0005row("GETDATE")
                         Else
                             PARA21.Value = DBNull.Value
                         End If
@@ -2106,11 +2110,7 @@ Public Class OIM0005TankList
                         Else
                             PARA83.Value = DBNull.Value
                         End If
-                        If OIM0005row("GETDATE") <> "" Then
-                            PARA84.Value = OIM0005row("GETDATE")
-                        Else
-                            PARA84.Value = DBNull.Value
-                        End If
+                        PARA84.Value = OIM0005row("OBTAINEDNAME")
                         If OIM0005row("EXCLUDEDATE") <> "" Then
                             PARA85.Value = OIM0005row("EXCLUDEDATE")
                         Else
@@ -2441,7 +2441,7 @@ Public Class OIM0005TankList
         work.WF_SEL_MARKNAME.Text = OIM0005tbl.Rows(WW_LINECNT)("MARKNAME")
 
         '取得年月日
-        work.WF_SEL_ALLINSPECTIONDATE.Text = OIM0005tbl.Rows(WW_LINECNT)("GETDATE")
+        work.WF_SEL_GETDATE.Text = OIM0005tbl.Rows(WW_LINECNT)("GETDATE")
 
         '車籍編入年月日
         work.WF_SEL_TRANSFERDATE.Text = OIM0005tbl.Rows(WW_LINECNT)("TRANSFERDATE")
@@ -3298,9 +3298,29 @@ Public Class OIM0005TankList
                 OIM0005INProw("PREINSPECTIONDATE") = XLSTBLrow("PREINSPECTIONDATE")
             End If
 
+            '現在経年
+            If WW_COLUMNS.IndexOf("PROGRESSYEAR") >= 0 Then
+                OIM0005INProw("PROGRESSYEAR") = XLSTBLrow("PROGRESSYEAR")
+            End If
+
             '取得年月日
             If WW_COLUMNS.IndexOf("GETDATE") >= 0 Then
                 OIM0005INProw("GETDATE") = XLSTBLrow("GETDATE")
+
+            End If
+
+            '取得年月日より現在経年を自動計算する
+            If Not String.IsNullOrEmpty(OIM0005INProw("GETDATE")) Then
+                Try
+                    Dim yearDiff = Date.Now.Year - CDate(OIM0005INProw("GETDATE")).Year
+                    If yearDiff > 0 Then
+                        OIM0005INProw("PROGRESSYEAR") = yearDiff
+                    Else
+                        OIM0005INProw("PROGRESSYEAR") = 0
+                    End If
+                Catch ex As Exception
+                    OIM0005INProw("PROGRESSYEAR") = 0
+                End Try
             End If
 
             '車籍編入年月日
@@ -3322,11 +3342,6 @@ Public Class OIM0005TankList
                 Else
                     OIM0005INProw("OBTAINEDNAME") = ""
                 End If
-            End If
-
-            '現在経年
-            If WW_COLUMNS.IndexOf("PROGRESSYEAR") >= 0 Then
-                OIM0005INProw("PROGRESSYEAR") = XLSTBLrow("PROGRESSYEAR")
             End If
 
             '次回全検時経年
@@ -4226,8 +4241,8 @@ Public Class OIM0005TankList
             End If
 
             '取得年月日(バリデーションチェック)
-            WW_TEXT = OIM0005INProw("ALLINSPECTIONDATE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            WW_TEXT = OIM0005INProw("GETDATE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "GETDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 If WW_TEXT <> "" Then
                     '年月日チェック
@@ -4239,7 +4254,7 @@ Public Class OIM0005TankList
                         WW_LINE_ERR = "ERR"
                         O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     Else
-                        OIM0005INProw("ALLINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                        OIM0005INProw("GETDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
                     End If
                 End If
             Else
@@ -4956,6 +4971,31 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            ' 次回全検年月日（バリデーションチェック）
+            WW_TEXT = OIM0005INProw("ALLINSPECTIONDATE")
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If WW_TEXT <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(WW_TEXT, "次回全検年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回全検年月日入力エラー)です。"
+                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        OIM0005INProw("ALLINSPECTIONDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(次回全検年月日入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
             ' 前回全検年月日（バリデーションチェック）
             WW_TEXT = OIM0005INProw("PREINSPECTIONDATE")
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PREINSPECTIONDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -4975,31 +5015,6 @@ Public Class OIM0005TankList
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(前回全検年月日入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            ' 取得年月日（バリデーションチェック）
-            WW_TEXT = OIM0005INProw("GETDATE")
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "GETDATE", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                If WW_TEXT <> "" Then
-                    '年月日チェック
-                    WW_CheckDate(WW_TEXT, "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                    If dateErrFlag = "1" Then
-                        WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
-                        WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                        WW_LINE_ERR = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    Else
-                        OIM0005INProw("GETDATE") = CDate(WW_TEXT).ToString("yyyy/MM/dd")
-                    End If
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"

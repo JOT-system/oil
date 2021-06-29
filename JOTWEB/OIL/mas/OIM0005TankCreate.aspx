@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIM0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIM0005CH" ContentPlaceHolderID="head" runat="server">
-<%--    <link href='<%=ResolveUrl("~/OIL/css/OIM0005C.css")%>' rel="stylesheet" type="text/css" />--%>
+    <link href='<%=ResolveUrl("~/OIL/css/OIM0005C.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0005C.js")%>'></script>
     <script type="text/javascript">
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
@@ -500,6 +500,17 @@
                     </span>
                 </p>
 
+                <p id="KEY_LINE_27.1">
+                    <!-- 全検計画年月 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_ALLINSPECTPLANYM_L" runat="server" Text="全検計画年月" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_ALLINSPECTPLANYM', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
+                            <asp:TextBox ID="WF_ALLINSPECTPLANYM" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_ALLINSPECTPLANYM_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
                 <p id="KEY_LINE_28">
                     <!-- 次回全検年月日(JR)  -->
                     <span class="ef">
@@ -509,7 +520,7 @@
                         </span>
                         <asp:Label ID="WF_JRALLINSPECTIONDATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                    
+
                     <!-- 次回全検年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_ALLINSPECTIONDATE_L" runat="server" Text="次回全検年月日" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -528,31 +539,31 @@
                             <asp:TextBox ID="WF_PREINSPECTIONDATE" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_PREINSPECTIONDATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                    
-                    <!-- 全検計画年月 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ALLINSPECTPLANYM_L" runat="server" Text="全検計画年月" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_ALLINSPECTPLANYM', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
-                            <asp:TextBox ID="WF_ALLINSPECTPLANYM" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="WF_ALLINSPECTPLANYM_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                </p>
-
-                <p id="KEY_LINE_30">
-                    <!-- 現在経年 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_PROGRESSYEAR_L" runat="server" Text="現在経年" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_PROGRESSYEAR" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_PROGRESSYEAR_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
+                    </span>                    
 
                     <!-- 次回全検時経年 -->
                     <span class="ef">
                         <asp:Label ID="WF_NEXTPROGRESSYEAR_L" runat="server" Text="次回全検時経年" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_NEXTPROGRESSYEAR" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_NEXTPROGRESSYEAR_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_30">
+                    <!-- 取得先C -->
+                    <span class="ef">
+                        <asp:Label ID="WF_OBTAINEDCODE_L" runat="server" Text="取得先C" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_OBTAINEDCODE', <%=LIST_BOX_CLASSIFICATION.LC_OBTAINED%>);" onchange="TextBox_change('WF_OBTAINEDCODE');">
+                            <asp:TextBox ID="WF_OBTAINEDCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+
+                    <!-- 取得価格 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_PURCHASEPRICE_L" runat="server" Text="取得価格" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_PURCHASEPRICE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
+                        <asp:Label ID="WF_PURCHASEPRICE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
@@ -565,25 +576,16 @@
                         </span>
                         <asp:Label ID="WF_GETDATE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                    
-                    <!-- 取得先C -->
+
+                    <!-- 現在経年 -->
                     <span class="ef">
-                        <asp:Label ID="WF_OBTAINEDCODE_L" runat="server" Text="取得先C" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_OBTAINEDCODE', <%=LIST_BOX_CLASSIFICATION.LC_OBTAINED%>);" onchange="TextBox_change('WF_OBTAINEDCODE');">
-                            <asp:TextBox ID="WF_OBTAINEDCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_PROGRESSYEAR_L" runat="server" Text="現在経年" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_PROGRESSYEAR" runat="server" CssClass="WF_TEXTBOX_CSS" ReadOnly="true"></asp:TextBox>
+                        <asp:Label ID="WF_PROGRESSYEAR_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
                 <p id="KEY_LINE_31.1">
-                    <!-- 取得価格 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_PURCHASEPRICE_L" runat="server" Text="取得価格" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_PURCHASEPRICE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
-                        <asp:Label ID="WF_PURCHASEPRICE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-
                     <!-- 車籍編入年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日"  CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -592,9 +594,7 @@
                         </span>
                         <asp:Label ID="WF_TRANSFERDATE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
 
-                <p id="KEY_LINE_31.2">
                     <!-- 車籍除外年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_EXCLUDEDATE_L" runat="server" Text="車籍除外年月日" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -603,7 +603,9 @@
                         </span>
                         <asp:Label ID="WF_EXCLUDEDATE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
 
+                <p id="KEY_LINE_31.2">
                     <!-- 資産除却年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_RETIRMENTDATE_L" runat="server" Text="資産除却年月日" CssClass="WF_TEXT_LABEL"></asp:Label>

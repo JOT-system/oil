@@ -1355,6 +1355,33 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_SPECIFIEDDATE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_ALLINSPECTPLANYM_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLINSPECTPLANYM_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ALLINSPECTPLANYM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLINSPECTPLANYM As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ALLINSPECTPLANYM_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ALLINSPECTPLANYM_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_JRALLINSPECTIONDATE_L コントロール。
     '''</summary>
     '''<remarks>
@@ -1436,60 +1463,6 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_PREINSPECTIONDATE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_ALLINSPECTPLANYM_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ALLINSPECTPLANYM_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_ALLINSPECTPLANYM コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ALLINSPECTPLANYM As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_ALLINSPECTPLANYM_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ALLINSPECTPLANYM_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_PROGRESSYEAR_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_PROGRESSYEAR_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_PROGRESSYEAR コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_PROGRESSYEAR As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_PROGRESSYEAR_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_PROGRESSYEAR_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_NEXTPROGRESSYEAR_L コントロール。
     '''</summary>
     '''<remarks>
@@ -1515,33 +1488,6 @@ Partial Public Class OIM0005TankCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_NEXTPROGRESSYEAR_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_GETDATE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GETDATE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_GETDATE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GETDATE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_GETDATE_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GETDATE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_OBTAINEDCODE_L コントロール。
@@ -1596,6 +1542,60 @@ Partial Public Class OIM0005TankCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PURCHASEPRICE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_GETDATE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_GETDATE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_GETDATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_GETDATE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_GETDATE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_GETDATE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_PROGRESSYEAR_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_PROGRESSYEAR_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_PROGRESSYEAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_PROGRESSYEAR As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_PROGRESSYEAR_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_PROGRESSYEAR_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_TRANSFERDATE_L コントロール。

@@ -4877,6 +4877,7 @@ Public Class OIT0003OrderList
                 & " AND OIT0003.STACKINGFLG = '1' "
 
         Dim dtShipClose As DataTable = New DataTable
+        Dim chkShipCloseFlg As String = "0"
         '○チェックボックス(当月積込、翌月発分を含める)未選択
         If ChkEndMonthChk.Checked = False Then
             SQLStrAri &=
@@ -4884,11 +4885,13 @@ Public Class OIT0003OrderList
         Else
             '○出荷休業日マスタに設定されているかチェック
             If CMNPTS.ChkShipClose(SQLcon, BaseDllConst.CONST_OFFICECODE_010402, lodDate, "1", dtShipClose) = True Then
+                chkShipCloseFlg = "1"
                 SQLStrAri &=
                   String.Format(" AND OIT0003.ACTUALLODDATE = '{0}' ", Format(Date.Parse(lodDate).AddDays(-1), "yyyy/MM/dd"))
             ElseIf CMNPTS.ChkShipClose(SQLcon, BaseDllConst.CONST_OFFICECODE_010402, lodDate, "2", dtShipClose) = True Then
-                SQLStrAri &=
-                  String.Format(" AND OIT0003.ACTUALLODDATE = '{0}' ", Format(Date.Parse(lodDate).AddDays(1), "yyyy/MM/dd"))
+                chkShipCloseFlg = "2"
+                '    SQLStrAri &=
+                '      String.Format(" AND OIT0003.ACTUALLODDATE = '{0}' ", Format(Date.Parse(lodDate).AddDays(1), "yyyy/MM/dd"))
             Else
                 SQLStrAri &=
                   " AND OIT0003.ACTUALLODDATE = @P03 "
@@ -4988,7 +4991,11 @@ Public Class OIT0003OrderList
 
                 '★出荷休業日マスタと一致した場合(月末休業日)
                 If dtShipClose.Rows.Count <> 0 Then
-                    SQLStrAri &= "AND OIT0002.TRAINNO IN ("
+                    If chkShipCloseFlg = "2" Then
+                        SQLStrAri &= "AND OIT0002.TRAINNO NOT IN ("
+                    Else
+                        SQLStrAri &= "AND OIT0002.TRAINNO IN ("
+                    End If
                     For Each dtShipCloserow As DataRow In dtShipClose.Rows
                         If dtShipCloserow("LINECNT") = "1" Then
                             SQLStrAri &= "'" + Convert.ToString(dtShipCloserow("TRAINNO")) + "'"

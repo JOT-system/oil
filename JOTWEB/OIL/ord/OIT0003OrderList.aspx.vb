@@ -6863,8 +6863,8 @@ Public Class OIT0003OrderList
             & " , OIM0029.VALUE02                                AS OILOUTCODE" _
             & " , CONVERT(INT, OIT0003.CARSAMOUNT * 1000)        AS CARSAMOUNT" _
             & " , CASE OIT0002.CONSIGNEECODE " _
-            & "        WHEN '10' THEN '北信（油）'" _
-            & "        WHEN '20' THEN '甲府（油）'" _
+            & String.Format("        WHEN '{0}' THEN '北信（油）'", BaseDllConst.CONST_CONSIGNEECODE_10) _
+            & String.Format("        WHEN '{0}' THEN '甲府（油）'", BaseDllConst.CONST_CONSIGNEECODE_20) _
             & "        ELSE '' " _
             & "   END AS CONSIGNEENAME" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
@@ -6916,9 +6916,9 @@ Public Class OIT0003OrderList
                 PARA05.Value = "LOAD_OILCODE"
                 Select Case tyohyoType
                     Case CONST_CSV_ACTUALLOAD_10
-                        PARA06.Value = "10"
+                        PARA06.Value = BaseDllConst.CONST_CONSIGNEECODE_10
                     Case CONST_CSV_ACTUALLOAD_20
-                        PARA06.Value = "20"
+                        PARA06.Value = BaseDllConst.CONST_CONSIGNEECODE_20
                 End Select
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -8110,7 +8110,8 @@ Public Class OIT0003OrderList
                 P_OFFICECODE.Value = officeCode
                 P_LODDATE.Value = lodDate
                 'P_TRAINNO.Value = trainNo
-                P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
+                P_SHIPPERSCODE.Value = BaseDllConst.CONST_SHIPPERCODE_0122700010
+                'P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
 
@@ -8301,7 +8302,8 @@ Public Class OIT0003OrderList
                 P_OFFICECODE.Value = officeCode
                 P_LODDATE.Value = lodDate
                 P_TRAINNO.Value = trainNo
-                P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
+                P_SHIPPERSCODE.Value = BaseDllConst.CONST_SHIPPERCODE_0122700010
+                'P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
 
@@ -8506,7 +8508,8 @@ Public Class OIT0003OrderList
                 P_OFFICECODE.Value = officeCode
                 P_LODDATE.Value = lodDate
                 P_TRAINNO.Value = trainNo
-                P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
+                P_SHIPPERSCODE.Value = BaseDllConst.CONST_SHIPPERCODE_0122700010
+                'P_SHIPPERSCODE.Value = CONST_SHIPPERSCODE_0122700010
                 P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 P_DELFLG.Value = C_DELETE_FLG.DELETE
 

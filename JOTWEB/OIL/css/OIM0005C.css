@@ -1,2 +1,6 @@
 ﻿body {
 }
+
+input#WF_PROGRESSYEAR {
+    background-color: #e6f1e6;
+}

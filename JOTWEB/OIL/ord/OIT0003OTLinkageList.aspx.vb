@@ -2394,6 +2394,7 @@ Public Class OIT0003OTLinkageList
                 '★出荷休業日チェック(対象受注が出荷休業日対象で、他に受注オーダーであった場合は含める。)
                 For Each OIT0003row As DataRow In cpcheckedRow.Rows
                     CMNPTS.ChkShipCloseOrder(SQLcon, BaseDllConst.CONST_OFFICECODE_010402,
+                                             Convert.ToString(OIT0003row("TRAINNO")),
                                              Convert.ToString(OIT0003row("ORDERNO")), checkedRow)
                 Next
 

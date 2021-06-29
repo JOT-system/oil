@@ -1337,6 +1337,7 @@ Public Class CmnParts
     ''' <param name="I_ORDERNO">受注No</param>
     Public Sub ChkShipCloseOrder(ByVal SQLcon As SqlConnection,
                                  ByVal I_OFFICECODE As String,
+                                 ByVal I_TRAINNO As String,
                                  ByVal I_ORDERNO As String,
                                  ByRef checkedRow As DataTable)
 
@@ -1353,7 +1354,7 @@ Public Class CmnParts
         dtShipClose.Clear()
 
         Dim SQLStr As String =
-              " SELECT " _
+              " SELECT DISTINCT " _
             & "   OIT0002.ORDERNO" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
@@ -1376,7 +1377,7 @@ Public Class CmnParts
             & "     AND FORMAT(OIM0034.SHIPCLOSEDATE,'yyyy/MM') = FORMAT(GETDATE(),'yyyy/MM') " _
             & " ) SHIPCLOSETBL ON " _
             & "     OIT0002.OFFICECODE = SHIPCLOSETBL.OFFICECODE " _
-            & " AND OIT0002.TRAINNO = SHIPCLOSETBL.TRAINNO " _
+            & String.Format(" AND OIT0002.TRAINNO = '{0}' ", I_TRAINNO) _
             & " AND OIT0003.ACTUALLODDATE = SHIPCLOSETBL.SHIPRESCHEDULE " _
             & String.Format(" WHERE OIT0002.ORDERNO <> '{0}'", I_ORDERNO)
 

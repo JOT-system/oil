@@ -48,9 +48,9 @@
 
                     <div class="rightSide">
                         <div style="display:none;">
+                        </div>
                         <input type="button" id="WF_ButtonOTCOMPARE" class="btn-sticky" value="OT取込結果"  onclick ="ButtonClick('WF_ButtonOTCOMPARE');" />
                         <input type="button" id="WF_ButtonOTINSERT" class="btn-sticky" value="OT空回日報取込"  onclick ="ButtonClick('WF_ButtonOTINSERT');" />
-                        </div>
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="新規登録"        onclick ="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"           onclick="ButtonClick('WF_ButtonCSV');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"               onclick="ButtonClick('WF_ButtonEND');" />

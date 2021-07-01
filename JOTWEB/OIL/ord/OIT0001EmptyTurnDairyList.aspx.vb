@@ -4080,6 +4080,7 @@ Public Class OIT0001EmptyTurnDairyList
                 '○登録済みの受注進行ステータスを取得
                 CMNPTS.SelectOrder(SQLcon, I_ORDERNO:=Convert.ToString(OIT0001Cmprow("KEYCODE1")), O_dtORDER:=dtOrder)
                 '★受注進行ステータスが"100"(受注受付)ではない場合は、追加しない。(SKIP)
+                If dtOrder.Rows.Count = 0 Then Continue For
                 If Convert.ToString(dtOrder.Rows(0)("ORDERSTATUS")) <> BaseDllConst.CONST_ORDERSTATUS_100 Then
                     Continue For
                 End If

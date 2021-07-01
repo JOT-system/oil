@@ -1356,6 +1356,7 @@ Public Class CmnParts
         Dim SQLStr As String =
               " SELECT DISTINCT " _
             & "   OIT0002.ORDERNO" _
+            & " , SHIPCLOSETBL.SHIPCLOSEDATE" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0002.ORDERNO = OIT0003.ORDERNO " _
@@ -1395,7 +1396,9 @@ Public Class CmnParts
 
                 For Each OIT0003row As DataRow In dtShipClose.Rows
                     Dim dtSendairow As DataRow = checkedRow.NewRow
+                    dtSendairow("LINECNT") = "9999"
                     dtSendairow("ORDERNO") = OIT0003row("ORDERNO")
+                    dtSendairow("LODDATE") = Format(OIT0003row("SHIPCLOSEDATE"), "yyyy/MM/dd")
                     checkedRow.Rows.Add(dtSendairow)
                 Next
             End Using

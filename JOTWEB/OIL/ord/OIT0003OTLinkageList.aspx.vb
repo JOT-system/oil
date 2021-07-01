@@ -2382,7 +2382,7 @@ Public Class OIT0003OTLinkageList
 
         '一覧で指定された受注№を条件に設定
         Dim j As Integer = 0
-        Dim checkedRow As DataTable
+        Dim checkedRow As DataTable = New DataTable
         'Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
         If IsNothing(I_ORDERNO) Then
             checkedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
@@ -2479,6 +2479,15 @@ Public Class OIT0003OTLinkageList
                     '○ テーブル検索結果をテーブル格納
                     wrkDt.Load(SQLdr)
                 End Using
+
+                '★出荷休業日対象のオーダーの発送日を変更(仙台新港営業所のみ)
+                If work.WF_SEL_OTS_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                    For Each OIT0003row As DataRow In checkedRow.Select("LINECNT='9999'")
+                        For Each wrkDtrow As DataRow In wrkDt.Select("ORDERNO='" + Convert.ToString(OIT0003row("ORDERNO")) + "'")
+                            wrkDtrow("LODDATE") = OIT0003row("LODDATE").ToString().Replace("/", "")
+                        Next
+                    Next
+                End If
 
                 '○タンク車合計の設定
                 For Each wrkDtrow As DataRow In wrkDt.Rows

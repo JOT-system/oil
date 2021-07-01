@@ -1138,7 +1138,7 @@ Public Structure CS0023XLSUPLOAD
                 ElseIf String.IsNullOrEmpty(xlsTrainNo) OrElse
                     xlsTrainNo = regCircleNum.Replace(svTrainNo, "") OrElse
                     svTrainNo = regCircleNum.Replace(xlsTrainNo, "") Then
-                    If xlsOil <> "●" Then
+                    If xlsOil <> "●" AndAlso xlsOil <> "○" Then
                         '初回以降
                         xlsTrainNo = svTrainNo
                         blnTestFlg = False

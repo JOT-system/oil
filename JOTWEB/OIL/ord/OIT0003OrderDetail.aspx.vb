@@ -6899,7 +6899,8 @@ Public Class OIT0003OrderDetail
             MAPDataADDTab4(SQLcon)
 
             '★受注進行ステータスが"500"(輸送完了)の場合
-            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
                 '受注費用(TBL)追加・更新
                 WW_UpdateOrderBilling(SQLcon)
                 '受注明細費用(TBL)追加・更新
@@ -6908,7 +6909,7 @@ Public Class OIT0003OrderDetail
                 WW_UpdateOrder_TAB4(SQLcon)
 
                 '### START 受注履歴テーブルの追加(2021/06/09) #############
-                WW_InsertOrderHistory(SQLcon)
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then WW_InsertOrderHistory(SQLcon)
                 '### END   ################################################
             End If
 
@@ -12530,6 +12531,7 @@ Public Class OIT0003OrderDetail
             PARA03.Value = work.WF_SEL_BILLINGNO.Text
             If work.WF_SEL_KEIJYOYMD.Text = "" Then
                 PARA04.Value = Me.TxtActualLoadingDate.Text
+                If Me.TxtActualLoadingDate.Text = "" Then PARA04.Value = DBNull.Value
             Else
                 PARA04.Value = work.WF_SEL_KEIJYOYMD.Text
             End If

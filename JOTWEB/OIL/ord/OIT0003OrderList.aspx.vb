@@ -3890,7 +3890,9 @@ Public Class OIT0003OrderList
         Select Case tyohyoType
             '固定帳票(積込予定(共通))作成処理
             Case CONST_RPT_LOADPLAN
-                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
+                Dim fileName As String = "_LOADPLAN.xlsx"
+                If officeCode = BaseDllConst.CONST_OFFICECODE_012401 Then fileName = "_YOKKAICHI_LOADPLAN.xlsx"
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & fileName, OIT0003Reporttbl)
                     Dim url As String
                     Try
                         url = repCbj.CreateExcelPrintData(tyohyoType, officeCode, lodDate:=Me.txtReportLodDate.Text)

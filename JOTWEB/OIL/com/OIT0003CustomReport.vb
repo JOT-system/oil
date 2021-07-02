@@ -102,7 +102,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 OrElse excelFileName = "OIT0003D_DELIVERYPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
-            ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" OrElse excelFileName = "OIT0003L_OTLOADPLAN.xlsx" Then
+            ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" _
+                OrElse excelFileName = "OIT0003L_OTLOADPLAN.xlsx" _
+                OrElse excelFileName = "OIT0003L_YOKKAICHI_LOADPLAN.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             ElseIf excelFileName = "OIT0003L_MIESHIOHAMA_LOADPLAN.xlsx" Then
@@ -248,17 +250,26 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
             '★不要項目を非表示
             Select Case officeCode
+                '○五井営業所
                 Case BaseDllConst.CONST_OFFICECODE_011201
                     Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("K:K").Columns.Hidden = True
+                '○甲子営業所
                 Case BaseDllConst.CONST_OFFICECODE_011202
                     Me.ExcelWorkSheet.Range("E:E").ColumnWidth = 15.25
                     Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
+                '○袖ヶ浦営業所
                 Case BaseDllConst.CONST_OFFICECODE_011203
                     Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("G:G").Columns.Hidden = True
+                '○四日市営業所
+                Case BaseDllConst.CONST_OFFICECODE_012401
+                    Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
+                    Me.ExcelWorkSheet.Range("L:L").Columns.Hidden = True
+                    Me.ExcelWorkSheet.Range("N:N").Columns.Hidden = True
+                    Me.ExcelWorkSheet.Range("O:O").Columns.Hidden = True
             End Select
 
         Catch ex As Exception
@@ -345,18 +356,38 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 '### 出力項目（空白） #####################################
                 '◯ 積込ポイント
                 '### 出力項目（空白） #####################################
-                '◯ 油種
-                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
-                ExcelMemoryRelease(rngDetailArea)
-                '◯ 型式
-                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("MODEL")
-                ExcelMemoryRelease(rngDetailArea)
-                '◯ 車番
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("TANKNUMBER")
-                ExcelMemoryRelease(rngDetailArea)
+
+                '    ★四日市営業所以外の場合
+                If officeCode <> BaseDllConst.CONST_OFFICECODE_012401 Then
+                    '◯ 油種
+                    rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
+                    ExcelMemoryRelease(rngDetailArea)
+                    '◯ 型式
+                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("MODEL")
+                    ExcelMemoryRelease(rngDetailArea)
+                    '◯ 車番
+                    rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("TANKNUMBER")
+                    ExcelMemoryRelease(rngDetailArea)
+
+                    '★四日市営業所の場合
+                Else
+                    '◯ 油種
+                    rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
+                    ExcelMemoryRelease(rngDetailArea)
+                    '◯ 型式
+                    rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("MODEL")
+                    ExcelMemoryRelease(rngDetailArea)
+                    '◯ 車番
+                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("TANKNUMBER")
+                    ExcelMemoryRelease(rngDetailArea)
+                End If
+
                 '◯ 予約数量
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("RESERVEAMOUNT")

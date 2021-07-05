@@ -149,12 +149,14 @@
             Case "OIT0001L"
                 SQLStr &=
                   "   WHERE OIT0002.ORDERNO IN ( "
+                Dim i As Integer = 1
                 For Each dtrow As DataRow In dt.Select("OPERATION='on'")
-                    If dtrow("LINECNT") = 1 Then
+                    If i = 1 Then
                         SQLStr &= "'" + dtrow("ORDERNO") + "'"
                     Else
                         SQLStr &= ",'" + dtrow("ORDERNO") + "'"
                     End If
+                    i += 1
                 Next
                 SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
 
@@ -190,12 +192,14 @@
             Case "OIT0001L"
                 SQLStr &=
                   "   WHERE OIT0002.ORDERNO IN ( "
+                Dim i As Integer = 1
                 For Each dtrow As DataRow In dt.Select("OPERATION='on'")
-                    If dtrow("LINECNT") = 1 Then
+                    If i = 1 Then
                         SQLStr &= "'" + dtrow("ORDERNO") + "'"
                     Else
                         SQLStr &= ",'" + dtrow("ORDERNO") + "'"
                     End If
+                    i += 1
                 Next
                 SQLStr &= ")" & " AND OIT0002.DELFLG <> @P02 "
 

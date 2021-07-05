@@ -6,6 +6,7 @@
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0006WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC"  %>
 
 <asp:Content ID="OIT0006LH" ContentPlaceHolderID="head" runat="server">
     <link href='<%=ResolveUrl("~/OIL/css/OIT0006L.css")%>' rel="stylesheet" type="text/css" /> 
@@ -13,6 +14,8 @@
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+        //共通ポップアップボタン名
+        var customPopUpOkButtonName = 'ﾀﾞｳﾝﾛｰﾄﾞ';
     </script>
 </asp:Content>
 
@@ -41,6 +44,7 @@
                     <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="回送新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
                     <a style="display:none;">
                         <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                    <input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />
                     </a>
                     <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                     <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
@@ -92,10 +96,49 @@
 
         <!-- 一覧・詳細画面切替用フラグ -->
         <input id="WF_BOXChange" runat="server" value="headerbox" type="text" />
+        <!-- 帳票フラグ -->
+        <input id="WF_TYOHYOFLG" runat="server" value="" type="text" />
 
         <!-- ボタン押下 -->
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+    </div>
+</asp:Content>
+
+<%--ポップアップタイトルバーの文字--%>
+<asp:Content ID="ctCostumPopUpTitle" ContentPlaceHolderID ="contentsPopUpTitle" runat="server">
+    帳票
+</asp:Content>
+<%--ポップアップタイトルバーの内容--%>
+<asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
+    <div class="grc0001Wrapper">
+        <span id="spnReportDateNowChk">
+            <asp:Label ID="lblReportDateNowChk" runat="server" Text=""></asp:Label>
+            <a id="aReportDateNowChk" onclick="reportDatrNowButton();" >
+                <asp:CheckBox ID="chkReportDateNowChk" runat="server" Text="当日" />
+            </a>
+        </span>
+        <span id="spnDepDate">
+            <asp:Label ID="lblReportDepDate" runat="server" Text="発送日"></asp:Label>
+            <a class="ef" id="aReportDepDate" ondblclick="Field_DBclick('txtReportDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportDepDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+    <br/>
+    <div>
+        <MSINC:tilelist ID="tileSalesOffice" runat="server" />
+    </div>
+
+    <div class="grc0001Wrapper">
+        <ul>
+            <li>
+                <asp:RadioButton ID="rbStationInspectionDateBtn" runat="server" GroupName="WF_SW" Text="貨物運送状(交検)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbStationALLInspectionDateBtn" runat="server" GroupName="WF_SW" Text="貨物運送状(全検)" onclick="reportRadioButton();" />
+            </li>
+        </ul>
     </div>
 </asp:Content>

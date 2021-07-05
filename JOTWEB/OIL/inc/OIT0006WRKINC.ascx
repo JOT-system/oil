@@ -134,6 +134,11 @@
     <!-- 受注№ -->
     <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
 
+    <!-- 帳票ポップアップ(営業所(コード)) -->
+    <asp:TextBox ID="WF_SEL_TH_ORDERSALESOFFICECODE" runat="server"></asp:TextBox>
+    <!-- 帳票ポップアップ(営業所(名)) -->
+    <asp:TextBox ID="WF_SEL_TH_ORDERSALESOFFICENAME" runat="server"></asp:TextBox>
+
     <!-- ■共通 -->
     <!-- 作成フラグ -->
     <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>

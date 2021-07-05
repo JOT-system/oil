@@ -203,6 +203,15 @@ Partial Public Class OIT0006OutOfServiceList
     Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_TYOHYOFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TYOHYOFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>
@@ -219,6 +228,69 @@ Partial Public Class OIT0006OutOfServiceList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''lblReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportDateNowChk As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''chkReportDateNowChk コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkReportDateNowChk As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
+    '''lblReportDepDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportDepDate As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportDepDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportDepDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''tileSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+    
+    '''<summary>
+    '''rbStationInspectionDateBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbStationInspectionDateBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbStationALLInspectionDateBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbStationALLInspectionDateBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''Master プロパティ。

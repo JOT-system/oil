@@ -29,3 +29,26 @@ div[data-generated="1"] td:nth-child(4) {
 .headerboxOnly {
     min-width: 750px; /* (共通指定 650pxだと小さすぎる為) */
 }
+
+/* 帳票ポップアップ個別指定*/
+#txtReportDepDate{
+    width: 150px !important;
+}
+.calendarIconArea div {
+    margin-top: calc(100% - 14px) !important;
+}
+.boxIconArea div {
+    margin-top: calc(100% - 14px) !important;
+}
+/* ポップアップボタン3列から4列に変更 */
+#divContentsPopUp {
+    width: 650px; /* 共通は500pxから変更 */
+    min-width: 650px;
+    margin-left: calc(50vw - 325px) /* 中央位置表示位置も横幅アップの為calc(50vw - 250px)から調整 */
+}
+#divContentsPopUp .grc0001Wrapper ul {
+    width:600px; /* 共通は450px で３列折り返しから４列折り返しに */
+}
+.grc0001Wrapper input[type=checkbox] + label {
+    display: inline-flex;
+}

@@ -79,6 +79,10 @@ Public Class OIT0006OutOfServiceList
                             WF_RIGHTBOX_Change()
                         Case "btnCommonConfirmOk"       '確認メッセージ
                             WW_UpdateKaisouStatusCancel()
+                        Case "tileSalesOffice"          '帳票ポップアップ(営業所(チェックボックス)選択)
+                            WF_TyohyoSalesOfficeSelect()
+                        Case "WF_ButtonOkCommonPopUp"   '帳票ポップアップ(ダウンロードボタン押下)
+                            WF_TyohyoDownloadClick()
                     End Select
 
                     '○ 一覧再表示処理
@@ -94,6 +98,16 @@ Public Class OIT0006OutOfServiceList
                 WF_MAPpermitcode.Value = "TRUE"
             Else
                 WF_MAPpermitcode.Value = "FALSE"
+            End If
+
+            '○ 帳票ボタン(活性・非活性)設定
+            If Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_010006 _
+                OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_010007 _
+                OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_012301 _
+                OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_012402 Then
+                WF_TYOHYOFLG.Value = "TRUE"
+            Else
+                WF_TYOHYOFLG.Value = "FALSE"
             End If
 
         Finally
@@ -171,6 +185,27 @@ Public Class OIT0006OutOfServiceList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0006D Then
             Master.RecoverTable(OIT0006tbl, work.WF_SEL_INPTBL.Text)
         End If
+
+        '### 帳票ポップアップの設定 ###################################################################
+        '〇仮置き
+        Dim paramData As Hashtable = work.CreateFIXParam(Master.USER_ORG)
+        '★三重塩浜営業所のみ
+        paramData.Item(C_PARAMETERS.LP_COMPANY) = BaseDllConst.CONST_OFFICECODE_012402
+
+        Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE_KAISOU
+        Me.tileSalesOffice.ParamData = paramData
+        Me.tileSalesOffice.LeftObj = leftview
+        Me.tileSalesOffice.SelectionMode = ListSelectionMode.Single
+        Me.tileSalesOffice.NeedsPostbackAfterSelect = True
+        Me.tileSalesOffice.SetTileValues()
+
+        'ラジオボタンを非表示にする。
+        Me.rbStationInspectionDateBtn.Visible = False
+        Me.rbStationALLInspectionDateBtn.Visible = False
+
+        '(帳票)発送日に翌日を設定
+        Me.txtReportDepDate.Text = Format(Now.AddDays(1), "yyyy/MM/dd")
+        '##############################################################################################
 
         ''○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
@@ -1113,6 +1148,76 @@ Public Class OIT0006OutOfServiceList
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
+
+#Region "帳票ポップアップ"
+    ''' <summary>
+    ''' 帳票ポップアップ(営業所(チェックボックス)選択)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_TyohyoSalesOfficeSelect()
+
+        '選択したチェックボックス(営業所)の名称を取得
+        work.WF_SEL_TH_ORDERSALESOFFICENAME.Text = tileSalesOffice.GetSelectedSingleText()
+        '選択したチェックボックス(営業所)のコードを取得
+        work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
+
+        '★初期化
+        'ラジオボタンを非表示にする。
+        Me.rbStationInspectionDateBtn.Visible = False
+        Me.rbStationALLInspectionDateBtn.Visible = False
+
+        Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
+            '◯三重塩浜営業所
+            Case BaseDllConst.CONST_OFFICECODE_012402
+                '貨物運送状(交検)(ラジオボタン)を表示
+                Me.rbStationInspectionDateBtn.Visible = True
+                '貨物運送状(全検)(ラジオボタン)を表示
+                Me.rbStationALLInspectionDateBtn.Visible = True
+
+            Case Else
+                '### すべてのラジオボタン非表示のまま ##########
+
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票ポップアップ(ダウンロードボタン押下)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_TyohyoDownloadClick()
+        '◯ 発送日(空白)チェック
+        If Me.txtReportDepDate.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "発送日が未設定です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '◯ 営業所(未選択)チェック
+        If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "営業所が未選択です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '◯ 帳票(未選択)チェック
+        If Me.rbStationInspectionDateBtn.Checked = False _
+            AndAlso Me.rbStationALLInspectionDateBtn.Checked = False Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "帳票が未選択です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '★ 各営業所の固定帳票
+        Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
+            '◯ 三重塩浜営業所
+            Case BaseDllConst.CONST_OFFICECODE_012402
+                If Me.rbStationInspectionDateBtn.Checked = True Then            '■貨物運送状(交検)を選択
+
+                ElseIf Me.rbStationALLInspectionDateBtn.Checked = True Then     '■貨物運送状(全検)を選択
+
+                End If
+        End Select
+
+    End Sub
+#End Region
 
     ''' <summary>
     ''' (タンク車所在TBL)所在地の内容を更新

@@ -15,6 +15,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 帳票ボタン活性／非活性
+    if (document.getElementById('WF_TYOHYOFLG').value === "TRUE") {
+        //活性
+        document.getElementById("WF_ButtonTyohyo").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonTyohyo").disabled = "disabled";
+    }
+
     //更新ボタン活性／非活性
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
@@ -106,4 +116,20 @@ function ChangeOrgUse(obj, lineCnt) {
             trlst[i].getElementsByTagName("td")[2].disabled = false;
         }
     }
+}
+
+// ○帳票(当日ボタンクリック)
+function reportDatrNowButton() {
+    var date = new Date();
+
+    if (document.getElementById("chkReportDateNowChk").checked) {
+        //当日を設定
+        document.getElementById("txtReportDepDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + date.getDate()).slice(-2);
+    } else {
+        //翌日を設定
+        document.getElementById("txtReportDepDate").value =
+            date.getFullYear() + "/" + ("00" + (date.getMonth() + 1)).slice(-2) + "/" + ("00" + (date.getDate() + 1)).slice(-2);
+    }
+
 }

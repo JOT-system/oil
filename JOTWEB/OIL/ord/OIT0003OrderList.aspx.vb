@@ -8634,6 +8634,7 @@ Public Class OIT0003OrderList
             & "     , OIT0003.ORDERINGTYPE                       AS ORDERINGTYPE " _
             & "     , ISNULL(OIM0003.REPORTOILNAME, '')          AS REPORTOILNAME " _
             & "     , OIT0003.CARSAMOUNT                         AS CARSAMOUNT " _
+            & "     , OIM0005.JRINSPECTIONDATE                   AS JRINSPECTIONDATE " _
             & " FROM " _
             & "     OIL.OIT0002_ORDER OIT0002 " _
             & "     INNER JOIN OIL.OIT0003_DETAIL OIT0003 " _

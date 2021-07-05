@@ -3163,12 +3163,20 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     rngDetailArea.Value = PrintDatarow("TANKNO")
                 End If
                 ExcelMemoryRelease(rngDetailArea)
-                '油種名
+                '### 20210705 START 指摘票No518(タンク車出荷連絡票対応) #######################################
+                '交検
                 rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+                ExcelMemoryRelease(rngDetailArea)
+                '### 20210705 END   指摘票No518(タンク車出荷連絡票対応) #######################################
+                '油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
                 ExcelMemoryRelease(rngDetailArea)
                 '数量
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("V" + i.ToString())
+                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("CARSAMOUNT")
                 ExcelMemoryRelease(rngDetailArea)
                 i += 1

@@ -4172,9 +4172,21 @@ Public Class OIT0001EmptyTurnDairyList
             '○受注明細TBLに変更分のJOINTを反映
             For Each OIT0001OTDetailrow As DataRow In OIT0001OTDetailtbl.Select("ORDERNO='" + OIT0001Cmprow("OT_ORDERNO") + "' AND OTDETAILNO='" + OIT0001Cmprow("OT_DETAILNO") + "'")
                 '★受注明細TBLのJOINTコードを更新
-                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_JOINTCODE"), I_PARA:="JOINTCODE")
+                Dim OT_JOINTCODE As String = ""
+                Try
+                    OT_JOINTCODE = OIT0001Cmprow("OT_JOINTCODE")
+                Catch ex As Exception
+                    OT_JOINTCODE = ""
+                End Try
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OT_JOINTCODE, I_PARA:="JOINTCODE")
                 '★受注明細TBLのJOINTを更新
-                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OIT0001Cmprow("OT_JOINT"), I_PARA:="JOINT")
+                Dim OT_JOINT As String = ""
+                Try
+                    OT_JOINT = OIT0001Cmprow("OT_JOINT")
+                Catch ex As Exception
+                    OT_JOINT = ""
+                End Try
+                CMNPTS.UpdateOrderDetailCRT(SQLcon, OIT0001Cmprow, Master, OT_JOINT, I_PARA:="JOINT")
                 Exit For
             Next
         Next

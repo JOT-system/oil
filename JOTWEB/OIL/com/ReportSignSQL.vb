@@ -1055,6 +1055,7 @@
             & "     SELECT " _
             & "       OIT0016.IMPORTFLG " _
             & "     , OIT0016.ORDERNO " _
+            & "     , OIT0017.OTORDERNO " _
             & "     , OIT0017.OTDETAILNO " _
             & "     , OIT0016.ORDERSTATUS " _
             & "     , OIT0016.TRAINNO " _
@@ -1104,13 +1105,15 @@
 
         SQLORDERStr &=
               " OT.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OT.OTORDERNO = OIT0003.ORDERNO " _
             & " AND OT.OTDETAILNO = OIT0003.DETAILNO " _
-            & " AND OT.TRAINNO = OIT0002.TRAINNO " _
-            & " AND OT.LODDATE = OIT0002.LODDATE " _
-            & " AND OT.DEPDATE = OIT0002.DEPDATE " _
-            & " AND OT.OILCODE = OIT0003.OILCODE " _
-            & " AND OT.ORDERINGTYPE = OIT0003.ORDERINGTYPE " _
-            & " AND ISNULL(OT.JOINTCODE,'') = ISNULL(OIT0003.JOINTCODE,'') "
+        '& " AND OT.TRAINNO = OIT0002.TRAINNO " _
+        '& " AND OT.LODDATE = OIT0002.LODDATE " _
+        '& " AND OT.DEPDATE = OIT0002.DEPDATE " _
+        '& " AND OT.OILCODE = OIT0003.OILCODE " _
+        '& " AND OT.ORDERINGTYPE = OIT0003.ORDERINGTYPE " _
+        '& " AND ISNULL(OT.JOINTCODE,'') = ISNULL(OIT0003.JOINTCODE,'') "
+
         'SQLORDERStr &=
         '      " OT.ORDERNO = OIT0002.ORDERNO " _
         '    & " AND OT.OTDETAILNO = OIT0003.DETAILNO "
@@ -1288,13 +1291,14 @@
 
         SQLOTORDERStr &=
               " JOT.OFFICECODE = OIT0016.OFFICECODE " _
+            & " AND JOT.ORDERNO = OIT0017.OTORDERNO " _
             & " AND JOT.DETAILNO = OIT0017.OTDETAILNO " _
-            & " AND JOT.TRAINNO = OIT0016.TRAINNO " _
-            & " AND JOT.LODDATE = OIT0016.LODDATE " _
-            & " AND JOT.DEPDATE = OIT0016.DEPDATE " _
-            & " AND JOT.OILCODE = OIT0017.OILCODE " _
-            & " AND JOT.ORDERINGTYPE = OIT0017.ORDERINGTYPE " _
-            & " AND ISNULL(JOT.JOINTCODE,'') = ISNULL(OIT0017.JOINTCODE,'') "
+        '& " AND JOT.TRAINNO = OIT0016.TRAINNO " _
+        '& " AND JOT.LODDATE = OIT0016.LODDATE " _
+        '& " AND JOT.DEPDATE = OIT0016.DEPDATE " _
+        '& " AND JOT.OILCODE = OIT0017.OILCODE " _
+        '& " AND JOT.ORDERINGTYPE = OIT0017.ORDERINGTYPE " _
+        '& " AND ISNULL(JOT.JOINTCODE,'') = ISNULL(OIT0017.JOINTCODE,'') "
         'SQLOTORDERStr &=
         '      " JOT.ORDERNO = OIT0016.ORDERNO " _
         '    & " AND JOT.DETAILNO = OIT0017.OTDETAILNO "

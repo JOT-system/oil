@@ -2079,6 +2079,12 @@ Public Class OIT0006OutOfServiceDetail
                             Catch ex As Exception
                             End Try
 
+                            '### START ★訂正時は以下のチェックは設定しない ##############################
+                            If WF_FIELD.Value = "ACTUALEMPARRDATE" AndAlso work.WF_SEL_CORRECTIONFLG.Text = "1" Then
+                                updHeader.Item("OPERATION") = "on"
+                            End If
+                            '### END   ★訂正時は以下のチェックは設定しない ##############################
+
                         End If
 
                         '○ 画面表示データ保存

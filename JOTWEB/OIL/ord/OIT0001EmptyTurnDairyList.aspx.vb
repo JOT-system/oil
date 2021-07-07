@@ -33,6 +33,11 @@ Public Class OIT0001EmptyTurnDairyList
     '帳票用
     Private Const CONST_RPT_OTCOMPARE As String = "OTCOMPARE"       '空回日報(受注TBL, OT受注TBL)比較
 
+    '空回日報取込用
+    Private Const CONST_OT_SENDAISTATIONCD243202 As String = "243202"   '仙台新港
+    Private Const CONST_OT_SENDAISTATIONCD2407 As String = "2407"       '郡山
+    Private Const CONST_OT_SENDAISTATIONCD2018 As String = "2018"       '盛岡(タ)
+
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
@@ -938,6 +943,19 @@ Public Class OIT0001EmptyTurnDairyList
                     'strDepDateSave = Convert.ToString(OIT0001Reprow("DEPDATE"))
                     'If strDepDateSave = "" Then strTrainNosave = Convert.ToString(OIT0001Reprow("OT_DEPDATE"))
                 Next
+
+                'SELECT条件用
+                Dim sCondition As String = ""
+                '○仙台新港営業所(仙台北港 - 盛岡(タ))
+                sCondition = "OFFICECODE='" + BaseDllConst.CONST_OFFICECODE_010402 + "' "
+                sCondition &= "AND DEPSTATION='" + CONST_OT_SENDAISTATIONCD243202 + "' "
+                sCondition &= "AND ARRSTATION='" + CONST_OT_SENDAISTATIONCD2018 + "' "
+                sCondition &= "AND OT_JOINT<>'' "
+                '★仙台北港 - 盛岡(タ)間でJOINTが設定されている場合は、不要なため空白(NULL)とする。
+                For Each OIT0001Reprow As DataRow In OIT0001ReportOTComparetbl.Select(sCondition)
+                    OIT0001Reprow("OT_JOINT") = ""
+                Next
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L EXCEL_OTCOMPARE_DATAGET")
@@ -3422,6 +3440,19 @@ Public Class OIT0001EmptyTurnDairyList
                     P_RETURNDATETRAIN.Value = OIT0001OTrow("RETURNDATETRAIN")
                     P_JOINTCODE.Value = OIT0001OTrow("JOINTCODE")
                     P_JOINT.Value = OIT0001OTrow("JOINT")
+                    For Each OIT0001OTOrow As DataRow In OIT0001OTOrdertbl.Select("ORDERNO='" + OIT0001OTrow("ORDERNO") + "'")
+                        '○仙台新港営業所対応
+                        If Convert.ToString(OIT0001OTOrow("OFFICECODE")) = BaseDllConst.CONST_OFFICECODE_010402 Then
+                            '★仙台新港営業所
+                            '　仙台北港 - 盛岡(タ)間でJOINTが設定されている場合は、不要なため空白(NULL)とする。
+                            If Convert.ToString(OIT0001OTOrow("ARRSTATION")) = CONST_OT_SENDAISTATIONCD2018 Then
+                                P_JOINTCODE.Value = DBNull.Value
+                                P_JOINT.Value = DBNull.Value
+                            End If
+                        Else
+                            Exit For
+                        End If
+                    Next
                     P_REMARK.Value = OIT0001OTrow("REMARK")
                     P_CHANGETRAINNO.Value = OIT0001OTrow("CHANGETRAINNO")
                     P_CHANGETRAINNAME.Value = OIT0001OTrow("CHANGETRAINNAME")
@@ -4011,13 +4042,11 @@ Public Class OIT0001EmptyTurnDairyList
         Next
 
         '○仙台新港営業所(仙台北港-郡山)
-        Dim SendaiStationName243202 As String = "243202"
-        Dim SendaiStationName2407 As String = "2407"
         For Each OIT0001Cmprow As DataRow In OIT0001CMPOrdertbl.Select("COMPAREINFOCD='1'")
             '○営業所が仙台新港営業所で発駅"243202"(仙台北港), 着駅が"2407"(郡山)の場合
             If Convert.ToString(OIT0001Cmprow("KEYCODE3")) = BaseDllConst.CONST_OFFICECODE_010402 _
-                AndAlso Convert.ToString(OIT0001Cmprow("DEPSTATION")) = SendaiStationName243202 Then
-                'AndAlso Convert.ToString(OIT0001Cmprow("ARRSTATION")) = SendaiStationName2407 Then
+                AndAlso Convert.ToString(OIT0001Cmprow("DEPSTATION")) = CONST_OT_SENDAISTATIONCD243202 _
+                AndAlso Convert.ToString(OIT0001Cmprow("ARRSTATION")) = CONST_OT_SENDAISTATIONCD2407 Then
                 '★JOINTチェック
                 If Convert.ToString(OIT0001Cmprow("JOINT")) <> Convert.ToString(OIT0001Cmprow("OT_JOINT")) Then
                     '★JOINT変更・更新

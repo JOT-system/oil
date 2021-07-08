@@ -603,6 +603,38 @@ Public Class CS0050SESSION : Implements IDisposable
         End Set
     End Property
     ''' <summary>
+    ''' パスワード有効期限
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property PASSENDYMD As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.PASSENDYMD))
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.PASSENDYMD) = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' パスワード警告表示回数
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property PASSALERTCNT As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.PASSALERTCNT))
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.PASSALERTCNT) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' DBの接続情報を作成する
     ''' </summary>
     ''' <param name="connect"></param>

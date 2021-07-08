@@ -329,6 +329,15 @@ Partial Public Class OIT0008CostManagement
     Protected WithEvents WF_DL_FINANCE_COOPERATION As Global.System.Web.UI.WebControls.Button
     
     '''<summary>
+    '''WF_DL_ACCOUNT_BUSINESS_INCOME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DL_ACCOUNT_BUSINESS_INCOME As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
     '''WF_UPDATE コントロール。
     '''</summary>
     '''<remarks>

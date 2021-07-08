@@ -143,6 +143,11 @@ Public Class OIT0008CustomReport : Implements IDisposable
                 '経理連携IF
                 Me.ExcelWorkSheet = DirectCast(
                     Me.ExcelWorkSheets(CONST_REPORTNAME_FINANCE_COOPERATION_IF), Excel.Worksheet)
+            ElseIf CONST_TEMPNAME_ACCOUNT_BRANCH_BUSINESS_INCOME.Equals(excelFileName) Then
+                '科目別一覧
+                Me.ExcelWorkSheet = DirectCast(
+                        Me.ExcelWorkSheets(CONST_REPORTNAME_ACCOUNT_BRANCH_BUSINESS_INCOME), Excel.Worksheet)
+                Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
             End If
         Catch ex As Exception
             If Me.xlProcId <> 0 Then
@@ -3982,6 +3987,161 @@ Public Class OIT0008CustomReport : Implements IDisposable
 
             '行加算
             idx += 1
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "ダウンロード(科目別一覧)"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(科目別一覧)URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintData_AccountBranchBusinessIncome(ByVal KeijyoYM As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") _
+                                    & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+
+        Try
+            Dim e_idx As Integer = 9
+            Dim srcRange As Excel.Range = Nothing
+            Dim destRange As Excel.Range = Nothing
+
+            Dim keijyoYmd As DateTime = DateTime.Parse(KeijyoYM + "/01")
+            srcRange = ExcelWorkSheet.Range("AO3")
+            srcRange.Value = keijyoYmd.ToString("yyyy年MM月")
+            ExcelMemoryRelease(srcRange)
+
+            '固定帳票(科目別一覧)作成処理
+            For Each row As DataRow In PrintData.Rows
+
+                If row("SEGMENTCODE").ToString.Equals("ALL") Then
+                    srcRange = ExcelTempSheet.Cells.Range("A4:CN4")
+                Else
+                    srcRange = ExcelTempSheet.Cells.Range("A2:CN2")
+                End If
+                destRange = ExcelWorkSheet.Range("A" + e_idx.ToString())
+                srcRange.Copy(destRange)
+                ExcelMemoryRelease(srcRange)
+                ExcelMemoryRelease(destRange)
+
+                '明細出力
+                EditAccountBranchBusinessIncome(e_idx, row)
+                e_idx += 1
+            Next
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票の明細設定(科目別一覧)
+    ''' </summary>
+    Private Sub EditAccountBranchBusinessIncome(ByVal idx As Int32, ByVal row As DataRow)
+        Dim rngDetailArea As Excel.Range = Nothing
+        Dim total As Long = 0
+
+        Try
+            '◯ セグメントコード
+            rngDetailArea = Me.ExcelWorkSheet.Range("A" + idx.ToString())
+            If row("SEGMENTCODE").ToString.Equals("ALL") Then
+                rngDetailArea.Value = "41?101"
+            Else
+                rngDetailArea.Value = String.Format("{0:000000}", row("SEGMENTCODE"))
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '◯ セグメント名
+            rngDetailArea = Me.ExcelWorkSheet.Range("F" + idx.ToString())
+            rngDetailArea.Value = String.Format("{0}", row("SEGMENTNAME"))
+            ExcelMemoryRelease(rngDetailArea)
+
+            If Not row("SEGMENTCODE").ToString.Equals("ALL") Then
+                '◯ 勘定科目コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + idx.ToString())
+                rngDetailArea.Value = String.Format("{0:00000000}", row("ACCOUNTCODE"))
+                ExcelMemoryRelease(rngDetailArea)
+
+                '◯ 勘定科目名
+                rngDetailArea = Me.ExcelWorkSheet.Range("Y" + idx.ToString())
+                rngDetailArea.Value = String.Format("{0:00000000}", row("ACCOUNTNAME"))
+                ExcelMemoryRelease(rngDetailArea)
+            End If
+
+            '〇 全社計
+            rngDetailArea = Me.ExcelWorkSheet.Range("AM" + idx.ToString())
+            If Double.Parse(row("ALL_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("ALL_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '〇 本社
+            rngDetailArea = Me.ExcelWorkSheet.Range("AV" + idx.ToString())
+            If Double.Parse(row("HONSYA_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("HONSYA_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '〇 東北
+            rngDetailArea = Me.ExcelWorkSheet.Range("BE" + idx.ToString())
+            If Double.Parse(row("TOHOKU_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("TOHOKU_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '〇 関東
+            rngDetailArea = Me.ExcelWorkSheet.Range("BN" + idx.ToString())
+            If Double.Parse(row("KANTO_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("KANTO_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '〇 中部
+            rngDetailArea = Me.ExcelWorkSheet.Range("BW" + idx.ToString())
+            If Double.Parse(row("CHUBU_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("CHUBU_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
+            '〇 ＭＣ
+            rngDetailArea = Me.ExcelWorkSheet.Range("CF" + idx.ToString())
+            If Double.Parse(row("MC_AM").ToString) <> 0 Then
+                rngDetailArea.Value = String.Format("{0:#,##0}", row("MC_AM"))
+            Else
+                rngDetailArea.Value = ""
+            End If
+            ExcelMemoryRelease(rngDetailArea)
+
         Catch ex As Exception
             Throw
         Finally

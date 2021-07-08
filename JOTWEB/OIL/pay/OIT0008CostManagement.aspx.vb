@@ -92,6 +92,8 @@ Public Class OIT0008CostManagement
                             WF_Button_DLTransportCostsDetail_Click()
                         Case "WF_Button_DLFinanceCooperation"   ' 「経理連携IF」ボタン押下
                             WF_Button_DLFinanceCooperation_Click()
+                        Case "WF_Button_DLAccountBusinessIncome"    ' 「科目別一覧」ボタン押下
+                            WF_Button_DLAccountBusinessIncome_Click()
 
                         Case Else
                             If WF_ButtonClick.Value.Contains("WF_ButtonShowDetail") Then
@@ -2813,7 +2815,7 @@ Public Class OIT0008CostManagement
     End Sub
 
     ''' <summary>
-    ''' 輸送費明細ダウンロードボタン押下時処理
+    ''' 経理連携IFダウンロードボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_Button_DLFinanceCooperation_Click()
@@ -2857,7 +2859,7 @@ Public Class OIT0008CostManagement
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC GET_FINANCE_COOPERATION_DATA")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIM0008M EXEC GET_TRANSPORT_COST_DETAIL"
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M EXEC GET_FINANCE_COOPERATION_DATA"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2873,6 +2875,77 @@ Public Class OIT0008CostManagement
                 url = repCbj.CreateExcelPrintData_FinanceCooperationIF(Master.USERID)
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT FINANCE_COOPERATION_IF")
+                Exit Sub
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' 科目別一覧ダウンロードボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Button_DLAccountBusinessIncome_Click()
+
+        If IsNothing(TCDtbl) Then
+            TCDtbl = New DataTable
+        End If
+
+        If TCDtbl.Columns.Count <> 0 Then
+            TCDtbl.Columns.Clear()
+        End If
+
+        TCDtbl.Clear()
+
+        Try
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                Using SQLcmd As New SqlCommand
+                    SQLcmd.Connection = SQLcon
+                    SQLcmd.CommandType = CommandType.StoredProcedure
+                    SQLcmd.CommandText = "[oil].[GET_ACCOUNT_BRANCH_BUSINESS_INCOME_DATA]"
+                    SQLcmd.Parameters.Clear()
+                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@KEIJYOYMD", SqlDbType.Date)         ' 計上年月日
+                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@MESSAGE", SqlDbType.VarChar, 1000)  ' メッセージ
+                    Dim RV As SqlParameter = SQLcmd.Parameters.Add("ReturnValue", SqlDbType.Int)            ' 戻り値
+
+                    PARA1.Value = DateTime.Parse(WW_KEIJYO_YM + "/01")
+                    PARA2.Direction = ParameterDirection.Output
+                    RV.Direction = ParameterDirection.ReturnValue
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        TCDtbl.Load(SQLdr)
+                    End Using
+
+                End Using
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC GET_ACCOUNT_BRANCH_BUSINESS_INCOME_DATA")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             ' SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0008M EXEC GET_ACCOUNT_BRANCH_BUSINESS_INCOME_DATA"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 ' ログ出力
+
+            Exit Sub
+        End Try
+
+        '帳票出力
+        Using repCbj = New OIT0008CustomReport(Master.MAPID, Master.MAPID & "_ACCOUNT_BRANCH_BUSINESS_INCOME.xlsx", TCDtbl)
+            Dim url As String
+            Try
+                '科目別支店別計上額一覧表作成
+                url = repCbj.CreateExcelPrintData_AccountBranchBusinessIncome(WW_KEIJYO_YM)
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0008M EXEC OUTPUT ACCOUNT_BRANCH_BUSINESS_INCOME")
                 Exit Sub
             End Try
             '○ 別画面でExcelを表示

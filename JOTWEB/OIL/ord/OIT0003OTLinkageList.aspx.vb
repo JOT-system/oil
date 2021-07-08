@@ -3058,7 +3058,8 @@ Public Class OIT0003OTLinkageList
             .AppendLine("       END ")
             .AppendLine("     AND TRA.DEPSTATION = ODR.DEPSTATION ")
             .AppendLine("     AND TRA.ARRSTATION = ODR.ARRSTATION ")
-            .AppendLine("     AND TRA.DEFAULTKBN = 'def' ")
+            .AppendLine(String.Format("     AND ((TRA.OFFICECODE = '{0}' AND TRA.DEFAULTKBN = 'def') OR TRA.OFFICECODE <> '{0}')", BaseDllConst.CONST_OFFICECODE_011201))
+            '.AppendLine("     AND TRA.DEFAULTKBN = 'def' ")
             .AppendLine("     AND TRA.DELFLG = @DELFLG ")
             '### 20210511 START 甲子営業所対応(荷重のソート順) #############################################
             .AppendLine("   INNER JOIN (SELECT ")

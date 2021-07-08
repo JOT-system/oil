@@ -19,6 +19,11 @@ Public Class OIT0006OutOfServiceList
     Private OIT0006Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0006His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0006His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0006ReportMieShiohamatbl As DataTable                '帳票用(三重塩浜)テーブル
+
+    '○ 帳票用
+    Private Const CONST_RPT_TRANSPORT_INSP As String = "TRANSPORT_INSP"       '運送状(交検)
+    Private Const CONST_RPT_TRANSPORT_AINS As String = "TRANSPORT_AINS"       '運送状(全検)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -1209,14 +1214,186 @@ Public Class OIT0006OutOfServiceList
         Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
             '◯ 三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
+                Dim a As String = ""
                 If Me.rbStationInspectionDateBtn.Checked = True Then            '■貨物運送状(交検)を選択
-
+                    '☆ 運送状(交検)作成処理
+                    WW_TyohyoMieShiohamaCreate(CONST_RPT_TRANSPORT_INSP, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 ElseIf Me.rbStationALLInspectionDateBtn.Checked = True Then     '■貨物運送状(全検)を選択
-
+                    '☆ 運送状(全検)作成処理
+                    WW_TyohyoMieShiohamaCreate(CONST_RPT_TRANSPORT_AINS, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 End If
+
         End Select
 
     End Sub
+
+#Region "固定帳票(三重塩浜営業所)"
+    ''' <summary>
+    ''' 固定帳票(三重塩浜営業所)作成処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_TyohyoMieShiohamaCreate(ByVal tyohyoType As String, ByVal officeCode As String)
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Select Case tyohyoType
+            '☆ 運送状(交検)作成処理, 運送状(全検)作成処理
+            Case CONST_RPT_TRANSPORT_INSP,
+                 CONST_RPT_TRANSPORT_AINS
+                '★交検、全検か判断
+                Dim insType As String = ""
+                If tyohyoType = CONST_RPT_TRANSPORT_INSP Then
+                    insType = BaseDllConst.CONST_OBJECTCODE_22
+                ElseIf tyohyoType = CONST_RPT_TRANSPORT_AINS Then
+                    insType = BaseDllConst.CONST_OBJECTCODE_23
+                End If
+
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelTransportDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_012402, depDate:=Me.txtReportDepDate.Text, insType:=insType)
+                End Using
+
+                Using repCbj = New OIT0006CustomReport(Master.MAPID, Master.MAPID & "_TRANSPORT.xlsx", OIT0006ReportMieShiohamatbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintMieShiohamaData(tyohyoType, Me.txtReportDepDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+
+        End Select
+
+    End Sub
+    ''' <summary>
+    ''' 帳票表示(運送状（交検・全検）)データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelTransportDataGet(ByVal SQLcon As SqlConnection, ByVal I_OFFICECODE As String,
+                                        Optional ByVal depDate As String = Nothing,
+                                        Optional ByVal insType As String = Nothing)
+        If IsNothing(OIT0006ReportMieShiohamatbl) Then
+            OIT0006ReportMieShiohamatbl = New DataTable
+        End If
+
+        If OIT0006ReportMieShiohamatbl.Columns.Count <> 0 Then
+            OIT0006ReportMieShiohamatbl.Columns.Clear()
+        End If
+
+        OIT0006ReportMieShiohamatbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+              "SELECT" _
+            & "   0                        AS LINECNT" _
+            & " , ''                       AS OPERATION" _
+            & " , '0'                      AS TIMSTP" _
+            & " , 1                        AS 'SELECT'" _
+            & " , 0                        AS HIDDEN" _
+            & " , OIT0007.KAISOUNO " _
+            & " , OIT0007.DETAILNO " _
+            & " , OIT0006.OFFICECODE " _
+            & " , OIT0006.OFFICENAME " _
+            & " , OIT0007.TRAINNO " _
+            & " , OIT0007.TRAINNAME " _
+            & " , OIM0005.JRTANKTYPE " _
+            & " , OIM0005.MODEL " _
+            & " , OIM0005.LOAD " _
+            & " , OIT0007.TANKNO " _
+            & " , OIT0006.KAISOUSTATUS " _
+            & " , OIT0007.OBJECTIVECODE " _
+            & " , OIS0015.VALUE1 " _
+            & " , OIT0007.KAISOUTYPE " _
+            & " , OIM0010.PATNAME " _
+            & " , OIT0007.DEPSTATION " _
+            & " , OIT0007.DEPSTATIONNAME " _
+            & " , OIT0007.ARRSTATION " _
+            & " , OIT0007.ARRSTATIONNAME " _
+            & " , OIT0007.ACTUALDEPDATE " _
+            & " , OIT0007.ACTUALEMPARRDATE " _
+            & "FROM " _
+            & "  oil.OIT0006_KAISOU OIT0006 " _
+            & "  INNER JOIN oil.OIT0007_KAISOUDETAIL OIT0007 ON " _
+            & "    OIT0007.KAISOUNO = OIT0006.KAISOUNO " _
+            & String.Format("    AND OIT0007.ACTUALDEPDATE = '{0}' ", depDate) _
+            & String.Format("    AND OIT0007.OBJECTIVECODE = '{0}' ", insType) _
+            & String.Format("    AND OIT0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
+            & "  LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "  OIM0005.TANKNUMBER = OIT0007.TANKNO " _
+            & String.Format("  AND OIM0005.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
+            & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015 ON " _
+            & "  OIS0015.CLASS = 'OBJECTIVECODE' " _
+            & "  AND OIS0015.KEYCODE = OIT0007.OBJECTIVECODE " _
+            & "  LEFT JOIN oil.OIM0010_PATTERN OIM0010 ON " _
+            & "  OIM0010.KBN = 'F' " _
+            & "  AND OIM0010.PATCODE = OIT0007.KAISOUTYPE " _
+            & "WHERE " _
+            & String.Format("  OIT0006.OFFICECODE = '{0}' ", I_OFFICECODE) _
+            & String.Format("  AND OIT0006.KAISOUSTATUS <> '{0}' ", BaseDllConst.CONST_ORDERSTATUS_900) _
+            & String.Format("  AND OIT0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '回送営業所コード
+                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                'Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '発送日
+                'Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス                PARA01.Value = I_OFFICECODE
+                'PARA01.Value = I_OFFICECODE
+                'PARA02.Value = C_DELETE_FLG.DELETE
+                'If Not String.IsNullOrEmpty(depDate) Then
+                '    PARA03.Value = depDate
+                'Else
+                '    PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                'End If
+                'PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0006ReportMieShiohamatbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0006ReportMieShiohamatbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0006Reprow As DataRow In OIT0006ReportMieShiohamatbl.Rows
+                    i += 1
+                    OIT0006Reprow("LINECNT") = i        'LINECNT
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006LMIESHIOHAMA EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006LMIESHIOHAMA EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0006ReportMieShiohamatbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+#End Region
+
 #End Region
 
     ''' <summary>

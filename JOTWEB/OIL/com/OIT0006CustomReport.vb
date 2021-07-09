@@ -109,17 +109,18 @@ Public Class OIT0006CustomReport : Implements IDisposable
 
     End Sub
 
+#Region "(帳票)三重塩浜営業所"
     ''' <summary>
     ''' テンプレートを元に帳票を作成しダウンロード(三重塩浜(運送状))URLを生成する
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
+    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal depDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
 
         '○帳票名取得
-        Dim tmpGetFileName As String = CMNPTS.SetReportFileName(repPtn, BaseDllConst.CONST_OFFICECODE_012402, lodDate, "")
+        Dim tmpGetFileName As String = CMNPTS.SetReportFileName(repPtn, BaseDllConst.CONST_OFFICECODE_012402, depDate, "")
         If tmpGetFileName <> "" Then
             tmpFileName = tmpGetFileName
         End If
@@ -129,27 +130,29 @@ Public Class OIT0006CustomReport : Implements IDisposable
 
         Try
             Select Case repPtn
-                '運送状(交検)
-                Case "TRANSPORT_INSP"
-                    ''***** TODO処理 ここから *****
-                    ''◯ヘッダーの設定
-                    'EditLoadHeaderArea(lodDate, officeCode)
-                    ''◯明細の設定
-                    'EditLoadDetailArea(officeCode)
+                '運送状(交検), 運送状(全検)
+                Case "TRANSPORT_INSP",
+                     "TRANSPORT_AINS"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditTransportHeaderArea(depDate, repPtn)
+                    '◯明細の設定
+                    EditTransportDetailArea(depDate, repPtn)
+                    '◯フッターの設定
+                    EditTransportFooterArea(depDate, repPtn)
                     '***** TODO処理 ここまで *****
-                    ExcelTempSheet.Delete() '雛形シート削除
-                    ExcelMemoryRelease(ExcelTempSheet)
-                '運送状(全検)
-                Case "TRANSPORT_AINS"
-                    ''***** TODO処理 ここから *****
-                    ''◯ヘッダーの設定
-                    'EditLoadHeaderArea(lodDate, officeCode)
-                    ''◯明細の設定
-                    'EditLoadDetailArea(officeCode)
-                    '***** TODO処理 ここまで *****
-                    ExcelWorkSheet.Delete() '雛形シート削除
-                    ExcelMemoryRelease(ExcelWorkSheet)
 
+                    '★不要シート削除
+                    Select Case repPtn
+                        '運送状(交検)
+                        Case "TRANSPORT_INSP"
+                            ExcelTempSheet.Delete() '「運送状(全検)」シート削除
+                            ExcelMemoryRelease(ExcelTempSheet)
+                        '運送状(全検)
+                        Case "TRANSPORT_AINS"
+                            ExcelWorkSheet.Delete() '「運送状(交検)」シート削除
+                            ExcelMemoryRelease(ExcelWorkSheet)
+                    End Select
             End Select
 
             '保存処理実行
@@ -174,6 +177,149 @@ Public Class OIT0006CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngWrite)
         End Try
     End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(運送状(共通))
+    ''' </summary>
+    Private Sub EditTransportHeaderArea(ByVal depDate As String, ByVal repPtn As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+        'シートを選択
+        Dim insExcelWorkSheet As Excel.Worksheet = Me.ExcelWorkSheet
+        If repPtn = "TRANSPORT_AINS" Then insExcelWorkSheet = Me.ExcelTempSheet
+
+        Try
+            '◯ 申込日
+            Dim sTodayYYYY As String = Now.ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
+            Dim sTodayMM As String = Now.ToString("MM", New Globalization.CultureInfo("ja-JP"))
+            Dim sTodayDD As String = Now.ToString("dd", New Globalization.CultureInfo("ja-JP"))
+            '　年
+            rngHeaderArea = insExcelWorkSheet.Range("AE1")
+            rngHeaderArea.Value = sTodayYYYY
+            ExcelMemoryRelease(rngHeaderArea)
+            '　月
+            rngHeaderArea = insExcelWorkSheet.Range("AJ1")
+            rngHeaderArea.Value = sTodayMM
+            ExcelMemoryRelease(rngHeaderArea)
+            '　日
+            rngHeaderArea = insExcelWorkSheet.Range("AO1")
+            rngHeaderArea.Value = sTodayDD
+            ExcelMemoryRelease(rngHeaderArea)
+
+            '◯ 発送日
+            Dim sDepDate As String = depDate
+            '　年
+            rngHeaderArea = insExcelWorkSheet.Range("AJ2")
+            rngHeaderArea.Value = Date.Parse(sDepDate).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
+            ExcelMemoryRelease(rngHeaderArea)
+            '　月
+            rngHeaderArea = insExcelWorkSheet.Range("AO2")
+            rngHeaderArea.Value = Date.Parse(sDepDate).ToString("MM", New Globalization.CultureInfo("ja-JP"))
+            ExcelMemoryRelease(rngHeaderArea)
+            '　日
+            rngHeaderArea = insExcelWorkSheet.Range("AT2")
+            rngHeaderArea.Value = Date.Parse(sDepDate).ToString("dd", New Globalization.CultureInfo("ja-JP"))
+            ExcelMemoryRelease(rngHeaderArea)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(運送状(共通))
+    ''' </summary>
+    Private Sub EditTransportDetailArea(ByVal depDate As String, ByVal repPtn As String)
+        Dim rngDetailArea As Excel.Range = Nothing
+        'シートを選択
+        Dim insExcelWorkSheet As Excel.Worksheet = Me.ExcelWorkSheet
+        If repPtn = "TRANSPORT_AINS" Then insExcelWorkSheet = Me.ExcelTempSheet
+
+        Try
+            Dim i As Integer = 13
+            Dim iProductName As Integer() = {13, 16, 19, 22, 25}
+            Dim iProductNum As Integer = iProductName(0)
+            Dim aProductName As String() = {"H", "J", "L", "N"}             '品目コード(配置場所)
+            Dim aJRTankType As String() = {"AN", "AP", "AR"}                '車種コード(配置場所)
+            Dim aTankNo As String() = {"AT", "AV", "AX", "AZ", "BB", "BD"}  '貨車番号(配置場所)
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 品名・荷造, 品目コード, 運賃計算トン数
+                If iProductNum = i Then
+                    '◯ 品名・荷造
+                    rngDetailArea = insExcelWorkSheet.Range("C" + i.ToString())
+                    rngDetailArea.Value = "私有タンク車"
+                    ExcelMemoryRelease(rngDetailArea)
+
+                    Dim ItemCd As String = "3011"
+                    '◯ 品目コード
+                    For j = 0 To 3
+                        rngDetailArea = insExcelWorkSheet.Range(aProductName(j) + i.ToString())
+                        rngDetailArea.Value = ItemCd.Substring(j, 1)
+                        ExcelMemoryRelease(rngDetailArea)
+                    Next
+
+                    '◯ 運賃計算トン数
+                    rngDetailArea = insExcelWorkSheet.Range("V" + i.ToString())
+                    rngDetailArea.Value = "4"
+                    ExcelMemoryRelease(rngDetailArea)
+
+                    iProductNum += 1
+                End If
+
+                '◯ 車種コード
+                Dim JRTankType As String = Convert.ToString(PrintDatarow("JRTANKTYPE"))
+                For j = 0 To 2
+                    rngDetailArea = insExcelWorkSheet.Range(aJRTankType(j) + i.ToString())
+                    'rngDetailArea = Me.ExcelWorkSheet.Range(aJRTankType(j) + i.ToString())
+                    rngDetailArea.Value = JRTankType.Substring(j, 1)
+                    ExcelMemoryRelease(rngDetailArea)
+                Next j
+
+                '◯ 貨車番号
+                Dim TankNo As String = Convert.ToString(PrintDatarow("TANKNO")).PadLeft(6)
+                For j = 0 To 5
+                    rngDetailArea = insExcelWorkSheet.Range(aTankNo(j) + i.ToString())
+                    'rngDetailArea = Me.ExcelWorkSheet.Range(aTankNo(j) + i.ToString())
+                    rngDetailArea.Value = TankNo.Substring(j, 1)
+                    ExcelMemoryRelease(rngDetailArea)
+                Next j
+
+                i += 1
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のフッター設定(運送状(共通))
+    ''' </summary>
+    Private Sub EditTransportFooterArea(ByVal depDate As String, ByVal repPtn As String)
+        Dim rngFooterArea As Excel.Range = Nothing
+        Dim insExcelWorkSheet As Excel.Worksheet = Me.ExcelWorkSheet
+        If repPtn = "TRANSPORT_AINS" Then insExcelWorkSheet = Me.ExcelTempSheet
+
+        Try
+            '◯ 運賃計算トン数(計)
+            rngFooterArea = insExcelWorkSheet.Range("V28")
+            rngFooterArea.Value = PrintData.Rows.Count * 4
+            ExcelMemoryRelease(rngFooterArea)
+
+            '◯ 総車数
+            rngFooterArea = insExcelWorkSheet.Range("AN29")
+            rngFooterArea.Value = PrintData.Rows.Count
+            ExcelMemoryRelease(rngFooterArea)
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngFooterArea)
+        End Try
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' Excelオブジェクトの解放

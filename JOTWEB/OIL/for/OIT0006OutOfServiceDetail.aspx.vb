@@ -2794,7 +2794,9 @@ Public Class OIT0006OutOfServiceDetail
             If OIT0006tbl.Select("OBJECTIVECODE<>'25' AND ISNULL(ACTUALEMPARRDATE,'')=''").Count = 0 Then
                 '★返送日が未来日日付かチェック
                 For Each OIT0006row As DataRow In OIT0006tbl.Select("OBJECTIVECODE<>'" + BaseDllConst.CONST_OBJECTCODE_25 + "'")
-                    If OIT0006row("ACTUALEMPARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                    If OIT0006row("ACTUALEMPARRDATE") <= Now.AddDays(0).ToString("yyyy/MM/dd") Then
+                        iFutureCnt += 0
+                    ElseIf OIT0006row("ACTUALEMPARRDATE") > Now.AddDays(0).ToString("yyyy/MM/dd") Then
                         iFutureCnt += 1
                     End If
                 Next

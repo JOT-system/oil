@@ -3113,17 +3113,17 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngHeaderArea.Value = PrintDatarow("CONSIGNEENAME")
                 ExcelMemoryRelease(rngHeaderArea)
                 '発日
-                rngHeaderArea = Me.ExcelWorkSheet.Range("S1")
+                rngHeaderArea = Me.ExcelWorkSheet.Range("Z1")
                 rngHeaderArea.Value = PrintDatarow("DEPDATE")
                 ExcelMemoryRelease(rngHeaderArea)
                 '列車（JR最終列車番号）
                 If PrintDatarow("TUMIOKIFLG").ToString = "0" Then
                     '当日発
-                    rngHeaderArea = Me.ExcelWorkSheet.Range("AA1")
+                    rngHeaderArea = Me.ExcelWorkSheet.Range("AH1")
                     rngHeaderArea.Value = PrintDatarow("JRTRAINNO3")
                 Else
                     '積置
-                    rngHeaderArea = Me.ExcelWorkSheet.Range("AA1")
+                    rngHeaderArea = Me.ExcelWorkSheet.Range("AH1")
                     rngHeaderArea.Value = PrintDatarow("TRAINNO_TUMIOKI")
                 End If
                 ExcelMemoryRelease(rngHeaderArea)

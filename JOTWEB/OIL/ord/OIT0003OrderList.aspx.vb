@@ -4787,6 +4787,8 @@ Public Class OIT0003OrderList
             & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
             & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
+            & " , OIT0003.SHIPORDER                              AS SHIPORDER" _
+            & " , OIT0003.LINEORDER                              AS LINEORDER" _
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIM0005.LOAD                                   AS LOAD" _
             & " , OIM0005.LOAD_SORT                              AS LOAD_SORT" _

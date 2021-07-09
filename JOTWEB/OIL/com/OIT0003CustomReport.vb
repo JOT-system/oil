@@ -268,7 +268,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 Case BaseDllConst.CONST_OFFICECODE_012401
                     Me.ExcelWorkSheet.Range("F:F").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("L:L").Columns.Hidden = True
-                    Me.ExcelWorkSheet.Range("N:N").Columns.Hidden = True
+                    'Me.ExcelWorkSheet.Range("N:N").Columns.Hidden = True
                     Me.ExcelWorkSheet.Range("O:O").Columns.Hidden = True
             End Select
 
@@ -408,16 +408,28 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     rngDetailArea.Value = PrintDatarow("TRAINNO")
                 End If
                 ExcelMemoryRelease(rngDetailArea)
-                '◯ 発日(予定)
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("DEPDATE")
-                ExcelMemoryRelease(rngDetailArea)
-                ''### 20201203 START 指摘票対応(No247) ######################
-                '○ 受入日(予定)
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("ACCDATE")
-                ExcelMemoryRelease(rngDetailArea)
-                ''### 20201203 END   指摘票対応(No247) ######################
+
+                '    ★四日市営業所以外の場合
+                If officeCode <> BaseDllConst.CONST_OFFICECODE_012401 Then
+                    '◯ 発日(予定)
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("DEPDATE")
+                    ExcelMemoryRelease(rngDetailArea)
+                    ''### 20201203 START 指摘票対応(No247) ######################
+                    '○ 受入日(予定)
+                    rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("ACCDATE")
+                    ExcelMemoryRelease(rngDetailArea)
+                    ''### 20201203 END   指摘票対応(No247) ######################
+
+                    '★四日市営業所の場合
+                Else
+                    '◯ 連結順序
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("SHIPORDER")
+                    ExcelMemoryRelease(rngDetailArea)
+                End If
+
                 '◯ 備考
                 '### 20201014 START 備考欄への表示対応 #####################
                 rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())

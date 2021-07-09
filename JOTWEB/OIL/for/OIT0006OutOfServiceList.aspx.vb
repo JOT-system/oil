@@ -72,12 +72,20 @@ Public Class OIT0006OutOfServiceList
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
+                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -680,6 +688,41 @@ Public Class OIT0006OutOfServiceList
     End Sub
 
     ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+                    ''会社コード
+                    'Dim prmData As New Hashtable
+                    'prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+
+                    '.SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    '.ActiveListBox()
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        '(帳票ポップアップ)発送日
+                        Case "txtReportDepDate"
+                            .WF_Calendar.Text = Me.txtReportDepDate.Text
+                    End Select
+                    .ActiveCalendar()
+                End If
+            End With
+        End If
+
+    End Sub
+
+    ''' <summary>
     ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
     ''' </summary>
     ''' <remarks></remarks>
@@ -871,6 +914,72 @@ Public Class OIT0006OutOfServiceList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
+
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '○ 選択内容を取得
+        '### LeftBoxマルチ対応(20200217) START #####################################################
+        If leftview.ActiveViewIdx = 2 Then
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '### LeftBoxマルチ対応(20200217) END   #####################################################
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            '(帳票ポップアップ)発送日
+            Case "txtReportDepDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.txtReportDepDate.Text = ""
+                    Else
+                        Me.txtReportDepDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.txtReportDepDate.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+
+    End Sub
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "txtReportDepDate"          '(帳票)発送日
+                Me.txtReportDepDate.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+    End Sub
+
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -1216,10 +1325,10 @@ Public Class OIT0006OutOfServiceList
             Case BaseDllConst.CONST_OFFICECODE_012402
                 Dim a As String = ""
                 If Me.rbStationInspectionDateBtn.Checked = True Then            '■貨物運送状(交検)を選択
-                    '☆ 運送状(交検)作成処理
+                    '★ 運送状(交検)作成処理
                     WW_TyohyoMieShiohamaCreate(CONST_RPT_TRANSPORT_INSP, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 ElseIf Me.rbStationALLInspectionDateBtn.Checked = True Then     '■貨物運送状(全検)を選択
-                    '☆ 運送状(全検)作成処理
+                    '★ 運送状(全検)作成処理
                     WW_TyohyoMieShiohamaCreate(CONST_RPT_TRANSPORT_AINS, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
                 End If
 
@@ -1311,8 +1420,8 @@ Public Class OIT0006OutOfServiceList
             & " , OIT0007.TANKNO " _
             & " , OIT0006.KAISOUSTATUS " _
             & " , OIT0007.OBJECTIVECODE " _
-            & " , OIS0015.VALUE1 " _
-            & " , OIT0007.KAISOUTYPE " _
+            & " , OIS0015.VALUE1 AS OBJECTIVENAME" _
+            & " , OIT0007.KAISOUTYPE AS PATCODE" _
             & " , OIM0010.PATNAME " _
             & " , OIT0007.DEPSTATION " _
             & " , OIT0007.DEPSTATIONNAME " _
@@ -1339,7 +1448,10 @@ Public Class OIT0006OutOfServiceList
             & "WHERE " _
             & String.Format("  OIT0006.OFFICECODE = '{0}' ", I_OFFICECODE) _
             & String.Format("  AND OIT0006.KAISOUSTATUS <> '{0}' ", BaseDllConst.CONST_ORDERSTATUS_900) _
-            & String.Format("  AND OIT0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            & String.Format("  AND OIT0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE) _
+            & "ORDER BY " _
+            & "   OIM0005.JRTANKTYPE " _
+            & " , CONVERT(INT, OIT0007.TANKNO) "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

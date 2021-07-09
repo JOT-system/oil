@@ -1898,7 +1898,16 @@ Public Class OIT0005TankLocList
                 End If
             Next
 
-            ''○回送TBLの回送進行ステータス更新チェック
+            '○回送TBLの回送進行ステータス更新チェック
+            For Each OIT0005row As DataRow In OIT0005tbl.Select("ISNULL(KAISOUNO,'')<>'' AND ORDER_ACTUALEMPARRDATE<>''", "KAISOUNO")
+                '★回送進行ステータスチェック用
+                If WW_CheckKaisouCnt(SQLcon, Convert.ToString(OIT0005row("KAISOUNO"))) = True Then
+                    '★回送TBL更新
+                    WW_UpdateKaisou(SQLcon, I_OIT0005row:=OIT0005row,
+                                I_ITEM:="KAISOUSTATUS",
+                                I_VALUE:=BaseDllConst.CONST_KAISOUSTATUS_500)
+                End If
+            Next
             'WW_CheckKaisouCnt(SQLcon)
             'For Each OIT0005row As DataRow In OIT0005tbl.Select("ISNULL(KAISOUNO,'')<>''")
             '    '○対象のオーダー回送の返送日がすべて登録済みか確認
@@ -2059,7 +2068,8 @@ Public Class OIT0005TankLocList
     ''' 回送進行ステータスチェック用
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub WW_CheckKaisouCnt(ByVal SQLcon As SqlConnection)
+    Public Function WW_CheckKaisouCnt(ByVal SQLcon As SqlConnection, ByVal I_KAISOUNO As String) As Boolean
+        Dim blnFlg As Boolean = False
         If IsNothing(OIT0005KaisouCnttbl) Then
             OIT0005KaisouCnttbl = New DataTable
         End If
@@ -2073,17 +2083,36 @@ Public Class OIT0005TankLocList
         Dim SQLStr As String = ""
         SQLStr =
           " SELECT " _
-        & "   OIT0007.KAISOUNO    AS KAISOUNO " _
-        & " , COUNT(1)            AS CNT " _
-        & " FROM OIL.OIT0007_KAISOUDETAIL OIT0007 " _
-        & " WHERE OIT0007.DELFLG <> @DELFLG " _
-        & "   AND ISNULL(OIT0007.ACTUALEMPARRDATE, '') = '' " _
-        & " GROUP BY OIT0007.KAISOUNO "
+        & "   OIT0007_ALL.KAISOUNO " _
+        & " , OIT0007_ALL.ALLCNT " _
+        & " , OIT0007_CHK.CHKCNT " _
+        & " , CASE WHEN OIT0007_ALL.ALLCNT = OIT0007_CHK.CHKCNT THEN '0' ELSE '1' END AS CHK_FLG " _
+        & " FROM " _
+        & " ( " _
+        & "      SELECT " _
+        & "        OIT0007.KAISOUNO" _
+        & "      , count(1) AS ALLCNT" _
+        & "      FROM oil.OIT0007_KAISOUDETAIL OIT0007 " _
+        & String.Format("      WHERE OIT0007.KAISOUNO = '{0}' ", I_KAISOUNO) _
+        & String.Format("        AND OIT0007.DELFLG  <> '{0}' ", C_DELETE_FLG.DELETE) _
+        & "      GROUP BY OIT0007.KAISOUNO " _
+        & " ) OIT0007_ALL " _
+        & " INNER JOIN " _
+        & " ( " _
+        & "      SELECT " _
+        & "        OIT0007.KAISOUNO" _
+        & "      , SUM(CASE WHEN OIT0007.ACTUALEMPARRDATE <= FORMAT(GETDATE(),'yyyy/MM/dd') Then 1 Else 0 End) AS CHKCNT" _
+        & "      FROM oil.OIT0007_KAISOUDETAIL OIT0007 " _
+        & String.Format("      WHERE OIT0007.KAISOUNO = '{0}' ", I_KAISOUNO) _
+        & String.Format("        AND OIT0007.DELFLG  <> '{0}' ", C_DELETE_FLG.DELETE) _
+        & "      GROUP BY OIT0007.KAISOUNO " _
+        & " ) OIT0007_CHK ON " _
+        & " OIT0007_ALL.KAISOUNO = OIT0007_CHK.KAISOUNO "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)  '削除フラグ
-                DELFLG.Value = C_DELETE_FLG.DELETE
+                'Dim DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)  '削除フラグ
+                'DELFLG.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2094,6 +2123,10 @@ Public Class OIT0005TankLocList
                     '○ テーブル検索結果をテーブル格納
                     OIT0005KaisouCnttbl.Load(SQLdr)
                 End Using
+
+                '★対象の回送登録すべてが返送日が設定(未来日は除く)されている場合
+                If Convert.ToString(OIT0005KaisouCnttbl.Rows(0)("CHK_FLG")) = "0" Then blnFlg = True
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0005L CHECKKAISOUCNT")
@@ -2104,9 +2137,11 @@ Public Class OIT0005TankLocList
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
+            Return blnFlg
+            'Exit Sub
         End Try
-    End Sub
+        Return blnFlg
+    End Function
 
 #End Region
 

@@ -14,15 +14,6 @@ Option Explicit On
 Partial Public Class OIS0002PasswordChange
     
     '''<summary>
-    '''WF_USERID コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_USERID As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_CURRENTPASSWORD コントロール。
     '''</summary>
     '''<remarks>

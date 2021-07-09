@@ -25,11 +25,6 @@
 
         <!-- ○ 変動項目 ○ -->
         <div class="inputBox">
-            <!-- ユーザーID -->
-            <div class="inputItem">
-                <a id="WF_USERID_LABEL" class="requiredMark">ユーザーID</a>
-                <asp:TextBox ID="WF_USERID" runat="server" CssClass="WF_TEXTBOX_CSS" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
-            </div>
             <!-- 現在パスワード -->
             <div class="inputItem">
                 <a id="WF_CURRENTPASSWORD_LABEL" class="requiredMark">現在のパスワード</a>

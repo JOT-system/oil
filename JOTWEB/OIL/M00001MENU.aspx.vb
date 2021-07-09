@@ -70,6 +70,7 @@ Public Class M00001MENU
             WF_ButtonClick.Value = ""
         End If
 
+        'パスワード有効期限警告
         Dim passendYmd = Date.Parse(CS0050Session.PASSENDYMD)
         Dim passalertCnt = Integer.Parse(CS0050Session.PASSALERTCNT)
         Dim span As TimeSpan = passendYmd - Date.Now
@@ -78,9 +79,17 @@ Public Class M00001MENU
             If span.Days < 1 Then
                 message = "本日中"
             End If
+
             'パスワード警告ダイアログ表示
-            Master.Output("10060", C_MESSAGE_TYPE.QUES, I_PARA01:=message, I_PARA02:="W",
-                needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnPassChangeOk")
+            If Not Master.ROLE_MENU.Contains("jot") Then
+                '他社ユーザーは変更依頼の警告を表示
+                Master.Output("10065", C_MESSAGE_TYPE.WAR, I_PARA01:=String.Format("{0}", span.Days), needsPopUp:=True)
+            Else
+                'JOTユーザーはパスワード変更画面遷移可能な警告を表示
+                Master.Output("10060", C_MESSAGE_TYPE.QUES, I_PARA01:=message, I_PARA02:="W",
+                            needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnPassChangeOk")
+            End If
+
             CS0050Session.PASSALERTCNT = "1"
         End If
 

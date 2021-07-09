@@ -1,11 +1,12 @@
 ﻿''************************************************************
 ' パスワード変更画面
 ' 作成日 2021/06/24
-' 更新日 
+' 更新日 2021/07/09
 ' 作成者 JOT伊草
 ' 更新者 
 '
 ' 修正履歴:2021/06/24 新規作成
+'         :2021/07/09 ユーザーID入力削除
 ''************************************************************
 Imports System.Data.SqlClient
 
@@ -71,10 +72,12 @@ Public Class OIS0002PasswordChange
         '○ 画面ID設定
         Master.MAPID = "OIS0002PC"
 
-        WF_USERID.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_RightboxOpen.Value = ""
+
+        '現在のパスワードをフォーカス
+        WF_CURRENTPASSWORD.Focus()
 
         '○ 画面の値設定
         WW_MAPValueSet()
@@ -112,7 +115,6 @@ Public Class OIS0002PasswordChange
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_USERID.Text)            'ユーザーID
         Master.EraseCharToIgnore(WF_CURRENTPASSWORD.Text)   '現在パスワード
         Master.EraseCharToIgnore(WF_NEWPASSWORD.Text)       '新パスワード
         Master.EraseCharToIgnore(WF_NEWPASSWORDCONF.Text)   '新パスワード(確認)
@@ -167,30 +169,12 @@ Public Class OIS0002PasswordChange
         Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
-        'ユーザーID
-        WW_TEXT = WF_USERID.Text
-        Master.CheckField(Master.USERCAMP, "USERID", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            If Not CheckUser(WW_TEXT) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "ユーザーID : " & WW_TEXT, needsPopUp:=True)
-                WF_USERID.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "ユーザーID", needsPopUp:=True)
-            WF_USERID.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
         '現在のパスワード
         WW_TEXT = WF_CURRENTPASSWORD.Text
         Master.CheckField(Master.USERCAMP, "CURRENTPASSWORD", WW_TEXT, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
-            If Not CheckCurrentPassword(WF_USERID.Text, WF_CURRENTPASSWORD.Text) Then
+            If Not CheckCurrentPassword(Master.USERID, WF_CURRENTPASSWORD.Text) Then
                 Master.Output("10061", C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 WF_CURRENTPASSWORD.Focus()
                 O_RTN = "ERR"
@@ -301,7 +285,7 @@ Public Class OIS0002PasswordChange
                     Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.DateTime)          '更新年月日
                     Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)      '更新ユーザーID
                     Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 20)      '更新端末
-                    PARA01.Value = WF_USERID.Text
+                    PARA01.Value = Master.USERID
                     PARA02.Value = WF_NEWPASSWORD.Text
                     PARA03.Value = Date.Now.AddDays(90) '本日から90日間有効
                     PARA04.Value = Date.Now
@@ -313,7 +297,7 @@ Public Class OIS0002PasswordChange
                     '更新ジャーナル出力
                     Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 20)  'ユーザーID
                     Dim jnlTbl As DataTable = New DataTable
-                    JPARA01.Value = WF_USERID.Text
+                    JPARA01.Value = Master.USERID
                     Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
 
                         For index As Integer = 0 To SQLdr.FieldCount - 1

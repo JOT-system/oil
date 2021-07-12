@@ -96,7 +96,8 @@ Public Class OIT0006CustomReport : Implements IDisposable
                                                     UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                     [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
             Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-            If excelFileName = "OIT0006L_TRANSPORT.xlsx" Then
+            If excelFileName = "OIT0006L_YOKKAICHI_TRANSPORT.xlsx" _
+                OrElse excelFileName = "OIT0006L_MIESHIOHAMA_TRANSPORT.xlsx" Then
                 Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("貨物運送状(交検)"), Excel.Worksheet)
                 Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("貨物運送状(全検)"), Excel.Worksheet)
             End If
@@ -108,6 +109,76 @@ Public Class OIT0006CustomReport : Implements IDisposable
         End Try
 
     End Sub
+
+#Region "(帳票)四日市営業所"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(四日市(運送状))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintYokkaichiData(ByVal repPtn As String, ByVal depDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+
+        '○帳票名取得
+        Dim tmpGetFileName As String = CMNPTS.SetReportFileName(repPtn, BaseDllConst.CONST_OFFICECODE_012401, depDate, "")
+        If tmpGetFileName <> "" Then
+            tmpFileName = tmpGetFileName
+        End If
+
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            Select Case repPtn
+                '運送状(交検), 運送状(全検)
+                Case "TRANSPORT_INSP",
+                     "TRANSPORT_AINS"
+                    '***** TODO処理 ここから *****
+                    '◯ヘッダーの設定
+                    EditTransportHeaderArea(depDate, repPtn)
+                    '◯明細の設定
+                    EditTransportDetailArea(depDate, repPtn)
+                    '◯フッターの設定
+                    EditTransportFooterArea(depDate, repPtn)
+                    '***** TODO処理 ここまで *****
+
+                    '★不要シート削除
+                    Select Case repPtn
+                        '運送状(交検)
+                        Case "TRANSPORT_INSP"
+                            ExcelTempSheet.Delete() '「運送状(全検)」シート削除
+                            ExcelMemoryRelease(ExcelTempSheet)
+                        '運送状(全検)
+                        Case "TRANSPORT_AINS"
+                            ExcelWorkSheet.Delete() '「運送状(交検)」シート削除
+                            ExcelMemoryRelease(ExcelWorkSheet)
+                    End Select
+            End Select
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+    End Function
+#End Region
 
 #Region "(帳票)三重塩浜営業所"
     ''' <summary>

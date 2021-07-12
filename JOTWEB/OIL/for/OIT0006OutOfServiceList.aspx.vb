@@ -19,6 +19,7 @@ Public Class OIT0006OutOfServiceList
     Private OIT0006Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0006His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0006His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0006ReportChubuBranchtbl As DataTable                '帳票用(中部(支店))テーブル
     Private OIT0006ReportMieShiohamatbl As DataTable                '帳票用(三重塩浜)テーブル
 
     '○ 帳票用
@@ -117,6 +118,7 @@ Public Class OIT0006OutOfServiceList
             If Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_010006 _
                 OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_010007 _
                 OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_012301 _
+                OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_012401 _
                 OrElse Master.USER_ORG = BaseDllConst.CONST_OFFICECODE_012402 Then
                 WF_TYOHYOFLG.Value = "TRUE"
             Else
@@ -202,8 +204,8 @@ Public Class OIT0006OutOfServiceList
         '### 帳票ポップアップの設定 ###################################################################
         '〇仮置き
         Dim paramData As Hashtable = work.CreateFIXParam(Master.USER_ORG)
-        '★三重塩浜営業所のみ
-        paramData.Item(C_PARAMETERS.LP_COMPANY) = BaseDllConst.CONST_OFFICECODE_012402
+        '★中部支店(四日市営業所, 三重塩浜営業所)のみ
+        paramData.Item(C_PARAMETERS.LP_COMPANY) = BaseDllConst.CONST_OFFICECODE_012301
 
         Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE_KAISOU
         Me.tileSalesOffice.ParamData = paramData
@@ -1281,6 +1283,12 @@ Public Class OIT0006OutOfServiceList
         Me.rbStationALLInspectionDateBtn.Visible = False
 
         Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
+            '◯四日市営業所
+            Case BaseDllConst.CONST_OFFICECODE_012401
+                '貨物運送状(交検)(ラジオボタン)を表示
+                Me.rbStationInspectionDateBtn.Visible = True
+                '貨物運送状(全検)(ラジオボタン)を表示
+                Me.rbStationALLInspectionDateBtn.Visible = True
             '◯三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
                 '貨物運送状(交検)(ラジオボタン)を表示
@@ -1321,9 +1329,18 @@ Public Class OIT0006OutOfServiceList
 
         '★ 各営業所の固定帳票
         Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
+            '◯ 四日市営業所
+            Case BaseDllConst.CONST_OFFICECODE_012401
+                If Me.rbStationInspectionDateBtn.Checked = True Then            '■貨物運送状(交検)を選択
+                    '★ 運送状(交検)作成処理
+                    WW_TyohyoYokkaichiCreate(CONST_RPT_TRANSPORT_INSP, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                ElseIf Me.rbStationALLInspectionDateBtn.Checked = True Then     '■貨物運送状(全検)を選択
+                    '★ 運送状(全検)作成処理
+                    WW_TyohyoYokkaichiCreate(CONST_RPT_TRANSPORT_AINS, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                End If
+
             '◯ 三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
-                Dim a As String = ""
                 If Me.rbStationInspectionDateBtn.Checked = True Then            '■貨物運送状(交検)を選択
                     '★ 運送状(交検)作成処理
                     WW_TyohyoMieShiohamaCreate(CONST_RPT_TRANSPORT_INSP, work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
@@ -1335,6 +1352,52 @@ Public Class OIT0006OutOfServiceList
         End Select
 
     End Sub
+
+#Region "固定帳票(四日市営業所)"
+    ''' <summary>
+    ''' 固定帳票(四日市営業所)作成処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_TyohyoYokkaichiCreate(ByVal tyohyoType As String, ByVal officeCode As String)
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Select Case tyohyoType
+            '☆ 運送状(交検)作成処理, 運送状(全検)作成処理
+            Case CONST_RPT_TRANSPORT_INSP,
+                 CONST_RPT_TRANSPORT_AINS
+                '★交検、全検か判断
+                Dim insType As String = ""
+                If tyohyoType = CONST_RPT_TRANSPORT_INSP Then
+                    insType = BaseDllConst.CONST_OBJECTCODE_22
+                ElseIf tyohyoType = CONST_RPT_TRANSPORT_AINS Then
+                    insType = BaseDllConst.CONST_OBJECTCODE_23
+                End If
+
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelTransportDataGet(SQLcon, officeCode, depDate:=Me.txtReportDepDate.Text, insType:=insType)
+                End Using
+
+                Using repCbj = New OIT0006CustomReport(Master.MAPID, Master.MAPID & "_YOKKAICHI_TRANSPORT.xlsx", OIT0006ReportChubuBranchtbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintYokkaichiData(tyohyoType, Me.txtReportDepDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
+
+        End Select
+    End Sub
+#End Region
 
 #Region "固定帳票(三重塩浜営業所)"
     ''' <summary>
@@ -1363,10 +1426,10 @@ Public Class OIT0006OutOfServiceList
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelTransportDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_012402, depDate:=Me.txtReportDepDate.Text, insType:=insType)
+                    ExcelTransportDataGet(SQLcon, officeCode, depDate:=Me.txtReportDepDate.Text, insType:=insType)
                 End Using
 
-                Using repCbj = New OIT0006CustomReport(Master.MAPID, Master.MAPID & "_TRANSPORT.xlsx", OIT0006ReportMieShiohamatbl)
+                Using repCbj = New OIT0006CustomReport(Master.MAPID, Master.MAPID & "_MIESHIOHAMA_TRANSPORT.xlsx", OIT0006ReportChubuBranchtbl)
                     Dim url As String
                     Try
                         url = repCbj.CreateExcelPrintMieShiohamaData(tyohyoType, Me.txtReportDepDate.Text)
@@ -1389,15 +1452,15 @@ Public Class OIT0006OutOfServiceList
     Protected Sub ExcelTransportDataGet(ByVal SQLcon As SqlConnection, ByVal I_OFFICECODE As String,
                                         Optional ByVal depDate As String = Nothing,
                                         Optional ByVal insType As String = Nothing)
-        If IsNothing(OIT0006ReportMieShiohamatbl) Then
-            OIT0006ReportMieShiohamatbl = New DataTable
+        If IsNothing(OIT0006ReportChubuBranchtbl) Then
+            OIT0006ReportChubuBranchtbl = New DataTable
         End If
 
-        If OIT0006ReportMieShiohamatbl.Columns.Count <> 0 Then
-            OIT0006ReportMieShiohamatbl.Columns.Clear()
+        If OIT0006ReportChubuBranchtbl.Columns.Count <> 0 Then
+            OIT0006ReportChubuBranchtbl.Columns.Clear()
         End If
 
-        OIT0006ReportMieShiohamatbl.Clear()
+        OIT0006ReportChubuBranchtbl.Clear()
 
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
@@ -1471,25 +1534,25 @@ Public Class OIT0006OutOfServiceList
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0006ReportMieShiohamatbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0006ReportChubuBranchtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0006ReportMieShiohamatbl.Load(SQLdr)
+                    OIT0006ReportChubuBranchtbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each OIT0006Reprow As DataRow In OIT0006ReportMieShiohamatbl.Rows
+                For Each OIT0006Reprow As DataRow In OIT0006ReportChubuBranchtbl.Rows
                     i += 1
                     OIT0006Reprow("LINECNT") = i        'LINECNT
                 Next
 
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006LMIESHIOHAMA EXCEL_DATAGET")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006LCHUBUBRANCH EXCEL_DATAGET")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0006LMIESHIOHAMA EXCEL_DATAGET"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006LCHUBUBRANCH EXCEL_DATAGET"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1498,7 +1561,7 @@ Public Class OIT0006OutOfServiceList
         End Try
 
         '○ 画面表示データ保存
-        'Master.SaveTable(OIT0006ReportMieShiohamatbl)
+        'Master.SaveTable(OIT0006ReportChubuBranchtbl)
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)

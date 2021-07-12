@@ -1394,6 +1394,13 @@ div[data-generated='1'] .caution{
     text-align: center;
     font-size: 22px;
 }
+div[data-generated='1'] .caution_letter{
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+    /*text-align: center;*/
+    font-size: 12px;
+}
 /* これ色設定いずれ不要：文字を表示しないので */
 div[data-generated='1'] .safe {
     color:green
@@ -1403,6 +1410,10 @@ div[data-generated='1'] .warning {
 }
 div[data-generated='1'] .caution {
     color:red
+}
+div[data-generated='1'] .caution_letter {
+    color:red;
+    letter-spacing: normal;
 }
 /* 各レベルニ応じた画像設定 */
 /* SAFE用(旧緑●)の設定いずれ、スタイル全消して表示しない */
@@ -1441,6 +1452,18 @@ div[data-generated='1'] .caution:after {
     background-size: contain;
     margin-left: calc(50% - 10.5px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
 }
+div[data-generated='1'] .caution_letter:after {
+    margin-top: 3px;
+    width: 21px;
+    height: 21px;
+    content: "";
+    /*display: block;*/
+    /*background-image: url('../oil/img/caution.png');*/
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: calc(50% - 10.5px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
+
 div[data-generated='1'] input[type=text],
 div[data-generated='1'] input[type=number]{
     height: 1.6em;

@@ -678,6 +678,7 @@ Public Class OIT0003OrderList
                 End Using
 
                 Dim i As Integer = 0
+                Dim OTSENDSTATUSNAME As String() = {"未送信", "済", "一部送信済", "再送信済"}
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
@@ -685,6 +686,13 @@ Public Class OIT0003OrderList
                     '◯名称取得
                     '積置きフラグ
                     CODENAME_get("STACKING", OIT0003row("STACKINGFLG"), OIT0003row("STACKINGNAME"), WW_RTN_SW)
+
+                    '### 20210712 START 指摘票No522(OT発送状況対応) ###############################################
+                    '★OT発送状況(未送信)の場合は赤文字にする。
+                    If Convert.ToString(OIT0003row("OTSENDSTATUSNAME")) = OTSENDSTATUSNAME(0) Then
+                        OIT0003row("OTSENDSTATUSNAME") = String.Format("<div class=""caution_letter"">{0}</div>", OTSENDSTATUSNAME(0))
+                    End If
+                    '### 20210712 END   指摘票No522(OT発送状況対応) ###############################################
 
                 Next
             End Using

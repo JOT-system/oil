@@ -1151,9 +1151,9 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_KAISOUPATTERN_07 As String = "交検-他社負担"
     ''' <summary>
-    ''' 08:全件-他社負担
+    ''' 08:全検-他社負担
     ''' </summary>
-    Public Const CONST_KAISOUPATTERN_08 As String = "全件-他社負担"
+    Public Const CONST_KAISOUPATTERN_08 As String = "全検-他社負担"
     ''' <summary>
     ''' 09:疎開留置-JOT負担発払
     ''' </summary>

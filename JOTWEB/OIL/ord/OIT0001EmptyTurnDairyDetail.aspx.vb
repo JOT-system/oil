@@ -31,7 +31,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
-    '◯交検・全件アラート表示用
+    '◯交検・全検アラート表示用
     Private Const CONST_ALERT_STATUS_SAFE As String = "'<div class=""safe""></div>'"
     Private Const CONST_ALERT_STATUS_WARNING As String = "'<div class=""warning""></div>'"
     Private Const CONST_ALERT_STATUS_CAUTION As String = "'<div class=""caution""></div>'"

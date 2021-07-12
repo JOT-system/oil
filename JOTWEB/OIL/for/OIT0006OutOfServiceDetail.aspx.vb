@@ -42,7 +42,7 @@ Public Class OIT0006OutOfServiceDetail
     Private Const CONST_TANKNO_STATUS_FUKA As String = "不可"
     Private Const CONST_TANKNO_STATUS_ZAN As String = "残車"
 
-    '◯交検・全件アラート表示用
+    '◯交検・全検アラート表示用
     Private Const CONST_ALERT_STATUS_SAFE As String = "'<div class=""safe""></div>'"
     Private Const CONST_ALERT_STATUS_WARNING As String = "'<div class=""warning""></div>'"
     Private Const CONST_ALERT_STATUS_CAUTION As String = "'<div class=""caution""></div>'"
@@ -3563,7 +3563,7 @@ Public Class OIT0006OutOfServiceDetail
                 '目的（交検）
                 Me.TxtInspection.Text = OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_22 + "'" + "AND DELFLG = '0'").Count
                 PARA51.Value = Me.TxtInspection.Text
-                '目的（全件）
+                '目的（全検）
                 Me.TxtALLInspection.Text = OIT0006tbl.Select("OBJECTIVECODE='" + BaseDllConst.CONST_OBJECTCODE_23 + "'" + "AND DELFLG = '0'").Count
                 PARA52.Value = Me.TxtALLInspection.Text
                 '目的（疎開留置）

@@ -802,7 +802,7 @@ Public Class CS0013ProfView
     ''' <summary>
     ''' ソートしたデータテーブルを返却
     ''' </summary>
-    ''' <param name="dt">全件データを格納したデータテーブル</param>
+    ''' <param name="dt">全検データを格納したデータテーブル</param>
     ''' <param name="pnlObj"></param>
     ''' <param name="hdnListPositionObj"></param>
     ''' <param name="additionalFilterString"></param>

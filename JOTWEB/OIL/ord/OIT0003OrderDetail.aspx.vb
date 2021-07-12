@@ -60,7 +60,7 @@ Public Class OIT0003OrderDetail
     Private Const CONST_TANKNO_STATUS_FUKA As String = "不可"
     Private Const CONST_TANKNO_STATUS_ZAN As String = "残車"
 
-    '◯交検・全件アラート表示用
+    '◯交検・全検アラート表示用
     Private Const CONST_ALERT_STATUS_SAFE As String = "'<div class=""safe""></div>'"
     Private Const CONST_ALERT_STATUS_WARNING As String = "'<div class=""warning""></div>'"
     Private Const CONST_ALERT_STATUS_CAUTION As String = "'<div class=""caution""></div>'"

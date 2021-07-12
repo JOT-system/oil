@@ -1263,6 +1263,25 @@ Public Class CmnParts
     End Function
 
     ''' <summary>
+    ''' 文字色取得
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <param name="I_ITEM">文字</param>
+    ''' <param name="I_COLOR">1:赤</param>
+    Public Function SetLetterColor(ByVal I_ITEM As String, ByVal I_COLOR As String) As String
+        Dim Letter As String = ""
+
+        Select Case I_COLOR
+            Case "1"
+                Letter = String.Format("<div class=""caution_letter"">{0}</div>", I_ITEM)
+            Case Else
+                Letter = I_ITEM
+        End Select
+
+        Return Letter
+    End Function
+
+    ''' <summary>
     ''' 出荷休業日(月末月初)チェック
     ''' </summary>
     ''' <returns></returns>

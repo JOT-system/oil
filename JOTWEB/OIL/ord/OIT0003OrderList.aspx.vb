@@ -690,7 +690,7 @@ Public Class OIT0003OrderList
                     '### 20210712 START 指摘票No522(OT発送状況対応) ###############################################
                     '★OT発送状況(未送信)の場合は赤文字にする。
                     If Convert.ToString(OIT0003row("OTSENDSTATUSNAME")) = OTSENDSTATUSNAME(0) Then
-                        OIT0003row("OTSENDSTATUSNAME") = String.Format("<div class=""caution_letter"">{0}</div>", OTSENDSTATUSNAME(0))
+                        OIT0003row("OTSENDSTATUSNAME") = CMNPTS.SetLetterColor(OTSENDSTATUSNAME(0), "1")
                     End If
                     '### 20210712 END   指摘票No522(OT発送状況対応) ###############################################
 

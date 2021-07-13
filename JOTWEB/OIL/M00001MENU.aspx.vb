@@ -71,9 +71,12 @@ Public Class M00001MENU
         End If
 
         'パスワード有効期限警告
-        Dim passendYmd = Date.Parse(CS0050Session.PASSENDYMD)
+        Dim passendYmd = New DateTime(Date.Parse(CS0050Session.PASSENDYMD).Year,
+                                      Date.Parse(CS0050Session.PASSENDYMD).Month,
+                                      Date.Parse(CS0050Session.PASSENDYMD).Day,
+                                      23, 59, 59)
         Dim passalertCnt = Integer.Parse(CS0050Session.PASSALERTCNT)
-        Dim span As TimeSpan = passendYmd - Date.Now
+        Dim span As TimeSpan = passendYmd - DateTime.Now
         If passalertCnt = 0 AndAlso span.Days >= 0 AndAlso span.Days < 7 Then
             Dim message As String = String.Format("{0}日以内", span.Days)
             If span.Days < 1 Then

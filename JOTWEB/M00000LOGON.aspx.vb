@@ -20,8 +20,11 @@ Public Class M00000LOGON
     'ＩＤ、パスワード入力間違いの時のメッセージ 
     Private Const CONST_MSG_10058 As String = "10058"
 
-    'パスワード有効期限切れの時のメッセージ 
-    Private Const CONST_MSG_10059 As String = "10058"
+    'パスワード有効期限切れ(JOTユーザー)の時のメッセージ 
+    Private Const CONST_MSG_10059 As String = "10059"
+
+    'パスワード有効期限切れ(その他ユーザー)の時のメッセージ 
+    Private Const CONST_MSG_10066 As String = "10066"
 
     Private Const C_MAX_MISS_PASSWORD_COUNT As Integer = 6      'パスワード入力失敗の最大回数
     ''' <summary>
@@ -421,7 +424,7 @@ Public Class M00000LOGON
 
             ElseIf (WW_MISSCNT >= C_MAX_MISS_PASSWORD_COUNT) Then
 
-                Master.Output(CONST_MSG_10059, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                Master.Output(CONST_MSG_10056, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
                 UserID.Focus()
                 WW_chk = "err"
             Else
@@ -432,7 +435,13 @@ Public Class M00000LOGON
                                 Date.Parse(WW_PASSENDYMD).Day,
                                 23, 59, 59)
                 If DateTime.Compare(today, passend) > 0 Then
-                    Master.Output("10059", C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+
+                    Dim messageId As String = CONST_MSG_10059
+                    If Not WW_MENUROLE.Contains("jot") Then
+                        messageId = CONST_MSG_10066
+                    End If
+
+                    Master.Output(messageId, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
                     PassWord.Focus()
                     Exit Sub
                 End If

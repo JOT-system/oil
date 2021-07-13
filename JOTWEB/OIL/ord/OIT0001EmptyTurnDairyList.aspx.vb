@@ -3829,7 +3829,8 @@ Public Class OIT0001EmptyTurnDairyList
                    AndAlso Convert.ToString(OIT0001OTrow("LODDATE")) = Convert.ToString(OIT0001row("LODDATE")) _
                    AndAlso Convert.ToString(OIT0001OTrow("DEPDATE")) = Convert.ToString(OIT0001row("DEPDATE")) Then
                     '★一致している場合、明細Noを設定
-                    If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) Then
+                    If Convert.ToString(OIT0001OTrow("ORDERINGOILNAME")) = Convert.ToString(OIT0001row("ORDERINGOILNAME")) _
+                        AndAlso Convert.ToString(OIT0001OTrow("JOINTCODE")) = Convert.ToString(OIT0001row("JOINTCODE")) Then
                         OIT0001OTrow("OTORDERNO") = OIT0001row("ORDERNO")
                         OIT0001OTrow("OTDETAILNO") = OIT0001row("DETAILNO")
                         OIT0001row("USEFLG") = "1"

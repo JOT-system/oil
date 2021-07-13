@@ -242,7 +242,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End If
 
                 '○帳票の明細(共通)設定
-                EditOTCompareDetailArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave)
+                EditOTCompareDetailArea(I_officeCode, rngDetailArea, PrintDatarow, i, strOtOilNameSave, z)
 
                 '○列車Noの保存
                 strTrainNoSave = Convert.ToString(PrintDatarow("TRAINNO"))
@@ -251,7 +251,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
                 '○次の行へカウント
                 i += 1
-                z += 1
+                'z += 1
             Next
 
             '◯ 合計
@@ -358,7 +358,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
                                         ByVal I_rngDetailArea As Excel.Range,
                                         ByVal PrintDatarow As DataRow,
                                         ByVal I_column As Integer,
-                                        ByRef O_OtOilName As String)
+                                        ByRef O_OtOilName As String,
+                                        ByRef O_TotalCnt As Integer)
 
         '◯ 車数
         I_rngDetailArea = Me.ExcelWorkSheet.Range("B" + I_column.ToString())
@@ -385,6 +386,10 @@ Public Class OIT0001CustomReport : Implements IDisposable
             I_rngDetailArea = Me.ExcelWorkSheet.Range("G" + I_column.ToString())
             I_rngDetailArea.Value = PrintDatarow("OTOILCTCNT")
             ExcelMemoryRelease(I_rngDetailArea)
+            Try
+                O_TotalCnt += Integer.Parse(PrintDatarow("OTOILCTCNT").ToString())
+            Catch ex As Exception
+            End Try
         End If
         O_OtOilName = PrintDatarow("OTOILNAME").ToString()
 

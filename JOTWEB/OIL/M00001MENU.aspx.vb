@@ -74,7 +74,7 @@ Public Class M00001MENU
         Dim passendYmd = Date.Parse(CS0050Session.PASSENDYMD)
         Dim passalertCnt = Integer.Parse(CS0050Session.PASSALERTCNT)
         Dim span As TimeSpan = passendYmd - Date.Now
-        If passalertCnt = 0 AndAlso span.Days >= 0 AndAlso span.Days <= 7 Then
+        If passalertCnt = 0 AndAlso span.Days >= 0 AndAlso span.Days < 7 Then
             Dim message As String = String.Format("{0}日以内", span.Days)
             If span.Days < 1 Then
                 message = "本日中"

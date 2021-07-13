@@ -150,6 +150,14 @@ Public Module SessionKey
         ''' メニューカスタム情報リスト
         ''' </summary>
         Public Const USERMENU_COSTOM_LIST As String = "UserMenuCostomList"
+        ''' <summary>
+        ''' パスワード有効期限
+        ''' </summary>
+        Public Const PASSENDYMD As String = "PassEndYMD"
+        ''' <summary>
+        ''' パスワード警告表示回数
+        ''' </summary>
+        Public Const PASSALERTCNT As String = "PassAlertCnt"
     End Class
 
 End Module 'End BaseDllConst

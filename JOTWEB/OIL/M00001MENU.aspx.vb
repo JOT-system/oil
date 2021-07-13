@@ -53,6 +53,8 @@ Public Class M00001MENU
                         ButtonSel_Click()
                     Case "WF_DownLoadReport"            '帳票ダウンロード
                         BtnDownLoadReport()
+                    Case "btnPassChangeOk"              'パスワード警告ダイアログOKボタン押下
+                        BtnPassChangeOK_Click()
                 End Select
             End If
             'ドロップダウンリスト選択変更
@@ -66,6 +68,32 @@ Public Class M00001MENU
             '★★★ 初期画面表示 ★★★
             Initialize()
             WF_ButtonClick.Value = ""
+        End If
+
+        'パスワード有効期限警告
+        Dim passendYmd = New DateTime(Date.Parse(CS0050Session.PASSENDYMD).Year,
+                                      Date.Parse(CS0050Session.PASSENDYMD).Month,
+                                      Date.Parse(CS0050Session.PASSENDYMD).Day,
+                                      23, 59, 59)
+        Dim passalertCnt = Integer.Parse(CS0050Session.PASSALERTCNT)
+        Dim span As TimeSpan = passendYmd - DateTime.Now
+        If passalertCnt = 0 AndAlso span.Days >= 0 AndAlso span.Days < 7 Then
+            Dim message As String = String.Format("{0}日以内", span.Days)
+            If span.Days < 1 Then
+                message = "本日中"
+            End If
+
+            'パスワード警告ダイアログ表示
+            If Not Master.ROLE_MENU.Contains("jot") Then
+                '他社ユーザーは変更依頼の警告を表示
+                Master.Output("10065", C_MESSAGE_TYPE.WAR, I_PARA01:=String.Format("{0}", span.Days), needsPopUp:=True)
+            Else
+                'JOTユーザーはパスワード変更画面遷移可能な警告を表示
+                Master.Output("10060", C_MESSAGE_TYPE.QUES, I_PARA01:=message, I_PARA02:="W",
+                            needsPopUp:=True, messageBoxTitle:="確認", IsConfirm:=True, YesButtonId:="btnPassChangeOk")
+            End If
+
+            CS0050Session.PASSALERTCNT = "1"
         End If
 
     End Sub
@@ -114,6 +142,9 @@ Public Class M00001MENU
             Catch ex As Exception
             End Try
         End Using
+
+
+
     End Sub
     ''' <summary>
     ''' 左ナビゲーションボタン押下時処理
@@ -191,6 +222,13 @@ Public Class M00001MENU
 
         'ボタン押下時、画面遷移
         Server.Transfer(menuItm.Url)
+    End Sub
+    ''' <summary>
+    ''' パスワード警告ダイアログOKボタン押下時処理
+    ''' </summary>
+    Private Sub BtnPassChangeOK_Click()
+        Master.MAPID = OIS0002WRKINC.MAPID
+        Master.TransitionPage()
     End Sub
     ''' <summary>
     ''' ガイダンスリンク押下時

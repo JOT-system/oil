@@ -148,6 +148,7 @@
     <Content Include="OIL\css\OIM0020L.css" />
     <Content Include="OIL\css\OIM0020S.css" />
     <Content Include="OIL\css\OIM0001S.css" />
+    <Content Include="OIL\css\OIS0002PC.css" />
     <Content Include="OIL\css\OIT0003OTL.css" />
     <Content Include="OIL\css\OIT0003OTS.css" />
     <Content Include="OIL\css\OIT0005S.css" />
@@ -256,6 +257,7 @@
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0021WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0024WRKINC.ascx" />
+    <Content Include="OIL\inc\OIS0002WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0007WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0008WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0009WRKINC.ascx" />
@@ -337,6 +339,7 @@
     <Content Include="OIL\mas\OIS0001UserCreate.aspx" />
     <Content Include="OIL\mas\OIS0001UserList.aspx" />
     <Content Include="OIL\mas\OIS0001UserSearch.aspx" />
+    <Content Include="OIL\mas\OIS0002PasswordChange.aspx" />
     <Content Include="OIL\menupane\MP0001CycleBillingStatus.ascx" />
     <Content Include="OIL\menupane\MP0002MonthlyTransfer.ascx" />
     <Content Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx" />
@@ -414,6 +417,7 @@
     <Content Include="OIL\script\OIM0024C.js" />
     <Content Include="OIL\script\OIM0024L.js" />
     <Content Include="OIL\script\OIM0024S.js" />
+    <Content Include="OIL\script\OIS0002PC.js" />
     <Content Include="OIL\script\OIT0003B.js" />
     <Content Include="OIL\script\OIT0003OTL.js" />
     <Content Include="OIL\script\OIT0003OTS.js" />
@@ -697,6 +701,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIM0024WRKINC.ascx.vb">
       <DependentUpon>OIM0024WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIS0002WRKINC.ascx.designer.vb">
+      <DependentUpon>OIS0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIS0002WRKINC.ascx.vb">
+      <DependentUpon>OIS0002WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIT0007WRKINC.ascx.designer.vb">
@@ -1215,6 +1226,13 @@
     </Compile>
     <Compile Include="OIL\mas\OIS0001UserSearch.aspx.vb">
       <DependentUpon>OIS0001UserSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIS0002PasswordChange.aspx.designer.vb">
+      <DependentUpon>OIS0002PasswordChange.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIS0002PasswordChange.aspx.vb">
+      <DependentUpon>OIS0002PasswordChange.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\menupane\MP0000Base.vb">

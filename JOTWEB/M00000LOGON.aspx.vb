@@ -20,6 +20,12 @@ Public Class M00000LOGON
     'ＩＤ、パスワード入力間違いの時のメッセージ 
     Private Const CONST_MSG_10058 As String = "10058"
 
+    'パスワード有効期限切れ(JOTユーザー)の時のメッセージ 
+    Private Const CONST_MSG_10059 As String = "10059"
+
+    'パスワード有効期限切れ(その他ユーザー)の時のメッセージ 
+    Private Const CONST_MSG_10066 As String = "10066"
+
     Private Const C_MAX_MISS_PASSWORD_COUNT As Integer = 6      'パスワード入力失敗の最大回数
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -326,7 +332,7 @@ Public Class M00000LOGON
                 sqlStat.AppendLine(" Where A.USERID      = @P1 ")
                 sqlStat.AppendLine("   and A.STYMD      <= @P2")
                 sqlStat.AppendLine("   and A.ENDYMD     >= @P3")
-                sqlStat.AppendLine("   and B.PASSENDYMD >= @P3")
+                'sqlStat.AppendLine("   and B.PASSENDYMD >= @P3")
                 sqlStat.AppendLine("   and A.DELFLG     <> @P4")
 
                 Using SQLcmd As New SqlCommand(sqlStat.ToString, SQLcon)
@@ -421,6 +427,24 @@ Public Class M00000LOGON
                 Master.Output(CONST_MSG_10056, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
                 UserID.Focus()
                 WW_chk = "err"
+            Else
+                Dim today = DateTime.Now
+                Dim passend = New DateTime(
+                                Date.Parse(WW_PASSENDYMD).Year,
+                                Date.Parse(WW_PASSENDYMD).Month,
+                                Date.Parse(WW_PASSENDYMD).Day,
+                                23, 59, 59)
+                If DateTime.Compare(today, passend) > 0 Then
+
+                    Dim messageId As String = CONST_MSG_10059
+                    If Not WW_MENUROLE.Contains("jot") Then
+                        messageId = CONST_MSG_10066
+                    End If
+
+                    Master.Output(messageId, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                    PassWord.Focus()
+                    Exit Sub
+                End If
 
             End If
 
@@ -586,6 +610,8 @@ Public Class M00000LOGON
         Master.MAPvariant = WW_VARIANT
         Master.MAPpermitcode = ""
         CS0050Session.LOGONDATE = WW_LOGONYMD
+        CS0050Session.PASSENDYMD = WW_PASSENDYMD
+        CS0050Session.PASSALERTCNT = "0"
 
         '画面遷移実行
         If CS0050Session.USERID <> "INIT" Then
